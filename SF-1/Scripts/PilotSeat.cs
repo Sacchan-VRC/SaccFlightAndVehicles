@@ -8,7 +8,6 @@ public class PilotSeat : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
-    public GameObject LeaveButton;
     public GameObject Saccflight;
     public GameObject Gun_pilot;
     public Transform PlaneMesh;
@@ -31,7 +30,6 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.EffectsControl.RGriplastframetrigger = true; //prevent instant flares drop on enter
         }
         if (EngineControl.HUDControl != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject); }
-        if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
         if (EnableOther != null) { EnableOther.SetActive(true); }
@@ -52,7 +50,6 @@ public class PilotSeat : UdonSharpBehaviour
     {
         if (EngineControl != null) { EngineControl.Piloting = false; EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel); }
         if (Saccflight != null) { Saccflight.SetActive(true); }
-        if (LeaveButton != null) { LeaveButton.SetActive(false); }
         if (EngineControl.EffectsControl != null)
         {
             EngineControl.EffectsControl.isfiring = false;

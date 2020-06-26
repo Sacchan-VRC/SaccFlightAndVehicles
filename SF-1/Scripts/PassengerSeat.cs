@@ -7,7 +7,6 @@ using VRC.Udon;
 public class PassengerSeat : UdonSharpBehaviour
 {
     public EngineController EngineControl;
-    public GameObject PassengerLeaveButton;
     public GameObject SeatAdjuster;
     public GameObject Saccflight;
     public GameObject EnableOther;
@@ -16,7 +15,6 @@ public class PassengerSeat : UdonSharpBehaviour
         if (Saccflight != null) { Saccflight.SetActive(false); }
         EngineControl.Passenger = true;
         Networking.SetOwner(EngineControl.localPlayer, gameObject);
-        if (PassengerLeaveButton != null) { PassengerLeaveButton.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
         if (EnableOther != null) { EnableOther.SetActive(true); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(true); }
@@ -30,7 +28,6 @@ public class PassengerSeat : UdonSharpBehaviour
             EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
         }
         if (Saccflight != null) { Saccflight.SetActive(true); }
-        if (PassengerLeaveButton != null) { PassengerLeaveButton.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
         if (EnableOther != null) { EnableOther.SetActive(false); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }

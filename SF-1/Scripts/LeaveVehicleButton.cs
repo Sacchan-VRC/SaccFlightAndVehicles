@@ -19,10 +19,6 @@ public class LeaveVehicleButton : UdonSharpBehaviour
             ExitStation();
         }
     }
-    public void Start()
-    {
-        gameObject.SetActive(false);
-    }
 
     public void Update()
     {
