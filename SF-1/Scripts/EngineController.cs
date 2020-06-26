@@ -21,7 +21,7 @@ public class EngineController : UdonSharpBehaviour
     public float AirFriction = 0.036f;
     public float PitchStrength = 1.5f;
     public float YawStrength = 5f;
-    public float RollStrength = 100f;
+    public float RollStrength = 50f;
     public float AccelerationResponse = 4.5f;
     public float RotationResponse = 90f;
     public float VelStraightenStrPitch = 0.2f;
@@ -263,7 +263,7 @@ public class EngineController : UdonSharpBehaviour
 
             //roll friction
             Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
-            FinalInputRot.z += -localAngularVelocity.z * AirplaneAirRollFriction;
+            FinalInputRot.z += -localAngularVelocity.z * AirplaneRollFriction;
 
             //final force input
             /*if (FinalInputRot.magnitude < .001 && FinalInputAcc.magnitude < .001) // let the rigidbody sleep //Except it doesn't work because wheel colliders are stupid
