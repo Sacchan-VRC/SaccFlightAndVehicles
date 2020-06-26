@@ -234,7 +234,7 @@ public class EngineController : UdonSharpBehaviour
             sidespeed = Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.right);
 
             //Extra thrust up if moving local down, and Lerp the inputs for 'engine response'
-            Vector3 InputAcc = (new Vector3(0f, downspeed, accelforward * Atmosphere));
+            Vector3 InputAcc = (new Vector3(0f, 0f, accelforward * Atmosphere));
             Vector3 FinalInputAcc = Vector3.Lerp(LastFrameLerpedInputAcc, InputAcc, AccelerationResponse * Time.deltaTime);
             //Lerp the inputs for 'rotation response'
             Vector3 InputRot;
