@@ -32,7 +32,7 @@ public class EngineController : UdonSharpBehaviour
     public float AirplaneVelLiftCoefficient = 1.4f;
     public float AirplanePullDownLiftRatio = .8f;
     public float AirplaneSidewaysLift = .17f;
-    public float AirplaneVelPullUp = 0.065f;
+    public float AirplaneVelPullUp = 2.5f;
     public float AirplaneRollFriction = 80f;
     public bool HasFlaps = true;
     public bool HasLandingGear = true;
@@ -257,8 +257,8 @@ public class EngineController : UdonSharpBehaviour
             //do lift and rotate toward velocity for airplanes
 
             FinalInputAcc.x = ((sidespeed * AirplaneSidewaysLift) * -1) * SpeedLiftFactor;
-            FinalInputAcc.y = downspeed * FlapsLift * AirplanePullDownLiftRatio * AirplaneLift * SpeedLiftFactor;
-            FinalInputRot.x += downspeed * VelStraightenStrPitch + (speed20 * (AirplaneVelPullUp * -1));
+            FinalInputAcc.y = downspeed * FlapsLift * AirplanePullDownLiftRatio * AirplaneLift * SpeedLiftFactor + (SpeedLiftFactor * AirplaneVelPullUp);
+            FinalInputRot.x += downspeed * VelStraightenStrPitch;// + (speed20 * (AirplaneVelPullUp * -1));
             FinalInputRot.y += sidespeed * VelStraightenStrYaw;
 
             //roll friction
