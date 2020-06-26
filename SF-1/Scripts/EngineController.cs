@@ -263,10 +263,7 @@ public class EngineController : UdonSharpBehaviour
 
             //roll friction
             Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
-            float temproll = Mathf.Abs(rollinput);
-            temproll = (temproll * -1) + 1;
-            float RollLiftTemp = SpeedLiftFactor * temproll;
-            FinalInputRot.z += -localAngularVelocity.z * RollLiftTemp * AirplaneAirRollFriction;
+            FinalInputRot.z += -localAngularVelocity.z * AirplaneAirRollFriction;
 
             //final force input
             /*if (FinalInputRot.magnitude < .001 && FinalInputAcc.magnitude < .001) // let the rigidbody sleep //Except it doesn't work because wheel colliders are stupid
