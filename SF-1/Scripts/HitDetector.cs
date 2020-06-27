@@ -10,6 +10,7 @@ public class HitDetector : UdonSharpBehaviour
     public SoundController SoundControl;
     void OnParticleCollision(GameObject other)
     {
+        if (other == null) return;//avatars can't shoot you
         if (EngineControl.localPlayer == null)
         {
             PlaneHit();
