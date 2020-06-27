@@ -15,11 +15,12 @@ MonoBehaviour:
   serializedUdonProgramAsset: {fileID: 11400000, guid: c3dec6cd915af4b499ff12f0a2bc0a57,
     type: 2}
   udonAssembly: ".data_start\r\n\r\n    .export VehicleMainObj\r\n    .export EngineControl\r\n
-    \   .export Saccflight\r\n    .export Gun_pilot\r\n    .export PlaneMesh\r\n    .export
-    SeatAdjuster\r\n    .export EnableOther\r\n\r\n    __refl_const_intnl_udonTypeID:
-    %SystemInt64, null\r\n    __refl_const_intnl_udonTypeName: %SystemString, null\r\n
-    \   EnableOther: %UnityEngineGameObject, null\r\n    Gun_pilot: %UnityEngineGameObject,
-    null\r\n    Saccflight: %UnityEngineGameObject, null\r\n    SeatAdjuster: %UnityEngineGameObject,
+    \   .export LeaveButton\r\n    .export Saccflight\r\n    .export Gun_pilot\r\n
+    \   .export PlaneMesh\r\n    .export SeatAdjuster\r\n    .export EnableOther\r\n\r\n
+    \   __refl_const_intnl_udonTypeID: %SystemInt64, null\r\n    __refl_const_intnl_udonTypeName:
+    %SystemString, null\r\n    EnableOther: %UnityEngineGameObject, null\r\n    Gun_pilot:
+    %UnityEngineGameObject, null\r\n    LeaveButton: %UnityEngineGameObject, null\r\n
+    \   Saccflight: %UnityEngineGameObject, null\r\n    SeatAdjuster: %UnityEngineGameObject,
     null\r\n    VehicleMainObj: %UnityEngineGameObject, null\r\n    PlaneMesh: %UnityEngineTransform,
     null\r\n    EngineControl: %VRCUdonUdonBehaviour, null\r\n    __0_this_intnl_PilotSeat:
     %VRCUdonUdonBehaviour, this\r\n    __0_child_Transform: %UnityEngineTransform,
@@ -68,26 +69,28 @@ MonoBehaviour:
     %SystemBoolean, null\r\n    __30_intnl_SystemBoolean: %SystemBoolean, null\r\n
     \   __31_intnl_SystemBoolean: %SystemBoolean, null\r\n    __32_intnl_SystemBoolean:
     %SystemBoolean, null\r\n    __33_intnl_SystemBoolean: %SystemBoolean, null\r\n
-    \   __4_intnl_SystemBoolean: %SystemBoolean, null\r\n    __5_intnl_SystemBoolean:
-    %SystemBoolean, null\r\n    __6_intnl_SystemBoolean: %SystemBoolean, null\r\n
-    \   __7_intnl_SystemBoolean: %SystemBoolean, null\r\n    __8_intnl_SystemBoolean:
-    %SystemBoolean, null\r\n    __9_intnl_SystemBoolean: %SystemBoolean, null\r\n
-    \   __0_intnl_UnityEngineGameObject: %UnityEngineGameObject, null\r\n    __1_intnl_UnityEngineGameObject:
-    %UnityEngineGameObject, null\r\n    __2_intnl_UnityEngineGameObject: %UnityEngineGameObject,
-    null\r\n    __0_intnl_SystemInt32: %SystemInt32, null\r\n    __1_intnl_SystemInt32:
-    %SystemInt32, null\r\n    __2_intnl_SystemInt32: %SystemInt32, null\r\n    __3_intnl_SystemInt32:
-    %SystemInt32, null\r\n    __0_intnl_SystemObject: %SystemObject, null\r\n    __1_intnl_SystemObject:
-    %SystemObject, null\r\n    __10_intnl_SystemObject: %SystemObject, null\r\n    __11_intnl_SystemObject:
-    %SystemObject, null\r\n    __12_intnl_SystemObject: %SystemObject, null\r\n    __13_intnl_SystemObject:
-    %SystemObject, null\r\n    __14_intnl_SystemObject: %SystemObject, null\r\n    __15_intnl_SystemObject:
-    %SystemObject, null\r\n    __16_intnl_SystemObject: %SystemObject, null\r\n    __17_intnl_SystemObject:
-    %SystemObject, null\r\n    __18_intnl_SystemObject: %SystemObject, null\r\n    __2_intnl_SystemObject:
-    %SystemObject, null\r\n    __3_intnl_SystemObject: %SystemObject, null\r\n    __4_intnl_SystemObject:
-    %SystemObject, null\r\n    __5_intnl_SystemObject: %SystemObject, null\r\n    __6_intnl_SystemObject:
-    %SystemObject, null\r\n    __7_intnl_SystemObject: %SystemObject, null\r\n    __8_intnl_SystemObject:
-    %SystemObject, null\r\n    __9_intnl_SystemObject: %SystemObject, null\r\n    __0_intnl_EffectsController:
-    %VRCUdonUdonBehaviour, null\r\n    __0_intnl_HUDController: %VRCUdonUdonBehaviour,
-    null\r\n    __0_intnl_SoundController: %VRCUdonUdonBehaviour, null\r\n    __0_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
+    \   __34_intnl_SystemBoolean: %SystemBoolean, null\r\n    __35_intnl_SystemBoolean:
+    %SystemBoolean, null\r\n    __4_intnl_SystemBoolean: %SystemBoolean, null\r\n
+    \   __5_intnl_SystemBoolean: %SystemBoolean, null\r\n    __6_intnl_SystemBoolean:
+    %SystemBoolean, null\r\n    __7_intnl_SystemBoolean: %SystemBoolean, null\r\n
+    \   __8_intnl_SystemBoolean: %SystemBoolean, null\r\n    __9_intnl_SystemBoolean:
+    %SystemBoolean, null\r\n    __0_intnl_UnityEngineGameObject: %UnityEngineGameObject,
+    null\r\n    __1_intnl_UnityEngineGameObject: %UnityEngineGameObject, null\r\n
+    \   __2_intnl_UnityEngineGameObject: %UnityEngineGameObject, null\r\n    __0_intnl_SystemInt32:
+    %SystemInt32, null\r\n    __1_intnl_SystemInt32: %SystemInt32, null\r\n    __2_intnl_SystemInt32:
+    %SystemInt32, null\r\n    __3_intnl_SystemInt32: %SystemInt32, null\r\n    __0_intnl_SystemObject:
+    %SystemObject, null\r\n    __1_intnl_SystemObject: %SystemObject, null\r\n    __10_intnl_SystemObject:
+    %SystemObject, null\r\n    __11_intnl_SystemObject: %SystemObject, null\r\n    __12_intnl_SystemObject:
+    %SystemObject, null\r\n    __13_intnl_SystemObject: %SystemObject, null\r\n    __14_intnl_SystemObject:
+    %SystemObject, null\r\n    __15_intnl_SystemObject: %SystemObject, null\r\n    __16_intnl_SystemObject:
+    %SystemObject, null\r\n    __17_intnl_SystemObject: %SystemObject, null\r\n    __18_intnl_SystemObject:
+    %SystemObject, null\r\n    __2_intnl_SystemObject: %SystemObject, null\r\n    __3_intnl_SystemObject:
+    %SystemObject, null\r\n    __4_intnl_SystemObject: %SystemObject, null\r\n    __5_intnl_SystemObject:
+    %SystemObject, null\r\n    __6_intnl_SystemObject: %SystemObject, null\r\n    __7_intnl_SystemObject:
+    %SystemObject, null\r\n    __8_intnl_SystemObject: %SystemObject, null\r\n    __9_intnl_SystemObject:
+    %SystemObject, null\r\n    __0_intnl_EffectsController: %VRCUdonUdonBehaviour,
+    null\r\n    __0_intnl_HUDController: %VRCUdonUdonBehaviour, null\r\n    __0_intnl_SoundController:
+    %VRCUdonUdonBehaviour, null\r\n    __0_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
     %VRCUdonUdonBehaviour, null\r\n    __1_intnl_EffectsController: %VRCUdonUdonBehaviour,
     null\r\n    __1_intnl_HUDController: %VRCUdonUdonBehaviour, null\r\n    __1_intnl_SoundController:
     %VRCUdonUdonBehaviour, null\r\n    __1_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
@@ -138,9 +141,14 @@ MonoBehaviour:
     \       PUSH, __0_intnl_SystemObject\r\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\r\n
     \       COPY\r\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\r\n        PUSH,
     VehicleMainObj\r\n        EXTERN, \"VRCSDKBaseNetworking.__SetOwner__VRCSDKBaseVRCPlayerApi_UnityEngineGameObject__SystemVoid\"\r\n
-    \       PUSH, EngineControl\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
+    \       PUSH, LeaveButton\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n
     \       PUSH, __2_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __2_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000180\r\n
+    \       PUSH, __2_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000114\r\n
+    \       PUSH, LeaveButton\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n        EXTERN,
+    \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n        PUSH,
+    EngineControl\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
+    \       PUSH, __3_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __3_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000001C8\r\n
     \       PUSH, EngineControl\r\n        PUSH, __0_const_intnl_SystemString\r\n
     \       PUSH, __0_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __0_intnl_SystemObject\r\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\r\n
@@ -154,8 +162,8 @@ MonoBehaviour:
     \       PUSH, __0_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __0_intnl_SystemObject\r\n        PUSH, __0_intnl_EffectsController\r\n
     \       COPY\r\n        PUSH, __0_intnl_EffectsController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __3_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __3_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000378\r\n
+    \       PUSH, __4_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __4_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000003C0\r\n
     \       PUSH, EngineControl\r\n        PUSH, __2_const_intnl_SystemString\r\n
     \       PUSH, __1_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __1_intnl_SystemObject\r\n        PUSH, __1_intnl_EffectsController\r\n
@@ -185,8 +193,8 @@ MonoBehaviour:
     \       PUSH, __1_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __1_intnl_SystemObject\r\n        PUSH, __0_intnl_HUDController\r\n
     \       COPY\r\n        PUSH, __0_intnl_HUDController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __4_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __4_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000474\r\n
+    \       PUSH, __5_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __5_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000004BC\r\n
     \       PUSH, EngineControl\r\n        PUSH, __0_const_intnl_SystemString\r\n
     \       PUSH, __2_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __2_intnl_SystemObject\r\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\r\n
@@ -198,26 +206,26 @@ MonoBehaviour:
     \       PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\r\n        PUSH, __0_intnl_UnityEngineGameObject\r\n
     \       EXTERN, \"VRCSDKBaseNetworking.__SetOwner__VRCSDKBaseVRCPlayerApi_UnityEngineGameObject__SystemVoid\"\r\n
     \       PUSH, Gun_pilot\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n
-    \       PUSH, __5_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __5_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000004BC\r\n
+    \       PUSH, __6_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __6_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000504\r\n
     \       PUSH, Gun_pilot\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n        EXTERN,
     \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n        PUSH,
     SeatAdjuster\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n        PUSH,
-    __6_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __6_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000504\r\n
+    __7_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __7_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000054C\r\n
     \       PUSH, SeatAdjuster\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n
     \       PUSH, EnableOther\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n
-    \       PUSH, __7_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __7_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000054C\r\n
+    \       PUSH, __8_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __8_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000594\r\n
     \       PUSH, EnableOther\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n        EXTERN,
     \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n        PUSH,
     EngineControl\r\n        PUSH, __6_const_intnl_SystemString\r\n        PUSH, __2_intnl_SystemObject\r\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __2_intnl_SystemObject\r\n        PUSH, __1_intnl_HUDController\r\n
     \       COPY\r\n        PUSH, __1_intnl_HUDController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __8_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __8_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000614\r\n
+    \       PUSH, __9_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __9_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000065C\r\n
     \       PUSH, EngineControl\r\n        PUSH, __6_const_intnl_SystemString\r\n
     \       PUSH, __3_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __3_intnl_SystemObject\r\n        PUSH, __2_intnl_HUDController\r\n
@@ -229,9 +237,9 @@ MonoBehaviour:
     \       PUSH, __3_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __3_intnl_SystemObject\r\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\r\n
     \       COPY\r\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\r\n        PUSH,
-    __0_const_intnl_VRCSDKBaseVRCPlayerApi\r\n        PUSH, __9_intnl_SystemBoolean\r\n
+    __0_const_intnl_VRCSDKBaseVRCPlayerApi\r\n        PUSH, __10_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemObject.__op_Inequality__SystemObject_SystemObject__SystemBoolean\"\r\n
-    \       PUSH, __9_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000006BC\r\n
+    \       PUSH, __10_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000704\r\n
     \       PUSH, EngineControl\r\n        PUSH, __0_const_intnl_SystemString\r\n
     \       PUSH, __4_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __4_intnl_SystemObject\r\n        PUSH, __3_intnl_VRCSDKBaseVRCPlayerApi\r\n
@@ -241,33 +249,33 @@ MonoBehaviour:
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __4_intnl_SystemObject\r\n        PUSH, __1_intnl_EffectsController\r\n
     \       COPY\r\n        PUSH, __1_intnl_EffectsController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __11_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __11_intnl_SystemBoolean\r\n        PUSH, __10_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __10_intnl_SystemBoolean\r\n        PUSH, __12_intnl_SystemBoolean\r\n
+    \       PUSH, __12_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __12_intnl_SystemBoolean\r\n        PUSH, __11_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __11_intnl_SystemBoolean\r\n        PUSH, __13_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __12_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000007D4\r\n
+    \       PUSH, __13_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000081C\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __5_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __5_intnl_SystemObject\r\n        PUSH, __0_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __0_intnl_SoundController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __13_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __10_intnl_SystemBoolean\r\n        PUSH, __13_intnl_SystemBoolean\r\n
-    \       PUSH, __14_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __14_intnl_SystemBoolean\r\n        PUSH, __10_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __10_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00000804\r\n        PUSH, __0_this_intnl_PilotSeat\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesNetworkEventTarget\r\n
+    \       PUSH, __14_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __11_intnl_SystemBoolean\r\n        PUSH, __14_intnl_SystemBoolean\r\n
+    \       PUSH, __15_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __15_intnl_SystemBoolean\r\n        PUSH, __11_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __11_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x0000084C\r\n        PUSH, __0_this_intnl_PilotSeat\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesNetworkEventTarget\r\n
     \       PUSH, __8_const_intnl_SystemString\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SendCustomNetworkEvent__VRCUdonCommonInterfacesNetworkEventTarget_SystemString__SystemVoid\"\r\n
     \       PUSH, PlaneMesh\r\n        PUSH, __0_const_intnl_UnityEngineTransform\r\n
-    \       PUSH, __15_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __15_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000928\r\n
+    \       PUSH, __16_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __16_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000970\r\n
     \       PUSH, PlaneMesh\r\n        PUSH, __0_const_intnl_SystemType\r\n        PUSH,
     __0_children_TransformArray\r\n        EXTERN, \"UnityEngineTransform.__GetComponentsInChildren__TArray\"\r\n
     \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __0_intnl_SystemInt32\r\n
     \       COPY\r\n        PUSH, __0_children_TransformArray\r\n        PUSH, __1_intnl_SystemInt32\r\n
     \       EXTERN, \"UnityEngineTransformArray.__get_Length__SystemInt32\"\r\n        PUSH,
     __0_intnl_SystemInt32\r\n        PUSH, __1_intnl_SystemInt32\r\n        PUSH,
-    __16_intnl_SystemBoolean\r\n        EXTERN, \"SystemInt32.__op_LessThan__SystemInt32_SystemInt32__SystemBoolean\"\r\n
-    \       PUSH, __16_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000928\r\n
+    __17_intnl_SystemBoolean\r\n        EXTERN, \"SystemInt32.__op_LessThan__SystemInt32_SystemInt32__SystemBoolean\"\r\n
+    \       PUSH, __17_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000970\r\n
     \       PUSH, __0_children_TransformArray\r\n        PUSH, __0_intnl_SystemInt32\r\n
     \       PUSH, __0_child_Transform\r\n        EXTERN, \"UnityEngineTransformArray.__Get__SystemInt32__UnityEngineTransform\"\r\n
     \       PUSH, __0_child_Transform\r\n        PUSH, __0_intnl_UnityEngineGameObject\r\n
@@ -276,13 +284,13 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineGameObject.__set_layer__SystemInt32__SystemVoid\"\r\n
     \       PUSH, __0_intnl_SystemInt32\r\n        PUSH, __2_const_intnl_SystemInt32\r\n
     \       PUSH, __0_intnl_SystemInt32\r\n        EXTERN, \"SystemInt32.__op_Addition__SystemInt32_SystemInt32__SystemInt32\"\r\n
-    \       JUMP, 0x00000880\r\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
+    \       JUMP, 0x000008C8\r\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
     epilogue\r\n        COPY\r\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\r\n
     \       \r\n    .export PilotLeave\r\n        \r\n    PilotLeave:\r\n        \r\n
     \       PUSH, __0_const_intnl_SystemUInt32\r\n        PUSH, EngineControl\r\n
     \       PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n        PUSH,
-    __17_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __17_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000A14\r\n
+    __18_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __18_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000A5C\r\n
     \       PUSH, EngineControl\r\n        PUSH, __1_const_intnl_SystemString\r\n
     \       PUSH, __0_const_intnl_SystemBoolean\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\r\n
     \       PUSH, EngineControl\r\n        PUSH, __0_const_intnl_SystemString\r\n
@@ -294,16 +302,21 @@ MonoBehaviour:
     \       COPY\r\n        PUSH, __5_intnl_VRCSDKBaseVRCPlayerApi\r\n        PUSH,
     __1_intnl_UnityEngineVector3\r\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__SetVelocity__UnityEngineVector3__SystemVoid\"\r\n
     \       PUSH, Saccflight\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n
-    \       PUSH, __18_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __18_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000A5C\r\n
+    \       PUSH, __19_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __19_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000AA4\r\n
     \       PUSH, Saccflight\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n        EXTERN,
+    \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n        PUSH,
+    LeaveButton\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n        PUSH,
+    __20_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __20_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000AEC\r\n
+    \       PUSH, LeaveButton\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        EXTERN,
     \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n        PUSH,
     EngineControl\r\n        PUSH, __2_const_intnl_SystemString\r\n        PUSH, __6_intnl_SystemObject\r\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __6_intnl_SystemObject\r\n        PUSH, __5_intnl_EffectsController\r\n
     \       COPY\r\n        PUSH, __5_intnl_EffectsController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __19_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __19_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000B68\r\n
+    \       PUSH, __21_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __21_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000BF8\r\n
     \       PUSH, EngineControl\r\n        PUSH, __2_const_intnl_SystemString\r\n
     \       PUSH, __7_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __7_intnl_SystemObject\r\n        PUSH, __6_intnl_EffectsController\r\n
@@ -315,26 +328,26 @@ MonoBehaviour:
     \       COPY\r\n        PUSH, __7_intnl_EffectsController\r\n        PUSH, __4_const_intnl_SystemString\r\n
     \       PUSH, __0_const_intnl_SystemBoolean\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\r\n
     \       PUSH, Gun_pilot\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n
-    \       PUSH, __20_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __20_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000BB0\r\n
+    \       PUSH, __22_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __22_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000C40\r\n
     \       PUSH, Gun_pilot\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        EXTERN,
     \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n        PUSH,
     SeatAdjuster\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n        PUSH,
-    __21_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __21_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000BF8\r\n
+    __23_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __23_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000C88\r\n
     \       PUSH, SeatAdjuster\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n
     \       PUSH, EnableOther\r\n        PUSH, __0_const_intnl_UnityEngineGameObject\r\n
-    \       PUSH, __22_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __22_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000C40\r\n
+    \       PUSH, __24_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __24_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000CD0\r\n
     \       PUSH, EnableOther\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        EXTERN,
     \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n        PUSH,
     EngineControl\r\n        PUSH, __6_const_intnl_SystemString\r\n        PUSH, __7_intnl_SystemObject\r\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __7_intnl_SystemObject\r\n        PUSH, __3_intnl_HUDController\r\n
     \       COPY\r\n        PUSH, __3_intnl_HUDController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __23_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __23_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000D08\r\n
+    \       PUSH, __25_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __25_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000D98\r\n
     \       PUSH, EngineControl\r\n        PUSH, __6_const_intnl_SystemString\r\n
     \       PUSH, __8_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __8_intnl_SystemObject\r\n        PUSH, __4_intnl_HUDController\r\n
@@ -343,16 +356,16 @@ MonoBehaviour:
     \       PUSH, __1_intnl_UnityEngineGameObject\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\r\n
     \       PUSH, PlaneMesh\r\n        PUSH, __0_const_intnl_UnityEngineTransform\r\n
-    \       PUSH, __24_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __24_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000E2C\r\n
+    \       PUSH, __26_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __26_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000EBC\r\n
     \       PUSH, PlaneMesh\r\n        PUSH, __0_const_intnl_SystemType\r\n        PUSH,
     __1_children_TransformArray\r\n        EXTERN, \"UnityEngineTransform.__GetComponentsInChildren__TArray\"\r\n
     \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __2_intnl_SystemInt32\r\n
     \       COPY\r\n        PUSH, __1_children_TransformArray\r\n        PUSH, __3_intnl_SystemInt32\r\n
     \       EXTERN, \"UnityEngineTransformArray.__get_Length__SystemInt32\"\r\n        PUSH,
     __2_intnl_SystemInt32\r\n        PUSH, __3_intnl_SystemInt32\r\n        PUSH,
-    __25_intnl_SystemBoolean\r\n        EXTERN, \"SystemInt32.__op_LessThan__SystemInt32_SystemInt32__SystemBoolean\"\r\n
-    \       PUSH, __25_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000E2C\r\n
+    __27_intnl_SystemBoolean\r\n        EXTERN, \"SystemInt32.__op_LessThan__SystemInt32_SystemInt32__SystemBoolean\"\r\n
+    \       PUSH, __27_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000EBC\r\n
     \       PUSH, __1_children_TransformArray\r\n        PUSH, __2_intnl_SystemInt32\r\n
     \       PUSH, __1_child_Transform\r\n        EXTERN, \"UnityEngineTransformArray.__Get__SystemInt32__UnityEngineTransform\"\r\n
     \       PUSH, __1_child_Transform\r\n        PUSH, __1_intnl_UnityEngineGameObject\r\n
@@ -361,15 +374,15 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineGameObject.__set_layer__SystemInt32__SystemVoid\"\r\n
     \       PUSH, __2_intnl_SystemInt32\r\n        PUSH, __2_const_intnl_SystemInt32\r\n
     \       PUSH, __2_intnl_SystemInt32\r\n        EXTERN, \"SystemInt32.__op_Addition__SystemInt32_SystemInt32__SystemInt32\"\r\n
-    \       JUMP, 0x00000D84\r\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
+    \       JUMP, 0x00000E14\r\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
     epilogue\r\n        COPY\r\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\r\n
     \       \r\n    .export WakeUp\r\n        \r\n    WakeUp:\r\n        \r\n        PUSH,
     __0_const_intnl_SystemUInt32\r\n        PUSH, EngineControl\r\n        PUSH, __2_const_intnl_SystemString\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        PUSH, __8_intnl_EffectsController\r\n
     \       COPY\r\n        PUSH, __8_intnl_EffectsController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __26_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __26_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000F00\r\n
+    \       PUSH, __28_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __28_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000F90\r\n
     \       PUSH, EngineControl\r\n        PUSH, __2_const_intnl_SystemString\r\n
     \       PUSH, __10_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __10_intnl_SystemObject\r\n        PUSH, __9_intnl_EffectsController\r\n
@@ -379,8 +392,8 @@ MonoBehaviour:
     \       PUSH, __10_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __10_intnl_SystemObject\r\n        PUSH, __1_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __1_intnl_SoundController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __27_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __27_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000FB8\r\n
+    \       PUSH, __29_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __29_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001048\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __11_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __11_intnl_SystemObject\r\n        PUSH, __2_intnl_SoundController\r\n
@@ -390,8 +403,8 @@ MonoBehaviour:
     \       PUSH, __11_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __11_intnl_SystemObject\r\n        PUSH, __2_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __2_intnl_SoundController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __28_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __28_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001070\r\n
+    \       PUSH, __30_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __30_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001100\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __12_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __12_intnl_SystemObject\r\n        PUSH, __3_intnl_SoundController\r\n
@@ -401,8 +414,8 @@ MonoBehaviour:
     \       PUSH, __12_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __12_intnl_SystemObject\r\n        PUSH, __3_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __3_intnl_SoundController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __29_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __29_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000116C\r\n
+    \       PUSH, __31_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __31_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000011FC\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __13_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __13_intnl_SystemObject\r\n        PUSH, __4_intnl_SoundController\r\n
@@ -417,8 +430,8 @@ MonoBehaviour:
     \       PUSH, __13_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __13_intnl_SystemObject\r\n        PUSH, __4_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __4_intnl_SoundController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __30_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __30_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001268\r\n
+    \       PUSH, __32_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000012F8\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __14_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __14_intnl_SystemObject\r\n        PUSH, __5_intnl_SoundController\r\n
@@ -433,8 +446,8 @@ MonoBehaviour:
     \       PUSH, __14_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __14_intnl_SystemObject\r\n        PUSH, __5_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __5_intnl_SoundController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __31_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __31_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001364\r\n
+    \       PUSH, __33_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000013F4\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __15_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __15_intnl_SystemObject\r\n        PUSH, __6_intnl_SoundController\r\n
@@ -449,8 +462,8 @@ MonoBehaviour:
     \       PUSH, __15_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __15_intnl_SystemObject\r\n        PUSH, __6_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __6_intnl_SoundController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __32_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001460\r\n
+    \       PUSH, __34_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __34_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000014F0\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __16_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __16_intnl_SystemObject\r\n        PUSH, __7_intnl_SoundController\r\n
@@ -465,8 +478,8 @@ MonoBehaviour:
     \       PUSH, __16_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __16_intnl_SystemObject\r\n        PUSH, __7_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __7_intnl_SoundController\r\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\r\n
-    \       PUSH, __33_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000155C\r\n
+    \       PUSH, __35_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
+    \       PUSH, __35_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000015EC\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __17_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __17_intnl_SystemObject\r\n        PUSH, __8_intnl_SoundController\r\n
@@ -509,7 +522,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 7
+      Data: 8
     - Name: 
       Entry: 7
       Data: 
@@ -641,7 +654,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Saccflight
+      Data: LeaveButton
     - Name: $v
       Entry: 7
       Data: 10|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -662,10 +675,10 @@ MonoBehaviour:
       Data: UnityEngineGameObject
     - Name: symbolOriginalName
       Entry: 1
-      Data: Saccflight
+      Data: LeaveButton
     - Name: symbolUniqueName
       Entry: 1
-      Data: Saccflight
+      Data: LeaveButton
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -698,7 +711,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Gun_pilot
+      Data: Saccflight
     - Name: $v
       Entry: 7
       Data: 13|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -719,10 +732,10 @@ MonoBehaviour:
       Data: UnityEngineGameObject
     - Name: symbolOriginalName
       Entry: 1
-      Data: Gun_pilot
+      Data: Saccflight
     - Name: symbolUniqueName
       Entry: 1
-      Data: Gun_pilot
+      Data: Saccflight
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -755,7 +768,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneMesh
+      Data: Gun_pilot
     - Name: $v
       Entry: 7
       Data: 16|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -763,14 +776,8 @@ MonoBehaviour:
       Entry: 7
       Data: 17|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 18|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: UnityEngine.Transform, UnityEngine.CoreModule
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -779,13 +786,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineTransform
+      Data: UnityEngineGameObject
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneMesh
+      Data: Gun_pilot
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneMesh
+      Data: Gun_pilot
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -794,7 +801,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 19|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 18|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -818,16 +825,22 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: SeatAdjuster
+      Data: PlaneMesh
     - Name: $v
       Entry: 7
-      Data: 20|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 19|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 21|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 20|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 4
+      Entry: 7
+      Data: 21|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UnityEngine.Transform, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -836,13 +849,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineGameObject
+      Data: UnityEngineTransform
     - Name: symbolOriginalName
       Entry: 1
-      Data: SeatAdjuster
+      Data: PlaneMesh
     - Name: symbolUniqueName
       Entry: 1
-      Data: SeatAdjuster
+      Data: PlaneMesh
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -875,13 +888,70 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: EnableOther
+      Data: SeatAdjuster
     - Name: $v
       Entry: 7
       Data: 23|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
       Data: 24|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 4
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineGameObject
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: SeatAdjuster
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: SeatAdjuster
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 25|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: EnableOther
+    - Name: $v
+      Entry: 7
+      Data: 26|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 27|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 4
@@ -908,7 +978,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 28|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
