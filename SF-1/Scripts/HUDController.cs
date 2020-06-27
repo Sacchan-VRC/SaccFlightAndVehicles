@@ -33,13 +33,14 @@ public class HUDController : UdonSharpBehaviour
         //Velocity indicator
         if (EngineControl.CurrentVel.magnitude < 2)
         {
-            tempvel.y += EngineControl.CurrentVel.y - 2f;
+            tempvel.y = -2f;//straight down instead of spazzing out when moving slow
         }
         else
         {
             tempvel = EngineControl.CurrentVel;
         }
-        VelocityIndicator.position = (EngineControl.VehicleMainObj.transform.position + tempvel);
+        Debug.Log(EngineControl.CurrentVel);
+        VelocityIndicator.position = (transform.position + tempvel);
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * (distance_from_head);
         /////////////////
 
