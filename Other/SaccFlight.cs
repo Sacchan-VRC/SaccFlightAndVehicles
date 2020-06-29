@@ -34,7 +34,7 @@ public class SaccFlight : UdonSharpBehaviour
                 Vector3 PlayerVel = localPlayer.GetVelocity();
                 if (Input.GetKey(KeyCode.F))
                 {
-                    newspeed = localPlayer.GetBoneRotation(HumanBodyBones.Head);
+                    newspeed = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
                     tempdir = newspeed * (Vector3.forward);
                 }
                 else

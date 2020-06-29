@@ -10,7 +10,7 @@ public class HitDetectorAAGun : UdonSharpBehaviour
     public AudioSource BulletHit;
     void OnParticleCollision(GameObject other)
     {
-        if (other == null) return;//avatars can't shoot you
+        if (other == null || AAGunControl.dead) return;//avatars can't shoot you, and you can't take hits when you're dead
         if (AAGunControl.localPlayer == null)
         {
             AAGunHit();
@@ -30,6 +30,14 @@ public class HitDetectorAAGun : UdonSharpBehaviour
         {
             BulletHit.pitch = Random.Range(.8f, 1.2f);
             BulletHit.Play();
+        }
+    }
+    public void respawn()
+    {
+        AAGunControl.dead = false;
+        if (AAGunControl.localPlayer.IsOwner(AAGunControl.gameObject))
+        {
+            AAGunControl.Health = AAGunControl.FullHealth;
         }
     }
 }

@@ -23,14 +23,14 @@ MonoBehaviour:
     null\r\n    __0_Ff_Single: %SystemSingle, null\r\n    __0_FinalCheatThrust_Single:
     %SystemSingle, null\r\n    __0_Spacef_Single: %SystemSingle, null\r\n    __0_PlayerVel_Vector3:
     %UnityEngineVector3, null\r\n    __0_tempdir_Vector3: %UnityEngineVector3, null\r\n
-    \   __0_const_intnl_SystemDouble: %SystemDouble, null\r\n    __0_const_intnl_UnityEngineHumanBodyBones:
-    %UnityEngineHumanBodyBones, null\r\n    __0_const_intnl_SystemInt32: %SystemInt32,
-    null\r\n    __1_const_intnl_SystemInt32: %SystemInt32, null\r\n    __2_const_intnl_SystemInt32:
-    %SystemInt32, null\r\n    __3_const_intnl_SystemInt32: %SystemInt32, null\r\n
-    \   __4_const_intnl_SystemInt32: %SystemInt32, null\r\n    __0_const_intnl_UnityEngineKeyCode:
-    %UnityEngineKeyCode, null\r\n    __1_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
-    null\r\n    __0_const_intnl_SystemString: %SystemString, null\r\n    __1_const_intnl_SystemString:
-    %SystemString, null\r\n    __0_const_intnl_VRCSDKBaseVRCPlayerApiTrackingDataType:
+    \   __0_const_intnl_SystemDouble: %SystemDouble, null\r\n    __0_const_intnl_SystemInt32:
+    %SystemInt32, null\r\n    __1_const_intnl_SystemInt32: %SystemInt32, null\r\n
+    \   __2_const_intnl_SystemInt32: %SystemInt32, null\r\n    __3_const_intnl_SystemInt32:
+    %SystemInt32, null\r\n    __4_const_intnl_SystemInt32: %SystemInt32, null\r\n
+    \   __0_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n    __1_const_intnl_UnityEngineKeyCode:
+    %UnityEngineKeyCode, null\r\n    __0_const_intnl_SystemString: %SystemString,
+    null\r\n    __1_const_intnl_SystemString: %SystemString, null\r\n    __0_const_intnl_VRCSDKBaseVRCPlayerApiTrackingDataType:
+    %VRCSDKBaseVRCPlayerApiTrackingDataType, null\r\n    __1_const_intnl_VRCSDKBaseVRCPlayerApiTrackingDataType:
     %VRCSDKBaseVRCPlayerApiTrackingDataType, null\r\n    __0_const_intnl_SystemUInt32:
     %SystemUInt32, null\r\n    __0_intnl_SystemBoolean: %SystemBoolean, null\r\n    __1_intnl_SystemBoolean:
     %SystemBoolean, null\r\n    __10_intnl_SystemBoolean: %SystemBoolean, null\r\n
@@ -63,7 +63,7 @@ MonoBehaviour:
     \"VRCSDKBaseVRCPlayerApi.__IsPlayerGrounded__SystemBoolean\"\r\n        PUSH,
     __0_intnl_SystemBoolean\r\n        PUSH, __1_intnl_SystemBoolean\r\n        EXTERN,
     \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n        PUSH,
-    __1_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000774\r\n        PUSH,
+    __1_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000078C\r\n        PUSH,
     __0_const_intnl_SystemInt32\r\n        PUSH, __0_Spacef_Single\r\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __0_const_intnl_UnityEngineKeyCode\r\n
     \       PUSH, __2_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineInput.__GetKey__UnityEngineKeyCode__SystemBoolean\"\r\n
@@ -93,17 +93,20 @@ MonoBehaviour:
     \       PUSH, __8_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __8_intnl_SystemBoolean\r\n        PUSH, __4_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __4_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000005E4\r\n        PUSH, localPlayer\r\n        PUSH, __0_PlayerVel_Vector3\r\n
+    0x000005FC\r\n        PUSH, localPlayer\r\n        PUSH, __0_PlayerVel_Vector3\r\n
     \       EXTERN, \"VRCSDKBaseVRCPlayerApi.__GetVelocity__UnityEngineVector3\"\r\n
     \       PUSH, __1_const_intnl_UnityEngineKeyCode\r\n        PUSH, __9_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineInput.__GetKey__UnityEngineKeyCode__SystemBoolean\"\r\n
-    \       PUSH, __9_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000002BC\r\n
-    \       PUSH, localPlayer\r\n        PUSH, __0_const_intnl_UnityEngineHumanBodyBones\r\n
-    \       PUSH, __0_newspeed_Quaternion\r\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__GetBoneRotation__UnityEngineHumanBodyBones__UnityEngineQuaternion\"\r\n
+    \       PUSH, __9_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000002D4\r\n
+    \       PUSH, localPlayer\r\n        PUSH, __0_const_intnl_VRCSDKBaseVRCPlayerApiTrackingDataType\r\n
+    \       PUSH, __0_intnl_VRCSDKBaseVRCPlayerApiTrackingData\r\n        EXTERN,
+    \"VRCSDKBaseVRCPlayerApi.__GetTrackingData__VRCSDKBaseVRCPlayerApiTrackingDataType__VRCSDKBaseVRCPlayerApiTrackingData\"\r\n
+    \       PUSH, __0_intnl_VRCSDKBaseVRCPlayerApiTrackingData\r\n        PUSH, __0_newspeed_Quaternion\r\n
+    \       EXTERN, \"VRCSDKBaseVRCPlayerApiTrackingData.__get_rotation__UnityEngineQuaternion\"\r\n
     \       PUSH, __0_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__get_forward__UnityEngineVector3\"\r\n
     \       PUSH, __0_newspeed_Quaternion\r\n        PUSH, __0_intnl_UnityEngineVector3\r\n
     \       PUSH, __0_tempdir_Vector3\r\n        EXTERN, \"UnityEngineQuaternion.__op_Multiply__UnityEngineQuaternion_UnityEngineVector3__UnityEngineVector3\"\r\n
-    \       JUMP, 0x000003B4\r\n        PUSH, localPlayer\r\n        PUSH, __0_const_intnl_VRCSDKBaseVRCPlayerApiTrackingDataType\r\n
+    \       JUMP, 0x000003CC\r\n        PUSH, localPlayer\r\n        PUSH, __1_const_intnl_VRCSDKBaseVRCPlayerApiTrackingDataType\r\n
     \       PUSH, __0_intnl_VRCSDKBaseVRCPlayerApiTrackingData\r\n        EXTERN,
     \"VRCSDKBaseVRCPlayerApi.__GetTrackingData__VRCSDKBaseVRCPlayerApiTrackingDataType__VRCSDKBaseVRCPlayerApiTrackingData\"\r\n
     \       PUSH, __0_intnl_VRCSDKBaseVRCPlayerApiTrackingData\r\n        PUSH, __0_intnl_UnityEngineQuaternion\r\n
@@ -166,14 +169,14 @@ MonoBehaviour:
     \       PUSH, __10_intnl_SystemBoolean\r\n        PUSH, __9_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __9_intnl_SystemBoolean\r\n        PUSH, __11_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __11_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000006A4\r\n
+    \       PUSH, __11_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000006BC\r\n
     \       PUSH, __0_const_intnl_UnityEngineKeyCode\r\n        PUSH, __12_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineInput.__GetKey__UnityEngineKeyCode__SystemBoolean\"\r\n
     \       PUSH, __9_intnl_SystemBoolean\r\n        PUSH, __12_intnl_SystemBoolean\r\n
     \       PUSH, __13_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __13_intnl_SystemBoolean\r\n        PUSH, __9_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __9_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00000774\r\n        PUSH, __0_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__get_up__UnityEngineVector3\"\r\n
+    0x0000078C\r\n        PUSH, __0_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__get_up__UnityEngineVector3\"\r\n
     \       PUSH, __0_intnl_UnityEngineVector3\r\n        PUSH, flystr\r\n        PUSH,
     __1_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
     \       PUSH, controllertriggerL\r\n        PUSH, __0_Spacef_Single\r\n        PUSH,

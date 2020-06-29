@@ -91,7 +91,7 @@ public class EffectsController : UdonSharpBehaviour
         else { DoEffects += Time.deltaTime; }
 
         machspeed = EngineControl.CurrentVel.magnitude / 343f;
-        
+
         if (EngineControl.localPlayer == null || (EngineControl.localPlayer.IsOwner(gameObject)))//works in editor or ingame
         {
             if (EngineControl.localPlayer == null || EngineControl.Piloting)
@@ -156,7 +156,7 @@ public class EffectsController : UdonSharpBehaviour
             {
                 EngineControl.Health += -Mathf.Clamp((EngineControl.Gs - MaxGs) * Time.deltaTime * GDamage, 0f, 99999f); //take damage of 15 per second per G above MaxGs
 
-                if (EngineControl.Health < 0f) //plane is ded
+                if (EngineControl.Health <= 0f) //plane is ded
                 {
                     if (EngineControl.localPlayer == null)//so it works in editor
                     {
@@ -271,8 +271,14 @@ public class EffectsController : UdonSharpBehaviour
 
         if (Smoking && EngineControl.Occupied) { PlaneAnimator.SetBool("displaysmoke", true); }
         else { PlaneAnimator.SetBool("displaysmoke", false); }
-
-        PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
+        if (EngineControl.Health > 0)
+        {
+            PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
+        }
+        else
+        {
+            PlaneAnimator.SetFloat("health", 1);//if plane is dead, set animator health to full so that there's no phantom healthsmoke
+        }
 
         DoVapor();
     }

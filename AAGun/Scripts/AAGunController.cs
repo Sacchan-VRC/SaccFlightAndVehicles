@@ -10,25 +10,29 @@ public class AAGunController : UdonSharpBehaviour
     public GameObject VehicleMainObj;
     private Animator AAGunAnimator;
     public VRCStation AAGunSeatStation;
-    public float TurnSpeedMulti = 1;
-    public float TurningResponse = 1f;
-    public float StopSpeed = 4.5f;
+    public float TurnSpeedMulti = 10;
+    public float TurningResponse = .1f;
+    public float StopSpeed = .95f;
+    [System.NonSerializedAttribute] [HideInInspector] public bool dead;
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
     private float LstickH;
     private float LstickV;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool firing;
     private float LTrigger = 0;
-    private float FullHealth;
+    public float FullHealth;
     private Vector3 Rotinputlerper;
     [System.NonSerializedAttribute] [HideInInspector] public bool Manning; //like Piloting in the plane
     [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
     private float InputXLerper = 0f;
     private float InputYLerper = 0f;
+    private Vector3 StartRot;
     void Start()
     {
         if (VehicleMainObj != null) { AAGunAnimator = VehicleMainObj.GetComponent<Animator>(); }
         FullHealth = Health;
         localPlayer = Networking.LocalPlayer;
+        StartRot = Rotator.transform.localRotation.eulerAngles;
+        if (StopSpeed > 1) StopSpeed = .999f;
     }
     void Update()
     {
@@ -109,7 +113,15 @@ public class AAGunController : UdonSharpBehaviour
         {
             AAGunAnimator.SetBool("firing", false);
         }
-        AAGunAnimator.SetFloat("health", Health);
+        if (Health > 0)
+        {
+            AAGunAnimator.SetFloat("health", Health / FullHealth);
+        }
+        else
+        {
+            AAGunAnimator.SetFloat("health", 1);//if dead, set animator health to full so that there's no phantom healthsmoke
+        }
+
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
@@ -117,7 +129,12 @@ public class AAGunController : UdonSharpBehaviour
         {
             if (AAGunSeatStation != null) { AAGunSeatStation.ExitStation(localPlayer); }
         }
+        dead = true;
         AAGunAnimator.SetTrigger("explode");
         Health = FullHealth;//turns off low health smoke
+        if (localPlayer.IsOwner(VehicleMainObj))
+        {
+            Rotator.transform.localRotation = Quaternion.Euler(StartRot);
+        }
     }
 }

@@ -33,7 +33,7 @@ public class HUDController : UdonSharpBehaviour
         //Velocity indicator
         if (EngineControl.CurrentVel.magnitude < 2)
         {
-            tempvel.y = -2f;//straight down instead of spazzing out when moving slow
+            tempvel = -Vector3.up * 2;//straight down instead of spazzing out when moving very slow
         }
         else
         {
