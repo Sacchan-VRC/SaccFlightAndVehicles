@@ -33,7 +33,7 @@ public class HitDetector : UdonSharpBehaviour
             SoundControl.DoSound = 0f;
             if (SoundControl.BulletHit != null)
             {
-                SoundControl.BulletHit.pitch = 1 * Random.Range(.8f, 1.2f);
+                SoundControl.BulletHit.pitch = Random.Range(.8f, 1.2f);
                 SoundControl.BulletHit.Play();
             }
         }

@@ -10,6 +10,19 @@ public class LeaveAAGunButton : UdonSharpBehaviour
     public VRCStation Seat;
     public void Interact()
     {
+        ExitStation();
+    }
+
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.R) || (Input.GetButtonDown("Oculus_CrossPlatform_Button4")))
+        {
+            ExitStation();
+        }
+    }
+
+    public void ExitStation()
+    {
         if (Seat != null) { Seat.ExitStation(AAGunControl.localPlayer); }
     }
 }

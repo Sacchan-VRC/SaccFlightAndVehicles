@@ -101,10 +101,21 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: HUDController/hud_flaps
+    path: HUDController/bigstuff/hud_flaps
     classID: 1
     script: {fileID: 0}
-  m_PPtrCurves: []
+  m_PPtrCurves:
+  - curve:
+    - time: 0
+      value: {fileID: 2100000, guid: c3d066a228c2d6d43b0c652eb7072427, type: 2}
+    - time: 0.98333335
+      value: {fileID: 2100000, guid: a18cdf3a6a3017543af0d876d0755d80, type: 2}
+    - time: 0.96666664
+      value: {fileID: 2100000, guid: c3d066a228c2d6d43b0c652eb7072427, type: 2}
+    attribute: m_Materials.Array.data[0]
+    path: HUDController/bigstuff/hud_flaps
+    classID: 23
+    script: {fileID: 0}
   m_SampleRate: 60
   m_WrapMode: 0
   m_Bounds:
@@ -127,13 +138,23 @@ AnimationClip:
       customType: 4
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 2140529258
+      path: 2972861875
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
       customType: 0
       isPPtrCurve: 0
-    pptrCurveMapping: []
+    - serializedVersion: 2
+      path: 2972861875
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 23
+      customType: 21
+      isPPtrCurve: 1
+    pptrCurveMapping:
+    - {fileID: 2100000, guid: c3d066a228c2d6d43b0c652eb7072427, type: 2}
+    - {fileID: 2100000, guid: a18cdf3a6a3017543af0d876d0755d80, type: 2}
+    - {fileID: 2100000, guid: c3d066a228c2d6d43b0c652eb7072427, type: 2}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -245,7 +266,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: HUDController/hud_flaps
+    path: HUDController/bigstuff/hud_flaps
     classID: 1
     script: {fileID: 0}
   m_EulerEditorCurves: []
