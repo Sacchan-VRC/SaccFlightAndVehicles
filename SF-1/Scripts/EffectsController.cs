@@ -343,12 +343,10 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl.Piloting)
         {
             if (PilotSeatStation != null) { PilotSeatStation.ExitStation(EngineControl.localPlayer); }
-            if (PilotSeat1 != null) { PilotSeat1.PilotLeave(); }
         }
         if (EngineControl.Passenger)
         {
             if (PassengerSeatStation != null) { PassengerSeatStation.ExitStation(EngineControl.localPlayer); }
-            if (PassengerSeat1 != null) { PassengerSeat1.PassengerLeave(); }
         }
         PlaneAnimator.SetTrigger("explode");
         EngineControl.Health = EngineControl.FullHealth;//turns off low health smoke
