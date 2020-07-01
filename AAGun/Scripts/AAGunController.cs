@@ -10,22 +10,27 @@ public class AAGunController : UdonSharpBehaviour
     public GameObject VehicleMainObj;
     private Animator AAGunAnimator;
     public VRCStation AAGunSeatStation;
+    public Camera AACam;
     public float TurnSpeedMulti = 10;
-    public float TurningResponse = .1f;
+    public float TurningResponse = .2f;
     public float StopSpeed = .95f;
-    [System.NonSerializedAttribute] [HideInInspector] public bool dead;
+    public float ZoomFov = .1f;
+    public float ZoomOutFov = 110f;
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
-    private float LstickH;
+    [System.NonSerializedAttribute] [HideInInspector] public bool dead;
+    private float RstickH;
     private float LstickV;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool firing;
     private float LTrigger = 0;
-    public float FullHealth;
+    [System.NonSerializedAttribute] [HideInInspector] public float FullHealth;
     private Vector3 Rotinputlerper;
     [System.NonSerializedAttribute] [HideInInspector] public bool Manning; //like Piloting in the plane
     [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
     private float InputXLerper = 0f;
     private float InputYLerper = 0f;
     private Vector3 StartRot;
+    private float RstickV;
+    private float ZoomLevel;
     void Start()
     {
         if (VehicleMainObj != null) { AAGunAnimator = VehicleMainObj.GetComponent<Animator>(); }
@@ -51,47 +56,54 @@ public class AAGunController : UdonSharpBehaviour
             }
             if (localPlayer == null || Manning)
             {
-                //get inputs
-                float Wf = 0; //inputs as floats
-                float Af = 0;
-                float Sf = 0;
-                float Df = 0;
-                if (Input.GetKey(KeyCode.W)) { Wf = 1; }
-                if (Input.GetKey(KeyCode.A)) { Af = -1; }
-                if (Input.GetKey(KeyCode.S)) { Sf = -1; }
-                if (Input.GetKey(KeyCode.D)) { Df = 1; }
-                LstickH = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                //Camera control
+                if (AACam != null) { ZoomLevel = AACam.fieldOfView / 90; }
                 LstickV = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                //lerp to inputs for smooth motion
-                float InputY = Mathf.Clamp((LstickH + Af + Df), -1, 1) * TurnSpeedMulti;
-                float InputX = Mathf.Clamp((LstickV + Wf + Sf), -1, 1) * TurnSpeedMulti;
+                if (Mathf.Abs(LstickV) > .1)
+                {
+                    if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView - 3.2f * RstickV * ZoomLevel, ZoomFov, ZoomOutFov); }
+                }
+                if (Input.GetKey(KeyCode.LeftShift))
+                {
+                    if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView - 1.6f * ZoomLevel, ZoomFov, ZoomOutFov); }
+                }
+                if (Input.GetKey(KeyCode.LeftControl))
+                {
+                    if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView + 1.6f * ZoomLevel, ZoomFov, ZoomOutFov); }
+                }
 
+
+                //get inputs
+                float Wf = Input.GetKey(KeyCode.W) ? -1 : 0; //inputs as floats
+                float Sf = Input.GetKey(KeyCode.S) ? 1 : 0;
+                float Af = Input.GetKey(KeyCode.A) ? -1 : 0;
+                float Df = Input.GetKey(KeyCode.D) ? 1 : 0;
+                RstickH = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                RstickV = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                //lerp to inputs for smooth motion
+                float InputY = Mathf.Clamp((RstickH + Af + Df), -1, 1) * TurnSpeedMulti;
+                float InputX = Mathf.Clamp((RstickV + Wf + Sf), -1, 1) * TurnSpeedMulti;
+                //only do friction if slowing down or trying to turn in the oposite direction
                 if (InputY > 0 && InputYLerper < 0 || InputY < 0 && InputYLerper > 0 || Mathf.Abs(InputYLerper) > Mathf.Abs(InputY))
                 {
                     InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * Time.deltaTime);
                     InputYLerper *= StopSpeed;
                 }
-                else
-                {
-                    InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * Time.deltaTime);
-                }
+                else { InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * Time.deltaTime); }
 
                 if (InputX > 0 && InputXLerper < 0 || InputX < 0 && InputXLerper > 0 || Mathf.Abs(InputXLerper) > Mathf.Abs(InputX))
                 {
                     InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * Time.deltaTime);
                     InputXLerper *= StopSpeed;
                 }
-                else
-                {
-                    InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * Time.deltaTime);
-                }
+                else { InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * Time.deltaTime); }
 
 
                 float temprot = Rotator.transform.localRotation.eulerAngles.x;
+                temprot += InputXLerper * ZoomLevel;
                 if (temprot > 180) { temprot -= 360; }
-                temprot += InputXLerper;
-                temprot = Mathf.Clamp(temprot, -90, 35);
-                Rotator.transform.localRotation = Quaternion.Euler(new Vector3(temprot, Rotator.transform.localRotation.eulerAngles.y + InputYLerper, 0));
+                temprot = Mathf.Clamp(temprot, -89, 35);
+                Rotator.transform.localRotation = Quaternion.Euler(new Vector3(temprot, Rotator.transform.localRotation.eulerAngles.y + (InputYLerper * ZoomLevel), 0));
 
                 LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                 //Firing the gun
@@ -99,10 +111,7 @@ public class AAGunController : UdonSharpBehaviour
                 {
                     firing = true;
                 }
-                else
-                {
-                    firing = false;
-                }
+                else { firing = false; }
             }
         }
         if (firing)

@@ -20,19 +20,18 @@ public class SaccFlight : UdonSharpBehaviour
     {
         if (!localPlayer.IsPlayerGrounded())//only does anything if in the air.
         {
-            float Spacef = 0;
-            if (Input.GetKey(KeyCode.Space)) { Spacef = 1; }
-            float Ff = 0;
-            if (Input.GetKey(KeyCode.F)) { Ff = 1; }
+            bool GetkeySpace = Input.GetKey(KeyCode.Space);
+            bool GetkeyF = Input.GetKey(KeyCode.F);
+            float Ff = GetkeyF ? 1 : 0;
 
             controllertriggerR = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
             controllertriggerL = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-            if ((controllertriggerR > 0.1) || (Input.GetKey(KeyCode.F)))
+            if ((controllertriggerR > 0.1) || GetkeyF)
             {
                 Quaternion newspeed;
                 Vector3 tempdir;
                 Vector3 PlayerVel = localPlayer.GetVelocity();
-                if (Input.GetKey(KeyCode.F))
+                if (GetkeyF)
                 {
                     newspeed = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
                     tempdir = newspeed * (Vector3.forward);
@@ -49,9 +48,9 @@ public class SaccFlight : UdonSharpBehaviour
                 float FinalCheatThrust = Mathf.Max(1, (BackThrustAmount * Mathf.Max(controllertriggerR, Ff)));
                 localPlayer.SetVelocity(PlayerVel + tempdir * FinalCheatThrust);
             }
-            if ((controllertriggerL > 0.1) || (Input.GetKey(KeyCode.Space)))
+            if ((controllertriggerL > 0.1) || GetkeySpace)
             {
-                Vector3 tempdir = ((Vector3.up * flystr) * Mathf.Max(controllertriggerL, Spacef));
+                Vector3 tempdir = ((Vector3.up * flystr) * Mathf.Max(controllertriggerL, GetkeySpace ? 1 : 0));
                 localPlayer.SetVelocity(localPlayer.GetVelocity() + tempdir);
             }
         }

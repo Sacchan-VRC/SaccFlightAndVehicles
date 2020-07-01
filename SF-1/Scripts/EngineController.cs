@@ -117,17 +117,17 @@ public class EngineController : UdonSharpBehaviour
             {
                 Occupied = true;
                 //collect inputs
-                float Wf = 0; //inputs as floats
-                float Af = 0;
-                float Sf = 0;
-                float Df = 0;
-                float Qf = 0;
-                float Ef = 0;
-                float upf = 0;
-                float downf = 0;
-                float leftf = 0;
-                float rightf = 0;
-                float shiftf = 0;
+                float Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as floats
+                float Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
+                float Af = Input.GetKey(KeyCode.A) ? -1 : 0;
+                float Df = Input.GetKey(KeyCode.D) ? 1 : 0;
+                float Qf = Input.GetKey(KeyCode.Q) ? -1 : 0;
+                float Ef = Input.GetKey(KeyCode.E) ? 1 : 0;
+                float upf = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
+                float downf = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
+                float leftf = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
+                float rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
+                float shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
                 LstickH = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                 LstickV = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                 RstickH = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
@@ -136,17 +136,6 @@ public class EngineController : UdonSharpBehaviour
                 LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                 //MouseX = Input.GetAxisRaw("Mouse X");
                 //MouseY = Input.GetAxisRaw("Mouse Y");
-                if (Input.GetKey(KeyCode.W)) { Wf = 1; }
-                if (Input.GetKey(KeyCode.A)) { Af = -1; }
-                if (Input.GetKey(KeyCode.S)) { Sf = -1; }
-                if (Input.GetKey(KeyCode.D)) { Df = 1; }
-                if (Input.GetKey(KeyCode.Q)) { Qf = -1; }
-                if (Input.GetKey(KeyCode.E)) { Ef = 1; }
-                if (Input.GetKey(KeyCode.LeftShift)) { shiftf = 1; }
-                if (Input.GetKey(KeyCode.UpArrow)) { upf = 1; }
-                if (Input.GetKey(KeyCode.DownArrow)) { downf = -1; }
-                if (Input.GetKey(KeyCode.LeftArrow)) { leftf = -1; }
-                if (Input.GetKey(KeyCode.RightArrow)) { rightf = 1; }
 
                 //inputs to forward thrust
                 ThrottleValue = (Mathf.Max(RTrigger, shiftf)); //for throttle effects

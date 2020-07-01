@@ -35,7 +35,7 @@ public class HitDetectorAAGun : UdonSharpBehaviour
     public void respawn()
     {
         AAGunControl.dead = false;
-        if (AAGunControl.localPlayer.IsOwner(AAGunControl.gameObject))
+        if (AAGunControl.localPlayer == null || AAGunControl.localPlayer.IsOwner(AAGunControl.gameObject))
         {
             AAGunControl.Health = AAGunControl.FullHealth;
         }

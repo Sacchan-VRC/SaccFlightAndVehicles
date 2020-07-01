@@ -25,7 +25,7 @@ public class HitDetector : UdonSharpBehaviour
 
         if (EngineControl.localPlayer == null || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
         {
-            EngineControl.Health += -10;
+            EngineControl.Health -= 10;
         }
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.DoEffects = 0f; }
         if (SoundControl != null)
