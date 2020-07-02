@@ -21,9 +21,9 @@ public class EngineController : UdonSharpBehaviour
     public float AirFriction = 0.036f;
     public float PitchStrength = 1.5f;
     public float YawStrength = 5f;
-    public float RollStrength = 50f;
+    public float RollStrength = 100f;
     public float AccelerationResponse = 4.5f;
-    public float RotationResponse = 90f;
+    public float RotationResponse = 45f;
     public float VelStraightenStrPitch = 0.2f;
     public float VelStraightenStrYaw = 0.15f;
     public float TaxiRotationSpeed = 35f;
@@ -32,7 +32,7 @@ public class EngineController : UdonSharpBehaviour
     public float AirplaneVelLiftCoefficient = 1.4f;
     public float AirplanePullDownLiftRatio = .8f;
     public float AirplaneSidewaysLift = .17f;
-    public float AirplaneVelPullUp = 2.5f;
+    public float AirplaneVelPullUp = 2f;
     public float AirplaneRollFriction = 80f;
     public bool HasFlaps = true;
     public bool HasLandingGear = true;

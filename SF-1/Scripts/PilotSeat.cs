@@ -14,7 +14,7 @@ public class PilotSeat : UdonSharpBehaviour
     public Transform PlaneMesh;
     public GameObject SeatAdjuster;
     public GameObject EnableOther;
-    private void Interact()
+    private void Interact()//entering the plane
     {
         if (Saccflight != null) { Saccflight.SetActive(false); }
         if (VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, VehicleMainObj); }

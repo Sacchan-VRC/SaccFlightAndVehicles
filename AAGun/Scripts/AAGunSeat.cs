@@ -27,6 +27,8 @@ public class AAGunSeat : UdonSharpBehaviour
         }
         if (AAGunAnimator != null) AAGunAnimator.SetBool("inside", true);
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
+        AAGunControl.InputXLerper = 0;
+        AAGunControl.InputYLerper = 0;
         if (AAGunControl.localPlayer != null) { AAGunControl.localPlayer.UseAttachedStation(); }
     }
     public void GunnerLeave()
@@ -37,10 +39,11 @@ public class AAGunSeat : UdonSharpBehaviour
             AAGunControl.Manning = false;
             AAGunControl.firing = false;
         }
-        if (AAGunAnimator != null) { AAGunAnimator.SetBool("inside", true); }
+        if (AAGunAnimator != null) { AAGunAnimator.SetBool("inside", false); }
+        if (AAGunAnimator != null) { AAGunAnimator.SetBool("firing", false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
         //set X rotation 0 so people don't get the seat bug when they enter again
-        AAGunControl.Rotator.transform.localRotation = Quaternion.Euler(new Vector3(0, AAGunControl.Rotator.transform.localRotation.y, AAGunControl.Rotator.transform.localRotation.z));
+        AAGunControl.Rotator.transform.localRotation = Quaternion.Euler(new Vector3(0, AAGunControl.Rotator.transform.localRotation.eulerAngles.y, 0));
     }
     private void OnOwnershipTransferred()
     {

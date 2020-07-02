@@ -51,7 +51,7 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 enginelerperL = new Vector3(0, 0, 0);
     private Vector3 enginelerperR = new Vector3(0, 0, 0);
     private Vector3 enginefirelerper = new Vector3(1, 1, 1);
-    [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so later joiners see effects if someone is already piloting, and so that engine fire has time to disappear at start
+    [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting, and so that engine fire has time to disappear at start
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking;
     private float LGrip;
     private float RGrip;
@@ -80,7 +80,14 @@ public class EffectsController : UdonSharpBehaviour
         {
             if (EngineControl.CenterOfMass.position.y < EngineControl.SeaLevel && !EngineControl.dead)
             {
-                EngineControl.Health = -10;
+                if (EngineControl.localPlayer == null)//so it works in editor
+                {
+                    Explode();
+                }
+                else
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                }
             }
         }
 
@@ -271,13 +278,13 @@ public class EffectsController : UdonSharpBehaviour
 
         if (Smoking && EngineControl.Occupied) { PlaneAnimator.SetBool("displaysmoke", true); }
         else { PlaneAnimator.SetBool("displaysmoke", false); }
-        if (EngineControl.Health > 0)
+        if (!EngineControl.dead)
         {
             PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         }
         else
         {
-            PlaneAnimator.SetFloat("health", 1);//if plane is dead, set animator health to full so that there's no phantom healthsmoke
+            PlaneAnimator.SetFloat("health", 1);//plane is dead, set animator health to full so that there's no phantom healthsmoke
         }
 
         DoVapor();

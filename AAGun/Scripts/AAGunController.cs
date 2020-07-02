@@ -21,13 +21,13 @@ public class AAGunController : UdonSharpBehaviour
     private float RstickH;
     private float LstickV;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool firing;
-    private float LTrigger = 0;
+    private float RTrigger = 0;
     [System.NonSerializedAttribute] [HideInInspector] public float FullHealth;
     private Vector3 Rotinputlerper;
-    [System.NonSerializedAttribute] [HideInInspector] public bool Manning; //like Piloting in the plane
+    [System.NonSerializedAttribute] [HideInInspector] public bool Manning;//like Piloting in the plane
     [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
-    private float InputXLerper = 0f;
-    private float InputYLerper = 0f;
+    public float InputXLerper = 0f;
+    public float InputYLerper = 0f;
     private Vector3 StartRot;
     private float RstickV;
     private float ZoomLevel;
@@ -43,7 +43,7 @@ public class AAGunController : UdonSharpBehaviour
     {
         if (localPlayer == null || localPlayer.IsOwner(VehicleMainObj))
         {
-            if (Health < 0)
+            if (Health <= 0)
             {
                 if (localPlayer == null)
                 {
@@ -61,7 +61,7 @@ public class AAGunController : UdonSharpBehaviour
                 LstickV = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                 if (Mathf.Abs(LstickV) > .1)
                 {
-                    if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView - 3.2f * RstickV * ZoomLevel, ZoomFov, ZoomOutFov); }
+                    if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView - 3.2f * LstickV * ZoomLevel, ZoomFov, ZoomOutFov); }
                 }
                 if (Input.GetKey(KeyCode.LeftShift))
                 {
@@ -79,7 +79,7 @@ public class AAGunController : UdonSharpBehaviour
                 float Af = Input.GetKey(KeyCode.A) ? -1 : 0;
                 float Df = Input.GetKey(KeyCode.D) ? 1 : 0;
                 RstickH = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                RstickV = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                RstickV = -Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                 //lerp to inputs for smooth motion
                 float InputY = Mathf.Clamp((RstickH + Af + Df), -1, 1) * TurnSpeedMulti;
                 float InputX = Mathf.Clamp((RstickV + Wf + Sf), -1, 1) * TurnSpeedMulti;
@@ -105,9 +105,9 @@ public class AAGunController : UdonSharpBehaviour
                 temprot = Mathf.Clamp(temprot, -89, 35);
                 Rotator.transform.localRotation = Quaternion.Euler(new Vector3(temprot, Rotator.transform.localRotation.eulerAngles.y + (InputYLerper * ZoomLevel), 0));
 
-                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                 //Firing the gun
-                if (LTrigger >= 0.75 || Input.GetKey(KeyCode.Space))
+                if (RTrigger >= 0.75 || Input.GetKey(KeyCode.Space))
                 {
                     firing = true;
                 }
@@ -122,13 +122,13 @@ public class AAGunController : UdonSharpBehaviour
         {
             AAGunAnimator.SetBool("firing", false);
         }
-        if (Health > 0)
+        if (!dead)
         {
             AAGunAnimator.SetFloat("health", Health / FullHealth);
         }
         else
         {
-            AAGunAnimator.SetFloat("health", 1);//if dead, set animator health to full so that there's no phantom healthsmoke
+            AAGunAnimator.SetFloat("health", 1);//dead, set animator health to full so that there's no phantom healthsmoke
         }
 
     }

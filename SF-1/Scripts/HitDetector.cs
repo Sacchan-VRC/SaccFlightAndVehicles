@@ -53,6 +53,7 @@ public class HitDetector : UdonSharpBehaviour
         {
             EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z); //this should respawn it in VRC, doesn't work in editor
         }
+        EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
         EngineControl.GearUp = false;
         EngineControl.Flaps = true;
     }
@@ -62,6 +63,6 @@ public class HitDetector : UdonSharpBehaviour
         {
             EngineControl.Health = EngineControl.FullHealth;
         }
-        EngineControl.dead = false; //because respawning gives us an immense number of Gs because we move so far in one frame, we stop being 'dead' 5 seconds after we respawn. Can't die when already dead. 
+        EngineControl.dead = false;//because respawning gives us an immense number of Gs because we move so far in one frame, we stop being 'dead' 5 seconds after we respawn. Can't die when already dead. 
     }
 }
