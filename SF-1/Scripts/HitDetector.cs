@@ -22,7 +22,7 @@ public class HitDetector : UdonSharpBehaviour
     }
     public void PlaneHit()
     {
-
+        if (EngineControl.dead) return;
         if (EngineControl.localPlayer == null || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
         {
             EngineControl.Health -= 10;
