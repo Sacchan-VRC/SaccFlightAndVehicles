@@ -12,8 +12,9 @@ public class SaccTarget : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     void OnParticleCollision(GameObject other)//hit by bullet
     {
-        HitPoints += -10;
-        if (HitPoints < 0f)
+        if (other == null) return;
+        HitPoints -= 10;
+        if (HitPoints <= 0f)
         {
             if (localPlayer == null)//editor
             {
