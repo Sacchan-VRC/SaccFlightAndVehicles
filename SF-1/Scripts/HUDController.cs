@@ -39,7 +39,6 @@ public class HUDController : UdonSharpBehaviour
         {
             tempvel = EngineControl.CurrentVel;
         }
-        Debug.Log(EngineControl.CurrentVel);
         VelocityIndicator.position = (transform.position + tempvel);
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * (distance_from_head);
         /////////////////
