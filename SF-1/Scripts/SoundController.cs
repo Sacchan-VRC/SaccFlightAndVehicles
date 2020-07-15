@@ -40,14 +40,15 @@ public class SoundController : UdonSharpBehaviour
     private float PlaneWindInitialVolume;
     float InVehicleAfterburnerVolumeFactor = .09f;
     float SonicBoomWave = 0f;
-    float SonicBoomDistance = 0f;
+    float SonicBoomDistance = -1f;
     bool Landed = false;
     private int dopplecounter;
     [System.NonSerializedAttribute] [HideInInspector] public float DoSound = 32; //3 seconds before idle so late joiners hear sound
     [System.NonSerializedAttribute] [HideInInspector] public bool silent;
     private float GunSoundInitialVolume;
     [System.NonSerializedAttribute] [HideInInspector] public bool soundsoff;
-
+    float relativespeed;
+    bool playsonicboom;
     private void Start()
     {
         //used to make it so that changing the volume in unity will do something //set 0 to avoid ear destruction
@@ -99,7 +100,8 @@ public class SoundController : UdonSharpBehaviour
             if (EngineControl.Occupied == true) { DoSound = 0f; }
             else { DoSound += Time.deltaTime; }
 
-            float doppletemp = (343 * (Time.deltaTime * 5)) + (ThisFrameDist - LastFrameDist);
+            relativespeed = (ThisFrameDist - LastFrameDist);
+            float doppletemp = (343 * (Time.deltaTime * 5)) + relativespeed;
 
             //supersonic a bit lower than the speed of sound because dopple is speed towards you, if they're coming in at an angle it won't be as high. stupid hack
             if (doppletemp < .1f)
@@ -109,24 +111,23 @@ public class SoundController : UdonSharpBehaviour
                 //Only Supersonic if the vehicle is actually moving faster than sound, and you're not inside it (prevents sonic booms from occuring if you move past a stationary vehicle)
                 if (EngineControl.CurrentVel.magnitude > 343 && !EngineControl.Passenger && !EngineControl.Piloting)
                 {
-                    SuperSonic = true;
+                    if (!silent)
+                    {
+                        SonicBoomWave = 0f;
+                        playsonicboom = true;
+                        SonicBoomDistance = ThisFrameDist;
+                    }
                 }
             }
-            else if (doppletemp > .1001f && SuperSonic)//if we're going less than the speed of sound (toward the viewer), and we were faster than the speed of sound before, begin sonic boom wave
-            {
-                SonicBoom.PlayDelayed(ThisFrameDist / 343);//speed of sound over distance delay
-                SuperSonic = false;
-                SonicBoomWave = 0f;
-                SonicBoomDistance = ThisFrameDist;
-            }
+
             Doppler = (343 * (Time.deltaTime * 5)) / doppletemp;
             LastFrameDist = ThisFrameDist;
             dopplecounter = 0;
         }
         dopplecounter++;
-        if (SonicBoomWave <= SonicBoomDistance)
+        if (SonicBoomWave < SonicBoomDistance)
         {
-            SonicBoomWave += 343 * Time.deltaTime; //simulate sound wave movement for other sounds
+            SonicBoomWave += Mathf.Max(343 * Time.deltaTime, -relativespeed / 5); //simulate sound wave movement
         }
         if (TouchDown != null)
         {
@@ -227,7 +228,7 @@ public class SoundController : UdonSharpBehaviour
 
         //set final volumes and pitches
         //lerp should help smooth out laggers and the dopple only being calculated every 5 frames
-        if (SonicBoomWave < SonicBoomDistance)
+        if (SonicBoomWave <= SonicBoomDistance)
         {
             silent = true;
         }
@@ -235,9 +236,11 @@ public class SoundController : UdonSharpBehaviour
         {
             silent = false;
         }
-        if (!silent && SonicBoom.isPlaying)
+        if (SonicBoom != null && !silent && playsonicboom)
         {
-            SonicBoom.pitch = ((Doppler - 1) * .3f) + 1.3f;
+            SonicBoom.pitch = Random.Range(.94f, 1.2f);
+            SonicBoom.Play();
+            playsonicboom = false;
         }
 
         if (PlaneIdle != null)
