@@ -127,7 +127,7 @@ public class SoundController : UdonSharpBehaviour
         dopplecounter++;
         if (SonicBoomWave < SonicBoomDistance)
         {
-            SonicBoomWave += Mathf.Max(343 * Time.deltaTime, -relativespeed / 5); //simulate sound wave movement
+            SonicBoomWave += Mathf.Max(343 * Time.deltaTime, -relativespeed * .2f); //simulate sound wave movement
         }
         if (TouchDown != null)
         {
@@ -285,7 +285,7 @@ public class SoundController : UdonSharpBehaviour
             else
             {
                 PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
-                PlaneWind.volume = Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) / 5f);
+                PlaneWind.volume = Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) * .2f);
             }
         }
 
