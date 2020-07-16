@@ -30,6 +30,7 @@ public class EngineController : UdonSharpBehaviour
     public float AirplanePitchDownStrRatio = .8f;
     public float AirplaneLift = .8f;
     public float AirplaneVelLiftCoefficient = 1.4f;
+    public float MaxVelLift = 5f;
     public float AirplanePullDownLiftRatio = .8f;
     public float AirplaneSidewaysLift = .17f;
     public float AirplaneVelPullUp = 2f;
@@ -77,6 +78,11 @@ public class EngineController : UdonSharpBehaviour
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     public float AtmosphereThinningEnd = 19812; //65,000 feet
     private float Atmosphere;
+    private float rotlift;
+    public float RotMultiMaxSpeed = 220f;
+    public float ReversingRollStrength = 1.6f;
+    public float ReversingPitchStrength = 2;
+    public float ReversingYawStrength = 2.4f;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -146,9 +152,14 @@ public class EngineController : UdonSharpBehaviour
                 pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + */LstickV + RstickV + Wf + Sf + downf + upf), -1, 1);
                 yawinput = Mathf.Clamp((LstickH + Qf + Ef), -1, 1);
 
-                roll = rollinput * RollStrength;
-                pitch = pitchinput * PitchStrength;
-                yaw = yawinput * YawStrength;
+                //if moving backwards, controls invert
+                bool forward = (Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.forward) > 0) ? true : false;
+                float forward_roll = forward ? 1 : -ReversingRollStrength;
+                float forward_pitch = forward ? 1 : -ReversingPitchStrength;
+                float forward_yaw = forward ? 1 : -ReversingYawStrength;
+                roll = rollinput * RollStrength * forward_roll;
+                pitch = pitchinput * PitchStrength * forward_pitch;
+                yaw = yawinput * YawStrength * forward_yaw;
 
                 //gear controls
                 if ((Input.GetKeyDown(KeyCode.G)) || (Input.GetButtonDown("Oculus_CrossPlatform_PrimaryThumbstick")) && HasLandingGear)
@@ -201,20 +212,21 @@ public class EngineController : UdonSharpBehaviour
             //speed related values
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
             speed20 = CurrentVel.magnitude / 20f;
-            float SpeedLiftFactor = Mathf.LinearToGammaSpace(speed20 * AirplaneVelLiftCoefficient);
+            float SpeedLiftFactor = Mathf.Clamp(CurrentVel.magnitude * CurrentVel.magnitude * AirplaneVelLiftCoefficient, 0, MaxVelLift);
+            Mathf.Min(rotlift = CurrentVel.magnitude / RotMultiMaxSpeed, RotMultiMaxSpeed);
 
             //thrust vecotring airplanes have a minimum rotation speed
             if (AirplaneThrustVectoring)
             {
-                roll *= Mathf.Max(AirplaneThrustVecStr, SpeedLiftFactor);
-                pitch *= Mathf.Max(AirplaneThrustVecStr, SpeedLiftFactor);
-                yaw *= Mathf.Max(AirplaneThrustVecStr, SpeedLiftFactor);
+                roll *= Mathf.Max(AirplaneThrustVecStr, rotlift);
+                pitch *= Mathf.Max(AirplaneThrustVecStr, rotlift);
+                yaw *= Mathf.Max(AirplaneThrustVecStr, rotlift);
             }
             else
             {
-                roll *= SpeedLiftFactor;
-                pitch *= SpeedLiftFactor;
-                yaw *= SpeedLiftFactor;
+                roll *= rotlift;
+                pitch *= rotlift;
+                yaw *= rotlift;
             }
 
             Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
