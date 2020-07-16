@@ -16,50 +16,58 @@ MonoBehaviour:
     type: 2}
   udonAssembly: ".data_start\r\n\r\n    .export VehicleMainObj\r\n    .export GroundDetector\r\n
     \   .export EffectsControl\r\n    .export SoundControl\r\n    .export HUDControl\r\n
-    \   .export CenterOfMass\r\n    .export PitchMoment\r\n    .export AirplaneThrustVectoring\r\n
-    \   .export AirplaneThrustVecStr\r\n    .export ThrottleStrengthForward\r\n    .export
-    AirFriction\r\n    .export PitchStrength\r\n    .export YawStrength\r\n    .export
-    RollStrength\r\n    .export AccelerationResponse\r\n    .export RotationResponse\r\n
-    \   .export VelStraightenStrPitch\r\n    .export VelStraightenStrYaw\r\n    .export
-    TaxiRotationSpeed\r\n    .export AirplanePitchDownStrRatio\r\n    .export AirplaneLift\r\n
-    \   .export AirplaneVelLiftCoefficient\r\n    .export MaxVelLift\r\n    .export
-    AirplanePullDownLiftRatio\r\n    .export AirplaneSidewaysLift\r\n    .export AirplaneVelPullUp\r\n
-    \   .export AirplaneRollFriction\r\n    .export HasFlaps\r\n    .export HasLandingGear\r\n
-    \   .export LandingGearDragMulti\r\n    .export FlapsDragMulti\r\n    .export
-    FlapsLiftMulti\r\n    .export Health\r\n    .export SeaLevel\r\n    .export AtmosphereThinningStart\r\n
-    \   .export AtmosphereThinningEnd\r\n    .export RotMultiMaxSpeed\r\n    .sync
-    Health, none\r\n    .sync ThrottleValue, none\r\n    .sync CurrentVel, none\r\n
-    \   .sync Gs, none\r\n    .sync GearUp, none\r\n    .sync Flaps, none\r\n    .sync
-    Occupied, none\r\n\r\n    __refl_const_intnl_udonTypeID: %SystemInt64, null\r\n
-    \   __refl_const_intnl_udonTypeName: %SystemString, null\r\n    AirplaneThrustVectoring:
-    %SystemBoolean, null\r\n    HasFlaps: %SystemBoolean, null\r\n    HasLandingGear:
-    %SystemBoolean, null\r\n    VehicleMainObj: %UnityEngineGameObject, null\r\n    AccelerationResponse:
-    %SystemSingle, null\r\n    AirFriction: %SystemSingle, null\r\n    AirplaneLift:
-    %SystemSingle, null\r\n    AirplanePitchDownStrRatio: %SystemSingle, null\r\n
-    \   AirplanePullDownLiftRatio: %SystemSingle, null\r\n    AirplaneRollFriction:
-    %SystemSingle, null\r\n    AirplaneSidewaysLift: %SystemSingle, null\r\n    AirplaneThrustVecStr:
-    %SystemSingle, null\r\n    AirplaneVelLiftCoefficient: %SystemSingle, null\r\n
-    \   AirplaneVelPullUp: %SystemSingle, null\r\n    AtmosphereThinningEnd: %SystemSingle,
-    null\r\n    AtmosphereThinningStart: %SystemSingle, null\r\n    FlapsDragMulti:
+    \   .export CenterOfMass\r\n    .export PitchMoment\r\n    .export YawMoment\r\n
+    \   .export AirplaneThrustVectoring\r\n    .export AirplaneThrustVecStr\r\n    .export
+    ThrottleStrengthForward\r\n    .export AirFriction\r\n    .export PitchStrength\r\n
+    \   .export YawStrength\r\n    .export RollStrength\r\n    .export AccelerationResponse\r\n
+    \   .export RotationResponse\r\n    .export VelStraightenStrPitch\r\n    .export
+    VelStraightenStrYaw\r\n    .export TaxiRotationSpeed\r\n    .export AirplanePitchDownStrRatio\r\n
+    \   .export AirplaneLift\r\n    .export AirplaneVelLiftCoefficient\r\n    .export
+    MaxVelLift\r\n    .export AirplanePullDownLiftRatio\r\n    .export AirplaneSidewaysLift\r\n
+    \   .export AirplaneVelPullUp\r\n    .export AirplaneRollFriction\r\n    .export
+    HasFlaps\r\n    .export HasLandingGear\r\n    .export LandingGearDragMulti\r\n
+    \   .export FlapsDragMulti\r\n    .export FlapsLiftMulti\r\n    .export Health\r\n
+    \   .export SeaLevel\r\n    .export AtmosphereThinningStart\r\n    .export AtmosphereThinningEnd\r\n
+    \   .export RotMultiMaxSpeed\r\n    .export ReversingRollStrength\r\n    .export
+    ReversingPitchStrength\r\n    .export ReversingYawStrength\r\n    .export MaxAngleOfAttack\r\n
+    \   .export MaxAngleOfAttackYaw\r\n    .export MinHighAoAControl\r\n    .export
+    MinAoAPitchLift\r\n    .export MinAoAYawLift\r\n    .sync Health, none\r\n    .sync
+    ThrottleValue, none\r\n    .sync CurrentVel, none\r\n    .sync Gs, none\r\n    .sync
+    GearUp, none\r\n    .sync Flaps, none\r\n    .sync Occupied, none\r\n\r\n    __refl_const_intnl_udonTypeID:
+    %SystemInt64, null\r\n    __refl_const_intnl_udonTypeName: %SystemString, null\r\n
+    \   AirplaneThrustVectoring: %SystemBoolean, null\r\n    HasFlaps: %SystemBoolean,
+    null\r\n    HasLandingGear: %SystemBoolean, null\r\n    VehicleMainObj: %UnityEngineGameObject,
+    null\r\n    AccelerationResponse: %SystemSingle, null\r\n    AirFriction: %SystemSingle,
+    null\r\n    AirplaneLift: %SystemSingle, null\r\n    AirplanePitchDownStrRatio:
+    %SystemSingle, null\r\n    AirplanePullDownLiftRatio: %SystemSingle, null\r\n
+    \   AirplaneRollFriction: %SystemSingle, null\r\n    AirplaneSidewaysLift: %SystemSingle,
+    null\r\n    AirplaneThrustVecStr: %SystemSingle, null\r\n    AirplaneVelLiftCoefficient:
+    %SystemSingle, null\r\n    AirplaneVelPullUp: %SystemSingle, null\r\n    AtmosphereThinningEnd:
+    %SystemSingle, null\r\n    AtmosphereThinningStart: %SystemSingle, null\r\n    FlapsDragMulti:
     %SystemSingle, null\r\n    FlapsLiftMulti: %SystemSingle, null\r\n    Health:
-    %SystemSingle, null\r\n    LandingGearDragMulti: %SystemSingle, null\r\n    MaxVelLift:
-    %SystemSingle, null\r\n    PitchStrength: %SystemSingle, null\r\n    RollStrength:
+    %SystemSingle, null\r\n    LandingGearDragMulti: %SystemSingle, null\r\n    MaxAngleOfAttack:
+    %SystemSingle, null\r\n    MaxAngleOfAttackYaw: %SystemSingle, null\r\n    MaxVelLift:
+    %SystemSingle, null\r\n    MinAoAPitchLift: %SystemSingle, null\r\n    MinAoAYawLift:
+    %SystemSingle, null\r\n    MinHighAoAControl: %SystemSingle, null\r\n    PitchStrength:
+    %SystemSingle, null\r\n    ReversingPitchStrength: %SystemSingle, null\r\n    ReversingRollStrength:
+    %SystemSingle, null\r\n    ReversingYawStrength: %SystemSingle, null\r\n    RollStrength:
     %SystemSingle, null\r\n    RotationResponse: %SystemSingle, null\r\n    RotMultiMaxSpeed:
     %SystemSingle, null\r\n    SeaLevel: %SystemSingle, null\r\n    TaxiRotationSpeed:
     %SystemSingle, null\r\n    ThrottleStrengthForward: %SystemSingle, null\r\n    VelStraightenStrPitch:
     %SystemSingle, null\r\n    VelStraightenStrYaw: %SystemSingle, null\r\n    YawStrength:
     %SystemSingle, null\r\n    CenterOfMass: %UnityEngineTransform, null\r\n    GroundDetector:
     %UnityEngineTransform, null\r\n    PitchMoment: %UnityEngineTransform, null\r\n
-    \   EffectsControl: %VRCUdonUdonBehaviour, null\r\n    HUDControl: %VRCUdonUdonBehaviour,
-    null\r\n    SoundControl: %VRCUdonUdonBehaviour, null\r\n    dead: %SystemBoolean,
-    null\r\n    Flaps: %SystemBoolean, null\r\n    GearUp: %SystemBoolean, null\r\n
-    \   Occupied: %SystemBoolean, null\r\n    Passenger: %SystemBoolean, null\r\n
-    \   Piloting: %SystemBoolean, null\r\n    Taxiing: %SystemBoolean, null\r\n    VehicleConstantForce:
-    %UnityEngineConstantForce, null\r\n    VehicleRigidbody: %UnityEngineRigidbody,
-    null\r\n    accelforward: %SystemSingle, null\r\n    AtmoshpereFadeDistance: %SystemSingle,
-    null\r\n    Atmosphere: %SystemSingle, null\r\n    AtmosphereHeightThing: %SystemSingle,
-    null\r\n    downspeed: %SystemSingle, null\r\n    FullHealth: %SystemSingle, null\r\n
-    \   Gs: %SystemSingle, null\r\n    LstickH: %SystemSingle, null\r\n    LstickV:
+    \   YawMoment: %UnityEngineTransform, null\r\n    EffectsControl: %VRCUdonUdonBehaviour,
+    null\r\n    HUDControl: %VRCUdonUdonBehaviour, null\r\n    SoundControl: %VRCUdonUdonBehaviour,
+    null\r\n    dead: %SystemBoolean, null\r\n    Flaps: %SystemBoolean, null\r\n
+    \   GearUp: %SystemBoolean, null\r\n    Occupied: %SystemBoolean, null\r\n    Passenger:
+    %SystemBoolean, null\r\n    Piloting: %SystemBoolean, null\r\n    Taxiing: %SystemBoolean,
+    null\r\n    VehicleConstantForce: %UnityEngineConstantForce, null\r\n    VehicleRigidbody:
+    %UnityEngineRigidbody, null\r\n    accelforward: %SystemSingle, null\r\n    AngleOfAttack:
+    %SystemSingle, null\r\n    AngleOfAttackYaw: %SystemSingle, null\r\n    AtmoshpereFadeDistance:
+    %SystemSingle, null\r\n    Atmosphere: %SystemSingle, null\r\n    AtmosphereHeightThing:
+    %SystemSingle, null\r\n    downspeed: %SystemSingle, null\r\n    FullHealth: %SystemSingle,
+    null\r\n    Gs: %SystemSingle, null\r\n    LstickH: %SystemSingle, null\r\n    LstickV:
     %SystemSingle, null\r\n    LTrigger: %SystemSingle, null\r\n    pitch: %SystemSingle,
     null\r\n    pitchinput: %SystemSingle, null\r\n    roll: %SystemSingle, null\r\n
     \   rollinput: %SystemSingle, null\r\n    rotlift: %SystemSingle, null\r\n    RstickH:
@@ -70,10 +78,13 @@ MonoBehaviour:
     %UnityEngineVector3, null\r\n    LastFrameLerpedInputRot: %UnityEngineVector3,
     null\r\n    LastFrameVel: %UnityEngineVector3, null\r\n    localPlayer: %VRCSDKBaseVRCPlayerApi,
     null\r\n    __0_this_intnl_UnityEngineTransform: %UnityEngineTransform, this\r\n
-    \   __0_Af_Single: %SystemSingle, null\r\n    __0_Df_Single: %SystemSingle, null\r\n
-    \   __0_downf_Single: %SystemSingle, null\r\n    __0_Ef_Single: %SystemSingle,
-    null\r\n    __0_FlapsDrag_Single: %SystemSingle, null\r\n    __0_FlapsGearDrag_Single:
-    %SystemSingle, null\r\n    __0_FlapsLift_Single: %SystemSingle, null\r\n    __0_GearDrag_Single:
+    \   __0_forward_Boolean: %SystemBoolean, null\r\n    __0_Af_Single: %SystemSingle,
+    null\r\n    __0_AoALift_Single: %SystemSingle, null\r\n    __0_AoALiftYaw_Single:
+    %SystemSingle, null\r\n    __0_Df_Single: %SystemSingle, null\r\n    __0_downf_Single:
+    %SystemSingle, null\r\n    __0_Ef_Single: %SystemSingle, null\r\n    __0_FlapsDrag_Single:
+    %SystemSingle, null\r\n    __0_FlapsGearDrag_Single: %SystemSingle, null\r\n    __0_FlapsLift_Single:
+    %SystemSingle, null\r\n    __0_forward_pitch_Single: %SystemSingle, null\r\n    __0_forward_roll_Single:
+    %SystemSingle, null\r\n    __0_forward_yaw_Single: %SystemSingle, null\r\n    __0_GearDrag_Single:
     %SystemSingle, null\r\n    __0_leftf_Single: %SystemSingle, null\r\n    __0_Qf_Single:
     %SystemSingle, null\r\n    __0_rightf_Single: %SystemSingle, null\r\n    __0_scaleratio_Single:
     %SystemSingle, null\r\n    __0_Sf_Single: %SystemSingle, null\r\n    __0_shiftf_Single:
@@ -86,30 +97,30 @@ MonoBehaviour:
     \   __0_const_intnl_SystemBoolean: %SystemBoolean, null\r\n    __1_const_intnl_SystemBoolean:
     %SystemBoolean, null\r\n    __0_const_intnl_UnityEngineForceMode: %UnityEngineForceMode,
     null\r\n    __0_const_intnl_SystemInt32: %SystemInt32, null\r\n    __1_const_intnl_SystemInt32:
-    %SystemInt32, null\r\n    __0_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
-    null\r\n    __1_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n
-    \   __10_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n    __11_const_intnl_UnityEngineKeyCode:
-    %UnityEngineKeyCode, null\r\n    __12_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
-    null\r\n    __2_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n
-    \   __3_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n    __4_const_intnl_UnityEngineKeyCode:
-    %UnityEngineKeyCode, null\r\n    __5_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
-    null\r\n    __6_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n
-    \   __7_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n    __8_const_intnl_UnityEngineKeyCode:
-    %UnityEngineKeyCode, null\r\n    __9_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
-    null\r\n    __0_const_intnl_SystemObject: %SystemObject, null\r\n    __0_const_intnl_SystemSingle:
-    %SystemSingle, null\r\n    __1_const_intnl_SystemSingle: %SystemSingle, null\r\n
-    \   __2_const_intnl_SystemSingle: %SystemSingle, null\r\n    __3_const_intnl_SystemSingle:
-    %SystemSingle, null\r\n    __0_const_intnl_SystemString: %SystemString, null\r\n
-    \   __1_const_intnl_SystemString: %SystemString, null\r\n    __2_const_intnl_SystemString:
-    %SystemString, null\r\n    __3_const_intnl_SystemString: %SystemString, null\r\n
-    \   __4_const_intnl_SystemString: %SystemString, null\r\n    __5_const_intnl_SystemString:
-    %SystemString, null\r\n    __6_const_intnl_SystemString: %SystemString, null\r\n
-    \   __7_const_intnl_SystemString: %SystemString, null\r\n    __8_const_intnl_SystemString:
-    %SystemString, null\r\n    __0_const_intnl_UnityEngineTransform: %UnityEngineTransform,
-    null\r\n    __0_const_intnl_SystemType: %SystemType, null\r\n    __1_const_intnl_SystemType:
-    %SystemType, null\r\n    __0_const_intnl_SystemUInt32: %SystemUInt32, null\r\n
-    \   __0_const_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi, null\r\n
-    \   __0_intnl_SystemBoolean: %SystemBoolean, null\r\n    __1_intnl_SystemBoolean:
+    %SystemInt32, null\r\n    __2_const_intnl_SystemInt32: %SystemInt32, null\r\n
+    \   __0_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n    __1_const_intnl_UnityEngineKeyCode:
+    %UnityEngineKeyCode, null\r\n    __10_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
+    null\r\n    __11_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n
+    \   __12_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n    __2_const_intnl_UnityEngineKeyCode:
+    %UnityEngineKeyCode, null\r\n    __3_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
+    null\r\n    __4_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n
+    \   __5_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n    __6_const_intnl_UnityEngineKeyCode:
+    %UnityEngineKeyCode, null\r\n    __7_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
+    null\r\n    __8_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n
+    \   __9_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode, null\r\n    __0_const_intnl_SystemObject:
+    %SystemObject, null\r\n    __0_const_intnl_SystemSingle: %SystemSingle, null\r\n
+    \   __1_const_intnl_SystemSingle: %SystemSingle, null\r\n    __2_const_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __3_const_intnl_SystemSingle: %SystemSingle, null\r\n
+    \   __0_const_intnl_SystemString: %SystemString, null\r\n    __1_const_intnl_SystemString:
+    %SystemString, null\r\n    __2_const_intnl_SystemString: %SystemString, null\r\n
+    \   __3_const_intnl_SystemString: %SystemString, null\r\n    __4_const_intnl_SystemString:
+    %SystemString, null\r\n    __5_const_intnl_SystemString: %SystemString, null\r\n
+    \   __6_const_intnl_SystemString: %SystemString, null\r\n    __7_const_intnl_SystemString:
+    %SystemString, null\r\n    __8_const_intnl_SystemString: %SystemString, null\r\n
+    \   __0_const_intnl_UnityEngineTransform: %UnityEngineTransform, null\r\n    __0_const_intnl_SystemType:
+    %SystemType, null\r\n    __1_const_intnl_SystemType: %SystemType, null\r\n    __0_const_intnl_SystemUInt32:
+    %SystemUInt32, null\r\n    __0_const_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi,
+    null\r\n    __0_intnl_SystemBoolean: %SystemBoolean, null\r\n    __1_intnl_SystemBoolean:
     %SystemBoolean, null\r\n    __10_intnl_SystemBoolean: %SystemBoolean, null\r\n
     \   __11_intnl_SystemBoolean: %SystemBoolean, null\r\n    __12_intnl_SystemBoolean:
     %SystemBoolean, null\r\n    __13_intnl_SystemBoolean: %SystemBoolean, null\r\n
@@ -143,6 +154,8 @@ MonoBehaviour:
     %SystemBoolean, null\r\n    __51_intnl_SystemBoolean: %SystemBoolean, null\r\n
     \   __52_intnl_SystemBoolean: %SystemBoolean, null\r\n    __53_intnl_SystemBoolean:
     %SystemBoolean, null\r\n    __54_intnl_SystemBoolean: %SystemBoolean, null\r\n
+    \   __55_intnl_SystemBoolean: %SystemBoolean, null\r\n    __56_intnl_SystemBoolean:
+    %SystemBoolean, null\r\n    __57_intnl_SystemBoolean: %SystemBoolean, null\r\n
     \   __6_intnl_SystemBoolean: %SystemBoolean, null\r\n    __7_intnl_SystemBoolean:
     %SystemBoolean, null\r\n    __8_intnl_SystemBoolean: %SystemBoolean, null\r\n
     \   __9_intnl_SystemBoolean: %SystemBoolean, null\r\n    __0_intnl_SystemInt32:
@@ -181,27 +194,54 @@ MonoBehaviour:
     %SystemSingle, null\r\n    __58_intnl_SystemSingle: %SystemSingle, null\r\n    __59_intnl_SystemSingle:
     %SystemSingle, null\r\n    __6_intnl_SystemSingle: %SystemSingle, null\r\n    __60_intnl_SystemSingle:
     %SystemSingle, null\r\n    __61_intnl_SystemSingle: %SystemSingle, null\r\n    __62_intnl_SystemSingle:
-    %SystemSingle, null\r\n    __63_intnl_SystemSingle: %SystemSingle, null\r\n    __7_intnl_SystemSingle:
-    %SystemSingle, null\r\n    __8_intnl_SystemSingle: %SystemSingle, null\r\n    __9_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __63_intnl_SystemSingle: %SystemSingle, null\r\n    __64_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __65_intnl_SystemSingle: %SystemSingle, null\r\n    __66_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __67_intnl_SystemSingle: %SystemSingle, null\r\n    __68_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __69_intnl_SystemSingle: %SystemSingle, null\r\n    __7_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __70_intnl_SystemSingle: %SystemSingle, null\r\n    __71_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __72_intnl_SystemSingle: %SystemSingle, null\r\n    __73_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __74_intnl_SystemSingle: %SystemSingle, null\r\n    __75_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __76_intnl_SystemSingle: %SystemSingle, null\r\n    __77_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __78_intnl_SystemSingle: %SystemSingle, null\r\n    __79_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __8_intnl_SystemSingle: %SystemSingle, null\r\n    __80_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __81_intnl_SystemSingle: %SystemSingle, null\r\n    __82_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __83_intnl_SystemSingle: %SystemSingle, null\r\n    __84_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __85_intnl_SystemSingle: %SystemSingle, null\r\n    __86_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __87_intnl_SystemSingle: %SystemSingle, null\r\n    __88_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __89_intnl_SystemSingle: %SystemSingle, null\r\n    __9_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __90_intnl_SystemSingle: %SystemSingle, null\r\n    __91_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __92_intnl_SystemSingle: %SystemSingle, null\r\n    __93_intnl_SystemSingle:
+    %SystemSingle, null\r\n    __94_intnl_SystemSingle: %SystemSingle, null\r\n    __95_intnl_SystemSingle:
     %SystemSingle, null\r\n    __0_intnl_UnityEngineTransform: %UnityEngineTransform,
-    null\r\n    __1_intnl_UnityEngineTransform: %UnityEngineTransform, null\r\n    __2_intnl_UnityEngineTransform:
-    %UnityEngineTransform, null\r\n    __3_intnl_UnityEngineTransform: %UnityEngineTransform,
-    null\r\n    __4_intnl_UnityEngineTransform: %UnityEngineTransform, null\r\n    __5_intnl_UnityEngineTransform:
-    %UnityEngineTransform, null\r\n    __0_intnl_returnTarget_UInt32: %SystemUInt32,
-    null\r\n    __0_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __1_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\r\n    __10_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __11_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __12_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\r\n    __13_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __14_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __15_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\r\n    __16_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __17_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __18_intnl_UnityEngineVector3:
+    null\r\n    __1_intnl_UnityEngineTransform: %UnityEngineTransform, null\r\n    __10_intnl_UnityEngineTransform:
+    %UnityEngineTransform, null\r\n    __2_intnl_UnityEngineTransform: %UnityEngineTransform,
+    null\r\n    __3_intnl_UnityEngineTransform: %UnityEngineTransform, null\r\n    __4_intnl_UnityEngineTransform:
+    %UnityEngineTransform, null\r\n    __5_intnl_UnityEngineTransform: %UnityEngineTransform,
+    null\r\n    __6_intnl_UnityEngineTransform: %UnityEngineTransform, null\r\n    __7_intnl_UnityEngineTransform:
+    %UnityEngineTransform, null\r\n    __8_intnl_UnityEngineTransform: %UnityEngineTransform,
+    null\r\n    __9_intnl_UnityEngineTransform: %UnityEngineTransform, null\r\n    __0_intnl_returnTarget_UInt32:
+    %SystemUInt32, null\r\n    __0_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __1_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __10_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __11_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __12_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __13_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __14_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __15_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __16_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __17_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __18_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __19_intnl_UnityEngineVector3:
     %UnityEngineVector3, null\r\n    __2_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __3_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __4_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\r\n    __5_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __6_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __7_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\r\n    __8_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __9_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n\r\n.data_end\r\n\r\n.code_start\r\n
-    \   .export _start\r\n        \r\n    _start:\r\n        \r\n        PUSH, __0_const_intnl_SystemUInt32\r\n
+    null\r\n    __20_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __21_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __22_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __23_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __24_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __25_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __26_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __27_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __28_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __29_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __3_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __4_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __5_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __6_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __7_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __8_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __9_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n\r\n.data_end\r\n\r\n.code_start\r\n    .export _start\r\n
+    \       \r\n    _start:\r\n        \r\n        PUSH, __0_const_intnl_SystemUInt32\r\n
     \       PUSH, AtmosphereThinningStart\r\n        PUSH, AtmosphereThinningEnd\r\n
     \       PUSH, __0_intnl_SystemBoolean\r\n        EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
     \       PUSH, __0_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000004C\r\n
@@ -289,7 +329,7 @@ MonoBehaviour:
     \       PUSH, __6_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __6_intnl_SystemBoolean\r\n        PUSH, __2_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __2_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00002318\r\n        PUSH, LandingGearDragMulti\r\n        PUSH, __0_GearDrag_Single\r\n
+    0x00002BC8\r\n        PUSH, LandingGearDragMulti\r\n        PUSH, __0_GearDrag_Single\r\n
     \       COPY\r\n        PUSH, localPlayer\r\n        PUSH, __0_const_intnl_VRCSDKBaseVRCPlayerApi\r\n
     \       PUSH, __8_intnl_SystemBoolean\r\n        EXTERN, \"SystemObject.__op_Equality__SystemObject_SystemObject__SystemBoolean\"\r\n
     \       PUSH, __8_intnl_SystemBoolean\r\n        PUSH, __7_intnl_SystemBoolean\r\n
@@ -320,7 +360,7 @@ MonoBehaviour:
     __18_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __18_intnl_SystemBoolean\r\n        PUSH, __15_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __15_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001424\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH, Occupied\r\n
+    0x000016C4\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH, Occupied\r\n
     \       COPY\r\n        PUSH, __0_const_intnl_UnityEngineKeyCode\r\n        PUSH,
     __19_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineInput.__GetKey__UnityEngineKeyCode__SystemBoolean\"\r\n
     \       PUSH, __19_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000768\r\n
@@ -467,83 +507,128 @@ MonoBehaviour:
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __21_intnl_SystemSingle\r\n
     \       PUSH, __22_intnl_SystemSingle\r\n        PUSH, __23_intnl_SystemSingle\r\n
     \       PUSH, yawinput\r\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, rollinput\r\n        PUSH, RollStrength\r\n        PUSH, roll\r\n
-    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, pitchinput\r\n        PUSH, PitchStrength\r\n        PUSH, pitch\r\n
-    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, yawinput\r\n        PUSH, YawStrength\r\n        PUSH, yaw\r\n        EXTERN,
-    \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __11_const_intnl_UnityEngineKeyCode\r\n        PUSH, __31_intnl_SystemBoolean\r\n
-    \       EXTERN, \"UnityEngineInput.__GetKeyDown__UnityEngineKeyCode__SystemBoolean\"\r\n
+    \       PUSH, VehicleRigidbody\r\n        PUSH, __4_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n
+    \       PUSH, VehicleMainObj\r\n        PUSH, __3_intnl_UnityEngineTransform\r\n
+    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
+    \       PUSH, __3_intnl_UnityEngineTransform\r\n        PUSH, __5_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineTransform.__get_forward__UnityEngineVector3\"\r\n
+    \       PUSH, __4_intnl_UnityEngineVector3\r\n        PUSH, __5_intnl_UnityEngineVector3\r\n
+    \       PUSH, __24_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__Dot__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\r\n
+    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __25_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __24_intnl_SystemSingle\r\n        PUSH, __25_intnl_SystemSingle\r\n        PUSH,
+    __31_intnl_SystemBoolean\r\n        EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
     \       PUSH, __31_intnl_SystemBoolean\r\n        PUSH, __30_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __30_intnl_SystemBoolean\r\n        PUSH, __32_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000010E0\r\n
-    \       PUSH, __6_const_intnl_SystemString\r\n        PUSH, __34_intnl_SystemBoolean\r\n
-    \       EXTERN, \"UnityEngineInput.__GetButtonDown__SystemString__SystemBoolean\"\r\n
-    \       PUSH, __34_intnl_SystemBoolean\r\n        PUSH, __33_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000010AC\r\n        PUSH, __33_intnl_SystemBoolean\r\n        PUSH, HasLandingGear\r\n
-    \       PUSH, __35_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __35_intnl_SystemBoolean\r\n        PUSH, __33_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __30_intnl_SystemBoolean\r\n        PUSH, __33_intnl_SystemBoolean\r\n
-    \       PUSH, __36_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __36_intnl_SystemBoolean\r\n        PUSH, __30_intnl_SystemBoolean\r\n
+    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001098\r\n
+    \       PUSH, __30_intnl_SystemBoolean\r\n        PUSH, AirplaneThrustVectoring\r\n
+    \       PUSH, __33_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __33_intnl_SystemBoolean\r\n        PUSH, __30_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __30_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001108\r\n        PUSH, GearUp\r\n        PUSH, GearUp\r\n        EXTERN,
-    \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n        PUSH,
-    __12_const_intnl_UnityEngineKeyCode\r\n        PUSH, __40_intnl_SystemBoolean\r\n
+    0x000010C4\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH, __0_forward_Boolean\r\n
+    \       COPY\r\n        JUMP, 0x000010D8\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n
+    \       PUSH, __0_forward_Boolean\r\n        COPY\r\n        PUSH, __0_forward_Boolean\r\n
+    \       JUMP_IF_FALSE, 0x00001108\r\n        PUSH, __0_const_intnl_SystemInt32\r\n
+    \       PUSH, __0_forward_roll_Single\r\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n
+    \       JUMP, 0x00001120\r\n        PUSH, ReversingRollStrength\r\n        PUSH,
+    __0_forward_roll_Single\r\n        EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_forward_Boolean\r\n        JUMP_IF_FALSE, 0x00001150\r\n        PUSH,
+    __0_const_intnl_SystemInt32\r\n        PUSH, __0_forward_pitch_Single\r\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        JUMP, 0x00001168\r\n
+    \       PUSH, ReversingPitchStrength\r\n        PUSH, __0_forward_pitch_Single\r\n
+    \       EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_forward_Boolean\r\n        JUMP_IF_FALSE, 0x00001198\r\n        PUSH,
+    __0_const_intnl_SystemInt32\r\n        PUSH, __0_forward_yaw_Single\r\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        JUMP, 0x000011B0\r\n
+    \       PUSH, ReversingYawStrength\r\n        PUSH, __0_forward_yaw_Single\r\n
+    \       EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n
+    \       PUSH, rollinput\r\n        PUSH, RollStrength\r\n        PUSH, __26_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __26_intnl_SystemSingle\r\n        PUSH, __0_forward_roll_Single\r\n
+    \       PUSH, roll\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, pitchinput\r\n        PUSH, PitchStrength\r\n        PUSH, __27_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __27_intnl_SystemSingle\r\n        PUSH, __0_forward_pitch_Single\r\n
+    \       PUSH, pitch\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, yawinput\r\n        PUSH, __28_intnl_SystemSingle\r\n        EXTERN,
+    \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n        PUSH,
+    __28_intnl_SystemSingle\r\n        PUSH, YawStrength\r\n        PUSH, __29_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __29_intnl_SystemSingle\r\n        PUSH, __0_forward_yaw_Single\r\n
+    \       PUSH, yaw\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __11_const_intnl_UnityEngineKeyCode\r\n        PUSH, __35_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineInput.__GetKeyDown__UnityEngineKeyCode__SystemBoolean\"\r\n
-    \       PUSH, __40_intnl_SystemBoolean\r\n        PUSH, __39_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __39_intnl_SystemBoolean\r\n        PUSH, __41_intnl_SystemBoolean\r\n
+    \       PUSH, __35_intnl_SystemBoolean\r\n        PUSH, __34_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __34_intnl_SystemBoolean\r\n        PUSH, __36_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __41_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000011A8\r\n
-    \       PUSH, __7_const_intnl_SystemString\r\n        PUSH, __42_intnl_SystemBoolean\r\n
+    \       PUSH, __36_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001380\r\n
+    \       PUSH, __6_const_intnl_SystemString\r\n        PUSH, __38_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineInput.__GetButtonDown__SystemString__SystemBoolean\"\r\n
-    \       PUSH, __39_intnl_SystemBoolean\r\n        PUSH, __42_intnl_SystemBoolean\r\n
-    \       PUSH, __43_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __43_intnl_SystemBoolean\r\n        PUSH, __39_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __39_intnl_SystemBoolean\r\n        PUSH, __38_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __38_intnl_SystemBoolean\r\n        PUSH, __44_intnl_SystemBoolean\r\n
+    \       PUSH, __38_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __37_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x0000134C\r\n        PUSH, __37_intnl_SystemBoolean\r\n        PUSH, HasLandingGear\r\n
+    \       PUSH, __39_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __39_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __34_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
+    \       PUSH, __40_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __40_intnl_SystemBoolean\r\n        PUSH, __34_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __34_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x000013A8\r\n        PUSH, GearUp\r\n        PUSH, GearUp\r\n        EXTERN,
+    \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n        PUSH,
+    __12_const_intnl_UnityEngineKeyCode\r\n        PUSH, __44_intnl_SystemBoolean\r\n
+    \       EXTERN, \"UnityEngineInput.__GetKeyDown__UnityEngineKeyCode__SystemBoolean\"\r\n
+    \       PUSH, __44_intnl_SystemBoolean\r\n        PUSH, __43_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __43_intnl_SystemBoolean\r\n        PUSH, __45_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __44_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001230\r\n
-    \       PUSH, __8_const_intnl_SystemString\r\n        PUSH, __45_intnl_SystemBoolean\r\n
+    \       PUSH, __45_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001448\r\n
+    \       PUSH, __7_const_intnl_SystemString\r\n        PUSH, __46_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineInput.__GetButtonDown__SystemString__SystemBoolean\"\r\n
-    \       PUSH, __38_intnl_SystemBoolean\r\n        PUSH, __45_intnl_SystemBoolean\r\n
-    \       PUSH, __46_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __46_intnl_SystemBoolean\r\n        PUSH, __38_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __38_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __37_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001288\r\n        PUSH, __37_intnl_SystemBoolean\r\n        PUSH, HasFlaps\r\n
-    \       PUSH, __47_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __47_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __37_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000012B0\r\n        PUSH, Flaps\r\n        PUSH, Flaps\r\n        EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __24_intnl_SystemSingle\r\n
+    \       PUSH, __43_intnl_SystemBoolean\r\n        PUSH, __46_intnl_SystemBoolean\r\n
+    \       PUSH, __47_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __47_intnl_SystemBoolean\r\n        PUSH, __43_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __43_intnl_SystemBoolean\r\n        PUSH, __42_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __42_intnl_SystemBoolean\r\n        PUSH, __48_intnl_SystemBoolean\r\n
+    \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __48_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000014D0\r\n
+    \       PUSH, __8_const_intnl_SystemString\r\n        PUSH, __49_intnl_SystemBoolean\r\n
+    \       EXTERN, \"UnityEngineInput.__GetButtonDown__SystemString__SystemBoolean\"\r\n
+    \       PUSH, __42_intnl_SystemBoolean\r\n        PUSH, __49_intnl_SystemBoolean\r\n
+    \       PUSH, __50_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __50_intnl_SystemBoolean\r\n        PUSH, __42_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __42_intnl_SystemBoolean\r\n        PUSH, __41_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __41_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x00001528\r\n        PUSH, __41_intnl_SystemBoolean\r\n        PUSH, HasFlaps\r\n
+    \       PUSH, __51_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __51_intnl_SystemBoolean\r\n        PUSH, __41_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __41_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x00001550\r\n        PUSH, Flaps\r\n        PUSH, Flaps\r\n        EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __30_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    pitch\r\n        PUSH, __24_intnl_SystemSingle\r\n        PUSH, __48_intnl_SystemBoolean\r\n
+    pitch\r\n        PUSH, __30_intnl_SystemSingle\r\n        PUSH, __52_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
-    \       PUSH, __48_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000132C\r\n
+    \       PUSH, __52_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000015CC\r\n
     \       PUSH, pitch\r\n        PUSH, AirplanePitchDownStrRatio\r\n        PUSH,
-    __25_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __25_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
-    \       PUSH, Taxiing\r\n        JUMP_IF_FALSE, 0x0000141C\r\n        PUSH, VehicleMainObj\r\n
-    \       PUSH, __3_intnl_UnityEngineTransform\r\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
-    \       PUSH, __3_intnl_UnityEngineTransform\r\n        PUSH, __0_intnl_UnityEngineQuaternion\r\n
+    __31_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __31_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
+    \       PUSH, Taxiing\r\n        JUMP_IF_FALSE, 0x000016BC\r\n        PUSH, VehicleMainObj\r\n
+    \       PUSH, __4_intnl_UnityEngineTransform\r\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
+    \       PUSH, __4_intnl_UnityEngineTransform\r\n        PUSH, __0_intnl_UnityEngineQuaternion\r\n
     \       EXTERN, \"UnityEngineTransform.__get_rotation__UnityEngineQuaternion\"\r\n
     \       PUSH, __0_intnl_UnityEngineQuaternion\r\n        PUSH, __0_taxirot_Vector3\r\n
     \       EXTERN, \"UnityEngineQuaternion.__get_eulerAngles__UnityEngineVector3\"\r\n
-    \       PUSH, VehicleMainObj\r\n        PUSH, __4_intnl_UnityEngineTransform\r\n
+    \       PUSH, VehicleMainObj\r\n        PUSH, __5_intnl_UnityEngineTransform\r\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
-    \       PUSH, __4_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__get_up__UnityEngineVector3\"\r\n
-    \       PUSH, yawinput\r\n        PUSH, TaxiRotationSpeed\r\n        PUSH, __25_intnl_SystemSingle\r\n
+    \       PUSH, __6_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__get_up__UnityEngineVector3\"\r\n
+    \       PUSH, yawinput\r\n        PUSH, TaxiRotationSpeed\r\n        PUSH, __31_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __26_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __25_intnl_SystemSingle\r\n        PUSH, __26_intnl_SystemSingle\r\n
-    \       PUSH, __27_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __4_intnl_UnityEngineTransform\r\n        PUSH, __4_intnl_UnityEngineVector3\r\n
-    \       PUSH, __27_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTransform.__Rotate__UnityEngineVector3_SystemSingle__SystemVoid\"\r\n
-    \       JUMP, 0x000014E4\r\n        PUSH, __1_const_intnl_SystemInt32\r\n        PUSH,
+    \       PUSH, __32_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
+    \       PUSH, __31_intnl_SystemSingle\r\n        PUSH, __32_intnl_SystemSingle\r\n
+    \       PUSH, __33_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __5_intnl_UnityEngineTransform\r\n        PUSH, __6_intnl_UnityEngineVector3\r\n
+    \       PUSH, __33_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTransform.__Rotate__UnityEngineVector3_SystemSingle__SystemVoid\"\r\n
+    \       JUMP, 0x00001784\r\n        PUSH, __1_const_intnl_SystemInt32\r\n        PUSH,
     roll\r\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n
     \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, pitch\r\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __1_const_intnl_SystemInt32\r\n
@@ -573,278 +658,397 @@ MonoBehaviour:
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
     downspeed\r\n        PUSH, __7_intnl_SystemSingle\r\n        PUSH, __19_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemSingle.__op_LessThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
-    \       PUSH, __19_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001618\r\n
+    \       PUSH, __19_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000018B8\r\n
     \       PUSH, downspeed\r\n        PUSH, AirplanePullDownLiftRatio\r\n        PUSH,
     __8_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __8_intnl_SystemSingle\r\n        PUSH, downspeed\r\n        COPY\r\n
-    \       PUSH, VehicleRigidbody\r\n        PUSH, CurrentVel\r\n        EXTERN,
-    \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n        PUSH, CurrentVel\r\n
-    \       PUSH, __8_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n
-    \       PUSH, __8_intnl_SystemSingle\r\n        PUSH, __1_const_intnl_SystemSingle\r\n
-    \       PUSH, speed20\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, CurrentVel\r\n        PUSH, __9_intnl_SystemSingle\r\n        EXTERN,
-    \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n        PUSH, CurrentVel\r\n
-    \       PUSH, __10_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n
-    \       PUSH, __9_intnl_SystemSingle\r\n        PUSH, __10_intnl_SystemSingle\r\n
-    \       PUSH, __11_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __11_intnl_SystemSingle\r\n        PUSH, AirplaneVelLiftCoefficient\r\n
-    \       PUSH, __12_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __13_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    __12_intnl_SystemSingle\r\n        PUSH, __13_intnl_SystemSingle\r\n        PUSH,
-    MaxVelLift\r\n        PUSH, __0_SpeedLiftFactor_Single\r\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, CurrentVel\r\n        PUSH, __14_intnl_SystemSingle\r\n        EXTERN,
-    \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n        PUSH, __14_intnl_SystemSingle\r\n
-    \       PUSH, RotMultiMaxSpeed\r\n        PUSH, rotlift\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, rotlift\r\n        PUSH, RotMultiMaxSpeed\r\n        PUSH, __15_intnl_SystemSingle\r\n
-    \       EXTERN, \"UnityEngineMathf.__Min__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, AirplaneThrustVectoring\r\n        JUMP_IF_FALSE, 0x00001884\r\n
-    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, rotlift\r\n        PUSH, __16_intnl_SystemSingle\r\n
-    \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, roll\r\n        PUSH, __16_intnl_SystemSingle\r\n        PUSH, __17_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __17_intnl_SystemSingle\r\n        PUSH, roll\r\n        COPY\r\n
-    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, rotlift\r\n        PUSH, __18_intnl_SystemSingle\r\n
-    \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, pitch\r\n        PUSH, __18_intnl_SystemSingle\r\n        PUSH,
-    __19_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __19_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
-    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, rotlift\r\n        PUSH, __20_intnl_SystemSingle\r\n
-    \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, yaw\r\n        PUSH, __20_intnl_SystemSingle\r\n        PUSH, __21_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __21_intnl_SystemSingle\r\n        PUSH, yaw\r\n        COPY\r\n
-    \       JUMP, 0x00001920\r\n        PUSH, roll\r\n        PUSH, rotlift\r\n        PUSH,
-    __16_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __16_intnl_SystemSingle\r\n        PUSH, roll\r\n        COPY\r\n
-    \       PUSH, pitch\r\n        PUSH, rotlift\r\n        PUSH, __17_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __17_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
-    \       PUSH, yaw\r\n        PUSH, rotlift\r\n        PUSH, __18_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __18_intnl_SystemSingle\r\n        PUSH, yaw\r\n        COPY\r\n
-    \       PUSH, CenterOfMass\r\n        PUSH, __6_intnl_UnityEngineVector3\r\n        EXTERN,
-    \"UnityEngineTransform.__get_position__UnityEngineVector3\"\r\n        PUSH, __6_intnl_UnityEngineVector3\r\n
-    \       PUSH, __16_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__get_y__SystemSingle\"\r\n
-    \       PUSH, __16_intnl_SystemSingle\r\n        PUSH, AtmoshpereFadeDistance\r\n
-    \       PUSH, __17_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __17_intnl_SystemSingle\r\n        PUSH, __18_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __19_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    __18_intnl_SystemSingle\r\n        PUSH, __19_intnl_SystemSingle\r\n        PUSH,
-    __20_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __20_intnl_SystemSingle\r\n        PUSH, AtmosphereHeightThing\r\n
-    \       PUSH, __21_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __22_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    __0_const_intnl_SystemInt32\r\n        PUSH, __23_intnl_SystemSingle\r\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __21_intnl_SystemSingle\r\n
-    \       PUSH, __22_intnl_SystemSingle\r\n        PUSH, __23_intnl_SystemSingle\r\n
-    \       PUSH, Atmosphere\r\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, VehicleRigidbody\r\n        PUSH, __7_intnl_UnityEngineVector3\r\n
-    \       EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n
     \       PUSH, VehicleMainObj\r\n        PUSH, __4_intnl_UnityEngineTransform\r\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
-    \       PUSH, __4_intnl_UnityEngineTransform\r\n        PUSH, __8_intnl_UnityEngineVector3\r\n
+    \       PUSH, __4_intnl_UnityEngineTransform\r\n        PUSH, __6_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineTransform.__get_forward__UnityEngineVector3\"\r\n
+    \       PUSH, CurrentVel\r\n        PUSH, __7_intnl_UnityEngineVector3\r\n        EXTERN,
+    \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\r\n        PUSH, VehicleMainObj\r\n
+    \       PUSH, __5_intnl_UnityEngineTransform\r\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
+    \       PUSH, __5_intnl_UnityEngineTransform\r\n        PUSH, __8_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineTransform.__get_right__UnityEngineVector3\"\r\n        PUSH,
-    __7_intnl_UnityEngineVector3\r\n        PUSH, __8_intnl_UnityEngineVector3\r\n
+    __6_intnl_UnityEngineVector3\r\n        PUSH, __7_intnl_UnityEngineVector3\r\n
+    \       PUSH, __8_intnl_UnityEngineVector3\r\n        PUSH, AngleOfAttack\r\n
+    \       EXTERN, \"UnityEngineVector3.__SignedAngle__UnityEngineVector3_UnityEngineVector3_UnityEngineVector3__SystemSingle\"\r\n
+    \       PUSH, VehicleMainObj\r\n        PUSH, __6_intnl_UnityEngineTransform\r\n
+    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
+    \       PUSH, __6_intnl_UnityEngineTransform\r\n        PUSH, __9_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineTransform.__get_forward__UnityEngineVector3\"\r\n
+    \       PUSH, CurrentVel\r\n        PUSH, __10_intnl_UnityEngineVector3\r\n        EXTERN,
+    \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\r\n        PUSH, VehicleMainObj\r\n
+    \       PUSH, __7_intnl_UnityEngineTransform\r\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
+    \       PUSH, __7_intnl_UnityEngineTransform\r\n        PUSH, __11_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineTransform.__get_up__UnityEngineVector3\"\r\n        PUSH,
+    __9_intnl_UnityEngineVector3\r\n        PUSH, __10_intnl_UnityEngineVector3\r\n
+    \       PUSH, __11_intnl_UnityEngineVector3\r\n        PUSH, AngleOfAttackYaw\r\n
+    \       EXTERN, \"UnityEngineVector3.__SignedAngle__UnityEngineVector3_UnityEngineVector3_UnityEngineVector3__SystemSingle\"\r\n
+    \       PUSH, AngleOfAttack\r\n        PUSH, __8_intnl_SystemSingle\r\n        EXTERN,
+    \"UnityEngineMathf.__Abs__SystemSingle__SystemSingle\"\r\n        PUSH, __8_intnl_SystemSingle\r\n
+    \       PUSH, MaxAngleOfAttack\r\n        PUSH, __9_intnl_SystemSingle\r\n        EXTERN,
+    \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n        PUSH,
+    AngleOfAttack\r\n        PUSH, __10_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Abs__SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __2_const_intnl_SystemInt32\r\n        PUSH, __11_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __10_intnl_SystemSingle\r\n        PUSH, __11_intnl_SystemSingle\r\n        PUSH,
+    __12_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Subtraction__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __12_intnl_SystemSingle\r\n        PUSH, __13_intnl_SystemSingle\r\n
+    \       EXTERN, \"UnityEngineMathf.__Abs__SystemSingle__SystemSingle\"\r\n        PUSH,
+    __13_intnl_SystemSingle\r\n        PUSH, MaxAngleOfAttack\r\n        PUSH, __14_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __9_intnl_SystemSingle\r\n        PUSH, __14_intnl_SystemSingle\r\n
+    \       PUSH, __0_AoALift_Single\r\n        EXTERN, \"UnityEngineMathf.__Min__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_AoALift_Single\r\n        PUSH, __0_AoALift_Single\r\n        EXTERN,
+    \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n        PUSH,
+    __0_const_intnl_SystemInt32\r\n        PUSH, __15_intnl_SystemSingle\r\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __0_AoALift_Single\r\n
+    \       PUSH, __15_intnl_SystemSingle\r\n        PUSH, __16_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __16_intnl_SystemSingle\r\n        PUSH, __0_AoALift_Single\r\n
+    \       COPY\r\n        PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __17_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __0_AoALift_Single\r\n        PUSH, MinHighAoAControl\r\n        PUSH, __17_intnl_SystemSingle\r\n
+    \       PUSH, __0_AoALift_Single\r\n        PUSH, __18_intnl_SystemSingle\r\n
+    \       COPY # Copy-on-write symbol value dirtied\r\n        PUSH, __0_AoALift_Single\r\n
+    \       EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, AngleOfAttackYaw\r\n        PUSH, __19_intnl_SystemSingle\r\n        EXTERN,
+    \"UnityEngineMathf.__Abs__SystemSingle__SystemSingle\"\r\n        PUSH, __19_intnl_SystemSingle\r\n
+    \       PUSH, MaxAngleOfAttackYaw\r\n        PUSH, __20_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, AngleOfAttackYaw\r\n        PUSH, __21_intnl_SystemSingle\r\n        EXTERN,
+    \"UnityEngineMathf.__Abs__SystemSingle__SystemSingle\"\r\n        PUSH, __2_const_intnl_SystemInt32\r\n
+    \       PUSH, __22_intnl_SystemSingle\r\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n
+    \       PUSH, __21_intnl_SystemSingle\r\n        PUSH, __22_intnl_SystemSingle\r\n
+    \       PUSH, __23_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Subtraction__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __23_intnl_SystemSingle\r\n        PUSH, __24_intnl_SystemSingle\r\n
+    \       EXTERN, \"UnityEngineMathf.__Abs__SystemSingle__SystemSingle\"\r\n        PUSH,
+    __24_intnl_SystemSingle\r\n        PUSH, MaxAngleOfAttackYaw\r\n        PUSH,
+    __25_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __20_intnl_SystemSingle\r\n        PUSH, __25_intnl_SystemSingle\r\n
+    \       PUSH, __0_AoALiftYaw_Single\r\n        EXTERN, \"UnityEngineMathf.__Min__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_AoALiftYaw_Single\r\n        PUSH, __0_AoALiftYaw_Single\r\n
+    \       EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __26_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __0_AoALiftYaw_Single\r\n        PUSH, __26_intnl_SystemSingle\r\n        PUSH,
+    __27_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __27_intnl_SystemSingle\r\n        PUSH, __0_AoALiftYaw_Single\r\n
+    \       COPY\r\n        PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __28_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __0_AoALiftYaw_Single\r\n        PUSH, MinHighAoAControl\r\n        PUSH, __28_intnl_SystemSingle\r\n
+    \       PUSH, __0_AoALiftYaw_Single\r\n        PUSH, __29_intnl_SystemSingle\r\n
+    \       COPY # Copy-on-write symbol value dirtied\r\n        PUSH, __0_AoALiftYaw_Single\r\n
+    \       EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, VehicleRigidbody\r\n        PUSH, CurrentVel\r\n        EXTERN,
+    \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n        PUSH, CurrentVel\r\n
+    \       PUSH, __30_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n
+    \       PUSH, __30_intnl_SystemSingle\r\n        PUSH, __1_const_intnl_SystemSingle\r\n
+    \       PUSH, speed20\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, CurrentVel\r\n        PUSH, __31_intnl_SystemSingle\r\n        EXTERN,
+    \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n        PUSH, CurrentVel\r\n
+    \       PUSH, __32_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n
+    \       PUSH, __31_intnl_SystemSingle\r\n        PUSH, __32_intnl_SystemSingle\r\n
+    \       PUSH, __33_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __33_intnl_SystemSingle\r\n        PUSH, AirplaneVelLiftCoefficient\r\n
+    \       PUSH, __34_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __35_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __34_intnl_SystemSingle\r\n        PUSH, __35_intnl_SystemSingle\r\n        PUSH,
+    MaxVelLift\r\n        PUSH, __0_SpeedLiftFactor_Single\r\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, CurrentVel\r\n        PUSH, __36_intnl_SystemSingle\r\n        EXTERN,
+    \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n        PUSH, __36_intnl_SystemSingle\r\n
+    \       PUSH, RotMultiMaxSpeed\r\n        PUSH, rotlift\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, AirplaneThrustVectoring\r\n        JUMP_IF_FALSE, 0x00001FD4\r\n
+    \       PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __37_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, __37_intnl_SystemSingle\r\n
+    \       PUSH, __38_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, roll\r\n        PUSH, __38_intnl_SystemSingle\r\n        PUSH, __39_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __39_intnl_SystemSingle\r\n        PUSH, roll\r\n        COPY\r\n
+    \       PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __40_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, __40_intnl_SystemSingle\r\n
+    \       PUSH, __41_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, pitch\r\n        PUSH, __41_intnl_SystemSingle\r\n        PUSH,
+    __42_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __42_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
+    \       PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __43_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, __43_intnl_SystemSingle\r\n
+    \       PUSH, __44_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, yaw\r\n        PUSH, __44_intnl_SystemSingle\r\n        PUSH, __45_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __45_intnl_SystemSingle\r\n        PUSH, yaw\r\n        COPY\r\n
+    \       JUMP, 0x000020D0\r\n        PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n
+    \       PUSH, __37_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, roll\r\n        PUSH, __37_intnl_SystemSingle\r\n        PUSH, __38_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __38_intnl_SystemSingle\r\n        PUSH, roll\r\n        COPY\r\n
+    \       PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __39_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, pitch\r\n        PUSH, __39_intnl_SystemSingle\r\n        PUSH,
+    __40_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __40_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
+    \       PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __41_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, yaw\r\n        PUSH, __41_intnl_SystemSingle\r\n        PUSH, __42_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __42_intnl_SystemSingle\r\n        PUSH, yaw\r\n        COPY\r\n
+    \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __37_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __0_AoALift_Single\r\n        PUSH, MinAoAPitchLift\r\n        PUSH, __37_intnl_SystemSingle\r\n
+    \       PUSH, __0_AoALift_Single\r\n        PUSH, __38_intnl_SystemSingle\r\n
+    \       COPY # Copy-on-write symbol value dirtied\r\n        PUSH, __0_AoALift_Single\r\n
+    \       EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __39_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __0_AoALiftYaw_Single\r\n        PUSH, MinAoAYawLift\r\n        PUSH, __39_intnl_SystemSingle\r\n
+    \       PUSH, __0_AoALiftYaw_Single\r\n        PUSH, __40_intnl_SystemSingle\r\n
+    \       COPY # Copy-on-write symbol value dirtied\r\n        PUSH, __0_AoALiftYaw_Single\r\n
+    \       EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, CenterOfMass\r\n        PUSH, __12_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\r\n
+    \       PUSH, __12_intnl_UnityEngineVector3\r\n        PUSH, __41_intnl_SystemSingle\r\n
+    \       EXTERN, \"UnityEngineVector3.__get_y__SystemSingle\"\r\n        PUSH,
+    __41_intnl_SystemSingle\r\n        PUSH, AtmoshpereFadeDistance\r\n        PUSH,
+    __42_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __42_intnl_SystemSingle\r\n        PUSH, __43_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __44_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __43_intnl_SystemSingle\r\n        PUSH, __44_intnl_SystemSingle\r\n        PUSH,
+    __45_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __45_intnl_SystemSingle\r\n        PUSH, AtmosphereHeightThing\r\n
+    \       PUSH, __46_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __47_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
+    __0_const_intnl_SystemInt32\r\n        PUSH, __48_intnl_SystemSingle\r\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __46_intnl_SystemSingle\r\n
+    \       PUSH, __47_intnl_SystemSingle\r\n        PUSH, __48_intnl_SystemSingle\r\n
+    \       PUSH, Atmosphere\r\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, VehicleRigidbody\r\n        PUSH, __13_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n
+    \       PUSH, VehicleMainObj\r\n        PUSH, __8_intnl_UnityEngineTransform\r\n
+    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
+    \       PUSH, __8_intnl_UnityEngineTransform\r\n        PUSH, __14_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineTransform.__get_right__UnityEngineVector3\"\r\n        PUSH,
+    __13_intnl_UnityEngineVector3\r\n        PUSH, __14_intnl_UnityEngineVector3\r\n
     \       PUSH, sidespeed\r\n        EXTERN, \"UnityEngineVector3.__Dot__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\r\n
-    \       PUSH, accelforward\r\n        PUSH, Atmosphere\r\n        PUSH, __24_intnl_SystemSingle\r\n
+    \       PUSH, accelforward\r\n        PUSH, Atmosphere\r\n        PUSH, __49_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __2_const_intnl_SystemSingle\r\n        PUSH, __2_const_intnl_SystemSingle\r\n
-    \       PUSH, __24_intnl_SystemSingle\r\n        PUSH, __0_InputAcc_Vector3\r\n
+    \       PUSH, __49_intnl_SystemSingle\r\n        PUSH, __0_InputAcc_Vector3\r\n
     \       EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __25_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, AccelerationResponse\r\n        PUSH, __25_intnl_SystemSingle\r\n
-    \       PUSH, __26_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __50_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
+    \       PUSH, AccelerationResponse\r\n        PUSH, __50_intnl_SystemSingle\r\n
+    \       PUSH, __51_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, LastFrameLerpedInputAcc\r\n        PUSH, __0_InputAcc_Vector3\r\n
-    \       PUSH, __26_intnl_SystemSingle\r\n        PUSH, __0_FinalInputAcc_Vector3\r\n
+    \       PUSH, __51_intnl_SystemSingle\r\n        PUSH, __0_FinalInputAcc_Vector3\r\n
     \       EXTERN, \"UnityEngineVector3.__Lerp__UnityEngineVector3_UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, PitchMoment\r\n        PUSH, __0_const_intnl_UnityEngineTransform\r\n
-    \       PUSH, __20_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __20_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001BB8\r\n
-    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __27_intnl_SystemSingle\r\n
+    \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __52_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    __27_intnl_SystemSingle\r\n        PUSH, yaw\r\n        PUSH, roll\r\n        PUSH,
-    __0_InputRot_Vector3\r\n        EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\r\n
-    \       JUMP, 0x00001BE0\r\n        PUSH, pitch\r\n        PUSH, yaw\r\n        PUSH,
-    roll\r\n        PUSH, __0_InputRot_Vector3\r\n        EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __27_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, RotationResponse\r\n        PUSH, __27_intnl_SystemSingle\r\n        PUSH,
-    __28_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    __1_const_intnl_SystemInt32\r\n        PUSH, __53_intnl_SystemSingle\r\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __52_intnl_SystemSingle\r\n
+    \       PUSH, __53_intnl_SystemSingle\r\n        PUSH, roll\r\n        PUSH, __0_InputRot_Vector3\r\n
+    \       EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\r\n
+    \       PUSH, __54_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
+    \       PUSH, RotationResponse\r\n        PUSH, __54_intnl_SystemSingle\r\n        PUSH,
+    __55_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, LastFrameLerpedInputRot\r\n        PUSH, __0_InputRot_Vector3\r\n
-    \       PUSH, __28_intnl_SystemSingle\r\n        PUSH, __0_FinalInputRot_Vector3\r\n
+    \       PUSH, __55_intnl_SystemSingle\r\n        PUSH, __0_FinalInputRot_Vector3\r\n
     \       EXTERN, \"UnityEngineVector3.__Lerp__UnityEngineVector3_UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
     \       PUSH, __0_FinalInputAcc_Vector3\r\n        PUSH, LastFrameLerpedInputAcc\r\n
     \       COPY\r\n        PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, LastFrameLerpedInputRot\r\n
     \       COPY\r\n        PUSH, FlapsDragMulti\r\n        PUSH, __0_FlapsDrag_Single\r\n
     \       COPY\r\n        PUSH, FlapsLiftMulti\r\n        PUSH, __0_FlapsLift_Single\r\n
-    \       COPY\r\n        PUSH, Flaps\r\n        PUSH, __22_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, Flaps\r\n        PUSH, __21_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __22_intnl_SystemBoolean\r\n        PUSH, __21_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __21_intnl_SystemBoolean\r\n        PUSH, __23_intnl_SystemBoolean\r\n
+    \       PUSH, __21_intnl_SystemBoolean\r\n        PUSH, __20_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __20_intnl_SystemBoolean\r\n        PUSH, __22_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __23_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001D28\r\n
-    \       PUSH, HasFlaps\r\n        PUSH, __24_intnl_SystemBoolean\r\n        EXTERN,
+    \       PUSH, __22_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002538\r\n
+    \       PUSH, HasFlaps\r\n        PUSH, __23_intnl_SystemBoolean\r\n        EXTERN,
     \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n        PUSH,
-    __21_intnl_SystemBoolean\r\n        PUSH, __24_intnl_SystemBoolean\r\n        PUSH,
-    __25_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __25_intnl_SystemBoolean\r\n        PUSH, __21_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __21_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001D68\r\n        PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __0_FlapsDrag_Single\r\n
+    __20_intnl_SystemBoolean\r\n        PUSH, __23_intnl_SystemBoolean\r\n        PUSH,
+    __24_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __24_intnl_SystemBoolean\r\n        PUSH, __20_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __20_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x00002578\r\n        PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __0_FlapsDrag_Single\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
     __0_const_intnl_SystemInt32\r\n        PUSH, __0_FlapsLift_Single\r\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, sidespeed\r\n
-    \       PUSH, AirplaneSidewaysLift\r\n        PUSH, __29_intnl_SystemSingle\r\n
+    \       PUSH, AirplaneSidewaysLift\r\n        PUSH, __56_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __1_intnl_SystemInt32\r\n
     \       EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\r\n
-    \       PUSH, __1_intnl_SystemInt32\r\n        PUSH, __30_intnl_SystemSingle\r\n
+    \       PUSH, __1_intnl_SystemInt32\r\n        PUSH, __57_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    __29_intnl_SystemSingle\r\n        PUSH, __30_intnl_SystemSingle\r\n        PUSH,
-    __31_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __31_intnl_SystemSingle\r\n        PUSH, __0_SpeedLiftFactor_Single\r\n
-    \       PUSH, __32_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_FinalInputAcc_Vector3\r\n        PUSH, __32_intnl_SystemSingle\r\n
+    __56_intnl_SystemSingle\r\n        PUSH, __57_intnl_SystemSingle\r\n        PUSH,
+    __58_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __58_intnl_SystemSingle\r\n        PUSH, __0_SpeedLiftFactor_Single\r\n
+    \       PUSH, __59_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __59_intnl_SystemSingle\r\n        PUSH, __0_AoALiftYaw_Single\r\n
+    \       PUSH, __60_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_FinalInputAcc_Vector3\r\n        PUSH, __60_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__set_x__SystemSingle\"\r\n        PUSH,
-    downspeed\r\n        PUSH, __0_FlapsLift_Single\r\n        PUSH, __33_intnl_SystemSingle\r\n
+    downspeed\r\n        PUSH, __0_FlapsLift_Single\r\n        PUSH, __61_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __33_intnl_SystemSingle\r\n        PUSH, AirplanePullDownLiftRatio\r\n
-    \       PUSH, __34_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __34_intnl_SystemSingle\r\n        PUSH, AirplaneLift\r\n        PUSH,
-    __35_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __35_intnl_SystemSingle\r\n        PUSH, __0_SpeedLiftFactor_Single\r\n
-    \       PUSH, __36_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_SpeedLiftFactor_Single\r\n        PUSH, AirplaneVelPullUp\r\n
-    \       PUSH, __37_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __36_intnl_SystemSingle\r\n        PUSH, __37_intnl_SystemSingle\r\n
-    \       PUSH, __38_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_FinalInputAcc_Vector3\r\n        PUSH, __38_intnl_SystemSingle\r\n
+    \       PUSH, __61_intnl_SystemSingle\r\n        PUSH, AirplanePullDownLiftRatio\r\n
+    \       PUSH, __62_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __62_intnl_SystemSingle\r\n        PUSH, AirplaneLift\r\n        PUSH,
+    __63_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __63_intnl_SystemSingle\r\n        PUSH, __0_SpeedLiftFactor_Single\r\n
+    \       PUSH, __64_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __64_intnl_SystemSingle\r\n        PUSH, __0_AoALift_Single\r\n
+    \       PUSH, __65_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_SpeedLiftFactor_Single\r\n        PUSH, __0_AoALift_Single\r\n
+    \       PUSH, __66_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __66_intnl_SystemSingle\r\n        PUSH, AirplaneVelPullUp\r\n        PUSH,
+    __67_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __65_intnl_SystemSingle\r\n        PUSH, __67_intnl_SystemSingle\r\n
+    \       PUSH, __68_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_FinalInputAcc_Vector3\r\n        PUSH, __68_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__set_y__SystemSingle\"\r\n        PUSH,
-    downspeed\r\n        PUSH, VelStraightenStrPitch\r\n        PUSH, __39_intnl_SystemSingle\r\n
+    downspeed\r\n        PUSH, VelStraightenStrPitch\r\n        PUSH, __69_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __40_intnl_SystemSingle\r\n
+    \       PUSH, __69_intnl_SystemSingle\r\n        PUSH, __0_AoALift_Single\r\n
+    \       PUSH, __70_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __71_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__get_x__SystemSingle\"\r\n        PUSH,
-    __40_intnl_SystemSingle\r\n        PUSH, __39_intnl_SystemSingle\r\n        PUSH,
-    __41_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __41_intnl_SystemSingle\r\n
+    __71_intnl_SystemSingle\r\n        PUSH, __70_intnl_SystemSingle\r\n        PUSH,
+    __72_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __72_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__set_x__SystemSingle\"\r\n        PUSH,
-    sidespeed\r\n        PUSH, VelStraightenStrYaw\r\n        PUSH, __42_intnl_SystemSingle\r\n
+    sidespeed\r\n        PUSH, VelStraightenStrYaw\r\n        PUSH, __73_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __43_intnl_SystemSingle\r\n
+    \       PUSH, __73_intnl_SystemSingle\r\n        PUSH, __0_AoALiftYaw_Single\r\n
+    \       PUSH, __74_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __75_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__get_y__SystemSingle\"\r\n        PUSH,
-    __43_intnl_SystemSingle\r\n        PUSH, __42_intnl_SystemSingle\r\n        PUSH,
-    __44_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __44_intnl_SystemSingle\r\n
+    __75_intnl_SystemSingle\r\n        PUSH, __74_intnl_SystemSingle\r\n        PUSH,
+    __76_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __76_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__set_y__SystemSingle\"\r\n        PUSH,
-    VehicleRigidbody\r\n        PUSH, __9_intnl_UnityEngineVector3\r\n        EXTERN,
+    VehicleRigidbody\r\n        PUSH, __15_intnl_UnityEngineVector3\r\n        EXTERN,
     \"UnityEngineRigidbody.__get_angularVelocity__UnityEngineVector3\"\r\n        PUSH,
-    __0_this_intnl_UnityEngineTransform\r\n        PUSH, __9_intnl_UnityEngineVector3\r\n
+    __0_this_intnl_UnityEngineTransform\r\n        PUSH, __15_intnl_UnityEngineVector3\r\n
     \       PUSH, __0_localAngularVelocity_Vector3\r\n        EXTERN, \"UnityEngineTransform.__InverseTransformDirection__UnityEngineVector3__UnityEngineVector3\"\r\n
-    \       PUSH, __0_localAngularVelocity_Vector3\r\n        PUSH, __45_intnl_SystemSingle\r\n
+    \       PUSH, __0_localAngularVelocity_Vector3\r\n        PUSH, __77_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__get_z__SystemSingle\"\r\n        PUSH,
-    __45_intnl_SystemSingle\r\n        PUSH, __46_intnl_SystemSingle\r\n        EXTERN,
+    __77_intnl_SystemSingle\r\n        PUSH, __78_intnl_SystemSingle\r\n        EXTERN,
     \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n        PUSH,
-    __46_intnl_SystemSingle\r\n        PUSH, AirplaneRollFriction\r\n        PUSH,
-    __47_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __48_intnl_SystemSingle\r\n
+    __78_intnl_SystemSingle\r\n        PUSH, AirplaneRollFriction\r\n        PUSH,
+    __79_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __80_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__get_z__SystemSingle\"\r\n        PUSH,
-    __48_intnl_SystemSingle\r\n        PUSH, __47_intnl_SystemSingle\r\n        PUSH,
-    __49_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __49_intnl_SystemSingle\r\n
+    __80_intnl_SystemSingle\r\n        PUSH, __79_intnl_SystemSingle\r\n        PUSH,
+    __81_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __0_FinalInputRot_Vector3\r\n        PUSH, __81_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineVector3.__set_z__SystemSingle\"\r\n        PUSH,
-    __0_FinalInputRot_Vector3\r\n        PUSH, Atmosphere\r\n        PUSH, __10_intnl_UnityEngineVector3\r\n
+    __0_FinalInputRot_Vector3\r\n        PUSH, Atmosphere\r\n        PUSH, __16_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __10_intnl_UnityEngineVector3\r\n        PUSH, __0_FinalInputRot_Vector3\r\n
+    \       PUSH, __16_intnl_UnityEngineVector3\r\n        PUSH, __0_FinalInputRot_Vector3\r\n
     \       COPY\r\n        PUSH, __0_FinalInputAcc_Vector3\r\n        PUSH, Atmosphere\r\n
-    \       PUSH, __11_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __11_intnl_UnityEngineVector3\r\n        PUSH, __0_FinalInputAcc_Vector3\r\n
+    \       PUSH, __17_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
+    \       PUSH, __17_intnl_UnityEngineVector3\r\n        PUSH, __0_FinalInputAcc_Vector3\r\n
     \       COPY\r\n        PUSH, VehicleConstantForce\r\n        PUSH, __0_FinalInputAcc_Vector3\r\n
     \       EXTERN, \"UnityEngineConstantForce.__set_relativeForce__UnityEngineVector3__SystemVoid\"\r\n
     \       PUSH, VehicleConstantForce\r\n        PUSH, __0_FinalInputRot_Vector3\r\n
     \       EXTERN, \"UnityEngineConstantForce.__set_relativeTorque__UnityEngineVector3__SystemVoid\"\r\n
-    \       PUSH, GearUp\r\n        PUSH, __26_intnl_SystemBoolean\r\n        COPY\r\n
-    \       PUSH, __26_intnl_SystemBoolean\r\n        PUSH, __27_intnl_SystemBoolean\r\n
+    \       PUSH, GearUp\r\n        PUSH, __25_intnl_SystemBoolean\r\n        COPY\r\n
+    \       PUSH, __25_intnl_SystemBoolean\r\n        PUSH, __26_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __27_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000021C0\r\n
-    \       PUSH, HasLandingGear\r\n        PUSH, __28_intnl_SystemBoolean\r\n        EXTERN,
+    \       PUSH, __26_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002A70\r\n
+    \       PUSH, HasLandingGear\r\n        PUSH, __27_intnl_SystemBoolean\r\n        EXTERN,
     \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n        PUSH,
-    __26_intnl_SystemBoolean\r\n        PUSH, __28_intnl_SystemBoolean\r\n        PUSH,
-    __29_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __29_intnl_SystemBoolean\r\n        PUSH, __26_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __26_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000021E8\r\n        PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __0_GearDrag_Single\r\n
+    __25_intnl_SystemBoolean\r\n        PUSH, __27_intnl_SystemBoolean\r\n        PUSH,
+    __28_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __28_intnl_SystemBoolean\r\n        PUSH, __25_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __25_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x00002A98\r\n        PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __0_GearDrag_Single\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    __0_GearDrag_Single\r\n        PUSH, __0_FlapsDrag_Single\r\n        PUSH, __50_intnl_SystemSingle\r\n
+    __0_GearDrag_Single\r\n        PUSH, __0_FlapsDrag_Single\r\n        PUSH, __82_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __51_intnl_SystemSingle\r\n
+    \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __83_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    __50_intnl_SystemSingle\r\n        PUSH, __51_intnl_SystemSingle\r\n        PUSH,
+    __82_intnl_SystemSingle\r\n        PUSH, __83_intnl_SystemSingle\r\n        PUSH,
     __0_FlapsGearDrag_Single\r\n        EXTERN, \"SystemSingle.__op_Subtraction__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, VehicleRigidbody\r\n        PUSH, __12_intnl_UnityEngineVector3\r\n
+    \       PUSH, VehicleRigidbody\r\n        PUSH, __18_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n
-    \       PUSH, __13_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__get_zero__UnityEngineVector3\"\r\n
+    \       PUSH, __19_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__get_zero__UnityEngineVector3\"\r\n
     \       PUSH, AirFriction\r\n        PUSH, __0_FlapsGearDrag_Single\r\n        PUSH,
-    __52_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __52_intnl_SystemSingle\r\n        PUSH, Atmosphere\r\n        PUSH,
-    __53_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __54_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __53_intnl_SystemSingle\r\n        PUSH, __54_intnl_SystemSingle\r\n
-    \       PUSH, __55_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __12_intnl_UnityEngineVector3\r\n        PUSH, __13_intnl_UnityEngineVector3\r\n
-    \       PUSH, __55_intnl_SystemSingle\r\n        PUSH, __14_intnl_UnityEngineVector3\r\n
+    __84_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __84_intnl_SystemSingle\r\n        PUSH, Atmosphere\r\n        PUSH,
+    __85_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __86_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
+    \       PUSH, __85_intnl_SystemSingle\r\n        PUSH, __86_intnl_SystemSingle\r\n
+    \       PUSH, __87_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __18_intnl_UnityEngineVector3\r\n        PUSH, __19_intnl_UnityEngineVector3\r\n
+    \       PUSH, __87_intnl_SystemSingle\r\n        PUSH, __20_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineVector3.__Lerp__UnityEngineVector3_UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, VehicleRigidbody\r\n        PUSH, __14_intnl_UnityEngineVector3\r\n
+    \       PUSH, VehicleRigidbody\r\n        PUSH, __20_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineRigidbody.__set_velocity__UnityEngineVector3__SystemVoid\"\r\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\r\n        COPY\r\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\r\n        \r\n    .export
     _fixedUpdate\r\n        \r\n    _fixedUpdate:\r\n        \r\n        PUSH, __0_const_intnl_SystemUInt32\r\n
-    \       PUSH, PitchMoment\r\n        PUSH, __0_const_intnl_UnityEngineTransform\r\n
-    \       PUSH, __49_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __49_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002414\r\n
-    \       PUSH, VehicleMainObj\r\n        PUSH, __5_intnl_UnityEngineTransform\r\n
+    \       PUSH, VehicleMainObj\r\n        PUSH, __9_intnl_UnityEngineTransform\r\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
-    \       PUSH, __5_intnl_UnityEngineTransform\r\n        PUSH, __15_intnl_UnityEngineVector3\r\n
+    \       PUSH, __9_intnl_UnityEngineTransform\r\n        PUSH, __21_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineTransform.__get_up__UnityEngineVector3\"\r\n        PUSH,
-    __15_intnl_UnityEngineVector3\r\n        PUSH, pitch\r\n        PUSH, __16_intnl_UnityEngineVector3\r\n
+    __21_intnl_UnityEngineVector3\r\n        PUSH, pitch\r\n        PUSH, __22_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __16_intnl_UnityEngineVector3\r\n        PUSH, Atmosphere\r\n        PUSH,
-    __17_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, PitchMoment\r\n        PUSH, __18_intnl_UnityEngineVector3\r\n        EXTERN,
+    \       PUSH, __22_intnl_UnityEngineVector3\r\n        PUSH, Atmosphere\r\n        PUSH,
+    __23_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
+    \       PUSH, PitchMoment\r\n        PUSH, __24_intnl_UnityEngineVector3\r\n        EXTERN,
     \"UnityEngineTransform.__get_position__UnityEngineVector3\"\r\n        PUSH, VehicleRigidbody\r\n
-    \       PUSH, __17_intnl_UnityEngineVector3\r\n        PUSH, __18_intnl_UnityEngineVector3\r\n
+    \       PUSH, __23_intnl_UnityEngineVector3\r\n        PUSH, __24_intnl_UnityEngineVector3\r\n
+    \       PUSH, __0_const_intnl_UnityEngineForceMode\r\n        EXTERN, \"UnityEngineRigidbody.__AddForceAtPosition__UnityEngineVector3_UnityEngineVector3_UnityEngineForceMode__SystemVoid\"\r\n
+    \       PUSH, VehicleMainObj\r\n        PUSH, __10_intnl_UnityEngineTransform\r\n
+    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
+    \       PUSH, __10_intnl_UnityEngineTransform\r\n        PUSH, __25_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineTransform.__get_right__UnityEngineVector3\"\r\n        PUSH,
+    __25_intnl_UnityEngineVector3\r\n        PUSH, yaw\r\n        PUSH, __26_intnl_UnityEngineVector3\r\n
+    \       EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
+    \       PUSH, __26_intnl_UnityEngineVector3\r\n        PUSH, Atmosphere\r\n        PUSH,
+    __27_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
+    \       PUSH, YawMoment\r\n        PUSH, __28_intnl_UnityEngineVector3\r\n        EXTERN,
+    \"UnityEngineTransform.__get_position__UnityEngineVector3\"\r\n        PUSH, VehicleRigidbody\r\n
+    \       PUSH, __27_intnl_UnityEngineVector3\r\n        PUSH, __28_intnl_UnityEngineVector3\r\n
     \       PUSH, __0_const_intnl_UnityEngineForceMode\r\n        EXTERN, \"UnityEngineRigidbody.__AddForceAtPosition__UnityEngineVector3_UnityEngineVector3_UnityEngineForceMode__SystemVoid\"\r\n
     \       PUSH, localPlayer\r\n        PUSH, __0_const_intnl_VRCSDKBaseVRCPlayerApi\r\n
-    \       PUSH, __51_intnl_SystemBoolean\r\n        EXTERN, \"SystemObject.__op_Equality__SystemObject_SystemObject__SystemBoolean\"\r\n
-    \       PUSH, __51_intnl_SystemBoolean\r\n        PUSH, __50_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __50_intnl_SystemBoolean\r\n        PUSH, __52_intnl_SystemBoolean\r\n
+    \       PUSH, __54_intnl_SystemBoolean\r\n        EXTERN, \"SystemObject.__op_Equality__SystemObject_SystemObject__SystemBoolean\"\r\n
+    \       PUSH, __54_intnl_SystemBoolean\r\n        PUSH, __53_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __53_intnl_SystemBoolean\r\n        PUSH, __55_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __52_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000024C4\r\n
-    \       PUSH, localPlayer\r\n        PUSH, VehicleMainObj\r\n        PUSH, __53_intnl_SystemBoolean\r\n
+    \       PUSH, __55_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002DF4\r\n
+    \       PUSH, localPlayer\r\n        PUSH, VehicleMainObj\r\n        PUSH, __56_intnl_SystemBoolean\r\n
     \       EXTERN, \"VRCSDKBaseVRCPlayerApi.__IsOwner__UnityEngineGameObject__SystemBoolean\"\r\n
-    \       PUSH, __50_intnl_SystemBoolean\r\n        PUSH, __53_intnl_SystemBoolean\r\n
-    \       PUSH, __54_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __54_intnl_SystemBoolean\r\n        PUSH, __50_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __50_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x0000260C\r\n        PUSH, __3_const_intnl_SystemSingle\r\n        PUSH, __56_intnl_SystemSingle\r\n
+    \       PUSH, __53_intnl_SystemBoolean\r\n        PUSH, __56_intnl_SystemBoolean\r\n
+    \       PUSH, __57_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __57_intnl_SystemBoolean\r\n        PUSH, __53_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __53_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x00002F3C\r\n        PUSH, __3_const_intnl_SystemSingle\r\n        PUSH, __88_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __57_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __56_intnl_SystemSingle\r\n        PUSH, __57_intnl_SystemSingle\r\n
-    \       PUSH, __58_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, LastFrameVel\r\n        PUSH, __59_intnl_SystemSingle\r\n        EXTERN,
-    \"UnityEngineVector3.__get_y__SystemSingle\"\r\n        PUSH, __59_intnl_SystemSingle\r\n
-    \       PUSH, __58_intnl_SystemSingle\r\n        PUSH, __60_intnl_SystemSingle\r\n
+    \       PUSH, __89_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
+    \       PUSH, __88_intnl_SystemSingle\r\n        PUSH, __89_intnl_SystemSingle\r\n
+    \       PUSH, __90_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, LastFrameVel\r\n        PUSH, __91_intnl_SystemSingle\r\n        EXTERN,
+    \"UnityEngineVector3.__get_y__SystemSingle\"\r\n        PUSH, __91_intnl_SystemSingle\r\n
+    \       PUSH, __90_intnl_SystemSingle\r\n        PUSH, __92_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, LastFrameVel\r\n        PUSH, __60_intnl_SystemSingle\r\n        EXTERN,
+    \       PUSH, LastFrameVel\r\n        PUSH, __92_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineVector3.__set_y__SystemSingle\"\r\n        PUSH, VehicleRigidbody\r\n
-    \       PUSH, __15_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n
-    \       PUSH, LastFrameVel\r\n        PUSH, __15_intnl_UnityEngineVector3\r\n
-    \       PUSH, __61_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__Distance__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\r\n
-    \       PUSH, __62_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __3_const_intnl_SystemSingle\r\n        PUSH, __62_intnl_SystemSingle\r\n
-    \       PUSH, __63_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __61_intnl_SystemSingle\r\n        PUSH, __63_intnl_SystemSingle\r\n
+    \       PUSH, __29_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n
+    \       PUSH, LastFrameVel\r\n        PUSH, __29_intnl_UnityEngineVector3\r\n
+    \       PUSH, __93_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__Distance__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\r\n
+    \       PUSH, __94_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
+    \       PUSH, __3_const_intnl_SystemSingle\r\n        PUSH, __94_intnl_SystemSingle\r\n
+    \       PUSH, __95_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __93_intnl_SystemSingle\r\n        PUSH, __95_intnl_SystemSingle\r\n
     \       PUSH, Gs\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, VehicleRigidbody\r\n        PUSH, LastFrameVel\r\n        EXTERN,
     \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n        PUSH, __0_intnl_returnTarget_UInt32
@@ -886,7 +1090,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 74
+      Data: 85
     - Name: 
       Entry: 7
       Data: 
@@ -1459,7 +1663,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneThrustVectoring
+      Data: YawMoment
     - Name: $v
       Entry: 7
       Data: 38|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1467,8 +1671,65 @@ MonoBehaviour:
       Entry: 7
       Data: 39|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
+      Entry: 9
+      Data: 8
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineTransform
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: YawMoment
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: YawMoment
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
       Entry: 7
-      Data: 40|System.RuntimeType, mscorlib
+      Data: 40|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: AirplaneThrustVectoring
+    - Name: $v
+      Entry: 7
+      Data: 41|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 42|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 7
+      Data: 43|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: System.Boolean, mscorlib
@@ -1498,7 +1759,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 41|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 44|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1525,13 +1786,13 @@ MonoBehaviour:
       Data: AirplaneThrustVecStr
     - Name: $v
       Entry: 7
-      Data: 42|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 45|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 43|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 46|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 44|System.RuntimeType, mscorlib
+      Data: 47|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: System.Single, mscorlib
@@ -1553,63 +1814,6 @@ MonoBehaviour:
     - Name: symbolUniqueName
       Entry: 1
       Data: AirplaneThrustVecStr
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 45|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: ThrottleStrengthForward
-    - Name: $v
-      Entry: 7
-      Data: 46|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 47|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 44
-    - Name: declarationType
-      Entry: 3
-      Data: 1
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: ThrottleStrengthForward
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: ThrottleStrengthForward
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1642,7 +1846,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirFriction
+      Data: ThrottleStrengthForward
     - Name: $v
       Entry: 7
       Data: 49|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1651,7 +1855,7 @@ MonoBehaviour:
       Data: 50|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1663,10 +1867,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirFriction
+      Data: ThrottleStrengthForward
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirFriction
+      Data: ThrottleStrengthForward
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1699,7 +1903,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PitchStrength
+      Data: AirFriction
     - Name: $v
       Entry: 7
       Data: 52|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1708,7 +1912,7 @@ MonoBehaviour:
       Data: 53|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1720,10 +1924,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PitchStrength
+      Data: AirFriction
     - Name: symbolUniqueName
       Entry: 1
-      Data: PitchStrength
+      Data: AirFriction
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1756,7 +1960,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: YawStrength
+      Data: PitchStrength
     - Name: $v
       Entry: 7
       Data: 55|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1765,7 +1969,7 @@ MonoBehaviour:
       Data: 56|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1777,10 +1981,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: YawStrength
+      Data: PitchStrength
     - Name: symbolUniqueName
       Entry: 1
-      Data: YawStrength
+      Data: PitchStrength
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1813,7 +2017,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RollStrength
+      Data: YawStrength
     - Name: $v
       Entry: 7
       Data: 58|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1822,7 +2026,7 @@ MonoBehaviour:
       Data: 59|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1834,10 +2038,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RollStrength
+      Data: YawStrength
     - Name: symbolUniqueName
       Entry: 1
-      Data: RollStrength
+      Data: YawStrength
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1870,7 +2074,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AccelerationResponse
+      Data: RollStrength
     - Name: $v
       Entry: 7
       Data: 61|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1879,7 +2083,7 @@ MonoBehaviour:
       Data: 62|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1891,10 +2095,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AccelerationResponse
+      Data: RollStrength
     - Name: symbolUniqueName
       Entry: 1
-      Data: AccelerationResponse
+      Data: RollStrength
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1927,7 +2131,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RotationResponse
+      Data: AccelerationResponse
     - Name: $v
       Entry: 7
       Data: 64|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1936,7 +2140,7 @@ MonoBehaviour:
       Data: 65|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1948,10 +2152,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RotationResponse
+      Data: AccelerationResponse
     - Name: symbolUniqueName
       Entry: 1
-      Data: RotationResponse
+      Data: AccelerationResponse
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1984,7 +2188,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: VelStraightenStrPitch
+      Data: RotationResponse
     - Name: $v
       Entry: 7
       Data: 67|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1993,7 +2197,7 @@ MonoBehaviour:
       Data: 68|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2005,10 +2209,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: VelStraightenStrPitch
+      Data: RotationResponse
     - Name: symbolUniqueName
       Entry: 1
-      Data: VelStraightenStrPitch
+      Data: RotationResponse
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2041,7 +2245,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: VelStraightenStrYaw
+      Data: VelStraightenStrPitch
     - Name: $v
       Entry: 7
       Data: 70|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2050,7 +2254,7 @@ MonoBehaviour:
       Data: 71|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2062,10 +2266,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: VelStraightenStrYaw
+      Data: VelStraightenStrPitch
     - Name: symbolUniqueName
       Entry: 1
-      Data: VelStraightenStrYaw
+      Data: VelStraightenStrPitch
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2098,7 +2302,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: TaxiRotationSpeed
+      Data: VelStraightenStrYaw
     - Name: $v
       Entry: 7
       Data: 73|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2107,7 +2311,7 @@ MonoBehaviour:
       Data: 74|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2119,10 +2323,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: TaxiRotationSpeed
+      Data: VelStraightenStrYaw
     - Name: symbolUniqueName
       Entry: 1
-      Data: TaxiRotationSpeed
+      Data: VelStraightenStrYaw
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2155,7 +2359,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplanePitchDownStrRatio
+      Data: TaxiRotationSpeed
     - Name: $v
       Entry: 7
       Data: 76|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2164,7 +2368,7 @@ MonoBehaviour:
       Data: 77|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2176,10 +2380,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplanePitchDownStrRatio
+      Data: TaxiRotationSpeed
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplanePitchDownStrRatio
+      Data: TaxiRotationSpeed
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2212,7 +2416,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneLift
+      Data: AirplanePitchDownStrRatio
     - Name: $v
       Entry: 7
       Data: 79|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2221,7 +2425,7 @@ MonoBehaviour:
       Data: 80|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2233,10 +2437,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneLift
+      Data: AirplanePitchDownStrRatio
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneLift
+      Data: AirplanePitchDownStrRatio
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2269,7 +2473,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneVelLiftCoefficient
+      Data: AirplaneLift
     - Name: $v
       Entry: 7
       Data: 82|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2278,7 +2482,7 @@ MonoBehaviour:
       Data: 83|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2290,10 +2494,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneVelLiftCoefficient
+      Data: AirplaneLift
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneVelLiftCoefficient
+      Data: AirplaneLift
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2326,7 +2530,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: MaxVelLift
+      Data: AirplaneVelLiftCoefficient
     - Name: $v
       Entry: 7
       Data: 85|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2335,7 +2539,7 @@ MonoBehaviour:
       Data: 86|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2347,10 +2551,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: MaxVelLift
+      Data: AirplaneVelLiftCoefficient
     - Name: symbolUniqueName
       Entry: 1
-      Data: MaxVelLift
+      Data: AirplaneVelLiftCoefficient
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2383,7 +2587,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplanePullDownLiftRatio
+      Data: MaxVelLift
     - Name: $v
       Entry: 7
       Data: 88|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2392,7 +2596,7 @@ MonoBehaviour:
       Data: 89|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2404,10 +2608,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplanePullDownLiftRatio
+      Data: MaxVelLift
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplanePullDownLiftRatio
+      Data: MaxVelLift
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2440,7 +2644,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneSidewaysLift
+      Data: AirplanePullDownLiftRatio
     - Name: $v
       Entry: 7
       Data: 91|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2449,7 +2653,7 @@ MonoBehaviour:
       Data: 92|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2461,10 +2665,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneSidewaysLift
+      Data: AirplanePullDownLiftRatio
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneSidewaysLift
+      Data: AirplanePullDownLiftRatio
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2497,7 +2701,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneVelPullUp
+      Data: AirplaneSidewaysLift
     - Name: $v
       Entry: 7
       Data: 94|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2506,7 +2710,7 @@ MonoBehaviour:
       Data: 95|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2518,10 +2722,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneVelPullUp
+      Data: AirplaneSidewaysLift
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneVelPullUp
+      Data: AirplaneSidewaysLift
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2554,7 +2758,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneRollFriction
+      Data: AirplaneVelPullUp
     - Name: $v
       Entry: 7
       Data: 97|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2563,7 +2767,7 @@ MonoBehaviour:
       Data: 98|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2575,10 +2779,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneRollFriction
+      Data: AirplaneVelPullUp
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneRollFriction
+      Data: AirplaneVelPullUp
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2611,7 +2815,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HasFlaps
+      Data: AirplaneRollFriction
     - Name: $v
       Entry: 7
       Data: 100|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2620,7 +2824,7 @@ MonoBehaviour:
       Data: 101|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2629,13 +2833,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: HasFlaps
+      Data: AirplaneRollFriction
     - Name: symbolUniqueName
       Entry: 1
-      Data: HasFlaps
+      Data: AirplaneRollFriction
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2668,7 +2872,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HasLandingGear
+      Data: HasFlaps
     - Name: $v
       Entry: 7
       Data: 103|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2677,7 +2881,7 @@ MonoBehaviour:
       Data: 104|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2689,10 +2893,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: HasLandingGear
+      Data: HasFlaps
     - Name: symbolUniqueName
       Entry: 1
-      Data: HasLandingGear
+      Data: HasFlaps
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2725,7 +2929,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LandingGearDragMulti
+      Data: HasLandingGear
     - Name: $v
       Entry: 7
       Data: 106|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2734,7 +2938,7 @@ MonoBehaviour:
       Data: 107|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2743,13 +2947,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: LandingGearDragMulti
+      Data: HasLandingGear
     - Name: symbolUniqueName
       Entry: 1
-      Data: LandingGearDragMulti
+      Data: HasLandingGear
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2782,7 +2986,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FlapsDragMulti
+      Data: LandingGearDragMulti
     - Name: $v
       Entry: 7
       Data: 109|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2791,7 +2995,7 @@ MonoBehaviour:
       Data: 110|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2803,10 +3007,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: FlapsDragMulti
+      Data: LandingGearDragMulti
     - Name: symbolUniqueName
       Entry: 1
-      Data: FlapsDragMulti
+      Data: LandingGearDragMulti
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2839,7 +3043,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FlapsLiftMulti
+      Data: FlapsDragMulti
     - Name: $v
       Entry: 7
       Data: 112|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2848,7 +3052,7 @@ MonoBehaviour:
       Data: 113|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2860,10 +3064,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: FlapsLiftMulti
+      Data: FlapsDragMulti
     - Name: symbolUniqueName
       Entry: 1
-      Data: FlapsLiftMulti
+      Data: FlapsDragMulti
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2896,7 +3100,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Health
+      Data: FlapsLiftMulti
     - Name: $v
       Entry: 7
       Data: 115|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2905,7 +3109,64 @@ MonoBehaviour:
       Data: 116|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: FlapsLiftMulti
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: FlapsLiftMulti
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 117|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Health
+    - Name: $v
+      Entry: 7
+      Data: 118|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 119|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2929,13 +3190,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 117|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 120|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 118|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 121|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -2962,13 +3223,13 @@ MonoBehaviour:
       Data: SeaLevel
     - Name: $v
       Entry: 7
-      Data: 119|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 122|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 120|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 123|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -2992,7 +3253,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 121|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 124|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -3019,13 +3280,13 @@ MonoBehaviour:
       Data: LastFrameLerpedInputAcc
     - Name: $v
       Entry: 7
-      Data: 122|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 125|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 123|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 126|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 124|System.RuntimeType, mscorlib
+      Data: 127|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: UnityEngine.Vector3, UnityEngine.CoreModule
@@ -3047,63 +3308,6 @@ MonoBehaviour:
     - Name: symbolUniqueName
       Entry: 1
       Data: LastFrameLerpedInputAcc
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 125|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: LastFrameLerpedInputRot
-    - Name: $v
-      Entry: 7
-      Data: 126|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 127|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 124
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: UnityEngineVector3
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: LastFrameLerpedInputRot
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: LastFrameLerpedInputRot
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3136,7 +3340,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LstickH
+      Data: LastFrameLerpedInputRot
     - Name: $v
       Entry: 7
       Data: 129|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3145,7 +3349,7 @@ MonoBehaviour:
       Data: 130|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 127
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3154,13 +3358,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: UnityEngineVector3
     - Name: symbolOriginalName
       Entry: 1
-      Data: LstickH
+      Data: LastFrameLerpedInputRot
     - Name: symbolUniqueName
       Entry: 1
-      Data: LstickH
+      Data: LastFrameLerpedInputRot
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3193,7 +3397,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LstickV
+      Data: LstickH
     - Name: $v
       Entry: 7
       Data: 132|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3202,7 +3406,7 @@ MonoBehaviour:
       Data: 133|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3214,10 +3418,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: LstickV
+      Data: LstickH
     - Name: symbolUniqueName
       Entry: 1
-      Data: LstickV
+      Data: LstickH
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3250,7 +3454,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RstickH
+      Data: LstickV
     - Name: $v
       Entry: 7
       Data: 135|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3259,7 +3463,7 @@ MonoBehaviour:
       Data: 136|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3271,10 +3475,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RstickH
+      Data: LstickV
     - Name: symbolUniqueName
       Entry: 1
-      Data: RstickH
+      Data: LstickV
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3307,7 +3511,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RstickV
+      Data: RstickH
     - Name: $v
       Entry: 7
       Data: 138|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3316,7 +3520,7 @@ MonoBehaviour:
       Data: 139|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3328,10 +3532,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RstickV
+      Data: RstickH
     - Name: symbolUniqueName
       Entry: 1
-      Data: RstickV
+      Data: RstickH
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3364,7 +3568,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RTrigger
+      Data: RstickV
     - Name: $v
       Entry: 7
       Data: 141|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3373,7 +3577,7 @@ MonoBehaviour:
       Data: 142|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3385,10 +3589,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RTrigger
+      Data: RstickV
     - Name: symbolUniqueName
       Entry: 1
-      Data: RTrigger
+      Data: RstickV
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3421,7 +3625,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LTrigger
+      Data: RTrigger
     - Name: $v
       Entry: 7
       Data: 144|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3430,7 +3634,7 @@ MonoBehaviour:
       Data: 145|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3442,10 +3646,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: LTrigger
+      Data: RTrigger
     - Name: symbolUniqueName
       Entry: 1
-      Data: LTrigger
+      Data: RTrigger
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3478,7 +3682,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: downspeed
+      Data: LTrigger
     - Name: $v
       Entry: 7
       Data: 147|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3487,7 +3691,7 @@ MonoBehaviour:
       Data: 148|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3499,10 +3703,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: downspeed
+      Data: LTrigger
     - Name: symbolUniqueName
       Entry: 1
-      Data: downspeed
+      Data: LTrigger
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3535,7 +3739,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: sidespeed
+      Data: downspeed
     - Name: $v
       Entry: 7
       Data: 150|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3544,7 +3748,7 @@ MonoBehaviour:
       Data: 151|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3556,10 +3760,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: sidespeed
+      Data: downspeed
     - Name: symbolUniqueName
       Entry: 1
-      Data: sidespeed
+      Data: downspeed
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3592,7 +3796,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: accelforward
+      Data: sidespeed
     - Name: $v
       Entry: 7
       Data: 153|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3601,7 +3805,7 @@ MonoBehaviour:
       Data: 154|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3613,10 +3817,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: accelforward
+      Data: sidespeed
     - Name: symbolUniqueName
       Entry: 1
-      Data: accelforward
+      Data: sidespeed
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3649,7 +3853,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: speed20
+      Data: accelforward
     - Name: $v
       Entry: 7
       Data: 156|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3658,7 +3862,64 @@ MonoBehaviour:
       Data: 157|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: accelforward
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: accelforward
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 158|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: speed20
+    - Name: $v
+      Entry: 7
+      Data: 159|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 160|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3682,19 +3943,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 158|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 161|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 159|System.NonSerializedAttribute, mscorlib
+      Data: 162|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 160|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 163|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -3721,13 +3982,13 @@ MonoBehaviour:
       Data: ThrottleValue
     - Name: $v
       Entry: 7
-      Data: 161|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 164|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 162|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 165|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3751,25 +4012,25 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 163|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 166|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
     - Name: 
       Entry: 7
-      Data: 164|System.NonSerializedAttribute, mscorlib
+      Data: 167|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 165|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 168|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 166|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 169|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -3796,13 +4057,13 @@ MonoBehaviour:
       Data: CurrentVel
     - Name: $v
       Entry: 7
-      Data: 167|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 170|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 168|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 171|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 124
+      Data: 127
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3826,25 +4087,25 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 169|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 172|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
     - Name: 
       Entry: 7
-      Data: 170|System.NonSerializedAttribute, mscorlib
+      Data: 173|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 171|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 174|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 172|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 175|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -3871,13 +4132,13 @@ MonoBehaviour:
       Data: Gs
     - Name: $v
       Entry: 7
-      Data: 173|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 176|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 174|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 177|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3901,25 +4162,25 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 175|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 178|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
     - Name: 
       Entry: 7
-      Data: 176|System.NonSerializedAttribute, mscorlib
+      Data: 179|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 177|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 180|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 178|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 181|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -3944,63 +4205,6 @@ MonoBehaviour:
     - Name: $k
       Entry: 1
       Data: roll
-    - Name: $v
-      Entry: 7
-      Data: 179|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 180|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 44
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: roll
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: roll
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 181|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: pitch
     - Name: $v
       Entry: 7
       Data: 182|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -4009,7 +4213,7 @@ MonoBehaviour:
       Data: 183|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4021,10 +4225,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: pitch
+      Data: roll
     - Name: symbolUniqueName
       Entry: 1
-      Data: pitch
+      Data: roll
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4057,7 +4261,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: yaw
+      Data: pitch
     - Name: $v
       Entry: 7
       Data: 185|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -4066,7 +4270,7 @@ MonoBehaviour:
       Data: 186|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4078,10 +4282,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: yaw
+      Data: pitch
     - Name: symbolUniqueName
       Entry: 1
-      Data: yaw
+      Data: pitch
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4114,7 +4318,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FullHealth
+      Data: yaw
     - Name: $v
       Entry: 7
       Data: 188|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -4123,7 +4327,7 @@ MonoBehaviour:
       Data: 189|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4135,10 +4339,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: FullHealth
+      Data: yaw
     - Name: symbolUniqueName
       Entry: 1
-      Data: FullHealth
+      Data: yaw
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4150,16 +4354,73 @@ MonoBehaviour:
       Data: 190|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 0
     - Name: 
-      Entry: 7
-      Data: 191|System.NonSerializedAttribute, mscorlib
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 192|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: FullHealth
+    - Name: $v
+      Entry: 7
+      Data: 191|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 192|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: FullHealth
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: FullHealth
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 193|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 194|System.NonSerializedAttribute, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 195|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4186,13 +4447,13 @@ MonoBehaviour:
       Data: Taxiing
     - Name: $v
       Entry: 7
-      Data: 193|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 196|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 194|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 197|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4216,19 +4477,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 195|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 198|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 196|System.NonSerializedAttribute, mscorlib
+      Data: 199|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 197|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 200|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4255,13 +4516,13 @@ MonoBehaviour:
       Data: GearUp
     - Name: $v
       Entry: 7
-      Data: 198|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 201|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 199|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 202|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4285,25 +4546,25 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 200|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 203|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
     - Name: 
       Entry: 7
-      Data: 201|System.NonSerializedAttribute, mscorlib
+      Data: 204|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 202|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 205|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 203|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 206|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -4330,13 +4591,13 @@ MonoBehaviour:
       Data: Flaps
     - Name: $v
       Entry: 7
-      Data: 204|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 207|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 205|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 208|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4360,25 +4621,25 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 206|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 209|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
     - Name: 
       Entry: 7
-      Data: 207|System.NonSerializedAttribute, mscorlib
+      Data: 210|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 208|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 211|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 209|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 212|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -4405,13 +4666,13 @@ MonoBehaviour:
       Data: rollinput
     - Name: $v
       Entry: 7
-      Data: 210|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 213|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 211|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 214|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4435,19 +4696,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 212|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 215|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 213|System.NonSerializedAttribute, mscorlib
+      Data: 216|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 214|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 217|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4474,13 +4735,13 @@ MonoBehaviour:
       Data: pitchinput
     - Name: $v
       Entry: 7
-      Data: 215|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 218|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 216|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 219|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4504,19 +4765,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 217|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 220|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 218|System.NonSerializedAttribute, mscorlib
+      Data: 221|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 219|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 222|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4543,13 +4804,13 @@ MonoBehaviour:
       Data: yawinput
     - Name: $v
       Entry: 7
-      Data: 220|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 223|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 221|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 224|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4573,19 +4834,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 222|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 225|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 223|System.NonSerializedAttribute, mscorlib
+      Data: 226|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 224|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 227|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4612,13 +4873,13 @@ MonoBehaviour:
       Data: Piloting
     - Name: $v
       Entry: 7
-      Data: 225|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 228|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 226|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 229|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4642,19 +4903,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 227|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 230|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 228|System.NonSerializedAttribute, mscorlib
+      Data: 231|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 229|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 232|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4681,13 +4942,13 @@ MonoBehaviour:
       Data: Passenger
     - Name: $v
       Entry: 7
-      Data: 230|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 233|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 231|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 234|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4711,19 +4972,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 232|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 235|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 233|System.NonSerializedAttribute, mscorlib
+      Data: 236|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 234|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 237|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4750,13 +5011,13 @@ MonoBehaviour:
       Data: LastFrameVel
     - Name: $v
       Entry: 7
-      Data: 235|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 238|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 236|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 239|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 124
+      Data: 127
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4780,19 +5041,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 237|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 240|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 238|System.NonSerializedAttribute, mscorlib
+      Data: 241|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 239|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 242|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4819,13 +5080,13 @@ MonoBehaviour:
       Data: Occupied
     - Name: $v
       Entry: 7
-      Data: 240|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 243|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 241|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 244|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4849,25 +5110,25 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 242|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 245|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 3
     - Name: 
       Entry: 7
-      Data: 243|System.NonSerializedAttribute, mscorlib
+      Data: 246|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 244|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 247|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 245|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 248|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -4894,13 +5155,13 @@ MonoBehaviour:
       Data: localPlayer
     - Name: $v
       Entry: 7
-      Data: 246|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 249|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 247|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 250|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 248|System.RuntimeType, mscorlib
+      Data: 251|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: VRC.SDKBase.VRCPlayerApi, VRCSDKBase
@@ -4930,19 +5191,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 249|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 252|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 250|System.NonSerializedAttribute, mscorlib
+      Data: 253|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 251|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 254|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -4969,13 +5230,13 @@ MonoBehaviour:
       Data: dead
     - Name: $v
       Entry: 7
-      Data: 252|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 255|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 253|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 256|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 43
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4999,19 +5260,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 254|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 257|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 255|System.NonSerializedAttribute, mscorlib
+      Data: 258|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 256|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 259|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -5038,13 +5299,13 @@ MonoBehaviour:
       Data: AtmoshpereFadeDistance
     - Name: $v
       Entry: 7
-      Data: 257|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 260|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 258|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 261|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -5068,19 +5329,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 259|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 262|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 260|System.NonSerializedAttribute, mscorlib
+      Data: 263|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 261|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 264|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -5107,13 +5368,13 @@ MonoBehaviour:
       Data: AtmosphereHeightThing
     - Name: $v
       Entry: 7
-      Data: 262|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 265|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 263|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 266|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -5137,19 +5398,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 264|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 267|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 265|System.NonSerializedAttribute, mscorlib
+      Data: 268|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 266|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 269|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -5174,63 +5435,6 @@ MonoBehaviour:
     - Name: $k
       Entry: 1
       Data: AtmosphereThinningStart
-    - Name: $v
-      Entry: 7
-      Data: 267|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 268|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 44
-    - Name: declarationType
-      Entry: 3
-      Data: 1
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: AtmosphereThinningStart
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: AtmosphereThinningStart
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 269|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: AtmosphereThinningEnd
     - Name: $v
       Entry: 7
       Data: 270|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -5239,7 +5443,7 @@ MonoBehaviour:
       Data: 271|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -5251,10 +5455,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AtmosphereThinningEnd
+      Data: AtmosphereThinningStart
     - Name: symbolUniqueName
       Entry: 1
-      Data: AtmosphereThinningEnd
+      Data: AtmosphereThinningStart
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -5287,7 +5491,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Atmosphere
+      Data: AtmosphereThinningEnd
     - Name: $v
       Entry: 7
       Data: 273|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -5296,10 +5500,10 @@ MonoBehaviour:
       Data: 274|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: syncMode
       Entry: 3
       Data: 0
@@ -5308,10 +5512,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: Atmosphere
+      Data: AtmosphereThinningEnd
     - Name: symbolUniqueName
       Entry: 1
-      Data: Atmosphere
+      Data: AtmosphereThinningEnd
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -5344,7 +5548,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: rotlift
+      Data: Atmosphere
     - Name: $v
       Entry: 7
       Data: 276|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -5353,7 +5557,7 @@ MonoBehaviour:
       Data: 277|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -5365,10 +5569,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: rotlift
+      Data: Atmosphere
     - Name: symbolUniqueName
       Entry: 1
-      Data: rotlift
+      Data: Atmosphere
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -5401,7 +5605,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RotMultiMaxSpeed
+      Data: rotlift
     - Name: $v
       Entry: 7
       Data: 279|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -5410,7 +5614,64 @@ MonoBehaviour:
       Data: 280|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 44
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: rotlift
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: rotlift
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 281|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: RotMultiMaxSpeed
+    - Name: $v
+      Entry: 7
+      Data: 282|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 283|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -5434,7 +5695,601 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 281|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 284|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: ReversingRollStrength
+    - Name: $v
+      Entry: 7
+      Data: 285|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 286|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: ReversingRollStrength
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: ReversingRollStrength
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 287|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: ReversingPitchStrength
+    - Name: $v
+      Entry: 7
+      Data: 288|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 289|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: ReversingPitchStrength
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: ReversingPitchStrength
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 290|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: ReversingYawStrength
+    - Name: $v
+      Entry: 7
+      Data: 291|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 292|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: ReversingYawStrength
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: ReversingYawStrength
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 293|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: AngleOfAttack
+    - Name: $v
+      Entry: 7
+      Data: 294|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 295|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: AngleOfAttack
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: AngleOfAttack
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 296|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 297|System.NonSerializedAttribute, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 298|UnityEngine.HideInInspector, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: AngleOfAttackYaw
+    - Name: $v
+      Entry: 7
+      Data: 299|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 300|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: AngleOfAttackYaw
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: AngleOfAttackYaw
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 301|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 302|System.NonSerializedAttribute, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 303|UnityEngine.HideInInspector, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: MaxAngleOfAttack
+    - Name: $v
+      Entry: 7
+      Data: 304|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 305|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: MaxAngleOfAttack
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: MaxAngleOfAttack
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 306|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: MaxAngleOfAttackYaw
+    - Name: $v
+      Entry: 7
+      Data: 307|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 308|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: MaxAngleOfAttackYaw
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: MaxAngleOfAttackYaw
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 309|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: MinHighAoAControl
+    - Name: $v
+      Entry: 7
+      Data: 310|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 311|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: MinHighAoAControl
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: MinHighAoAControl
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 312|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: MinAoAPitchLift
+    - Name: $v
+      Entry: 7
+      Data: 313|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 314|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: MinAoAPitchLift
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: MinAoAPitchLift
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 315|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: MinAoAYawLift
+    - Name: $v
+      Entry: 7
+      Data: 316|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 317|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: MinAoAYawLift
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: MinAoAYawLift
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 318|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

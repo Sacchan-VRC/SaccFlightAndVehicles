@@ -81,7 +81,7 @@ public class HUDController : UdonSharpBehaviour
             }
             else
             {
-                HUDText_angleofattack_temp = Vector3.SignedAngle(EngineControl.VehicleMainObj.transform.forward, EngineControl.CurrentVel.normalized, EngineControl.VehicleMainObj.transform.right).ToString("F0");
+                HUDText_angleofattack_temp = EngineControl.AngleOfAttack.ToString("F0");
             }
             HUDText_angleofattack.text = HUDText_angleofattack_temp;
             check = 0;
