@@ -365,7 +365,7 @@ MonoBehaviour:
     dopplecounter\r\n        EXTERN, \"SystemInt32.__op_Addition__SystemInt32_SystemInt32__SystemInt32\"\r\n
     \       PUSH, SonicBoomWave\r\n        PUSH, SonicBoomDistance\r\n        PUSH,
     __7_intnl_SystemBoolean\r\n        EXTERN, \"SystemSingle.__op_LessThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
-    \       PUSH, __7_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000CF4\r\n
+    \       PUSH, __7_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000CDC\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
     \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __1_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -373,23 +373,21 @@ MonoBehaviour:
     __2_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, relativespeed\r\n        PUSH, __3_intnl_SystemSingle\r\n        EXTERN,
     \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\r\n        PUSH,
-    __2_const_intnl_SystemInt32\r\n        PUSH, __4_intnl_SystemSingle\r\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __3_intnl_SystemSingle\r\n
-    \       PUSH, __4_intnl_SystemSingle\r\n        PUSH, __5_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __2_intnl_SystemSingle\r\n        PUSH, __5_intnl_SystemSingle\r\n
-    \       PUSH, __6_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, SonicBoomWave\r\n        PUSH, __6_intnl_SystemSingle\r\n        PUSH,
-    __7_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __7_intnl_SystemSingle\r\n        PUSH, SonicBoomWave\r\n        COPY\r\n
+    __3_intnl_SystemSingle\r\n        PUSH, __4_const_intnl_SystemSingle\r\n        PUSH,
+    __4_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __2_intnl_SystemSingle\r\n        PUSH, __4_intnl_SystemSingle\r\n
+    \       PUSH, __5_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, SonicBoomWave\r\n        PUSH, __5_intnl_SystemSingle\r\n        PUSH,
+    __6_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __6_intnl_SystemSingle\r\n        PUSH, SonicBoomWave\r\n        COPY\r\n
     \       PUSH, TouchDown\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __8_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __8_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000EAC\r\n
+    \       PUSH, __8_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000E94\r\n
     \       PUSH, Landed\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH,
     __10_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_Equality__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __10_intnl_SystemBoolean\r\n        PUSH, __9_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __9_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00000DF4\r\n        PUSH, EngineControl\r\n        PUSH, __6_const_intnl_SystemString\r\n
+    0x00000DDC\r\n        PUSH, EngineControl\r\n        PUSH, __6_const_intnl_SystemString\r\n
     \       PUSH, __0_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __0_intnl_SystemObject\r\n        PUSH, __12_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
@@ -399,16 +397,16 @@ MonoBehaviour:
     \       PUSH, __14_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __14_intnl_SystemBoolean\r\n        PUSH, __9_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __9_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00000E14\r\n        PUSH, TouchDown\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
+    0x00000DFC\r\n        PUSH, TouchDown\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
     \       PUSH, EngineControl\r\n        PUSH, __6_const_intnl_SystemString\r\n
     \       PUSH, __1_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __1_intnl_SystemObject\r\n        PUSH, __16_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
     \       PUSH, __16_intnl_SystemBoolean\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n
     \       PUSH, __17_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_Equality__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __17_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000E98\r\n
+    \       PUSH, __17_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000E80\r\n
     \       PUSH, __1_const_intnl_SystemBoolean\r\n        PUSH, Landed\r\n        COPY\r\n
-    \       JUMP, 0x00000EAC\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH,
+    \       JUMP, 0x00000E94\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH,
     Landed\r\n        COPY\r\n        PUSH, EngineControl\r\n        PUSH, __2_const_intnl_SystemString\r\n
     \       PUSH, __0_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __0_intnl_SystemObject\r\n        PUSH, __11_intnl_SystemBoolean\r\n
@@ -416,7 +414,7 @@ MonoBehaviour:
     \       PUSH, __11_intnl_SystemBoolean\r\n        PUSH, __9_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __9_intnl_SystemBoolean\r\n        PUSH, __12_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __12_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000F8C\r\n
+    \       PUSH, __12_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000F74\r\n
     \       PUSH, EngineControl\r\n        PUSH, __4_const_intnl_SystemString\r\n
     \       PUSH, __1_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __1_intnl_SystemObject\r\n        PUSH, __14_intnl_SystemBoolean\r\n
@@ -425,11 +423,11 @@ MonoBehaviour:
     \       PUSH, __15_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __15_intnl_SystemBoolean\r\n        PUSH, __9_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __9_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000022B4\r\n        PUSH, PlaneAfterburner\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
+    0x0000229C\r\n        PUSH, PlaneAfterburner\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __17_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
     \       PUSH, __17_intnl_SystemBoolean\r\n        PUSH, __16_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __16_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001044\r\n        PUSH, PlaneAfterburner\r\n        PUSH, __18_intnl_SystemBoolean\r\n
+    0x0000102C\r\n        PUSH, PlaneAfterburner\r\n        PUSH, __18_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
     \       PUSH, __18_intnl_SystemBoolean\r\n        PUSH, __19_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
@@ -437,7 +435,7 @@ MonoBehaviour:
     \       PUSH, __20_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __20_intnl_SystemBoolean\r\n        PUSH, __16_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __16_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001064\r\n        PUSH, PlaneAfterburner\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
+    0x0000104C\r\n        PUSH, PlaneAfterburner\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
     \       PUSH, EngineControl\r\n        PUSH, __0_const_intnl_SystemString\r\n
     \       PUSH, __2_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __2_intnl_SystemObject\r\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\r\n
@@ -447,7 +445,7 @@ MonoBehaviour:
     \       PUSH, __23_intnl_SystemBoolean\r\n        PUSH, __22_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __22_intnl_SystemBoolean\r\n        PUSH, __24_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __24_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001160\r\n
+    \       PUSH, __24_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001148\r\n
     \       PUSH, EngineControl\r\n        PUSH, __5_const_intnl_SystemString\r\n
     \       PUSH, __3_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __3_intnl_SystemObject\r\n        PUSH, __26_intnl_SystemBoolean\r\n
@@ -458,7 +456,7 @@ MonoBehaviour:
     \       COPY\r\n        PUSH, __22_intnl_SystemBoolean\r\n        PUSH, __21_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __21_intnl_SystemBoolean\r\n        PUSH, __28_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __28_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001208\r\n
+    \       PUSH, __28_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000011F0\r\n
     \       PUSH, EngineControl\r\n        PUSH, __4_const_intnl_SystemString\r\n
     \       PUSH, __4_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __4_intnl_SystemObject\r\n        PUSH, __30_intnl_SystemBoolean\r\n
@@ -467,15 +465,15 @@ MonoBehaviour:
     \       PUSH, __31_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __31_intnl_SystemBoolean\r\n        PUSH, __21_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __21_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001C8C\r\n        PUSH, Leftplane\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n
+    0x00001C74\r\n        PUSH, Leftplane\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n
     \       PUSH, __32_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_Equality__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001340\r\n
+    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001328\r\n
     \       PUSH, PlaneInside\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __33_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000012F8\r\n
+    \       PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000012E0\r\n
     \       PUSH, PlaneIdle\r\n        PUSH, __0_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__get_pitch__SystemSingle\"\r\n        PUSH, __0_intnl_SystemSingle\r\n
-    \       PUSH, __4_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n
+    \       PUSH, __5_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneInside\r\n        PUSH, __1_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_pitch__SystemSingle__SystemVoid\"\r\n        PUSH,
@@ -490,18 +488,18 @@ MonoBehaviour:
     \       PUSH, __34_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
     \       PUSH, __34_intnl_SystemBoolean\r\n        PUSH, __33_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000013D0\r\n        PUSH, PlaneDistant\r\n        PUSH, __35_intnl_SystemBoolean\r\n
+    0x000013B8\r\n        PUSH, PlaneDistant\r\n        PUSH, __35_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
     \       PUSH, __33_intnl_SystemBoolean\r\n        PUSH, __35_intnl_SystemBoolean\r\n
     \       PUSH, __36_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __36_intnl_SystemBoolean\r\n        PUSH, __33_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000013F0\r\n        PUSH, PlaneDistant\r\n        EXTERN, \"UnityEngineAudioSource.__Stop__SystemVoid\"\r\n
+    0x000013D8\r\n        PUSH, PlaneDistant\r\n        EXTERN, \"UnityEngineAudioSource.__Stop__SystemVoid\"\r\n
     \       PUSH, PlaneInside\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __38_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
     \       PUSH, __38_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __37_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001498\r\n        PUSH, PlaneInside\r\n        PUSH, __39_intnl_SystemBoolean\r\n
+    0x00001480\r\n        PUSH, PlaneInside\r\n        PUSH, __39_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
     \       PUSH, __39_intnl_SystemBoolean\r\n        PUSH, __40_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
@@ -509,18 +507,18 @@ MonoBehaviour:
     \       PUSH, __41_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __41_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __37_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000014B8\r\n        PUSH, PlaneInside\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
+    0x000014A0\r\n        PUSH, PlaneInside\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
     \       PUSH, PlaneIdle\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __43_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
     \       PUSH, __43_intnl_SystemBoolean\r\n        PUSH, __42_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __42_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001548\r\n        PUSH, PlaneIdle\r\n        PUSH, __44_intnl_SystemBoolean\r\n
+    0x00001530\r\n        PUSH, PlaneIdle\r\n        PUSH, __44_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
     \       PUSH, __42_intnl_SystemBoolean\r\n        PUSH, __44_intnl_SystemBoolean\r\n
     \       PUSH, __45_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __45_intnl_SystemBoolean\r\n        PUSH, __42_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __42_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001568\r\n        PUSH, PlaneIdle\r\n        EXTERN, \"UnityEngineAudioSource.__Stop__SystemVoid\"\r\n
+    0x00001550\r\n        PUSH, PlaneIdle\r\n        EXTERN, \"UnityEngineAudioSource.__Stop__SystemVoid\"\r\n
     \       PUSH, EngineControl\r\n        PUSH, __0_const_intnl_SystemString\r\n
     \       PUSH, __5_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __5_intnl_SystemObject\r\n        PUSH, __3_intnl_VRCSDKBaseVRCPlayerApi\r\n
@@ -530,7 +528,7 @@ MonoBehaviour:
     \       PUSH, __48_intnl_SystemBoolean\r\n        PUSH, __47_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __47_intnl_SystemBoolean\r\n        PUSH, __49_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __49_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001664\r\n
+    \       PUSH, __49_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000164C\r\n
     \       PUSH, EngineControl\r\n        PUSH, __5_const_intnl_SystemString\r\n
     \       PUSH, __6_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __6_intnl_SystemObject\r\n        PUSH, __51_intnl_SystemBoolean\r\n
@@ -541,14 +539,14 @@ MonoBehaviour:
     \       COPY\r\n        PUSH, __47_intnl_SystemBoolean\r\n        PUSH, __46_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __46_intnl_SystemBoolean\r\n        PUSH, __53_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __53_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000179C\r\n
+    \       PUSH, __53_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001784\r\n
     \       PUSH, EngineControl\r\n        PUSH, __2_const_intnl_SystemString\r\n
     \       PUSH, __7_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __7_intnl_SystemObject\r\n        PUSH, __56_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
     \       PUSH, __56_intnl_SystemBoolean\r\n        PUSH, __54_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __54_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001768\r\n        PUSH, EngineControl\r\n        PUSH, __4_const_intnl_SystemString\r\n
+    0x00001750\r\n        PUSH, EngineControl\r\n        PUSH, __4_const_intnl_SystemString\r\n
     \       PUSH, __8_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __8_intnl_SystemObject\r\n        PUSH, __58_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
@@ -559,21 +557,21 @@ MonoBehaviour:
     \       PUSH, __60_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __60_intnl_SystemBoolean\r\n        PUSH, __46_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __46_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001A64\r\n        PUSH, PlaneInside\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
+    0x00001A4C\r\n        PUSH, PlaneInside\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __61_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __61_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001964\r\n
+    \       PUSH, __61_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000194C\r\n
     \       PUSH, PlaneInside\r\n        PUSH, __0_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__get_pitch__SystemSingle\"\r\n        PUSH, EngineControl\r\n
     \       PUSH, __7_const_intnl_SystemString\r\n        PUSH, __9_intnl_SystemObject\r\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        PUSH, __2_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\r\n        PUSH,
-    __2_intnl_SystemSingle\r\n        PUSH, __5_const_intnl_SystemSingle\r\n        PUSH,
+    __2_intnl_SystemSingle\r\n        PUSH, __6_const_intnl_SystemSingle\r\n        PUSH,
     __3_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __3_intnl_SystemSingle\r\n        PUSH, __4_const_intnl_SystemSingle\r\n
+    \       PUSH, __3_intnl_SystemSingle\r\n        PUSH, __5_const_intnl_SystemSingle\r\n
     \       PUSH, __4_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __5_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __6_const_intnl_SystemSingle\r\n        PUSH, __5_intnl_SystemSingle\r\n
+    \       PUSH, __7_const_intnl_SystemSingle\r\n        PUSH, __5_intnl_SystemSingle\r\n
     \       PUSH, __6_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        PUSH, __4_intnl_SystemSingle\r\n
     \       PUSH, __6_intnl_SystemSingle\r\n        PUSH, __7_intnl_SystemSingle\r\n
@@ -582,14 +580,14 @@ MonoBehaviour:
     \"UnityEngineAudioSource.__set_pitch__SystemSingle__SystemVoid\"\r\n        PUSH,
     PlaneInside\r\n        PUSH, __8_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineAudioSource.__get_volume__SystemSingle\"\r\n
     \       PUSH, __9_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __7_const_intnl_SystemSingle\r\n        PUSH, __9_intnl_SystemSingle\r\n
+    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __9_intnl_SystemSingle\r\n
     \       PUSH, __10_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __8_intnl_SystemSingle\r\n        PUSH, __5_const_intnl_SystemSingle\r\n
+    \       PUSH, __8_intnl_SystemSingle\r\n        PUSH, __6_const_intnl_SystemSingle\r\n
     \       PUSH, __10_intnl_SystemSingle\r\n        PUSH, __11_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneInside\r\n        PUSH, __11_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        PUSH,
-    __4_const_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerPitch\r\n        COPY\r\n
+    __5_const_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerPitch\r\n        COPY\r\n
     \       PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        PUSH, __1_intnl_SystemSingle\r\n
@@ -599,21 +597,21 @@ MonoBehaviour:
     \       PUSH, __2_intnl_SystemSingle\r\n        PUSH, InVehicleAfterburnerVolumeFactor\r\n
     \       PUSH, __3_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __4_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __4_intnl_SystemSingle\r\n
+    \       PUSH, __9_const_intnl_SystemSingle\r\n        PUSH, __4_intnl_SystemSingle\r\n
     \       PUSH, __5_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneAfterburnerVolume\r\n        PUSH, __3_intnl_SystemSingle\r\n
     \       PUSH, __5_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerVolume\r\n
     \       PUSH, __6_intnl_SystemSingle\r\n        COPY # Copy-on-write symbol value
     dirtied\r\n        PUSH, PlaneAfterburnerVolume\r\n        EXTERN, \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       JUMP, 0x00001C84\r\n        PUSH, EngineControl\r\n        PUSH, __4_const_intnl_SystemString\r\n
+    \       JUMP, 0x00001C6C\r\n        PUSH, EngineControl\r\n        PUSH, __4_const_intnl_SystemString\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        PUSH, __62_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
-    \       PUSH, __62_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001C84\r\n
+    \       PUSH, __62_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001C6C\r\n
     \       PUSH, PlaneInside\r\n        PUSH, __0_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__get_pitch__SystemSingle\"\r\n        PUSH, __1_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n        PUSH,
-    __9_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n        PUSH,
+    __10_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n        PUSH,
     __2_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __3_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -624,7 +622,7 @@ MonoBehaviour:
     \"UnityEngineAudioSource.__set_pitch__SystemSingle__SystemVoid\"\r\n        PUSH,
     PlaneInside\r\n        PUSH, __5_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineAudioSource.__get_volume__SystemSingle\"\r\n
     \       PUSH, __6_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __7_const_intnl_SystemSingle\r\n        PUSH, __6_intnl_SystemSingle\r\n
+    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __6_intnl_SystemSingle\r\n
     \       PUSH, __7_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __8_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -633,9 +631,9 @@ MonoBehaviour:
     \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneInside\r\n        PUSH, __9_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        PUSH,
-    __4_const_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerPitch\r\n        COPY\r\n
+    __5_const_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerPitch\r\n        COPY\r\n
     \       PUSH, __10_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __10_intnl_SystemSingle\r\n
+    \       PUSH, __9_const_intnl_SystemSingle\r\n        PUSH, __10_intnl_SystemSingle\r\n
     \       PUSH, __11_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __12_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -643,15 +641,15 @@ MonoBehaviour:
     __11_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerVolume\r\n        PUSH,
     __13_intnl_SystemSingle\r\n        COPY # Copy-on-write symbol value dirtied\r\n
     \       PUSH, PlaneAfterburnerVolume\r\n        EXTERN, \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       JUMP, 0x000022AC\r\n        PUSH, Leftplane\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n
+    \       JUMP, 0x00002294\r\n        PUSH, Leftplane\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n
     \       PUSH, __32_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_Equality__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001CCC\r\n
-    \       PUSH, __0_const_intnl_exitJumpLoc_UInt32\r\n        JUMP, 0x00003774\r\n
+    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001CB4\r\n
+    \       PUSH, __0_const_intnl_exitJumpLoc_UInt32\r\n        JUMP, 0x000037A4\r\n
     \       PUSH, PlaneIdle\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __34_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
     \       PUSH, __34_intnl_SystemBoolean\r\n        PUSH, __33_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001D74\r\n        PUSH, PlaneIdle\r\n        PUSH, __35_intnl_SystemBoolean\r\n
+    0x00001D5C\r\n        PUSH, PlaneIdle\r\n        PUSH, __35_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
     \       PUSH, __35_intnl_SystemBoolean\r\n        PUSH, __36_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
@@ -659,12 +657,12 @@ MonoBehaviour:
     \       PUSH, __37_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __37_intnl_SystemBoolean\r\n        PUSH, __33_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001D94\r\n        PUSH, PlaneIdle\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
+    0x00001D7C\r\n        PUSH, PlaneIdle\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
     \       PUSH, PlaneDistant\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __39_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
     \       PUSH, __39_intnl_SystemBoolean\r\n        PUSH, __38_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __38_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001E3C\r\n        PUSH, PlaneDistant\r\n        PUSH, __40_intnl_SystemBoolean\r\n
+    0x00001E24\r\n        PUSH, PlaneDistant\r\n        PUSH, __40_intnl_SystemBoolean\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
     \       PUSH, __40_intnl_SystemBoolean\r\n        PUSH, __41_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
@@ -672,9 +670,9 @@ MonoBehaviour:
     \       PUSH, __42_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __42_intnl_SystemBoolean\r\n        PUSH, __38_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __38_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00001E5C\r\n        PUSH, PlaneDistant\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
+    0x00001E44\r\n        PUSH, PlaneDistant\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __7_const_intnl_SystemSingle\r\n        PUSH, __0_intnl_SystemSingle\r\n
+    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __0_intnl_SystemSingle\r\n
     \       PUSH, __1_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __4_const_intnl_SystemInt32\r\n        PUSH, __2_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -686,7 +684,7 @@ MonoBehaviour:
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
     Doppler\r\n        PUSH, __4_intnl_SystemSingle\r\n        PUSH, __43_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
-    \       PUSH, __43_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002068\r\n
+    \       PUSH, __43_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002050\r\n
     \       PUSH, __5_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
     \       PUSH, __6_const_intnl_SystemInt32\r\n        PUSH, __6_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -709,12 +707,12 @@ MonoBehaviour:
     __12_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerVolume\r\n        PUSH,
     __14_intnl_SystemSingle\r\n        COPY # Copy-on-write symbol value dirtied\r\n
     \       PUSH, PlaneAfterburnerVolume\r\n        EXTERN, \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       JUMP, 0x000021B0\r\n        PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
+    \       JUMP, 0x00002198\r\n        PUSH, EngineControl\r\n        PUSH, __7_const_intnl_SystemString\r\n
     \       PUSH, __5_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __5_intnl_SystemObject\r\n        PUSH, __6_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\r\n        PUSH,
     __7_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __7_const_intnl_SystemSingle\r\n        PUSH, __7_intnl_SystemSingle\r\n
+    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __7_intnl_SystemSingle\r\n
     \       PUSH, __8_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneDistantVolume\r\n        PUSH, __6_intnl_SystemSingle\r\n        PUSH,
     __8_intnl_SystemSingle\r\n        PUSH, PlaneDistantVolume\r\n        PUSH, __9_intnl_SystemSingle\r\n
@@ -725,7 +723,7 @@ MonoBehaviour:
     \       PUSH, __6_intnl_SystemObject\r\n        PUSH, __11_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\r\n        PUSH,
     __12_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __12_intnl_SystemSingle\r\n
+    \       PUSH, __9_const_intnl_SystemSingle\r\n        PUSH, __12_intnl_SystemSingle\r\n
     \       PUSH, __13_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneAfterburnerVolume\r\n        PUSH, __11_intnl_SystemSingle\r\n
     \       PUSH, __13_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerVolume\r\n
@@ -737,23 +735,23 @@ MonoBehaviour:
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __5_intnl_SystemObject\r\n        PUSH, __6_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\r\n        PUSH,
-    __6_intnl_SystemSingle\r\n        PUSH, __10_const_intnl_SystemSingle\r\n        PUSH,
+    __6_intnl_SystemSingle\r\n        PUSH, __11_const_intnl_SystemSingle\r\n        PUSH,
     __7_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Subtraction__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __7_intnl_SystemSingle\r\n        PUSH, __11_const_intnl_SystemSingle\r\n
+    \       PUSH, __7_intnl_SystemSingle\r\n        PUSH, __12_const_intnl_SystemSingle\r\n
     \       PUSH, __8_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __9_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __12_const_intnl_SystemSingle\r\n        PUSH, __9_intnl_SystemSingle\r\n
+    \       PUSH, __13_const_intnl_SystemSingle\r\n        PUSH, __9_intnl_SystemSingle\r\n
     \       PUSH, __10_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneIdlePitch\r\n        PUSH, __8_intnl_SystemSingle\r\n        PUSH,
     __10_intnl_SystemSingle\r\n        PUSH, PlaneIdlePitch\r\n        PUSH, __11_intnl_SystemSingle\r\n
     \       COPY # Copy-on-write symbol value dirtied\r\n        PUSH, PlaneIdlePitch\r\n
     \       EXTERN, \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       JUMP, 0x00002504\r\n        PUSH, Leftplane\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n
+    \       JUMP, 0x000024EC\r\n        PUSH, Leftplane\r\n        PUSH, __1_const_intnl_SystemBoolean\r\n
     \       PUSH, __16_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_Equality__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __16_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000022F4\r\n
-    \       PUSH, __1_const_intnl_exitJumpLoc_UInt32\r\n        JUMP, 0x00003774\r\n
+    \       PUSH, __16_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000022DC\r\n
+    \       PUSH, __1_const_intnl_exitJumpLoc_UInt32\r\n        JUMP, 0x000037A4\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __0_intnl_SystemSingle\r\n
+    \       PUSH, __9_const_intnl_SystemSingle\r\n        PUSH, __0_intnl_SystemSingle\r\n
     \       PUSH, __1_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __2_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -762,7 +760,7 @@ MonoBehaviour:
     __3_intnl_SystemSingle\r\n        COPY # Copy-on-write symbol value dirtied\r\n
     \       PUSH, PlaneAfterburnerVolume\r\n        EXTERN, \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __4_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __13_const_intnl_SystemSingle\r\n        PUSH, __4_intnl_SystemSingle\r\n
+    \       PUSH, __14_const_intnl_SystemSingle\r\n        PUSH, __4_intnl_SystemSingle\r\n
     \       PUSH, __5_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __6_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -771,7 +769,7 @@ MonoBehaviour:
     # Copy-on-write symbol value dirtied\r\n        PUSH, PlaneIdlePitch\r\n        EXTERN,
     \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __8_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __13_const_intnl_SystemSingle\r\n        PUSH, __8_intnl_SystemSingle\r\n
+    \       PUSH, __14_const_intnl_SystemSingle\r\n        PUSH, __8_intnl_SystemSingle\r\n
     \       PUSH, __9_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __10_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -780,7 +778,7 @@ MonoBehaviour:
     # Copy-on-write symbol value dirtied\r\n        PUSH, PlaneIdleVolume\r\n        EXTERN,
     \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __12_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __7_const_intnl_SystemSingle\r\n        PUSH, __12_intnl_SystemSingle\r\n
+    \       PUSH, __8_const_intnl_SystemSingle\r\n        PUSH, __12_intnl_SystemSingle\r\n
     \       PUSH, __13_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __14_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -798,7 +796,7 @@ MonoBehaviour:
     \       PUSH, __19_intnl_SystemBoolean\r\n        PUSH, __16_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __16_intnl_SystemBoolean\r\n        PUSH, __20_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __20_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002628\r\n
+    \       PUSH, __20_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002610\r\n
     \       PUSH, EngineControl\r\n        PUSH, __4_const_intnl_SystemString\r\n
     \       PUSH, __3_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __3_intnl_SystemObject\r\n        PUSH, __22_intnl_SystemBoolean\r\n
@@ -809,14 +807,14 @@ MonoBehaviour:
     \       PUSH, __24_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __24_intnl_SystemBoolean\r\n        PUSH, __16_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __16_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x0000277C\r\n        PUSH, PlaneIdlePitch\r\n        PUSH, Doppler\r\n        PUSH,
+    0x00002764\r\n        PUSH, PlaneIdlePitch\r\n        PUSH, Doppler\r\n        PUSH,
     __0_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        PUSH, PlaneIdlePitch\r\n        COPY\r\n
     \       PUSH, __4_const_intnl_SystemInt32\r\n        PUSH, __1_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
     Doppler\r\n        PUSH, __1_intnl_SystemSingle\r\n        PUSH, __2_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Subtraction__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __2_intnl_SystemSingle\r\n        PUSH, __5_const_intnl_SystemSingle\r\n
+    \       PUSH, __2_intnl_SystemSingle\r\n        PUSH, __6_const_intnl_SystemSingle\r\n
     \       PUSH, __3_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __4_const_intnl_SystemInt32\r\n        PUSH, __4_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -825,33 +823,33 @@ MonoBehaviour:
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __6_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
     __5_intnl_SystemSingle\r\n        PUSH, __6_intnl_SystemSingle\r\n        PUSH,
-    __14_const_intnl_SystemSingle\r\n        PUSH, PlaneDistantPitch\r\n        EXTERN,
+    __15_const_intnl_SystemSingle\r\n        PUSH, PlaneDistantPitch\r\n        EXTERN,
     \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __7_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    Doppler\r\n        PUSH, __7_intnl_SystemSingle\r\n        PUSH, __15_const_intnl_SystemSingle\r\n
+    Doppler\r\n        PUSH, __7_intnl_SystemSingle\r\n        PUSH, __16_const_intnl_SystemSingle\r\n
     \       PUSH, PlaneAfterburnerPitch\r\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, SonicBoomWave\r\n        PUSH, SonicBoomDistance\r\n        PUSH,
     __25_intnl_SystemBoolean\r\n        EXTERN, \"SystemSingle.__op_LessThanOrEqual__SystemSingle_SystemSingle__SystemBoolean\"\r\n
-    \       PUSH, __25_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000027C8\r\n
+    \       PUSH, __25_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000027B0\r\n
     \       PUSH, __1_const_intnl_SystemBoolean\r\n        PUSH, silent\r\n        COPY\r\n
-    \       JUMP, 0x000027DC\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH,
+    \       JUMP, 0x000027C4\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH,
     silent\r\n        COPY\r\n        PUSH, SonicBoom\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __28_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
     \       PUSH, __28_intnl_SystemBoolean\r\n        PUSH, __27_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __27_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x0000286C\r\n        PUSH, silent\r\n        PUSH, __29_intnl_SystemBoolean\r\n
+    0x00002854\r\n        PUSH, silent\r\n        PUSH, __29_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __27_intnl_SystemBoolean\r\n        PUSH, __29_intnl_SystemBoolean\r\n
     \       PUSH, __30_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __30_intnl_SystemBoolean\r\n        PUSH, __27_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __27_intnl_SystemBoolean\r\n        PUSH, __26_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __26_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000028C4\r\n        PUSH, __26_intnl_SystemBoolean\r\n        PUSH, playsonicboom\r\n
+    0x000028AC\r\n        PUSH, __26_intnl_SystemBoolean\r\n        PUSH, playsonicboom\r\n
     \       PUSH, __31_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __31_intnl_SystemBoolean\r\n        PUSH, __26_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __26_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00002930\r\n        PUSH, __16_const_intnl_SystemSingle\r\n        PUSH, __17_const_intnl_SystemSingle\r\n
+    0x00002918\r\n        PUSH, __17_const_intnl_SystemSingle\r\n        PUSH, __18_const_intnl_SystemSingle\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineRandom.__Range__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, SonicBoom\r\n        PUSH, __0_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_pitch__SystemSingle__SystemVoid\"\r\n        PUSH,
@@ -859,13 +857,13 @@ MonoBehaviour:
     \       PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH, playsonicboom\r\n
     \       COPY\r\n        PUSH, PlaneIdle\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n
     \       PUSH, __32_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002AA0\r\n
-    \       PUSH, silent\r\n        JUMP_IF_FALSE, 0x00002990\r\n        PUSH, PlaneIdle\r\n
+    \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002A88\r\n
+    \       PUSH, silent\r\n        JUMP_IF_FALSE, 0x00002978\r\n        PUSH, PlaneIdle\r\n
     \       PUSH, __0_const_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n
-    \       JUMP, 0x00002AA0\r\n        PUSH, PlaneIdle\r\n        PUSH, __0_intnl_SystemSingle\r\n
+    \       JUMP, 0x00002A88\r\n        PUSH, PlaneIdle\r\n        PUSH, __0_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_volume__SystemSingle\"\r\n        PUSH,
     __1_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __18_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n
+    \       PUSH, __19_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n
     \       PUSH, __2_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        PUSH, PlaneIdleVolume\r\n        PUSH,
     __2_intnl_SystemSingle\r\n        PUSH, __3_intnl_SystemSingle\r\n        EXTERN,
@@ -874,7 +872,7 @@ MonoBehaviour:
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        PUSH,
     PlaneIdle\r\n        PUSH, __4_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineAudioSource.__get_pitch__SystemSingle\"\r\n
     \       PUSH, __5_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __18_const_intnl_SystemSingle\r\n        PUSH, __5_intnl_SystemSingle\r\n
+    \       PUSH, __19_const_intnl_SystemSingle\r\n        PUSH, __5_intnl_SystemSingle\r\n
     \       PUSH, __6_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __4_intnl_SystemSingle\r\n        PUSH, PlaneIdlePitch\r\n        PUSH,
     __6_intnl_SystemSingle\r\n        PUSH, __7_intnl_SystemSingle\r\n        EXTERN,
@@ -883,12 +881,12 @@ MonoBehaviour:
     \"UnityEngineAudioSource.__set_pitch__SystemSingle__SystemVoid\"\r\n        PUSH,
     PlaneDistant\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n        PUSH,
     __33_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002C04\r\n
-    \       PUSH, silent\r\n        JUMP_IF_FALSE, 0x00002AF4\r\n        PUSH, __0_const_intnl_SystemSingle\r\n
+    \       PUSH, __33_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002BEC\r\n
+    \       PUSH, silent\r\n        JUMP_IF_FALSE, 0x00002ADC\r\n        PUSH, __0_const_intnl_SystemSingle\r\n
     \       PUSH, PlaneDistantVolume\r\n        COPY\r\n        PUSH, PlaneDistant\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineAudioSource.__get_volume__SystemSingle\"\r\n
     \       PUSH, __1_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __18_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n
+    \       PUSH, __19_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n
     \       PUSH, __2_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        PUSH, PlaneDistantVolume\r\n        PUSH,
     __2_intnl_SystemSingle\r\n        PUSH, __3_intnl_SystemSingle\r\n        EXTERN,
@@ -897,7 +895,7 @@ MonoBehaviour:
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        PUSH,
     PlaneDistant\r\n        PUSH, __4_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineAudioSource.__get_pitch__SystemSingle\"\r\n
     \       PUSH, __5_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
-    \       PUSH, __18_const_intnl_SystemSingle\r\n        PUSH, __5_intnl_SystemSingle\r\n
+    \       PUSH, __19_const_intnl_SystemSingle\r\n        PUSH, __5_intnl_SystemSingle\r\n
     \       PUSH, __6_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __4_intnl_SystemSingle\r\n        PUSH, PlaneDistantPitch\r\n        PUSH,
     __6_intnl_SystemSingle\r\n        PUSH, __7_intnl_SystemSingle\r\n        EXTERN,
@@ -906,17 +904,17 @@ MonoBehaviour:
     \"UnityEngineAudioSource.__set_pitch__SystemSingle__SystemVoid\"\r\n        PUSH,
     PlaneAfterburner\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n        PUSH,
     __34_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __34_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002D1C\r\n
-    \       PUSH, silent\r\n        JUMP_IF_FALSE, 0x00002C7C\r\n        PUSH, __3_const_intnl_SystemInt32\r\n
+    \       PUSH, __34_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00002D04\r\n
+    \       PUSH, silent\r\n        JUMP_IF_FALSE, 0x00002C64\r\n        PUSH, __3_const_intnl_SystemInt32\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n
     \       PUSH, PlaneAfterburner\r\n        PUSH, __0_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        JUMP,
-    0x00002C94\r\n        PUSH, PlaneAfterburner\r\n        PUSH, PlaneAfterburnerVolume\r\n
+    0x00002C7C\r\n        PUSH, PlaneAfterburner\r\n        PUSH, PlaneAfterburnerVolume\r\n
     \       EXTERN, \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n
     \       PUSH, PlaneAfterburner\r\n        PUSH, __0_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__get_pitch__SystemSingle\"\r\n        PUSH, __1_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n        PUSH,
-    __18_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n        PUSH,
+    __19_const_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemSingle\r\n        PUSH,
     __2_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerPitch\r\n
     \       PUSH, __2_intnl_SystemSingle\r\n        PUSH, __3_intnl_SystemSingle\r\n
@@ -925,12 +923,12 @@ MonoBehaviour:
     \"UnityEngineAudioSource.__set_pitch__SystemSingle__SystemVoid\"\r\n        PUSH,
     PlaneWind\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n        PUSH,
     __35_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __35_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000030B0\r\n
-    \       PUSH, silent\r\n        JUMP_IF_FALSE, 0x00002D94\r\n        PUSH, __3_const_intnl_SystemInt32\r\n
+    \       PUSH, __35_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00003098\r\n
+    \       PUSH, silent\r\n        JUMP_IF_FALSE, 0x00002D7C\r\n        PUSH, __3_const_intnl_SystemInt32\r\n
     \       PUSH, __0_intnl_SystemSingle\r\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n
     \       PUSH, PlaneWind\r\n        PUSH, __0_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        JUMP,
-    0x000030B0\r\n        PUSH, __7_const_intnl_SystemInt32\r\n        PUSH, __1_intnl_SystemInt32\r\n
+    0x00003098\r\n        PUSH, __7_const_intnl_SystemInt32\r\n        PUSH, __1_intnl_SystemInt32\r\n
     \       EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\r\n
     \       PUSH, __1_intnl_SystemInt32\r\n        PUSH, __0_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -957,7 +955,7 @@ MonoBehaviour:
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __6_intnl_SystemSingle\r\n
     \       PUSH, __7_intnl_SystemSingle\r\n        PUSH, __8_intnl_SystemSingle\r\n
     \       PUSH, __9_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __9_intnl_SystemSingle\r\n        PUSH, __19_const_intnl_SystemSingle\r\n
+    \       PUSH, __9_intnl_SystemSingle\r\n        PUSH, __20_const_intnl_SystemSingle\r\n
     \       PUSH, __10_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, EngineControl\r\n        PUSH, __8_const_intnl_SystemString\r\n
     \       PUSH, __5_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
@@ -979,15 +977,15 @@ MonoBehaviour:
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __17_intnl_SystemSingle\r\n
     \       PUSH, __18_intnl_SystemSingle\r\n        PUSH, __19_intnl_SystemSingle\r\n
     \       PUSH, __20_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __20_intnl_SystemSingle\r\n        PUSH, __20_const_intnl_SystemSingle\r\n
-    \       PUSH, __21_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __20_intnl_SystemSingle\r\n        PUSH, __4_const_intnl_SystemSingle\r\n
+    \       PUSH, __21_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __10_intnl_SystemSingle\r\n        PUSH, __21_intnl_SystemSingle\r\n
     \       PUSH, __22_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneWind\r\n        PUSH, __22_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        PUSH,
     GunSound\r\n        PUSH, __0_const_intnl_UnityEngineAudioSource\r\n        PUSH,
     __36_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\r\n
-    \       PUSH, __36_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00003758\r\n
+    \       PUSH, __36_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00003788\r\n
     \       PUSH, EngineControl\r\n        PUSH, __9_const_intnl_SystemString\r\n
     \       PUSH, __4_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __4_intnl_SystemObject\r\n        PUSH, __0_intnl_EffectsController\r\n
@@ -997,7 +995,7 @@ MonoBehaviour:
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
     \       PUSH, __39_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __37_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x00003228\r\n        PUSH, EngineControl\r\n        PUSH, __11_const_intnl_SystemString\r\n
+    0x00003210\r\n        PUSH, EngineControl\r\n        PUSH, __11_const_intnl_SystemString\r\n
     \       PUSH, __6_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __6_intnl_SystemObject\r\n        PUSH, __0_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __0_intnl_SoundController\r\n        PUSH, __12_const_intnl_SystemString\r\n
@@ -1010,7 +1008,7 @@ MonoBehaviour:
     \       PUSH, __43_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __43_intnl_SystemBoolean\r\n        PUSH, __37_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __37_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000035B0\r\n        PUSH, EngineControl\r\n        PUSH, __11_const_intnl_SystemString\r\n
+    0x00003598\r\n        PUSH, EngineControl\r\n        PUSH, __11_const_intnl_SystemString\r\n
     \       PUSH, __8_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __8_intnl_SystemObject\r\n        PUSH, __1_intnl_SoundController\r\n
     \       COPY\r\n        PUSH, __1_intnl_SoundController\r\n        PUSH, __13_const_intnl_SystemString\r\n
@@ -1021,7 +1019,7 @@ MonoBehaviour:
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, __1_intnl_SystemSingle\r\n
     \       PUSH, __2_intnl_SystemSingle\r\n        PUSH, __3_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Subtraction__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __3_intnl_SystemSingle\r\n        PUSH, __10_const_intnl_SystemSingle\r\n
+    \       PUSH, __3_intnl_SystemSingle\r\n        PUSH, __11_const_intnl_SystemSingle\r\n
     \       PUSH, __4_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __4_const_intnl_SystemInt32\r\n        PUSH, __5_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -1030,14 +1028,14 @@ MonoBehaviour:
     \       PUSH, __3_const_intnl_SystemInt32\r\n        PUSH, __7_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
     __6_intnl_SystemSingle\r\n        PUSH, __7_intnl_SystemSingle\r\n        PUSH,
-    __17_const_intnl_SystemSingle\r\n        PUSH, __8_intnl_SystemSingle\r\n        EXTERN,
+    __18_const_intnl_SystemSingle\r\n        PUSH, __8_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, GunSound\r\n        PUSH, __8_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_pitch__SystemSingle__SystemVoid\"\r\n        PUSH,
     GunSound\r\n        PUSH, __44_intnl_SystemBoolean\r\n        EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
     \       PUSH, __44_intnl_SystemBoolean\r\n        PUSH, __45_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __45_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000033DC\r\n
+    \       PUSH, __45_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000033C4\r\n
     \       PUSH, GunSound\r\n        EXTERN, \"UnityEngineAudioSource.__Play__SystemVoid\"\r\n
     \       PUSH, EngineControl\r\n        PUSH, __11_const_intnl_SystemString\r\n
     \       PUSH, __10_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
@@ -1048,7 +1046,7 @@ MonoBehaviour:
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\r\n        PUSH,
     __10_intnl_SystemSingle\r\n        PUSH, __21_const_intnl_SystemSingle\r\n        PUSH,
     __46_intnl_SystemBoolean\r\n        EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
-    \       PUSH, __46_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00003520\r\n
+    \       PUSH, __46_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00003508\r\n
     \       PUSH, GunSound\r\n        PUSH, __11_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__get_volume__SystemSingle\"\r\n        PUSH, __12_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n        PUSH,
@@ -1061,7 +1059,7 @@ MonoBehaviour:
     \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, GunSound\r\n        PUSH, __15_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        JUMP,
-    0x000035A8\r\n        PUSH, GunSound\r\n        PUSH, __11_intnl_SystemSingle\r\n
+    0x00003590\r\n        PUSH, GunSound\r\n        PUSH, __11_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_volume__SystemSingle\"\r\n        PUSH,
     __12_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
     \       PUSH, __23_const_intnl_SystemSingle\r\n        PUSH, __12_intnl_SystemSingle\r\n
@@ -1071,33 +1069,38 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, GunSound\r\n        PUSH, __14_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineAudioSource.__set_volume__SystemSingle__SystemVoid\"\r\n        JUMP,
-    0x00003758\r\n        PUSH, EngineControl\r\n        PUSH, __11_const_intnl_SystemString\r\n
+    0x00003788\r\n        PUSH, EngineControl\r\n        PUSH, __9_const_intnl_SystemString\r\n
     \       PUSH, __8_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
-    \       PUSH, __8_intnl_SystemObject\r\n        PUSH, __1_intnl_SoundController\r\n
-    \       COPY\r\n        PUSH, __1_intnl_SoundController\r\n        PUSH, __12_const_intnl_SystemString\r\n
+    \       PUSH, __8_intnl_SystemObject\r\n        PUSH, __1_intnl_EffectsController\r\n
+    \       COPY\r\n        PUSH, __1_intnl_EffectsController\r\n        PUSH, __10_const_intnl_SystemString\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
     \       PUSH, __9_intnl_SystemObject\r\n        PUSH, __46_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
-    \       PUSH, __46_intnl_SystemBoolean\r\n        PUSH, __44_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __44_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x0000368C\r\n        PUSH, GunSound\r\n        PUSH, __47_intnl_SystemBoolean\r\n
-    \       EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
-    \       PUSH, __44_intnl_SystemBoolean\r\n        PUSH, __47_intnl_SystemBoolean\r\n
-    \       PUSH, __48_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __48_intnl_SystemBoolean\r\n        PUSH, __44_intnl_SystemBoolean\r\n
-    \       COPY\r\n        PUSH, __44_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x000036B4\r\n        PUSH, GunSound\r\n        EXTERN, \"UnityEngineAudioSource.__Stop__SystemVoid\"\r\n
-    \       JUMP, 0x00003758\r\n        PUSH, EngineControl\r\n        PUSH, __9_const_intnl_SystemString\r\n
-    \       PUSH, __10_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
-    \       PUSH, __10_intnl_SystemObject\r\n        PUSH, __1_intnl_EffectsController\r\n
-    \       COPY\r\n        PUSH, __1_intnl_EffectsController\r\n        PUSH, __10_const_intnl_SystemString\r\n
-    \       PUSH, __11_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
-    \       PUSH, __11_intnl_SystemObject\r\n        PUSH, __50_intnl_SystemBoolean\r\n
-    \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
-    \       PUSH, __50_intnl_SystemBoolean\r\n        PUSH, __51_intnl_SystemBoolean\r\n
+    \       PUSH, __46_intnl_SystemBoolean\r\n        PUSH, __47_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
-    \       PUSH, __51_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00003758\r\n
-    \       PUSH, GunSound\r\n        EXTERN, \"UnityEngineAudioSource.__Stop__SystemVoid\"\r\n
+    \       PUSH, __47_intnl_SystemBoolean\r\n        PUSH, __44_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __44_intnl_SystemBoolean\r\n        PUSH, __48_intnl_SystemBoolean\r\n
+    \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __48_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00003768\r\n
+    \       PUSH, EngineControl\r\n        PUSH, __11_const_intnl_SystemString\r\n
+    \       PUSH, __10_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
+    \       PUSH, __10_intnl_SystemObject\r\n        PUSH, __1_intnl_SoundController\r\n
+    \       COPY\r\n        PUSH, __1_intnl_SoundController\r\n        PUSH, __12_const_intnl_SystemString\r\n
+    \       PUSH, __11_intnl_SystemObject\r\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\r\n
+    \       PUSH, __11_intnl_SystemObject\r\n        PUSH, __51_intnl_SystemBoolean\r\n
+    \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\r\n
+    \       PUSH, __51_intnl_SystemBoolean\r\n        PUSH, __49_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __49_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x00003734\r\n        PUSH, GunSound\r\n        PUSH, __52_intnl_SystemBoolean\r\n
+    \       EXTERN, \"UnityEngineAudioSource.__get_isPlaying__SystemBoolean\"\r\n
+    \       PUSH, __49_intnl_SystemBoolean\r\n        PUSH, __52_intnl_SystemBoolean\r\n
+    \       PUSH, __53_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __53_intnl_SystemBoolean\r\n        PUSH, __49_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __44_intnl_SystemBoolean\r\n        PUSH, __49_intnl_SystemBoolean\r\n
+    \       PUSH, __54_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __54_intnl_SystemBoolean\r\n        PUSH, __44_intnl_SystemBoolean\r\n
+    \       COPY\r\n        PUSH, __44_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
+    0x00003788\r\n        PUSH, GunSound\r\n        EXTERN, \"UnityEngineAudioSource.__Stop__SystemVoid\"\r\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\r\n        COPY\r\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\r\n        \r\n    Exitplane:\r\n
     \       \r\n        PUSH, __0_const_intnl_SystemUInt32\r\n        PUSH, PlaneInside\r\n
@@ -1111,7 +1114,7 @@ MonoBehaviour:
     \       PUSH, __23_intnl_SystemSingle\r\n        PUSH, PlaneAfterburnerVolume\r\n
     \       COPY\r\n        PUSH, PlaneInside\r\n        PUSH, PlaneIdlePitch\r\n
     \       EXTERN, \"UnityEngineAudioSource.__get_pitch__SystemSingle\"\r\n        PUSH,
-    PlaneIdleInitialVolume\r\n        PUSH, __5_const_intnl_SystemSingle\r\n        PUSH,
+    PlaneIdleInitialVolume\r\n        PUSH, __6_const_intnl_SystemSingle\r\n        PUSH,
     PlaneIdleVolume\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, PlaneAfterburnerVolume\r\n        PUSH, PlaneDistantVolume\r\n        COPY\r\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\r\n        COPY\r\n
