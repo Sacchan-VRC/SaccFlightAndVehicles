@@ -86,7 +86,7 @@ public class EngineController : UdonSharpBehaviour
     public float ReversingRollStrength = 1.6f;
     public float ReversingPitchStrength = 2;
     public float ReversingYawStrength = 2.4f;
-    [System.NonSerializedAttribute] [HideInInspector] public float AngleOfAttack;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AngleOfAttack;
     [System.NonSerializedAttribute] [HideInInspector] public float AngleOfAttackYaw;
     public float MaxAngleOfAttack;
     public float MaxAngleOfAttackYaw;
