@@ -17,56 +17,55 @@ MonoBehaviour:
   udonAssembly: ".data_start\r\n\r\n    .export VehicleMainObj\r\n    .export GroundDetector\r\n
     \   .export EffectsControl\r\n    .export SoundControl\r\n    .export HUDControl\r\n
     \   .export CenterOfMass\r\n    .export PitchMoment\r\n    .export YawMoment\r\n
-    \   .export AirplaneThrustVectoring\r\n    .export AirplaneThrustVecStr\r\n    .export
-    ThrottleStrengthForward\r\n    .export AirFriction\r\n    .export PitchStrength\r\n
-    \   .export YawStrength\r\n    .export RollStrength\r\n    .export AccelerationResponse\r\n
-    \   .export RotationResponse\r\n    .export VelStraightenStrPitch\r\n    .export
-    VelStraightenStrYaw\r\n    .export TaxiRotationSpeed\r\n    .export AirplanePitchDownStrRatio\r\n
-    \   .export AirplaneLift\r\n    .export AirplaneVelLiftCoefficient\r\n    .export
-    MaxVelLift\r\n    .export AirplanePullDownLiftRatio\r\n    .export AirplaneSidewaysLift\r\n
-    \   .export AirplaneVelPullUp\r\n    .export RollFriction\r\n    .export PitchFriction\r\n
-    \   .export YawFriction\r\n    .export HasFlaps\r\n    .export HasLandingGear\r\n
-    \   .export LandingGearDragMulti\r\n    .export FlapsDragMulti\r\n    .export
-    FlapsLiftMulti\r\n    .export Health\r\n    .export SeaLevel\r\n    .export AtmosphereThinningStart\r\n
-    \   .export AtmosphereThinningEnd\r\n    .export RotMultiMaxSpeed\r\n    .export
-    ReversingRollStrength\r\n    .export ReversingPitchStrength\r\n    .export ReversingYawStrength\r\n
-    \   .export MaxAngleOfAttack\r\n    .export MaxAngleOfAttackYaw\r\n    .export
-    MinHighAoAControl\r\n    .export MinAoAPitchLift\r\n    .export MinAoAYawLift\r\n
-    \   .sync Health, none\r\n    .sync ThrottleValue, none\r\n    .sync CurrentVel,
-    none\r\n    .sync Gs, none\r\n    .sync GearUp, none\r\n    .sync Flaps, none\r\n
-    \   .sync Occupied, none\r\n\r\n    __refl_const_intnl_udonTypeID: %SystemInt64,
-    null\r\n    __refl_const_intnl_udonTypeName: %SystemString, null\r\n    AirplaneThrustVectoring:
-    %SystemBoolean, null\r\n    HasFlaps: %SystemBoolean, null\r\n    HasLandingGear:
-    %SystemBoolean, null\r\n    VehicleMainObj: %UnityEngineGameObject, null\r\n    AccelerationResponse:
-    %SystemSingle, null\r\n    AirFriction: %SystemSingle, null\r\n    AirplaneLift:
-    %SystemSingle, null\r\n    AirplanePitchDownStrRatio: %SystemSingle, null\r\n
-    \   AirplanePullDownLiftRatio: %SystemSingle, null\r\n    AirplaneSidewaysLift:
-    %SystemSingle, null\r\n    AirplaneThrustVecStr: %SystemSingle, null\r\n    AirplaneVelLiftCoefficient:
-    %SystemSingle, null\r\n    AirplaneVelPullUp: %SystemSingle, null\r\n    AtmosphereThinningEnd:
+    \   .export ThrustVectoring\r\n    .export ThrustVecStr\r\n    .export ThrottleStrengthForward\r\n
+    \   .export AirFriction\r\n    .export PitchStrength\r\n    .export YawStrength\r\n
+    \   .export RollStrength\r\n    .export AccelerationResponse\r\n    .export RotationResponse\r\n
+    \   .export VelStraightenStrPitch\r\n    .export VelStraightenStrYaw\r\n    .export
+    TaxiRotationSpeed\r\n    .export PitchDownStrRatio\r\n    .export Lift\r\n    .export
+    VelLiftCoefficient\r\n    .export MaxVelLift\r\n    .export PullDownLiftRatio\r\n
+    \   .export SidewaysLift\r\n    .export VelPullUp\r\n    .export RollFriction\r\n
+    \   .export PitchFriction\r\n    .export YawFriction\r\n    .export HasFlaps\r\n
+    \   .export HasLandingGear\r\n    .export LandingGearDragMulti\r\n    .export
+    FlapsDragMulti\r\n    .export FlapsLiftMulti\r\n    .export Health\r\n    .export
+    SeaLevel\r\n    .export AtmosphereThinningStart\r\n    .export AtmosphereThinningEnd\r\n
+    \   .export RotMultiMaxSpeed\r\n    .export ReversingRollStrength\r\n    .export
+    ReversingPitchStrength\r\n    .export ReversingYawStrength\r\n    .export MaxAngleOfAttack\r\n
+    \   .export MaxAngleOfAttackYaw\r\n    .export MinHighAoAControl\r\n    .export
+    MinAoAPitchLift\r\n    .export MinAoAYawLift\r\n    .sync Health, none\r\n    .sync
+    ThrottleValue, none\r\n    .sync CurrentVel, none\r\n    .sync Gs, none\r\n    .sync
+    GearUp, none\r\n    .sync Flaps, none\r\n    .sync Occupied, none\r\n    .sync
+    AngleOfAttack, none\r\n\r\n    __refl_const_intnl_udonTypeID: %SystemInt64, null\r\n
+    \   __refl_const_intnl_udonTypeName: %SystemString, null\r\n    HasFlaps: %SystemBoolean,
+    null\r\n    HasLandingGear: %SystemBoolean, null\r\n    ThrustVectoring: %SystemBoolean,
+    null\r\n    VehicleMainObj: %UnityEngineGameObject, null\r\n    AccelerationResponse:
+    %SystemSingle, null\r\n    AirFriction: %SystemSingle, null\r\n    AtmosphereThinningEnd:
     %SystemSingle, null\r\n    AtmosphereThinningStart: %SystemSingle, null\r\n    FlapsDragMulti:
     %SystemSingle, null\r\n    FlapsLiftMulti: %SystemSingle, null\r\n    Health:
-    %SystemSingle, null\r\n    LandingGearDragMulti: %SystemSingle, null\r\n    MaxAngleOfAttack:
-    %SystemSingle, null\r\n    MaxAngleOfAttackYaw: %SystemSingle, null\r\n    MaxVelLift:
-    %SystemSingle, null\r\n    MinAoAPitchLift: %SystemSingle, null\r\n    MinAoAYawLift:
-    %SystemSingle, null\r\n    MinHighAoAControl: %SystemSingle, null\r\n    PitchFriction:
-    %SystemSingle, null\r\n    PitchStrength: %SystemSingle, null\r\n    ReversingPitchStrength:
-    %SystemSingle, null\r\n    ReversingRollStrength: %SystemSingle, null\r\n    ReversingYawStrength:
-    %SystemSingle, null\r\n    RollFriction: %SystemSingle, null\r\n    RollStrength:
-    %SystemSingle, null\r\n    RotationResponse: %SystemSingle, null\r\n    RotMultiMaxSpeed:
-    %SystemSingle, null\r\n    SeaLevel: %SystemSingle, null\r\n    TaxiRotationSpeed:
-    %SystemSingle, null\r\n    ThrottleStrengthForward: %SystemSingle, null\r\n    VelStraightenStrPitch:
-    %SystemSingle, null\r\n    VelStraightenStrYaw: %SystemSingle, null\r\n    YawFriction:
-    %SystemSingle, null\r\n    YawStrength: %SystemSingle, null\r\n    CenterOfMass:
-    %UnityEngineTransform, null\r\n    GroundDetector: %UnityEngineTransform, null\r\n
-    \   PitchMoment: %UnityEngineTransform, null\r\n    YawMoment: %UnityEngineTransform,
-    null\r\n    EffectsControl: %VRCUdonUdonBehaviour, null\r\n    HUDControl: %VRCUdonUdonBehaviour,
-    null\r\n    SoundControl: %VRCUdonUdonBehaviour, null\r\n    dead: %SystemBoolean,
-    null\r\n    Flaps: %SystemBoolean, null\r\n    GearUp: %SystemBoolean, null\r\n
-    \   Occupied: %SystemBoolean, null\r\n    Passenger: %SystemBoolean, null\r\n
-    \   Piloting: %SystemBoolean, null\r\n    Taxiing: %SystemBoolean, null\r\n    VehicleConstantForce:
-    %UnityEngineConstantForce, null\r\n    VehicleRigidbody: %UnityEngineRigidbody,
-    null\r\n    accelforward: %SystemSingle, null\r\n    AngleOfAttack: %SystemSingle,
-    null\r\n    AngleOfAttackYaw: %SystemSingle, null\r\n    AtmoshpereFadeDistance:
+    %SystemSingle, null\r\n    LandingGearDragMulti: %SystemSingle, null\r\n    Lift:
+    %SystemSingle, null\r\n    MaxAngleOfAttack: %SystemSingle, null\r\n    MaxAngleOfAttackYaw:
+    %SystemSingle, null\r\n    MaxVelLift: %SystemSingle, null\r\n    MinAoAPitchLift:
+    %SystemSingle, null\r\n    MinAoAYawLift: %SystemSingle, null\r\n    MinHighAoAControl:
+    %SystemSingle, null\r\n    PitchDownStrRatio: %SystemSingle, null\r\n    PitchFriction:
+    %SystemSingle, null\r\n    PitchStrength: %SystemSingle, null\r\n    PullDownLiftRatio:
+    %SystemSingle, null\r\n    ReversingPitchStrength: %SystemSingle, null\r\n    ReversingRollStrength:
+    %SystemSingle, null\r\n    ReversingYawStrength: %SystemSingle, null\r\n    RollFriction:
+    %SystemSingle, null\r\n    RollStrength: %SystemSingle, null\r\n    RotationResponse:
+    %SystemSingle, null\r\n    RotMultiMaxSpeed: %SystemSingle, null\r\n    SeaLevel:
+    %SystemSingle, null\r\n    SidewaysLift: %SystemSingle, null\r\n    TaxiRotationSpeed:
+    %SystemSingle, null\r\n    ThrottleStrengthForward: %SystemSingle, null\r\n    ThrustVecStr:
+    %SystemSingle, null\r\n    VelLiftCoefficient: %SystemSingle, null\r\n    VelPullUp:
+    %SystemSingle, null\r\n    VelStraightenStrPitch: %SystemSingle, null\r\n    VelStraightenStrYaw:
+    %SystemSingle, null\r\n    YawFriction: %SystemSingle, null\r\n    YawStrength:
+    %SystemSingle, null\r\n    CenterOfMass: %UnityEngineTransform, null\r\n    GroundDetector:
+    %UnityEngineTransform, null\r\n    PitchMoment: %UnityEngineTransform, null\r\n
+    \   YawMoment: %UnityEngineTransform, null\r\n    EffectsControl: %VRCUdonUdonBehaviour,
+    null\r\n    HUDControl: %VRCUdonUdonBehaviour, null\r\n    SoundControl: %VRCUdonUdonBehaviour,
+    null\r\n    dead: %SystemBoolean, null\r\n    Flaps: %SystemBoolean, null\r\n
+    \   GearUp: %SystemBoolean, null\r\n    Occupied: %SystemBoolean, null\r\n    Passenger:
+    %SystemBoolean, null\r\n    Piloting: %SystemBoolean, null\r\n    Taxiing: %SystemBoolean,
+    null\r\n    VehicleConstantForce: %UnityEngineConstantForce, null\r\n    VehicleRigidbody:
+    %UnityEngineRigidbody, null\r\n    accelforward: %SystemSingle, null\r\n    AngleOfAttack:
+    %SystemSingle, null\r\n    AngleOfAttackYaw: %SystemSingle, null\r\n    AtmoshpereFadeDistance:
     %SystemSingle, null\r\n    Atmosphere: %SystemSingle, null\r\n    AtmosphereHeightThing:
     %SystemSingle, null\r\n    downspeed: %SystemSingle, null\r\n    FullHealth: %SystemSingle,
     null\r\n    Gs: %SystemSingle, null\r\n    LstickH: %SystemSingle, null\r\n    LstickV:
@@ -544,8 +543,8 @@ MonoBehaviour:
     \       COPY\r\n        PUSH, __30_intnl_SystemBoolean\r\n        PUSH, __32_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __32_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00001098\r\n
-    \       PUSH, __30_intnl_SystemBoolean\r\n        PUSH, AirplaneThrustVectoring\r\n
-    \       PUSH, __33_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
+    \       PUSH, __30_intnl_SystemBoolean\r\n        PUSH, ThrustVectoring\r\n        PUSH,
+    __33_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __33_intnl_SystemBoolean\r\n        PUSH, __30_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __30_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
     0x000010C4\r\n        PUSH, __0_const_intnl_SystemBoolean\r\n        PUSH, __0_forward_Boolean\r\n
@@ -630,8 +629,8 @@ MonoBehaviour:
     pitch\r\n        PUSH, __30_intnl_SystemSingle\r\n        PUSH, __52_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
     \       PUSH, __52_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000015CC\r\n
-    \       PUSH, pitch\r\n        PUSH, AirplanePitchDownStrRatio\r\n        PUSH,
-    __31_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, pitch\r\n        PUSH, PitchDownStrRatio\r\n        PUSH, __31_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __31_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
     \       PUSH, Taxiing\r\n        JUMP_IF_FALSE, 0x000016BC\r\n        PUSH, VehicleMainObj\r\n
     \       PUSH, __4_intnl_UnityEngineTransform\r\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
@@ -680,8 +679,8 @@ MonoBehaviour:
     downspeed\r\n        PUSH, __7_intnl_SystemSingle\r\n        PUSH, __19_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemSingle.__op_LessThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
     \       PUSH, __19_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000018B8\r\n
-    \       PUSH, downspeed\r\n        PUSH, AirplanePullDownLiftRatio\r\n        PUSH,
-    __8_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, downspeed\r\n        PUSH, PullDownLiftRatio\r\n        PUSH, __8_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __8_intnl_SystemSingle\r\n        PUSH, downspeed\r\n        COPY\r\n
     \       PUSH, VehicleMainObj\r\n        PUSH, __4_intnl_UnityEngineTransform\r\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
@@ -822,7 +821,7 @@ MonoBehaviour:
     \       PUSH, __52_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n
     \       PUSH, __51_intnl_SystemSingle\r\n        PUSH, __52_intnl_SystemSingle\r\n
     \       PUSH, __53_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __53_intnl_SystemSingle\r\n        PUSH, AirplaneVelLiftCoefficient\r\n
+    \       PUSH, __53_intnl_SystemSingle\r\n        PUSH, VelLiftCoefficient\r\n
     \       PUSH, __54_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __1_const_intnl_SystemInt32\r\n        PUSH, __55_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
@@ -831,25 +830,25 @@ MonoBehaviour:
     \       PUSH, CurrentVel\r\n        PUSH, __56_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineVector3.__get_magnitude__SystemSingle\"\r\n        PUSH, __56_intnl_SystemSingle\r\n
     \       PUSH, RotMultiMaxSpeed\r\n        PUSH, rotlift\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, AirplaneThrustVectoring\r\n        JUMP_IF_FALSE, 0x00002294\r\n
-    \       PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __57_intnl_SystemSingle\r\n
+    \       PUSH, ThrustVectoring\r\n        JUMP_IF_FALSE, 0x00002294\r\n        PUSH,
+    rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __57_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, __57_intnl_SystemSingle\r\n
-    \       PUSH, __58_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, ThrustVecStr\r\n        PUSH, __57_intnl_SystemSingle\r\n        PUSH,
+    __58_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, roll\r\n        PUSH, __58_intnl_SystemSingle\r\n        PUSH, __59_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __59_intnl_SystemSingle\r\n        PUSH, roll\r\n        COPY\r\n
     \       PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __60_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, __60_intnl_SystemSingle\r\n
-    \       PUSH, __61_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, ThrustVecStr\r\n        PUSH, __60_intnl_SystemSingle\r\n        PUSH,
+    __61_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, pitch\r\n        PUSH, __61_intnl_SystemSingle\r\n        PUSH,
     __62_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __62_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
     \       PUSH, rotlift\r\n        PUSH, __0_AoALift_Single\r\n        PUSH, __63_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, AirplaneThrustVecStr\r\n        PUSH, __63_intnl_SystemSingle\r\n
-    \       PUSH, __64_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, ThrustVecStr\r\n        PUSH, __63_intnl_SystemSingle\r\n        PUSH,
+    __64_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, yaw\r\n        PUSH, __64_intnl_SystemSingle\r\n        PUSH, __65_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __65_intnl_SystemSingle\r\n        PUSH, yaw\r\n        COPY\r\n
@@ -951,8 +950,8 @@ MonoBehaviour:
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
     __0_const_intnl_SystemInt32\r\n        PUSH, __0_FlapsLift_Single\r\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH, sidespeed\r\n
-    \       PUSH, AirplaneSidewaysLift\r\n        PUSH, __76_intnl_SystemSingle\r\n
-    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, SidewaysLift\r\n        PUSH, __76_intnl_SystemSingle\r\n        EXTERN,
+    \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __1_intnl_SystemInt32\r\n
     \       EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\r\n
     \       PUSH, __1_intnl_SystemInt32\r\n        PUSH, __77_intnl_SystemSingle\r\n
@@ -967,17 +966,17 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineVector3.__set_x__SystemSingle\"\r\n        PUSH,
     downspeed\r\n        PUSH, __0_FlapsLift_Single\r\n        PUSH, __81_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __81_intnl_SystemSingle\r\n        PUSH, AirplanePullDownLiftRatio\r\n
-    \       PUSH, __82_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __82_intnl_SystemSingle\r\n        PUSH, AirplaneLift\r\n        PUSH,
-    __83_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __81_intnl_SystemSingle\r\n        PUSH, PullDownLiftRatio\r\n        PUSH,
+    __82_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
+    \       PUSH, __82_intnl_SystemSingle\r\n        PUSH, Lift\r\n        PUSH, __83_intnl_SystemSingle\r\n
+    \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __83_intnl_SystemSingle\r\n        PUSH, __0_SpeedLiftFactor_Single\r\n
     \       PUSH, __84_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __84_intnl_SystemSingle\r\n        PUSH, __0_AoALift_Single\r\n
     \       PUSH, __85_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_SpeedLiftFactor_Single\r\n        PUSH, __0_AoALift_Single\r\n
     \       PUSH, __86_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, __86_intnl_SystemSingle\r\n        PUSH, AirplaneVelPullUp\r\n        PUSH,
+    \       PUSH, __86_intnl_SystemSingle\r\n        PUSH, VelPullUp\r\n        PUSH,
     __87_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __85_intnl_SystemSingle\r\n        PUSH, __87_intnl_SystemSingle\r\n
     \       PUSH, __88_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
@@ -1826,7 +1825,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneThrustVectoring
+      Data: ThrustVectoring
     - Name: $v
       Entry: 7
       Data: 41|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1853,10 +1852,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneThrustVectoring
+      Data: ThrustVectoring
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneThrustVectoring
+      Data: ThrustVectoring
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1889,7 +1888,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneThrustVecStr
+      Data: ThrustVecStr
     - Name: $v
       Entry: 7
       Data: 45|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1916,10 +1915,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneThrustVecStr
+      Data: ThrustVecStr
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneThrustVecStr
+      Data: ThrustVecStr
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2522,7 +2521,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplanePitchDownStrRatio
+      Data: PitchDownStrRatio
     - Name: $v
       Entry: 7
       Data: 79|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2543,10 +2542,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplanePitchDownStrRatio
+      Data: PitchDownStrRatio
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplanePitchDownStrRatio
+      Data: PitchDownStrRatio
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2579,7 +2578,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneLift
+      Data: Lift
     - Name: $v
       Entry: 7
       Data: 82|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2600,10 +2599,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneLift
+      Data: Lift
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneLift
+      Data: Lift
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2636,7 +2635,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneVelLiftCoefficient
+      Data: VelLiftCoefficient
     - Name: $v
       Entry: 7
       Data: 85|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2657,10 +2656,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneVelLiftCoefficient
+      Data: VelLiftCoefficient
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneVelLiftCoefficient
+      Data: VelLiftCoefficient
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2750,7 +2749,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplanePullDownLiftRatio
+      Data: PullDownLiftRatio
     - Name: $v
       Entry: 7
       Data: 91|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2771,10 +2770,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplanePullDownLiftRatio
+      Data: PullDownLiftRatio
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplanePullDownLiftRatio
+      Data: PullDownLiftRatio
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2807,7 +2806,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneSidewaysLift
+      Data: SidewaysLift
     - Name: $v
       Entry: 7
       Data: 94|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2828,10 +2827,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneSidewaysLift
+      Data: SidewaysLift
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneSidewaysLift
+      Data: SidewaysLift
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2864,7 +2863,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirplaneVelPullUp
+      Data: VelPullUp
     - Name: $v
       Entry: 7
       Data: 97|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2885,10 +2884,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirplaneVelPullUp
+      Data: VelPullUp
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirplaneVelPullUp
+      Data: VelPullUp
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -6125,7 +6124,7 @@ MonoBehaviour:
       Data: 2
     - Name: syncMode
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: symbolResolvedTypeName
       Entry: 1
       Data: SystemSingle
@@ -6146,7 +6145,7 @@ MonoBehaviour:
       Data: 302|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 7
       Data: 303|System.NonSerializedAttribute, mscorlib
@@ -6160,6 +6159,12 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
+      Entry: 7
+      Data: 305|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
       Entry: 13
       Data: 
     - Name: 
@@ -6182,10 +6187,10 @@ MonoBehaviour:
       Data: AngleOfAttackYaw
     - Name: $v
       Entry: 7
-      Data: 305|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 306|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 306|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 307|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 47
@@ -6212,19 +6217,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 307|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 308|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 308|System.NonSerializedAttribute, mscorlib
+      Data: 309|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 309|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 310|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -6251,10 +6256,10 @@ MonoBehaviour:
       Data: MaxAngleOfAttack
     - Name: $v
       Entry: 7
-      Data: 310|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 311|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 311|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 312|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 47
@@ -6281,7 +6286,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 312|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 313|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6308,10 +6313,10 @@ MonoBehaviour:
       Data: MaxAngleOfAttackYaw
     - Name: $v
       Entry: 7
-      Data: 313|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 314|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 314|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 315|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 47
@@ -6338,7 +6343,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 315|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 316|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6365,10 +6370,10 @@ MonoBehaviour:
       Data: MinHighAoAControl
     - Name: $v
       Entry: 7
-      Data: 316|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 317|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 317|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 318|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 47
@@ -6395,7 +6400,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 318|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 319|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6422,10 +6427,10 @@ MonoBehaviour:
       Data: MinAoAPitchLift
     - Name: $v
       Entry: 7
-      Data: 319|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 320|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 320|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 321|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 47
@@ -6452,7 +6457,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 321|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 322|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -6479,10 +6484,10 @@ MonoBehaviour:
       Data: MinAoAYawLift
     - Name: $v
       Entry: 7
-      Data: 322|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 323|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 323|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 324|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 47
@@ -6509,7 +6514,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 324|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 325|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

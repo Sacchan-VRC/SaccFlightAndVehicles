@@ -16,7 +16,7 @@ public class EngineController : UdonSharpBehaviour
     public Transform CenterOfMass;
     public Transform PitchMoment;
     public Transform YawMoment;
-    public bool ThrustVectoring = true;
+    public bool ThrustVectoring = false;
     public float ThrustVecStr = 1;
     public float ThrottleStrengthForward = 25f;
     public float AirFriction = 0.036f;
