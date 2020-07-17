@@ -35,7 +35,9 @@ public class EngineController : UdonSharpBehaviour
     public float AirplanePullDownLiftRatio = .8f;
     public float AirplaneSidewaysLift = .17f;
     public float AirplaneVelPullUp = 2f;
-    public float AirplaneRollFriction = 80f;
+    public float RollFriction = 80f;
+    public float PitchFriction = 80f;
+    public float YawFriction = 80f;
     public bool HasFlaps = true;
     public bool HasLandingGear = true;
     public float LandingGearDragMulti = 1.6f;
@@ -290,12 +292,14 @@ public class EngineController : UdonSharpBehaviour
 
             FinalInputAcc.x = ((sidespeed * AirplaneSidewaysLift) * -1) * SpeedLiftFactor * AoALiftYaw;
             FinalInputAcc.y = downspeed * FlapsLift * AirplanePullDownLiftRatio * AirplaneLift * SpeedLiftFactor * AoALift + (SpeedLiftFactor * AoALift * AirplaneVelPullUp);
-            FinalInputRot.x += downspeed * VelStraightenStrPitch * AoALift;// + (speed20 * (AirplaneVelPullUp * -1));
+            FinalInputRot.x += downspeed * VelStraightenStrPitch * AoALift * rotlift;
             FinalInputRot.y += sidespeed * VelStraightenStrYaw * AoALiftYaw;
 
             //roll friction
             Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
-            FinalInputRot.z += -localAngularVelocity.z * AirplaneRollFriction;
+            FinalInputRot.x += -localAngularVelocity.x * PitchFriction * AoALift * rotlift;
+            FinalInputRot.y += -localAngularVelocity.y * YawFriction * rotlift;
+            FinalInputRot.z += -localAngularVelocity.z * RollFriction * AoALiftYaw * rotlift;
 
             //final force input
             /*if (FinalInputRot.magnitude < .001 && FinalInputAcc.magnitude < .001) // let the rigidbody sleep //Except it doesn't work because wheel colliders are stupid
