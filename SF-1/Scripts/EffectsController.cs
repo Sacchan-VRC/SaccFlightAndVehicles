@@ -18,13 +18,14 @@ public class EffectsController : UdonSharpBehaviour
     public Transform EngineR;
     public Transform EnginefireL;
     public Transform EnginefireR;
-    public ParticleSystem GVaporL;
-    public ParticleSystem GVaporR;
-    public ParticleSystem MachVapor;
     public Transform RudderL;
     public Transform RudderR;
     public Transform SlatsL;
     public Transform SlatsR;
+    public ParticleSystem AoAVapor;
+    public ParticleSystem GVaporL;
+    public ParticleSystem GVaporR;
+    public ParticleSystem MachVapor;
     public TrailRenderer WingTrailL;
     public TrailRenderer WingTrailR;
     public float TrailGs = 4f;
@@ -40,6 +41,7 @@ public class EffectsController : UdonSharpBehaviour
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
     private ParticleSystem.EmissionModule emmachvapor;
+    private ParticleSystem.EmissionModule emaoavapor;
     private ParticleSystem.EmissionModule emgvaporl;
     private ParticleSystem.EmissionModule emgvaporr;
     private Vector3 pitchlerper = new Vector3(0, 0, 0);
@@ -68,6 +70,7 @@ public class EffectsController : UdonSharpBehaviour
         if (PilotSeatStation != null) { PilotSeat1 = PilotSeatStation.gameObject.GetComponent<PilotSeat>(); }
         if (PassengerSeatStation != null) { PassengerSeat1 = PassengerSeatStation.gameObject.GetComponent<PassengerSeat>(); }
         if (MachVapor != null) { emmachvapor = MachVapor.emission; }
+        if (AoAVapor != null) { emaoavapor = AoAVapor.emission; }
         if (GVaporL != null) { emgvaporl = GVaporL.emission; }
         if (GVaporR != null) { emgvaporr = GVaporR.emission; }
         if (EngineControl.localPlayer == null) { DoEffects = 0f; } //not asleep in editor
@@ -251,6 +254,18 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
+        if (AoAVapor != null)
+        {
+            if (Mathf.Abs(EngineControl.AngleOfAttack) > 30 && vapor)
+            {
+                emaoavapor.enabled = true;
+                emaoavapor.rateOverTime = (Mathf.Abs(EngineControl.AngleOfAttack) - 30) * 3 * EngineControl.Gs - 3;
+            }
+            else
+            {
+                emaoavapor.enabled = false;
+            }
+        }
         if (GVaporL != null)
         {
             if (EngineControl.Gs > 3 && vapor)
