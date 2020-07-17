@@ -222,13 +222,13 @@ public class EngineController : UdonSharpBehaviour
             float AoALift = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);
             AoALift = -AoALift;
             AoALift += 1;
+            AoALift = -Mathf.Pow((1 - AoALift), 1.6f) + 1;
             AoALift = Mathf.Clamp(AoALift, MinHighAoAControl, 1);
             float AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
             AoALiftYaw = -AoALiftYaw;
             AoALiftYaw += 1;
+            AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), 1.6f) + 1;
             AoALiftYaw = Mathf.Clamp(AoALiftYaw, MinHighAoAControl, 1);
-
-
 
             //speed related values
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
