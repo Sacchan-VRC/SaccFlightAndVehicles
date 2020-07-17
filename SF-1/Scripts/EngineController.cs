@@ -160,8 +160,9 @@ public class EngineController : UdonSharpBehaviour
                 pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + */LstickV + RstickV + Wf + Sf + downf + upf), -1, 1);
                 yawinput = Mathf.Clamp((LstickH + Qf + Ef), -1, 1);
 
+
                 //if moving backwards, controls invert
-                bool forward = (Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.forward) > 0 || AirplaneThrustVectoring) ? true : false;
+                bool forward = (Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.forward) > 0) || AirplaneThrustVectoring ? true : false;
                 float forward_roll = forward ? 1 : -ReversingRollStrength;
                 float forward_pitch = forward ? 1 : -ReversingPitchStrength;
                 float forward_yaw = forward ? 1 : -ReversingYawStrength;
@@ -219,11 +220,19 @@ public class EngineController : UdonSharpBehaviour
 
             AngleOfAttack = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel.normalized, VehicleMainObj.transform.right);
             AngleOfAttackYaw = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel.normalized, VehicleMainObj.transform.up);
-            float AoALift = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);
+            float AoALift = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
             AoALift = -AoALift;
             AoALift += 1;
             AoALift = -Mathf.Pow((1 - AoALift), 1.6f) + 1;
-            AoALift = Mathf.Clamp(AoALift, MinHighAoAControl, 1);
+            //AoALift = Mathf.Clamp(AoALift, MinHighAoAControl, 1);
+
+            float AoALiftMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 180);//linear version to 180 for high aoa
+            AoALiftMin = -AoALiftMin;
+            AoALiftMin += 1;
+            AoALiftMin *= MinHighAoAControl;
+            AoALift = Mathf.Max(AoALiftMin, AoALift);//take 
+
+
             float AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
             AoALiftYaw = -AoALiftYaw;
             AoALiftYaw += 1;
