@@ -22,8 +22,9 @@ public class HUDController : UdonSharpBehaviour
     public Transform VelocityIndicator;
     private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
-    float check = 0;
-    Vector3 temprot;
+    private float check = 0;
+    private Vector3 temprot;
+    private int showvel;
     private void OnEnable()
     {
         maxGs = 0f;
@@ -39,6 +40,7 @@ public class HUDController : UdonSharpBehaviour
         {
             tempvel = EngineControl.CurrentVel;
         }
+
         VelocityIndicator.position = (transform.position + tempvel);
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * (distance_from_head);
         /////////////////
@@ -61,10 +63,7 @@ public class HUDController : UdonSharpBehaviour
         /////////////////
 
         //Down indicator
-        temprot = EngineControl.VehicleMainObj.transform.transform.rotation.eulerAngles;
-        temprot.x = 0;
-        temprot.y = 0;
-        DownIndicator.localRotation = Quaternion.Euler(-temprot);
+        DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, new_z));
         /////////////////
 
         if (check > .3)//update text
