@@ -229,26 +229,30 @@ public class EngineController : UdonSharpBehaviour
                 downspeed *= PullDownLiftRatio;
             }
 
-            AngleOfAttack = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel.normalized, VehicleMainObj.transform.right);
-            AngleOfAttackYaw = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel.normalized, VehicleMainObj.transform.up);
+            AngleOfAttack = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.right);
+            AngleOfAttackYaw = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.up);
+
             float AoALift = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
             AoALift = -AoALift;
             AoALift += 1;
             AoALift = -Mathf.Pow((1 - AoALift), 1.6f) + 1;
-            //AoALift = Mathf.Clamp(AoALift, MinHighAoAControl, 1);
+            AoALift = Mathf.Clamp(AoALift, 0, 1);
 
-            float AoALiftMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 180);//linear version to 180 for high aoa
+            float AoALiftMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / 180, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 180);//linear version to 180 for high aoa
             AoALiftMin = -AoALiftMin;
             AoALiftMin += 1;
             AoALiftMin *= MinHighAoAControl;
-            AoALift = Mathf.Max(AoALiftMin, AoALift);//take 
-
 
             float AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
             AoALiftYaw = -AoALiftYaw;
             AoALiftYaw += 1;
             AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), 1.6f) + 1;
-            AoALiftYaw = Mathf.Clamp(AoALiftYaw, MinHighAoAControl, 1);
+            AoALiftYaw = Mathf.Clamp(AoALiftYaw, 0, 1);
+
+            float AoALiftMinYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 180, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 180);//linear version to 180 for high aoa
+            AoALiftMinYaw = -AoALiftMin;
+            AoALiftMinYaw += 1;
+            AoALiftMinYaw *= MinHighAoAControl;
 
             //speed related values
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
@@ -268,8 +272,6 @@ public class EngineController : UdonSharpBehaviour
                 pitch *= rotlift * AoALift;
                 yaw *= rotlift * AoALift;
             }
-            AoALift = Mathf.Clamp(AoALift, MinAoAPitchLift, 1);
-            AoALiftYaw = Mathf.Clamp(AoALiftYaw, MinAoAYawLift, 1);
 
             Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
 
@@ -299,9 +301,9 @@ public class EngineController : UdonSharpBehaviour
             //used to add rotation friction
             Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
-            Vector3 FinalInputRot = new Vector3(downspeed * VelStraightenStrPitch * AoALift * rotlift + (-localAngularVelocity.x * PitchFriction * rotlift * AoALift * AoALiftYaw),// X
-                sidespeed * VelStraightenStrYaw * AoALiftYaw + (-localAngularVelocity.y * YawFriction * rotlift * AoALift * AoALiftYaw),// Y
-                    LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALift * AoALiftYaw));// Z
+            Vector3 FinalInputRot = new Vector3(downspeed * VelStraightenStrPitch * AoALift * rotlift + (-localAngularVelocity.x * PitchFriction * rotlift * AoALift),// X Pitch
+                sidespeed * VelStraightenStrYaw * AoALiftYaw + (-localAngularVelocity.y * YawFriction * rotlift * AoALiftYaw),// Y Yaw
+                    LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift));// Z Roll
 
             FinalInputRot *= Atmosphere;//Atmospheric thickness
             FinalInputAcc *= Atmosphere;
