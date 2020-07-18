@@ -208,27 +208,27 @@ public class EffectsController : UdonSharpBehaviour
             PlaneAnimator.SetBool("gearup", false);
         }
 
-        if (AileronL != null) { aileronLlerper = Vector3.Lerp(aileronLlerper, new Vector3(0, roll + (-pitch * .5f), 0), 4.5f * Time.deltaTime); ; AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
-        if (AileronR != null) { aileronRlerper = Vector3.Lerp(aileronRlerper, new Vector3(0, -roll + (-pitch * .5f), 0), 4.5f * Time.deltaTime); ; AileronR.localRotation = Quaternion.Euler(aileronRlerper); }
+        if (AileronL != null) { aileronLlerper.y = Mathf.Lerp(aileronLlerper.y, roll + (-pitch * .5f), 4.5f * Time.deltaTime); ; AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
+        if (AileronR != null) { aileronRlerper.y = Mathf.Lerp(aileronRlerper.y, -roll + (-pitch * .5f), 4.5f * Time.deltaTime); ; AileronR.localRotation = Quaternion.Euler(aileronRlerper); }
 
-        pitchlerper = Vector3.Lerp(pitchlerper, new Vector3(pitch, 0, 0), 4.5f * Time.deltaTime);
+        pitchlerper.x = Mathf.Lerp(pitchlerper.x, pitch, 4.5f * Time.deltaTime);
         if (Elevator != null) { Elevator.localRotation = Quaternion.Euler(-pitchlerper); }
         if (Canards != null) { Canards.localRotation = Quaternion.Euler(pitchlerper * .5f); }
 
-        yawlerper = Vector3.Lerp(yawlerper, new Vector3(0, yaw, 0), 4.5f * Time.deltaTime);
+        yawlerper.y = Mathf.Lerp(yawlerper.y, yaw, 4.5f * Time.deltaTime);
         if (RudderL != null) { RudderL.localRotation = Quaternion.Euler(-yawlerper); }
         if (RudderR != null) { RudderR.localRotation = Quaternion.Euler(yawlerper); }
 
-        SlatsLerper = Vector3.Lerp(SlatsLerper, new Vector3(0, Mathf.Max((-EngineControl.speed20 * .1f) * 35f + 35f, 0f), 0), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
+        SlatsLerper.y = Mathf.Lerp(SlatsLerper.y, Mathf.Max((-EngineControl.CurrentVel.magnitude * 0.005f) * 35f + 35f, 0f), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
         if (SlatsL != null) { SlatsL.localRotation = Quaternion.Euler(SlatsLerper); }
         if (SlatsR != null) { SlatsR.localRotation = Quaternion.Euler(SlatsLerper); }
 
 
-        if (EngineL != null) { enginelerperL = Vector3.Lerp(enginelerperL, new Vector3((roll * .3f) + (-pitch * .65f), 0, 0), 4.5f * Time.deltaTime); EngineL.localRotation = Quaternion.Euler(enginelerperL); }
-        if (EngineR != null) { enginelerperR = Vector3.Lerp(enginelerperR, new Vector3((-roll * .3f) + (-pitch * .65f), 0, 0), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
+        if (EngineL != null) { enginelerperL.x = Mathf.Lerp(enginelerperL.x, (roll * .3f) + (-pitch * .65f), 4.5f * Time.deltaTime); EngineL.localRotation = Quaternion.Euler(enginelerperL); }
+        if (EngineR != null) { enginelerperR.x = Mathf.Lerp(enginelerperR.x, (-roll * .3f) + (-pitch * .65f), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
 
 
-        enginefirelerper = Vector3.Lerp(enginefirelerper, new Vector3(1, EngineControl.ThrottleValue * 2, 1), .9f * Time.deltaTime);
+        enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.ThrottleValue * 2, .9f * Time.deltaTime);
         if (EnginefireL != null)
         {
             if (enginefirelerper.y > .06f)
