@@ -54,10 +54,8 @@ public class EngineController : UdonSharpBehaviour
     float LerpedRoll;
     float LerpedPitch;
     float LerpedYaw;
-    float LstickH;
-    float LstickV;
-    float RstickH;
-    float RstickV;
+    Vector2 Lstick;
+    Vector2 Rstick = new Vector2(0, 0);
     float RTrigger;
     float LTrigger;
     float downspeed;
@@ -136,21 +134,21 @@ public class EngineController : UdonSharpBehaviour
             {
                 Occupied = true;
                 //collect inputs
-                float Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as floats
-                float Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
-                float Af = Input.GetKey(KeyCode.A) ? -1 : 0;
-                float Df = Input.GetKey(KeyCode.D) ? 1 : 0;
-                float Qf = Input.GetKey(KeyCode.Q) ? -1 : 0;
-                float Ef = Input.GetKey(KeyCode.E) ? 1 : 0;
-                float upf = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
-                float downf = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
-                float leftf = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
-                float rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
-                float shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
-                LstickH = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                LstickV = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                RstickH = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                RstickV = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as floats
+                int Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
+                int Af = Input.GetKey(KeyCode.A) ? -1 : 0;
+                int Df = Input.GetKey(KeyCode.D) ? 1 : 0;
+                int Qf = Input.GetKey(KeyCode.Q) ? -1 : 0;
+                int Ef = Input.GetKey(KeyCode.E) ? 1 : 0;
+                int upf = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
+                int downf = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
+                int leftf = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
+                int rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
+                int shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
+                Lstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                //Lstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                Rstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                Rstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                 RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                 LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                 //MouseX = Input.GetAxisRaw("Mouse X");
@@ -160,10 +158,50 @@ public class EngineController : UdonSharpBehaviour
                 ThrottleValue = (Mathf.Max(RTrigger, shiftf)); //for throttle effects
                 accelforward = ThrottleValue * ThrottleStrengthForward;
 
+                //making a circular control stick square for better control
+                if (Mathf.Abs(Rstick.x) > Mathf.Abs(Rstick.y))
+                {
+                    if (Mathf.Abs(Rstick.x) != 0)
+                    {
+                        float temp = Rstick.magnitude / Mathf.Abs(Rstick.x);
+                        Rstick.x *= temp;
+                        Rstick.y *= temp;
+                    }
+                }
+                else
+                {
+                    if (Mathf.Abs(Rstick.y) != 0)
+                    {
+                        float temp = Rstick.magnitude / Mathf.Abs(Rstick.y);
+                        Rstick.y *= temp;
+                        Rstick.x *= temp;
+                    }
+                }
+                /*//make circular for left stick
+                if (Mathf.Abs(Lstick.x) > Mathf.Abs(Lstick.y))
+                {
+                    if (Mathf.Abs(Lstick.x) != 0)
+                    {
+                        float temp = Lstick.magnitude / Mathf.Abs(Lstick.x);
+                        Lstick.x *= temp;
+                        Lstick.y *= temp;
+                    }
+                }
+                else
+                {
+                    if (Mathf.Abs(Lstick.y) != 0)
+                    {
+                        float temp = Lstick.magnitude / Mathf.Abs(Lstick.y);
+                        Lstick.y *= temp;
+                        Lstick.x *= temp;
+                    }
+                } */
+
+
                 //inputs to axis and clamp
-                rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */RstickH + Af + Df + leftf + rightf) * -1), -1, 1);//these are used by effectscontroller
-                pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + */LstickV + RstickV + Wf + Sf + downf + upf), -1, 1);
-                yawinput = Mathf.Clamp((LstickH + Qf + Ef), -1, 1);
+                rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */Rstick.x + Af + Df + leftf + rightf) * -1), -1, 1);//these are used by effectscontroller
+                pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */Rstick.y + Wf + Sf + downf + upf), -1, 1);
+                yawinput = Mathf.Clamp((Lstick.x + Qf + Ef), -1, 1);
 
 
                 //if moving backwards, controls invert (if thrustvectoring is disabled)
