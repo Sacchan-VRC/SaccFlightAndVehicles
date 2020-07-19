@@ -45,6 +45,7 @@ public class SoundController : UdonSharpBehaviour
     private int dopplecounter;
     [System.NonSerializedAttribute] [HideInInspector] public float DoSound = 32; //3 seconds before idle so late joiners hear sound
     [System.NonSerializedAttribute] [HideInInspector] public bool silent;
+    private int silentint = 0;
     private float GunSoundInitialVolume;
     [System.NonSerializedAttribute] [HideInInspector] public bool soundsoff;
     float relativespeed;
@@ -129,6 +130,18 @@ public class SoundController : UdonSharpBehaviour
         {
             SonicBoomWave += Mathf.Max(343 * Time.deltaTime, -relativespeed * .2f); //simulate sound wave movement
         }
+
+        if (SonicBoomWave <= SonicBoomDistance)
+        {
+            silent = true;
+            silentint = 0;//for multiplying sound volumes
+        }
+        else
+        {
+            silent = false;
+            silentint = 1;
+        }
+
         if (TouchDown != null)
         {
             if (Landed == false && EngineControl.Taxiing == true) { TouchDown.Play(); }
@@ -140,7 +153,7 @@ public class SoundController : UdonSharpBehaviour
             {
                 PlaneAfterburner.Play();
             }
-            if (EngineControl.localPlayer == null || EngineControl.Piloting || EngineControl.Passenger)//do this in editor or if you're a pilot or (passenger while pilot is in pilotseat) //!= null to test outside vehicle sounds (don't forget to change it back!)
+            if (EngineControl.localPlayer != null || EngineControl.Piloting || EngineControl.Passenger)//do this in editor or if you're a pilot or (passenger while pilot is in pilotseat) //!= null to test outside vehicle sounds (don't forget to change it back!)
             {
                 if (Leftplane == false)//change stuff when you get in
                 {
@@ -228,14 +241,6 @@ public class SoundController : UdonSharpBehaviour
 
         //set final volumes and pitches
         //lerp should help smooth out laggers and the dopple only being calculated every 5 frames
-        if (SonicBoomWave <= SonicBoomDistance)
-        {
-            silent = true;
-        }
-        else
-        {
-            silent = false;
-        }
         if (SonicBoom != null && !silent && playsonicboom)
         {
             SonicBoom.pitch = Random.Range(.94f, 1.2f);
@@ -245,48 +250,32 @@ public class SoundController : UdonSharpBehaviour
 
         if (PlaneIdle != null)
         {
-            if (silent)//dont play engine sounds til sonicboom happens
-            {
-                PlaneIdle.volume = 0f;
-            }
-            else
-            {
-                PlaneIdle.volume = Mathf.Lerp(PlaneIdle.volume, PlaneIdleVolume, 30f * Time.deltaTime);
-                PlaneIdle.pitch = Mathf.Lerp(PlaneIdle.pitch, PlaneIdlePitch, 30f * Time.deltaTime);
-            }
+            PlaneIdle.volume = Mathf.Lerp(PlaneIdle.volume, PlaneIdleVolume, 30f * Time.deltaTime);
+            PlaneIdle.pitch = Mathf.Lerp(PlaneIdle.pitch, PlaneIdlePitch, 30f * Time.deltaTime);
+
+            PlaneIdle.volume *= silentint;
         }
         if (PlaneDistant != null)
         {
-            if (silent)
-            {
-                PlaneDistantVolume = 0f;
-            }
             PlaneDistant.volume = Mathf.Lerp(PlaneDistant.volume, PlaneDistantVolume, 30f * Time.deltaTime);
             PlaneDistant.pitch = Mathf.Lerp(PlaneDistant.pitch, PlaneDistantPitch, 30f * Time.deltaTime);
+
+            PlaneDistantVolume *= silentint;
         }
         if (PlaneAfterburner != null)
         {
-            if (silent)
-            {
-                PlaneAfterburner.volume = 0;
-            }
-            else
-            {
-                PlaneAfterburner.volume = PlaneAfterburnerVolume;
-            }
+            PlaneAfterburner.volume = PlaneAfterburnerVolume;
             PlaneAfterburner.pitch = Mathf.Lerp(PlaneAfterburner.pitch, PlaneAfterburnerPitch, 30f * Time.deltaTime);
+ 
+            PlaneAfterburner.volume *= silentint;
         }
         if (PlaneWind != null)
         {
-            if (silent)
-            {
-                PlaneWind.volume = 0;
-            }
-            else
-            {
-                PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
-                PlaneWind.volume = Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) * .2f);
-            }
+            PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
+            PlaneWind.volume = Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) * .2f);
+ 
+            PlaneWind.volume *= silentint;
+
         }
 
         if (GunSound != null)
