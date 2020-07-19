@@ -236,23 +236,23 @@ public class EngineController : UdonSharpBehaviour
             AoALift = -AoALift;
             AoALift += 1;
             AoALift = -Mathf.Pow((1 - AoALift), 1.6f) + 1;
-            AoALift = Mathf.Clamp(AoALift, 0, 1);
 
             float AoALiftMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / 180, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 180);//linear version to 180 for high aoa
             AoALiftMin = -AoALiftMin;
             AoALiftMin += 1;
             AoALiftMin *= MinHighAoAControl;
+            AoALift = Mathf.Clamp(AoALift, AoALiftMin, 1);
 
             float AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
             AoALiftYaw = -AoALiftYaw;
             AoALiftYaw += 1;
             AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), 1.6f) + 1;
-            AoALiftYaw = Mathf.Clamp(AoALiftYaw, 0, 1);
 
             float AoALiftMinYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 180, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 180);//linear version to 180 for high aoa
             AoALiftMinYaw = -AoALiftMin;
             AoALiftMinYaw += 1;
             AoALiftMinYaw *= MinHighAoAControl;
+            AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftMinYaw, 1);
 
             //speed related values
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
@@ -301,9 +301,9 @@ public class EngineController : UdonSharpBehaviour
             //used to add rotation friction
             Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
-            Vector3 FinalInputRot = new Vector3(downspeed * VelStraightenStrPitch * AoALift * rotlift + (-localAngularVelocity.x * PitchFriction * rotlift * AoALift),// X Pitch
-                sidespeed * VelStraightenStrYaw * AoALiftYaw + (-localAngularVelocity.y * YawFriction * rotlift * AoALiftYaw),// Y Yaw
-                    LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift));// Z Roll
+            Vector3 FinalInputRot = new Vector3(downspeed * VelStraightenStrPitch * AoALift * rotlift + (-localAngularVelocity.x * PitchFriction * rotlift * AoALift * AoALiftYaw),// X Pitch
+                sidespeed * VelStraightenStrYaw * AoALiftYaw + (-localAngularVelocity.y * YawFriction * rotlift * AoALift * AoALiftYaw),// Y Yaw
+                    LerpedRoll * rotlift + (-localAngularVelocity.z * RollFriction * rotlift));// Z Roll
 
             FinalInputRot *= Atmosphere;//Atmospheric thickness
             FinalInputAcc *= Atmosphere;
