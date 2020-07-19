@@ -22,9 +22,6 @@ public class EffectsController : UdonSharpBehaviour
     public Transform RudderR;
     public Transform SlatsL;
     public Transform SlatsR;
-    public ParticleSystem AoAVapor;
-    public ParticleSystem GVaporL;
-    public ParticleSystem GVaporR;
     public ParticleSystem MachVapor;
     public TrailRenderer WingTrailL;
     public TrailRenderer WingTrailR;
@@ -41,9 +38,6 @@ public class EffectsController : UdonSharpBehaviour
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
     private ParticleSystem.EmissionModule emmachvapor;
-    private ParticleSystem.EmissionModule emaoavapor;
-    private ParticleSystem.EmissionModule emgvaporl;
-    private ParticleSystem.EmissionModule emgvaporr;
     private Vector3 pitchlerper = new Vector3(0, 0, 0);
     private Vector3 aileronLlerper = new Vector3(0, 0, 0);
     private Vector3 aileronRlerper = new Vector3(0, 0, 0);
@@ -70,9 +64,6 @@ public class EffectsController : UdonSharpBehaviour
         if (PilotSeatStation != null) { PilotSeat1 = PilotSeatStation.gameObject.GetComponent<PilotSeat>(); }
         if (PassengerSeatStation != null) { PassengerSeat1 = PassengerSeatStation.gameObject.GetComponent<PassengerSeat>(); }
         if (MachVapor != null) { emmachvapor = MachVapor.emission; }
-        if (AoAVapor != null) { emaoavapor = AoAVapor.emission; }
-        if (GVaporL != null) { emgvaporl = GVaporL.emission; }
-        if (GVaporR != null) { emgvaporr = GVaporR.emission; }
         if (EngineControl.localPlayer == null) { DoEffects = 0f; } //not asleep in editor
         Spawnposition = VehicleMainObj.transform.position;
         Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
@@ -228,7 +219,7 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineR != null) { enginelerperR.x = Mathf.Lerp(enginelerperR.x, (-roll * .3f) + (-pitch * .65f), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
 
 
-        enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.ThrottleInput * 2, .9f * Time.deltaTime);
+        enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.Throttle * 2, .9f * Time.deltaTime);
         if (EnginefireL != null)
         {
             if (enginefirelerper.y > .06f)
@@ -254,53 +245,11 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
-        if (AoAVapor != null)
-        {
-            if (Mathf.Abs(EngineControl.AngleOfAttack) > 30 && vapor)
-            {
-                emaoavapor.enabled = true;
-                emaoavapor.rateOverTime = (Mathf.Abs(EngineControl.AngleOfAttack) - 30) * 3 * EngineControl.Gs - 3;
-            }
-            else
-            {
-                emaoavapor.enabled = false;
-            }
-        }
-        if (GVaporL != null)
-        {
-            if (EngineControl.Gs > 3 && vapor)
-            {
-                emgvaporl.enabled = true;
-                emgvaporl.rateOverTime = (EngineControl.Gs - 3) * 40;
-            }
-            else
-            {
-                emgvaporl.enabled = false;
-            }
-        }
-        if (GVaporR != null)
-        {
-            if (EngineControl.Gs > 3 && vapor)
-            {
-                emgvaporr.enabled = true;
-                emgvaporr.rateOverTime = (EngineControl.Gs - 3) * 40;
-            }
-            else
-            {
-                emgvaporr.enabled = false;
-            }
-        }
-
         if (Smoking && EngineControl.Occupied) { PlaneAnimator.SetBool("displaysmoke", true); }
         else { PlaneAnimator.SetBool("displaysmoke", false); }
-        if (!EngineControl.dead)
-        {
-            PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
-        }
-        else
-        {
-            PlaneAnimator.SetFloat("health", 1);//plane is dead, set animator health to full so that there's no phantom healthsmoke
-        }
+        PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
+        PlaneAnimator.SetFloat("Gs", EngineControl.Gs / 50);
+        PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
 
         DoVapor();
     }
