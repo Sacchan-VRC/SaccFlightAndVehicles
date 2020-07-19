@@ -166,7 +166,7 @@ public class EngineController : UdonSharpBehaviour
                 yawinput = Mathf.Clamp((LstickH + Qf + Ef), -1, 1);
 
 
-                //if moving backwards, controls invert
+                //if moving backwards, controls invert (if thrustvectoring is disabled)
                 if ((Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.forward) > 0) || ThrustVectoring)
                 {
                     roll = rollinput * RollStrength;
@@ -232,26 +232,30 @@ public class EngineController : UdonSharpBehaviour
             AngleOfAttack = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.right);
             AngleOfAttackYaw = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.up);
 
+            //angle of attack stuff, pitch and yaw are calculated seperately
+            //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
             float AoALift = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
             AoALift = -AoALift;
-            AoALift += 1;
-            AoALift = -Mathf.Pow((1 - AoALift), 1.6f) + 1;
+            AoALift++;
+            AoALift = -Mathf.Pow((1 - AoALift), 1.6f) + 1;//give it a curve
 
-            float AoALiftMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / 180, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 180);//linear version to 180 for high aoa
+            float AoALiftMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 90);//linear version to 90 for high aoa
             AoALiftMin = -AoALiftMin;
-            AoALiftMin += 1;
+            AoALiftMin++;
             AoALiftMin *= MinHighAoAControl;
+            AoALiftMin = Mathf.Clamp(AoALiftMin, 0, 1);
             AoALift = Mathf.Clamp(AoALift, AoALiftMin, 1);
 
             float AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
             AoALiftYaw = -AoALiftYaw;
-            AoALiftYaw += 1;
-            AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), 1.6f) + 1;
+            AoALiftYaw++;
+            AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), 1.6f) + 1;//give it a curve
 
-            float AoALiftMinYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 180, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 180);//linear version to 180 for high aoa
+            float AoALiftMinYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 180 for high aoa
             AoALiftMinYaw = -AoALiftMin;
-            AoALiftMinYaw += 1;
+            AoALiftMinYaw++;
             AoALiftMinYaw *= MinHighAoAControl;
+            AoALiftMinYaw = Mathf.Clamp(AoALiftMinYaw, 0, 1);
             AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftMinYaw, 1);
 
             //speed related values
@@ -272,6 +276,11 @@ public class EngineController : UdonSharpBehaviour
                 pitch *= rotlift * AoALift;
                 yaw *= rotlift * AoALift;
             }
+
+            //set the minimum lift when at high aoa
+            AoALift = Mathf.Clamp(AoALift, MinAoAPitchLift, 1);
+            AoALiftYaw = Mathf.Clamp(AoALiftYaw, MinAoAYawLift, 1);
+
 
             Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
 
@@ -303,7 +312,7 @@ public class EngineController : UdonSharpBehaviour
 
             Vector3 FinalInputRot = new Vector3(downspeed * VelStraightenStrPitch * AoALift * rotlift + (-localAngularVelocity.x * PitchFriction * rotlift * AoALift * AoALiftYaw),// X Pitch
                 sidespeed * VelStraightenStrYaw * AoALiftYaw + (-localAngularVelocity.y * YawFriction * rotlift * AoALift * AoALiftYaw),// Y Yaw
-                    LerpedRoll * rotlift + (-localAngularVelocity.z * RollFriction * rotlift));// Z Roll
+                    LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift));// Z Roll
 
             FinalInputRot *= Atmosphere;//Atmospheric thickness
             FinalInputAcc *= Atmosphere;
