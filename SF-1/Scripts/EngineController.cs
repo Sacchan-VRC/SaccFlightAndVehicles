@@ -18,8 +18,9 @@ public class EngineController : UdonSharpBehaviour
     public Transform YawMoment;
     public bool ThrustVectoring = false;
     public float ThrustVecStr = 1;
-    public float ThrottleStrengthForward = 25f;
+    public float ThrottleStrength = 25f;
     public float AccelerationResponse = 4.5f;
+    public float EngineSpoolDownSpeedMulti = .25f;
     public float AirFriction = 0.036f;
     public float RollStrength = 100f;
     public float RollFriction = 80f;
@@ -60,8 +61,8 @@ public class EngineController : UdonSharpBehaviour
     float LTrigger;
     float downspeed;
     float sidespeed;
-    float accelforward = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float ThrottleValue = 0f;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Throttle = 0f;
+    [System.NonSerializedAttribute] [HideInInspector] private float ThrottleInput = 0f;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 CurrentVel = new Vector3(0, 0, 0);
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Gs = 1f;
     float roll = 0f;
@@ -155,8 +156,7 @@ public class EngineController : UdonSharpBehaviour
                 //MouseY = Input.GetAxisRaw("Mouse Y");
 
                 //inputs to forward thrust
-                ThrottleValue = (Mathf.Max(RTrigger, shiftf)); //for throttle effects
-                accelforward = ThrottleValue * ThrottleStrengthForward;
+                ThrottleInput = (Mathf.Max(RTrigger, shiftf)); //for throttle effects
 
                 //making a circular control stick square for better control
                 if (Mathf.Abs(Rstick.x) > Mathf.Abs(Rstick.y))
@@ -257,8 +257,7 @@ public class EngineController : UdonSharpBehaviour
                 rollinput = 0;
                 pitchinput = 0;
                 yawinput = 0;
-                ThrottleValue = 0;
-                accelforward = 0;
+                ThrottleInput = 0;
             }
             //used to create air resistance only in the relative down direction
             downspeed = Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.up) * -1;
@@ -325,8 +324,17 @@ public class EngineController : UdonSharpBehaviour
             //used to add physics to plane's yaw (accel angvel towards velocity)
             sidespeed = Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.right);
 
-            //Lerp the inputs for 'engine response'
-            InputAcc = Mathf.Lerp(InputAcc, accelforward * Atmosphere, AccelerationResponse * Time.deltaTime);
+            //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownMulti)
+            if (Throttle < ThrottleInput)
+            {
+                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * Time.deltaTime); // ThrottleInput * ThrottleStrengthForward;
+            }
+            else
+            {
+                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * Time.deltaTime); // ThrottleInput * ThrottleStrengthForward;
+            }
+            InputAcc = Throttle * ThrottleStrength * Atmosphere;
+
             //Lerp the inputs for 'rotation response'
             LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * Time.deltaTime);
             LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * Time.deltaTime);

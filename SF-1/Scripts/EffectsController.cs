@@ -228,7 +228,7 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineR != null) { enginelerperR.x = Mathf.Lerp(enginelerperR.x, (-roll * .3f) + (-pitch * .65f), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
 
 
-        enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.ThrottleValue * 2, .9f * Time.deltaTime);
+        enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.ThrottleInput * 2, .9f * Time.deltaTime);
         if (EnginefireL != null)
         {
             if (enginefirelerper.y > .06f)
