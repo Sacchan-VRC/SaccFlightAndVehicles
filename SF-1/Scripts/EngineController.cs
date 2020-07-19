@@ -34,6 +34,7 @@ public class EngineController : UdonSharpBehaviour
     public float YawFriction = 80f;
     public float YawResponse = 45f;
     public float YawStrengthReversingMulti = 2.4f;
+    public float InputPower = 2.3f;
     public float VelStraightenStrPitch = 0.2f;
     public float VelStraightenStrYaw = 0.15f;
     public float TaxiRotationSpeed = 35f;
@@ -164,8 +165,7 @@ public class EngineController : UdonSharpBehaviour
                     if (Mathf.Abs(Rstick.x) != 0)
                     {
                         float temp = Rstick.magnitude / Mathf.Abs(Rstick.x);
-                        Rstick.x *= temp;
-                        Rstick.y *= temp;
+                        Rstick *= temp;
                     }
                 }
                 else
@@ -173,8 +173,7 @@ public class EngineController : UdonSharpBehaviour
                     if (Mathf.Abs(Rstick.y) != 0)
                     {
                         float temp = Rstick.magnitude / Mathf.Abs(Rstick.y);
-                        Rstick.y *= temp;
-                        Rstick.x *= temp;
+                        Rstick *= temp;
                     }
                 }
                 /*//make circular for left stick
@@ -202,6 +201,13 @@ public class EngineController : UdonSharpBehaviour
                 rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */Rstick.x + Af + Df + leftf + rightf) * -1), -1, 1);//these are used by effectscontroller
                 pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */Rstick.y + Wf + Sf + downf + upf), -1, 1);
                 yawinput = Mathf.Clamp((Lstick.x + Qf + Ef), -1, 1);
+
+                //ability to adjust input to be more precise at low amounts
+
+                rollinput = rollinput > 0 ? Mathf.Pow(rollinput, InputPower) : -Mathf.Pow(Mathf.Abs(rollinput), InputPower);
+                pitchinput = pitchinput > 0 ? Mathf.Pow(pitchinput, InputPower) : -Mathf.Pow(Mathf.Abs(pitchinput), InputPower);
+                yawinput = yawinput > 0 ? Mathf.Pow(yawinput, InputPower) : -Mathf.Pow(Mathf.Abs(yawinput), InputPower);
+
 
 
                 //if moving backwards, controls invert (if thrustvectoring is disabled)
