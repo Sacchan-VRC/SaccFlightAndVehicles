@@ -181,11 +181,11 @@ public class SoundController : UdonSharpBehaviour
                 {
                     if (PlaneInside != null)
                     {
-                        PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.ThrottleValue * .4f) + .8f, 2.25f * Time.deltaTime);
+                        PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.Throttle * .4f) + .8f, 2.25f * Time.deltaTime);
                         PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, .4f, .72f * Time.deltaTime);
                     }
                     PlaneAfterburnerPitch = 0.8f;
-                    PlaneAfterburnerVolume = Mathf.Lerp(PlaneAfterburnerVolume, (EngineControl.ThrottleValue * PlaneAfterburnerInitialVolume) * InVehicleAfterburnerVolumeFactor, 1.08f * Time.deltaTime);
+                    PlaneAfterburnerVolume = Mathf.Lerp(PlaneAfterburnerVolume, (EngineControl.Throttle * PlaneAfterburnerInitialVolume) * InVehicleAfterburnerVolumeFactor, 1.08f * Time.deltaTime);
                 }
                 else if (/*localPlayer == null || */EngineControl.Passenger)//enable here and disable above for testing //you're a passenger and no one is flying
                 {
@@ -214,11 +214,11 @@ public class SoundController : UdonSharpBehaviour
                 }
                 else
                 {
-                    PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, EngineControl.ThrottleValue, .72f * Time.deltaTime);
-                    PlaneAfterburnerVolume = Mathf.Lerp(PlaneAfterburnerVolume, EngineControl.ThrottleValue, 1.08f * Time.deltaTime);
+                    PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, EngineControl.Throttle, .72f * Time.deltaTime);
+                    PlaneAfterburnerVolume = Mathf.Lerp(PlaneAfterburnerVolume, EngineControl.Throttle, 1.08f * Time.deltaTime);
                 }
                 PlaneAfterburnerPitch = 1;
-                PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (EngineControl.ThrottleValue - 0.3f) + 1.3f, .54f * Time.deltaTime);
+                PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (EngineControl.Throttle - 0.3f) + 1.3f, .54f * Time.deltaTime);
             }
         }
         else //no one is in the plane
