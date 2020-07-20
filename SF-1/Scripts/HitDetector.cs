@@ -42,22 +42,14 @@ public class HitDetector : UdonSharpBehaviour
     {
         if (EngineControl.localPlayer == null)//editor
         {
-            RespawnStuff();
+            Respawn_event();
         }
         else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RespawnStuff");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Respawn_event");//owner broadcasts because it's more reliable than everyone doing it individually
         }
     }
-    public void NotDead()//called by 'respawn' animation 5s in
-    {
-        if (EngineControl.localPlayer == null || EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
-        {
-            EngineControl.Health = EngineControl.FullHealth;
-            EngineControl.dead = false;//because respawning gives us an immense number of Gs because we move so far in one frame, we stop being 'dead' 5 seconds after we respawn. Can't die when already dead. 
-        }
-    }
-    public void RespawnStuff()//called by Respawn()
+    public void Respawn_event()//called by Respawn()
     {
         //re-enable plane model and effects
         EngineControl.EffectsControl.DoEffects = 6f; //wake up if was asleep
@@ -79,5 +71,29 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.GearUp = false;
             EngineControl.Flaps = true;
         }
+    }
+    public void NotDead()//called by 'respawn' animation 5s in
+    {
+        if (EngineControl.localPlayer == null)//editor
+        {
+            NotDead_event();
+        }
+        else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "NotDead_event");//owner broadcasts because it's more reliable than everyone doing it individually
+        }
+    }
+    public void NotDead_event()//called by NotDead()
+    {
+        if (EngineControl.localPlayer == null)//editor
+        {
+            EngineControl.Health = EngineControl.FullHealth;
+            EngineControl.dead = false;
+        }
+        else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
+        {
+            EngineControl.Health = EngineControl.FullHealth;
+        }
+        EngineControl.dead = false;//because respawning gives us an immense number of Gs because we move so far in one frame, we stop being 'dead' 5 seconds after we respawn. Can't die when already dead. 
     }
 }

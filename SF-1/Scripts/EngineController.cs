@@ -20,7 +20,7 @@ public class EngineController : UdonSharpBehaviour
     public float ThrustVecStr = 0.25f;
     public float ThrottleStrength = 25f;
     public float AccelerationResponse = 4.5f;
-    public float EngineSpoolDownSpeedMulti = .25f;
+    public float EngineSpoolDownSpeedMulti = .5f;
     public float AirFriction = 0.036f;
     public float RollStrength = 100f;
     public float RollFriction = 80f;
