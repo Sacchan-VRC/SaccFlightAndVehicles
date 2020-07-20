@@ -206,8 +206,7 @@ public class EngineController : UdonSharpBehaviour
                 pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */Rstick.y + Wf + Sf + downf + upf), -1, 1);
                 yawinput = Mathf.Clamp((Lstick.x + Qf + Ef), -1, 1);
 
-                //ability to adjust input to be more precise at low amounts
-
+                //ability to adjust input to be more precise at low amounts 'exponant'
                 rollinput = rollinput > 0 ? Mathf.Pow(rollinput, InputPower) : -Mathf.Pow(Mathf.Abs(rollinput), InputPower);
                 pitchinput = pitchinput > 0 ? Mathf.Pow(pitchinput, InputPower) : -Mathf.Pow(Mathf.Abs(pitchinput), InputPower);
                 yawinput = yawinput > 0 ? Mathf.Pow(yawinput, InputPower) : -Mathf.Pow(Mathf.Abs(yawinput), InputPower);
@@ -298,7 +297,7 @@ public class EngineController : UdonSharpBehaviour
             AoALiftYaw++;
             AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), 1.6f) + 1;//give it a curve
 
-            float AoALiftMinYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 180 for high aoa
+            float AoALiftMinYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
             AoALiftMinYaw = -AoALiftMin;
             AoALiftMinYaw++;
             AoALiftMinYaw *= MinHighAoAControl;

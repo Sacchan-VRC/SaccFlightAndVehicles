@@ -82,6 +82,7 @@ MonoBehaviour:
     %SystemSingle, null\r\n    yaw: %SystemSingle, null\r\n    yawinput: %SystemSingle,
     null\r\n    Lstick: %UnityEngineVector2, null\r\n    Rstick: %UnityEngineVector2,
     null\r\n    CurrentVel: %UnityEngineVector3, null\r\n    LastFrameVel: %UnityEngineVector3,
+    null\r\n    Pitching: %UnityEngineVector3, null\r\n    Yawing: %UnityEngineVector3,
     null\r\n    localPlayer: %VRCSDKBaseVRCPlayerApi, null\r\n    __0_this_intnl_UnityEngineTransform:
     %UnityEngineTransform, this\r\n    __0_Af_Int32: %SystemInt32, null\r\n    __0_Df_Int32:
     %SystemInt32, null\r\n    __0_downf_Int32: %SystemInt32, null\r\n    __0_Ef_Int32:
@@ -266,16 +267,14 @@ MonoBehaviour:
     %UnityEngineVector3, null\r\n    __33_intnl_UnityEngineVector3: %UnityEngineVector3,
     null\r\n    __34_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __35_intnl_UnityEngineVector3:
     %UnityEngineVector3, null\r\n    __36_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __37_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __38_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\r\n    __39_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __4_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __5_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\r\n    __6_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n    __7_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __8_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\r\n    __9_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\r\n\r\n.data_end\r\n\r\n.code_start\r\n    .export _start\r\n        \r\n
-    \   _start:\r\n        \r\n        PUSH, __0_const_intnl_SystemUInt32\r\n        PUSH,
-    AtmosphereThinningStart\r\n        PUSH, AtmosphereThinningEnd\r\n        PUSH,
-    __0_intnl_SystemBoolean\r\n        EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
+    null\r\n    __37_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __4_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __5_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __6_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n    __7_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\r\n    __8_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\r\n    __9_intnl_UnityEngineVector3: %UnityEngineVector3, null\r\n\r\n.data_end\r\n\r\n.code_start\r\n
+    \   .export _start\r\n        \r\n    _start:\r\n        \r\n        PUSH, __0_const_intnl_SystemUInt32\r\n
+    \       PUSH, AtmosphereThinningStart\r\n        PUSH, AtmosphereThinningEnd\r\n
+    \       PUSH, __0_intnl_SystemBoolean\r\n        EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\r\n
     \       PUSH, __0_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x0000004C\r\n
     \       PUSH, AtmosphereThinningStart\r\n        PUSH, AtmosphereThinningEnd\r\n
     \       COPY\r\n        PUSH, VehicleMainObj\r\n        PUSH, __0_intnl_UnityEngineTransform\r\n
@@ -361,7 +360,7 @@ MonoBehaviour:
     \       PUSH, __6_intnl_SystemBoolean\r\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\r\n
     \       PUSH, __6_intnl_SystemBoolean\r\n        PUSH, __2_intnl_SystemBoolean\r\n
     \       COPY\r\n        PUSH, __2_intnl_SystemBoolean\r\n        JUMP_IF_FALSE,
-    0x0000376C\r\n        PUSH, LandingGearDragMulti\r\n        PUSH, __0_GearDrag_Single\r\n
+    0x000039E4\r\n        PUSH, LandingGearDragMulti\r\n        PUSH, __0_GearDrag_Single\r\n
     \       COPY\r\n        PUSH, localPlayer\r\n        PUSH, __0_const_intnl_VRCSDKBaseVRCPlayerApi\r\n
     \       PUSH, __8_intnl_SystemBoolean\r\n        EXTERN, \"SystemObject.__op_Equality__SystemObject_SystemObject__SystemBoolean\"\r\n
     \       PUSH, __8_intnl_SystemBoolean\r\n        PUSH, __7_intnl_SystemBoolean\r\n
@@ -1212,9 +1211,6 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineVector3.__Lerp__UnityEngineVector3_UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
     \       PUSH, VehicleRigidbody\r\n        PUSH, __18_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineRigidbody.__set_velocity__UnityEngineVector3__SystemVoid\"\r\n
-    \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\r\n        COPY\r\n
-    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\r\n        \r\n    .export
-    _fixedUpdate\r\n        \r\n    _fixedUpdate:\r\n        \r\n        PUSH, __0_const_intnl_SystemUInt32\r\n
     \       PUSH, VehicleMainObj\r\n        PUSH, __9_intnl_UnityEngineTransform\r\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
     \       PUSH, __9_intnl_UnityEngineTransform\r\n        PUSH, __19_intnl_UnityEngineVector3\r\n
@@ -1236,37 +1232,40 @@ MonoBehaviour:
     \       PUSH, __25_intnl_UnityEngineVector3\r\n        PUSH, rotlift\r\n        PUSH,
     __26_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
     \       PUSH, __21_intnl_UnityEngineVector3\r\n        PUSH, __26_intnl_UnityEngineVector3\r\n
-    \       PUSH, __27_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\r\n
-    \       PUSH, PitchMoment\r\n        PUSH, __28_intnl_UnityEngineVector3\r\n        EXTERN,
-    \"UnityEngineTransform.__get_position__UnityEngineVector3\"\r\n        PUSH, VehicleRigidbody\r\n
-    \       PUSH, __27_intnl_UnityEngineVector3\r\n        PUSH, __28_intnl_UnityEngineVector3\r\n
-    \       PUSH, __0_const_intnl_UnityEngineForceMode\r\n        EXTERN, \"UnityEngineRigidbody.__AddForceAtPosition__UnityEngineVector3_UnityEngineVector3_UnityEngineForceMode__SystemVoid\"\r\n
+    \       PUSH, Pitching\r\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\r\n
     \       PUSH, VehicleMainObj\r\n        PUSH, __11_intnl_UnityEngineTransform\r\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
-    \       PUSH, __11_intnl_UnityEngineTransform\r\n        PUSH, __29_intnl_UnityEngineVector3\r\n
+    \       PUSH, __11_intnl_UnityEngineTransform\r\n        PUSH, __27_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineTransform.__get_right__UnityEngineVector3\"\r\n        PUSH,
-    __29_intnl_UnityEngineVector3\r\n        PUSH, LerpedYaw\r\n        PUSH, __30_intnl_UnityEngineVector3\r\n
+    __27_intnl_UnityEngineVector3\r\n        PUSH, LerpedYaw\r\n        PUSH, __28_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __30_intnl_UnityEngineVector3\r\n        PUSH, Atmosphere\r\n        PUSH,
-    __31_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
+    \       PUSH, __28_intnl_UnityEngineVector3\r\n        PUSH, Atmosphere\r\n        PUSH,
+    __29_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
     \       PUSH, VehicleMainObj\r\n        PUSH, __12_intnl_UnityEngineTransform\r\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\r\n
-    \       PUSH, __12_intnl_UnityEngineTransform\r\n        PUSH, __32_intnl_UnityEngineVector3\r\n
+    \       PUSH, __12_intnl_UnityEngineTransform\r\n        PUSH, __30_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineTransform.__get_right__UnityEngineVector3\"\r\n        PUSH,
-    __32_intnl_UnityEngineVector3\r\n        PUSH, __33_intnl_UnityEngineVector3\r\n
+    __30_intnl_UnityEngineVector3\r\n        PUSH, __31_intnl_UnityEngineVector3\r\n
     \       EXTERN, \"UnityEngineVector3.__op_UnaryNegation__UnityEngineVector3__UnityEngineVector3\"\r\n
-    \       PUSH, __33_intnl_UnityEngineVector3\r\n        PUSH, sidespeed\r\n        PUSH,
+    \       PUSH, __31_intnl_UnityEngineVector3\r\n        PUSH, sidespeed\r\n        PUSH,
+    __32_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
+    \       PUSH, __32_intnl_UnityEngineVector3\r\n        PUSH, VelStraightenStrYaw\r\n
+    \       PUSH, __33_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
+    \       PUSH, __33_intnl_UnityEngineVector3\r\n        PUSH, AoALiftYaw\r\n        PUSH,
     __34_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __34_intnl_UnityEngineVector3\r\n        PUSH, VelStraightenStrYaw\r\n
-    \       PUSH, __35_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __35_intnl_UnityEngineVector3\r\n        PUSH, AoALiftYaw\r\n        PUSH,
-    __36_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\r\n
-    \       PUSH, __31_intnl_UnityEngineVector3\r\n        PUSH, __36_intnl_UnityEngineVector3\r\n
-    \       PUSH, __37_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\r\n
-    \       PUSH, YawMoment\r\n        PUSH, __38_intnl_UnityEngineVector3\r\n        EXTERN,
+    \       PUSH, __29_intnl_UnityEngineVector3\r\n        PUSH, __34_intnl_UnityEngineVector3\r\n
+    \       PUSH, Yawing\r\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\r\n
+    \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\r\n        COPY\r\n
+    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\r\n        \r\n    .export
+    _fixedUpdate\r\n        \r\n    _fixedUpdate:\r\n        \r\n        PUSH, __0_const_intnl_SystemUInt32\r\n
+    \       PUSH, PitchMoment\r\n        PUSH, __35_intnl_UnityEngineVector3\r\n        EXTERN,
     \"UnityEngineTransform.__get_position__UnityEngineVector3\"\r\n        PUSH, VehicleRigidbody\r\n
-    \       PUSH, __37_intnl_UnityEngineVector3\r\n        PUSH, __38_intnl_UnityEngineVector3\r\n
-    \       PUSH, __0_const_intnl_UnityEngineForceMode\r\n        EXTERN, \"UnityEngineRigidbody.__AddForceAtPosition__UnityEngineVector3_UnityEngineVector3_UnityEngineForceMode__SystemVoid\"\r\n
+    \       PUSH, Pitching\r\n        PUSH, __35_intnl_UnityEngineVector3\r\n        PUSH,
+    __0_const_intnl_UnityEngineForceMode\r\n        EXTERN, \"UnityEngineRigidbody.__AddForceAtPosition__UnityEngineVector3_UnityEngineVector3_UnityEngineForceMode__SystemVoid\"\r\n
+    \       PUSH, YawMoment\r\n        PUSH, __36_intnl_UnityEngineVector3\r\n        EXTERN,
+    \"UnityEngineTransform.__get_position__UnityEngineVector3\"\r\n        PUSH, VehicleRigidbody\r\n
+    \       PUSH, Yawing\r\n        PUSH, __36_intnl_UnityEngineVector3\r\n        PUSH,
+    __0_const_intnl_UnityEngineForceMode\r\n        EXTERN, \"UnityEngineRigidbody.__AddForceAtPosition__UnityEngineVector3_UnityEngineVector3_UnityEngineForceMode__SystemVoid\"\r\n
     \       PUSH, localPlayer\r\n        PUSH, __0_const_intnl_VRCSDKBaseVRCPlayerApi\r\n
     \       PUSH, __58_intnl_SystemBoolean\r\n        EXTERN, \"SystemObject.__op_Equality__SystemObject_SystemObject__SystemBoolean\"\r\n
     \       PUSH, __58_intnl_SystemBoolean\r\n        PUSH, __57_intnl_SystemBoolean\r\n
@@ -1290,8 +1289,8 @@ MonoBehaviour:
     \       EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, LastFrameVel\r\n        PUSH, __134_intnl_SystemSingle\r\n        EXTERN,
     \"UnityEngineVector3.__set_y__SystemSingle\"\r\n        PUSH, VehicleRigidbody\r\n
-    \       PUSH, __39_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n
-    \       PUSH, LastFrameVel\r\n        PUSH, __39_intnl_UnityEngineVector3\r\n
+    \       PUSH, __37_intnl_UnityEngineVector3\r\n        EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\r\n
+    \       PUSH, LastFrameVel\r\n        PUSH, __37_intnl_UnityEngineVector3\r\n
     \       PUSH, __135_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineVector3.__Distance__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\r\n
     \       PUSH, __136_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\r\n
     \       PUSH, __3_const_intnl_SystemSingle\r\n        PUSH, __136_intnl_SystemSingle\r\n
@@ -1338,7 +1337,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 92
+      Data: 94
     - Name: 
       Entry: 7
       Data: 
@@ -4614,88 +4613,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Throttle
+      Data: ThrottleInput
     - Name: $v
       Entry: 7
       Data: 183|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
       Data: 184|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 47
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 1
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: Throttle
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: Throttle
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 185|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 7
-      Data: 186|System.NonSerializedAttribute, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 187|UnityEngine.HideInInspector, UnityEngine.CoreModule
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 188|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: ThrottleInput
-    - Name: $v
-      Entry: 7
-      Data: 189|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 190|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 47
@@ -4722,19 +4646,94 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 191|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 185|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 192|System.NonSerializedAttribute, mscorlib
+      Data: 186|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 193|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 187|UnityEngine.HideInInspector, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Throttle
+    - Name: $v
+      Entry: 7
+      Data: 188|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 189|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 47
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 1
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: Throttle
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: Throttle
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 190|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 191|System.NonSerializedAttribute, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 192|UnityEngine.HideInInspector, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 193|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -6949,6 +6948,120 @@ MonoBehaviour:
     - Name: fieldAttributes
       Entry: 7
       Data: 341|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Pitching
+    - Name: $v
+      Entry: 7
+      Data: 342|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 343|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 196
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineVector3
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: Pitching
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: Pitching
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 344|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Yawing
+    - Name: $v
+      Entry: 7
+      Data: 345|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 346|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 196
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineVector3
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: Yawing
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: Yawing
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 347|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
