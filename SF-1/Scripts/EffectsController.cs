@@ -31,9 +31,7 @@ public class EffectsController : UdonSharpBehaviour
     private PilotSeat PilotSeat1;
     private PassengerSeat PassengerSeat1;
     private bool vapor;
-    [UdonSynced(UdonSyncMode.None)] private float roll;
-    [UdonSynced(UdonSyncMode.None)] private float pitch;
-    [UdonSynced(UdonSyncMode.None)] private float yaw;
+    [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
     private float machspeed;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
@@ -46,9 +44,9 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 SlatsLerper = new Vector3(0, 35, 0);
     private Vector3 enginelerperL = new Vector3(0, 0, 0);
     private Vector3 enginelerperR = new Vector3(0, 0, 0);
-    private Vector3 enginefirelerper = new Vector3(1, 1, 1);
-    [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting, and so that engine fire has time to disappear at start
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking;
+    private Vector3 enginefirelerper = new Vector3(1, 0, 1);
+    [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
     private float LGrip;
     private float RGrip;
     [System.NonSerializedAttribute] [HideInInspector] public bool RGriplastframetrigger;
@@ -137,20 +135,11 @@ public class EffectsController : UdonSharpBehaviour
                     LGriplastframetrigger = false;
                 }
 
-                roll = EngineControl.rollinput * 35;
-                yaw = EngineControl.yawinput * 20;
-                pitch = EngineControl.pitchinput * 25;
-            }
-            else
-            {
-                roll = EngineControl.rollinput;
-                yaw = EngineControl.yawinput;
-                pitch = EngineControl.pitchinput;
-                roll *= 35;
-                yaw *= 20;
-                pitch *= 25;
-            }
 
+            }
+            rotationinputs.x = EngineControl.pitchinput * 25;
+            rotationinputs.y = EngineControl.yawinput * 20;
+            rotationinputs.z = EngineControl.rollinput * 35;
 
             //G Damage
             if (!EngineControl.dead)
@@ -199,14 +188,17 @@ public class EffectsController : UdonSharpBehaviour
             PlaneAnimator.SetBool("gearup", false);
         }
 
-        if (AileronL != null) { aileronLlerper.y = Mathf.Lerp(aileronLlerper.y, roll + (-pitch * .5f), 4.5f * Time.deltaTime); ; AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
-        if (AileronR != null) { aileronRlerper.y = Mathf.Lerp(aileronRlerper.y, -roll + (-pitch * .5f), 4.5f * Time.deltaTime); ; AileronR.localRotation = Quaternion.Euler(aileronRlerper); }
+        //rotationinputs.x = pitch
+        //rotationinputs.y = yaw
+        //rotationinputs.z = roll
+        if (AileronL != null) { aileronLlerper.y = Mathf.Lerp(aileronLlerper.y, rotationinputs.z + (-rotationinputs.x * .5f), 4.5f * Time.deltaTime); ; AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
+        if (AileronR != null) { aileronRlerper.y = Mathf.Lerp(aileronRlerper.y, -rotationinputs.z + (-rotationinputs.x * .5f), 4.5f * Time.deltaTime); ; AileronR.localRotation = Quaternion.Euler(aileronRlerper); }
 
-        pitchlerper.x = Mathf.Lerp(pitchlerper.x, pitch, 4.5f * Time.deltaTime);
+        pitchlerper.x = Mathf.Lerp(pitchlerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
         if (Elevator != null) { Elevator.localRotation = Quaternion.Euler(-pitchlerper); }
         if (Canards != null) { Canards.localRotation = Quaternion.Euler(pitchlerper * .5f); }
 
-        yawlerper.y = Mathf.Lerp(yawlerper.y, yaw, 4.5f * Time.deltaTime);
+        yawlerper.y = Mathf.Lerp(yawlerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
         if (RudderL != null) { RudderL.localRotation = Quaternion.Euler(-yawlerper); }
         if (RudderR != null) { RudderR.localRotation = Quaternion.Euler(yawlerper); }
 
@@ -215,8 +207,8 @@ public class EffectsController : UdonSharpBehaviour
         if (SlatsR != null) { SlatsR.localRotation = Quaternion.Euler(SlatsLerper); }
 
 
-        if (EngineL != null) { enginelerperL.x = Mathf.Lerp(enginelerperL.x, (roll * .3f) + (-pitch * .65f), 4.5f * Time.deltaTime); EngineL.localRotation = Quaternion.Euler(enginelerperL); }
-        if (EngineR != null) { enginelerperR.x = Mathf.Lerp(enginelerperR.x, (-roll * .3f) + (-pitch * .65f), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
+        if (EngineL != null) { enginelerperL.x = Mathf.Lerp(enginelerperL.x, (rotationinputs.z * .3f) + (-rotationinputs.x * .65f), 4.5f * Time.deltaTime); EngineL.localRotation = Quaternion.Euler(enginelerperL); }
+        if (EngineR != null) { enginelerperR.x = Mathf.Lerp(enginelerperR.x, (-rotationinputs.z * .3f) + (-rotationinputs.x * .65f), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
 
 
         enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.Throttle * 2, .9f * Time.deltaTime);
