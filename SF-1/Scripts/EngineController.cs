@@ -17,7 +17,7 @@ public class EngineController : UdonSharpBehaviour
     public Transform PitchMoment;
     public Transform YawMoment;
     public bool ThrustVectoring = false;
-    public float ThrustVecStr = 1;
+    public float ThrustVecStr = 0.25f;
     public float ThrottleStrength = 25f;
     public float AccelerationResponse = 4.5f;
     public float EngineSpoolDownSpeedMulti = .25f;
@@ -112,13 +112,12 @@ public class EngineController : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
 
         float scaleratio = CenterOfMass.transform.lossyScale.magnitude / Vector3.one.magnitude;
-        VehicleRigidbody.centerOfMass = CenterOfMass.localPosition * scaleratio;
+        VehicleRigidbody.centerOfMass = CenterOfMass.localPosition * scaleratio;//correct position if scaled
 
         FullHealth = Health;
 
         AtmoshpereFadeDistance = (AtmosphereThinningEnd + SeaLevel) - (AtmosphereThinningStart + SeaLevel); //for finding atmosphere thinning gradient
         AtmosphereHeightThing = (AtmosphereThinningStart + SeaLevel) / (AtmoshpereFadeDistance); //used to add back the height to the atmosphere after finding gradient
-
     }
     private void Update()
     {
