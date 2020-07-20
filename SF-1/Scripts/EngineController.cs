@@ -62,8 +62,8 @@ public class EngineController : UdonSharpBehaviour
     float LTrigger;
     float downspeed;
     float sidespeed;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Throttle = 0f;
     [System.NonSerializedAttribute] [HideInInspector] private float ThrottleInput = 0f;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Throttle = 0f;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 CurrentVel = new Vector3(0, 0, 0);
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Gs = 1f;
     float roll = 0f;
@@ -78,7 +78,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float yawinput = 0f;
     [System.NonSerializedAttribute] [HideInInspector] public bool Piloting = false;
     [System.NonSerializedAttribute] [HideInInspector] public bool Passenger = false;
-    [System.NonSerializedAttribute] [HideInInspector] public Vector3 LastFrameVel = new Vector3(0, 0, 0);
+    [System.NonSerializedAttribute] [HideInInspector] public Vector3 LastFrameVel = new Vector3(1, 0, 1);
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
     [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
     [System.NonSerializedAttribute] [HideInInspector] public bool dead = false;
