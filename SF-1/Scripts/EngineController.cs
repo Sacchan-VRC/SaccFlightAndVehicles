@@ -96,6 +96,10 @@ public class EngineController : UdonSharpBehaviour
     public float MinHighAoAControl;
     public float MinAoAPitchLift;
     public float MinAoAYawLift;
+    private float AoALiftYaw;
+    private float AoALift;
+    private Vector3 Pitching;
+    private Vector3 Yawing;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -277,7 +281,7 @@ public class EngineController : UdonSharpBehaviour
 
             //angle of attack stuff, pitch and yaw are calculated seperately
             //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
-            float AoALift = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
+            AoALift = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
             AoALift = -AoALift;
             AoALift++;
             AoALift = -Mathf.Pow((1 - AoALift), 1.6f) + 1;//give it a curve
@@ -289,7 +293,7 @@ public class EngineController : UdonSharpBehaviour
             AoALiftMin = Mathf.Clamp(AoALiftMin, 0, 1);
             AoALift = Mathf.Clamp(AoALift, AoALiftMin, 1);
 
-            float AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
+            AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
             AoALiftYaw = -AoALiftYaw;
             AoALiftYaw++;
             AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), 1.6f) + 1;//give it a curve
@@ -362,8 +366,8 @@ public class EngineController : UdonSharpBehaviour
             //used to add rotation friction
             Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
-            Vector3 FinalInputRot = new Vector3(downspeed * VelStraightenStrPitch * AoALift * rotlift + (-localAngularVelocity.x * PitchFriction * rotlift * AoALift * AoALiftYaw),// X Pitch
-                sidespeed * VelStraightenStrYaw * AoALiftYaw + (-localAngularVelocity.y * YawFriction * rotlift * AoALift * AoALiftYaw),// Y Yaw
+            Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALift * AoALiftYaw),// X Pitch
+                (-localAngularVelocity.y * YawFriction * rotlift * AoALift * AoALiftYaw),// Y Yaw
                     LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift));// Z Roll
 
             FinalInputRot *= Atmosphere;//Atmospheric thickness
@@ -382,14 +386,18 @@ public class EngineController : UdonSharpBehaviour
 
             //lerp velocity toward '0' to simulate air friction
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, (AirFriction * FlapsGearDrag) * Atmosphere * Time.deltaTime);
+
+            //create values for use in fixedupdate
+            Pitching = VehicleMainObj.transform.up * LerpedPitch * Atmosphere + (VehicleMainObj.transform.up * downspeed * VelStraightenStrPitch * AoALift * rotlift);
+            Yawing = VehicleMainObj.transform.right * LerpedYaw * Atmosphere + (-VehicleMainObj.transform.right * sidespeed * VelStraightenStrYaw * AoALiftYaw);
         }
     }
     private void FixedUpdate()
     {
         //apply pitching
-        VehicleRigidbody.AddForceAtPosition(VehicleMainObj.transform.up * LerpedPitch * Atmosphere, PitchMoment.position, ForceMode.Force);
+        VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);
         //apply yawing
-        VehicleRigidbody.AddForceAtPosition(VehicleMainObj.transform.right * LerpedYaw * Atmosphere, YawMoment.position, ForceMode.Force);
+        VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
         //calc Gs
         if (localPlayer == null || localPlayer.IsOwner(VehicleMainObj))
         {
