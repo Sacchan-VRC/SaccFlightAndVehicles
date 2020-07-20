@@ -40,7 +40,14 @@ public class HitDetector : UdonSharpBehaviour
     }
     public void Respawn()//called by the explode animation on last frame
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RespawnStuff");
+        if (EngineControl.localPlayer == null)//editor
+        {
+            RespawnStuff();
+        }
+        else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RespawnStuff");
+        }
     }
     public void NotDead()//called by 'respawn' animation 5s in
     {
@@ -60,11 +67,13 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.VehicleRigidbody.velocity = new Vector3(0, 0, 0);
             EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.EffectsControl.Spawnrotation);
             EngineControl.VehicleMainObj.transform.position = EngineControl.EffectsControl.Spawnposition;
+            EngineControl.Health = EngineControl.FullHealth;
+            EngineControl.GearUp = false;
+            EngineControl.Flaps = true;
         }
         else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
         {
             EngineControl.Health = EngineControl.FullHealth;
-
             //this should respawn it in VRC, doesn't work in editor
             EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
             EngineControl.GearUp = false;

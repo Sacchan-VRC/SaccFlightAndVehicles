@@ -229,6 +229,7 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Max(Mathf.Abs(EngineControl.AngleOfAttack / 180), Mathf.Abs(EngineControl.AngleOfAttackYaw / 180)) : 0);
+        PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         DoVapor();
     }
 
