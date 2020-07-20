@@ -22,20 +22,14 @@ public class EffectsController : UdonSharpBehaviour
     public Transform RudderR;
     public Transform SlatsL;
     public Transform SlatsR;
-    public ParticleSystem MachVapor;
-    public TrailRenderer WingTrailL;
-    public TrailRenderer WingTrailR;
-    public float TrailGs = 4f;
     public float MaxGs = 20f;
     public float GDamage = 15f;
     private PilotSeat PilotSeat1;
     private PassengerSeat PassengerSeat1;
     private bool vapor;
     [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
-    private float machspeed;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
-    private ParticleSystem.EmissionModule emmachvapor;
     private Vector3 pitchlerper = new Vector3(0, 0, 0);
     private Vector3 aileronLlerper = new Vector3(0, 0, 0);
     private Vector3 aileronRlerper = new Vector3(0, 0, 0);
@@ -51,7 +45,6 @@ public class EffectsController : UdonSharpBehaviour
     private float RGrip;
     [System.NonSerializedAttribute] [HideInInspector] public bool RGriplastframetrigger;
     private bool LGriplastframetrigger;
-    private ParticleSystem.EmissionModule flareemission;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool isfiring = false;
@@ -61,7 +54,6 @@ public class EffectsController : UdonSharpBehaviour
         if (VehicleMainObj != null) { PlaneAnimator = VehicleMainObj.GetComponent<Animator>(); }
         if (PilotSeatStation != null) { PilotSeat1 = PilotSeatStation.gameObject.GetComponent<PilotSeat>(); }
         if (PassengerSeatStation != null) { PassengerSeat1 = PassengerSeatStation.gameObject.GetComponent<PassengerSeat>(); }
-        if (MachVapor != null) { emmachvapor = MachVapor.emission; }
         if (EngineControl.localPlayer == null) { DoEffects = 0f; } //not asleep in editor
         Spawnposition = VehicleMainObj.transform.position;
         Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
@@ -88,8 +80,6 @@ public class EffectsController : UdonSharpBehaviour
 
         if (EngineControl.Occupied == true) { DoEffects = 0f; }
         else { DoEffects += Time.deltaTime; }
-
-        machspeed = EngineControl.CurrentVel.magnitude / 343f;
 
         if (EngineControl.localPlayer == null || (EngineControl.localPlayer.IsOwner(gameObject)))//works in editor or ingame
         {
@@ -159,8 +149,7 @@ public class EffectsController : UdonSharpBehaviour
                 }
             }
         }
-        if (EngineControl.CurrentVel.magnitude > 80) { vapor = true; } // only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever       
-        else { vapor = false; }
+        vapor = (EngineControl.CurrentVel.magnitude > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         if (isfiring && EngineControl.Occupied) //send firing to animator
         {
@@ -237,12 +226,9 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
-        if (Smoking && EngineControl.Occupied) { PlaneAnimator.SetBool("displaysmoke", true); }
-        else { PlaneAnimator.SetBool("displaysmoke", false); }
+        PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
-        PlaneAnimator.SetFloat("Gs", EngineControl.Gs / 50);
-        PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
-
+        PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Max(Mathf.Abs(EngineControl.AngleOfAttack / 180), Mathf.Abs(EngineControl.AngleOfAttackYaw / 180)) : 0);
         DoVapor();
     }
 
@@ -258,46 +244,9 @@ public class EffectsController : UdonSharpBehaviour
         {
             Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * Time.deltaTime);//linger for a bit before cutting off
         }
-
-        if (WingTrailL != null)
-        {
-            if (Gs_trail > TrailGs && vapor)
-            {
-
-                WingTrailL.emitting = true;
-            }
-            else
-            {
-
-                WingTrailL.emitting = false;
-            }
-        }
-        if (WingTrailR != null)
-        {
-            if (Gs_trail > TrailGs && vapor)
-            {
-
-                WingTrailR.emitting = true;
-            }
-            else
-            {
-
-                WingTrailR.emitting = false;
-            }
-        }
-        if (MachVapor != null)
-        {
-            if (machspeed > .985 && machspeed < 1.015)
-            {
-                emmachvapor.enabled = true;
-            }
-            else
-            {
-                emmachvapor.enabled = false;
-            }
-
-        }
-        Gs_trail = EngineControl.Gs;
+        PlaneAnimator.SetFloat("mach10", EngineControl.CurrentVel.magnitude / 343 / 10);
+        PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
+        PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
