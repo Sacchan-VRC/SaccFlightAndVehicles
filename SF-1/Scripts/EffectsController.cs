@@ -22,8 +22,8 @@ public class EffectsController : UdonSharpBehaviour
     public Transform RudderR;
     public Transform SlatsL;
     public Transform SlatsR;
-    public float MaxGs = 20f;
-    public float GDamage = 15f;
+    public float MaxGs = 40f;
+    public float GDamage = 30f;
     private PilotSeat PilotSeat1;
     private PassengerSeat PassengerSeat1;
     private bool vapor;

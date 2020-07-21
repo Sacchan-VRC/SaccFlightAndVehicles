@@ -7,12 +7,11 @@ using VRC.Udon;
 public class EngineController : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
-    public Transform GroundDetector;
     [System.NonSerializedAttribute] [HideInInspector] public Rigidbody VehicleRigidbody;
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
-    private ConstantForce VehicleConstantForce;
+    public Transform GroundDetector;
     public Transform CenterOfMass;
     public Transform PitchMoment;
     public Transform YawMoment;
@@ -22,29 +21,35 @@ public class EngineController : UdonSharpBehaviour
     public float AccelerationResponse = 4.5f;
     public float EngineSpoolDownSpeedMulti = .5f;
     public float AirFriction = 0.036f;
-    public float RollStrength = 100f;
-    public float RollFriction = 80f;
-    public float RollResponse = 45f;
+    public float RollStrength = 450f;
+    public float RollFriction = 90f;
+    public float RollResponse = 12f;
     public float RollStrengthReversingMulti = 1.6f;
-    public float PitchStrength = 1.5f;
-    public float PitchFriction = 80f;
-    public float PitchResponse = 45f;
+    public float PitchStrength = 5f;
+    public float PitchFriction = 24f;
+    public float PitchResponse = 12f;
     public float PitchStrengthReversingMulti = 2;
-    public float YawStrength = 5f;
-    public float YawFriction = 80f;
-    public float YawResponse = 45f;
+    public float YawStrength = 3f;
+    public float YawFriction = 15f;
+    public float YawResponse = 12f;
     public float YawStrengthReversingMulti = 2.4f;
-    public float InputPower = 2.3f;
-    public float VelStraightenStrPitch = 0.2f;
-    public float VelStraightenStrYaw = 0.15f;
+    public float InputPower = 1.7f;
+    public float VelStraightenStrPitch = 0.035f;
+    public float VelStraightenStrYaw = 0.045f;
+    public float MaxAngleOfAttack = 25f;
+    public float MaxAngleOfAttackYaw = 40f;
+    public float HighAoAMinControlPitch = 0.2f;
+    public float HighAoAMinControlYaw = 0.2f;
+    public float HighPitchAoAMinLift = 0.2f;
+    public float HighYawAoaMinLift = 0.2f;
     public float TaxiRotationSpeed = 35f;
     public float PitchDownStrRatio = .8f;
     public float Lift = .8f;
-    public float VelLiftCoefficient = 1.4f;
-    public float MaxVelLift = 5f;
+    public float VelLiftCoefficient = 0.00014f;
+    public float MaxVelLift = 10f;
     public float PullDownLiftRatio = .8f;
     public float SidewaysLift = .17f;
-    public float VelPullUp = 2f;
+    public float VelPullUp = 1f;
     public bool HasFlaps = true;
     public bool HasLandingGear = true;
     public float LandingGearDragMulti = 1.6f;
@@ -52,23 +57,24 @@ public class EngineController : UdonSharpBehaviour
     public float FlapsLiftMulti = 1.35f;
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
     public float SeaLevel = -100;
-    float InputAcc;
-    float LerpedRoll;
-    float LerpedPitch;
-    float LerpedYaw;
+    private ConstantForce VehicleConstantForce;
+    private float InputAcc;
+    private float LerpedRoll;
+    private float LerpedPitch;
+    private float LerpedYaw;
     Vector2 Lstick;
     Vector2 Rstick = new Vector2(0, 0);
-    float RTrigger;
-    float LTrigger;
-    float downspeed;
-    float sidespeed;
+    private float RTrigger;
+    private float LTrigger;
+    private float downspeed;
+    private float sidespeed;
     [System.NonSerializedAttribute] [HideInInspector] private float ThrottleInput = 0f;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Throttle = 0f;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 CurrentVel = new Vector3(0, 0, 0);
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Gs = 1f;
-    float roll = 0f;
-    float pitch = 0f;
-    float yaw = 0f;
+    private float roll = 0f;
+    private float pitch = 0f;
+    private float yaw = 0f;
     [System.NonSerializedAttribute] [HideInInspector] public float FullHealth;
     [System.NonSerializedAttribute] [HideInInspector] public bool Taxiing = false;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool GearUp = false;
@@ -91,13 +97,8 @@ public class EngineController : UdonSharpBehaviour
     public float RotMultiMaxSpeed = 220f;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AngleOfAttack;
     [System.NonSerializedAttribute] [HideInInspector] public float AngleOfAttackYaw;
-    public float MaxAngleOfAttack;
-    public float MaxAngleOfAttackYaw;
-    public float MinHighAoAControl;
-    public float MinAoAPitchLift;
-    public float MinAoAYawLift;
     private float AoALiftYaw;
-    private float AoALift;
+    private float AoALiftPitch;
     private Vector3 Pitching;
     private Vector3 Yawing;
     //float MouseX;
@@ -279,52 +280,53 @@ public class EngineController : UdonSharpBehaviour
 
             //angle of attack stuff, pitch and yaw are calculated seperately
             //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
-            AoALift = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
-            AoALift = -AoALift;
-            AoALift++;
-            AoALift = -Mathf.Pow((1 - AoALift), 1.6f) + 1;//give it a curve
+            //the linear version is used for high aoa, and is 0 when at 90 degrees. When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
+            AoALiftPitch = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
+            AoALiftPitch = -AoALiftPitch;
+            AoALiftPitch++;
+            AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), 1.6f) + 1;//give it a curve
 
-            float AoALiftMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 90);//linear version to 90 for high aoa
-            AoALiftMin = -AoALiftMin;
-            AoALiftMin++;
-            AoALiftMin *= MinHighAoAControl;
-            AoALiftMin = Mathf.Clamp(AoALiftMin, 0, 1);
-            AoALift = Mathf.Clamp(AoALift, AoALiftMin, 1);
+            float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 90);//linear version to 90 for high aoa
+            AoALiftPitchMin = -AoALiftPitchMin;
+            AoALiftPitchMin++;
+            AoALiftPitchMin *= HighAoAMinControlPitch;
+            AoALiftPitchMin = Mathf.Clamp(AoALiftPitchMin, 0, 1);
+            AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
 
             AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
             AoALiftYaw = -AoALiftYaw;
             AoALiftYaw++;
             AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), 1.6f) + 1;//give it a curve
 
-            float AoALiftMinYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
-            AoALiftMinYaw = -AoALiftMin;
-            AoALiftMinYaw++;
-            AoALiftMinYaw *= MinHighAoAControl;
-            AoALiftMinYaw = Mathf.Clamp(AoALiftMinYaw, 0, 1);
-            AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftMinYaw, 1);
+            float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
+            AoALiftYawMin = -AoALiftPitchMin;
+            AoALiftYawMin++;
+            AoALiftYawMin *= HighAoAMinControlYaw;
+            AoALiftYawMin = Mathf.Clamp(AoALiftYawMin, 0, 1);
+            AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
 
             //speed related values
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
             float SpeedLiftFactor = Mathf.Clamp(CurrentVel.magnitude * CurrentVel.magnitude * VelLiftCoefficient, 0, MaxVelLift);
-            rotlift = CurrentVel.magnitude / RotMultiMaxSpeed;
+            rotlift = CurrentVel.magnitude / RotMultiMaxSpeed;//using a simple linear curve for increased control while moving faster, just feels better this way
 
             //thrust vecotring airplanes have a minimum rotation speed
             if (ThrustVectoring)
             {
-                roll *= Mathf.Max(ThrustVecStr, rotlift * AoALift);
-                pitch *= Mathf.Max(ThrustVecStr, rotlift * AoALift);
-                yaw *= Mathf.Max(ThrustVecStr, rotlift * AoALift);
+                roll *= Mathf.Max(ThrustVecStr, rotlift * AoALiftPitch);
+                pitch *= Mathf.Max(ThrustVecStr, rotlift * AoALiftPitch);
+                yaw *= Mathf.Max(ThrustVecStr, rotlift * AoALiftPitch);
             }
             else
             {
-                roll *= rotlift * AoALift;
-                pitch *= rotlift * AoALift;
-                yaw *= rotlift * AoALift;
+                roll *= rotlift * AoALiftPitch;
+                pitch *= rotlift * AoALiftPitch;
+                yaw *= rotlift * AoALiftPitch;
             }
 
-            //set the minimum lift when at high aoa
-            AoALift = Mathf.Clamp(AoALift, MinAoAPitchLift, 1);
-            AoALiftYaw = Mathf.Clamp(AoALiftYaw, MinAoAYawLift, 1);
+            //rotation inputs are done, now we can set the minimum lift/drag when at high aoa, this should be high than 0 because if it's 0 you will have 0 drag when at 90 degree AoA.
+            AoALiftPitch = Mathf.Clamp(AoALiftPitch, HighPitchAoAMinLift, 1);
+            AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
 
 
             Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
@@ -356,17 +358,21 @@ public class EngineController : UdonSharpBehaviour
                 FlapsDrag = 1;
                 FlapsLift = 1;
             }
-            //do lift and rotate toward velocity
+            //do lift
             Vector3 FinalInputAcc = new Vector3(((sidespeed * SidewaysLift) * -1) * SpeedLiftFactor * AoALiftYaw,// X
-                downspeed * FlapsLift * PullDownLiftRatio * Lift * SpeedLiftFactor * AoALift + (SpeedLiftFactor * AoALift * VelPullUp),// Y
+                downspeed * FlapsLift * PullDownLiftRatio * Lift * SpeedLiftFactor * AoALiftPitch + (SpeedLiftFactor * AoALiftPitch * VelPullUp),// Y
                     InputAcc);// Z
+
+            //create values for use in fixedupdate (control input and straightening forces)
+            Pitching = VehicleMainObj.transform.up * LerpedPitch * Atmosphere + (VehicleMainObj.transform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift);
+            Yawing = VehicleMainObj.transform.right * LerpedYaw * Atmosphere + (-VehicleMainObj.transform.right * sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift);
 
             //used to add rotation friction
             Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
-            Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALift * AoALiftYaw),// X Pitch
-                (-localAngularVelocity.y * YawFriction * rotlift * AoALift * AoALiftYaw),// Y Yaw
-                    LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift));// Z Roll
+            Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw),// X Pitch
+                (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw),// Y Yaw
+                    LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw));// Z Roll
 
             FinalInputRot *= Atmosphere;//Atmospheric thickness
             FinalInputAcc *= Atmosphere;
@@ -384,10 +390,6 @@ public class EngineController : UdonSharpBehaviour
 
             //lerp velocity toward '0' to simulate air friction
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, (AirFriction * FlapsGearDrag) * Atmosphere * Time.deltaTime);
-
-            //create values for use in fixedupdate
-            Pitching = VehicleMainObj.transform.up * LerpedPitch * Atmosphere + (VehicleMainObj.transform.up * downspeed * VelStraightenStrPitch * AoALift * rotlift);
-            Yawing = VehicleMainObj.transform.right * LerpedYaw * Atmosphere + (-VehicleMainObj.transform.right * sidespeed * VelStraightenStrYaw * AoALiftYaw);
         }
     }
     private void FixedUpdate()
