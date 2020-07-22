@@ -46,8 +46,7 @@ public class EngineController : UdonSharpBehaviour
     public float HighYawAoaMinLift = 0.2f;
     public float TaxiRotationSpeed = 35f;
     public float PitchDownStrRatio = .8f;
-    public float Lift = .8f;
-    public float VelLiftCoefficient = 0.00014f;
+    public float VelLiftCoefficient = 0.000112f;
     public float MaxVelLift = 10f;
     public float PullDownLiftRatio = .8f;
     public float SidewaysLift = .17f;
@@ -96,12 +95,34 @@ public class EngineController : UdonSharpBehaviour
     public float AtmosphereThinningEnd = 19812; //65,000 feet
     private float Atmosphere;
     private float rotlift;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AngleOfAttack;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AngleOfAttack;//MAX of yaw & pitch //used by effectscontroller
+    [System.NonSerializedAttribute] [HideInInspector] public float AngleOfAttackPitch;
     [System.NonSerializedAttribute] [HideInInspector] public float AngleOfAttackYaw;
     private float AoALiftYaw;
     private float AoALiftPitch;
     private Vector3 Pitching;
     private Vector3 Yawing;
+    private float Taxiinglerper;
+    private float AoALiftYawMin;
+    private float AoALiftPitchMin;
+    private float SpeedLiftFactor;
+    private int Wf;
+    private int Sf;
+    private int Af;
+    private int Df;
+    private int Qf;
+    private int Ef;
+    private int upf;
+    private int downf;
+    private int leftf;
+    private int rightf;
+    private int shiftf;
+    private float GearDrag;
+    private float FlapsGearDrag;
+    private float FlapsDrag;
+    private float FlapsLift;
+    private float temp;
+    private float minlifttemp;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -134,24 +155,23 @@ public class EngineController : UdonSharpBehaviour
 
         if (localPlayer == null || (localPlayer.IsOwner(VehicleMainObj)))//works in editor or ingame
         {
-            float GearDrag = LandingGearDragMulti;
             if ((localPlayer == null) || (localPlayer.IsOwner(VehicleMainObj) && !Piloting)) { Occupied = false; } //should make vehicle respawnable if player disconnects while occupying
 
             if (localPlayer == null || Piloting)
             {
                 Occupied = true;
                 //collect inputs
-                int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as floats
-                int Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
-                int Af = Input.GetKey(KeyCode.A) ? -1 : 0;
-                int Df = Input.GetKey(KeyCode.D) ? 1 : 0;
-                int Qf = Input.GetKey(KeyCode.Q) ? -1 : 0;
-                int Ef = Input.GetKey(KeyCode.E) ? 1 : 0;
-                int upf = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
-                int downf = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
-                int leftf = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
-                int rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
-                int shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
+                Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as floats
+                Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
+                Af = Input.GetKey(KeyCode.A) ? -1 : 0;
+                Df = Input.GetKey(KeyCode.D) ? 1 : 0;
+                Qf = Input.GetKey(KeyCode.Q) ? -1 : 0;
+                Ef = Input.GetKey(KeyCode.E) ? 1 : 0;
+                upf = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
+                downf = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
+                leftf = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
+                rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
+                shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
                 Lstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                 //Lstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                 Rstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
@@ -169,7 +189,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (Mathf.Abs(Rstick.x) != 0)
                     {
-                        float temp = Rstick.magnitude / Mathf.Abs(Rstick.x);
+                        temp = Rstick.magnitude / Mathf.Abs(Rstick.x);
                         Rstick *= temp;
                     }
                 }
@@ -177,7 +197,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (Mathf.Abs(Rstick.y) != 0)
                     {
-                        float temp = Rstick.magnitude / Mathf.Abs(Rstick.y);
+                        temp = Rstick.magnitude / Mathf.Abs(Rstick.y);
                         Rstick *= temp;
                     }
                 }
@@ -203,7 +223,8 @@ public class EngineController : UdonSharpBehaviour
 
 
                 //combine inputs and clamp
-                rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */Rstick.x + Af + Df + leftf + rightf) * -1), -1, 1);//these are used by effectscontroller
+                //these are used by effectscontroller
+                rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */Rstick.x + Af + Df + leftf + rightf) * -1), -1, 1);
                 pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */Rstick.y + Wf + Sf + downf + upf), -1, 1);
                 yawinput = Mathf.Clamp((Lstick.x + Qf + Ef), -1, 1);
 
@@ -225,7 +246,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     roll = rollinput * RollStrength * -ReversingRollStrengthMulti;
                     pitch = pitchinput * PitchStrength * -ReversingPitchStrengthMulti;
-                    yaw = -yawinput * YawStrength * -ReversingYawStrengthMulti;
+                    yaw = yawinput * YawStrength * ReversingYawStrengthMulti;
                 }
 
 
@@ -254,8 +275,12 @@ public class EngineController : UdonSharpBehaviour
 
                 if (Taxiing)
                 {
-                    Vector3 taxirot = VehicleMainObj.transform.rotation.eulerAngles;
-                    VehicleMainObj.transform.Rotate(Vector3.up, (yawinput * TaxiRotationSpeed) * Time.deltaTime);
+                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, yawinput * TaxiRotationSpeed * Time.deltaTime, 1.5f * Time.deltaTime);
+                    VehicleMainObj.transform.Rotate(Vector3.up, Taxiinglerper);
+                }
+                else
+                {
+                    Taxiinglerper = 0;
                 }
 
             }
@@ -276,18 +301,18 @@ public class EngineController : UdonSharpBehaviour
                 downspeed *= PullDownLiftRatio;
             }
 
-            AngleOfAttack = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.right);
+            AngleOfAttackPitch = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.right);
             AngleOfAttackYaw = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.up);
 
             //angle of attack stuff, pitch and yaw are calculated seperately
             //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
-            //the linear version is used for high aoa, and is 0 when at 90 degrees. When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
-            AoALiftPitch = Mathf.Min(Mathf.Abs(AngleOfAttack) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
+            //the linear version is used for high aoa, and is 0 when at 90 degrees, 1 at 0(multiplied by HighAoaMinControlx). When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
+            AoALiftPitch = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / MaxAngleOfAttack, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / MaxAngleOfAttack);//angle of attack as 0-1 float, for backwards and forwards
             AoALiftPitch = -AoALiftPitch;
             AoALiftPitch++;
             AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), AoaCurveStrength) + 1;//give it a curve
 
-            float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttack) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttack) - 180) / 90);//linear version to 90 for high aoa
+            AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / 90);//linear version to 90 for high aoa
             AoALiftPitchMin = -AoALiftPitchMin;
             AoALiftPitchMin++;
             AoALiftPitchMin *= HighAoaMinControlPitch;
@@ -299,30 +324,33 @@ public class EngineController : UdonSharpBehaviour
             AoALiftYaw++;
             AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
 
-            float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
+            AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
             AoALiftYawMin = -AoALiftPitchMin;
             AoALiftYawMin++;
             AoALiftYawMin *= HighAoaMinControlYaw;
             AoALiftYawMin = Mathf.Clamp(AoALiftYawMin, 0, 1);
             AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
 
+            AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
             //speed related values
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
-            float SpeedLiftFactor = Mathf.Clamp(CurrentVel.magnitude * CurrentVel.magnitude * VelLiftCoefficient, 0, MaxVelLift);
+            SpeedLiftFactor = Mathf.Clamp(CurrentVel.magnitude * CurrentVel.magnitude * VelLiftCoefficient, 0, MaxVelLift);
             rotlift = CurrentVel.magnitude / RotMultiMaxSpeed;//using a simple linear curve for increasing control as you move faster
 
             //thrust vecotring airplanes have a minimum rotation speed
             if (ThrustVectoring)
             {
-                roll *= Mathf.Max(ThrustVecStr, rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw));
-                pitch *= Mathf.Max(ThrustVecStr, rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw));
-                yaw *= Mathf.Max(ThrustVecStr, rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw));
+                minlifttemp = Mathf.Max(ThrustVecStr, rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw));
+                roll *= minlifttemp;
+                pitch *= minlifttemp;
+                yaw *= minlifttemp;
             }
             else
             {
-                pitch *= rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
-                yaw *= rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
-                roll *= rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
+                minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
+                pitch *= minlifttemp;
+                yaw *= minlifttemp;
+                roll *= minlifttemp;
             }
 
             //rotation inputs are done, now we can set the minimum lift/drag when at high aoa, this should be high than 0 because if it's 0 you will have 0 drag when at 90 degree AoA.
@@ -352,16 +380,26 @@ public class EngineController : UdonSharpBehaviour
             LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * Time.deltaTime);
 
             //flaps drag and lift
-            float FlapsDrag = FlapsDragMulti;
-            float FlapsLift = FlapsLiftMulti;
+            FlapsDrag = FlapsDragMulti;
+            FlapsLift = FlapsLiftMulti;
             if (!Flaps || !HasFlaps)
             {
                 FlapsDrag = 1;
                 FlapsLift = 1;
             }
+            //gear drag
+            if (GearUp || !HasLandingGear)
+            {
+                GearDrag = 1;
+            }
+            else
+            {
+                GearDrag = LandingGearDragMulti;
+            }
+            FlapsGearDrag = (GearDrag + FlapsDrag) - 1;
             //do lift
             Vector3 FinalInputAcc = new Vector3(((sidespeed * SidewaysLift) * -1) * SpeedLiftFactor * AoALiftYaw,// X Side
-                downspeed * FlapsLift * PullDownLiftRatio * Lift * SpeedLiftFactor * AoALiftPitch + (SpeedLiftFactor * AoALiftPitch * VelPullUp),// Y Up
+                downspeed * FlapsLift * PullDownLiftRatio * SpeedLiftFactor * AoALiftPitch + (SpeedLiftFactor * AoALiftPitch * VelPullUp),// Y Up
                     InputAcc);// Z Forward
 
             //used to add rotation friction
@@ -375,21 +413,12 @@ public class EngineController : UdonSharpBehaviour
             Pitching = VehicleMainObj.transform.up * LerpedPitch * Atmosphere + (VehicleMainObj.transform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift);
             Yawing = VehicleMainObj.transform.right * LerpedYaw * Atmosphere + (-VehicleMainObj.transform.right * sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift);
 
-            FinalInputRot *= Atmosphere;//Atmospheric thickness
+            FinalInputRot *= Atmosphere;//Atmosphere thickness
             FinalInputAcc *= Atmosphere;
             VehicleConstantForce.relativeForce = FinalInputAcc;
             VehicleConstantForce.relativeTorque = FinalInputRot;
 
-
-            //gear drag
-            if (GearUp || !HasLandingGear)
-            {
-                GearDrag = 1;
-            }
-            float FlapsGearDrag = (GearDrag + FlapsDrag) - 1;
-
-
-            //lerp velocity toward '0' to simulate air friction
+            //lerp velocity toward 0 to simulate air friction
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, (AirFriction * FlapsGearDrag) * Atmosphere * Time.deltaTime);
         }
     }
