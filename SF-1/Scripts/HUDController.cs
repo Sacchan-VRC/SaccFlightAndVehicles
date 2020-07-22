@@ -76,13 +76,12 @@ public class HUDController : UdonSharpBehaviour
 
             if (EngineControl.CurrentVel.magnitude < 2)
             {
-                HUDText_angleofattack_temp = System.String.Empty;
+                HUDText_angleofattack.text = System.String.Empty;
             }
             else
             {
-                HUDText_angleofattack_temp = EngineControl.AngleOfAttack.ToString("F0");
+                HUDText_angleofattack.text = EngineControl.AngleOfAttack.ToString("F0");
             }
-            HUDText_angleofattack.text = HUDText_angleofattack_temp;
             check = 0;
             //  }
         }
