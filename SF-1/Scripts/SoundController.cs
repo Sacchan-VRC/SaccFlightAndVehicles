@@ -49,6 +49,7 @@ public class SoundController : UdonSharpBehaviour
     private float GunSoundInitialVolume;
     [System.NonSerializedAttribute] [HideInInspector] public bool soundsoff;
     float relativespeed;
+    private float SonicBoomPreventer = 5f;//used to prevent sonic booms from occuring too often in case of laggers etc
     bool playsonicboom;
     private void Start()
     {
@@ -239,12 +240,20 @@ public class SoundController : UdonSharpBehaviour
         }
 
 
+        if (SonicBoomPreventer < 5.1f)//count up, limited to 5.1(plane can only cause a sonic boom every 5 seconds max)
+        {
+            SonicBoomPreventer += Time.deltaTime;
+        }
         //set final volumes and pitches
         //lerp should help smooth out laggers and the dopple only being calculated every 5 frames
         if (SonicBoom != null && !silent && playsonicboom)
         {
-            SonicBoom.pitch = Random.Range(.94f, 1.2f);
-            SonicBoom.Play();
+            if (SonicBoomPreventer > 5 && !EngineControl.dead)
+            {
+                SonicBoom.pitch = Random.Range(.94f, 1.2f);
+                SonicBoom.Play();
+                SonicBoomPreventer = 0;
+            }
             playsonicboom = false;
         }
 
@@ -266,14 +275,14 @@ public class SoundController : UdonSharpBehaviour
         {
             PlaneAfterburner.volume = PlaneAfterburnerVolume;
             PlaneAfterburner.pitch = Mathf.Lerp(PlaneAfterburner.pitch, PlaneAfterburnerPitch, 30f * Time.deltaTime);
- 
+
             PlaneAfterburner.volume *= silentint;
         }
         if (PlaneWind != null)
         {
             PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
             PlaneWind.volume = Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) * .2f);
- 
+
             PlaneWind.volume *= silentint;
 
         }

@@ -6,12 +6,13 @@ https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Major Changes in 1.2
+Huge code changes in this version, back up your projects.
 •New Lift model, not floaty any more
 •Customizable lift based on angle of attack, allowing stalls
+•Inverts control inputs if plane is moving backwards
+•Seperate thrust vectoring axis' strength
 •Square input on control stick, so that controller users don't have disadvantage against keyboard users
-•'Exponant' option on control stick for more precise control
-•Invert control inputs if plane is moving backwards
-•Seperate thrust vectoring axis'
+•'Power' option for control stick for more precise input
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Major Changes in 1.17
 •Added fully animated HUD
@@ -90,7 +91,17 @@ This package contains the air vehicles and scripts I've been working on. I hope 
 
 important changes users of the previous version should know about:
 angular drag is now set to 0 on the rigidbody.
+a lot of variable names have changed, or have different effects now, so you'll have to re-calibrate the settings for your vehicles.
 
+Some of the animations use the 'Normalized Time' feature, which makes the animation be controlled by a float parameter (which is controlled by effectscontroller).
+float value 1(or more) = play the last frame of the animation
+float value 0(or less) = play the first frame of the animation
+and everything in between accordingly.
+
+The MachVapor for example uses the mach10 variable. This variable = 1 at mach10, and 0 when not moving. The animation is 1000 frames long, and the MachVapor is enabled on frame 97 and disabled on frame 102, which corresponds to mach1.
+This can be used to do other things like F-14 wings moving back at a certain speed.
+
+The angle of attack variable is 0 at 0 AoA, and 1 at 180.
 
 The prefab uses station triggers, which currently are currently a bit awkward to use. You must set the inspector to debug mode in order to assign them. Enter the name of a public function that is on the script running on this objects UdonBehaviour.
 This prefab is only using On Local Player Exit Station, and the function names used for it are PilotLeave, PassengerLeave and GunnerLeave.
@@ -115,7 +126,7 @@ The leave buttons are children of the HUDController object, just to make the exp
 
 HUDController's bigstuff object is scaled to 8000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 if you plan on editing HUD elements.
 
-The Gun_pilot now is set to not collide with reserved2 layer. The plane is set to reserved2 for the pilot when he enters, so that he can't shoot himself, and reverted back to Walkthrough when he leaves.
+The Gun_pilot is set to not collide with reserved2 layer. The plane is set to reserved2 for the pilot when he enters, so that he can't shoot himself, and reverted back to Walkthrough when he leaves.
 
 
 There are 20 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
@@ -251,6 +262,9 @@ When the plane is is at a high angle of attack you can give it a minimum amount 
 
 Taxi Rotation Speed
 Degrees per second the vehicle rotates on the ground. Uses simple object rotation with a lerp, no real physics to it.
+
+Taxi Rotation Response
+How smoothed the taxi movement rotation is
 
 Airplane Vel Lift Coefficient (new in 1.01)
 Adjust how long the lift curve is. Higher = more lift

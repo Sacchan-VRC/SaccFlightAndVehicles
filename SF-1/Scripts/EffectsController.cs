@@ -134,7 +134,7 @@ public class EffectsController : UdonSharpBehaviour
             //G Damage
             if (!EngineControl.dead)
             {
-                EngineControl.Health += -Mathf.Clamp((EngineControl.Gs - MaxGs) * Time.deltaTime * GDamage, 0f, 99999f); //take damage of 15 per second per G above MaxGs
+                EngineControl.Health += -Mathf.Clamp((EngineControl.Gs - MaxGs) * Time.deltaTime * GDamage, 0f, 99999f); //take damage of GDamage per second per G above MaxGs
 
                 if (EngineControl.Health <= 0f) //plane is ded
                 {
@@ -255,7 +255,12 @@ public class EffectsController : UdonSharpBehaviour
 
         EngineControl.dead = true;
 
-        EngineControl.GearUp = true;//prevent touchdown sound
+        if (EngineControl.localPlayer.IsOwner(gameObject))
+        {
+            EngineControl.GearUp = true;//prevent touchdown sound
+            EngineControl.CurrentVel = Vector3.zero;
+            EngineControl.Health = EngineControl.FullHealth;//turns off low health smoke
+        }
 
         //pilot and passenger are dropped out of the plane
         if (EngineControl.SoundControl != null && EngineControl.SoundControl.Explosion != null) { EngineControl.SoundControl.Explosion.Play(); }
@@ -268,7 +273,7 @@ public class EffectsController : UdonSharpBehaviour
             if (PassengerSeatStation != null) { PassengerSeatStation.ExitStation(EngineControl.localPlayer); }
         }
         PlaneAnimator.SetTrigger("explode");
-        EngineControl.Health = EngineControl.FullHealth;//turns off low health smoke
+
     }
     public void DropFlares()
     {
