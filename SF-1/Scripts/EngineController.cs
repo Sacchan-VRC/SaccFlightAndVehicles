@@ -49,12 +49,12 @@ public class EngineController : UdonSharpBehaviour
     public float HighYawAoaMinLift = 0.2f;
     public float TaxiRotationSpeed = 35f;
     public float VelLiftCoefficient = 0.000112f;
-    public float MaxVelLift = 10f;
     public float SidewaysLift = .17f;
+    public float MaxVelLift = 10f;
     public float VelPullUp = 1f;
-    public bool HasFlaps = true;
     public bool HasLandingGear = true;
     public float LandingGearDragMulti = 1.6f;
+    public bool HasFlaps = true;
     public float FlapsDragMulti = 1.8f;
     public float FlapsLiftMulti = 1.35f;
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;

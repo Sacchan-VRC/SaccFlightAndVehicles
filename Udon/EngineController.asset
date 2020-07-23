@@ -30,16 +30,16 @@ MonoBehaviour:
     MaxAngleOfAttackYaw\r\n    .export AoaCurveStrength\r\n    .export HighAoaMinControlPitch\r\n
     \   .export HighAoaMinControlYaw\r\n    .export HighPitchAoaMinLift\r\n    .export
     HighYawAoaMinLift\r\n    .export TaxiRotationSpeed\r\n    .export VelLiftCoefficient\r\n
-    \   .export MaxVelLift\r\n    .export SidewaysLift\r\n    .export VelPullUp\r\n
-    \   .export HasFlaps\r\n    .export HasLandingGear\r\n    .export LandingGearDragMulti\r\n
-    \   .export FlapsDragMulti\r\n    .export FlapsLiftMulti\r\n    .export Health\r\n
-    \   .export SeaLevel\r\n    .export AtmosphereThinningStart\r\n    .export AtmosphereThinningEnd\r\n
-    \   .sync Health, none\r\n    .sync Throttle, none\r\n    .sync CurrentVel, none\r\n
-    \   .sync Gs, none\r\n    .sync GearUp, none\r\n    .sync Flaps, none\r\n    .sync
-    Occupied, none\r\n    .sync AngleOfAttack, none\r\n\r\n    __refl_const_intnl_udonTypeID:
-    %SystemInt64, null\r\n    __refl_const_intnl_udonTypeName: %SystemString, null\r\n
-    \   HasFlaps: %SystemBoolean, null\r\n    HasLandingGear: %SystemBoolean, null\r\n
-    \   VehicleMainObj: %UnityEngineGameObject, null\r\n    AccelerationResponse:
+    \   .export SidewaysLift\r\n    .export MaxVelLift\r\n    .export VelPullUp\r\n
+    \   .export HasLandingGear\r\n    .export LandingGearDragMulti\r\n    .export
+    HasFlaps\r\n    .export FlapsDragMulti\r\n    .export FlapsLiftMulti\r\n    .export
+    Health\r\n    .export SeaLevel\r\n    .export AtmosphereThinningStart\r\n    .export
+    AtmosphereThinningEnd\r\n    .sync Health, none\r\n    .sync Throttle, none\r\n
+    \   .sync CurrentVel, none\r\n    .sync Gs, none\r\n    .sync GearUp, none\r\n
+    \   .sync Flaps, none\r\n    .sync Occupied, none\r\n    .sync AngleOfAttack,
+    none\r\n\r\n    __refl_const_intnl_udonTypeID: %SystemInt64, null\r\n    __refl_const_intnl_udonTypeName:
+    %SystemString, null\r\n    HasFlaps: %SystemBoolean, null\r\n    HasLandingGear:
+    %SystemBoolean, null\r\n    VehicleMainObj: %UnityEngineGameObject, null\r\n    AccelerationResponse:
     %SystemSingle, null\r\n    AirFriction: %SystemSingle, null\r\n    AoaCurveStrength:
     %SystemSingle, null\r\n    AtmosphereThinningEnd: %SystemSingle, null\r\n    AtmosphereThinningStart:
     %SystemSingle, null\r\n    EngineSpoolDownSpeedMulti: %SystemSingle, null\r\n
@@ -3859,7 +3859,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: MaxVelLift
+      Data: SidewaysLift
     - Name: $v
       Entry: 7
       Data: 140|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3880,10 +3880,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: MaxVelLift
+      Data: SidewaysLift
     - Name: symbolUniqueName
       Entry: 1
-      Data: MaxVelLift
+      Data: SidewaysLift
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3916,7 +3916,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: SidewaysLift
+      Data: MaxVelLift
     - Name: $v
       Entry: 7
       Data: 143|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3937,10 +3937,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: SidewaysLift
+      Data: MaxVelLift
     - Name: symbolUniqueName
       Entry: 1
-      Data: SidewaysLift
+      Data: MaxVelLift
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4030,7 +4030,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HasFlaps
+      Data: HasLandingGear
     - Name: $v
       Entry: 7
       Data: 149|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -4057,10 +4057,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: HasFlaps
+      Data: HasLandingGear
     - Name: symbolUniqueName
       Entry: 1
-      Data: HasFlaps
+      Data: HasLandingGear
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4093,7 +4093,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HasLandingGear
+      Data: LandingGearDragMulti
     - Name: $v
       Entry: 7
       Data: 153|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -4102,7 +4102,7 @@ MonoBehaviour:
       Data: 154|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 151
+      Data: 39
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -4111,13 +4111,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: HasLandingGear
+      Data: LandingGearDragMulti
     - Name: symbolUniqueName
       Entry: 1
-      Data: HasLandingGear
+      Data: LandingGearDragMulti
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4150,7 +4150,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LandingGearDragMulti
+      Data: HasFlaps
     - Name: $v
       Entry: 7
       Data: 156|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -4159,7 +4159,7 @@ MonoBehaviour:
       Data: 157|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 39
+      Data: 151
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -4168,13 +4168,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: LandingGearDragMulti
+      Data: HasFlaps
     - Name: symbolUniqueName
       Entry: 1
-      Data: LandingGearDragMulti
+      Data: HasFlaps
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
