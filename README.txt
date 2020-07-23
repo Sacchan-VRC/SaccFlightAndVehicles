@@ -5,6 +5,13 @@ https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Major Changes in 1.2
+•New Lift model, not floaty any more
+•Customizable lift based on Angle of Attack, allowing stalls
+•Square input on control stick
+•'Exponant' option on control stick for more precise control
+•Invert control inputs if plane is moving backwards
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Major Changes in 1.17
 •Added fully animated HUD
 •Added mannable AAGun
