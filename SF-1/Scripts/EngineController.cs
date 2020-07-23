@@ -15,25 +15,25 @@ public class EngineController : UdonSharpBehaviour
     public Transform CenterOfMass;
     public Transform PitchMoment;
     public Transform YawMoment;
-    public float ThrustVecStrPitch = 0f;
-    public float ThrustVecStrYaw = 0f;
-    public float ThrustVecStrRoll = 0f;
     public float ThrottleStrength = 25f;
     public float AccelerationResponse = 4.5f;
     public float EngineSpoolDownSpeedMulti = .5f;
     public float AirFriction = 0.036f;
-    public float RollStrength = 450f;
-    public float RollFriction = 90f;
-    public float RollResponse = 12f;
-    public float ReversingRollStrengthMulti = 1.6f;//reversing = AoA > 90
     public float PitchStrength = 5f;
+    public float PitchThrustVecStr = 0f;
     public float PitchFriction = 24f;
     public float PitchResponse = 12f;
     public float ReversingPitchStrengthMulti = 2;
     public float YawStrength = 3f;
+    public float YawThrustVecStr = 0f;
     public float YawFriction = 15f;
     public float YawResponse = 12f;
     public float ReversingYawStrengthMulti = 2.4f;
+    public float RollStrength = 450f;
+    public float RollThrustVecStr = 0f;
+    public float RollFriction = 90f;
+    public float RollResponse = 12f;
+    public float ReversingRollStrengthMulti = 1.6f;//reversing = AoA > 90
     public float PitchDownStrMulti = .8f;
     public float PitchDownLiftMulti = .8f;
     public float RotMultiMaxSpeed = 220f;
@@ -151,9 +151,9 @@ public class EngineController : UdonSharpBehaviour
 
         //used to set each rotation axis' reversing behaviour to inverted if 0 thrust vectoring, and not inverted if thrust vectoring is non-zero.
         //the variables are called 'Zero' because they ask if thrustvec is set to 0.
-        ReversingPitchStrengthZero = ThrustVecStrPitch == 0 ? -ReversingPitchStrengthMulti : 1;
-        ReversingYawStrengthZero = ThrustVecStrYaw == 0 ? -ReversingYawStrengthMulti : 1;
-        ReversingRollStrengthZero = ThrustVecStrRoll == 0 ? -ReversingRollStrengthMulti : 1;
+        ReversingPitchStrengthZero = PitchThrustVecStr == 0 ? -ReversingPitchStrengthMulti : 1;
+        ReversingYawStrengthZero = YawThrustVecStr == 0 ? -ReversingYawStrengthMulti : 1;
+        ReversingRollStrengthZero = RollThrustVecStr == 0 ? -ReversingRollStrengthMulti : 1;
     }
     private void Update()
     {
@@ -353,9 +353,9 @@ public class EngineController : UdonSharpBehaviour
 
             //thrust vecotring airplanes have a minimum rotation speed
             minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
-            pitch *= Mathf.Max(ThrustVecStrPitch, minlifttemp);
-            yaw *= Mathf.Max(ThrustVecStrYaw, minlifttemp);
-            roll *= Mathf.Max(ThrustVecStrRoll, minlifttemp);
+            pitch *= Mathf.Max(PitchThrustVecStr, minlifttemp);
+            yaw *= Mathf.Max(YawThrustVecStr, minlifttemp);
+            roll *= Mathf.Max(RollThrustVecStr, minlifttemp);
 
 
 
