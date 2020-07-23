@@ -7,10 +7,11 @@ Feel free to give feedback or ask questions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Major Changes in 1.2
 •New Lift model, not floaty any more
-•Customizable lift based on Angle of Attack, allowing stalls
-•Square input on control stick
+•Customizable lift based on angle of attack, allowing stalls
+•Square input on control stick, so that controller users don't have disadvantage against keyboard users
 •'Exponant' option on control stick for more precise control
 •Invert control inputs if plane is moving backwards
+•Seperate thrust vectoring axis'
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Major Changes in 1.17
 •Added fully animated HUD
@@ -87,16 +88,9 @@ the two above combined should allow for more boring plane physics
 This package contains the air vehicles and scripts I've been working on. I hope to provide an example of avatar flight and air vehicles people can use as a base to create their own. Feel free to use it however you want.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-important changes in the SF-1's hierarchy since the last version:
-HUDController is now only enabled when inside the vehicle.
-The leave buttons are now children of the HUDController object, just to make the explosion animation simpler. Disabling them in the explosion animation and using write defaults when not exploding means they need a parent to be disabled.
+important changes users of the previous version should know about:
+angular drag is now set to 0 on the rigidbody.
 
-
-HUDController's bigstuff object is scaled to 8000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 if you plan on editing HUD elements.
-
-To update from the previous version, make sure all the object references are set, and there are no missing references in the animations.
-
-The Gun_pilot now is set to not collide with Playerlocal layer. The plane is set to PlayerLocal for the pilot when he enters, and reverted back to Walkthrough when he leaves.
 
 The prefab uses station triggers, which currently are currently a bit awkward to use. You must set the inspector to debug mode in order to assign them. Enter the name of a public function that is on the script running on this objects UdonBehaviour.
 This prefab is only using On Local Player Exit Station, and the function names used for it are PilotLeave, PassengerLeave and GunnerLeave.
@@ -116,11 +110,15 @@ All planes always react to inputs in the editor play mode.
 It's probably best to break my prefab and remake your own after you've modified the vehicles to your liking and understand how everything works.
 If you've made you own vehicle and it's having trouble taking off, try adjusting the center of mass and pitch moment positions
 
-Performance seemed to be suffering a little in testing, I hope to find ways to optimize it in future.
+HUDController is only enabled when inside the vehicle.
+The leave buttons are children of the HUDController object, just to make the explosion animation simpler. Disabling them in the explosion animation and using write defaults when not exploding means they would need a parent in order to be disabled anyway.
+
+HUDController's bigstuff object is scaled to 8000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 if you plan on editing HUD elements.
+
+The Gun_pilot now is set to not collide with reserved2 layer. The plane is set to reserved2 for the pilot when he enters, so that he can't shoot himself, and reverted back to Walkthrough when he leaves.
 
 
-There are 15 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
-
+There are 20 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
 
 SF-1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -137,11 +135,10 @@ Arrow Up / W: Pitch Down
 Arrow Down / S: Pitch Up
 Arrow Left / A: Roll Left
 Arrow Right / D: Roll Right
-Space: Thrust Up (Helicopter)
+F: Toggle Flaps
+G: Toggle Landing Gear
 
 Controls VR:
-Left Stick Up: Pitch Down
-Left Stick Down: Pitch Up
 Left Stick Left: Yaw Left
 Left Stick Right: Yaw Right
 Right Stick Up: Pitch Down
@@ -158,9 +155,6 @@ Variables:
 Vehicle Main Obj
 The script needs access to the Vehicle's main object.
 
-Ground Detector
-Empty object who's location is used to detect whether or not the vehicle is touching the ground. If gear is down the code traces from it's position, local down 44cm, and if it hits something it enables taxxiing. Including the vehicle itself, so place it between the wheels or something.
-
 Effects Control
 Effects controller goes in here, used to access variables in effects controller
 
@@ -170,68 +164,105 @@ Sound controller goes in here, used to access variables in sound controller
 Hud Control
 Hud controller goes in here, used to access variables in hud controller
 
+Ground Detector
+Empty object who's location is used to detect whether or not the vehicle is touching the ground. If gear is down the code traces from it's position, local down 44cm, and if it hits something it enables taxxiing. Including the vehicle itself, so place it between the wheels or something.
+
 Center of Mass (new in 1.1)
 The aircraft's center of mass. Useful to adjust how long it takes to take off.
 
 Pitch Moment (new in 1.04)
-The point at which force is added to make the vehicle pitch. If not set, vehicle will rotate around center of mass. When set, Pitch Strength will likely need to be set to a much lower value.
+The point at which force is added to make the vehicle pitch. If not set, script will fail.
 
-Airplane Thrust Vectoring (new in 1.01)
-Tick if you want an airplane to be able to turn quickly even at low speeds.
-
-Airplane Thrust Vec Str (new in 1.04)
-minimum rotatation speed value for vehicles that are moving slowly. Only affects if Airplane Thrust Vectoring is enabled.
+Yaw Moment (new in 1.2)
+The point at which force is added to make the vehicle yaw. If not set, script will fail.
 
 Throttle Strength Forward
 Value put into the Constant Force's value corresponding to forward.
+
+Acceleration Response
+How long it takes for the throttle to reach max after you press and hold it (it's lerped).
+
+Engine Spool Down Speed Multi
+Multiplies the number above but for when you're slowing down the engine.
 
 Air Friction
 Amount per frame the vehicle's velocity is lerped towards MaxSpeed.
 
 Pitch Strength
-Value put into the Constant Force's value corresponding to Pitch.
-
 Yaw Strength
-Value put into the Constant Force's value corresponding to Yaw.
-
 Roll Strength
-Value put into the Constant Force's value corresponding to Roll.
+Strength of the rotation on the respective axis
 
-Acceleration Response
-How long it takes for the throttle to reach max after you press and hold it (it's lerped).
+Pitch Thrust Vec Str (new in 1.2)
+Yaw Thrust Vec Str
+Roll Thrust Vec Str
+Minimum rotational strength for each axis. If non-zero then the plane will not invert it's rotation controls on that axis when moving backwards.
 
-Rotation Response
-How long it takes for the rotation to reach max after you press and hold it (it's lerped).
+Pitch Friction (new in 1.2)
+Yaw Friction
+Roll Friction
+How much friction is applied to stop you from moving on each axis.
 
-Vel Straighten Str Pitch
-How much the the vehicle's nose is pulled toward the direction of movement on the pitch axis (uses the constantforce).
+Pitch Response (new in 1.2)
+Yaw Response
+Roll Response
+How long it takes for the rotational inputs to reach max after you press and hold it (it's lerped).
 
-Vel Straighten Str Yaw
-How much the the vehicle's nose is pulled toward the direction of movement on the yaw axis (uses the constantforce).
+Reversing Pitch Strength Multi (new in 1.2)
+Reversing Yaw Strength Multi
+Reversing Roll Strength Multi
+When moving backwards through the air, your plane's rotational inputs can but multiplied. Does'nt effect axis with thrust vectoring enabled.
 
-Taxi Rotation Speed
-Degrees per second the vehicle rotates on the ground. Uses simple object rotation, no physics, should probably be improved.
-
-Airplane Pitch Down Str Ratio
+Pitch Down Str Multi
 Allows you to set a seperate rotation speed for pulling down.
 
-Airplane Lift
-Amount of lift the wings generate. Or amount of local thrust upward generated when your velocity vector is toward the bottom of your vehicle, and vice-versa.
+Pitch Down Lift Multi
+Allows you to generate less lift from pulling down. (air hitting the top of your plane)
+
+Rot Multi Max Speed (new in 1.2)
+Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear.
+
+Stick Input Power (new in 1.2)
+Applies a response curve to the rotational inputs. 1 = linear, >1 = flatter then vertical, <1 = more vertical, then gets flatter
+see this to understand and help tweak: https://www.wolframalpha.com/input/?i=x%5E1.7
+
+Vel Straighten Str Pitch
+How much the the vehicle's nose is pulled toward the direction of movement on the pitch axis.
+
+Vel Straighten Str Yaw
+How much the the vehicle's nose is pulled toward the direction of movement on the yaw axis.
+
+Max Angle Of Attack Pitch (new in 1.2)
+Max Angle Of Attack Yaw
+Angle of attack above which the plane will lose control.
+
+Aoa Curve Strength (new in 1.2)
+Shape of the angle of attack lift curve.
+See this to understand (the 2 in the input represents this value): https://www.wolframalpha.com/input/?i=-%28%281-x%29%5E2%29%2B1
+
+High Aoa Mine Control Pitch (new in 1.2)
+High Aoa Mine Control Yaw
+The angle of attack curve is augmented by being MAX'd(taking the higher value) with a linear curve that is multiplied by this number.
+Use this value to decide how much control the plane has when beyond it's 'max' angle of attack.
+
+High Pitch Aoa Min Lift (new in 1.2)
+High Yaw Aoa Min Lift
+When the plane is is at a high angle of attack you can give it a minimum amount of lift/drag, so that it doesn't just lose all air resistance.
+
+Taxi Rotation Speed
+Degrees per second the vehicle rotates on the ground. Uses simple object rotation with a lerp, no real physics to it.
 
 Airplane Vel Lift Coefficient (new in 1.01)
-Adjust the curve of how much more lift is generated from moving faster.
+Adjust how long the lift curve is. Higher = more lift
 
-Airplane Pull Down Lift Ratio
-Allows you to generate less lift from pulling down.
-
-Airplane Sideways Lift
+Sideways Lift
 How much angle of attack on yaw affects vehicles velocity vector. Yaw steering strength?
+
+Max Vel Lift (new in 1.2)
+Maximum value for lift, as it's exponential it's wise to stop it at some point.
 
 Airplane Vel Pull up
 Vehicle will pull up slightly depending on it's speed multiplied by this value. Used to counter the fact that without it, your nose will slowly point down.
-
-Airplane Roll Friction (new in 1.1)
-How quickly the plane will stop rolling after you let go of roll controls. Also increases the faster you go.
 
 Has Flaps (new in 1.1)
 Whether or not the vehicle has flaps and does physics/animations for them.
@@ -239,17 +270,17 @@ Whether or not the vehicle has flaps and does physics/animations for them.
 Has Landing Gear (new in 1.1)
 Whether or not the vehicle has landing gear and does physics/animations for them.
 
-Landing Gear Drag Multi (new in 1.1)
-How much extra drag you incur from having landing gear deployed.
-
 Flap Drag Multi (new in 1.1)
 How much extra drag you incur from having flaps deployed.
+
+Landing Gear Drag Multi (new in 1.1)
+How much extra drag you incur from having landing gear deployed.
 
 Flaps Lift Multi (new in 1.1)
 How much extra lift the flaps give you.
 
 Health
-Total health of the plane
+Max health of the plane.
 
 Sea Level
 Height of the sea in global coordinates, the hud's height is based with this at 0. Plane will instantly explode if below this height.
@@ -270,6 +301,9 @@ Variables:
 
 Vehicle Main Obj
 The script needs access to the Vehicle's main object.
+
+Engine Control
+Engine Controller is needed to know vehicle's control inputs.
 
 Pilot Seat Station
 Needs the pilot's station to eject the player when exploded.
@@ -295,20 +329,6 @@ These rotate to point forward as speed increases.
 Enginefire L
 Enginefire R
 Scaled larger on Z with throttle, disappear if too small.
-
-Mach Vapor
-Particle System that appears when you are going approximately mach 1.
-
-G Vapor L
-G Vapor R
-Particle system that appears when pulling Gs.
-
-Wing Trail L
-Wing Trail R
-Trail renderers that start emitting when you pull enough Gs. Located on the wing tips.
-
-Trail Gs
-How many Gs you have to pull before wing trails starts appearing.
 
 Max Gs
 amount of Gs at which you will take damage if you go past. You take damage of 15 per second per G above MaxGs. This is what hurts you when you crash too.
