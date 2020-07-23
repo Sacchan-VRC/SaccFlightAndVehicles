@@ -15,13 +15,17 @@ public class VehicleRespawnButton : UdonSharpBehaviour
             Networking.SetOwner(EngineControl.localPlayer, VehicleMainObj);
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
             VehicleMainObj.transform.position = new Vector3(VehicleMainObj.transform.position.x, -10000, VehicleMainObj.transform.position.z);
-            EngineControl.EffectsControl.DoEffects = 6;
             EngineControl.GearUp = false;
             EngineControl.Flaps = true;
             EngineControl.Health = EngineControl.FullHealth;
-            EngineControl.dead = true;//this makes it invincible and unable to be respawned again for 5s
-            EngineControl.EffectsControl.PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead
-            EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ButtonRespawn");
         }
+    }
+    public void ButtonRespawn()
+    {
+        EngineControl.EffectsControl.DoEffects = 6;
+        EngineControl.dead = true;//this makes it invincible and unable to be respawned again for 5s
+        EngineControl.EffectsControl.PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead
+        EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
     }
 }

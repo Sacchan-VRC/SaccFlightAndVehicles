@@ -48,7 +48,8 @@ public class EngineController : UdonSharpBehaviour
     public float HighPitchAoaMinLift = 0.2f;
     public float HighYawAoaMinLift = 0.2f;
     public float TaxiRotationSpeed = 35f;
-    public float VelLiftCoefficient = 0.000112f;
+    public float TaxiRotationResponse = 2.5f;
+    public float Lift = 0.000112f;
     public float SidewaysLift = .17f;
     public float MaxVelLift = 10f;
     public float VelPullUp = 1f;
@@ -289,7 +290,7 @@ public class EngineController : UdonSharpBehaviour
 
                 if (Taxiing)
                 {
-                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, yawinput * TaxiRotationSpeed * Time.deltaTime, 1.5f * Time.deltaTime);
+                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, yawinput * TaxiRotationSpeed * Time.deltaTime, TaxiRotationResponse * Time.deltaTime);
                     VehicleMainObj.transform.Rotate(Vector3.up, Taxiinglerper);
                 }
                 else
@@ -348,7 +349,7 @@ public class EngineController : UdonSharpBehaviour
             AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
             //speed related values
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
-            SpeedLiftFactor = Mathf.Clamp(CurrentVel.magnitude * CurrentVel.magnitude * VelLiftCoefficient, 0, MaxVelLift);
+            SpeedLiftFactor = Mathf.Clamp(CurrentVel.magnitude * CurrentVel.magnitude * Lift, 0, MaxVelLift);
             rotlift = CurrentVel.magnitude / RotMultiMaxSpeed;//using a simple linear curve for increasing control as you move faster
 
             //thrust vecotring airplanes have a minimum rotation speed
