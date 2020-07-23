@@ -17,13 +17,13 @@ MonoBehaviour:
   udonAssembly: ".data_start\r\n\r\n    .export VehicleMainObj\r\n    .export EffectsControl\r\n
     \   .export SoundControl\r\n    .export HUDControl\r\n    .export GroundDetector\r\n
     \   .export CenterOfMass\r\n    .export PitchMoment\r\n    .export YawMoment\r\n
-    \   .export ThrustVecStrPitch\r\n    .export ThrustVecStrYaw\r\n    .export ThrustVecStrRoll\r\n
     \   .export ThrottleStrength\r\n    .export AccelerationResponse\r\n    .export
-    EngineSpoolDownSpeedMulti\r\n    .export AirFriction\r\n    .export RollStrength\r\n
-    \   .export RollFriction\r\n    .export RollResponse\r\n    .export ReversingRollStrengthMulti\r\n
-    \   .export PitchStrength\r\n    .export PitchFriction\r\n    .export PitchResponse\r\n
+    EngineSpoolDownSpeedMulti\r\n    .export AirFriction\r\n    .export PitchStrength\r\n
+    \   .export PitchThrustVecStr\r\n    .export PitchFriction\r\n    .export PitchResponse\r\n
     \   .export ReversingPitchStrengthMulti\r\n    .export YawStrength\r\n    .export
-    YawFriction\r\n    .export YawResponse\r\n    .export ReversingYawStrengthMulti\r\n
+    YawThrustVecStr\r\n    .export YawFriction\r\n    .export YawResponse\r\n    .export
+    ReversingYawStrengthMulti\r\n    .export RollStrength\r\n    .export RollThrustVecStr\r\n
+    \   .export RollFriction\r\n    .export RollResponse\r\n    .export ReversingRollStrengthMulti\r\n
     \   .export PitchDownStrMulti\r\n    .export PitchDownLiftMulti\r\n    .export
     RotMultiMaxSpeed\r\n    .export StickInputPower\r\n    .export VelStraightenStrPitch\r\n
     \   .export VelStraightenStrYaw\r\n    .export MaxAngleOfAttackPitch\r\n    .export
@@ -51,34 +51,33 @@ MonoBehaviour:
     %SystemSingle, null\r\n    MaxVelLift: %SystemSingle, null\r\n    PitchDownLiftMulti:
     %SystemSingle, null\r\n    PitchDownStrMulti: %SystemSingle, null\r\n    PitchFriction:
     %SystemSingle, null\r\n    PitchResponse: %SystemSingle, null\r\n    PitchStrength:
-    %SystemSingle, null\r\n    ReversingPitchStrengthMulti: %SystemSingle, null\r\n
-    \   ReversingRollStrengthMulti: %SystemSingle, null\r\n    ReversingYawStrengthMulti:
-    %SystemSingle, null\r\n    RollFriction: %SystemSingle, null\r\n    RollResponse:
-    %SystemSingle, null\r\n    RollStrength: %SystemSingle, null\r\n    RotMultiMaxSpeed:
-    %SystemSingle, null\r\n    SeaLevel: %SystemSingle, null\r\n    SidewaysLift:
-    %SystemSingle, null\r\n    StickInputPower: %SystemSingle, null\r\n    TaxiRotationSpeed:
-    %SystemSingle, null\r\n    ThrottleStrength: %SystemSingle, null\r\n    ThrustVecStrPitch:
-    %SystemSingle, null\r\n    ThrustVecStrRoll: %SystemSingle, null\r\n    ThrustVecStrYaw:
-    %SystemSingle, null\r\n    VelLiftCoefficient: %SystemSingle, null\r\n    VelPullUp:
-    %SystemSingle, null\r\n    VelStraightenStrPitch: %SystemSingle, null\r\n    VelStraightenStrYaw:
-    %SystemSingle, null\r\n    YawFriction: %SystemSingle, null\r\n    YawResponse:
-    %SystemSingle, null\r\n    YawStrength: %SystemSingle, null\r\n    CenterOfMass:
-    %UnityEngineTransform, null\r\n    GroundDetector: %UnityEngineTransform, null\r\n
-    \   PitchMoment: %UnityEngineTransform, null\r\n    YawMoment: %UnityEngineTransform,
-    null\r\n    EffectsControl: %VRCUdonUdonBehaviour, null\r\n    HUDControl: %VRCUdonUdonBehaviour,
-    null\r\n    SoundControl: %VRCUdonUdonBehaviour, null\r\n    dead: %SystemBoolean,
-    null\r\n    Flaps: %SystemBoolean, null\r\n    GearUp: %SystemBoolean, null\r\n
-    \   Occupied: %SystemBoolean, null\r\n    Passenger: %SystemBoolean, null\r\n
-    \   Piloting: %SystemBoolean, null\r\n    Taxiing: %SystemBoolean, null\r\n    VehicleConstantForce:
-    %UnityEngineConstantForce, null\r\n    Af: %SystemInt32, null\r\n    Df: %SystemInt32,
-    null\r\n    downf: %SystemInt32, null\r\n    Ef: %SystemInt32, null\r\n    leftf:
-    %SystemInt32, null\r\n    Qf: %SystemInt32, null\r\n    rightf: %SystemInt32,
-    null\r\n    Sf: %SystemInt32, null\r\n    shiftf: %SystemInt32, null\r\n    upf:
-    %SystemInt32, null\r\n    Wf: %SystemInt32, null\r\n    VehicleRigidbody: %UnityEngineRigidbody,
-    null\r\n    AngleOfAttack: %SystemSingle, null\r\n    AngleOfAttackPitch: %SystemSingle,
-    null\r\n    AngleOfAttackYaw: %SystemSingle, null\r\n    AoALiftPitch: %SystemSingle,
-    null\r\n    AoALiftPitchMin: %SystemSingle, null\r\n    AoALiftYaw: %SystemSingle,
-    null\r\n    AoALiftYawMin: %SystemSingle, null\r\n    AtmoshpereFadeDistance:
+    %SystemSingle, null\r\n    PitchThrustVecStr: %SystemSingle, null\r\n    ReversingPitchStrengthMulti:
+    %SystemSingle, null\r\n    ReversingRollStrengthMulti: %SystemSingle, null\r\n
+    \   ReversingYawStrengthMulti: %SystemSingle, null\r\n    RollFriction: %SystemSingle,
+    null\r\n    RollResponse: %SystemSingle, null\r\n    RollStrength: %SystemSingle,
+    null\r\n    RollThrustVecStr: %SystemSingle, null\r\n    RotMultiMaxSpeed: %SystemSingle,
+    null\r\n    SeaLevel: %SystemSingle, null\r\n    SidewaysLift: %SystemSingle,
+    null\r\n    StickInputPower: %SystemSingle, null\r\n    TaxiRotationSpeed: %SystemSingle,
+    null\r\n    ThrottleStrength: %SystemSingle, null\r\n    VelLiftCoefficient: %SystemSingle,
+    null\r\n    VelPullUp: %SystemSingle, null\r\n    VelStraightenStrPitch: %SystemSingle,
+    null\r\n    VelStraightenStrYaw: %SystemSingle, null\r\n    YawFriction: %SystemSingle,
+    null\r\n    YawResponse: %SystemSingle, null\r\n    YawStrength: %SystemSingle,
+    null\r\n    YawThrustVecStr: %SystemSingle, null\r\n    CenterOfMass: %UnityEngineTransform,
+    null\r\n    GroundDetector: %UnityEngineTransform, null\r\n    PitchMoment: %UnityEngineTransform,
+    null\r\n    YawMoment: %UnityEngineTransform, null\r\n    EffectsControl: %VRCUdonUdonBehaviour,
+    null\r\n    HUDControl: %VRCUdonUdonBehaviour, null\r\n    SoundControl: %VRCUdonUdonBehaviour,
+    null\r\n    dead: %SystemBoolean, null\r\n    Flaps: %SystemBoolean, null\r\n
+    \   GearUp: %SystemBoolean, null\r\n    Occupied: %SystemBoolean, null\r\n    Passenger:
+    %SystemBoolean, null\r\n    Piloting: %SystemBoolean, null\r\n    Taxiing: %SystemBoolean,
+    null\r\n    VehicleConstantForce: %UnityEngineConstantForce, null\r\n    Af: %SystemInt32,
+    null\r\n    Df: %SystemInt32, null\r\n    downf: %SystemInt32, null\r\n    Ef:
+    %SystemInt32, null\r\n    leftf: %SystemInt32, null\r\n    Qf: %SystemInt32, null\r\n
+    \   rightf: %SystemInt32, null\r\n    Sf: %SystemInt32, null\r\n    shiftf: %SystemInt32,
+    null\r\n    upf: %SystemInt32, null\r\n    Wf: %SystemInt32, null\r\n    VehicleRigidbody:
+    %UnityEngineRigidbody, null\r\n    AngleOfAttack: %SystemSingle, null\r\n    AngleOfAttackPitch:
+    %SystemSingle, null\r\n    AngleOfAttackYaw: %SystemSingle, null\r\n    AoALiftPitch:
+    %SystemSingle, null\r\n    AoALiftPitchMin: %SystemSingle, null\r\n    AoALiftYaw:
+    %SystemSingle, null\r\n    AoALiftYawMin: %SystemSingle, null\r\n    AtmoshpereFadeDistance:
     %SystemSingle, null\r\n    Atmosphere: %SystemSingle, null\r\n    AtmosphereHeightThing:
     %SystemSingle, null\r\n    downspeed: %SystemSingle, null\r\n    FlapsDrag: %SystemSingle,
     null\r\n    FlapsGearDrag: %SystemSingle, null\r\n    FlapsLift: %SystemSingle,
@@ -327,7 +326,7 @@ MonoBehaviour:
     \       PUSH, AtmosphereHeightThing\r\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __5_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    ThrustVecStrPitch\r\n        PUSH, __5_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemBoolean\r\n
+    PitchThrustVecStr\r\n        PUSH, __5_intnl_SystemSingle\r\n        PUSH, __1_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemSingle.__op_Equality__SystemSingle_SystemSingle__SystemBoolean\"\r\n
     \       PUSH, __1_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000002C8\r\n
     \       PUSH, ReversingPitchStrengthMulti\r\n        PUSH, ReversingPitchStrengthZero\r\n
@@ -336,7 +335,7 @@ MonoBehaviour:
     ReversingPitchStrengthZero\r\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n
     \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __6_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    ThrustVecStrYaw\r\n        PUSH, __6_intnl_SystemSingle\r\n        PUSH, __2_intnl_SystemBoolean\r\n
+    YawThrustVecStr\r\n        PUSH, __6_intnl_SystemSingle\r\n        PUSH, __2_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemSingle.__op_Equality__SystemSingle_SystemSingle__SystemBoolean\"\r\n
     \       PUSH, __2_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x00000348\r\n
     \       PUSH, ReversingYawStrengthMulti\r\n        PUSH, ReversingYawStrengthZero\r\n
@@ -345,7 +344,7 @@ MonoBehaviour:
     ReversingYawStrengthZero\r\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n
     \       PUSH, __0_const_intnl_SystemInt32\r\n        PUSH, __7_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\r\n        PUSH,
-    ThrustVecStrRoll\r\n        PUSH, __7_intnl_SystemSingle\r\n        PUSH, __3_intnl_SystemBoolean\r\n
+    RollThrustVecStr\r\n        PUSH, __7_intnl_SystemSingle\r\n        PUSH, __3_intnl_SystemBoolean\r\n
     \       EXTERN, \"SystemSingle.__op_Equality__SystemSingle_SystemSingle__SystemBoolean\"\r\n
     \       PUSH, __3_intnl_SystemBoolean\r\n        JUMP_IF_FALSE, 0x000003C8\r\n
     \       PUSH, ReversingRollStrengthMulti\r\n        PUSH, ReversingRollStrengthZero\r\n
@@ -991,17 +990,17 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineMathf.__Min__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, rotlift\r\n        PUSH, __75_intnl_SystemSingle\r\n        PUSH,
     minlifttemp\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
-    \       PUSH, ThrustVecStrPitch\r\n        PUSH, minlifttemp\r\n        PUSH,
+    \       PUSH, PitchThrustVecStr\r\n        PUSH, minlifttemp\r\n        PUSH,
     __76_intnl_SystemSingle\r\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, pitch\r\n        PUSH, __76_intnl_SystemSingle\r\n        PUSH,
     __77_intnl_SystemSingle\r\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __77_intnl_SystemSingle\r\n        PUSH, pitch\r\n        COPY\r\n
-    \       PUSH, ThrustVecStrYaw\r\n        PUSH, minlifttemp\r\n        PUSH, __78_intnl_SystemSingle\r\n
+    \       PUSH, YawThrustVecStr\r\n        PUSH, minlifttemp\r\n        PUSH, __78_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, yaw\r\n        PUSH, __78_intnl_SystemSingle\r\n        PUSH, __79_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, __79_intnl_SystemSingle\r\n        PUSH, yaw\r\n        COPY\r\n
-    \       PUSH, ThrustVecStrRoll\r\n        PUSH, minlifttemp\r\n        PUSH, __80_intnl_SystemSingle\r\n
+    \       PUSH, RollThrustVecStr\r\n        PUSH, minlifttemp\r\n        PUSH, __80_intnl_SystemSingle\r\n
     \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\r\n
     \       PUSH, roll\r\n        PUSH, __80_intnl_SystemSingle\r\n        PUSH, __81_intnl_SystemSingle\r\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\r\n
@@ -1916,7 +1915,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ThrustVecStrPitch
+      Data: ThrottleStrength
     - Name: $v
       Entry: 7
       Data: 37|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1943,10 +1942,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: ThrustVecStrPitch
+      Data: ThrottleStrength
     - Name: symbolUniqueName
       Entry: 1
-      Data: ThrustVecStrPitch
+      Data: ThrottleStrength
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1979,7 +1978,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ThrustVecStrYaw
+      Data: AccelerationResponse
     - Name: $v
       Entry: 7
       Data: 41|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2000,10 +1999,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: ThrustVecStrYaw
+      Data: AccelerationResponse
     - Name: symbolUniqueName
       Entry: 1
-      Data: ThrustVecStrYaw
+      Data: AccelerationResponse
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2036,7 +2035,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ThrustVecStrRoll
+      Data: EngineSpoolDownSpeedMulti
     - Name: $v
       Entry: 7
       Data: 44|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2057,10 +2056,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: ThrustVecStrRoll
+      Data: EngineSpoolDownSpeedMulti
     - Name: symbolUniqueName
       Entry: 1
-      Data: ThrustVecStrRoll
+      Data: EngineSpoolDownSpeedMulti
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2093,7 +2092,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ThrottleStrength
+      Data: AirFriction
     - Name: $v
       Entry: 7
       Data: 47|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2114,10 +2113,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: ThrottleStrength
+      Data: AirFriction
     - Name: symbolUniqueName
       Entry: 1
-      Data: ThrottleStrength
+      Data: AirFriction
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2150,7 +2149,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AccelerationResponse
+      Data: PitchStrength
     - Name: $v
       Entry: 7
       Data: 50|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2171,10 +2170,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AccelerationResponse
+      Data: PitchStrength
     - Name: symbolUniqueName
       Entry: 1
-      Data: AccelerationResponse
+      Data: PitchStrength
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2207,7 +2206,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: EngineSpoolDownSpeedMulti
+      Data: PitchThrustVecStr
     - Name: $v
       Entry: 7
       Data: 53|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2228,10 +2227,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: EngineSpoolDownSpeedMulti
+      Data: PitchThrustVecStr
     - Name: symbolUniqueName
       Entry: 1
-      Data: EngineSpoolDownSpeedMulti
+      Data: PitchThrustVecStr
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2264,7 +2263,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirFriction
+      Data: PitchFriction
     - Name: $v
       Entry: 7
       Data: 56|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2285,10 +2284,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirFriction
+      Data: PitchFriction
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirFriction
+      Data: PitchFriction
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2321,7 +2320,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RollStrength
+      Data: PitchResponse
     - Name: $v
       Entry: 7
       Data: 59|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2342,10 +2341,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RollStrength
+      Data: PitchResponse
     - Name: symbolUniqueName
       Entry: 1
-      Data: RollStrength
+      Data: PitchResponse
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2378,7 +2377,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RollFriction
+      Data: ReversingPitchStrengthMulti
     - Name: $v
       Entry: 7
       Data: 62|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2399,10 +2398,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RollFriction
+      Data: ReversingPitchStrengthMulti
     - Name: symbolUniqueName
       Entry: 1
-      Data: RollFriction
+      Data: ReversingPitchStrengthMulti
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2435,7 +2434,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RollResponse
+      Data: YawStrength
     - Name: $v
       Entry: 7
       Data: 65|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2456,10 +2455,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RollResponse
+      Data: YawStrength
     - Name: symbolUniqueName
       Entry: 1
-      Data: RollResponse
+      Data: YawStrength
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2492,7 +2491,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ReversingRollStrengthMulti
+      Data: YawThrustVecStr
     - Name: $v
       Entry: 7
       Data: 68|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2513,10 +2512,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: ReversingRollStrengthMulti
+      Data: YawThrustVecStr
     - Name: symbolUniqueName
       Entry: 1
-      Data: ReversingRollStrengthMulti
+      Data: YawThrustVecStr
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2549,7 +2548,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PitchStrength
+      Data: YawFriction
     - Name: $v
       Entry: 7
       Data: 71|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2570,10 +2569,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PitchStrength
+      Data: YawFriction
     - Name: symbolUniqueName
       Entry: 1
-      Data: PitchStrength
+      Data: YawFriction
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2606,7 +2605,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PitchFriction
+      Data: YawResponse
     - Name: $v
       Entry: 7
       Data: 74|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2627,10 +2626,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PitchFriction
+      Data: YawResponse
     - Name: symbolUniqueName
       Entry: 1
-      Data: PitchFriction
+      Data: YawResponse
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2663,7 +2662,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PitchResponse
+      Data: ReversingYawStrengthMulti
     - Name: $v
       Entry: 7
       Data: 77|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2684,10 +2683,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PitchResponse
+      Data: ReversingYawStrengthMulti
     - Name: symbolUniqueName
       Entry: 1
-      Data: PitchResponse
+      Data: ReversingYawStrengthMulti
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2720,7 +2719,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ReversingPitchStrengthMulti
+      Data: RollStrength
     - Name: $v
       Entry: 7
       Data: 80|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2741,10 +2740,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: ReversingPitchStrengthMulti
+      Data: RollStrength
     - Name: symbolUniqueName
       Entry: 1
-      Data: ReversingPitchStrengthMulti
+      Data: RollStrength
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2777,7 +2776,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: YawStrength
+      Data: RollThrustVecStr
     - Name: $v
       Entry: 7
       Data: 83|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2798,10 +2797,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: YawStrength
+      Data: RollThrustVecStr
     - Name: symbolUniqueName
       Entry: 1
-      Data: YawStrength
+      Data: RollThrustVecStr
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2834,7 +2833,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: YawFriction
+      Data: RollFriction
     - Name: $v
       Entry: 7
       Data: 86|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2855,10 +2854,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: YawFriction
+      Data: RollFriction
     - Name: symbolUniqueName
       Entry: 1
-      Data: YawFriction
+      Data: RollFriction
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2891,7 +2890,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: YawResponse
+      Data: RollResponse
     - Name: $v
       Entry: 7
       Data: 89|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2912,10 +2911,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: YawResponse
+      Data: RollResponse
     - Name: symbolUniqueName
       Entry: 1
-      Data: YawResponse
+      Data: RollResponse
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2948,7 +2947,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ReversingYawStrengthMulti
+      Data: ReversingRollStrengthMulti
     - Name: $v
       Entry: 7
       Data: 92|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2969,10 +2968,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: ReversingYawStrengthMulti
+      Data: ReversingRollStrengthMulti
     - Name: symbolUniqueName
       Entry: 1
-      Data: ReversingYawStrengthMulti
+      Data: ReversingRollStrengthMulti
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
