@@ -5,6 +5,9 @@ https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix 1.21
+Fixed plane not exploding in editor test
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Major Changes in 1.2
 Huge code changes in this version, back up your projects.
 •New Lift model, not floaty any more
@@ -266,7 +269,7 @@ Degrees per second the vehicle rotates on the ground. Uses simple object rotatio
 Taxi Rotation Response
 How smoothed the taxi movement rotation is
 
-Airplane Vel Lift Coefficient (new in 1.01)
+Lift
 Adjust how long the lift curve is. Higher = more lift
 
 Sideways Lift

@@ -104,7 +104,7 @@ public class EngineController : UdonSharpBehaviour
     private float AoALiftPitch;
     private Vector3 Pitching;
     private Vector3 Yawing;
-    private float Taxiinglerper;
+    [System.NonSerializedAttribute] [HideInInspector] public float Taxiinglerper;
     private float AoALiftYawMin;
     private float AoALiftPitchMin;
     private float SpeedLiftFactor;

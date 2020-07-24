@@ -255,7 +255,7 @@ public class EffectsController : UdonSharpBehaviour
 
         EngineControl.dead = true;
 
-        if (EngineControl.localPlayer.IsOwner(gameObject))
+        if (EngineControl.localPlayer == null || EngineControl.localPlayer.IsOwner(gameObject))
         {
             EngineControl.GearUp = true;//prevent touchdown sound
             EngineControl.CurrentVel = Vector3.zero;

@@ -62,6 +62,7 @@ public class PilotSeat : UdonSharpBehaviour
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
         if (EnableOther != null) { EnableOther.SetActive(false); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
+        if (EngineControl != null) { EngineControl.Taxiinglerper = 0; }
         //set plane's layer back
         if (PlaneMesh != null)
         {
