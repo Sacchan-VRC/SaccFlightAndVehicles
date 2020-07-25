@@ -29,7 +29,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.EffectsControl.isfiring = false;
             EngineControl.EffectsControl.Smoking = false;
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
-            EngineControl.EffectsControl.RGriplastframetrigger = true; //prevent instant flares drop on enter
+            EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
         }
         if (EngineControl.HUDControl != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject); }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }

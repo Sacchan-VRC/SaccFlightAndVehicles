@@ -41,14 +41,12 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 enginefirelerper = new Vector3(1, 0, 1);
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
-    private float LGrip;
-    private float RGrip;
-    [System.NonSerializedAttribute] [HideInInspector] public bool RGriplastframetrigger;
-    private bool LGriplastframetrigger;
+    private float LTrigger;
+    private bool LTriggerlastframetrigger;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool isfiring = false;
-    private float LTrigger = 0;
+    private float RTrigger = 0;
     private void Start()
     {
         if (VehicleMainObj != null) { PlaneAnimator = VehicleMainObj.GetComponent<Animator>(); }
@@ -85,9 +83,9 @@ public class EffectsController : UdonSharpBehaviour
         {
             if (EngineControl.localPlayer == null || EngineControl.Piloting)
             {
-                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                 //Firing the gun
-                if (LTrigger >= 0.75 || Input.GetKey(KeyCode.Space))
+                if (RTrigger > 0.75 || Input.GetKey(KeyCode.Space))
                 {
                     isfiring = true;
                 }
@@ -95,34 +93,19 @@ public class EffectsController : UdonSharpBehaviour
                 {
                     isfiring = false;
                 }
-                //Deploy Flares
-                RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
-                if (RGrip >= 0.75 && !RGriplastframetrigger || (Input.GetKeyDown(KeyCode.X)))
-                {
-                    if (EngineControl.localPlayer == null) { PlaneAnimator.SetTrigger("flares"); }//editor
-                    else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DropFlares"); }//ingame
-                    if (!Input.GetKeyDown(KeyCode.X))
-                    {
-                        RGriplastframetrigger = true;
-                    }
-                }
-                else if (RGrip < 0.75 && RGriplastframetrigger)
-                {
-                    RGriplastframetrigger = false;
-                }
                 //Display Smoke
-                LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
-                if (LGrip >= 0.75 && !LGriplastframetrigger || (Input.GetKeyDown(KeyCode.C)))
+                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                if (LTrigger >= 0.75 && !LTriggerlastframetrigger || (Input.GetKeyDown(KeyCode.C)))
                 {
                     Smoking = !Smoking;
                     if (!Input.GetKeyDown(KeyCode.C))
                     {
-                        LGriplastframetrigger = true;
+                        LTriggerlastframetrigger = true;
                     }
                 }
-                else if (LGrip < 0.75 && LGriplastframetrigger)
+                else if (LTrigger < 0.75 && LTriggerlastframetrigger)
                 {
-                    LGriplastframetrigger = false;
+                    LTriggerlastframetrigger = false;
                 }
 
 
