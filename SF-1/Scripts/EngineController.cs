@@ -67,8 +67,22 @@ public class EngineController : UdonSharpBehaviour
     private float LerpedYaw;
     Vector2 Lstick;
     Vector2 Rstick = new Vector2(0, 0);
-    private float RTrigger;
-    private float LTrigger;
+    private float LGrip;
+    public bool LGripLastFrame = false;
+    Vector3 JoystickPos;
+    Quaternion PlaneRotDif;
+    Quaternion PlaneRotAtPress;
+    Quaternion PlaneRotDifSincePressed;
+    Quaternion JoystickDifference;
+    Quaternion JoystickZeroPoint;
+    Quaternion PlaneRotLastFrame;
+    float ThrottleDifference;
+    float VRThrottle;
+    float TempThrottle;
+    float handpos;
+    float ThrottleZeroPoint;
+    private float RGrip;
+    public bool RGripLastFrame = false;
     private float downspeed;
     private float sidespeed;
     [System.NonSerializedAttribute] [HideInInspector] private float ThrottleInput = 0f;
@@ -131,6 +145,8 @@ public class EngineController : UdonSharpBehaviour
     private float ReversingPitchStrengthZero;
     private float ReversingYawStrengthZero;
     private float ReversingRollStrengthZero;
+    public Transform DEBUGGER;
+    public bool testjoy;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -190,13 +206,61 @@ public class EngineController : UdonSharpBehaviour
                 //Lstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                 Rstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
                 Rstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
+                RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                 //MouseX = Input.GetAxisRaw("Mouse X");
                 //MouseY = Input.GetAxisRaw("Mouse Y");
 
+                //VR Joystickd
+                if (RGrip > 0.75)
+                //if (testjoy)
+                {
+                    PlaneRotDif = VehicleMainObj.transform.rotation * Quaternion.Inverse(PlaneRotLastFrame);
+                    PlaneRotDifSincePressed = PlaneRotDif * PlaneRotDifSincePressed;
+                    JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane
+                    if (!RGripLastFrame)
+                    {
+                        PlaneRotDifSincePressed = VehicleMainObj.transform.rotation;
+                        JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
+                        //JoystickZeroPoint = DEBUGGER.rotation;
+                    }
+                    // Quaternion temprot = Quaternion.Inverse(PlaneRotDifSincePressed) * DEBUGGER.rotation;
+                    Quaternion temprot = Quaternion.Inverse(PlaneRotDifSincePressed) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
+                    JoystickDifference = temprot * Quaternion.Inverse(JoystickZeroPoint);
+                    JoystickPos = (JoystickDifference * VehicleMainObj.transform.up);
+                    Rstick = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;
+
+                    RGripLastFrame = true;
+                }
+                else
+                {
+                    JoystickPos = Vector3.zero;
+                    RGripLastFrame = false;
+                }
+                PlaneRotLastFrame = VehicleMainObj.transform.rotation;
+
+                //VR Throttle
+                if (LGrip > 0.75)
+                {
+                    handpos = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position).z;
+                    if (!LGripLastFrame)
+                    {
+                        ThrottleZeroPoint = handpos;
+                        TempThrottle = VRThrottle;
+                    }
+                    ThrottleDifference = ThrottleZeroPoint - handpos;
+                    ThrottleDifference *= -3;
+
+                    VRThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
+                    LGripLastFrame = true;
+                }
+                else if (LGrip < 0.75)
+                {
+                    LGripLastFrame = false;
+                }
+
                 //inputs to forward thrust
-                ThrottleInput = (Mathf.Max(RTrigger, shiftf)); //for throttle effects
+                ThrottleInput = (Mathf.Max(VRThrottle, shiftf)); //for throttle effects
 
                 //making a circular control stick square for better control
                 if (Mathf.Abs(Rstick.x) > Mathf.Abs(Rstick.y))
