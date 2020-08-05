@@ -65,7 +65,9 @@ public class EngineController : UdonSharpBehaviour
     private float LerpedRoll;
     private float LerpedPitch;
     private float LerpedYaw;
-    Vector2 Lstick;
+    private Vector2 Lstick;
+    private Vector2 RStick;
+    [System.NonSerializedAttribute] [HideInInspector] public int RStickSelection = 1;
     Vector2 VRRollYawInput = new Vector2(0, 0);
     private float LGrip;
     [System.NonSerializedAttribute] [HideInInspector] public bool LGripLastFrame = false;
@@ -203,13 +205,35 @@ public class EngineController : UdonSharpBehaviour
                 rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
                 shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
                 Lstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                //Lstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                VRRollYawInput.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                VRRollYawInput.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                Lstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                RStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                RStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                 LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
                 RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                 //MouseX = Input.GetAxisRaw("Mouse X");
                 //MouseY = Input.GetAxisRaw("Mouse Y");
+
+                //RStick Selection wheel
+                if (RStick.magnitude > .5f)
+                {
+                    float stickdir = Vector2.SignedAngle(new Vector2(-1f, 1), RStick);
+                    if (stickdir > 90)//down
+                    {
+                        RStickSelection = 3;//bombs
+                    }
+                    else if (stickdir > 0)//left
+                    {
+                        RStickSelection = 4;//flares
+                    }
+                    else if (stickdir > -90)//up
+                    {
+                        RStickSelection = 1;//machine gun
+                    }
+                    else//right
+                    {
+                        RStickSelection = 2;//missile
+                    }
+                }
 
                 //VR Joystick
                 if (RGrip > 0.75)
@@ -228,11 +252,28 @@ public class EngineController : UdonSharpBehaviour
                     VRRollYawInput = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;//easier just to override the right stick, this way the squaring gets applied too
 
                     RGripLastFrame = true;
+                    //making a circular joy stick square
+                    if (Mathf.Abs(VRRollYawInput.x) > Mathf.Abs(VRRollYawInput.y))
+                    {
+                        if (Mathf.Abs(VRRollYawInput.x) != 0)
+                        {
+                            temp = VRRollYawInput.magnitude / Mathf.Abs(VRRollYawInput.x);
+                            VRRollYawInput *= temp;
+                        }
+                    }
+                    else
+                    {
+                        if (Mathf.Abs(VRRollYawInput.y) != 0)
+                        {
+                            temp = VRRollYawInput.magnitude / Mathf.Abs(VRRollYawInput.y);
+                            VRRollYawInput *= temp;
+                        }
+                    }
                 }
                 else
                 {
                     JoystickPosYaw.x = 0;
-                    JoystickPos = Vector3.zero;
+                    VRRollYawInput = Vector3.zero;
                     RGripLastFrame = false;
                 }
                 PlaneRotLastFrame = VehicleMainObj.transform.rotation;
@@ -247,36 +288,17 @@ public class EngineController : UdonSharpBehaviour
                         TempThrottle = VRThrottle;
                     }
                     ThrottleDifference = ThrottleZeroPoint - handpos;
-                    ThrottleDifference *= -3;
+                    ThrottleDifference *= -6;
 
                     VRThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
                     LGripLastFrame = true;
                 }
-                else if (LGrip < 0.75)
+                else
                 {
                     LGripLastFrame = false;
                 }
 
-                //inputs to forward thrust
-                ThrottleInput = (Mathf.Max(VRThrottle, shiftf)); //for throttle effects
 
-                //making a circular control stick square for better control
-                if (Mathf.Abs(VRRollYawInput.x) > Mathf.Abs(VRRollYawInput.y))
-                {
-                    if (Mathf.Abs(VRRollYawInput.x) != 0)
-                    {
-                        temp = VRRollYawInput.magnitude / Mathf.Abs(VRRollYawInput.x);
-                        VRRollYawInput *= temp;
-                    }
-                }
-                else
-                {
-                    if (Mathf.Abs(VRRollYawInput.y) != 0)
-                    {
-                        temp = VRRollYawInput.magnitude / Mathf.Abs(VRRollYawInput.y);
-                        VRRollYawInput *= temp;
-                    }
-                }
                 /*//make square for left stick
                 if (Mathf.Abs(Lstick.x) > Mathf.Abs(Lstick.y))
                 {
@@ -297,6 +319,8 @@ public class EngineController : UdonSharpBehaviour
                     }
                 } */
 
+                //inputs to forward thrust
+                ThrottleInput = (Mathf.Max(VRThrottle, shiftf)); //for throttle effects
 
                 //combine inputs and clamp
                 //these are used by effectscontroller

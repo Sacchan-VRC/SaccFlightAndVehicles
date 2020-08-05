@@ -26,7 +26,7 @@ public class PilotSeat : UdonSharpBehaviour
         }
         if (EngineControl.EffectsControl != null)
         {
-            EngineControl.EffectsControl.isfiring = false;
+            EngineControl.EffectsControl.IsFiringGun = false;
             EngineControl.EffectsControl.Smoking = false;
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
@@ -50,20 +50,28 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public void PilotLeave()
     {
-        if (EngineControl != null) { EngineControl.Piloting = false; EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel); }
+        if (EngineControl != null)
+        {
+            EngineControl.Piloting = false;
+            EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+            EngineControl.Taxiinglerper = 0;
+            EngineControl.VRThrottle = 0;
+            EngineControl.LGripLastFrame = false;
+            EngineControl.RGripLastFrame = false;
+        }
         if (Saccflight != null) { Saccflight.SetActive(true); }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
         if (EngineControl.EffectsControl != null)
         {
-            EngineControl.EffectsControl.isfiring = false;
+            EngineControl.EffectsControl.IsFiringGun = false;
             EngineControl.EffectsControl.Smoking = false;
+            EngineControl.EffectsControl.LTriggerlastframe = false;
+            EngineControl.EffectsControl.RTriggerlastframe = false;
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
         if (EnableOther != null) { EnableOther.SetActive(false); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
-        if (EngineControl != null) { EngineControl.Taxiinglerper = 0; }
-        if (EngineControl != null) { EngineControl.VRThrottle = 0; }
         //set plane's layer back
         if (PlaneMesh != null)
         {
