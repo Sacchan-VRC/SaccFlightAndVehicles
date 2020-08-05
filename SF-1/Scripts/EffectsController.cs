@@ -10,6 +10,7 @@ public class EffectsController : UdonSharpBehaviour
     public EngineController EngineControl;
     public VRCStation PilotSeatStation; //so you can leave when exploded
     public VRCStation PassengerSeatStation; // so you can leave when exploded
+    public Transform JoyStick;
     public Transform AileronL;
     public Transform AileronR;
     public Transform Canards;
@@ -83,6 +84,7 @@ public class EffectsController : UdonSharpBehaviour
         {
             if (EngineControl.localPlayer == null || EngineControl.Piloting)
             {
+                PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
                 RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                 //Firing the gun
                 if (RTrigger > 0.75 || Input.GetKey(KeyCode.Space))
@@ -109,10 +111,15 @@ public class EffectsController : UdonSharpBehaviour
                 }
 
 
+
             }
             rotationinputs.x = EngineControl.pitchinput * 25;
             rotationinputs.y = EngineControl.yawinput * 20;
             rotationinputs.z = EngineControl.rollinput * 35;
+
+            //joystick movement
+            Vector3 tempjoy = new Vector3(rotationinputs.x * 1.8f, -rotationinputs.z * 1.285714f, rotationinputs.y);//x and y to 45 degrees
+            JoyStick.localRotation = Quaternion.Euler(tempjoy);
 
             //G Damage
             if (!EngineControl.dead)

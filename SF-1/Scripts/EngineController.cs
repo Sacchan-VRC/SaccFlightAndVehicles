@@ -66,9 +66,9 @@ public class EngineController : UdonSharpBehaviour
     private float LerpedPitch;
     private float LerpedYaw;
     Vector2 Lstick;
-    Vector2 Rstick = new Vector2(0, 0);
+    Vector2 VRRollYawInput = new Vector2(0, 0);
     private float LGrip;
-    public bool LGripLastFrame = false;
+    [System.NonSerializedAttribute] [HideInInspector] public bool LGripLastFrame = false;
     Vector3 JoystickPos;
     Quaternion PlaneRotDif;
     Quaternion PlaneRotAtPress;
@@ -77,15 +77,15 @@ public class EngineController : UdonSharpBehaviour
     Quaternion JoystickZeroPoint;
     Quaternion PlaneRotLastFrame;
     float ThrottleDifference;
-    float VRThrottle;
+    [System.NonSerializedAttribute] [HideInInspector] public float VRThrottle;
     float TempThrottle;
     float handpos;
     float ThrottleZeroPoint;
     private float RGrip;
-    public bool RGripLastFrame = false;
+    [System.NonSerializedAttribute] [HideInInspector] public bool RGripLastFrame = false;
     private float downspeed;
     private float sidespeed;
-    [System.NonSerializedAttribute] [HideInInspector] private float ThrottleInput = 0f;
+    [System.NonSerializedAttribute] [HideInInspector] public float ThrottleInput = 0f;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Throttle = 0f;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 CurrentVel = new Vector3(0, 0, 0);
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Gs = 1f;
@@ -145,8 +145,8 @@ public class EngineController : UdonSharpBehaviour
     private float ReversingPitchStrengthZero;
     private float ReversingYawStrengthZero;
     private float ReversingRollStrengthZero;
-    public Transform DEBUGGER;
-    public bool testjoy;
+    Vector3 JoystickPosYaw;
+
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -172,7 +172,7 @@ public class EngineController : UdonSharpBehaviour
         ReversingYawStrengthZero = YawThrustVecStr == 0 ? -ReversingYawStrengthMulti : 1;
         ReversingRollStrengthZero = RollThrustVecStr == 0 ? -ReversingRollStrengthMulti : 1;
     }
-    private void Update()
+    private void LateUpdate()
     {
         if (GroundDetector != null)
         {
@@ -204,36 +204,34 @@ public class EngineController : UdonSharpBehaviour
                 shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
                 Lstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                 //Lstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                Rstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                Rstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                VRRollYawInput.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                VRRollYawInput.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                 LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
                 RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                 //MouseX = Input.GetAxisRaw("Mouse X");
                 //MouseY = Input.GetAxisRaw("Mouse Y");
 
-                //VR Joystickd
+                //VR Joystick
                 if (RGrip > 0.75)
-                //if (testjoy)
                 {
-                    PlaneRotDif = VehicleMainObj.transform.rotation * Quaternion.Inverse(PlaneRotLastFrame);
-                    PlaneRotDifSincePressed = PlaneRotDif * PlaneRotDifSincePressed;
-                    JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane
-                    if (!RGripLastFrame)
+                    PlaneRotDif = VehicleMainObj.transform.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
+                    JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
+                    if (!RGripLastFrame)//first frame you pressed it?
                     {
-                        PlaneRotDifSincePressed = VehicleMainObj.transform.rotation;
-                        JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
-                        //JoystickZeroPoint = DEBUGGER.rotation;
+                        PlaneRotDif = Quaternion.identity;
+                        JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
                     }
-                    // Quaternion temprot = Quaternion.Inverse(PlaneRotDifSincePressed) * DEBUGGER.rotation;
-                    Quaternion temprot = Quaternion.Inverse(PlaneRotDifSincePressed) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
-                    JoystickDifference = temprot * Quaternion.Inverse(JoystickZeroPoint);
+                    //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
+                    JoystickDifference = (Quaternion.Inverse(VehicleMainObj.transform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
+                    JoystickPosYaw = (JoystickDifference * VehicleMainObj.transform.forward);//angles to vector
                     JoystickPos = (JoystickDifference * VehicleMainObj.transform.up);
-                    Rstick = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;
+                    VRRollYawInput = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;//easier just to override the right stick, this way the squaring gets applied too
 
                     RGripLastFrame = true;
                 }
                 else
                 {
+                    JoystickPosYaw.x = 0;
                     JoystickPos = Vector3.zero;
                     RGripLastFrame = false;
                 }
@@ -263,20 +261,20 @@ public class EngineController : UdonSharpBehaviour
                 ThrottleInput = (Mathf.Max(VRThrottle, shiftf)); //for throttle effects
 
                 //making a circular control stick square for better control
-                if (Mathf.Abs(Rstick.x) > Mathf.Abs(Rstick.y))
+                if (Mathf.Abs(VRRollYawInput.x) > Mathf.Abs(VRRollYawInput.y))
                 {
-                    if (Mathf.Abs(Rstick.x) != 0)
+                    if (Mathf.Abs(VRRollYawInput.x) != 0)
                     {
-                        temp = Rstick.magnitude / Mathf.Abs(Rstick.x);
-                        Rstick *= temp;
+                        temp = VRRollYawInput.magnitude / Mathf.Abs(VRRollYawInput.x);
+                        VRRollYawInput *= temp;
                     }
                 }
                 else
                 {
-                    if (Mathf.Abs(Rstick.y) != 0)
+                    if (Mathf.Abs(VRRollYawInput.y) != 0)
                     {
-                        temp = Rstick.magnitude / Mathf.Abs(Rstick.y);
-                        Rstick *= temp;
+                        temp = VRRollYawInput.magnitude / Mathf.Abs(VRRollYawInput.y);
+                        VRRollYawInput *= temp;
                     }
                 }
                 /*//make square for left stick
@@ -302,14 +300,17 @@ public class EngineController : UdonSharpBehaviour
 
                 //combine inputs and clamp
                 //these are used by effectscontroller
-                pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */Rstick.y + Wf + Sf + downf + upf), -1, 1);
-                yawinput = Mathf.Clamp((Lstick.x + Qf + Ef), -1, 1);
-                rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */Rstick.x + Af + Df + leftf + rightf) * -1), -1, 1);
+                pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf), -1, 1);
+                yawinput = Mathf.Clamp((Lstick.x + Qf + Ef + JoystickPosYaw.x), -1, 1);
+                rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRRollYawInput.x + Af + Df + leftf + rightf) * -1), -1, 1);
 
                 //ability to adjust input to be more precise at low amounts. 'exponant'
-                pitchinput = pitchinput > 0 ? Mathf.Pow(pitchinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(pitchinput), StickInputPower);
-                yawinput = yawinput > 0 ? Mathf.Pow(yawinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(yawinput), StickInputPower);
-                rollinput = rollinput > 0 ? Mathf.Pow(rollinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(rollinput), StickInputPower);
+                if (!RGripLastFrame)//only do power if not using Virtual joystick
+                {
+                    pitchinput = pitchinput > 0 ? Mathf.Pow(pitchinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(pitchinput), StickInputPower);
+                    yawinput = yawinput > 0 ? Mathf.Pow(yawinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(yawinput), StickInputPower);
+                    rollinput = rollinput > 0 ? Mathf.Pow(rollinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(rollinput), StickInputPower);
+                }
 
                 //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
                 if ((Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.forward) > 0))//normal, moving forward
