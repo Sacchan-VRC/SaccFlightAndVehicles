@@ -289,7 +289,7 @@ public class SoundController : UdonSharpBehaviour
 
         if (GunSound != null)
         {
-            if (EngineControl.EffectsControl.isfiring && !EngineControl.SoundControl.silent)
+            if (EngineControl.EffectsControl.IsFiringGun && !EngineControl.SoundControl.silent)
             {
                 GunSound.pitch = Mathf.Clamp(((EngineControl.SoundControl.Doppler - 1) * .3f) + 1, 0, 1.2f);
                 if (!GunSound.isPlaying)
@@ -305,7 +305,7 @@ public class SoundController : UdonSharpBehaviour
                     GunSound.volume = Mathf.Lerp(GunSound.volume, GunSoundInitialVolume, 9f * Time.deltaTime);
                 }
             }
-            else if (!EngineControl.EffectsControl.isfiring || EngineControl.SoundControl.silent && GunSound.isPlaying)
+            else if (!EngineControl.EffectsControl.IsFiringGun || EngineControl.SoundControl.silent && GunSound.isPlaying)
             {
                 GunSound.Stop();
             }

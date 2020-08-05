@@ -43,11 +43,12 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
     private float LTrigger;
-    private bool LTriggerlastframetrigger;
+    [System.NonSerializedAttribute] [HideInInspector] public bool LTriggerlastframe;
+    [System.NonSerializedAttribute] [HideInInspector] public bool RTriggerlastframe;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool isfiring = false;
-    private float RTrigger = 0;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
+    private float RTrigger;
     private void Start()
     {
         if (VehicleMainObj != null) { PlaneAnimator = VehicleMainObj.GetComponent<Animator>(); }
@@ -86,28 +87,51 @@ public class EffectsController : UdonSharpBehaviour
             {
                 PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
                 RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                //Firing the gun
+                //Firing selected weapon
                 if (RTrigger > 0.75 || Input.GetKey(KeyCode.Space))
                 {
-                    isfiring = true;
+                    switch (EngineControl.RStickSelection)
+                    {
+                        case 1://machinegun
+                            IsFiringGun = true;
+                            break;
+                        case 2://smoke for now, will be missiles
+                            IsFiringGun = false;
+                            if (!RTriggerlastframe) { Smoking = !Smoking; }
+                            break;
+                        case 3://bombs soon
+                            IsFiringGun = false;
+                            break;
+                        case 4://flares
+                            IsFiringGun = false;
+                            if (!RTriggerlastframe)
+                            {
+                                if (EngineControl.localPlayer == null) { PlaneAnimator.SetTrigger("flares"); }//editor
+                                else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DropFlares"); }//ingame
+                            }
+                            break;
+                    }
+                    RTriggerlastframe = true;
                 }
                 else
                 {
-                    isfiring = false;
+                    IsFiringGun = false;
+                    RTriggerlastframe = false;
                 }
+
                 //Display Smoke
                 LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                if (LTrigger >= 0.75 && !LTriggerlastframetrigger || (Input.GetKeyDown(KeyCode.C)))
+                if (LTrigger >= 0.75 && !LTriggerlastframe || (Input.GetKeyDown(KeyCode.C)))
                 {
                     Smoking = !Smoking;
                     if (!Input.GetKeyDown(KeyCode.C))
                     {
-                        LTriggerlastframetrigger = true;
+                        LTriggerlastframe = true;
                     }
                 }
-                else if (LTrigger < 0.75 && LTriggerlastframetrigger)
+                else if (LTrigger < 0.75 && LTriggerlastframe)
                 {
-                    LTriggerlastframetrigger = false;
+                    LTriggerlastframe = false;
                 }
 
 
@@ -141,7 +165,7 @@ public class EffectsController : UdonSharpBehaviour
         }
         vapor = (EngineControl.CurrentVel.magnitude > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
-        if (isfiring && EngineControl.Occupied) //send firing to animator
+        if (IsFiringGun && EngineControl.Occupied) //send firing to animator
         {
             PlaneAnimator.SetBool("gunfiring", true);
         }
