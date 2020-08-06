@@ -37,7 +37,7 @@ public class EngineController : UdonSharpBehaviour
     public float PitchDownStrMulti = .8f;
     public float PitchDownLiftMulti = .8f;
     public float RotMultiMaxSpeed = 220f;
-    public float StickInputPower = 1.7f;
+    //public float StickInputPower = 1.7f;
     public float VelStraightenStrPitch = 0.035f;
     public float VelStraightenStrYaw = 0.045f;
     public float MaxAngleOfAttackPitch = 25f;
@@ -58,6 +58,12 @@ public class EngineController : UdonSharpBehaviour
     public bool HasFlaps = true;
     public float FlapsDragMulti = 1.8f;
     public float FlapsLiftMulti = 1.35f;
+    public float AirbrakeStrength = 3f;
+    [System.NonSerializedAttribute] [HideInInspector] public bool SafeFlightLimitsEnabled = true;
+    private float GLimitStrength;
+    public float GLimit;
+    public float AoALimit;
+    private float AoALimitStrength;
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
     public float SeaLevel = -100;
     private ConstantForce VehicleConstantForce;
@@ -65,24 +71,36 @@ public class EngineController : UdonSharpBehaviour
     private float LerpedRoll;
     private float LerpedPitch;
     private float LerpedYaw;
-    private Vector2 Lstick;
+    private Vector2 LStick;
     private Vector2 RStick;
-    [System.NonSerializedAttribute] [HideInInspector] public int RStickSelection = 1;
-    Vector2 VRRollYawInput = new Vector2(0, 0);
+    [System.NonSerializedAttribute] [HideInInspector] public int RStickSelection = 0;
+    [System.NonSerializedAttribute] [HideInInspector] public int LStickSelection = 0;
+    private Vector2 VRRollYawInput;
     private float LGrip;
     [System.NonSerializedAttribute] [HideInInspector] public bool LGripLastFrame = false;
+    private float LTrigger;
+    [System.NonSerializedAttribute] [HideInInspector] public bool LTriggerLastFrame = false;
     Vector3 JoystickPos;
+    Vector3 JoystickPosYaw;
     Quaternion PlaneRotDif;
-    Quaternion PlaneRotAtPress;
-    Quaternion PlaneRotDifSincePressed;
     Quaternion JoystickDifference;
     Quaternion JoystickZeroPoint;
     Quaternion PlaneRotLastFrame;
-    float ThrottleDifference;
+    private float ThrottleDifference;
     [System.NonSerializedAttribute] [HideInInspector] public float VRThrottle;
-    float TempThrottle;
-    float handpos;
-    float ThrottleZeroPoint;
+    private float TempThrottle;
+    private float handpos;
+    private float ThrottleZeroPoint;
+    private float TempSpeed;
+    [System.NonSerializedAttribute] [HideInInspector] public float SetSpeed;
+    private float SpeedDifference;
+    private float SpeedZeroPoint;
+    private float AirBrakeInput;
+    private bool AdjustSetSpeedLastFrame = false;
+    [System.NonSerializedAttribute] [HideInInspector] public bool SetSpeedLastFrame = false;
+    private bool ToggleLimitersLastFrame = false;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AirBrake;
+    private float AirBrakeDrag;
     private float RGrip;
     [System.NonSerializedAttribute] [HideInInspector] public bool RGripLastFrame = false;
     private float downspeed;
@@ -130,6 +148,7 @@ public class EngineController : UdonSharpBehaviour
     private int Df;
     private int Qf;
     private int Ef;
+    private int Bf;
     private int upf;
     private int downf;
     private int leftf;
@@ -147,7 +166,6 @@ public class EngineController : UdonSharpBehaviour
     private float ReversingPitchStrengthZero;
     private float ReversingYawStrengthZero;
     private float ReversingRollStrengthZero;
-    Vector3 JoystickPosYaw;
 
     //float MouseX;
     //float MouseY;
@@ -204,12 +222,13 @@ public class EngineController : UdonSharpBehaviour
                 leftf = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
                 rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
                 shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
-                Lstick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                Lstick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                LStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                LStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                 RStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
                 RStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                 LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
                 RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
+                LTrigger = LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                 //MouseX = Input.GetAxisRaw("Mouse X");
                 //MouseY = Input.GetAxisRaw("Mouse Y");
 
@@ -233,6 +252,94 @@ public class EngineController : UdonSharpBehaviour
                     {
                         RStickSelection = 2;//missile
                     }
+                }
+
+                //LStick Selection wheel
+                if (LStick.magnitude > .5f)
+                {
+                    float stickdir = Vector2.SignedAngle(new Vector2(-1f, 1), LStick);
+                    if (stickdir > 90)//down
+                    {
+                        LStickSelection = 3;//AirBrake
+                    }
+                    else if (stickdir > 0)//left
+                    {
+                        LStickSelection = 4;//Toggle Limiters
+                    }
+                    else if (stickdir > -90)//up
+                    {
+                        LStickSelection = 1;//set speed
+                    }
+                    else//right
+                    {
+                        LStickSelection = 2;//gear?hook?
+                    }
+                }
+
+
+                switch (LStickSelection)
+                {
+                    case 0://nothing
+                        break;
+                    case 1://set speed
+                        AirBrakeInput = 0;
+                        if (!SetSpeedLastFrame)
+                        {
+                            SetSpeed = CurrentVel.magnitude;
+                        }
+                        SetSpeedLastFrame = true;
+                        //VR Set Speed
+                        if (LTrigger > 0.75)
+                        {
+                            handpos = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position).z;
+                            if (!AdjustSetSpeedLastFrame)
+                            {
+                                SpeedZeroPoint = handpos;
+                                TempSpeed = SetSpeed;
+                            }
+                            SpeedDifference = SpeedZeroPoint - handpos;
+                            SpeedDifference *= -600;
+
+                            SetSpeed = Mathf.Clamp(TempSpeed + SpeedDifference, 0, 2000);
+                            AdjustSetSpeedLastFrame = true;
+                        }
+                        else { AdjustSetSpeedLastFrame = false; }
+                        ToggleLimitersLastFrame = false;
+                        break;
+                    case 2://gear?hook?
+                        AirBrakeInput = 0;
+                        ToggleLimitersLastFrame = false;
+                        AdjustSetSpeedLastFrame = false;
+                        SetSpeedLastFrame = false;
+                        break;
+                    case 3://AirBrake
+                        AirBrakeInput = LTrigger;
+                        ToggleLimitersLastFrame = false;
+                        AdjustSetSpeedLastFrame = false;
+                        SetSpeedLastFrame = false;
+                        break;
+                    case 4://Toggle Limiters
+                        if (LTrigger > 0.75)
+                        {
+                            if (!ToggleLimitersLastFrame)
+                            {
+                                SafeFlightLimitsEnabled = !SafeFlightLimitsEnabled;
+                            }
+                            ToggleLimitersLastFrame = true;
+                        }
+                        else { ToggleLimitersLastFrame = false; }
+                        AirBrakeInput = 0;
+                        AdjustSetSpeedLastFrame = false;
+                        SetSpeedLastFrame = false;
+                        break;
+                }
+
+                Bf = Input.GetKey(KeyCode.B) ? 1 : 0;
+                AirBrake = Mathf.Lerp(AirBrake, Mathf.Max(AirBrakeInput, Bf), 5 * Time.deltaTime);
+
+                if (Input.GetKey(KeyCode.H))
+                {
+                    SafeFlightLimitsEnabled = !SafeFlightLimitsEnabled;
                 }
 
                 //VR Joystick
@@ -285,7 +392,7 @@ public class EngineController : UdonSharpBehaviour
                     if (!LGripLastFrame)
                     {
                         ThrottleZeroPoint = handpos;
-                        TempThrottle = VRThrottle;
+                        TempThrottle = ThrottleInput;
                     }
                     ThrottleDifference = ThrottleZeroPoint - handpos;
                     ThrottleDifference *= -6;
@@ -320,21 +427,41 @@ public class EngineController : UdonSharpBehaviour
                 } */
 
                 //inputs to forward thrust
-                ThrottleInput = (Mathf.Max(VRThrottle, shiftf)); //for throttle effects
-
+                if (LStickSelection == 1 && !LGripLastFrame)
+                {
+                    if (CurrentVel.magnitude < SetSpeed)
+                    {
+                        ThrottleInput = 1;
+                    }
+                    else
+                    {
+                        ThrottleInput = 0;
+                    }
+                }
+                else
+                {
+                    ThrottleInput = (Mathf.Max(VRThrottle, shiftf)); //for throttle effects
+                }
                 //combine inputs and clamp
                 //these are used by effectscontroller
-                pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf), -1, 1);
-                yawinput = Mathf.Clamp((Lstick.x + Qf + Ef + JoystickPosYaw.x), -1, 1);
+                if (SafeFlightLimitsEnabled && !Taxiing)
+                {
+                    GLimitStrength = Mathf.Clamp(-(Gs / GLimit) + 1, 0, 1);
+                    AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimit) + 1, 0, 1);
+                    pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf), -1, 1) * GLimitStrength * AoALimitStrength;
+                    yawinput = Mathf.Clamp((Qf + Ef + JoystickPosYaw.x), -1, 1) * GLimitStrength * AoALimitStrength;
+                }
+                else
+                {
+                    pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf), -1, 1);
+                    yawinput = Mathf.Clamp((Qf + Ef + JoystickPosYaw.x), -1, 1);
+                }
                 rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRRollYawInput.x + Af + Df + leftf + rightf) * -1), -1, 1);
 
                 //ability to adjust input to be more precise at low amounts. 'exponant'
-                if (!RGripLastFrame)//only do power if not using Virtual joystick
-                {
-                    pitchinput = pitchinput > 0 ? Mathf.Pow(pitchinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(pitchinput), StickInputPower);
-                    yawinput = yawinput > 0 ? Mathf.Pow(yawinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(yawinput), StickInputPower);
-                    rollinput = rollinput > 0 ? Mathf.Pow(rollinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(rollinput), StickInputPower);
-                }
+                /* pitchinput = pitchinput > 0 ? Mathf.Pow(pitchinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(pitchinput), StickInputPower);
+                yawinput = yawinput > 0 ? Mathf.Pow(yawinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(yawinput), StickInputPower);
+                rollinput = rollinput > 0 ? Mathf.Pow(rollinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(rollinput), StickInputPower); */
 
                 //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
                 if ((Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.forward) > 0))//normal, moving forward
@@ -492,7 +619,8 @@ public class EngineController : UdonSharpBehaviour
             {
                 GearDrag = LandingGearDragMulti;
             }
-            FlapsGearDrag = (GearDrag + FlapsDrag) - 1;
+            AirBrakeDrag = AirBrake * AirbrakeStrength;
+            FlapsGearDrag = (GearDrag + FlapsDrag + AirBrakeDrag) - 1;
             //do lift
             Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Side
                 downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch + (SpeedLiftFactor * AoALiftPitch * VelPullUp),// Y Up
