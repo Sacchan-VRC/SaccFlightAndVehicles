@@ -42,12 +42,13 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 enginefirelerper = new Vector3(1, 0, 1);
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
-    private float LTrigger;
+    //private float LTrigger;
     [System.NonSerializedAttribute] [HideInInspector] public bool LTriggerlastframe;
-    [System.NonSerializedAttribute] [HideInInspector] public bool RTriggerlastframe;
+    [System.NonSerializedAttribute] [HideInInspector] public bool RTriggerLastFrame;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
+    private float brake;
     private float RTrigger;
     private void Start()
     {
@@ -92,47 +93,49 @@ public class EffectsController : UdonSharpBehaviour
                 {
                     switch (EngineControl.RStickSelection)
                     {
+                        case 0://nothing
+                            break;
                         case 1://machinegun
                             IsFiringGun = true;
                             break;
                         case 2://smoke for now, will be missiles
                             IsFiringGun = false;
-                            if (!RTriggerlastframe) { Smoking = !Smoking; }
+                            if (!RTriggerLastFrame) { Smoking = !Smoking; }
                             break;
                         case 3://bombs soon
                             IsFiringGun = false;
                             break;
                         case 4://flares
                             IsFiringGun = false;
-                            if (!RTriggerlastframe)
+                            if (!RTriggerLastFrame)
                             {
                                 if (EngineControl.localPlayer == null) { PlaneAnimator.SetTrigger("flares"); }//editor
                                 else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DropFlares"); }//ingame
                             }
                             break;
                     }
-                    RTriggerlastframe = true;
+                    RTriggerLastFrame = true;
                 }
                 else
                 {
                     IsFiringGun = false;
-                    RTriggerlastframe = false;
+                    RTriggerLastFrame = false;
                 }
 
-                //Display Smoke
-                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                if (LTrigger >= 0.75 && !LTriggerlastframe || (Input.GetKeyDown(KeyCode.C)))
-                {
-                    Smoking = !Smoking;
-                    if (!Input.GetKeyDown(KeyCode.C))
-                    {
-                        LTriggerlastframe = true;
-                    }
-                }
-                else if (LTrigger < 0.75 && LTriggerlastframe)
-                {
-                    LTriggerlastframe = false;
-                }
+                /*      //Display Smoke
+                     LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                     if (LTrigger >= 0.75 && !LTriggerlastframe || (Input.GetKeyDown(KeyCode.C)))
+                     {
+                         Smoking = !Smoking;
+                         if (!Input.GetKeyDown(KeyCode.C))
+                         {
+                             LTriggerlastframe = true;
+                         }
+                     }
+                     else if (LTrigger < 0.75 && LTriggerlastframe)
+                     {
+                         LTriggerlastframe = false;
+                     } */
 
 
 
@@ -243,6 +246,7 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
+        PlaneAnimator.SetFloat("brake", EngineControl.AirBrake);
         PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         DoVapor();
     }

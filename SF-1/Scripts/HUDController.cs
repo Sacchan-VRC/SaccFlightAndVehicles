@@ -12,6 +12,7 @@ public class HUDController : UdonSharpBehaviour
     public Text HUDText_G;
     public Text HUDText_mach;
     public Text HUDText_altitude;
+    public Text HUDText_knotstarget;
     public Text HUDText_knots;
     public Text HUDText_angleofattack;
     private string HUDText_angleofattack_temp;
@@ -20,6 +21,7 @@ public class HUDController : UdonSharpBehaviour
     public Transform ElevationIndicator;
     public Transform HeadingIndicator;
     public Transform VelocityIndicator;
+    public GameObject HudSAFE;
     private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
     private float check = 0;
@@ -66,6 +68,18 @@ public class HUDController : UdonSharpBehaviour
         DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, new_z));
         /////////////////
 
+        //SAFE indicator
+        if (EngineControl.SafeFlightLimitsEnabled)
+        {
+            HudSAFE.SetActive(true);
+        }
+        else { HudSAFE.SetActive(false); }
+
+        if (EngineControl.LStickSelection == 1)
+        {
+            HUDText_knotstarget.text = ((EngineControl.SetSpeed) * 1.9438445f).ToString("F0");
+        }
+        else { HUDText_knotstarget.text = string.Empty; }
         if (check > .3)//update text
         {
             if (EngineControl.Gs > maxGs) { maxGs = EngineControl.Gs; }

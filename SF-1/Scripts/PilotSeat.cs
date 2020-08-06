@@ -58,6 +58,10 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.VRThrottle = 0;
             EngineControl.LGripLastFrame = false;
             EngineControl.RGripLastFrame = false;
+            EngineControl.LStickSelection = 0;
+            EngineControl.RStickSelection = 0;
+            EngineControl.AirBrake = 0;
+            EngineControl.SetSpeedLastFrame = false;
         }
         if (Saccflight != null) { Saccflight.SetActive(true); }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
@@ -66,7 +70,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.EffectsControl.IsFiringGun = false;
             EngineControl.EffectsControl.Smoking = false;
             EngineControl.EffectsControl.LTriggerlastframe = false;
-            EngineControl.EffectsControl.RTriggerlastframe = false;
+            EngineControl.EffectsControl.RTriggerLastFrame = false;
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
