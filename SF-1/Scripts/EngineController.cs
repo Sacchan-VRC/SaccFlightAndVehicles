@@ -153,7 +153,7 @@ public class EngineController : UdonSharpBehaviour
     private int downf;
     private int leftf;
     private int rightf;
-    private int shiftf;
+    private int Shiftf;
     private float GearDrag;
     private float FlapsGearDrag;
     private float FlapsDrag;
@@ -166,6 +166,13 @@ public class EngineController : UdonSharpBehaviour
     private float ReversingPitchStrengthZero;
     private float ReversingYawStrengthZero;
     private float ReversingRollStrengthZero;
+    public float Proportional;
+    public float Integral;
+    public float Derivative;
+    public float Integrator;
+    public float IntegratorMax;
+    public float IntegratorMin;
+    private float lastframeerror;
 
     //float MouseX;
     //float MouseY;
@@ -177,6 +184,7 @@ public class EngineController : UdonSharpBehaviour
         VehicleRigidbody = VehicleMainObj.GetComponent<Rigidbody>();
         VehicleConstantForce = VehicleMainObj.GetComponent<ConstantForce>();
         localPlayer = Networking.LocalPlayer;
+        if (localPlayer == null) { Piloting = true; }
 
         float scaleratio = CenterOfMass.transform.lossyScale.magnitude / Vector3.one.magnitude;
         VehicleRigidbody.centerOfMass = CenterOfMass.localPosition * scaleratio;//correct position if scaled
@@ -205,9 +213,10 @@ public class EngineController : UdonSharpBehaviour
 
         if (localPlayer == null || (localPlayer.IsOwner(VehicleMainObj)))//works in editor or ingame
         {
+            CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
             if ((localPlayer == null) || (localPlayer.IsOwner(VehicleMainObj) && !Piloting)) { Occupied = false; } //should make vehicle respawnable if player disconnects while occupying
 
-            if (localPlayer == null || Piloting)
+            if (Piloting)
             {
                 Occupied = true;
                 //collect inputs
@@ -221,7 +230,7 @@ public class EngineController : UdonSharpBehaviour
                 downf = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
                 leftf = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
                 rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
-                shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
+                Shiftf = Input.GetKey(KeyCode.LeftShift) ? 1 : 0;
                 LStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                 LStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                 RStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
@@ -276,7 +285,7 @@ public class EngineController : UdonSharpBehaviour
                     }
                 }
 
-
+                if (Input.GetKey(KeyCode.Alpha1)) LStickSelection = 1;
                 switch (LStickSelection)
                 {
                     case 0://nothing
@@ -287,6 +296,8 @@ public class EngineController : UdonSharpBehaviour
                         {
                             SetSpeed = CurrentVel.magnitude;
                         }
+                        SetSpeed += Shiftf * 90 * Time.deltaTime;
+                        if (Input.GetKey(KeyCode.LeftControl)) SetSpeed -= 90 * Time.deltaTime;
                         SetSpeedLastFrame = true;
                         //VR Set Speed
                         if (LTrigger > 0.75)
@@ -333,11 +344,19 @@ public class EngineController : UdonSharpBehaviour
                         SetSpeedLastFrame = false;
                         break;
                 }
-
-                Bf = Input.GetKey(KeyCode.B) ? 1 : 0;
+                if (Input.GetKey(KeyCode.B))
+                {
+                    Bf = 1;
+                    LStickSelection = 0;
+                    SetSpeedLastFrame = false;
+                }
+                else
+                {
+                    Bf = 0;
+                }
                 AirBrake = Mathf.Lerp(AirBrake, Mathf.Max(AirBrakeInput, Bf), 5 * Time.deltaTime);
 
-                if (Input.GetKey(KeyCode.H))
+                if (Input.GetKeyDown(KeyCode.H))
                 {
                     SafeFlightLimitsEnabled = !SafeFlightLimitsEnabled;
                 }
@@ -406,50 +425,40 @@ public class EngineController : UdonSharpBehaviour
                 }
 
 
-                /*//make square for left stick
-                if (Mathf.Abs(Lstick.x) > Mathf.Abs(Lstick.y))
-                {
-                    if (Mathf.Abs(Lstick.x) != 0)
-                    {
-                        float temp = Lstick.magnitude / Mathf.Abs(Lstick.x);
-                        Lstick.x *= temp;
-                        Lstick.y *= temp;
-                    }
-                }
-                else
-                {
-                    if (Mathf.Abs(Lstick.y) != 0)
-                    {
-                        float temp = Lstick.magnitude / Mathf.Abs(Lstick.y);
-                        Lstick.y *= temp;
-                        Lstick.x *= temp;
-                    }
-                } */
 
-                //inputs to forward thrust
                 if (LStickSelection == 1 && !LGripLastFrame)
                 {
-                    if (CurrentVel.magnitude < SetSpeed)
-                    {
-                        ThrottleInput = 1;
-                    }
-                    else
-                    {
-                        ThrottleInput = 0;
-                    }
+
+                    float error = (SetSpeed - CurrentVel.magnitude);
+
+                    Integrator += error * Time.deltaTime;
+                    Integrator = Mathf.Clamp(Integrator, IntegratorMin, IntegratorMax);
+
+                    //float Derivator = Mathf.Clamp(((error - lastframeerror) / Time.deltaTime),DerivMin, DerivMax);
+
+                    ThrottleInput = Proportional * error;
+
+                    ThrottleInput += Integral * Integrator;
+
+                    //ThrottleInput += Derivative * Derivator; //works but spazzes out real bad
+
+                    ThrottleInput = Mathf.Clamp(ThrottleInput, 0, 1);
+
+                    lastframeerror = error;
+
                 }
                 else
                 {
-                    ThrottleInput = (Mathf.Max(VRThrottle, shiftf)); //for throttle effects
+                    ThrottleInput = (Mathf.Max(VRThrottle, Shiftf)); //for throttle effects
                 }
                 //combine inputs and clamp
                 //these are used by effectscontroller
-                if (SafeFlightLimitsEnabled && !Taxiing)
+                if (SafeFlightLimitsEnabled && !Taxiing && AngleOfAttack < AoALimit)
                 {
                     GLimitStrength = Mathf.Clamp(-(Gs / GLimit) + 1, 0, 1);
                     AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimit) + 1, 0, 1);
-                    pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf), -1, 1) * GLimitStrength * AoALimitStrength;
-                    yawinput = Mathf.Clamp((Qf + Ef + JoystickPosYaw.x), -1, 1) * GLimitStrength * AoALimitStrength;
+                    pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf), -1, 1) * Mathf.Min(GLimitStrength, AoALimitStrength);
+                    yawinput = Mathf.Clamp((Qf + Ef + JoystickPosYaw.x), -1, 1) * Mathf.Min(GLimitStrength, AoALimitStrength);
                 }
                 else
                 {
@@ -564,7 +573,6 @@ public class EngineController : UdonSharpBehaviour
 
             AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
             //speed related values
-            CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
             SpeedLiftFactor = Mathf.Clamp(CurrentVel.magnitude * CurrentVel.magnitude * Lift, 0, MaxVelLift);
             rotlift = CurrentVel.magnitude / RotMultiMaxSpeed;//using a simple linear curve for increasing control as you move faster
 
@@ -641,20 +649,22 @@ public class EngineController : UdonSharpBehaviour
             FinalInputAcc *= Atmosphere;
             VehicleConstantForce.relativeForce = FinalInputAcc;
             VehicleConstantForce.relativeTorque = FinalInputRot;
-
-            //lerp velocity toward 0 to simulate air friction
-            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, (AirFriction * FlapsGearDrag) * Atmosphere * Time.deltaTime);
         }
     }
     private void FixedUpdate()
     {
-        //apply pitching
-        VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);
-        //apply yawing
-        VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
-        //calc Gs
         if (localPlayer == null || localPlayer.IsOwner(VehicleMainObj))
         {
+            //lerp velocity toward 0 to simulate air friction
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, (AirFriction * FlapsGearDrag) * Atmosphere);
+            if (Piloting)
+            {
+                //apply pitching
+                VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);
+                //apply yawing
+                VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
+            }
+            //calc Gs
             LastFrameVel.y += (-9.81f * Time.deltaTime); //add gravity
             Gs = Vector3.Distance(LastFrameVel, VehicleRigidbody.velocity) / (9.81f * Time.deltaTime);
             LastFrameVel = VehicleRigidbody.velocity;

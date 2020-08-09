@@ -84,7 +84,7 @@ public class EffectsController : UdonSharpBehaviour
 
         if (EngineControl.localPlayer == null || (EngineControl.localPlayer.IsOwner(gameObject)))//works in editor or ingame
         {
-            if (EngineControl.localPlayer == null || EngineControl.Piloting)
+            if (EngineControl.Piloting)
             {
                 PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
                 RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
