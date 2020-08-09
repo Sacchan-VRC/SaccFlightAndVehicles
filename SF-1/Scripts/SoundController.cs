@@ -154,7 +154,7 @@ public class SoundController : UdonSharpBehaviour
             {
                 PlaneAfterburner.Play();
             }
-            if (EngineControl.localPlayer == null || EngineControl.Piloting || EngineControl.Passenger)//do this in editor or if you're a pilot or (passenger while pilot is in pilotseat) //!= null to test outside vehicle sounds (don't forget to change it back!)
+            if (EngineControl.Piloting || EngineControl.Passenger)//do this in editor or if you're a pilot or (passenger while pilot is in pilotseat) //!= null to test outside vehicle sounds (don't forget to change it back!)
             {
                 if (Leftplane == false)//change stuff when you get in
                 {
@@ -178,7 +178,7 @@ public class SoundController : UdonSharpBehaviour
                 {
                     PlaneIdle.Stop();
                 }
-                if (EngineControl.localPlayer == null || EngineControl.Piloting || EngineControl.Occupied && EngineControl.Passenger) //you're piloting or someone is piloting and you're a passenger
+                if (EngineControl.Piloting || EngineControl.Occupied && EngineControl.Passenger) //you're piloting or someone is piloting and you're a passenger
                 {
                     if (PlaneInside != null)
                     {
