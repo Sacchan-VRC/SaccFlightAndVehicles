@@ -11,10 +11,12 @@ public class EngineController : UdonSharpBehaviour
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
-    public Transform GroundDetector;
     public Transform CenterOfMass;
     public Transform PitchMoment;
     public Transform YawMoment;
+    public Transform GroundDetector;
+    public Transform HookDetector;
+    public LayerMask HookRopeLayer;
     public float ThrottleStrength = 25f;
     public float AccelerationResponse = 4.5f;
     public float EngineSpoolDownSpeedMulti = .5f;
@@ -56,7 +58,8 @@ public class EngineController : UdonSharpBehaviour
     public float LandingGearDragMulti = 1.6f;
     public float FlapsDragMulti = 1.8f;
     public float FlapsLiftMulti = 1.35f;
-    public float AirbrakeStrength = 3f;
+    public float AirbrakeStrength = 4f;
+    public float HookedBrakeStrength = .0084f;
     [System.NonSerializedAttribute] [HideInInspector] public bool SafeFlightLimitsEnabled = true;
     private float GLimitStrength;
     public float GLimit;
@@ -101,10 +104,9 @@ public class EngineController : UdonSharpBehaviour
     private Vector3 SmokeZeroPoint;
     private Vector3 TempSmokeCol;
     private Vector3 SmokeDifference;
-    private float AirBrakeInput;
+    public float AirBrakeInput;
     [System.NonSerializedAttribute] [HideInInspector] public bool SetSpeedLast = false;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AirBrake;
-    private float AirBrakeDrag;
     private float RGrip;
     [System.NonSerializedAttribute] [HideInInspector] public bool RGripLastFrame = false;
     private float downspeed;
@@ -120,6 +122,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public bool Taxiing = false;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool GearUp = false;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Flaps = true;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool HookDown = false;
     [System.NonSerializedAttribute] [HideInInspector] public float rollinput = 0f;
     [System.NonSerializedAttribute] [HideInInspector] public float pitchinput = 0f;
     [System.NonSerializedAttribute] [HideInInspector] public float yawinput = 0f;
@@ -161,7 +164,7 @@ public class EngineController : UdonSharpBehaviour
     private int rightf;
     private int Shiftf;
     private float GearDrag;
-    private float FlapsGearDrag;
+    private float FlapsGearBrakeDrag;
     private float FlapsDrag;
     private float FlapsLift;
     private float temp;
@@ -174,7 +177,6 @@ public class EngineController : UdonSharpBehaviour
     private float ReversingRollStrengthZero;
     private float CruiseProportional = .1f;
     private float CruiseIntegral = .1f;
-    //private float Derivative;
     private float CruiseIntegrator;
     private float CruiseIntegratorMax = 5;
     private float CruiseIntegratorMin = -5;
@@ -189,7 +191,9 @@ public class EngineController : UdonSharpBehaviour
     private float AltHoldPitchlastframeerror;
     private float AltHoldRollProportional = -.005f;
     private bool LevelFlight;
-
+    [System.NonSerializedAttribute] [HideInInspector] public float Hooked;
+    private Vector3 HookedLoc;
+    private float HookedDrag;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 SmokeColor = new Vector3(1, 1, 1);
 
     //float MouseX;
@@ -261,6 +265,7 @@ public class EngineController : UdonSharpBehaviour
                 LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
                 RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                 LTrigger = LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                 //MouseX = Input.GetAxisRaw("Mouse X");
                 //MouseY = Input.GetAxisRaw("Mouse Y");
 
@@ -399,6 +404,14 @@ public class EngineController : UdonSharpBehaviour
                             LTriggerLastFrame = true;
                             break;
                         case 4://HOOK
+                            if (!LTriggerLastFrame)
+                            {
+                                if (HookDetector != null)
+                                {
+                                    HookDown = !HookDown;
+                                }
+                                Hooked = 0;
+                            }
 
                             AirBrakeInput = 0;
                             SetSpeedLast = false;
@@ -450,19 +463,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     Bf = 0;
                 }
-
-                AirBrake = Mathf.Lerp(AirBrake, Mathf.Max(AirBrakeInput, Bf), 5 * Time.deltaTime);
-
-
-
-
-
-
-
-
-
-
-                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                AirBrake = Mathf.Max(AirBrakeInput, Bf);
 
                 if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha5)))
                 {
@@ -495,7 +496,7 @@ public class EngineController : UdonSharpBehaviour
                             RTriggerLastFrame = true;
                             break;
                         case 5://GEAR
-                            if (!RTriggerLastFrame) GearUp = !GearUp;
+                            if (!RTriggerLastFrame) { GearUp = !GearUp; }
 
                             EffectsControl.IsFiringGun = false;
                             RTriggerLastFrame = true;
@@ -507,6 +508,7 @@ public class EngineController : UdonSharpBehaviour
                             RTriggerLastFrame = true;
                             break;
                         case 7://smoke
+                               //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
                             if (!RTriggerLastFrame)
                             {
                                 if (InVR)
@@ -653,16 +655,7 @@ public class EngineController : UdonSharpBehaviour
                     ThrottleInput = (Mathf.Max(VRThrottle, Shiftf)); //for throttle effects
                 }
 
-
-
-
-
-
-
-
-
-
-
+                //Altitude hold PID Controller
                 if (LevelFlight && !RGripLastFrame)
                 {
                     SafeFlightLimitsEnabled = true;
@@ -860,6 +853,52 @@ public class EngineController : UdonSharpBehaviour
             LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * Time.deltaTime);
             LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * Time.deltaTime);
             LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * Time.deltaTime);
+            if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookRopeLayer))
+            {
+                Debug.Log("workx");
+            }
+            if (HookDown)
+            {
+                if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookRopeLayer) && Hooked < 0 && CurrentVel.magnitude > 25)
+                {
+                    HookedLoc = VehicleMainObj.transform.position;
+                    Hooked = 5f;
+                    if (EffectsControl != null)
+                    {
+                        EffectsControl.PlaneAnimator.SetTrigger("hooked");
+                    }
+                }
+                Hooked -= Time.deltaTime;
+            }
+            if (Hooked > 0f && Taxiing)
+            {
+                if (Vector3.Distance(VehicleMainObj.transform.position, HookedLoc) > 90)//real planes take around 80-90 meters to stop on a carrier
+                {
+                    //if you go furtdher than 90 you snap the rope and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
+                    float damage = 0;
+                    if (Hooked > 3)
+                    {
+                        damage = ((Hooked - 3) / 2) * FullHealth;
+                    }
+                    Health -= damage;
+                    Hooked = 0;
+                    //Debug.Log("snap");
+                }
+                if (CurrentVel.magnitude > HookedBrakeStrength * Time.deltaTime)
+                {
+                    VehicleRigidbody.velocity += -CurrentVel.normalized * HookedBrakeStrength * Time.deltaTime;
+                }
+                else
+                {
+                    VehicleRigidbody.velocity = Vector3.zero;
+                }
+                //Debug.Log(Vector3.Distance(VehicleMainObj.transform.position, HookedLoc));
+                //Debug.Log("hooked");
+            }
+            else
+            {
+                HookedDrag = 0;
+            }
 
             //flaps drag and lift
             FlapsDrag = FlapsDragMulti;
@@ -878,8 +917,7 @@ public class EngineController : UdonSharpBehaviour
             {
                 GearDrag = LandingGearDragMulti;
             }
-            AirBrakeDrag = AirBrake * AirbrakeStrength;
-            FlapsGearDrag = (GearDrag + FlapsDrag + AirBrakeDrag) - 1;
+            FlapsGearBrakeDrag = (GearDrag + FlapsDrag + (AirBrake * AirbrakeStrength)) - 1;
             //do lift
             Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Side
                 downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch + (SpeedLiftFactor * AoALiftPitch * VelPullUp),// Y Up
@@ -907,7 +945,7 @@ public class EngineController : UdonSharpBehaviour
         if (InEditor || localPlayer.IsOwner(VehicleMainObj))
         {
             //lerp velocity toward 0 to simulate air friction
-            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, (((AirFriction * FlapsGearDrag) * Atmosphere) * 90) * Time.deltaTime);
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, ((((AirFriction * FlapsGearBrakeDrag) * Atmosphere)) * 90) * Time.deltaTime);
             if (Piloting)
             {
                 //apply pitching
