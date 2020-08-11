@@ -22,7 +22,7 @@ public class LeaveVehicleButton : UdonSharpBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.R) || (Input.GetButtonDown("Oculus_CrossPlatform_Button4")))
+        if (Input.GetKeyDown(KeyCode.T) || (Input.GetButtonDown("Oculus_CrossPlatform_Button4")))
         {
             ExitStation();
         }

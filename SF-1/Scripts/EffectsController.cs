@@ -41,6 +41,7 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 enginelerperL = new Vector3(0, 0, 0);
     private Vector3 enginelerperR = new Vector3(0, 0, 0);
     private Vector3 enginefirelerper = new Vector3(1, 0, 1);
+    private float airbrakelerper;
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
     [System.NonSerializedAttribute] [HideInInspector] public ParticleSystem.ColorOverLifetimeModule SmokeModule;
@@ -125,10 +126,14 @@ public class EffectsController : UdonSharpBehaviour
             {
                 PlaneAnimator.SetBool("gunfiring", false);
             }
-            var main = DisplaySmoke.main;
-            main.startColor = new ParticleSystem.MinMaxGradient(new Color(EngineControl.SmokeColor.x, EngineControl.SmokeColor.y, EngineControl.SmokeColor.z), new Color(EngineControl.SmokeColor.x, EngineControl.SmokeColor.y, EngineControl.SmokeColor.z) * .83f);
+            if (Smoking)
+            {
+                var main = DisplaySmoke.main;
+                Color newsmoke = new Color(EngineControl.SmokeColor.x, EngineControl.SmokeColor.y, EngineControl.SmokeColor.z);
+                main.startColor = new ParticleSystem.MinMaxGradient(newsmoke, newsmoke * .85f);
+            }
         }
-        else { DoEffects += Time.deltaTime; }
+        else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
 
         if (EngineControl.Flaps)
         {
@@ -148,9 +153,19 @@ public class EffectsController : UdonSharpBehaviour
             PlaneAnimator.SetBool("gearup", false);
         }
 
+        if (EngineControl.HookDown)
+        {
+            PlaneAnimator.SetBool("hookdown", true);
+        }
+        else
+        {
+            PlaneAnimator.SetBool("hookdown", false);
+        }
+
         //rotationinputs.x = pitch
         //rotationinputs.y = yaw
         //rotationinputs.z = roll
+        //rotating the control surfaces based on inputs
         if (AileronL != null) { aileronLlerper.y = Mathf.Lerp(aileronLlerper.y, rotationinputs.z + (-rotationinputs.x * .5f), 4.5f * Time.deltaTime); ; AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
         if (AileronR != null) { aileronRlerper.y = Mathf.Lerp(aileronRlerper.y, -rotationinputs.z + (-rotationinputs.x * .5f), 4.5f * Time.deltaTime); ; AileronR.localRotation = Quaternion.Euler(aileronRlerper); }
 
@@ -170,7 +185,7 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineL != null) { enginelerperL.x = Mathf.Lerp(enginelerperL.x, (rotationinputs.z * .3f) + (-rotationinputs.x * .65f), 4.5f * Time.deltaTime); EngineL.localRotation = Quaternion.Euler(enginelerperL); }
         if (EngineR != null) { enginelerperR.x = Mathf.Lerp(enginelerperR.x, (-rotationinputs.z * .3f) + (-rotationinputs.x * .65f), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
 
-
+        //engine thrust animation
         enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.Throttle * 2, .9f * Time.deltaTime);
         if (EnginefireL != null)
         {
@@ -197,10 +212,12 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
+        airbrakelerper = Mathf.Lerp(airbrakelerper, EngineControl.AirBrake, 5f * Time.deltaTime);
+
         PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
-        PlaneAnimator.SetFloat("brake", EngineControl.AirBrake);
+        PlaneAnimator.SetFloat("brake", airbrakelerper);
         PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         DoVapor();
     }
@@ -226,6 +243,9 @@ public class EffectsController : UdonSharpBehaviour
         DoEffects = 0f; //keep awake
 
         EngineControl.dead = true;
+        EngineControl.HookDown = false;
+        EngineControl.AirBrakeInput = 0;
+        EngineControl.SafeFlightLimitsEnabled = true;
 
         if (EngineControl.localPlayer == null || EngineControl.localPlayer.IsOwner(gameObject))
         {

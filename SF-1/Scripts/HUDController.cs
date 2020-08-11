@@ -81,7 +81,7 @@ public class HUDController : UdonSharpBehaviour
         switch (EngineControl.RStickSelection)
         {
             case 0:
-                RStickDisplayHighlighter.rotation = Quaternion.Euler(0, 180, 0);//invisible, backfacing
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);//invisible, backfacing
                 break;
             case 1:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);

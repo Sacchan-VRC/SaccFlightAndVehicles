@@ -23,6 +23,8 @@ public class PilotSeat : UdonSharpBehaviour
         {
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
             EngineControl.Piloting = true;
+            EngineControl.Hooked = 0;
+            EngineControl.AirBrakeInput = 0;
         }
         if (EngineControl.EffectsControl != null)
         {
