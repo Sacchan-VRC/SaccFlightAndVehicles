@@ -21,6 +21,8 @@ public class HUDController : UdonSharpBehaviour
     public Transform ElevationIndicator;
     public Transform HeadingIndicator;
     public Transform VelocityIndicator;
+    public Transform LStickDisplayHighlighter;
+    public Transform RStickDisplayHighlighter;
     public GameObject HudSAFE;
     private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
@@ -43,8 +45,8 @@ public class HUDController : UdonSharpBehaviour
             tempvel = EngineControl.CurrentVel;
         }
 
-        VelocityIndicator.position = (transform.position + tempvel);
-        VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * (distance_from_head);
+        VelocityIndicator.position = transform.position + tempvel;
+        VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
         /////////////////
 
         //Heading indicator
@@ -65,7 +67,7 @@ public class HUDController : UdonSharpBehaviour
         /////////////////
 
         //Down indicator
-        DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, new_z));
+        DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, temprot.z));
         /////////////////
 
         //SAFE indicator
@@ -75,7 +77,72 @@ public class HUDController : UdonSharpBehaviour
         }
         else { HudSAFE.SetActive(false); }
 
-        if (EngineControl.LStickSelection == 1)
+        //Stick Selectors
+        switch (EngineControl.RStickSelection)
+        {
+            case 0:
+                RStickDisplayHighlighter.rotation = Quaternion.Euler(0, 180, 0);//invisible, backfacing
+                break;
+            case 1:
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
+                break;
+            case 2:
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -45);
+                break;
+            case 3:
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -90);
+                break;
+            case 4:
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -135);
+                break;
+            case 5:
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -180);
+                break;
+            case 6:
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -225);
+                break;
+            case 7:
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -270);
+                break;
+            case 8:
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -315);
+                break;
+        }
+
+        //Stick Selectors
+        switch (EngineControl.LStickSelection)
+        {
+            case 0:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);//invisible, backfacing
+                break;
+            case 1:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
+                break;
+            case 2:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -45);
+                break;
+            case 3:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -90);
+                break;
+            case 4:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -135);
+                break;
+            case 5:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -180);
+                break;
+            case 6:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -225);
+                break;
+            case 7:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -270);
+                break;
+            case 8:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -315);
+                break;
+        }
+
+
+        if (EngineControl.SetSpeedLast)
         {
             HUDText_knotstarget.text = ((EngineControl.SetSpeed) * 1.9438445f).ToString("F0");
         }

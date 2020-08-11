@@ -61,7 +61,9 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.LStickSelection = 0;
             EngineControl.RStickSelection = 0;
             EngineControl.AirBrake = 0;
-            EngineControl.SetSpeedLastFrame = false;
+            EngineControl.SetSpeedLast = false;
+            EngineControl.LTriggerLastFrame = false;
+            EngineControl.RTriggerLastFrame = false;
         }
         if (Saccflight != null) { Saccflight.SetActive(true); }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
@@ -69,8 +71,6 @@ public class PilotSeat : UdonSharpBehaviour
         {
             EngineControl.EffectsControl.IsFiringGun = false;
             EngineControl.EffectsControl.Smoking = false;
-            EngineControl.EffectsControl.LTriggerlastframe = false;
-            EngineControl.EffectsControl.RTriggerLastFrame = false;
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
@@ -90,11 +90,5 @@ public class PilotSeat : UdonSharpBehaviour
     {
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.DoEffects = 0f; }
         if (EngineControl.SoundControl != null) { EngineControl.SoundControl.DoSound = 0f; }
-        if (EngineControl.SoundControl != null) { EngineControl.SoundControl.soundsoff = false; }
-        if (EngineControl.SoundControl != null) { EngineControl.SoundControl.PlaneIdle.gameObject.SetActive(true); }
-        if (EngineControl.SoundControl != null) { EngineControl.SoundControl.PlaneDistant.gameObject.SetActive(true); }
-        if (EngineControl.SoundControl != null) { EngineControl.SoundControl.PlaneAfterburner.gameObject.SetActive(true); }
-        if (EngineControl.SoundControl != null) { EngineControl.SoundControl.PlaneWind.gameObject.SetActive(true); }
-        if (EngineControl.SoundControl != null) { EngineControl.SoundControl.PlaneInside.gameObject.SetActive(true); }
     }
 }

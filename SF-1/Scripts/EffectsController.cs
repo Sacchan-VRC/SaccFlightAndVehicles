@@ -23,6 +23,7 @@ public class EffectsController : UdonSharpBehaviour
     public Transform RudderR;
     public Transform SlatsL;
     public Transform SlatsR;
+    public ParticleSystem DisplaySmoke;
     public float MaxGs = 40f;
     public float GDamage = 30f;
     private PilotSeat PilotSeat1;
@@ -42,30 +43,27 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 enginefirelerper = new Vector3(1, 0, 1);
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
-    //private float LTrigger;
-    [System.NonSerializedAttribute] [HideInInspector] public bool LTriggerlastframe;
-    [System.NonSerializedAttribute] [HideInInspector] public bool RTriggerLastFrame;
+    [System.NonSerializedAttribute] [HideInInspector] public ParticleSystem.ColorOverLifetimeModule SmokeModule;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
     private float brake;
-    private float RTrigger;
     private void Start()
     {
         if (VehicleMainObj != null) { PlaneAnimator = VehicleMainObj.GetComponent<Animator>(); }
         if (PilotSeatStation != null) { PilotSeat1 = PilotSeatStation.gameObject.GetComponent<PilotSeat>(); }
         if (PassengerSeatStation != null) { PassengerSeat1 = PassengerSeatStation.gameObject.GetComponent<PassengerSeat>(); }
-        if (EngineControl.localPlayer == null) { DoEffects = 0f; } //not asleep in editor
         Spawnposition = VehicleMainObj.transform.position;
         Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
+        SmokeModule = DisplaySmoke.colorOverLifetime;
     }
     private void Update()
     {
-        if (EngineControl.localPlayer == null || EngineControl.localPlayer != null && (EngineControl.localPlayer.IsOwner(gameObject)))//kill plane if in sea
+        if (EngineControl.InEditor || EngineControl.localPlayer != null && (EngineControl.localPlayer.IsOwner(gameObject)))//kill plane if in sea
         {
             if (EngineControl.CenterOfMass.position.y < EngineControl.SeaLevel && !EngineControl.dead)
             {
-                if (EngineControl.localPlayer == null)//so it works in editor
+                if (EngineControl.InEditor)//so it works in editor
                 {
                     Explode();
                 }
@@ -79,64 +77,11 @@ public class EffectsController : UdonSharpBehaviour
         if (DoEffects > 10) { return; }
         if (EngineControl.SoundControl != null && EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.dead && !EngineControl.localPlayer.IsOwner(gameObject)) { DoVapor(); return; }//udonsharp doesn't support goto yet, so i'm usnig a function instead //vapor is visible from a long way away so only do vapor if far away.
 
-        if (EngineControl.Occupied == true) { DoEffects = 0f; }
-        else { DoEffects += Time.deltaTime; }
-
-        if (EngineControl.localPlayer == null || (EngineControl.localPlayer.IsOwner(gameObject)))//works in editor or ingame
+        if (EngineControl.InEditor || (EngineControl.localPlayer.IsOwner(gameObject)))//works in editor or ingame
         {
             if (EngineControl.Piloting)
             {
                 PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
-                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                //Firing selected weapon
-                if (RTrigger > 0.75 || Input.GetKey(KeyCode.Space))
-                {
-                    switch (EngineControl.RStickSelection)
-                    {
-                        case 0://nothing
-                            break;
-                        case 1://machinegun
-                            IsFiringGun = true;
-                            break;
-                        case 2://smoke for now, will be missiles
-                            IsFiringGun = false;
-                            if (!RTriggerLastFrame) { Smoking = !Smoking; }
-                            break;
-                        case 3://bombs soon
-                            IsFiringGun = false;
-                            break;
-                        case 4://flares
-                            IsFiringGun = false;
-                            if (!RTriggerLastFrame)
-                            {
-                                if (EngineControl.localPlayer == null) { PlaneAnimator.SetTrigger("flares"); }//editor
-                                else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DropFlares"); }//ingame
-                            }
-                            break;
-                    }
-                    RTriggerLastFrame = true;
-                }
-                else
-                {
-                    IsFiringGun = false;
-                    RTriggerLastFrame = false;
-                }
-
-                /*      //Display Smoke
-                     LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                     if (LTrigger >= 0.75 && !LTriggerlastframe || (Input.GetKeyDown(KeyCode.C)))
-                     {
-                         Smoking = !Smoking;
-                         if (!Input.GetKeyDown(KeyCode.C))
-                         {
-                             LTriggerlastframe = true;
-                         }
-                     }
-                     else if (LTrigger < 0.75 && LTriggerlastframe)
-                     {
-                         LTriggerlastframe = false;
-                     } */
-
 
 
             }
@@ -155,7 +100,7 @@ public class EffectsController : UdonSharpBehaviour
 
                 if (EngineControl.Health <= 0f) //plane is ded
                 {
-                    if (EngineControl.localPlayer == null)//so it works in editor
+                    if (EngineControl.InEditor)//so it works in editor
                     {
                         Explode();
                     }
@@ -168,14 +113,23 @@ public class EffectsController : UdonSharpBehaviour
         }
         vapor = (EngineControl.CurrentVel.magnitude > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
-        if (IsFiringGun && EngineControl.Occupied) //send firing to animator
+
+        if (EngineControl.Occupied == true)
         {
-            PlaneAnimator.SetBool("gunfiring", true);
+            DoEffects = 0f;
+            if (IsFiringGun) //send firing to animator
+            {
+                PlaneAnimator.SetBool("gunfiring", true);
+            }
+            else
+            {
+                PlaneAnimator.SetBool("gunfiring", false);
+            }
+            var main = DisplaySmoke.main;
+            main.startColor = new ParticleSystem.MinMaxGradient(new Color(EngineControl.SmokeColor.x, EngineControl.SmokeColor.y, EngineControl.SmokeColor.z), new Color(EngineControl.SmokeColor.x, EngineControl.SmokeColor.y, EngineControl.SmokeColor.z) * .83f);
         }
-        else
-        {
-            PlaneAnimator.SetBool("gunfiring", false);
-        }
+        else { DoEffects += Time.deltaTime; }
+
         if (EngineControl.Flaps)
         {
             PlaneAnimator.SetBool("flaps", true);

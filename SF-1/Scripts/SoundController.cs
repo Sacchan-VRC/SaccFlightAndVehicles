@@ -62,22 +62,14 @@ public class SoundController : UdonSharpBehaviour
         {
             GunSoundInitialVolume = GunSound.volume;
         }
+        dopplecounter = Random.Range(0, 4);
     }
 
     private void Update()
     {
         if (DoSound > 35f)
         {
-            if (!soundsoff) //disable all the sounds that always play, re-enabled in pilotseat
-            {
-                PlaneAfterburner.gameObject.SetActive(false);
-                PlaneDistant.gameObject.SetActive(false);
-                PlaneIdle.gameObject.SetActive(false);
-                PlaneWind.gameObject.SetActive(false);
-                PlaneInside.gameObject.SetActive(false);
-                soundsoff = true;
-            }
-            else { return; }
+            return;
         }
 
 
@@ -85,7 +77,7 @@ public class SoundController : UdonSharpBehaviour
         PlaneIdlePitch = LastFramePlaneIdlePitch;
         PlaneAfterburnerPitch = LastFramePlaneAfterburnerPitch;
 
-        //this doppler code is really bad.
+        //the doppler code is done in a really scuffed hacky way to avoid having to do it in fixedupdate to avoid worse performance.
         //only calculate doppler every 5 frames to smooth out laggers and frame drops
         if (dopplecounter > 4)
         {
@@ -95,7 +87,7 @@ public class SoundController : UdonSharpBehaviour
                 ThisFrameDist = Vector3.Distance(EngineControl.localPlayer.GetPosition(), EngineControl.CenterOfMass.position);
                 if (ThisFrameDist > SonicBoom.maxDistance) { LastFrameDist = ThisFrameDist; return; } // too far away to hear, so just stop
             }
-            else if ((testcamera != null) && (EngineControl.localPlayer == null))//editor
+            else if ((testcamera != null) && (EngineControl.InEditor))//editor
             {
                 ThisFrameDist = Vector3.Distance(testcamera.transform.position, EngineControl.CenterOfMass.position);
             }
@@ -188,7 +180,7 @@ public class SoundController : UdonSharpBehaviour
                     PlaneAfterburnerPitch = 0.8f;
                     PlaneAfterburnerVolume = Mathf.Lerp(PlaneAfterburnerVolume, (EngineControl.Throttle * PlaneAfterburnerInitialVolume) * InVehicleAfterburnerVolumeFactor, 1.08f * Time.deltaTime);
                 }
-                else if (/*localPlayer == null || */EngineControl.Passenger)//enable here and disable above for testing //you're a passenger and no one is flying
+                else if (/*InEditor || */EngineControl.Passenger)//enable here and disable above for testing //you're a passenger and no one is flying
                 {
                     PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * Time.deltaTime);
                     PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * Time.deltaTime);
