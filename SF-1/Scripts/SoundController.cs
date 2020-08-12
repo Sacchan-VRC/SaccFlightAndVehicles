@@ -82,12 +82,12 @@ public class SoundController : UdonSharpBehaviour
         if (dopplecounter > 4)
         {
             //find distance to player or testcamera
-            if (EngineControl.localPlayer != null) //ingame
+            if (!EngineControl.InEditor) //ingame
             {
                 ThisFrameDist = Vector3.Distance(EngineControl.localPlayer.GetPosition(), EngineControl.CenterOfMass.position);
                 if (ThisFrameDist > SonicBoom.maxDistance) { LastFrameDist = ThisFrameDist; return; } // too far away to hear, so just stop
             }
-            else if ((testcamera != null) && (EngineControl.InEditor))//editor
+            else if ((testcamera != null))//editor
             {
                 ThisFrameDist = Vector3.Distance(testcamera.transform.position, EngineControl.CenterOfMass.position);
             }
