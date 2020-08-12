@@ -60,7 +60,7 @@ public class EffectsController : UdonSharpBehaviour
     }
     private void Update()
     {
-        if (EngineControl.InEditor || EngineControl.localPlayer != null && (EngineControl.localPlayer.IsOwner(gameObject)))//kill plane if in sea
+        if (EngineControl.InEditor || EngineControl.IsOwner)//kill plane if in sea
         {
             if (EngineControl.CenterOfMass.position.y < EngineControl.SeaLevel && !EngineControl.dead)
             {
@@ -76,22 +76,17 @@ public class EffectsController : UdonSharpBehaviour
         }
 
         if (DoEffects > 10) { return; }
-        if (EngineControl.SoundControl != null && EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.dead && !EngineControl.localPlayer.IsOwner(gameObject)) { DoVapor(); return; }//udonsharp doesn't support goto yet, so i'm usnig a function instead //vapor is visible from a long way away so only do vapor if far away.
+        if (EngineControl.SoundControl != null && EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.dead && !EngineControl.IsOwner) { DoVapor(); return; }//udonsharp doesn't support goto yet, so i'm usnig a function instead //vapor is visible from a long way away so only do vapor if far away.
 
-        if (EngineControl.InEditor || (EngineControl.localPlayer.IsOwner(gameObject)))//works in editor or ingame
+        if (EngineControl.InEditor || EngineControl.IsOwner)//works in editor or ingame
         {
-            if (EngineControl.Piloting)
-            {
-                PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
-
-
-            }
-            rotationinputs.x = EngineControl.pitchinput * 25;
-            rotationinputs.y = EngineControl.yawinput * 20;
+            PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
+            rotationinputs.x = Mathf.Clamp(EngineControl.pitchinput + EngineControl.Trim.x, -1, 1) * 25;
+            rotationinputs.y = Mathf.Clamp(EngineControl.yawinput + EngineControl.Trim.y, -1, 1) * 20;
             rotationinputs.z = EngineControl.rollinput * 35;
 
             //joystick movement
-            Vector3 tempjoy = new Vector3(rotationinputs.x * 1.8f, -rotationinputs.z * 1.285714f, rotationinputs.y);//x and y to 45 degrees
+            Vector3 tempjoy = new Vector3(EngineControl.pitchinput * 45f, -EngineControl.rollinput * 45f, EngineControl.yawinput * 45);
             JoyStick.localRotation = Quaternion.Euler(tempjoy);
 
             //G Damage
@@ -112,7 +107,7 @@ public class EffectsController : UdonSharpBehaviour
                 }
             }
         }
-        vapor = (EngineControl.CurrentVel.magnitude > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
+        vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
 
         if (EngineControl.Occupied == true)
@@ -177,7 +172,7 @@ public class EffectsController : UdonSharpBehaviour
         if (RudderL != null) { RudderL.localRotation = Quaternion.Euler(-yawlerper); }
         if (RudderR != null) { RudderR.localRotation = Quaternion.Euler(yawlerper); }
 
-        SlatsLerper.y = Mathf.Lerp(SlatsLerper.y, Mathf.Max((-EngineControl.CurrentVel.magnitude * 0.005f) * 35f + 35f, 0f), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
+        SlatsLerper.y = Mathf.Lerp(SlatsLerper.y, Mathf.Max((-EngineControl.Speed * 0.005f) * 35f + 35f, 0f), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
         if (SlatsL != null) { SlatsL.localRotation = Quaternion.Euler(SlatsLerper); }
         if (SlatsR != null) { SlatsR.localRotation = Quaternion.Euler(SlatsLerper); }
 
@@ -234,7 +229,7 @@ public class EffectsController : UdonSharpBehaviour
         {
             Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * Time.deltaTime);//linger for a bit before cutting off
         }
-        PlaneAnimator.SetFloat("mach10", EngineControl.CurrentVel.magnitude / 343 / 10);
+        PlaneAnimator.SetFloat("mach10", EngineControl.Speed / 343 / 10);
         PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
         PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
     }
@@ -247,7 +242,7 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.AirBrakeInput = 0;
         EngineControl.SafeFlightLimitsEnabled = true;
 
-        if (EngineControl.localPlayer == null || EngineControl.localPlayer.IsOwner(gameObject))
+        if (EngineControl.InEditor || EngineControl.IsOwner)
         {
             EngineControl.GearUp = true;//prevent touchdown sound
             EngineControl.CurrentVel = Vector3.zero;

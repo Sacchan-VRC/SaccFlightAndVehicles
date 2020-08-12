@@ -10,7 +10,7 @@ public class LeaveVehicleButton : UdonSharpBehaviour
     public VRCStation Seat;
     private void Interact()
     {
-        if (EngineControl != null && EngineControl.CurrentVel.magnitude < 1)
+        if (EngineControl != null && EngineControl.Speed < 1)
         {
             ExitStation();
         }

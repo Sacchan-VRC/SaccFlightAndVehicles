@@ -151,11 +151,11 @@ public class HUDController : UdonSharpBehaviour
         {
             if (EngineControl.Gs > maxGs) { maxGs = EngineControl.Gs; }
             HUDText_G.text = string.Concat(EngineControl.Gs.ToString("F1"), "\n", maxGs.ToString("F1"));
-            HUDText_mach.text = ((EngineControl.CurrentVel.magnitude) / 343f).ToString("F2");
+            HUDText_mach.text = ((EngineControl.Speed) / 343f).ToString("F2");
             HUDText_altitude.text = string.Concat((EngineControl.CurrentVel.y * 60 * 3.28084f).ToString("F0"), "\n", ((EngineControl.CenterOfMass.position.y + -EngineControl.SeaLevel) * 3.28084f).ToString("F0"));
-            HUDText_knots.text = ((EngineControl.CurrentVel.magnitude) * 1.9438445f).ToString("F0");
+            HUDText_knots.text = ((EngineControl.Speed) * 1.9438445f).ToString("F0");
 
-            if (EngineControl.CurrentVel.magnitude < 2)
+            if (EngineControl.Speed < 2)
             {
                 HUDText_angleofattack.text = System.String.Empty;
             }
@@ -164,7 +164,6 @@ public class HUDController : UdonSharpBehaviour
                 HUDText_angleofattack.text = EngineControl.AngleOfAttack.ToString("F0");
             }
             check = 0;
-            //  }
         }
         check += Time.deltaTime;
     }

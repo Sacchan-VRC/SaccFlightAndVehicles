@@ -67,7 +67,7 @@ public class EngineController : UdonSharpBehaviour
     private float AoALimitStrength;
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
     public float SeaLevel = -100;
-    private ConstantForce VehicleConstantForce;
+    [System.NonSerializedAttribute] [HideInInspector] public ConstantForce VehicleConstantForce;
     private float InputAcc;
     private float LerpedRoll;
     private float LerpedPitch;
@@ -98,12 +98,19 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float SetSpeed;
     private float SpeedDifference;
     private float SpeedZeroPoint;
-    private float holdtime;
+    private float SmokeHoldTime;
     private bool SetSmokeLastFrame;
-    private Vector3 handpossmoke;
+    private Vector3 HandPosSmoke;
     private Vector3 SmokeZeroPoint;
     private Vector3 TempSmokeCol;
     private Vector3 SmokeDifference;
+    private float TrimTapTime;
+    private bool DoTrim;
+    private Vector3 HandPosTrim;
+    private Vector3 TrimZeroPoint;
+    private Vector2 TempTrim;
+    private Vector2 TrimDifference;
+    public Vector2 Trim;
     public float AirBrakeInput;
     [System.NonSerializedAttribute] [HideInInspector] public bool SetSpeedLast = false;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AirBrake;
@@ -195,8 +202,13 @@ public class EngineController : UdonSharpBehaviour
     private Vector3 HookedLoc;
     private float HookedDrag;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 SmokeColor = new Vector3(1, 1, 1);
+    [System.NonSerializedAttribute] [HideInInspector] public float Speed;
+    [System.NonSerializedAttribute] [HideInInspector] public bool IsOwner = false;
+    public Vector2 Wind;
+    Vector3 AirVel;
+    //private float StillWindMulti;
 
-    //float MouseX;
+    //float MouseX;d
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
     //float mousexsens = 1;
@@ -229,6 +241,7 @@ public class EngineController : UdonSharpBehaviour
 
     private void LateUpdate()
     {
+        if (!InEditor) IsOwner = localPlayer.IsOwner(VehicleMainObj);
         if (GroundDetector != null)
         {
             if (Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 1) && (!GearUp))
@@ -238,9 +251,11 @@ public class EngineController : UdonSharpBehaviour
             else { Taxiing = false; }
         }
 
-        if (InEditor || (localPlayer.IsOwner(VehicleMainObj)))//works in editor or ingame
+        if (InEditor || IsOwner)//works in editor or ingame
         {
+            AirVel = new Vector3(VehicleRigidbody.velocity.x - Wind.x, VehicleRigidbody.velocity.y, VehicleRigidbody.velocity.z - Wind.y);
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
+            Speed = CurrentVel.magnitude; ;//because rigidbody values aren't accessable by non-owner players
             if ((InEditor) || !Piloting) { Occupied = false; } //should make vehicle respawnable if player disconnects while occupying
 
             if (Piloting)
@@ -368,7 +383,7 @@ public class EngineController : UdonSharpBehaviour
 
                             if (!SetSpeedLast)
                             {
-                                SetSpeed = CurrentVel.magnitude;
+                                SetSpeed = Speed;
                             }
 
                             //VR Set Speed
@@ -423,6 +438,40 @@ public class EngineController : UdonSharpBehaviour
                             LTriggerLastFrame = true;
                             break;
                         case 6://Trim
+                            if (!LTriggerLastFrame)
+                            {
+                                if (InVR)
+                                {
+                                    HandPosTrim = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position);
+                                    TrimZeroPoint = HandPosTrim;
+                                    TempTrim = Trim;
+                                }
+                                if (TrimTapTime > .4f)//no double tap
+                                {
+                                    TrimTapTime = 0;
+                                    DoTrim = true;
+                                }
+                                else//double tap detected, reset trim
+                                {
+                                    DoTrim = false;
+                                    TrimTapTime = 0;
+                                    Trim = new Vector2(0, 0);
+                                }
+                            }
+                            if (InVR && DoTrim)
+                            {
+                                SmokeHoldTime += Time.deltaTime;
+                                if (SmokeHoldTime > 1)
+                                {
+                                }
+                                //VR Set Trim
+                                HandPosTrim = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position);
+
+                                TrimDifference = (TrimZeroPoint - HandPosTrim) * 8f;
+                                Trim.y = Mathf.Clamp(TempTrim.x + TrimDifference.x, 0, 1);
+                                Trim.x = Mathf.Clamp(TempTrim.y + TrimDifference.y, 0, 1);
+                            }
+                            TrimTapTime += Time.deltaTime;
 
                             AirBrakeInput = 0;
                             SetSpeedLast = false;
@@ -513,23 +562,23 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 if (InVR)
                                 {
-                                    handpossmoke = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
-                                    SmokeZeroPoint = handpossmoke;
+                                    HandPosSmoke = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
+                                    SmokeZeroPoint = HandPosSmoke;
                                     TempSmokeCol = SmokeColor;
                                 }
                                 EffectsControl.Smoking = !EffectsControl.Smoking;
-                                holdtime = 0;
+                                SmokeHoldTime = 0;
                             }
                             if (InVR)
                             {
-                                holdtime += Time.deltaTime;
-                                if (holdtime > 1)
+                                SmokeHoldTime += Time.deltaTime;
+                                if (SmokeHoldTime > 1)
                                 {
 
                                     //VR Set Smoke
-                                    handpossmoke = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
+                                    HandPosSmoke = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
 
-                                    SmokeDifference = (SmokeZeroPoint - handpossmoke) * 8f;
+                                    SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * 8f;
                                     SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
                                     SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
                                     SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
@@ -570,7 +619,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     PlaneRotDif = VehicleMainObj.transform.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
                     JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
-                    if (!RGripLastFrame)//first frame you pressed it?
+                    if (!RGripLastFrame)//first frame you gripped joystick
                     {
                         PlaneRotDif = Quaternion.identity;
                         JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
@@ -635,7 +684,7 @@ public class EngineController : UdonSharpBehaviour
                     SetSpeed += Shiftf * 90 * Time.deltaTime;
                     if (Input.GetKey(KeyCode.LeftControl)) SetSpeed -= 90 * Time.deltaTime;
 
-                    float error = (SetSpeed - CurrentVel.magnitude);
+                    float error = (SetSpeed - Speed);
 
                     CruiseIntegrator += error * Time.deltaTime;
                     CruiseIntegrator = Mathf.Clamp(CruiseIntegrator, CruiseIntegratorMin, CruiseIntegratorMax);
@@ -705,15 +754,16 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (SafeFlightLimitsEnabled && !Taxiing && AngleOfAttack < AoALimit)
                     {
+                        float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
                         GLimitStrength = Mathf.Clamp(-(Gs / GLimit) + 1, 0, 1);
                         AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimit) + 1, 0, 1);
-                        pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf), -1, 1) * Mathf.Min(GLimitStrength, AoALimitStrength);
-                        yawinput = Mathf.Clamp((Qf + Ef + JoystickPosYaw.x), -1, 1) * Mathf.Min(GLimitStrength, AoALimitStrength);
+                        pitchinput = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf, -1, 1) * Limits;
+                        yawinput = Mathf.Clamp(Qf + Ef + JoystickPosYaw.x, -1, 1) * Limits;
                     }
                     else
                     {
-                        pitchinput = Mathf.Clamp((/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf), -1, 1);
-                        yawinput = Mathf.Clamp((Qf + Ef + JoystickPosYaw.x), -1, 1);
+                        pitchinput = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRRollYawInput.y + Wf + Sf + downf + upf, -1, 1);
+                        yawinput = Mathf.Clamp(Qf + Ef + JoystickPosYaw.x, -1, 1);
                     }
                     rollinput = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRRollYawInput.x + Af + Df + leftf + rightf) * -1), -1, 1);
                 }
@@ -727,7 +777,7 @@ public class EngineController : UdonSharpBehaviour
                 rollinput = rollinput > 0 ? Mathf.Pow(rollinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(rollinput), StickInputPower); */
 
                 //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
-                if ((Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.forward) > 0))//normal, moving forward
+                if ((Vector3.Dot(AirVel, VehicleMainObj.transform.forward) > 0))//normal, moving forward
                 {
                     ReversingPitchStrength = 1;
                     ReversingYawStrength = 1;
@@ -740,8 +790,8 @@ public class EngineController : UdonSharpBehaviour
                     ReversingRollStrength = ReversingRollStrengthZero;
                 }
 
-                pitch = pitchinput * PitchStrength * ReversingPitchStrength;
-                yaw = -yawinput * YawStrength * ReversingYawStrength;
+                pitch = Mathf.Clamp(pitchinput + Trim.x, -1, 1) * PitchStrength * ReversingPitchStrength;
+                yaw = Mathf.Clamp(-yawinput - Trim.y, -1, 1) * YawStrength * ReversingYawStrength;
                 roll = rollinput * RollStrength * ReversingRollStrength;
 
                 //flip ur Vehicle to upright and stop rotating
@@ -774,19 +824,23 @@ public class EngineController : UdonSharpBehaviour
                 pitch = 0;
                 yaw = 0;
                 rollinput = 0;
-                pitchinput = 0;
-                yawinput = 0;
+                pitchinput = Trim.x;
+                yawinput = Trim.y;
                 ThrottleInput = 0;
             }
-            //used to create air resistance only in the relative down direction
-            downspeed = Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.up) * -1;
-            if (downspeed < 0)
+            //used to create air resistance for updown and sideways if your movement direction is in those directions
+            //to add physics to plane's yaw and pitch, accel angvel towards velocity, and add force to the plane
+            //and add wind
+            sidespeed = Vector3.Dot(AirVel, VehicleMainObj.transform.right);
+            downspeed = Vector3.Dot(AirVel, VehicleMainObj.transform.up) * -1;
+
+            if (downspeed < 0)//air is hitting plane from above
             {
                 downspeed *= PitchDownLiftMulti;
             }
 
-            AngleOfAttackPitch = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.right);
-            AngleOfAttackYaw = Vector3.SignedAngle(VehicleMainObj.transform.forward, CurrentVel, VehicleMainObj.transform.up);
+            AngleOfAttackPitch = Vector3.SignedAngle(VehicleMainObj.transform.forward, AirVel, VehicleMainObj.transform.right);
+            AngleOfAttackYaw = Vector3.SignedAngle(VehicleMainObj.transform.forward, AirVel, VehicleMainObj.transform.up);
 
             //angle of attack stuff, pitch and yaw are calculated seperately
             //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
@@ -817,8 +871,8 @@ public class EngineController : UdonSharpBehaviour
 
             AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
             //speed related values
-            SpeedLiftFactor = Mathf.Clamp(CurrentVel.magnitude * CurrentVel.magnitude * Lift, 0, MaxVelLift);
-            rotlift = CurrentVel.magnitude / RotMultiMaxSpeed;//using a simple linear curve for increasing control as you move faster
+            SpeedLiftFactor = Mathf.Clamp(AirVel.magnitude * AirVel.magnitude * Lift, 0, MaxVelLift);
+            rotlift = Speed / RotMultiMaxSpeed;//using a simple linear curve for increasing control as you move faster
 
             //thrust vecotring airplanes have a minimum rotation speed
             minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
@@ -835,9 +889,6 @@ public class EngineController : UdonSharpBehaviour
 
             Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
 
-            //used to add physics to plane's yaw (accel angvel towards velocity)
-            sidespeed = Vector3.Dot(VehicleRigidbody.velocity, VehicleMainObj.transform.right);
-
             //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownMulti)
             if (Throttle < ThrottleInput)
             {
@@ -853,13 +904,10 @@ public class EngineController : UdonSharpBehaviour
             LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * Time.deltaTime);
             LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * Time.deltaTime);
             LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * Time.deltaTime);
-            if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookRopeLayer))
-            {
-                Debug.Log("workx");
-            }
+
             if (HookDown)
             {
-                if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookRopeLayer) && Hooked < 0 && CurrentVel.magnitude > 25)
+                if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookRopeLayer) && Hooked < 0 && Speed > 25)
                 {
                     HookedLoc = VehicleMainObj.transform.position;
                     Hooked = 5f;
@@ -884,7 +932,7 @@ public class EngineController : UdonSharpBehaviour
                     Hooked = 0;
                     //Debug.Log("snap");
                 }
-                if (CurrentVel.magnitude > HookedBrakeStrength * Time.deltaTime)
+                if (Speed > HookedBrakeStrength * Time.deltaTime)
                 {
                     VehicleRigidbody.velocity += -CurrentVel.normalized * HookedBrakeStrength * Time.deltaTime;
                 }
@@ -892,7 +940,6 @@ public class EngineController : UdonSharpBehaviour
                 {
                     VehicleRigidbody.velocity = Vector3.zero;
                 }
-                //Debug.Log(Vector3.Distance(VehicleMainObj.transform.position, HookedLoc));
                 //Debug.Log("hooked");
             }
             else
@@ -919,13 +966,14 @@ public class EngineController : UdonSharpBehaviour
             }
             FlapsGearBrakeDrag = (GearDrag + FlapsDrag + (AirBrake * AirbrakeStrength)) - 1;
             //do lift
-            Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Side
+            Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Sideways
                 downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch + (SpeedLiftFactor * AoALiftPitch * VelPullUp),// Y Up
                     InputAcc);// Z Forward
 
             //used to add rotation friction
             Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
+            //roll + rotational frictions
             Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw),// X Pitch
                 (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw),// Y Yaw
                     LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw));// Z Roll
@@ -938,14 +986,15 @@ public class EngineController : UdonSharpBehaviour
             FinalInputAcc *= Atmosphere;
             VehicleConstantForce.relativeForce = FinalInputAcc;
             VehicleConstantForce.relativeTorque = FinalInputRot;
+            //StillWindMulti = Mathf.Clamp(Speed / 10, 0, 1);//was gonna use this to stop planes blowing around in the wind when they're still, see commented multiplication in the airfriction line
         }
     }
     private void FixedUpdate()
     {
-        if (InEditor || localPlayer.IsOwner(VehicleMainObj))
+        if (InEditor || IsOwner)
         {
             //lerp velocity toward 0 to simulate air friction
-            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, ((((AirFriction * FlapsGearBrakeDrag) * Atmosphere)) * 90) * Time.deltaTime);
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, AirVel = new Vector3(Wind.x, 0, Wind.y)/* * StillWindMulti */, ((((AirFriction * FlapsGearBrakeDrag) * Atmosphere)) * 90) * Time.deltaTime);
             if (Piloting)
             {
                 //apply pitching
