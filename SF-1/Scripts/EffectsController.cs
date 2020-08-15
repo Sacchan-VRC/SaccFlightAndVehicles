@@ -24,8 +24,6 @@ public class EffectsController : UdonSharpBehaviour
     public Transform SlatsL;
     public Transform SlatsR;
     public ParticleSystem DisplaySmoke;
-    public float MaxGs = 40f;
-    public float GDamage = 30f;
     private PilotSeat PilotSeat1;
     private PassengerSeat PassengerSeat1;
     private bool vapor;
@@ -40,7 +38,7 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 SlatsLerper = new Vector3(0, 35, 0);
     private Vector3 enginelerperL = new Vector3(0, 0, 0);
     private Vector3 enginelerperR = new Vector3(0, 0, 0);
-    private Vector3 enginefirelerper = new Vector3(1, 0, 1);
+    private Vector3 enginefirelerper = new Vector3(1, 0.6f, 1);
     private float airbrakelerper;
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
@@ -60,9 +58,23 @@ public class EffectsController : UdonSharpBehaviour
     }
     private void Update()
     {
-        if (EngineControl.InEditor || EngineControl.IsOwner)//kill plane if in sea
+        if ((EngineControl.InEditor || EngineControl.IsOwner) && !EngineControl.dead)//kill plane if in sea
         {
             if (EngineControl.CenterOfMass.position.y < EngineControl.SeaLevel && !EngineControl.dead)
+            {
+                if (EngineControl.InEditor)//so it works in editor
+                {
+                    Explode();
+                }
+                else
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                }
+            }
+
+            //G/crash Damage
+            EngineControl.Health += -Mathf.Clamp((EngineControl.Gs - EngineControl.MaxGs) * Time.deltaTime * EngineControl.GDamage, 0f, 99999f); //take damage of GDamage per second per G above MaxGs
+            if (EngineControl.Health <= 0f) //plane is ded
             {
                 if (EngineControl.InEditor)//so it works in editor
                 {
@@ -76,9 +88,11 @@ public class EffectsController : UdonSharpBehaviour
         }
 
         if (DoEffects > 10) { return; }
-        if (EngineControl.SoundControl != null && EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.dead && !EngineControl.IsOwner) { DoVapor(); return; }//udonsharp doesn't support goto yet, so i'm usnig a function instead //vapor is visible from a long way away so only do vapor if far away.
 
-        if (EngineControl.InEditor || EngineControl.IsOwner)//works in editor or ingame
+        //if a long way away just skip effects except large vapor effects
+        if (EngineControl.SoundControl != null && EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner) { DoVapor(); return; }//udonsharp doesn't support goto yet, so i'm usnig a function instead
+
+        if (EngineControl.InEditor || EngineControl.IsOwner)
         {
             PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
             rotationinputs.x = Mathf.Clamp(EngineControl.pitchinput + EngineControl.Trim.x, -1, 1) * 25;
@@ -88,24 +102,6 @@ public class EffectsController : UdonSharpBehaviour
             //joystick movement
             Vector3 tempjoy = new Vector3(EngineControl.pitchinput * 45f, -EngineControl.rollinput * 45f, EngineControl.yawinput * 45);
             JoyStick.localRotation = Quaternion.Euler(tempjoy);
-
-            //G Damage
-            if (!EngineControl.dead)
-            {
-                EngineControl.Health += -Mathf.Clamp((EngineControl.Gs - MaxGs) * Time.deltaTime * GDamage, 0f, 99999f); //take damage of GDamage per second per G above MaxGs
-
-                if (EngineControl.Health <= 0f) //plane is ded
-                {
-                    if (EngineControl.InEditor)//so it works in editor
-                    {
-                        Explode();
-                    }
-                    else
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-                    }
-                }
-            }
         }
         vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
@@ -181,27 +177,38 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineR != null) { enginelerperR.x = Mathf.Lerp(enginelerperR.x, (-rotationinputs.z * .3f) + (-rotationinputs.x * .65f), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
 
         //engine thrust animation
-        enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.Throttle * 2, .9f * Time.deltaTime);
+        enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
+
         if (EnginefireL != null)
         {
-            if (enginefirelerper.y > .06f)
+            if (EngineControl.AfterburnerOn)
             {
                 EnginefireL.gameObject.SetActive(true);
                 EnginefireL.localScale = enginefirelerper;
             }
             else
             {
+                EnginefireL.gameObject.SetActive(true);
+                EnginefireL.localScale = new Vector3(1, 0, 1);
+            }
+            if (EngineControl.Throttle <= .03f)
+            {
                 EnginefireL.gameObject.SetActive(false);
             }
         }
         if (EnginefireR != null)
         {
-            if (enginefirelerper.y > .06f)
+            if (EngineControl.AfterburnerOn)
             {
                 EnginefireR.gameObject.SetActive(true);
                 EnginefireR.localScale = enginefirelerper;
             }
             else
+            {
+                EnginefireR.gameObject.SetActive(true);
+                EnginefireR.localScale = new Vector3(1, 0, 1);
+            }
+            if (EngineControl.Throttle <= .03f)
             {
                 EnginefireR.gameObject.SetActive(false);
             }
@@ -213,6 +220,7 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
         PlaneAnimator.SetFloat("brake", airbrakelerper);
+        PlaneAnimator.SetBool("canopyopen", EngineControl.CanopyOpen);
         PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         DoVapor();
     }
@@ -240,7 +248,11 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.dead = true;
         EngineControl.HookDown = false;
         EngineControl.AirBrakeInput = 0;
-        EngineControl.SafeFlightLimitsEnabled = true;
+        EngineControl.FlightLimitsEnabled = true;
+        EngineControl.CanopyOpen = false;
+        EngineControl.Cruise = false;
+        EngineControl.Trim = Vector2.zero;
+        EngineControl.CanopyOpen = true;
 
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
@@ -251,11 +263,11 @@ public class EffectsController : UdonSharpBehaviour
 
         //pilot and passenger are dropped out of the plane
         if (EngineControl.SoundControl != null && EngineControl.SoundControl.Explosion != null) { EngineControl.SoundControl.Explosion.Play(); }
-        if (EngineControl.Piloting)
+        if (EngineControl.Piloting && !EngineControl.InEditor)
         {
             if (PilotSeatStation != null) { PilotSeatStation.ExitStation(EngineControl.localPlayer); }
         }
-        if (EngineControl.Passenger)
+        if (EngineControl.Passenger && !EngineControl.InEditor)
         {
             if (PassengerSeatStation != null) { PassengerSeatStation.ExitStation(EngineControl.localPlayer); }
         }

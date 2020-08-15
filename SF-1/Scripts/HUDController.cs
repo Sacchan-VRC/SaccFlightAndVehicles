@@ -14,27 +14,51 @@ public class HUDController : UdonSharpBehaviour
     public Text HUDText_altitude;
     public Text HUDText_knotstarget;
     public Text HUDText_knots;
+    public Text HUDText_knotsairspeed;
     public Text HUDText_angleofattack;
     private string HUDText_angleofattack_temp;
-    public float distance_from_head = 1.333f;
+    private const float distance_from_head = 1.333f;
     public Transform DownIndicator;
     public Transform ElevationIndicator;
     public Transform HeadingIndicator;
     public Transform VelocityIndicator;
     public Transform LStickDisplayHighlighter;
     public Transform RStickDisplayHighlighter;
+    public Transform PitchRoll;
+    public Transform Yaw;
+    public Transform TrimPitch;
+    public Transform TrimYaw;
     public GameObject HudSAFE;
+    public GameObject HudAB;
+    private Vector3 InputsZeroPos;
     private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
     private float check = 0;
     private Vector3 temprot;
     private int showvel;
+    private void Start()
+    {
+        InputsZeroPos = PitchRoll.localPosition;
+    }
     private void OnEnable()
     {
         maxGs = 0f;
     }
     private void Update()
     {
+        const float InputSquareSize = 0.0284317f;
+        //RollPitch Indicator
+        PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.rollinput, EngineControl.pitchinput, 0)) * InputSquareSize;
+
+        //Yaw Indicator
+        Yaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.yawinput, 0, 0)) * InputSquareSize;
+
+        //Yaw Trim Indicator
+        TrimYaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.Trim.y, 0, 0)) * InputSquareSize;
+
+        //Pitch Trim Indicator
+        TrimPitch.localPosition = InputsZeroPos + (new Vector3(0, EngineControl.Trim.x, 0)) * InputSquareSize;
+
         //Velocity indicator
         if (EngineControl.CurrentVel.magnitude < 2)
         {
@@ -71,7 +95,7 @@ public class HUDController : UdonSharpBehaviour
         /////////////////
 
         //SAFE indicator
-        if (EngineControl.SafeFlightLimitsEnabled)
+        if (EngineControl.FlightLimitsEnabled)
         {
             HudSAFE.SetActive(true);
         }
@@ -140,9 +164,11 @@ public class HUDController : UdonSharpBehaviour
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -315);
                 break;
         }
+        //AB
+        if (EngineControl.AfterburnerOn) { HudAB.SetActive(true); }
+        else { HudAB.SetActive(false); }
 
-
-        if (EngineControl.SetSpeedLast)
+        if (EngineControl.Cruise)
         {
             HUDText_knotstarget.text = ((EngineControl.SetSpeed) * 1.9438445f).ToString("F0");
         }
@@ -154,6 +180,7 @@ public class HUDController : UdonSharpBehaviour
             HUDText_mach.text = ((EngineControl.Speed) / 343f).ToString("F2");
             HUDText_altitude.text = string.Concat((EngineControl.CurrentVel.y * 60 * 3.28084f).ToString("F0"), "\n", ((EngineControl.CenterOfMass.position.y + -EngineControl.SeaLevel) * 3.28084f).ToString("F0"));
             HUDText_knots.text = ((EngineControl.Speed) * 1.9438445f).ToString("F0");
+            HUDText_knotsairspeed.text = ((EngineControl.AirVel.magnitude) * 1.9438445f).ToString("F0");
 
             if (EngineControl.Speed < 2)
             {
