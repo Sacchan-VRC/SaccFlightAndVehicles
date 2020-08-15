@@ -25,6 +25,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.Piloting = true;
             EngineControl.Hooked = 0;
             EngineControl.AirBrakeInput = 0;
+            EngineControl.LTriggerTapTime = 1;
         }
         if (EngineControl.EffectsControl != null)
         {
@@ -57,15 +58,16 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.Piloting = false;
             EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
             EngineControl.Taxiinglerper = 0;
-            EngineControl.VRThrottle = 0;
+            EngineControl.PlayerThrottle = 0;
             EngineControl.LGripLastFrame = false;
             EngineControl.RGripLastFrame = false;
-            EngineControl.LStickSelection = 0;
-            EngineControl.RStickSelection = 0;
+            EngineControl.LStickSelection = 1;
+            EngineControl.RStickSelection = 1;
             EngineControl.AirBrake = 0;
-            EngineControl.SetSpeedLast = false;
             EngineControl.LTriggerLastFrame = false;
             EngineControl.RTriggerLastFrame = false;
+            if (EngineControl.CatapultStatus == 2) { }//keep launching if launching
+            else EngineControl.CatapultStatus = 0;//else unhook from catapult
         }
         if (Saccflight != null) { Saccflight.SetActive(true); }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }

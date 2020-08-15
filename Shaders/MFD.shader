@@ -3,7 +3,7 @@ Shader "SF-1/MFD" {
         _Color ("Color", Color) = (0.5,0.5,0.5,0.0) 
     }
     SubShader{
-        Tags {"Queue"="Opaque" "RenderType"="Opaque" }
+      Tags { "RenderType" = "Opaque" }
         
                 Pass
         {

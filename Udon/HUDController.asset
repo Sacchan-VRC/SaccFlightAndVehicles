@@ -16,43 +16,53 @@ MonoBehaviour:
     type: 2}
   udonAssembly: ".data_start\n\n    .export EngineControl\n    .export HUDText_G\n
     \   .export HUDText_mach\n    .export HUDText_altitude\n    .export HUDText_knotstarget\n
-    \   .export HUDText_knots\n    .export HUDText_angleofattack\n    .export distance_from_head\n
+    \   .export HUDText_knots\n    .export HUDText_knotsairspeed\n    .export HUDText_angleofattack\n
     \   .export DownIndicator\n    .export ElevationIndicator\n    .export HeadingIndicator\n
     \   .export VelocityIndicator\n    .export LStickDisplayHighlighter\n    .export
-    RStickDisplayHighlighter\n    .export HudSAFE\n\n    __refl_const_intnl_udonTypeID:
+    RStickDisplayHighlighter\n    .export PitchRoll\n    .export Yaw\n    .export
+    TrimPitch\n    .export TrimYaw\n    .export HudSAFE\n    .export HudAB\n\n    __refl_const_intnl_udonTypeID:
     %SystemInt64, null\n    __refl_const_intnl_udonTypeName: %SystemString, null\n
-    \   HudSAFE: %UnityEngineGameObject, null\n    distance_from_head: %SystemSingle,
+    \   HudAB: %UnityEngineGameObject, null\n    HudSAFE: %UnityEngineGameObject,
     null\n    HUDText_altitude: %UnityEngineUIText, null\n    HUDText_angleofattack:
     %UnityEngineUIText, null\n    HUDText_G: %UnityEngineUIText, null\n    HUDText_knots:
-    %UnityEngineUIText, null\n    HUDText_knotstarget: %UnityEngineUIText, null\n
-    \   HUDText_mach: %UnityEngineUIText, null\n    DownIndicator: %UnityEngineTransform,
-    null\n    ElevationIndicator: %UnityEngineTransform, null\n    HeadingIndicator:
-    %UnityEngineTransform, null\n    LStickDisplayHighlighter: %UnityEngineTransform,
-    null\n    RStickDisplayHighlighter: %UnityEngineTransform, null\n    VelocityIndicator:
-    %UnityEngineTransform, null\n    EngineControl: %VRCUdonUdonBehaviour, null\n
-    \   showvel: %SystemInt32, null\n    check: %SystemSingle, null\n    maxGs: %SystemSingle,
-    null\n    HUDText_angleofattack_temp: %SystemString, null\n    startingpos: %UnityEngineVector3,
-    null\n    temprot: %UnityEngineVector3, null\n    tempvel: %UnityEngineVector3,
-    null\n    __0_this_intnl_UnityEngineTransform: %UnityEngineTransform, this\n    __0_new_z_Single:
-    %SystemSingle, null\n    __0_const_intnl_SystemBoolean: %SystemBoolean, null\n
-    \   __1_const_intnl_SystemBoolean: %SystemBoolean, null\n    __0_const_intnl_SystemDouble:
-    %SystemDouble, null\n    __0_const_intnl_SystemInt32: %SystemInt32, null\n    __1_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __10_const_intnl_SystemInt32: %SystemInt32, null\n    __11_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __12_const_intnl_SystemInt32: %SystemInt32, null\n    __13_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __14_const_intnl_SystemInt32: %SystemInt32, null\n    __15_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __16_const_intnl_SystemInt32: %SystemInt32, null\n    __2_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __3_const_intnl_SystemInt32: %SystemInt32, null\n    __4_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __5_const_intnl_SystemInt32: %SystemInt32, null\n    __6_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __7_const_intnl_SystemInt32: %SystemInt32, null\n    __8_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __9_const_intnl_SystemInt32: %SystemInt32, null\n    __0_const_intnl_SystemSingle:
-    %SystemSingle, null\n    __1_const_intnl_SystemSingle: %SystemSingle, null\n    __2_const_intnl_SystemSingle:
-    %SystemSingle, null\n    __3_const_intnl_SystemSingle: %SystemSingle, null\n    __0_const_intnl_SystemString:
+    %UnityEngineUIText, null\n    HUDText_knotsairspeed: %UnityEngineUIText, null\n
+    \   HUDText_knotstarget: %UnityEngineUIText, null\n    HUDText_mach: %UnityEngineUIText,
+    null\n    DownIndicator: %UnityEngineTransform, null\n    ElevationIndicator:
+    %UnityEngineTransform, null\n    HeadingIndicator: %UnityEngineTransform, null\n
+    \   LStickDisplayHighlighter: %UnityEngineTransform, null\n    PitchRoll: %UnityEngineTransform,
+    null\n    RStickDisplayHighlighter: %UnityEngineTransform, null\n    TrimPitch:
+    %UnityEngineTransform, null\n    TrimYaw: %UnityEngineTransform, null\n    VelocityIndicator:
+    %UnityEngineTransform, null\n    Yaw: %UnityEngineTransform, null\n    EngineControl:
+    %VRCUdonUdonBehaviour, null\n    showvel: %SystemInt32, null\n    check: %SystemSingle,
+    null\n    distance_from_head: %SystemSingle, null\n    maxGs: %SystemSingle, null\n
+    \   HUDText_angleofattack_temp: %SystemString, null\n    InputsZeroPos: %UnityEngineVector3,
+    null\n    startingpos: %UnityEngineVector3, null\n    temprot: %UnityEngineVector3,
+    null\n    tempvel: %UnityEngineVector3, null\n    __0_this_intnl_UnityEngineTransform:
+    %UnityEngineTransform, this\n    __0_InputSquareSize_Single: %SystemSingle, null\n
+    \   __0_new_z_Single: %SystemSingle, null\n    __0_const_intnl_SystemBoolean:
+    %SystemBoolean, null\n    __1_const_intnl_SystemBoolean: %SystemBoolean, null\n
+    \   __0_const_intnl_SystemDouble: %SystemDouble, null\n    __0_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __1_const_intnl_SystemInt32: %SystemInt32, null\n    __10_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __11_const_intnl_SystemInt32: %SystemInt32, null\n    __12_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __13_const_intnl_SystemInt32: %SystemInt32, null\n    __14_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __15_const_intnl_SystemInt32: %SystemInt32, null\n    __16_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __2_const_intnl_SystemInt32: %SystemInt32, null\n    __3_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __4_const_intnl_SystemInt32: %SystemInt32, null\n    __5_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __6_const_intnl_SystemInt32: %SystemInt32, null\n    __7_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __8_const_intnl_SystemInt32: %SystemInt32, null\n    __9_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __0_const_intnl_SystemSingle: %SystemSingle, null\n    __1_const_intnl_SystemSingle:
+    %SystemSingle, null\n    __2_const_intnl_SystemSingle: %SystemSingle, null\n    __3_const_intnl_SystemSingle:
+    %SystemSingle, null\n    __4_const_intnl_SystemSingle: %SystemSingle, null\n    __0_const_intnl_SystemString:
     %SystemString, null\n    __1_const_intnl_SystemString: %SystemString, null\n    __10_const_intnl_SystemString:
     %SystemString, null\n    __11_const_intnl_SystemString: %SystemString, null\n
     \   __12_const_intnl_SystemString: %SystemString, null\n    __13_const_intnl_SystemString:
     %SystemString, null\n    __14_const_intnl_SystemString: %SystemString, null\n
-    \   __15_const_intnl_SystemString: %SystemString, null\n    __2_const_intnl_SystemString:
-    %SystemString, null\n    __3_const_intnl_SystemString: %SystemString, null\n    __4_const_intnl_SystemString:
+    \   __15_const_intnl_SystemString: %SystemString, null\n    __16_const_intnl_SystemString:
+    %SystemString, null\n    __17_const_intnl_SystemString: %SystemString, null\n
+    \   __18_const_intnl_SystemString: %SystemString, null\n    __19_const_intnl_SystemString:
+    %SystemString, null\n    __2_const_intnl_SystemString: %SystemString, null\n    __20_const_intnl_SystemString:
+    %SystemString, null\n    __21_const_intnl_SystemString: %SystemString, null\n
+    \   __3_const_intnl_SystemString: %SystemString, null\n    __4_const_intnl_SystemString:
     %SystemString, null\n    __5_const_intnl_SystemString: %SystemString, null\n    __6_const_intnl_SystemString:
     %SystemString, null\n    __7_const_intnl_SystemString: %SystemString, null\n    __8_const_intnl_SystemString:
     %SystemString, null\n    __9_const_intnl_SystemString: %SystemString, null\n    __0_const_intnl_SystemUInt32:
@@ -65,7 +75,8 @@ MonoBehaviour:
     %SystemBoolean, null\n    __2_intnl_SystemBoolean: %SystemBoolean, null\n    __20_intnl_SystemBoolean:
     %SystemBoolean, null\n    __21_intnl_SystemBoolean: %SystemBoolean, null\n    __22_intnl_SystemBoolean:
     %SystemBoolean, null\n    __23_intnl_SystemBoolean: %SystemBoolean, null\n    __24_intnl_SystemBoolean:
-    %SystemBoolean, null\n    __25_intnl_SystemBoolean: %SystemBoolean, null\n    __3_intnl_SystemBoolean:
+    %SystemBoolean, null\n    __25_intnl_SystemBoolean: %SystemBoolean, null\n    __26_intnl_SystemBoolean:
+    %SystemBoolean, null\n    __27_intnl_SystemBoolean: %SystemBoolean, null\n    __3_intnl_SystemBoolean:
     %SystemBoolean, null\n    __4_intnl_SystemBoolean: %SystemBoolean, null\n    __5_intnl_SystemBoolean:
     %SystemBoolean, null\n    __6_intnl_SystemBoolean: %SystemBoolean, null\n    __7_intnl_SystemBoolean:
     %SystemBoolean, null\n    __8_intnl_SystemBoolean: %SystemBoolean, null\n    __9_intnl_SystemBoolean:
@@ -80,16 +91,20 @@ MonoBehaviour:
     %SystemObject, null\n    __10_intnl_SystemObject: %SystemObject, null\n    __11_intnl_SystemObject:
     %SystemObject, null\n    __12_intnl_SystemObject: %SystemObject, null\n    __13_intnl_SystemObject:
     %SystemObject, null\n    __14_intnl_SystemObject: %SystemObject, null\n    __15_intnl_SystemObject:
-    %SystemObject, null\n    __16_intnl_SystemObject: %SystemObject, null\n    __2_intnl_SystemObject:
-    %SystemObject, null\n    __3_intnl_SystemObject: %SystemObject, null\n    __4_intnl_SystemObject:
-    %SystemObject, null\n    __5_intnl_SystemObject: %SystemObject, null\n    __6_intnl_SystemObject:
-    %SystemObject, null\n    __7_intnl_SystemObject: %SystemObject, null\n    __8_intnl_SystemObject:
-    %SystemObject, null\n    __9_intnl_SystemObject: %SystemObject, null\n    __0_intnl_UnityEngineQuaternion:
-    %UnityEngineQuaternion, null\n    __1_intnl_UnityEngineQuaternion: %UnityEngineQuaternion,
-    null\n    __2_intnl_UnityEngineQuaternion: %UnityEngineQuaternion, null\n    __3_intnl_UnityEngineQuaternion:
-    %UnityEngineQuaternion, null\n    __4_intnl_UnityEngineQuaternion: %UnityEngineQuaternion,
-    null\n    __5_intnl_UnityEngineQuaternion: %UnityEngineQuaternion, null\n    __0_intnl_SystemSingle:
-    %SystemSingle, null\n    __1_intnl_SystemSingle: %SystemSingle, null\n    __10_intnl_SystemSingle:
+    %SystemObject, null\n    __16_intnl_SystemObject: %SystemObject, null\n    __17_intnl_SystemObject:
+    %SystemObject, null\n    __18_intnl_SystemObject: %SystemObject, null\n    __19_intnl_SystemObject:
+    %SystemObject, null\n    __2_intnl_SystemObject: %SystemObject, null\n    __20_intnl_SystemObject:
+    %SystemObject, null\n    __21_intnl_SystemObject: %SystemObject, null\n    __22_intnl_SystemObject:
+    %SystemObject, null\n    __23_intnl_SystemObject: %SystemObject, null\n    __3_intnl_SystemObject:
+    %SystemObject, null\n    __4_intnl_SystemObject: %SystemObject, null\n    __5_intnl_SystemObject:
+    %SystemObject, null\n    __6_intnl_SystemObject: %SystemObject, null\n    __7_intnl_SystemObject:
+    %SystemObject, null\n    __8_intnl_SystemObject: %SystemObject, null\n    __9_intnl_SystemObject:
+    %SystemObject, null\n    __0_intnl_UnityEngineQuaternion: %UnityEngineQuaternion,
+    null\n    __1_intnl_UnityEngineQuaternion: %UnityEngineQuaternion, null\n    __2_intnl_UnityEngineQuaternion:
+    %UnityEngineQuaternion, null\n    __3_intnl_UnityEngineQuaternion: %UnityEngineQuaternion,
+    null\n    __4_intnl_UnityEngineQuaternion: %UnityEngineQuaternion, null\n    __5_intnl_UnityEngineQuaternion:
+    %UnityEngineQuaternion, null\n    __0_intnl_SystemSingle: %SystemSingle, null\n
+    \   __1_intnl_SystemSingle: %SystemSingle, null\n    __10_intnl_SystemSingle:
     %SystemSingle, null\n    __11_intnl_SystemSingle: %SystemSingle, null\n    __12_intnl_SystemSingle:
     %SystemSingle, null\n    __13_intnl_SystemSingle: %SystemSingle, null\n    __14_intnl_SystemSingle:
     %SystemSingle, null\n    __15_intnl_SystemSingle: %SystemSingle, null\n    __16_intnl_SystemSingle:
@@ -103,93 +118,188 @@ MonoBehaviour:
     %SystemSingle, null\n    __3_intnl_SystemSingle: %SystemSingle, null\n    __30_intnl_SystemSingle:
     %SystemSingle, null\n    __31_intnl_SystemSingle: %SystemSingle, null\n    __32_intnl_SystemSingle:
     %SystemSingle, null\n    __33_intnl_SystemSingle: %SystemSingle, null\n    __34_intnl_SystemSingle:
-    %SystemSingle, null\n    __4_intnl_SystemSingle: %SystemSingle, null\n    __5_intnl_SystemSingle:
+    %SystemSingle, null\n    __35_intnl_SystemSingle: %SystemSingle, null\n    __36_intnl_SystemSingle:
+    %SystemSingle, null\n    __37_intnl_SystemSingle: %SystemSingle, null\n    __38_intnl_SystemSingle:
+    %SystemSingle, null\n    __39_intnl_SystemSingle: %SystemSingle, null\n    __4_intnl_SystemSingle:
+    %SystemSingle, null\n    __40_intnl_SystemSingle: %SystemSingle, null\n    __41_intnl_SystemSingle:
+    %SystemSingle, null\n    __42_intnl_SystemSingle: %SystemSingle, null\n    __43_intnl_SystemSingle:
+    %SystemSingle, null\n    __44_intnl_SystemSingle: %SystemSingle, null\n    __45_intnl_SystemSingle:
+    %SystemSingle, null\n    __46_intnl_SystemSingle: %SystemSingle, null\n    __47_intnl_SystemSingle:
+    %SystemSingle, null\n    __48_intnl_SystemSingle: %SystemSingle, null\n    __49_intnl_SystemSingle:
+    %SystemSingle, null\n    __5_intnl_SystemSingle: %SystemSingle, null\n    __50_intnl_SystemSingle:
+    %SystemSingle, null\n    __51_intnl_SystemSingle: %SystemSingle, null\n    __52_intnl_SystemSingle:
     %SystemSingle, null\n    __6_intnl_SystemSingle: %SystemSingle, null\n    __7_intnl_SystemSingle:
     %SystemSingle, null\n    __8_intnl_SystemSingle: %SystemSingle, null\n    __9_intnl_SystemSingle:
     %SystemSingle, null\n    __0_intnl_SystemString: %SystemString, null\n    __1_intnl_SystemString:
     %SystemString, null\n    __2_intnl_SystemString: %SystemString, null\n    __3_intnl_SystemString:
     %SystemString, null\n    __4_intnl_SystemString: %SystemString, null\n    __5_intnl_SystemString:
     %SystemString, null\n    __6_intnl_SystemString: %SystemString, null\n    __7_intnl_SystemString:
-    %SystemString, null\n    __8_intnl_SystemString: %SystemString, null\n    __0_intnl_UnityEngineTransform:
-    %UnityEngineTransform, null\n    __1_intnl_UnityEngineTransform: %UnityEngineTransform,
-    null\n    __2_intnl_UnityEngineTransform: %UnityEngineTransform, null\n    __3_intnl_UnityEngineTransform:
-    %UnityEngineTransform, null\n    __4_intnl_UnityEngineTransform: %UnityEngineTransform,
-    null\n    __0_intnl_returnTarget_UInt32: %SystemUInt32, null\n    __0_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __1_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __10_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __11_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __12_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __13_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __14_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __15_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __16_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __2_intnl_UnityEngineVector3:
+    %SystemString, null\n    __8_intnl_SystemString: %SystemString, null\n    __9_intnl_SystemString:
+    %SystemString, null\n    __0_intnl_UnityEngineTransform: %UnityEngineTransform,
+    null\n    __1_intnl_UnityEngineTransform: %UnityEngineTransform, null\n    __2_intnl_UnityEngineTransform:
+    %UnityEngineTransform, null\n    __3_intnl_UnityEngineTransform: %UnityEngineTransform,
+    null\n    __4_intnl_UnityEngineTransform: %UnityEngineTransform, null\n    __0_intnl_returnTarget_UInt32:
+    %SystemUInt32, null\n    __0_intnl_UnityEngineVector2: %UnityEngineVector2, null\n
+    \   __1_intnl_UnityEngineVector2: %UnityEngineVector2, null\n    __2_intnl_UnityEngineVector2:
+    %UnityEngineVector2, null\n    __3_intnl_UnityEngineVector2: %UnityEngineVector2,
+    null\n    __0_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __1_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __10_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __11_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __12_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __13_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __14_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __15_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __16_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __17_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __18_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __19_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __2_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __20_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __21_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __22_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __23_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __24_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __25_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __26_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __27_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __28_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __29_intnl_UnityEngineVector3:
     %UnityEngineVector3, null\n    __3_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __4_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __5_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __6_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __7_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __8_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __9_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n\n.data_end\n\n.code_start\n    .export _onEnable\n        \n    _onEnable:\n
-    \       \n        PUSH, __0_const_intnl_SystemUInt32\n        PUSH, __0_const_intnl_SystemSingle\n
-    \       PUSH, maxGs\n        COPY\n        PUSH, __0_intnl_returnTarget_UInt32
-    #Function epilogue\n        COPY\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n
-    \       \n    .export _update\n        \n    _update:\n        \n        PUSH,
-    __0_const_intnl_SystemUInt32\n        PUSH, EngineControl\n        PUSH, __0_const_intnl_SystemString\n
+    null\n    __30_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __4_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __5_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __6_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __7_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __8_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __9_intnl_UnityEngineVector3: %UnityEngineVector3, null\n\n.data_end\n\n.code_start\n
+    \   .export _start\n        \n    _start:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
+    \       PUSH, PitchRoll\n        PUSH, InputsZeroPos\n        EXTERN, \"UnityEngineTransform.__get_localPosition__UnityEngineVector3\"\n
+    \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
+    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _onEnable\n
+    \       \n    _onEnable:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
+    \       PUSH, __0_const_intnl_SystemSingle\n        PUSH, maxGs\n        COPY\n
+    \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
+    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _update\n
+    \       \n    _update:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
+    \       PUSH, __1_const_intnl_SystemSingle\n        PUSH, __0_InputSquareSize_Single\n
+    \       COPY\n        PUSH, EngineControl\n        PUSH, __0_const_intnl_SystemString\n
     \       PUSH, __0_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __0_intnl_SystemObject\n        PUSH, __1_intnl_UnityEngineVector3\n
-    \       COPY\n        PUSH, __1_intnl_UnityEngineVector3\n        PUSH, __0_intnl_SystemSingle\n
-    \       EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\n        PUSH,
-    __0_const_intnl_SystemInt32\n        PUSH, __1_intnl_SystemSingle\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __0_intnl_SystemSingle\n
-    \       PUSH, __1_intnl_SystemSingle\n        PUSH, __0_intnl_SystemBoolean\n
-    \       EXTERN, \"SystemSingle.__op_LessThan__SystemSingle_SystemSingle__SystemBoolean\"\n
-    \       PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000134\n        PUSH,
-    __2_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__get_up__UnityEngineVector3\"\n
-    \       PUSH, __2_intnl_UnityEngineVector3\n        PUSH, __3_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineVector3.__op_UnaryNegation__UnityEngineVector3__UnityEngineVector3\"\n
-    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __2_intnl_SystemSingle\n
-    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __3_intnl_UnityEngineVector3\n        PUSH, __2_intnl_SystemSingle\n        PUSH,
-    tempvel\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
-    \       JUMP, 0x0000017C\n        PUSH, EngineControl\n        PUSH, __0_const_intnl_SystemString\n
-    \       PUSH, __1_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __1_intnl_SystemObject\n        PUSH, __2_intnl_UnityEngineVector3\n
-    \       COPY\n        PUSH, __2_intnl_UnityEngineVector3\n        PUSH, tempvel\n
-    \       COPY\n        PUSH, __0_this_intnl_UnityEngineTransform\n        PUSH,
-    __2_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
-    \       PUSH, __2_intnl_UnityEngineVector3\n        PUSH, tempvel\n        PUSH,
-    __3_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
-    \       PUSH, VelocityIndicator\n        PUSH, __3_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineTransform.__set_position__UnityEngineVector3__SystemVoid\"\n
-    \       PUSH, VelocityIndicator\n        PUSH, __4_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineTransform.__get_localPosition__UnityEngineVector3\"\n
-    \       PUSH, __4_intnl_UnityEngineVector3\n        PUSH, __5_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\n
-    \       PUSH, __5_intnl_UnityEngineVector3\n        PUSH, distance_from_head\n
-    \       PUSH, __6_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
-    \       PUSH, VelocityIndicator\n        PUSH, __6_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n
+    \       PUSH, __0_intnl_SystemObject\n        PUSH, __1_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, __1_intnl_SystemSingle\n
+    \       PUSH, __2_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\n
     \       PUSH, EngineControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
     __1_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __1_intnl_SystemObject\n        PUSH, __1_intnl_UnityEngineGameObject\n
+    \       PUSH, __1_intnl_SystemObject\n        PUSH, __4_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __5_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __2_intnl_SystemSingle\n        PUSH, __4_intnl_SystemSingle\n        PUSH,
+    __5_intnl_SystemSingle\n        PUSH, __0_intnl_UnityEngineVector3\n        EXTERN,
+    \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, __0_intnl_UnityEngineVector3\n        PUSH, __0_InputSquareSize_Single\n
+    \       PUSH, __1_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, InputsZeroPos\n        PUSH, __1_intnl_UnityEngineVector3\n        PUSH,
+    __2_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, PitchRoll\n        PUSH, __2_intnl_UnityEngineVector3\n        EXTERN,
+    \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n
+    \       PUSH, EngineControl\n        PUSH, __2_const_intnl_SystemString\n        PUSH,
+    __2_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __2_intnl_SystemObject\n        PUSH, __7_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __8_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __9_intnl_SystemSingle\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
+    __7_intnl_SystemSingle\n        PUSH, __8_intnl_SystemSingle\n        PUSH, __9_intnl_SystemSingle\n
+    \       PUSH, __3_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, __3_intnl_UnityEngineVector3\n        PUSH, __0_InputSquareSize_Single\n
+    \       PUSH, __4_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, InputsZeroPos\n        PUSH, __4_intnl_UnityEngineVector3\n        PUSH,
+    __5_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, Yaw\n        PUSH, __5_intnl_UnityEngineVector3\n        EXTERN,
+    \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n
+    \       PUSH, EngineControl\n        PUSH, __3_const_intnl_SystemString\n        PUSH,
+    __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __3_intnl_SystemObject\n        PUSH, __1_intnl_UnityEngineVector2\n
+    \       COPY\n        PUSH, __1_intnl_UnityEngineVector2\n        PUSH, __10_intnl_SystemSingle\n
+    \       EXTERN, \"UnityEngineVector2.__get_y__SystemSingle\"\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __11_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __12_intnl_SystemSingle\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
+    __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n        PUSH,
+    __12_intnl_SystemSingle\n        PUSH, __6_intnl_UnityEngineVector3\n        EXTERN,
+    \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, __6_intnl_UnityEngineVector3\n        PUSH, __0_InputSquareSize_Single\n
+    \       PUSH, __7_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, InputsZeroPos\n        PUSH, __7_intnl_UnityEngineVector3\n        PUSH,
+    __8_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, TrimYaw\n        PUSH, __8_intnl_UnityEngineVector3\n        EXTERN,
+    \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n
+    \       PUSH, EngineControl\n        PUSH, __3_const_intnl_SystemString\n        PUSH,
+    __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __4_intnl_SystemObject\n        PUSH, __3_intnl_UnityEngineVector2\n
+    \       COPY\n        PUSH, __3_intnl_UnityEngineVector2\n        PUSH, __13_intnl_SystemSingle\n
+    \       EXTERN, \"UnityEngineVector2.__get_x__SystemSingle\"\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __14_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __15_intnl_SystemSingle\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
+    __14_intnl_SystemSingle\n        PUSH, __13_intnl_SystemSingle\n        PUSH,
+    __15_intnl_SystemSingle\n        PUSH, __9_intnl_UnityEngineVector3\n        EXTERN,
+    \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, __9_intnl_UnityEngineVector3\n        PUSH, __0_InputSquareSize_Single\n
+    \       PUSH, __10_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, InputsZeroPos\n        PUSH, __10_intnl_UnityEngineVector3\n        PUSH,
+    __11_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, TrimPitch\n        PUSH, __11_intnl_UnityEngineVector3\n        EXTERN,
+    \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n
+    \       PUSH, EngineControl\n        PUSH, __4_const_intnl_SystemString\n        PUSH,
+    __5_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __5_intnl_SystemObject\n        PUSH, __13_intnl_UnityEngineVector3\n
+    \       COPY\n        PUSH, __13_intnl_UnityEngineVector3\n        PUSH, __16_intnl_SystemSingle\n
+    \       EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\n        PUSH,
+    __1_const_intnl_SystemInt32\n        PUSH, __17_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __16_intnl_SystemSingle\n
+    \       PUSH, __17_intnl_SystemSingle\n        PUSH, __0_intnl_SystemBoolean\n
+    \       EXTERN, \"SystemSingle.__op_LessThan__SystemSingle_SystemSingle__SystemBoolean\"\n
+    \       PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000057C\n        PUSH,
+    __14_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__get_up__UnityEngineVector3\"\n
+    \       PUSH, __14_intnl_UnityEngineVector3\n        PUSH, __15_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineVector3.__op_UnaryNegation__UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __18_intnl_SystemSingle\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
+    __15_intnl_UnityEngineVector3\n        PUSH, __18_intnl_SystemSingle\n        PUSH,
+    tempvel\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
+    \       JUMP, 0x000005C4\n        PUSH, EngineControl\n        PUSH, __4_const_intnl_SystemString\n
+    \       PUSH, __6_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __6_intnl_SystemObject\n        PUSH, __14_intnl_UnityEngineVector3\n
+    \       COPY\n        PUSH, __14_intnl_UnityEngineVector3\n        PUSH, tempvel\n
+    \       COPY\n        PUSH, __0_this_intnl_UnityEngineTransform\n        PUSH,
+    __14_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
+    \       PUSH, __14_intnl_UnityEngineVector3\n        PUSH, tempvel\n        PUSH,
+    __15_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, VelocityIndicator\n        PUSH, __15_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineTransform.__set_position__UnityEngineVector3__SystemVoid\"\n
+    \       PUSH, VelocityIndicator\n        PUSH, __16_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineTransform.__get_localPosition__UnityEngineVector3\"\n
+    \       PUSH, __16_intnl_UnityEngineVector3\n        PUSH, __17_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\n
+    \       PUSH, __17_intnl_UnityEngineVector3\n        PUSH, distance_from_head\n
+    \       PUSH, __18_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, VelocityIndicator\n        PUSH, __18_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n
+    \       PUSH, EngineControl\n        PUSH, __5_const_intnl_SystemString\n        PUSH,
+    __6_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __6_intnl_SystemObject\n        PUSH, __1_intnl_UnityEngineGameObject\n
     \       COPY\n        PUSH, __1_intnl_UnityEngineGameObject\n        PUSH, __0_intnl_UnityEngineTransform\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
     \       PUSH, __0_intnl_UnityEngineTransform\n        PUSH, __0_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__get_rotation__UnityEngineQuaternion\"\n
     \       PUSH, __0_intnl_UnityEngineQuaternion\n        PUSH, temprot\n        EXTERN,
     \"UnityEngineQuaternion.__get_eulerAngles__UnityEngineVector3\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __2_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __18_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, temprot\n
-    \       PUSH, __2_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__set_x__SystemSingle\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __3_intnl_SystemSingle\n
+    \       PUSH, __18_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__set_x__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __19_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    temprot\n        PUSH, __3_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__set_z__SystemSingle\"\n
-    \       PUSH, temprot\n        PUSH, __7_intnl_UnityEngineVector3\n        EXTERN,
+    temprot\n        PUSH, __19_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__set_z__SystemSingle\"\n
+    \       PUSH, temprot\n        PUSH, __19_intnl_UnityEngineVector3\n        EXTERN,
     \"UnityEngineVector3.__op_UnaryNegation__UnityEngineVector3__UnityEngineVector3\"\n
-    \       PUSH, __7_intnl_UnityEngineVector3\n        PUSH, __1_intnl_UnityEngineQuaternion\n
+    \       PUSH, __19_intnl_UnityEngineVector3\n        PUSH, __1_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__UnityEngineVector3__UnityEngineQuaternion\"\n
     \       PUSH, HeadingIndicator\n        PUSH, __1_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
-    __2_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __2_intnl_SystemObject\n        PUSH, __3_intnl_UnityEngineGameObject\n
+    \       PUSH, EngineControl\n        PUSH, __5_const_intnl_SystemString\n        PUSH,
+    __7_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __7_intnl_SystemObject\n        PUSH, __3_intnl_UnityEngineGameObject\n
     \       COPY\n        PUSH, __3_intnl_UnityEngineGameObject\n        PUSH, __1_intnl_UnityEngineTransform\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
     \       PUSH, __1_intnl_UnityEngineTransform\n        PUSH, __2_intnl_UnityEngineQuaternion\n
@@ -197,451 +307,471 @@ MonoBehaviour:
     \       PUSH, __2_intnl_UnityEngineQuaternion\n        PUSH, temprot\n        EXTERN,
     \"UnityEngineQuaternion.__get_eulerAngles__UnityEngineVector3\"\n        PUSH,
     temprot\n        PUSH, __0_new_z_Single\n        EXTERN, \"UnityEngineVector3.__get_z__SystemSingle\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __4_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __20_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    temprot\n        PUSH, __4_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__set_y__SystemSingle\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __5_intnl_SystemSingle\n
+    temprot\n        PUSH, __20_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__set_y__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __21_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    temprot\n        PUSH, __5_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__set_z__SystemSingle\"\n
-    \       PUSH, temprot\n        PUSH, __8_intnl_UnityEngineVector3\n        EXTERN,
+    temprot\n        PUSH, __21_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__set_z__SystemSingle\"\n
+    \       PUSH, temprot\n        PUSH, __20_intnl_UnityEngineVector3\n        EXTERN,
     \"UnityEngineVector3.__op_UnaryNegation__UnityEngineVector3__UnityEngineVector3\"\n
-    \       PUSH, __8_intnl_UnityEngineVector3\n        PUSH, __3_intnl_UnityEngineQuaternion\n
+    \       PUSH, __20_intnl_UnityEngineVector3\n        PUSH, __3_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__UnityEngineVector3__UnityEngineQuaternion\"\n
     \       PUSH, ElevationIndicator\n        PUSH, __3_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       PUSH, ElevationIndicator\n        PUSH, __9_intnl_UnityEngineVector3\n
+    \       PUSH, ElevationIndicator\n        PUSH, __21_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
-    \       PUSH, EngineControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
-    __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __3_intnl_SystemObject\n        PUSH, __5_intnl_UnityEngineGameObject\n
+    \       PUSH, EngineControl\n        PUSH, __5_const_intnl_SystemString\n        PUSH,
+    __8_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __8_intnl_SystemObject\n        PUSH, __5_intnl_UnityEngineGameObject\n
     \       COPY\n        PUSH, __5_intnl_UnityEngineGameObject\n        PUSH, __2_intnl_UnityEngineTransform\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __2_intnl_UnityEngineTransform\n        PUSH, __10_intnl_UnityEngineVector3\n
+    \       PUSH, __2_intnl_UnityEngineTransform\n        PUSH, __22_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineTransform.__get_forward__UnityEngineVector3\"\n        PUSH,
-    __0_new_z_Single\n        PUSH, __6_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\n
-    \       PUSH, ElevationIndicator\n        PUSH, __9_intnl_UnityEngineVector3\n
-    \       PUSH, __10_intnl_UnityEngineVector3\n        PUSH, __6_intnl_SystemSingle\n
+    __0_new_z_Single\n        PUSH, __22_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\n
+    \       PUSH, ElevationIndicator\n        PUSH, __21_intnl_UnityEngineVector3\n
+    \       PUSH, __22_intnl_UnityEngineVector3\n        PUSH, __22_intnl_SystemSingle\n
     \       EXTERN, \"UnityEngineTransform.__RotateAround__UnityEngineVector3_UnityEngineVector3_SystemSingle__SystemVoid\"\n
-    \       PUSH, __11_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__get_zero__UnityEngineVector3\"\n
-    \       PUSH, ElevationIndicator\n        PUSH, __11_intnl_UnityEngineVector3\n
+    \       PUSH, __23_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__get_zero__UnityEngineVector3\"\n
+    \       PUSH, ElevationIndicator\n        PUSH, __23_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n
-    \       PUSH, temprot\n        PUSH, __7_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__get_z__SystemSingle\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __8_intnl_SystemSingle\n
+    \       PUSH, temprot\n        PUSH, __23_intnl_SystemSingle\n        EXTERN,
+    \"UnityEngineVector3.__get_z__SystemSingle\"\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __24_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __25_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __9_intnl_SystemSingle\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __8_intnl_SystemSingle\n
-    \       PUSH, __9_intnl_SystemSingle\n        PUSH, __7_intnl_SystemSingle\n        PUSH,
-    __12_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n
-    \       PUSH, __12_intnl_UnityEngineVector3\n        PUSH, __13_intnl_UnityEngineVector3\n
+    __24_intnl_SystemSingle\n        PUSH, __25_intnl_SystemSingle\n        PUSH,
+    __23_intnl_SystemSingle\n        PUSH, __24_intnl_UnityEngineVector3\n        EXTERN,
+    \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, __24_intnl_UnityEngineVector3\n        PUSH, __25_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineVector3.__op_UnaryNegation__UnityEngineVector3__UnityEngineVector3\"\n
-    \       PUSH, __13_intnl_UnityEngineVector3\n        PUSH, __4_intnl_UnityEngineQuaternion\n
+    \       PUSH, __25_intnl_UnityEngineVector3\n        PUSH, __4_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__UnityEngineVector3__UnityEngineQuaternion\"\n
     \       PUSH, DownIndicator\n        PUSH, __4_intnl_UnityEngineQuaternion\n        EXTERN,
     \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __2_const_intnl_SystemString\n        PUSH,
-    __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __4_intnl_SystemObject\n        PUSH, __2_intnl_SystemBoolean\n
+    \       PUSH, EngineControl\n        PUSH, __6_const_intnl_SystemString\n        PUSH,
+    __9_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __9_intnl_SystemObject\n        PUSH, __2_intnl_SystemBoolean\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
-    __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000698\n        PUSH, HudSAFE\n
+    __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000AE0\n        PUSH, HudSAFE\n
     \       PUSH, __0_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
-    \       JUMP, 0x000006B0\n        PUSH, HudSAFE\n        PUSH, __1_const_intnl_SystemBoolean\n
+    \       JUMP, 0x00000AF8\n        PUSH, HudSAFE\n        PUSH, __1_const_intnl_SystemBoolean\n
     \       EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __3_const_intnl_SystemString\n        PUSH,
-    __5_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __5_intnl_SystemObject\n        PUSH, __1_intnl_SystemInt32\n        EXTERN,
+    \       PUSH, EngineControl\n        PUSH, __7_const_intnl_SystemString\n        PUSH,
+    __10_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __10_intnl_SystemObject\n        PUSH, __1_intnl_SystemInt32\n        EXTERN,
     \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, __1_intnl_SystemInt32\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __3_intnl_SystemBoolean\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __3_intnl_SystemBoolean\n
     \       EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __3_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000720\n        JUMP,
-    0x000008E8\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __2_const_intnl_SystemInt32\n
+    \       PUSH, __3_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000B68\n        JUMP,
+    0x00000D30\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __2_const_intnl_SystemInt32\n
     \       PUSH, __4_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000758\n        JUMP,
-    0x00000978\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000BA0\n        JUMP,
+    0x00000DC0\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __1_const_intnl_SystemInt32\n
     \       PUSH, __5_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __5_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000790\n        JUMP,
-    0x00000A08\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __3_const_intnl_SystemInt32\n
+    \       PUSH, __5_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000BD8\n        JUMP,
+    0x00000E50\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __3_const_intnl_SystemInt32\n
     \       PUSH, __6_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __6_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000007C8\n        JUMP,
-    0x00000AB0\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __4_const_intnl_SystemInt32\n
+    \       PUSH, __6_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000C10\n        JUMP,
+    0x00000EF8\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __4_const_intnl_SystemInt32\n
     \       PUSH, __7_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __7_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000800\n        JUMP,
-    0x00000B58\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __5_const_intnl_SystemInt32\n
+    \       PUSH, __7_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000C48\n        JUMP,
+    0x00000FA0\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __5_const_intnl_SystemInt32\n
     \       PUSH, __8_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000838\n        JUMP,
-    0x00000C00\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __6_const_intnl_SystemInt32\n
+    \       PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000C80\n        JUMP,
+    0x00001048\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __6_const_intnl_SystemInt32\n
     \       PUSH, __9_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __9_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000870\n        JUMP,
-    0x00000CA8\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __7_const_intnl_SystemInt32\n
+    \       PUSH, __9_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000CB8\n        JUMP,
+    0x000010F0\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __7_const_intnl_SystemInt32\n
     \       PUSH, __10_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000008A8\n        JUMP,
-    0x00000D50\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __8_const_intnl_SystemInt32\n
+    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000CF0\n        JUMP,
+    0x00001198\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __8_const_intnl_SystemInt32\n
     \       PUSH, __11_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __11_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000008E0\n        JUMP,
-    0x00000DF8\n        JUMP, 0x00000EA0\n        PUSH, __1_const_intnl_SystemInt32\n
-    \       PUSH, __10_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __9_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n
+    \       PUSH, __11_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000D28\n        JUMP,
+    0x00001240\n        JUMP, 0x000012E8\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __26_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __9_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __12_intnl_SystemSingle\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __10_intnl_SystemSingle\n
-    \       PUSH, __11_intnl_SystemSingle\n        PUSH, __12_intnl_SystemSingle\n
+    __0_const_intnl_SystemInt32\n        PUSH, __28_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __26_intnl_SystemSingle\n
+    \       PUSH, __27_intnl_SystemSingle\n        PUSH, __28_intnl_SystemSingle\n
     \       PUSH, __5_intnl_UnityEngineQuaternion\n        EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, __1_const_intnl_SystemInt32\n        PUSH,
-    __10_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n
+    \       JUMP, 0x000012E8\n        PUSH, __0_const_intnl_SystemInt32\n        PUSH,
+    __26_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __12_intnl_SystemSingle\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __10_intnl_SystemSingle\n
-    \       PUSH, __11_intnl_SystemSingle\n        PUSH, __12_intnl_SystemSingle\n
+    __0_const_intnl_SystemInt32\n        PUSH, __28_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __26_intnl_SystemSingle\n
+    \       PUSH, __27_intnl_SystemSingle\n        PUSH, __28_intnl_SystemSingle\n
     \       PUSH, __5_intnl_UnityEngineQuaternion\n        EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, __10_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x000012E8\n        PUSH, __10_const_intnl_SystemInt32\n        PUSH,
     __2_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __2_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, __11_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x000012E8\n        PUSH, __11_const_intnl_SystemInt32\n        PUSH,
     __2_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __2_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, __12_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x000012E8\n        PUSH, __12_const_intnl_SystemInt32\n        PUSH,
     __2_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __2_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, __9_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x000012E8\n        PUSH, __9_const_intnl_SystemInt32\n        PUSH,
     __2_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __2_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, __13_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x000012E8\n        PUSH, __13_const_intnl_SystemInt32\n        PUSH,
     __2_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __2_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, __14_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x000012E8\n        PUSH, __14_const_intnl_SystemInt32\n        PUSH,
     __2_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __2_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, __15_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x000012E8\n        PUSH, __15_const_intnl_SystemInt32\n        PUSH,
     __2_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __2_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, RStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00000EA0\n        PUSH, EngineControl\n        PUSH, __4_const_intnl_SystemString\n
-    \       PUSH, __6_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __6_intnl_SystemObject\n        PUSH, __3_intnl_SystemInt32\n        EXTERN,
+    \       JUMP, 0x000012E8\n        PUSH, EngineControl\n        PUSH, __8_const_intnl_SystemString\n
+    \       PUSH, __11_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __11_intnl_SystemObject\n        PUSH, __3_intnl_SystemInt32\n        EXTERN,
     \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, __3_intnl_SystemInt32\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __12_intnl_SystemBoolean\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __12_intnl_SystemBoolean\n
     \       EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __12_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000F10\n        JUMP,
-    0x000010D8\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __2_const_intnl_SystemInt32\n
+    \       PUSH, __12_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001358\n        JUMP,
+    0x00001520\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __2_const_intnl_SystemInt32\n
     \       PUSH, __13_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __13_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000F48\n        JUMP,
-    0x00001168\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __13_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001390\n        JUMP,
+    0x000015B0\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __1_const_intnl_SystemInt32\n
     \       PUSH, __14_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __14_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000F80\n        JUMP,
-    0x000011F8\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __3_const_intnl_SystemInt32\n
+    \       PUSH, __14_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000013C8\n        JUMP,
+    0x00001640\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __3_const_intnl_SystemInt32\n
     \       PUSH, __15_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __15_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000FB8\n        JUMP,
-    0x000012A0\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __4_const_intnl_SystemInt32\n
+    \       PUSH, __15_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001400\n        JUMP,
+    0x000016E8\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __4_const_intnl_SystemInt32\n
     \       PUSH, __16_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __16_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000FF0\n        JUMP,
-    0x00001348\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __5_const_intnl_SystemInt32\n
+    \       PUSH, __16_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001438\n        JUMP,
+    0x00001790\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __5_const_intnl_SystemInt32\n
     \       PUSH, __17_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __17_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001028\n        JUMP,
-    0x000013F0\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __6_const_intnl_SystemInt32\n
+    \       PUSH, __17_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001470\n        JUMP,
+    0x00001838\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __6_const_intnl_SystemInt32\n
     \       PUSH, __18_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __18_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001060\n        JUMP,
-    0x00001498\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __7_const_intnl_SystemInt32\n
+    \       PUSH, __18_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000014A8\n        JUMP,
+    0x000018E0\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __7_const_intnl_SystemInt32\n
     \       PUSH, __19_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __19_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001098\n        JUMP,
-    0x00001540\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __8_const_intnl_SystemInt32\n
+    \       PUSH, __19_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000014E0\n        JUMP,
+    0x00001988\n        PUSH, __3_intnl_SystemInt32\n        PUSH, __8_const_intnl_SystemInt32\n
     \       PUSH, __20_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __20_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000010D0\n        JUMP,
-    0x000015E8\n        JUMP, 0x00001690\n        PUSH, __1_const_intnl_SystemInt32\n
-    \       PUSH, __10_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __9_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n
+    \       PUSH, __20_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001518\n        JUMP,
+    0x00001A30\n        JUMP, 0x00001AD8\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __26_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __9_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __12_intnl_SystemSingle\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __10_intnl_SystemSingle\n
-    \       PUSH, __11_intnl_SystemSingle\n        PUSH, __12_intnl_SystemSingle\n
+    __0_const_intnl_SystemInt32\n        PUSH, __28_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __26_intnl_SystemSingle\n
+    \       PUSH, __27_intnl_SystemSingle\n        PUSH, __28_intnl_SystemSingle\n
     \       PUSH, __5_intnl_UnityEngineQuaternion\n        EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, __1_const_intnl_SystemInt32\n        PUSH,
-    __10_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n
+    \       JUMP, 0x00001AD8\n        PUSH, __0_const_intnl_SystemInt32\n        PUSH,
+    __26_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __12_intnl_SystemSingle\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __10_intnl_SystemSingle\n
-    \       PUSH, __11_intnl_SystemSingle\n        PUSH, __12_intnl_SystemSingle\n
+    __0_const_intnl_SystemInt32\n        PUSH, __28_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __26_intnl_SystemSingle\n
+    \       PUSH, __27_intnl_SystemSingle\n        PUSH, __28_intnl_SystemSingle\n
     \       PUSH, __5_intnl_UnityEngineQuaternion\n        EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, __10_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x00001AD8\n        PUSH, __10_const_intnl_SystemInt32\n        PUSH,
     __4_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __4_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, __11_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x00001AD8\n        PUSH, __11_const_intnl_SystemInt32\n        PUSH,
     __4_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __4_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, __12_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x00001AD8\n        PUSH, __12_const_intnl_SystemInt32\n        PUSH,
     __4_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __4_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, __9_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x00001AD8\n        PUSH, __9_const_intnl_SystemInt32\n        PUSH,
     __4_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __4_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, __13_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x00001AD8\n        PUSH, __13_const_intnl_SystemInt32\n        PUSH,
     __4_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __4_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, __14_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x00001AD8\n        PUSH, __14_const_intnl_SystemInt32\n        PUSH,
     __4_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __4_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, __15_const_intnl_SystemInt32\n        PUSH,
+    \       JUMP, 0x00001AD8\n        PUSH, __15_const_intnl_SystemInt32\n        PUSH,
     __4_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __26_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __1_const_intnl_SystemInt32\n        PUSH, __11_intnl_SystemSingle\n        EXTERN,
+    __0_const_intnl_SystemInt32\n        PUSH, __27_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __4_intnl_SystemInt32\n
-    \       PUSH, __12_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
+    \       PUSH, __28_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, LStickDisplayHighlighter\n        PUSH, __5_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
-    \       JUMP, 0x00001690\n        PUSH, EngineControl\n        PUSH, __5_const_intnl_SystemString\n
-    \       PUSH, __7_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __7_intnl_SystemObject\n        PUSH, __22_intnl_SystemBoolean\n
+    \       JUMP, 0x00001AD8\n        PUSH, EngineControl\n        PUSH, __9_const_intnl_SystemString\n
+    \       PUSH, __12_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __12_intnl_SystemObject\n        PUSH, __22_intnl_SystemBoolean\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
-    __22_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001770\n        PUSH, EngineControl\n
-    \       PUSH, __6_const_intnl_SystemString\n        PUSH, __8_intnl_SystemObject\n
+    __22_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001B40\n        PUSH, HudAB\n
+    \       PUSH, __0_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
+    \       JUMP, 0x00001B58\n        PUSH, HudAB\n        PUSH, __1_const_intnl_SystemBoolean\n
+    \       EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
+    \       PUSH, EngineControl\n        PUSH, __10_const_intnl_SystemString\n        PUSH,
+    __13_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __13_intnl_SystemObject\n        PUSH, __24_intnl_SystemBoolean\n
+    \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
+    __24_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001C38\n        PUSH, EngineControl\n
+    \       PUSH, __11_const_intnl_SystemString\n        PUSH, __14_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __8_intnl_SystemObject\n        PUSH, __11_intnl_SystemSingle\n
+    \       PUSH, __14_intnl_SystemObject\n        PUSH, __27_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH,
-    __11_intnl_SystemSingle\n        PUSH, __1_const_intnl_SystemSingle\n        PUSH,
-    __12_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __12_intnl_SystemSingle\n        PUSH, __7_const_intnl_SystemString\n
+    __27_intnl_SystemSingle\n        PUSH, __2_const_intnl_SystemSingle\n        PUSH,
+    __28_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __28_intnl_SystemSingle\n        PUSH, __12_const_intnl_SystemString\n
     \       PUSH, __0_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
     \       PUSH, HUDText_knotstarget\n        PUSH, __0_intnl_SystemString\n        EXTERN,
-    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        JUMP, 0x00001798\n
+    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        JUMP, 0x00001C60\n
     \       PUSH, __0_intnl_SystemString\n        EXTERN, \"SystemString.__get_Empty__SystemString\"\n
     \       PUSH, HUDText_knotstarget\n        PUSH, __0_intnl_SystemString\n        EXTERN,
     \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, check\n
     \       PUSH, __0_intnl_SystemDouble\n        EXTERN, \"SystemConvert.__ToDouble__SystemSingle__SystemDouble\"\n
     \       PUSH, __0_intnl_SystemDouble\n        PUSH, __0_const_intnl_SystemDouble\n
-    \       PUSH, __23_intnl_SystemBoolean\n        EXTERN, \"SystemDouble.__op_GreaterThan__SystemDouble_SystemDouble__SystemBoolean\"\n
-    \       PUSH, __23_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001DA8\n        PUSH,
-    EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH, __8_intnl_SystemObject\n
+    \       PUSH, __25_intnl_SystemBoolean\n        EXTERN, \"SystemDouble.__op_GreaterThan__SystemDouble_SystemDouble__SystemBoolean\"\n
+    \       PUSH, __25_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00002314\n        PUSH,
+    EngineControl\n        PUSH, __13_const_intnl_SystemString\n        PUSH, __14_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __8_intnl_SystemObject\n        PUSH, __11_intnl_SystemSingle\n
+    \       PUSH, __14_intnl_SystemObject\n        PUSH, __27_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH,
-    __11_intnl_SystemSingle\n        PUSH, maxGs\n        PUSH, __24_intnl_SystemBoolean\n
+    __27_intnl_SystemSingle\n        PUSH, maxGs\n        PUSH, __26_intnl_SystemBoolean\n
     \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\n
-    \       PUSH, __24_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001880\n        PUSH,
-    EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH, __9_intnl_SystemObject\n
+    \       PUSH, __26_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001D48\n        PUSH,
+    EngineControl\n        PUSH, __13_const_intnl_SystemString\n        PUSH, __15_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __9_intnl_SystemObject\n        PUSH, maxGs\n        EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n
-    \       PUSH, EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH,
-    __9_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __9_intnl_SystemObject\n        PUSH, __13_intnl_SystemSingle\n
+    \       PUSH, __15_intnl_SystemObject\n        PUSH, maxGs\n        EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n
+    \       PUSH, EngineControl\n        PUSH, __13_const_intnl_SystemString\n        PUSH,
+    __15_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __15_intnl_SystemObject\n        PUSH, __29_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH,
-    __13_intnl_SystemSingle\n        PUSH, __9_const_intnl_SystemString\n        PUSH,
+    __29_intnl_SystemSingle\n        PUSH, __14_const_intnl_SystemString\n        PUSH,
     __0_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
-    \       PUSH, maxGs\n        PUSH, __9_const_intnl_SystemString\n        PUSH,
+    \       PUSH, maxGs\n        PUSH, __14_const_intnl_SystemString\n        PUSH,
     __1_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
-    \       PUSH, __0_intnl_SystemString\n        PUSH, __10_const_intnl_SystemString\n
+    \       PUSH, __0_intnl_SystemString\n        PUSH, __15_const_intnl_SystemString\n
     \       PUSH, __1_intnl_SystemString\n        PUSH, __2_intnl_SystemString\n        EXTERN,
     \"SystemString.__Concat__SystemString_SystemString_SystemString__SystemString\"\n
     \       PUSH, HUDText_G\n        PUSH, __2_intnl_SystemString\n        EXTERN,
     \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, EngineControl\n
-    \       PUSH, __11_const_intnl_SystemString\n        PUSH, __10_intnl_SystemObject\n
+    \       PUSH, __16_const_intnl_SystemString\n        PUSH, __16_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __10_intnl_SystemObject\n        PUSH, __15_intnl_SystemSingle\n
+    \       PUSH, __16_intnl_SystemObject\n        PUSH, __31_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH,
-    __15_intnl_SystemSingle\n        PUSH, __2_const_intnl_SystemSingle\n        PUSH,
-    __16_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __16_intnl_SystemSingle\n        PUSH, __12_const_intnl_SystemString\n
+    __31_intnl_SystemSingle\n        PUSH, __3_const_intnl_SystemSingle\n        PUSH,
+    __32_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __32_intnl_SystemSingle\n        PUSH, __17_const_intnl_SystemString\n
     \       PUSH, __3_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
     \       PUSH, HUDText_mach\n        PUSH, __3_intnl_SystemString\n        EXTERN,
     \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, EngineControl\n
-    \       PUSH, __0_const_intnl_SystemString\n        PUSH, __11_intnl_SystemObject\n
+    \       PUSH, __4_const_intnl_SystemString\n        PUSH, __17_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __11_intnl_SystemObject\n        PUSH, __15_intnl_UnityEngineVector3\n
-    \       COPY\n        PUSH, __15_intnl_UnityEngineVector3\n        PUSH, __17_intnl_SystemSingle\n
+    \       PUSH, __17_intnl_SystemObject\n        PUSH, __27_intnl_UnityEngineVector3\n
+    \       COPY\n        PUSH, __27_intnl_UnityEngineVector3\n        PUSH, __33_intnl_SystemSingle\n
     \       EXTERN, \"UnityEngineVector3.__get_y__SystemSingle\"\n        PUSH, __16_const_intnl_SystemInt32\n
-    \       PUSH, __18_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __17_intnl_SystemSingle\n        PUSH, __18_intnl_SystemSingle\n
-    \       PUSH, __19_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __19_intnl_SystemSingle\n        PUSH, __3_const_intnl_SystemSingle\n
-    \       PUSH, __20_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __20_intnl_SystemSingle\n        PUSH, __7_const_intnl_SystemString\n
+    \       PUSH, __34_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __33_intnl_SystemSingle\n        PUSH, __34_intnl_SystemSingle\n
+    \       PUSH, __35_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __35_intnl_SystemSingle\n        PUSH, __4_const_intnl_SystemSingle\n
+    \       PUSH, __36_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __36_intnl_SystemSingle\n        PUSH, __12_const_intnl_SystemString\n
     \       PUSH, __4_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
-    \       PUSH, EngineControl\n        PUSH, __13_const_intnl_SystemString\n        PUSH,
-    __12_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __12_intnl_SystemObject\n        PUSH, __4_intnl_UnityEngineTransform\n
-    \       COPY\n        PUSH, __4_intnl_UnityEngineTransform\n        PUSH, __16_intnl_UnityEngineVector3\n
+    \       PUSH, EngineControl\n        PUSH, __18_const_intnl_SystemString\n        PUSH,
+    __18_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __18_intnl_SystemObject\n        PUSH, __4_intnl_UnityEngineTransform\n
+    \       COPY\n        PUSH, __4_intnl_UnityEngineTransform\n        PUSH, __28_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
-    \       PUSH, __16_intnl_UnityEngineVector3\n        PUSH, __21_intnl_SystemSingle\n
+    \       PUSH, __28_intnl_UnityEngineVector3\n        PUSH, __37_intnl_SystemSingle\n
     \       EXTERN, \"UnityEngineVector3.__get_y__SystemSingle\"\n        PUSH, EngineControl\n
-    \       PUSH, __14_const_intnl_SystemString\n        PUSH, __13_intnl_SystemObject\n
+    \       PUSH, __19_const_intnl_SystemString\n        PUSH, __19_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __13_intnl_SystemObject\n        PUSH, __23_intnl_SystemSingle\n
+    \       PUSH, __19_intnl_SystemObject\n        PUSH, __39_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH,
-    __23_intnl_SystemSingle\n        PUSH, __24_intnl_SystemSingle\n        EXTERN,
-    \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\n        PUSH, __21_intnl_SystemSingle\n
-    \       PUSH, __24_intnl_SystemSingle\n        PUSH, __25_intnl_SystemSingle\n
+    __39_intnl_SystemSingle\n        PUSH, __40_intnl_SystemSingle\n        EXTERN,
+    \"SystemSingle.__op_UnaryMinus__SystemSingle__SystemSingle\"\n        PUSH, __37_intnl_SystemSingle\n
+    \       PUSH, __40_intnl_SystemSingle\n        PUSH, __41_intnl_SystemSingle\n
     \       EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __25_intnl_SystemSingle\n        PUSH, __3_const_intnl_SystemSingle\n
-    \       PUSH, __26_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __26_intnl_SystemSingle\n        PUSH, __7_const_intnl_SystemString\n
+    \       PUSH, __41_intnl_SystemSingle\n        PUSH, __4_const_intnl_SystemSingle\n
+    \       PUSH, __42_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __42_intnl_SystemSingle\n        PUSH, __12_const_intnl_SystemString\n
     \       PUSH, __5_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
-    \       PUSH, __4_intnl_SystemString\n        PUSH, __10_const_intnl_SystemString\n
+    \       PUSH, __4_intnl_SystemString\n        PUSH, __15_const_intnl_SystemString\n
     \       PUSH, __5_intnl_SystemString\n        PUSH, __6_intnl_SystemString\n        EXTERN,
     \"SystemString.__Concat__SystemString_SystemString_SystemString__SystemString\"\n
     \       PUSH, HUDText_altitude\n        PUSH, __6_intnl_SystemString\n        EXTERN,
     \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, EngineControl\n
-    \       PUSH, __11_const_intnl_SystemString\n        PUSH, __14_intnl_SystemObject\n
+    \       PUSH, __16_const_intnl_SystemString\n        PUSH, __20_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __14_intnl_SystemObject\n        PUSH, __28_intnl_SystemSingle\n
+    \       PUSH, __20_intnl_SystemObject\n        PUSH, __44_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH,
-    __28_intnl_SystemSingle\n        PUSH, __1_const_intnl_SystemSingle\n        PUSH,
-    __29_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __29_intnl_SystemSingle\n        PUSH, __7_const_intnl_SystemString\n
+    __44_intnl_SystemSingle\n        PUSH, __2_const_intnl_SystemSingle\n        PUSH,
+    __45_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __45_intnl_SystemSingle\n        PUSH, __12_const_intnl_SystemString\n
     \       PUSH, __7_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
     \       PUSH, HUDText_knots\n        PUSH, __7_intnl_SystemString\n        EXTERN,
     \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, EngineControl\n
-    \       PUSH, __11_const_intnl_SystemString\n        PUSH, __15_intnl_SystemObject\n
+    \       PUSH, __20_const_intnl_SystemString\n        PUSH, __21_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __15_intnl_SystemObject\n        PUSH, __31_intnl_SystemSingle\n
+    \       PUSH, __21_intnl_SystemObject\n        PUSH, __30_intnl_UnityEngineVector3\n
+    \       COPY\n        PUSH, __30_intnl_UnityEngineVector3\n        PUSH, __46_intnl_SystemSingle\n
+    \       EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\n        PUSH,
+    __46_intnl_SystemSingle\n        PUSH, __2_const_intnl_SystemSingle\n        PUSH,
+    __47_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __47_intnl_SystemSingle\n        PUSH, __12_const_intnl_SystemString\n
+    \       PUSH, __8_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
+    \       PUSH, HUDText_knotsairspeed\n        PUSH, __8_intnl_SystemString\n        EXTERN,
+    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, EngineControl\n
+    \       PUSH, __16_const_intnl_SystemString\n        PUSH, __22_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __22_intnl_SystemObject\n        PUSH, __49_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH,
-    __0_const_intnl_SystemInt32\n        PUSH, __32_intnl_SystemSingle\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __31_intnl_SystemSingle\n
-    \       PUSH, __32_intnl_SystemSingle\n        PUSH, __25_intnl_SystemBoolean\n
+    __1_const_intnl_SystemInt32\n        PUSH, __50_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __49_intnl_SystemSingle\n
+    \       PUSH, __50_intnl_SystemSingle\n        PUSH, __27_intnl_SystemBoolean\n
     \       EXTERN, \"SystemSingle.__op_LessThan__SystemSingle_SystemSingle__SystemBoolean\"\n
-    \       PUSH, __25_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001D20\n        PUSH,
-    __8_intnl_SystemString\n        EXTERN, \"SystemString.__get_Empty__SystemString\"\n
-    \       PUSH, HUDText_angleofattack\n        PUSH, __8_intnl_SystemString\n        EXTERN,
-    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        JUMP, 0x00001D90\n
-    \       PUSH, EngineControl\n        PUSH, __15_const_intnl_SystemString\n        PUSH,
-    __16_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __16_intnl_SystemObject\n        PUSH, __34_intnl_SystemSingle\n
+    \       PUSH, __27_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000228C\n        PUSH,
+    __9_intnl_SystemString\n        EXTERN, \"SystemString.__get_Empty__SystemString\"\n
+    \       PUSH, HUDText_angleofattack\n        PUSH, __9_intnl_SystemString\n        EXTERN,
+    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        JUMP, 0x000022FC\n
+    \       PUSH, EngineControl\n        PUSH, __21_const_intnl_SystemString\n        PUSH,
+    __23_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __23_intnl_SystemObject\n        PUSH, __52_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH,
-    __34_intnl_SystemSingle\n        PUSH, __7_const_intnl_SystemString\n        PUSH,
-    __8_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
-    \       PUSH, HUDText_angleofattack\n        PUSH, __8_intnl_SystemString\n        EXTERN,
-    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, __1_const_intnl_SystemInt32\n
+    __52_intnl_SystemSingle\n        PUSH, __12_const_intnl_SystemString\n        PUSH,
+    __9_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
+    \       PUSH, HUDText_angleofattack\n        PUSH, __9_intnl_SystemString\n        EXTERN,
+    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, __0_const_intnl_SystemInt32\n
     \       PUSH, check\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __10_intnl_SystemSingle\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\n
-    \       PUSH, check\n        PUSH, __10_intnl_SystemSingle\n        PUSH, __11_intnl_SystemSingle\n
+    \       PUSH, __26_intnl_SystemSingle\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\n
+    \       PUSH, check\n        PUSH, __26_intnl_SystemSingle\n        PUSH, __27_intnl_SystemSingle\n
     \       EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __11_intnl_SystemSingle\n        PUSH, check\n        COPY\n        PUSH,
+    \       PUSH, __27_intnl_SystemSingle\n        PUSH, check\n        COPY\n        PUSH,
     __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n        JUMP_INDIRECT,
     __0_intnl_returnTarget_UInt32\n        \n.code_end\n"
   assemblyError: 
@@ -674,7 +804,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 22
+      Data: 29
     - Name: 
       Entry: 7
       Data: 
@@ -1097,7 +1227,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HUDText_angleofattack
+      Data: HUDText_knotsairspeed
     - Name: $v
       Entry: 7
       Data: 26|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1118,10 +1248,10 @@ MonoBehaviour:
       Data: UnityEngineUIText
     - Name: symbolOriginalName
       Entry: 1
-      Data: HUDText_angleofattack
+      Data: HUDText_knotsairspeed
     - Name: symbolUniqueName
       Entry: 1
-      Data: HUDText_angleofattack
+      Data: HUDText_knotsairspeed
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1154,7 +1284,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HUDText_angleofattack_temp
+      Data: HUDText_angleofattack
     - Name: $v
       Entry: 7
       Data: 29|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1162,29 +1292,23 @@ MonoBehaviour:
       Entry: 7
       Data: 30|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 31|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: System.String, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 12
     - Name: declarationType
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: syncMode
       Entry: 3
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemString
+      Data: UnityEngineUIText
     - Name: symbolOriginalName
       Entry: 1
-      Data: HUDText_angleofattack_temp
+      Data: HUDText_angleofattack
     - Name: symbolUniqueName
       Entry: 1
-      Data: HUDText_angleofattack_temp
+      Data: HUDText_angleofattack
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1193,7 +1317,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 32|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 31|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1217,31 +1341,37 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: distance_from_head
+      Data: HUDText_angleofattack_temp
     - Name: $v
       Entry: 7
-      Data: 33|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 32|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 34|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 33|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 8
+      Entry: 7
+      Data: 34|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: System.String, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: syncMode
       Entry: 3
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemString
     - Name: symbolOriginalName
       Entry: 1
-      Data: distance_from_head
+      Data: HUDText_angleofattack_temp
     - Name: symbolUniqueName
       Entry: 1
-      Data: distance_from_head
+      Data: HUDText_angleofattack_temp
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1274,7 +1404,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DownIndicator
+      Data: distance_from_head
     - Name: $v
       Entry: 7
       Data: 36|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1282,29 +1412,23 @@ MonoBehaviour:
       Entry: 7
       Data: 37|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 38|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: UnityEngine.Transform, UnityEngine.CoreModule
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 8
     - Name: declarationType
       Entry: 3
-      Data: 1
+      Data: 258
     - Name: syncMode
       Entry: 3
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineTransform
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: DownIndicator
+      Data: distance_from_head
     - Name: symbolUniqueName
       Entry: 1
-      Data: DownIndicator
+      Data: distance_from_head
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1313,7 +1437,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 39|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 38|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1337,16 +1461,22 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ElevationIndicator
+      Data: DownIndicator
     - Name: $v
       Entry: 7
-      Data: 40|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 39|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 41|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 40|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 38
+      Entry: 7
+      Data: 41|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UnityEngine.Transform, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1358,10 +1488,10 @@ MonoBehaviour:
       Data: UnityEngineTransform
     - Name: symbolOriginalName
       Entry: 1
-      Data: ElevationIndicator
+      Data: DownIndicator
     - Name: symbolUniqueName
       Entry: 1
-      Data: ElevationIndicator
+      Data: DownIndicator
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1394,7 +1524,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HeadingIndicator
+      Data: ElevationIndicator
     - Name: $v
       Entry: 7
       Data: 43|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1403,7 +1533,7 @@ MonoBehaviour:
       Data: 44|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 38
+      Data: 41
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1415,10 +1545,10 @@ MonoBehaviour:
       Data: UnityEngineTransform
     - Name: symbolOriginalName
       Entry: 1
-      Data: HeadingIndicator
+      Data: ElevationIndicator
     - Name: symbolUniqueName
       Entry: 1
-      Data: HeadingIndicator
+      Data: ElevationIndicator
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1451,7 +1581,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: VelocityIndicator
+      Data: HeadingIndicator
     - Name: $v
       Entry: 7
       Data: 46|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1460,7 +1590,7 @@ MonoBehaviour:
       Data: 47|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 38
+      Data: 41
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1472,10 +1602,10 @@ MonoBehaviour:
       Data: UnityEngineTransform
     - Name: symbolOriginalName
       Entry: 1
-      Data: VelocityIndicator
+      Data: HeadingIndicator
     - Name: symbolUniqueName
       Entry: 1
-      Data: VelocityIndicator
+      Data: HeadingIndicator
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1508,7 +1638,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LStickDisplayHighlighter
+      Data: VelocityIndicator
     - Name: $v
       Entry: 7
       Data: 49|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1517,7 +1647,7 @@ MonoBehaviour:
       Data: 50|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 38
+      Data: 41
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1529,10 +1659,10 @@ MonoBehaviour:
       Data: UnityEngineTransform
     - Name: symbolOriginalName
       Entry: 1
-      Data: LStickDisplayHighlighter
+      Data: VelocityIndicator
     - Name: symbolUniqueName
       Entry: 1
-      Data: LStickDisplayHighlighter
+      Data: VelocityIndicator
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1565,7 +1695,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RStickDisplayHighlighter
+      Data: LStickDisplayHighlighter
     - Name: $v
       Entry: 7
       Data: 52|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1574,7 +1704,7 @@ MonoBehaviour:
       Data: 53|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 38
+      Data: 41
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -1586,10 +1716,10 @@ MonoBehaviour:
       Data: UnityEngineTransform
     - Name: symbolOriginalName
       Entry: 1
-      Data: RStickDisplayHighlighter
+      Data: LStickDisplayHighlighter
     - Name: symbolUniqueName
       Entry: 1
-      Data: RStickDisplayHighlighter
+      Data: LStickDisplayHighlighter
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1622,7 +1752,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HudSAFE
+      Data: RStickDisplayHighlighter
     - Name: $v
       Entry: 7
       Data: 55|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -1630,8 +1760,293 @@ MonoBehaviour:
       Entry: 7
       Data: 56|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
+      Entry: 9
+      Data: 41
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineTransform
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: RStickDisplayHighlighter
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: RStickDisplayHighlighter
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
       Entry: 7
-      Data: 57|System.RuntimeType, mscorlib
+      Data: 57|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: PitchRoll
+    - Name: $v
+      Entry: 7
+      Data: 58|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 59|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 41
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineTransform
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: PitchRoll
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: PitchRoll
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 60|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Yaw
+    - Name: $v
+      Entry: 7
+      Data: 61|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 62|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 41
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineTransform
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: Yaw
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: Yaw
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 63|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: TrimPitch
+    - Name: $v
+      Entry: 7
+      Data: 64|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 65|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 41
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineTransform
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: TrimPitch
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: TrimPitch
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 66|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: TrimYaw
+    - Name: $v
+      Entry: 7
+      Data: 67|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 68|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 41
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineTransform
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: TrimYaw
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: TrimYaw
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 69|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: HudSAFE
+    - Name: $v
+      Entry: 7
+      Data: 70|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 71|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 7
+      Data: 72|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: UnityEngine.GameObject, UnityEngine.CoreModule
@@ -1661,7 +2076,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 58|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 73|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1685,16 +2100,73 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: tempvel
+      Data: HudAB
     - Name: $v
       Entry: 7
-      Data: 59|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 74|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 60|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 75|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 72
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineGameObject
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: HudAB
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: HudAB
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 76|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: InputsZeroPos
+    - Name: $v
+      Entry: 7
+      Data: 77|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 78|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 61|System.RuntimeType, mscorlib
+      Data: 79|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: UnityEngine.Vector3, UnityEngine.CoreModule
@@ -1712,6 +2184,63 @@ MonoBehaviour:
       Data: UnityEngineVector3
     - Name: symbolOriginalName
       Entry: 1
+      Data: InputsZeroPos
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: InputsZeroPos
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 80|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: tempvel
+    - Name: $v
+      Entry: 7
+      Data: 81|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 82|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 79
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineVector3
+    - Name: symbolOriginalName
+      Entry: 1
       Data: tempvel
     - Name: symbolUniqueName
       Entry: 1
@@ -1724,7 +2253,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 62|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 83|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1751,13 +2280,13 @@ MonoBehaviour:
       Data: startingpos
     - Name: $v
       Entry: 7
-      Data: 63|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 84|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 64|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 85|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 61
+      Data: 79
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1781,7 +2310,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 65|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 86|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1808,10 +2337,10 @@ MonoBehaviour:
       Data: check
     - Name: $v
       Entry: 7
-      Data: 66|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 87|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 67|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 88|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 8
@@ -1838,7 +2367,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 68|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 89|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1865,13 +2394,13 @@ MonoBehaviour:
       Data: temprot
     - Name: $v
       Entry: 7
-      Data: 69|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 90|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 70|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 91|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 61
+      Data: 79
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1895,7 +2424,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 71|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 92|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1922,13 +2451,13 @@ MonoBehaviour:
       Data: showvel
     - Name: $v
       Entry: 7
-      Data: 72|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 93|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 73|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 94|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 74|System.RuntimeType, mscorlib
+      Data: 95|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: System.Int32, mscorlib
@@ -1958,7 +2487,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 75|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 96|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
