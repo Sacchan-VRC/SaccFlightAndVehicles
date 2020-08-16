@@ -30,10 +30,22 @@ public class HUDController : UdonSharpBehaviour
     public Transform TrimYaw;
     public GameObject HudSAFE;
     public GameObject HudAB;
+    public GameObject LStick_funcon1;
+    public GameObject LStick_funcon2;
+    public GameObject LStick_funcon3;
+    public GameObject LStick_funcon4;
+    public GameObject LStick_funcon6;
+    public GameObject LStick_funcon7;
+    public GameObject LStick_funcon8;
+    public GameObject RStick_funcon4;
+    public GameObject RStick_funcon5;
+    public GameObject RStick_funcon6;
+    public GameObject RStick_funcon7;
     private Vector3 InputsZeroPos;
     private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
     private float check = 0;
+    [System.NonSerializedAttribute] [HideInInspector] public float MenuSoundCheckLast = 6;
     private Vector3 temprot;
     private int showvel;
     private void Start()
@@ -168,11 +180,58 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.AfterburnerOn) { HudAB.SetActive(true); }
         else { HudAB.SetActive(false); }
 
+        //Cruise Control target knots
         if (EngineControl.Cruise)
         {
             HUDText_knotstarget.text = ((EngineControl.SetSpeed) * 1.9438445f).ToString("F0");
         }
         else { HUDText_knotstarget.text = string.Empty; }
+
+        //left stick toggles/functions on?
+        if (EngineControl.Cruise) { LStick_funcon1.SetActive(true); }
+        else { LStick_funcon1.SetActive(false); }
+
+        if (EngineControl.FlightLimitsEnabled) { LStick_funcon2.SetActive(true); }
+        else { LStick_funcon2.SetActive(false); }
+
+        if (EngineControl.CatapultStatus == 1) { LStick_funcon3.SetActive(true); }
+        else { LStick_funcon3.SetActive(false); }
+
+        if (EngineControl.HookDown) { LStick_funcon4.SetActive(true); }
+        else { LStick_funcon4.SetActive(false); }
+
+        if (EngineControl.Trim.x != 0) { LStick_funcon6.SetActive(true); }
+        else { LStick_funcon6.SetActive(false); }
+
+        if (EngineControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
+        else { LStick_funcon7.SetActive(false); }
+
+        if (EngineControl.AfterburnerOn) { LStick_funcon8.SetActive(true); }
+        else { LStick_funcon8.SetActive(false); }
+
+
+        //right stick toggles/functions on?
+        if (EngineControl.LevelFlight) { RStick_funcon4.SetActive(true); }
+        else { RStick_funcon4.SetActive(false); }
+
+        if (!EngineControl.GearUp) { RStick_funcon5.SetActive(true); }
+        else { RStick_funcon5.SetActive(false); }
+
+        if (EngineControl.Flaps) { RStick_funcon6.SetActive(true); }
+        else { RStick_funcon6.SetActive(false); }
+
+        if (EngineControl.Smoking) { RStick_funcon7.SetActive(true); }
+        else { RStick_funcon7.SetActive(false); }
+
+        //play menu sound if selection changed since last frame
+        float MenuSoundCheck = EngineControl.RStickSelection + EngineControl.LStickSelection;
+        if (MenuSoundCheck != MenuSoundCheckLast)
+        {
+            EngineControl.SoundControl.MenuSelect.Play();
+        }
+        MenuSoundCheckLast = MenuSoundCheck;
+
+        //updating numbers 3~x times a second
         if (check > .3)//update text
         {
             if (EngineControl.Gs > maxGs) { maxGs = EngineControl.Gs; }

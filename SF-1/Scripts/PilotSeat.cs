@@ -26,11 +26,12 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.Hooked = 0;
             EngineControl.AirBrakeInput = 0;
             EngineControl.LTriggerTapTime = 1;
+
         }
         if (EngineControl.EffectsControl != null)
         {
             EngineControl.EffectsControl.IsFiringGun = false;
-            EngineControl.EffectsControl.Smoking = false;
+            EngineControl.Smoking = false;
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
         }
@@ -38,7 +39,11 @@ public class PilotSeat : UdonSharpBehaviour
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
         if (EnableOther != null) { EnableOther.SetActive(true); }
-        if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(true); }
+        if (EngineControl.HUDControl != null)
+        {
+            EngineControl.HUDControl.gameObject.SetActive(true);
+            EngineControl.HUDControl.MenuSoundCheckLast = 6;
+        }
         if (EngineControl.localPlayer != null) { EngineControl.localPlayer.UseAttachedStation(); }
         if (EngineControl.EffectsControl != null || EngineControl.SoundControl != null) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "WakeUp"); }
         //set plane to a layer that doesn't collide with its own bullets
@@ -61,7 +66,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.PlayerThrottle = 0;
             EngineControl.LGripLastFrame = false;
             EngineControl.RGripLastFrame = false;
-            EngineControl.LStickSelection = 1;
+            EngineControl.LStickSelection = 5;
             EngineControl.RStickSelection = 1;
             EngineControl.AirBrake = 0;
             EngineControl.LTriggerLastFrame = false;
@@ -74,7 +79,7 @@ public class PilotSeat : UdonSharpBehaviour
         if (EngineControl.EffectsControl != null)
         {
             EngineControl.EffectsControl.IsFiringGun = false;
-            EngineControl.EffectsControl.Smoking = false;
+            EngineControl.Smoking = false;
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
