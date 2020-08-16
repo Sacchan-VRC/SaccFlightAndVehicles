@@ -41,7 +41,6 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 enginefirelerper = new Vector3(1, 0.6f, 1);
     private float airbrakelerper;
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
     [System.NonSerializedAttribute] [HideInInspector] public ParticleSystem.ColorOverLifetimeModule SmokeModule;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
@@ -117,7 +116,7 @@ public class EffectsController : UdonSharpBehaviour
             {
                 PlaneAnimator.SetBool("gunfiring", false);
             }
-            if (Smoking)
+            if (EngineControl.Smoking)
             {
                 var main = DisplaySmoke.main;
                 Color newsmoke = new Color(EngineControl.SmokeColor.x, EngineControl.SmokeColor.y, EngineControl.SmokeColor.z);
@@ -216,12 +215,13 @@ public class EffectsController : UdonSharpBehaviour
 
         airbrakelerper = Mathf.Lerp(airbrakelerper, EngineControl.AirBrake, 5f * Time.deltaTime);
 
-        PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
+        PlaneAnimator.SetBool("displaysmoke", (EngineControl.Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
         PlaneAnimator.SetFloat("brake", airbrakelerper);
         PlaneAnimator.SetBool("canopyopen", EngineControl.CanopyOpen);
         PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
+        PlaneAnimator.SetFloat("fuel", EngineControl.Fuel / EngineControl.FullFuel);
         DoVapor();
     }
 
@@ -246,6 +246,7 @@ public class EffectsController : UdonSharpBehaviour
         DoEffects = 0f; //keep awake
 
         EngineControl.dead = true;
+        EngineControl.GearUp = false;
         EngineControl.HookDown = false;
         EngineControl.AirBrakeInput = 0;
         EngineControl.FlightLimitsEnabled = true;
@@ -253,12 +254,14 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.Cruise = false;
         EngineControl.Trim = Vector2.zero;
         EngineControl.CanopyOpen = true;
+        EngineControl.CanopyCloseTimer = -100000;
+
 
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
-            EngineControl.GearUp = true;//prevent touchdown sound
-            EngineControl.CurrentVel = Vector3.zero;
+            EngineControl.VehicleRigidbody.velocity = Vector3.zero;
             EngineControl.Health = EngineControl.FullHealth;//turns off low health smoke
+            EngineControl.Fuel = EngineControl.FullFuel;//turns off low health smoke
         }
 
         //pilot and passenger are dropped out of the plane
