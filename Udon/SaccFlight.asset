@@ -23,10 +23,9 @@ MonoBehaviour:
     %UnityEngineQuaternion, null\n    __0_BackThrustAmount_Single: %SystemSingle,
     null\n    __0_Ff_Single: %SystemSingle, null\n    __0_FinalCheatThrust_Single:
     %SystemSingle, null\n    __0_PlayerVel_Vector3: %UnityEngineVector3, null\n    __0_tempdir_Vector3:
-    %UnityEngineVector3, null\n    __0_const_intnl_SystemDouble: %SystemDouble, null\n
-    \   __0_const_intnl_SystemInt32: %SystemInt32, null\n    __1_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __2_const_intnl_SystemInt32: %SystemInt32, null\n    __3_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __4_const_intnl_SystemInt32: %SystemInt32, null\n    __0_const_intnl_UnityEngineKeyCode:
+    %UnityEngineVector3, null\n    __0_const_intnl_SystemInt32: %SystemInt32, null\n
+    \   __1_const_intnl_SystemInt32: %SystemInt32, null\n    __2_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __3_const_intnl_SystemInt32: %SystemInt32, null\n    __0_const_intnl_UnityEngineKeyCode:
     %UnityEngineKeyCode, null\n    __1_const_intnl_UnityEngineKeyCode: %UnityEngineKeyCode,
     null\n    __0_const_intnl_SystemString: %SystemString, null\n    __1_const_intnl_SystemString:
     %SystemString, null\n    __0_const_intnl_VRCSDKBaseVRCPlayerApiTrackingDataType:
@@ -37,21 +36,21 @@ MonoBehaviour:
     %SystemBoolean, null\n    __4_intnl_SystemBoolean: %SystemBoolean, null\n    __5_intnl_SystemBoolean:
     %SystemBoolean, null\n    __6_intnl_SystemBoolean: %SystemBoolean, null\n    __7_intnl_SystemBoolean:
     %SystemBoolean, null\n    __8_intnl_SystemBoolean: %SystemBoolean, null\n    __9_intnl_SystemBoolean:
-    %SystemBoolean, null\n    __0_intnl_SystemDouble: %SystemDouble, null\n    __1_intnl_SystemDouble:
-    %SystemDouble, null\n    __0_intnl_SystemInt32: %SystemInt32, null\n    __0_intnl_UnityEngineQuaternion:
+    %SystemBoolean, null\n    __0_intnl_SystemInt32: %SystemInt32, null\n    __0_intnl_UnityEngineQuaternion:
     %UnityEngineQuaternion, null\n    __1_intnl_UnityEngineQuaternion: %UnityEngineQuaternion,
     null\n    __0_intnl_SystemSingle: %SystemSingle, null\n    __1_intnl_SystemSingle:
-    %SystemSingle, null\n    __2_intnl_SystemSingle: %SystemSingle, null\n    __3_intnl_SystemSingle:
-    %SystemSingle, null\n    __4_intnl_SystemSingle: %SystemSingle, null\n    __5_intnl_SystemSingle:
-    %SystemSingle, null\n    __6_intnl_SystemSingle: %SystemSingle, null\n    __7_intnl_SystemSingle:
-    %SystemSingle, null\n    __8_intnl_SystemSingle: %SystemSingle, null\n    __9_intnl_SystemSingle:
-    %SystemSingle, null\n    __0_intnl_VRCSDKBaseVRCPlayerApiTrackingData: %VRCSDKBaseVRCPlayerApiTrackingData,
-    null\n    __0_intnl_returnTarget_UInt32: %SystemUInt32, null\n    __0_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __1_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __2_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __3_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n\n.data_end\n\n.code_start\n    .export _start\n        \n
-    \   _start:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n        PUSH,
-    localPlayer\n        EXTERN, \"VRCSDKBaseNetworking.__get_LocalPlayer__VRCSDKBaseVRCPlayerApi\"\n
+    %SystemSingle, null\n    __10_intnl_SystemSingle: %SystemSingle, null\n    __2_intnl_SystemSingle:
+    %SystemSingle, null\n    __3_intnl_SystemSingle: %SystemSingle, null\n    __4_intnl_SystemSingle:
+    %SystemSingle, null\n    __5_intnl_SystemSingle: %SystemSingle, null\n    __6_intnl_SystemSingle:
+    %SystemSingle, null\n    __7_intnl_SystemSingle: %SystemSingle, null\n    __8_intnl_SystemSingle:
+    %SystemSingle, null\n    __9_intnl_SystemSingle: %SystemSingle, null\n    __0_intnl_VRCSDKBaseVRCPlayerApiTrackingData:
+    %VRCSDKBaseVRCPlayerApiTrackingData, null\n    __0_intnl_returnTarget_UInt32:
+    %SystemUInt32, null\n    __0_intnl_UnityEngineVector3: %UnityEngineVector3, null\n
+    \   __1_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __2_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __3_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n\n.data_end\n\n.code_start\n    .export _start\n        \n    _start:\n
+    \       \n        PUSH, __0_const_intnl_SystemUInt32\n        PUSH, localPlayer\n
+    \       EXTERN, \"VRCSDKBaseNetworking.__get_LocalPlayer__VRCSDKBaseVRCPlayerApi\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _fixedUpdate\n
     \       \n    _fixedUpdate:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
@@ -71,10 +70,10 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineInput.__GetAxisRaw__SystemString__SystemSingle\"\n
     \       PUSH, __1_const_intnl_SystemString\n        PUSH, controllertriggerL\n
     \       EXTERN, \"UnityEngineInput.__GetAxisRaw__SystemString__SystemSingle\"\n
-    \       PUSH, controllertriggerR\n        PUSH, __0_intnl_SystemDouble\n        EXTERN,
-    \"SystemConvert.__ToDouble__SystemSingle__SystemDouble\"\n        PUSH, __0_intnl_SystemDouble\n
-    \       PUSH, __0_const_intnl_SystemDouble\n        PUSH, __3_intnl_SystemBoolean\n
-    \       EXTERN, \"SystemDouble.__op_GreaterThan__SystemDouble_SystemDouble__SystemBoolean\"\n
+    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __0_intnl_SystemSingle\n
+    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
+    controllertriggerR\n        PUSH, __0_intnl_SystemSingle\n        PUSH, __3_intnl_SystemBoolean\n
+    \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\n
     \       PUSH, __3_intnl_SystemBoolean\n        PUSH, __2_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __2_intnl_SystemBoolean\n        PUSH, __4_intnl_SystemBoolean\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
@@ -96,49 +95,49 @@ MonoBehaviour:
     \       PUSH, __0_intnl_VRCSDKBaseVRCPlayerApiTrackingData\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__GetTrackingData__VRCSDKBaseVRCPlayerApiTrackingDataType__VRCSDKBaseVRCPlayerApiTrackingData\"\n
     \       PUSH, __0_intnl_VRCSDKBaseVRCPlayerApiTrackingData\n        PUSH, __0_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"VRCSDKBaseVRCPlayerApiTrackingData.__get_rotation__UnityEngineQuaternion\"\n
-    \       PUSH, __2_const_intnl_SystemInt32\n        PUSH, __0_intnl_SystemSingle\n
+    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __1_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __3_const_intnl_SystemInt32\n        PUSH, __1_intnl_SystemSingle\n        EXTERN,
+    __2_const_intnl_SystemInt32\n        PUSH, __2_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __1_const_intnl_SystemInt32\n
-    \       PUSH, __2_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __0_intnl_SystemSingle\n        PUSH, __1_intnl_SystemSingle\n        PUSH,
-    __2_intnl_SystemSingle\n        PUSH, __1_intnl_UnityEngineQuaternion\n        EXTERN,
+    \       PUSH, __3_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __1_intnl_SystemSingle\n        PUSH, __2_intnl_SystemSingle\n        PUSH,
+    __3_intnl_SystemSingle\n        PUSH, __1_intnl_UnityEngineQuaternion\n        EXTERN,
     \"UnityEngineQuaternion.__Euler__SystemSingle_SystemSingle_SystemSingle__UnityEngineQuaternion\"\n
     \       PUSH, __0_intnl_UnityEngineQuaternion\n        PUSH, __1_intnl_UnityEngineQuaternion\n
     \       PUSH, __0_newspeed_Quaternion\n        EXTERN, \"UnityEngineQuaternion.__op_Multiply__UnityEngineQuaternion_UnityEngineQuaternion__UnityEngineQuaternion\"\n
-    \       PUSH, __0_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__get_up__UnityEngineVector3\"\n
+    \       PUSH, __0_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__get_forward__UnityEngineVector3\"\n
     \       PUSH, __0_newspeed_Quaternion\n        PUSH, __0_intnl_UnityEngineVector3\n
     \       PUSH, __0_tempdir_Vector3\n        EXTERN, \"UnityEngineQuaternion.__op_Multiply__UnityEngineQuaternion_UnityEngineVector3__UnityEngineVector3\"\n
     \       PUSH, __0_tempdir_Vector3\n        PUSH, __0_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\n
     \       PUSH, __0_PlayerVel_Vector3\n        PUSH, __0_intnl_UnityEngineVector3\n
-    \       PUSH, __0_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__Dot__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n
-    \       PUSH, __0_intnl_SystemSingle\n        PUSH, BackThrustStrength\n        PUSH,
-    __1_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __1_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__Dot__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n
+    \       PUSH, __1_intnl_SystemSingle\n        PUSH, BackThrustStrength\n        PUSH,
+    __2_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
     \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __0_intnl_SystemInt32\n
     \       EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n        PUSH,
-    __0_intnl_SystemInt32\n        PUSH, __2_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, __1_intnl_SystemSingle\n        PUSH, __2_intnl_SystemSingle\n        PUSH,
-    __3_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __4_intnl_SystemSingle\n
+    __0_intnl_SystemInt32\n        PUSH, __3_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, __2_intnl_SystemSingle\n        PUSH, __3_intnl_SystemSingle\n        PUSH,
+    __4_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __5_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __4_const_intnl_SystemInt32\n        PUSH, __5_intnl_SystemSingle\n        EXTERN,
-    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __3_intnl_SystemSingle\n
-    \       PUSH, __4_intnl_SystemSingle\n        PUSH, __5_intnl_SystemSingle\n        PUSH,
+    __3_const_intnl_SystemInt32\n        PUSH, __6_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, __4_intnl_SystemSingle\n
+    \       PUSH, __5_intnl_SystemSingle\n        PUSH, __6_intnl_SystemSingle\n        PUSH,
     __0_BackThrustAmount_Single\n        EXTERN, \"UnityEngineMathf.__Clamp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\n
     \       PUSH, __0_tempdir_Vector3\n        PUSH, flystr\n        PUSH, __1_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
-    \       PUSH, controllertriggerR\n        PUSH, __0_Ff_Single\n        PUSH, __6_intnl_SystemSingle\n
-    \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __1_intnl_UnityEngineVector3\n        PUSH, __6_intnl_SystemSingle\n
-    \       PUSH, __0_tempdir_Vector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
     \       PUSH, controllertriggerR\n        PUSH, __0_Ff_Single\n        PUSH, __7_intnl_SystemSingle\n
     \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __0_BackThrustAmount_Single\n        PUSH, __7_intnl_SystemSingle\n
-    \       PUSH, __8_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __9_intnl_SystemSingle\n
+    \       PUSH, __1_intnl_UnityEngineVector3\n        PUSH, __7_intnl_SystemSingle\n
+    \       PUSH, __0_tempdir_Vector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
+    \       PUSH, controllertriggerR\n        PUSH, __0_Ff_Single\n        PUSH, __8_intnl_SystemSingle\n
+    \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __0_BackThrustAmount_Single\n        PUSH, __8_intnl_SystemSingle\n
+    \       PUSH, __9_intnl_SystemSingle\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __10_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    __9_intnl_SystemSingle\n        PUSH, __8_intnl_SystemSingle\n        PUSH, __0_FinalCheatThrust_Single\n
+    __10_intnl_SystemSingle\n        PUSH, __9_intnl_SystemSingle\n        PUSH, __0_FinalCheatThrust_Single\n
     \       EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\n
     \       PUSH, __0_tempdir_Vector3\n        PUSH, __0_FinalCheatThrust_Single\n
     \       PUSH, __2_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
@@ -146,9 +145,10 @@ MonoBehaviour:
     \       PUSH, __3_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
     \       PUSH, localPlayer\n        PUSH, __3_intnl_UnityEngineVector3\n        EXTERN,
     \"VRCSDKBaseVRCPlayerApi.__SetVelocity__UnityEngineVector3__SystemVoid\"\n        PUSH,
-    controllertriggerL\n        PUSH, __1_intnl_SystemDouble\n        EXTERN, \"SystemConvert.__ToDouble__SystemSingle__SystemDouble\"\n
-    \       PUSH, __1_intnl_SystemDouble\n        PUSH, __0_const_intnl_SystemDouble\n
-    \       PUSH, __7_intnl_SystemBoolean\n        EXTERN, \"SystemDouble.__op_GreaterThan__SystemDouble_SystemDouble__SystemBoolean\"\n
+    __1_const_intnl_SystemInt32\n        PUSH, __1_intnl_SystemSingle\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, controllertriggerL\n
+    \       PUSH, __1_intnl_SystemSingle\n        PUSH, __7_intnl_SystemBoolean\n
+    \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\n
     \       PUSH, __7_intnl_SystemBoolean\n        PUSH, __6_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __6_intnl_SystemBoolean\n        PUSH, __8_intnl_SystemBoolean\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
@@ -164,10 +164,10 @@ MonoBehaviour:
     __0_const_intnl_SystemInt32\n        PUSH, __0_intnl_SystemInt32\n        COPY\n
     \       JUMP, 0x000006BC\n        PUSH, __1_const_intnl_SystemInt32\n        PUSH,
     __0_intnl_SystemInt32\n        COPY\n        PUSH, __0_intnl_SystemInt32\n        PUSH,
-    __0_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, controllertriggerL\n        PUSH, __0_intnl_SystemSingle\n        PUSH,
-    __1_intnl_SystemSingle\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __1_intnl_UnityEngineVector3\n        PUSH, __1_intnl_SystemSingle\n
+    __2_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, controllertriggerL\n        PUSH, __2_intnl_SystemSingle\n        PUSH,
+    __3_intnl_SystemSingle\n        EXTERN, \"UnityEngineMathf.__Max__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __1_intnl_UnityEngineVector3\n        PUSH, __3_intnl_SystemSingle\n
     \       PUSH, __0_tempdir_Vector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
     \       PUSH, localPlayer\n        PUSH, __2_intnl_UnityEngineVector3\n        EXTERN,
     \"VRCSDKBaseVRCPlayerApi.__GetVelocity__UnityEngineVector3\"\n        PUSH, __2_intnl_UnityEngineVector3\n

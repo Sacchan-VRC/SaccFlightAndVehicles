@@ -26,7 +26,8 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.Hooked = 0;
             EngineControl.AirBrakeInput = 0;
             EngineControl.LTriggerTapTime = 1;
-
+            if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;
+            else EngineControl.CanopyCloseTimer = -1;
         }
         if (EngineControl.EffectsControl != null)
         {
@@ -66,9 +67,9 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.PlayerThrottle = 0;
             EngineControl.LGripLastFrame = false;
             EngineControl.RGripLastFrame = false;
-            EngineControl.LStickSelection = 5;
-            EngineControl.RStickSelection = 1;
-            EngineControl.AirBrake = 0;
+            EngineControl.LStickSelection = 0;
+            EngineControl.RStickSelection = 0;
+            EngineControl.AirBrakeInput = 0;
             EngineControl.LTriggerLastFrame = false;
             EngineControl.RTriggerLastFrame = false;
             if (EngineControl.CatapultStatus == 2) { }//keep launching if launching

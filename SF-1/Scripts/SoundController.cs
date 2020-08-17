@@ -20,6 +20,18 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource GunSound;
     public AudioSource BulletHit;
     public AudioSource MenuSelect;
+    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneIdleNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneInsideNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneDistantNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneThrustNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneABOnNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool TouchDownNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneWindNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool SonicBoomNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool ExplosionNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool GunSoundNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool BulletHitNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool MenuSelectNull;
     public Transform testcamera;
     private bool SuperSonic = false;
     private float IdleDoppleTemp;
@@ -55,12 +67,25 @@ public class SoundController : UdonSharpBehaviour
     bool playsonicboom;
     private void Start()
     {
+        PlaneIdleNull = (PlaneIdle == null) ? true : false;
+        PlaneInsideNull = (PlaneInside == null) ? true : false;
+        PlaneDistantNull = (PlaneDistant == null) ? true : false;
+        PlaneThrustNull = (PlaneThrust == null) ? true : false;
+        PlaneABOnNull = (PlaneABOn == null) ? true : false;
+        TouchDownNull = (TouchDown == null) ? true : false;
+        PlaneWindNull = (PlaneWind == null) ? true : false;
+        SonicBoomNull = (SonicBoom == null) ? true : false;
+        ExplosionNull = (Explosion == null) ? true : false;
+        GunSoundNull = (GunSound == null) ? true : false;
+        BulletHitNull = (BulletHit == null) ? true : false;
+        MenuSelectNull = (MenuSelect == null) ? true : false;
+
         //used to make it so that changing the volume in unity will do something //set 0 to avoid ear destruction
-        if (PlaneIdle != null) { PlaneIdleInitialVolume = PlaneIdle.volume; PlaneIdle.volume = 0f; }
-        if (PlaneDistant != null) { PlaneDistantInitialVolume = PlaneDistant.volume; PlaneDistant.volume = 0f; }
-        if (PlaneThrust != null) { PlaneThrustInitialVolume = PlaneThrust.volume; PlaneThrust.volume = 0f; }
-        if (PlaneWind != null) { PlaneWindInitialVolume = PlaneWind.volume; PlaneWind.volume = 0f; }
-        if (GunSound != null)
+        if (!PlaneIdleNull) { PlaneIdleInitialVolume = PlaneIdle.volume; PlaneIdle.volume = 0f; }
+        if (!PlaneDistantNull) { PlaneDistantInitialVolume = PlaneDistant.volume; PlaneDistant.volume = 0f; }
+        if (!PlaneThrustNull) { PlaneThrustInitialVolume = PlaneThrust.volume; PlaneThrust.volume = 0f; }
+        if (!PlaneWindNull) { PlaneWindInitialVolume = PlaneWind.volume; PlaneWind.volume = 0f; }
+        if (!GunSoundNull)
         {
             GunSoundInitialVolume = GunSound.volume;
         }
@@ -137,100 +162,103 @@ public class SoundController : UdonSharpBehaviour
             silentint = 1;
         }
 
-        if (TouchDown != null)
+        if (!TouchDownNull)
         {
             if (Landed == false && EngineControl.Taxiing == true) { TouchDown.Play(); }
             if (EngineControl.Taxiing == true) { Landed = true; } else { Landed = false; }
         }
-        if (EngineControl.Occupied) //EngineController.Occupied is set true if localplayer == null so this works in editor
+
+        if ((EngineControl.Piloting || EngineControl.Passenger) && (EngineControl.CanopyCloseTimer < 0 && EngineControl.CanopyCloseTimer > -100000))//EngineControl.Piloting = true in editor. Invert for testing outside sounds
         {
-            if ((PlaneThrust != null) && !PlaneThrust.isPlaying)
+            if (Leftplane == false)//change stuff when you get in
+            {
+                PlaneThrustPitch = 0.8f;
+                if (!PlaneInsideNull)
+                {
+                    PlaneInside.pitch = PlaneIdle.pitch * .8f;
+                    PlaneInside.volume = PlaneIdle.volume * .4f;//it'll lerp up from here
+                }
+                if (!PlaneABOnNull)
+                {
+                    PlaneABOn.volume *= .25f;//afterburner quieter inside
+                }
+                PlaneThrustVolume *= InVehicleThrustVolumeFactor;
+                Leftplane = true;//used when we leave to see if we just left
+            }
+            if ((!PlaneThrustNull) && !PlaneThrust.isPlaying)
             {
                 PlaneThrust.Play();
             }
-            if ((EngineControl.Piloting || EngineControl.Passenger) && (EngineControl.CanopyCloseTimer < 0 && EngineControl.CanopyCloseTimer > -100000))//do this in editor or if you're a pilot or (passenger while pilot is in pilotseat) //!= null to test outside vehicle sounds (don't forget to change it back!)
+            if ((!PlaneDistantNull) && PlaneDistant.isPlaying)
             {
-                if (Leftplane == false)//change stuff when you get in
-                {
-                    if (PlaneInside != null)
-                    {
-                        PlaneInside.pitch = PlaneIdle.pitch * .8f;
-                        PlaneInside.volume = 0;
-                    }
-                    if (PlaneABOn != null)
-                    {
-                        PlaneABOn.volume *= .25f;
-                    }
-                    PlaneThrustVolume *= InVehicleThrustVolumeFactor;
-                    Leftplane = true;
-                }
-                if ((PlaneDistant != null) && PlaneDistant.isPlaying)
-                {
-                    PlaneDistant.Stop();
-                }
-                if ((PlaneInside != null) && !PlaneInside.isPlaying)
-                {
-                    PlaneInside.Play();
-                }
-                if ((PlaneIdle != null) && PlaneIdle.isPlaying)
-                {
-                    PlaneIdle.Stop();
-                }
-                if (EngineControl.Piloting || EngineControl.Occupied && EngineControl.Passenger) //you're piloting or someone is piloting and you're a passenger
-                {
-                    if (PlaneInside != null)
-                    {
-                        PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.Throttle * .4f) + .8f, 2.25f * Time.deltaTime);
-                        PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, .4f, .72f * Time.deltaTime);
-                    }
-                    PlaneThrustPitch = 0.8f;
-                    PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, (EngineControl.Throttle * PlaneThrustInitialVolume) * InVehicleThrustVolumeFactor, 1.08f * Time.deltaTime);
-                }
-                else if (/*InEditor || */EngineControl.Passenger)//enable here and disable above for testing //you're a passenger and no one is flying
-                {
-                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * Time.deltaTime);
-                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * Time.deltaTime);
-                    PlaneThrustPitch = 0.8f;
-                    PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * Time.deltaTime);
-                }
+                PlaneDistant.Stop();
             }
-            else //someone else is piloting
+            if ((!PlaneInsideNull) && !PlaneInside.isPlaying)
             {
-                if (Leftplane == true) { Exitplane(); }
-                if ((PlaneIdle != null) && !PlaneIdle.isPlaying)
-                {
-                    PlaneIdle.Play();
-                }
-                if ((PlaneDistant != null) && !PlaneDistant.isPlaying)
-                {
-                    PlaneDistant.Play();
-                }
-                PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 1, .72f * Time.deltaTime);
-                if (Doppler > 50)
-                {
-                    PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, 3 * Time.deltaTime);
-                    PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 3 * Time.deltaTime);
-                }
-                else
-                {
-                    PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, EngineControl.Throttle, .72f * Time.deltaTime);
-                    PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, EngineControl.Throttle, 1.08f * Time.deltaTime);
-                }
-                PlaneThrustPitch = 1;
-                PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (EngineControl.Throttle - 0.3f) + 1.3f, .54f * Time.deltaTime);
+                PlaneInside.Play();
             }
+            if ((!PlaneIdleNull) && PlaneIdle.isPlaying)
+            {
+                PlaneIdle.Stop();
+            }
+            if (EngineControl.Piloting || EngineControl.Occupied && EngineControl.Passenger) //you're piloting or someone is piloting and you're a passenger
+            {
+                if (!PlaneInsideNull)
+                {
+                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.Throttle * .4f) + .8f, 2.25f * Time.deltaTime);
+                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, .4f, .72f * Time.deltaTime);
+                }
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, (EngineControl.Throttle * PlaneThrustInitialVolume) * InVehicleThrustVolumeFactor, 1.08f * Time.deltaTime);
+            }
+            else if (/*InEditor || */EngineControl.Passenger)//enable here and disable 'Piloting' above for testing //you're a passenger and no one is flying
+            {
+                PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * Time.deltaTime);
+                PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * Time.deltaTime);
+
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * Time.deltaTime);
+            }
+        }
+        else if (EngineControl.Occupied)//someone else is piloting
+        {
+            if (Leftplane == true) { Exitplane(); }//passenger left
+            if ((!PlaneThrustNull) && !PlaneThrust.isPlaying)
+            {
+                PlaneThrust.Play();
+            }
+            if ((!PlaneIdleNull) && !PlaneIdle.isPlaying)
+            {
+                PlaneIdle.Play();
+            }
+            if ((!PlaneDistantNull) && !PlaneDistant.isPlaying)
+            {
+                PlaneDistant.Play();
+            }
+            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 1, .72f * Time.deltaTime);
+            if (Doppler > 50)
+            {
+                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, 3 * Time.deltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 3 * Time.deltaTime);
+            }
+            else
+            {
+                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, EngineControl.Throttle, .72f * Time.deltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, EngineControl.Throttle, 1.08f * Time.deltaTime);
+            }
+            PlaneThrustPitch = 1;
+            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (EngineControl.Throttle - 0.3f) + 1.3f, .54f * Time.deltaTime);
         }
         else //no one is in the plane
         {
-            if (Leftplane == true) { Exitplane(); }
+            if (Leftplane == true) { Exitplane(); }//pilot left
             PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * Time.deltaTime);
             PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, .09f * Time.deltaTime);
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * Time.deltaTime);
             PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, .72f * Time.deltaTime);
         }
+
         LastFramePlaneIdlePitch = PlaneIdlePitch;
 
-        if ((!EngineControl.Piloting) || !EngineControl.Passenger) //apply dopper if you're not in the vehicle
+        if (!EngineControl.Piloting && !EngineControl.Passenger) //apply dopper if you're not in the vehicle
         {
             PlaneIdlePitch *= Doppler;
             PlaneDistantPitch = Mathf.Clamp(((Doppler - 1) * .4f) + 1, 0, 1.25f);//40% effect + clamp to prevent sounding too stupid while plane is flying towards you
@@ -255,28 +283,28 @@ public class SoundController : UdonSharpBehaviour
             playsonicboom = false;
         }
 
-        if (PlaneIdle != null)
+        if (!PlaneIdleNull)
         {
             PlaneIdle.volume = Mathf.Lerp(PlaneIdle.volume, PlaneIdleVolume, 30f * Time.deltaTime);
             PlaneIdle.pitch = Mathf.Lerp(PlaneIdle.pitch, PlaneIdlePitch, 30f * Time.deltaTime);
 
             PlaneIdle.volume *= silentint;
         }
-        if (PlaneDistant != null)
+        if (!PlaneDistantNull)
         {
             PlaneDistant.volume = Mathf.Lerp(PlaneDistant.volume, PlaneDistantVolume, 30f * Time.deltaTime);
             PlaneDistant.pitch = Mathf.Lerp(PlaneDistant.pitch, PlaneDistantPitch, 30f * Time.deltaTime);
 
             PlaneDistantVolume *= silentint;
         }
-        if (PlaneThrust != null)
+        if (!PlaneThrustNull)
         {
             PlaneThrust.volume = PlaneThrustVolume;
             PlaneThrust.pitch = Mathf.Lerp(PlaneThrust.pitch, PlaneThrustPitch, 30f * Time.deltaTime);
 
             PlaneThrust.volume *= silentint;
         }
-        if (PlaneWind != null)
+        if (!PlaneWindNull)
         {
             PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
             PlaneWind.volume = Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) * .2f);
@@ -285,7 +313,7 @@ public class SoundController : UdonSharpBehaviour
 
         }
 
-        if (GunSound != null)
+        if (!GunSoundNull)
         {
             if (EngineControl.EffectsControl.IsFiringGun && !EngineControl.SoundControl.silent)
             {
@@ -311,16 +339,16 @@ public class SoundController : UdonSharpBehaviour
     }
     private void Exitplane()//sets sound values to give illusion of continuity of engine sound when exiting the plane
     {
-        if (PlaneInside != null) PlaneInside.Stop();
-        if (PlaneIdle != null) PlaneIdle.Play();
-        if (PlaneThrust != null) PlaneThrust.Play();
-        if (PlaneDistant != null) PlaneDistant.Play();
+        if (!PlaneInsideNull) PlaneInside.Stop();
+        if (!PlaneIdleNull) PlaneIdle.Play();
+        if (!PlaneThrustNull) PlaneThrust.Play();
+        if (!PlaneDistantNull) PlaneDistant.Play();
         Leftplane = false;
         PlaneThrustVolume *= 6.666666f;
         PlaneIdlePitch = PlaneInside.pitch;
         PlaneIdleVolume = PlaneIdleInitialVolume * .4f;
         PlaneDistantVolume = PlaneThrustVolume;
-        if (PlaneABOn != null)
+        if (!PlaneABOnNull)
         {
             PlaneABOn.volume *= 4f;
         }

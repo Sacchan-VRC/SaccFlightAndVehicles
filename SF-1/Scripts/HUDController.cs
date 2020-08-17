@@ -30,6 +30,8 @@ public class HUDController : UdonSharpBehaviour
     public Transform TrimYaw;
     public GameObject HudSAFE;
     public GameObject HudAB;
+    public GameObject AGMScreen;
+    public GameObject AGMCam;
     public GameObject LStick_funcon1;
     public GameObject LStick_funcon2;
     public GameObject LStick_funcon3;
@@ -37,6 +39,7 @@ public class HUDController : UdonSharpBehaviour
     public GameObject LStick_funcon6;
     public GameObject LStick_funcon7;
     public GameObject LStick_funcon8;
+    public GameObject RStick_funcon3;
     public GameObject RStick_funcon4;
     public GameObject RStick_funcon5;
     public GameObject RStick_funcon6;
@@ -103,7 +106,7 @@ public class HUDController : UdonSharpBehaviour
         /////////////////
 
         //Down indicator
-        DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, temprot.z));
+        DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, -new_z));
         /////////////////
 
         //SAFE indicator
@@ -113,7 +116,39 @@ public class HUDController : UdonSharpBehaviour
         }
         else { HudSAFE.SetActive(false); }
 
-        //Stick Selectors
+        //Left Stick Selector
+        switch (EngineControl.LStickSelection)
+        {
+            case 0:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);//invisible, backfacing
+                break;
+            case 1:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
+                break;
+            case 2:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -45);
+                break;
+            case 3:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -90);
+                break;
+            case 4:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -135);
+                break;
+            case 5:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -180);
+                break;
+            case 6:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -225);
+                break;
+            case 7:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -270);
+                break;
+            case 8:
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -315);
+                break;
+        }
+
+        //Right Stick Selector
         switch (EngineControl.RStickSelection)
         {
             case 0:
@@ -145,37 +180,7 @@ public class HUDController : UdonSharpBehaviour
                 break;
         }
 
-        //Stick Selectors
-        switch (EngineControl.LStickSelection)
-        {
-            case 0:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);//invisible, backfacing
-                break;
-            case 1:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
-                break;
-            case 2:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -45);
-                break;
-            case 3:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -90);
-                break;
-            case 4:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -135);
-                break;
-            case 5:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -180);
-                break;
-            case 6:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -225);
-                break;
-            case 7:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -270);
-                break;
-            case 8:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -315);
-                break;
-        }
+
         //AB
         if (EngineControl.AfterburnerOn) { HudAB.SetActive(true); }
         else { HudAB.SetActive(false); }
@@ -211,6 +216,9 @@ public class HUDController : UdonSharpBehaviour
 
 
         //right stick toggles/functions on?
+        if (EngineControl.AGMLocked) { RStick_funcon3.SetActive(true); }
+        else { RStick_funcon3.SetActive(false); }
+
         if (EngineControl.LevelFlight) { RStick_funcon4.SetActive(true); }
         else { RStick_funcon4.SetActive(false); }
 
@@ -230,6 +238,24 @@ public class HUDController : UdonSharpBehaviour
             EngineControl.SoundControl.MenuSelect.Play();
         }
         MenuSoundCheckLast = MenuSoundCheck;
+
+        //AGMScreen
+        if (EngineControl.RStickSelection == 3)
+        {
+            AGMScreen.SetActive(true);
+            EngineControl.AGMCam.SetActive(true);
+        }
+        else if (!EngineControl.AGMLocked)
+        {
+            AGMScreen.SetActive(false);
+            EngineControl.AGMCam.SetActive(false);
+        }
+
+        //AGM Camera
+        if (EngineControl.AGMLocked)
+        {
+            if (AGMCam != null) AGMCam.transform.LookAt(EngineControl.AGMTarget);
+        }
 
         //updating numbers 3~x times a second
         if (check > .3)//update text
