@@ -26,7 +26,7 @@ public class SaccFlight : UdonSharpBehaviour
 
             controllertriggerR = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
             controllertriggerL = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-            if ((controllertriggerR > 0.1) || GetkeyF)
+            if ((controllertriggerR > 0) || GetkeyF)
             {
                 Quaternion newspeed;
                 Vector3 tempdir;
@@ -38,8 +38,8 @@ public class SaccFlight : UdonSharpBehaviour
                 }
                 else
                 {
-                    newspeed = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(90, 60, 0);
-                    tempdir = newspeed * Vector3.up;
+                    newspeed = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0);
+                    tempdir = newspeed * Vector3.forward;
                 }
                 //get backwards amount
                 float BackThrustAmount = Mathf.Clamp(((Vector3.Dot(PlayerVel, tempdir.normalized)) * BackThrustStrength) * -1, 0, 99999);
@@ -48,7 +48,7 @@ public class SaccFlight : UdonSharpBehaviour
                 float FinalCheatThrust = Mathf.Max(1, (BackThrustAmount * Mathf.Max(controllertriggerR, Ff)));
                 localPlayer.SetVelocity(PlayerVel + tempdir * FinalCheatThrust);
             }
-            if ((controllertriggerL > 0.1) || GetkeySpace)
+            if ((controllertriggerL > 0) || GetkeySpace)
             {
                 Vector3 tempdir = ((Vector3.up * flystr) * Mathf.Max(controllertriggerL, GetkeySpace ? 1 : 0));
                 localPlayer.SetVelocity(localPlayer.GetVelocity() + tempdir);

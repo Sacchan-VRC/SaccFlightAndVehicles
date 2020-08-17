@@ -213,7 +213,7 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
-        airbrakelerper = Mathf.Lerp(airbrakelerper, EngineControl.AirBrake, 5f * Time.deltaTime);
+        airbrakelerper = Mathf.Lerp(airbrakelerper, EngineControl.AirBrakeInput, 5f * Time.deltaTime);
 
         PlaneAnimator.SetBool("displaysmoke", (EngineControl.Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
@@ -254,14 +254,14 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.Cruise = false;
         EngineControl.Trim = Vector2.zero;
         EngineControl.CanopyOpen = true;
-        EngineControl.CanopyCloseTimer = -100000;
+        EngineControl.CanopyCloseTimer = -100001;
 
 
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
             EngineControl.VehicleRigidbody.velocity = Vector3.zero;
             EngineControl.Health = EngineControl.FullHealth;//turns off low health smoke
-            EngineControl.Fuel = EngineControl.FullFuel;//turns off low health smoke
+            EngineControl.Fuel = EngineControl.FullFuel;
         }
 
         //pilot and passenger are dropped out of the plane
