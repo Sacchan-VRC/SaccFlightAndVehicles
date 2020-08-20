@@ -9,25 +9,22 @@ public class PilotSeat : UdonSharpBehaviour
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
     public GameObject LeaveButton;
-    public GameObject Saccflight;
+    //public GameObject Saccflight; 
     public GameObject Gun_pilot;
     public Transform PlaneMesh;
     public GameObject SeatAdjuster;
     public GameObject EnableOther;
     private void Interact()//entering the plane
     {
-        if (Saccflight != null) { Saccflight.SetActive(false); }
+        //if (Saccflight != null) { Saccflight.SetActive(false); }
         if (VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, VehicleMainObj); }
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (EngineControl != null)
         {
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
             EngineControl.Piloting = true;
-            EngineControl.Hooked = 0;
-            EngineControl.AirBrakeInput = 0;
-            EngineControl.LTriggerTapTime = 1;
-            if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;
-            else EngineControl.CanopyCloseTimer = -1;
+            if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;//has to be less than -100000
+            else EngineControl.CanopyCloseTimer = -1;//less than 0
         }
         if (EngineControl.EffectsControl != null)
         {
@@ -36,15 +33,14 @@ public class PilotSeat : UdonSharpBehaviour
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
         }
-        if (EngineControl.HUDControl != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject); }
+        if (EngineControl.HUDControl != null)
+        {
+            Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject);
+            EngineControl.HUDControl.gameObject.SetActive(true);
+        }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
         if (EnableOther != null) { EnableOther.SetActive(true); }
-        if (EngineControl.HUDControl != null)
-        {
-            EngineControl.HUDControl.gameObject.SetActive(true);
-            EngineControl.HUDControl.MenuSoundCheckLast = 6;
-        }
         if (EngineControl.localPlayer != null) { EngineControl.localPlayer.UseAttachedStation(); }
         if (EngineControl.EffectsControl != null || EngineControl.SoundControl != null) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "WakeUp"); }
         //set plane to a layer that doesn't collide with its own bullets
@@ -63,6 +59,10 @@ public class PilotSeat : UdonSharpBehaviour
         {
             EngineControl.Piloting = false;
             EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+            EngineControl.Hooked = 0;
+            EngineControl.AirBrakeInput = 0;
+            EngineControl.LTriggerTapTime = 1;
+            EngineControl.RTriggerTapTime = 1;
             EngineControl.Taxiinglerper = 0;
             EngineControl.PlayerThrottle = 0;
             EngineControl.LGripLastFrame = false;
@@ -72,10 +72,12 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.AirBrakeInput = 0;
             EngineControl.LTriggerLastFrame = false;
             EngineControl.RTriggerLastFrame = false;
+            EngineControl.HUDControl.MenuSoundCheckLast = 0;
+            EngineControl.AGMLocked = false;
             if (EngineControl.CatapultStatus == 2) { }//keep launching if launching
             else EngineControl.CatapultStatus = 0;//else unhook from catapult
         }
-        if (Saccflight != null) { Saccflight.SetActive(true); }
+        //if (Saccflight != null) { Saccflight.SetActive(true); }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
         if (EngineControl.EffectsControl != null)
         {

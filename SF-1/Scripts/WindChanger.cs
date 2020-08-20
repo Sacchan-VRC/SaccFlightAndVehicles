@@ -7,8 +7,9 @@ using VRC.Udon;
 
 public class WindChanger : UdonSharpBehaviour
 {
-    public Slider WindSlider;
     public GameObject Menu;
+    public Slider WindSlider;
+    public Text WindStr_text;
     public AudioSource WindApplySound;
     public EngineController[] VehicleEngines;
     [UdonSynced(UdonSyncMode.None)] private float WindStrength;
@@ -21,8 +22,16 @@ public class WindChanger : UdonSharpBehaviour
     }
     private void Update()
     {
-        if (IsOwner) WindSlider.value = WindStrength;
-        else WindStrength = WindSlider.value;
+        if (IsOwner)
+        {
+            WindStrength = WindSlider.value;
+            WindStr_text.text = WindSlider.value.ToString("F1");
+        }
+        else WindSlider.value = WindStrength;
+    }
+    private void OnPickupUseDown()
+    {
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ApplyWindDir");
     }
     public void ApplyWindDir()
     {
@@ -30,12 +39,9 @@ public class WindChanger : UdonSharpBehaviour
         Vector3 newwinddir = (gameObject.transform.rotation * Vector3.forward) * WindStrength;
         foreach (EngineController vehicle in VehicleEngines)
         {
-            vehicle.Wind = newwinddir;
+            if (localPlayer.IsOwner(vehicle.gameObject))
+                vehicle.Wind = newwinddir;
         }
-    }
-    private void OnPickupUseDown()
-    {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ApplyWindDir");
     }
     private void OnPickup()
     {
@@ -46,8 +52,6 @@ public class WindChanger : UdonSharpBehaviour
     {
         if (localPlayer.IsOwner(gameObject)) { IsOwner = true; }
         else { IsOwner = false; }
-
         Menu.SetActive(false);
     }
-
 }

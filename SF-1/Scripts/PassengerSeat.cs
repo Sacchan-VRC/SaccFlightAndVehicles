@@ -9,11 +9,11 @@ public class PassengerSeat : UdonSharpBehaviour
     public EngineController EngineControl;
     public GameObject LeaveButton;
     public GameObject SeatAdjuster;
-    public GameObject Saccflight;
+    //public GameObject Saccflight;
     public GameObject EnableOther;
     private void Interact()
     {
-        if (Saccflight != null) { Saccflight.SetActive(false); }
+        //if (Saccflight != null) { Saccflight.SetActive(false); }
         EngineControl.Passenger = true;
         Networking.SetOwner(EngineControl.localPlayer, gameObject);
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
@@ -31,7 +31,7 @@ public class PassengerSeat : UdonSharpBehaviour
             EngineControl.Passenger = false;
             EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
         }
-        if (Saccflight != null) { Saccflight.SetActive(true); }
+        //if (Saccflight != null) { Saccflight.SetActive(true); }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
         if (EnableOther != null) { EnableOther.SetActive(false); }

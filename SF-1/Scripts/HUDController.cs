@@ -48,7 +48,7 @@ public class HUDController : UdonSharpBehaviour
     private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
     private float check = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public float MenuSoundCheckLast = 6;
+    [System.NonSerializedAttribute] [HideInInspector] public float MenuSoundCheckLast = 0;
     private Vector3 temprot;
     private int showvel;
     private void Start()
@@ -63,10 +63,10 @@ public class HUDController : UdonSharpBehaviour
     {
         const float InputSquareSize = 0.0284317f;
         //RollPitch Indicator
-        PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.rollinput, EngineControl.pitchinput, 0)) * InputSquareSize;
+        PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.RollInput, EngineControl.PitchInput, 0)) * InputSquareSize;
 
         //Yaw Indicator
-        Yaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.yawinput, 0, 0)) * InputSquareSize;
+        Yaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.YawInput, 0, 0)) * InputSquareSize;
 
         //Yaw Trim Indicator
         TrimYaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.Trim.y, 0, 0)) * InputSquareSize;
@@ -126,25 +126,25 @@ public class HUDController : UdonSharpBehaviour
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
                 break;
             case 2:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -45);
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 45, 0);
                 break;
             case 3:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -90);
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 90, 0);
                 break;
             case 4:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -135);
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 135, 0);
                 break;
             case 5:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -180);
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);
                 break;
             case 6:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -225);
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 225, 0);
                 break;
             case 7:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -270);
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 270, 0);
                 break;
             case 8:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -315);
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 315, 0);
                 break;
         }
 
@@ -158,25 +158,25 @@ public class HUDController : UdonSharpBehaviour
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
                 break;
             case 2:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -45);
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 45, 0);
                 break;
             case 3:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -90);
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 90, 0);
                 break;
             case 4:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -135);
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 135, 0);
                 break;
             case 5:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -180);
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);
                 break;
             case 6:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -225);
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 225, 0);
                 break;
             case 7:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -270);
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 270, 0);
                 break;
             case 8:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -315);
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 315, 0);
                 break;
         }
 
@@ -243,12 +243,12 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.RStickSelection == 3)
         {
             AGMScreen.SetActive(true);
-            EngineControl.AGMCam.SetActive(true);
+            EngineControl.AGMCam.gameObject.SetActive(true);
         }
         else if (!EngineControl.AGMLocked)
         {
             AGMScreen.SetActive(false);
-            EngineControl.AGMCam.SetActive(false);
+            EngineControl.AGMCam.gameObject.SetActive(false);
         }
 
         //AGM Camera
