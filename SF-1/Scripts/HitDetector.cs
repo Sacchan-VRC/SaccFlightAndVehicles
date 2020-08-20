@@ -56,7 +56,6 @@ public class HitDetector : UdonSharpBehaviour
         EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
         if (EngineControl.localPlayer == null)//editor
         {
-            EngineControl.VehicleRigidbody.velocity = new Vector3(0, 0, 0);
             EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.EffectsControl.Spawnrotation);
             EngineControl.VehicleMainObj.transform.position = EngineControl.EffectsControl.Spawnposition;
             EngineControl.Health = EngineControl.FullHealth;

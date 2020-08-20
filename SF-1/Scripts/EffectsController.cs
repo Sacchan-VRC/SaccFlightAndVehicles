@@ -8,8 +8,7 @@ public class EffectsController : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
-    public VRCStation PilotSeatStation; //so you can leave when exploded
-    public VRCStation PassengerSeatStation; // so you can leave when exploded
+    public LeaveVehicleButton[] LeaveButtons; //so you can leave when exploded
     public Transform JoyStick;
     public Transform AileronL;
     public Transform AileronR;
@@ -24,8 +23,6 @@ public class EffectsController : UdonSharpBehaviour
     public Transform SlatsL;
     public Transform SlatsR;
     public ParticleSystem DisplaySmoke;
-    private PilotSeat PilotSeat1;
-    private PassengerSeat PassengerSeat1;
     private bool vapor;
     [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
@@ -49,8 +46,6 @@ public class EffectsController : UdonSharpBehaviour
     private void Start()
     {
         if (VehicleMainObj != null) { PlaneAnimator = VehicleMainObj.GetComponent<Animator>(); }
-        if (PilotSeatStation != null) { PilotSeat1 = PilotSeatStation.gameObject.GetComponent<PilotSeat>(); }
-        if (PassengerSeatStation != null) { PassengerSeat1 = PassengerSeatStation.gameObject.GetComponent<PassengerSeat>(); }
         Spawnposition = VehicleMainObj.transform.position;
         Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
         SmokeModule = DisplaySmoke.colorOverLifetime;
@@ -94,12 +89,12 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
             PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
-            rotationinputs.x = Mathf.Clamp(EngineControl.pitchinput + EngineControl.Trim.x, -1, 1) * 25;
-            rotationinputs.y = Mathf.Clamp(EngineControl.yawinput + EngineControl.Trim.y, -1, 1) * 20;
-            rotationinputs.z = EngineControl.rollinput * 35;
+            rotationinputs.x = Mathf.Clamp(EngineControl.PitchInput + EngineControl.Trim.x, -1, 1) * 25;
+            rotationinputs.y = Mathf.Clamp(EngineControl.YawInput + EngineControl.Trim.y, -1, 1) * 20;
+            rotationinputs.z = EngineControl.RollInput * 35;
 
             //joystick movement
-            Vector3 tempjoy = new Vector3(EngineControl.pitchinput * 45f, -EngineControl.rollinput * 45f, EngineControl.yawinput * 45);
+            Vector3 tempjoy = new Vector3(EngineControl.PitchInput * 45f, -EngineControl.RollInput * 45f, EngineControl.YawInput * 45);
             JoyStick.localRotation = Quaternion.Euler(tempjoy);
         }
         vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
@@ -125,36 +120,19 @@ public class EffectsController : UdonSharpBehaviour
         }
         else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
 
-        if (EngineControl.Flaps)
-        {
-            PlaneAnimator.SetBool("flaps", true);
-        }
-        else
-        {
-            PlaneAnimator.SetBool("flaps", false);
-        }
+        if (EngineControl.Flaps) { PlaneAnimator.SetBool("flaps", true); }
+        else { PlaneAnimator.SetBool("flaps", false); }
 
-        if (EngineControl.GearUp)
-        {
-            PlaneAnimator.SetBool("gearup", true);
-        }
-        else
-        {
-            PlaneAnimator.SetBool("gearup", false);
-        }
+        if (EngineControl.GearUp) { PlaneAnimator.SetBool("gearup", true); }
+        else { PlaneAnimator.SetBool("gearup", false); }
 
-        if (EngineControl.HookDown)
-        {
-            PlaneAnimator.SetBool("hookdown", true);
-        }
-        else
-        {
-            PlaneAnimator.SetBool("hookdown", false);
-        }
+        if (EngineControl.HookDown) { PlaneAnimator.SetBool("hookdown", true); }
+        else { PlaneAnimator.SetBool("hookdown", false); }
 
-        //rotationinputs.x = pitch
-        //rotationinputs.y = yaw
-        //rotationinputs.z = roll
+
+        //rotationinputs.x == pitch
+        //rotationinputs.y == yaw
+        //rotationinputs.z == roll
         //rotating the control surfaces based on inputs
         if (AileronL != null) { aileronLlerper.y = Mathf.Lerp(aileronLlerper.y, rotationinputs.z + (-rotationinputs.x * .5f), 4.5f * Time.deltaTime); ; AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
         if (AileronR != null) { aileronRlerper.y = Mathf.Lerp(aileronRlerper.y, -rotationinputs.z + (-rotationinputs.x * .5f), 4.5f * Time.deltaTime); ; AileronR.localRotation = Quaternion.Euler(aileronRlerper); }
@@ -266,16 +244,14 @@ public class EffectsController : UdonSharpBehaviour
 
         //pilot and passenger are dropped out of the plane
         if (EngineControl.SoundControl != null && EngineControl.SoundControl.Explosion != null) { EngineControl.SoundControl.Explosion.Play(); }
-        if (EngineControl.Piloting && !EngineControl.InEditor)
+        if ((EngineControl.Piloting || EngineControl.Passenger) && !EngineControl.InEditor)
         {
-            if (PilotSeatStation != null) { PilotSeatStation.ExitStation(EngineControl.localPlayer); }
-        }
-        if (EngineControl.Passenger && !EngineControl.InEditor)
-        {
-            if (PassengerSeatStation != null) { PassengerSeatStation.ExitStation(EngineControl.localPlayer); }
+            foreach (LeaveVehicleButton seat in LeaveButtons)
+            {
+                seat.ExitStation();
+            }
         }
         PlaneAnimator.SetTrigger("explode");
-
     }
     public void DropFlares()
     {

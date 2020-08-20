@@ -30,6 +30,7 @@ public class LeaveVehicleButton : UdonSharpBehaviour
 
     public void ExitStation()
     {
-        if (Seat != null) { Seat.ExitStation(EngineControl.localPlayer); }
+        if (gameObject.activeSelf)//so we only exit our own seat
+            if (Seat != null) { Seat.ExitStation(EngineControl.localPlayer); }
     }
 }

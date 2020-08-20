@@ -201,7 +201,7 @@ public class SoundController : UdonSharpBehaviour
             {
                 PlaneIdle.Stop();
             }
-            if (EngineControl.Piloting || EngineControl.Occupied && EngineControl.Passenger) //you're piloting or someone is piloting and you're a passenger
+            if ((EngineControl.Piloting || (EngineControl.Passenger && EngineControl.Occupied)) && EngineControl.Fuel > 5) //you're piloting or someone is piloting and you're a passenger
             {
                 if (!PlaneInsideNull)
                 {
@@ -210,7 +210,7 @@ public class SoundController : UdonSharpBehaviour
                 }
                 PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, (EngineControl.Throttle * PlaneThrustInitialVolume) * InVehicleThrustVolumeFactor, 1.08f * Time.deltaTime);
             }
-            else if (/*InEditor || */EngineControl.Passenger)//enable here and disable 'Piloting' above for testing //you're a passenger and no one is flying
+            else/*  if (InEditor) */ //enable here and disable 'Piloting' above for testing //you're a passenger and no one is flying
             {
                 PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * Time.deltaTime);
                 PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * Time.deltaTime);
