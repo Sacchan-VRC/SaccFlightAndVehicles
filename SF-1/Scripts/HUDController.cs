@@ -106,7 +106,7 @@ public class HUDController : UdonSharpBehaviour
         /////////////////
 
         //Down indicator
-        DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, -new_z));
+        DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, new_z));
         /////////////////
 
         //SAFE indicator
@@ -120,7 +120,7 @@ public class HUDController : UdonSharpBehaviour
         switch (EngineControl.LStickSelection)
         {
             case 0:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);//invisible, backfacing
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);//invisible, backfacing
                 break;
             case 1:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
@@ -152,7 +152,7 @@ public class HUDController : UdonSharpBehaviour
         switch (EngineControl.RStickSelection)
         {
             case 0:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);//invisible, backfacing
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);//invisible, backfacing
                 break;
             case 1:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
@@ -242,22 +242,22 @@ public class HUDController : UdonSharpBehaviour
         //AGMScreen
         if (EngineControl.RStickSelection == 3)
         {
-            AGMScreen.SetActive(true);
-            EngineControl.AGMCam.gameObject.SetActive(true);
+            if (EngineControl.AGMCam != null)
+            {
+                AGMScreen.SetActive(true);
+                EngineControl.AGMCam.gameObject.SetActive(true);
+            }
         }
         else if (!EngineControl.AGMLocked)
         {
-            AGMScreen.SetActive(false);
-            EngineControl.AGMCam.gameObject.SetActive(false);
+            if (EngineControl.AGMCam != null)
+            {
+                AGMScreen.SetActive(false);
+                EngineControl.AGMCam.gameObject.SetActive(false);
+            }
         }
 
-        //AGM Camera
-        if (EngineControl.AGMLocked)
-        {
-            if (AGMCam != null) AGMCam.transform.LookAt(EngineControl.AGMTarget);
-        }
-
-        //updating numbers 3~x times a second
+        //updating numbers 3~ times a second
         if (check > .3)//update text
         {
             if (EngineControl.Gs > maxGs) { maxGs = EngineControl.Gs; }

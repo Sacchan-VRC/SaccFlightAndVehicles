@@ -7,7 +7,7 @@ using VRC.Udon;
 public class EngineController : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
-    [System.NonSerializedAttribute] [HideInInspector] public Rigidbody VehicleRigidbody;
+    public LeaveVehicleButton[] LeaveButtons;
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
@@ -85,7 +85,8 @@ public class EngineController : UdonSharpBehaviour
     public float HookedBrakeStrength = 65f;
     public float CatapultLaunchStrength = 50f;
     public float CatapultLaunchTime = 2f;
-    public float TakeoffAssist = 10f;
+    public float TakeoffAssist = 5f;
+    public float TakeoffAssistSpeed = 50f;
     [System.NonSerializedAttribute] [HideInInspector] public bool FlightLimitsEnabled = true;
     private float GLimitStrength;
     public float GLimit = 12f;
@@ -95,6 +96,7 @@ public class EngineController : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
     public float SeaLevel = -10f;
     [System.NonSerializedAttribute] [HideInInspector] public ConstantForce VehicleConstantForce;
+    [System.NonSerializedAttribute] [HideInInspector] public Rigidbody VehicleRigidbody;
     private float LerpedRoll;
     private float LerpedPitch;
     private float LerpedYaw;
@@ -126,7 +128,6 @@ public class EngineController : UdonSharpBehaviour
     private float ZoomDifference;
     private bool AGMZoomLastFrame;
     [System.NonSerializedAttribute] [HideInInspector] public float SetSpeed;
-    private float SpeedDifference;
     private float SpeedZeroPoint;
     private float SmokeHoldTime;
     private bool SetSmokeLastFrame;
@@ -134,6 +135,9 @@ public class EngineController : UdonSharpBehaviour
     private Vector3 SmokeZeroPoint;
     private Vector3 TempSmokeCol;
     private Vector3 SmokeDifference;
+    private float EjectZeroPoint;
+    public float EjectTimer = 1;
+    public bool Ejected = false;
     [System.NonSerializedAttribute] [HideInInspector] public float LTriggerTapTime = 1;
     [System.NonSerializedAttribute] [HideInInspector] public float RTriggerTapTime = 1;
     private bool DoTrim;
@@ -238,6 +242,10 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float AirSpeed;
     [System.NonSerializedAttribute] [HideInInspector] public bool IsOwner = false;
     public Vector3 Wind;
+    private Vector3 FinalWind;
+    public float WindGustStrength = 15;
+    public float WindGustiness = 0.03f;
+    public float WindTurbulanceScale = 0.0001f;
     public Vector3 AirVel;
     private float StillWindMulti;
     private float SoundBarrier;
@@ -258,7 +266,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public bool AGMLocked;
     [System.NonSerializedAttribute] [HideInInspector] private int AGMUnlocking = 0;
     [System.NonSerializedAttribute] [HideInInspector] private float AGMUnlockTimer;
-    [System.NonSerializedAttribute] [HideInInspector] public Vector3 AGMTarget;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -308,8 +316,12 @@ public class EngineController : UdonSharpBehaviour
         {
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
             Speed = CurrentVel.magnitude;
-            AirVel = VehicleRigidbody.velocity - Wind;
-            AirSpeed = AirVel.magnitude; ;
+            float gustx = (Time.time * WindGustiness) + (VehicleMainObj.transform.position.x * WindTurbulanceScale);
+            float gustz = (Time.time * WindGustiness) + (VehicleMainObj.transform.position.z * WindTurbulanceScale);
+            FinalWind = Vector3.Normalize(new Vector3((Mathf.PerlinNoise(gustx + 9000, gustz) - .5f), /* (Mathf.PerlinNoise(gustx - 9000, gustz - 9000) - .5f) */0, (Mathf.PerlinNoise(gustx, gustz + 9999) - .5f))) * WindGustStrength;
+            FinalWind += Wind;
+            AirVel = VehicleRigidbody.velocity - FinalWind;
+            AirSpeed = AirVel.magnitude;
             if (InEditor || !Piloting) { Occupied = false; } //should make vehicle respawnable if player disconnects while occupying
             AngleOfAttackPitch = Vector3.SignedAngle(VehicleMainObj.transform.forward, AirVel, VehicleMainObj.transform.right);
             AngleOfAttackYaw = Vector3.SignedAngle(VehicleMainObj.transform.forward, AirVel, VehicleMainObj.transform.up);
@@ -490,7 +502,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         case 0://player just got in and hasn't selected anything
                             break;
-                        case 1://set speed
+                        case 1://Cruise
                             if (LTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha4)))
                             {
                                 if (!LTriggerLastFrame)
@@ -507,6 +519,7 @@ public class EngineController : UdonSharpBehaviour
                                     else//double tap detected, turn off cruise
                                     {
                                         Cruise = false;
+                                        PlayerThrottle = ThrottleInput;
                                     }
                                 }
 
@@ -520,15 +533,15 @@ public class EngineController : UdonSharpBehaviour
                                         SpeedZeroPoint = handpos;
                                         TempSpeed = SetSpeed;
                                     }
-                                    SpeedDifference = (SpeedZeroPoint - handpos) * -600;
+                                    float SpeedDifference = (SpeedZeroPoint - handpos) * -600;
                                     SetSpeed = Mathf.Clamp(TempSpeed + SpeedDifference, 0, 2000);
 
                                 }
 
-                                AirBrakeInput = 0;
                                 LTriggerLastFrame = true;
                             }
                             else { LTriggerLastFrame = false; }
+                            AirBrakeInput = 0;
                             break;
                         case 2://LIMIT
                             if (LTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha4)))
@@ -539,9 +552,9 @@ public class EngineController : UdonSharpBehaviour
                                 }
 
                                 LTriggerLastFrame = true;
-                                AirBrakeInput = 0;
                             }
                             else { LTriggerLastFrame = false; }
+                            AirBrakeInput = 0;
                             break;
                         case 3://CATAPULT
                             if (LTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha4)))
@@ -560,10 +573,10 @@ public class EngineController : UdonSharpBehaviour
                                     }
                                 }
 
-                                AirBrakeInput = 0;
                                 LTriggerLastFrame = true;
                             }
                             else { LTriggerLastFrame = false; }
+                            AirBrakeInput = 0;
                             break;
                         case 4://HOOK
                             if (LTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha4)))
@@ -577,10 +590,10 @@ public class EngineController : UdonSharpBehaviour
                                     Hooked = 0;
                                 }
 
-                                AirBrakeInput = 0;
                                 LTriggerLastFrame = true;
                             }
                             else { LTriggerLastFrame = false; }
+                            AirBrakeInput = 0;
                             break;
                         case 5://Brake done elsewhere because it's analog
                             if (Input.GetKey(KeyCode.Alpha4))
@@ -622,37 +635,61 @@ public class EngineController : UdonSharpBehaviour
                                     Trim.x = Mathf.Clamp(TempTrim.y + TrimDifference.y, -1, 1);
                                     Trim.y = Mathf.Clamp(TempTrim.x + -TrimDifference.x, -1, 1);
                                 }
-
-                                AirBrakeInput = 0;
                                 LTriggerLastFrame = true;
                             }
                             else { LTriggerLastFrame = false; }
+                            AirBrakeInput = 0;
                             break;
                         case 7://Canopy
                             if (LTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha4)))
                             {
-                                if (!LTriggerLastFrame)
+                                if (!LTriggerLastFrame && Speed < 20)
                                 {
-                                    if (Speed < 20)
+                                    if (CanopyCloseTimer < (-100000 - CanopyCloseTime))
                                     {
-                                        if (CanopyCloseTimer < (-100000 - CanopyCloseTime))
-                                        {
-                                            CanopyOpen = false;
-                                            if (InEditor) CanopyClosing();
-                                            else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
-                                        }
-                                        else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -10000)
-                                        {
-                                            CanopyOpen = true;
-                                            if (InEditor) CanopyOpening();
-                                            else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
-                                        }
+                                        CanopyOpen = false;
+                                        if (InEditor) CanopyClosing();
+                                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
+                                    }
+                                    else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -10000)
+                                    {
+                                        CanopyOpen = true;
+                                        if (InEditor) CanopyOpening();
+                                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
                                     }
                                 }
-                                AirBrakeInput = 0;
+
+                                //ejection
+                                if (InVR)
+                                {
+                                    float handposL = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position).y;
+                                    float handposR = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position).y;
+                                    if (!LTriggerLastFrame && (handposL - handposR) < 0.15f)
+                                    {
+                                        EjectZeroPoint = handposL;
+                                        EjectTimer = 0;
+                                    }
+                                    if (handposL - EjectZeroPoint > .5f && EjectTimer < 1)
+                                    {
+                                        Ejected = true;
+                                        foreach (LeaveVehicleButton seat in LeaveButtons)
+                                        {
+                                            if (seat != null) seat.ExitStation();
+                                        }
+                                        CanopyOpen = true;
+                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
+                                    }
+                                }
+
+                                EjectTimer += Time.deltaTime;
                                 LTriggerLastFrame = true;
                             }
-                            else { LTriggerLastFrame = false; }
+                            else
+                            {
+                                LTriggerLastFrame = false;
+                                EjectTimer = 2;
+                            }
+                            AirBrakeInput = 0;
                             break;
                         case 8://Afterburner
                             if (LTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha4)))
@@ -674,11 +711,10 @@ public class EngineController : UdonSharpBehaviour
                                     }
                                     else { Afterburner = 1; }
                                 }
-
-                                AirBrakeInput = 0;
                                 LTriggerLastFrame = true;
                             }
                             else { LTriggerLastFrame = false; }
+                            AirBrakeInput = 0;
                             break;
                     }
                 }
@@ -714,21 +750,6 @@ public class EngineController : UdonSharpBehaviour
                             AGMLocked = false; AGMUnlockTimer = 0;
                             AGMZoomLastFrame = false;
                         }
-                        else if (RTrigger > 0.75f)
-                        {
-                            //VR Set Speed
-                            if (InVR)
-                            {
-                                handpos = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position).z;
-                                if (!AGMZoomLastFrame)
-                                {
-                                    ZoomZeroPoint = handpos;
-                                    TempZoom = AGMCam.fieldOfView;
-                                }
-                                ZoomDifference = (ZoomZeroPoint - handpos) * 200;
-                                AGMCam.fieldOfView = Mathf.Clamp(TempZoom + ZoomDifference, 0, 2000);
-                            }
-                        }
                         AGMZoomLastFrame = false;
                         if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha5)))
                         {
@@ -753,9 +774,9 @@ public class EngineController : UdonSharpBehaviour
                                         Physics.Raycast(AGMCam.transform.position, AGMCam.transform.forward, out lockpoint, Mathf.Infinity, 1);
                                         if (lockpoint.point != null)
                                         {
+                                            AGMTarget = lockpoint.point;
                                             AGMLocked = true;
                                             AGMUnlocking = 0;
-                                            AGMTarget = lockpoint.point;
                                         }
                                     }
                                 }
@@ -785,9 +806,25 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 temp = VehicleMainObj.transform.rotation.eulerAngles;
                             }
-                            temp.z = 0;
+
                             if (AGMCam != null) AGMCam.transform.rotation = Quaternion.Euler(temp);
+                            //dunno if there's a better way to do this
+                            Vector3 localrot = AGMCam.transform.localRotation.eulerAngles;
+                            localrot.z = 0;
+                            if (AGMCam != null) AGMCam.transform.localRotation = Quaternion.Euler(localrot);
                         }
+                        else
+                        {
+                            if (AGMCam != null) AGMCam.transform.LookAt(AGMTarget, VehicleMainObj.transform.up);
+                        }
+                        RaycastHit camhit;
+                        Physics.Raycast(AGMCam.transform.position, AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
+                        if (camhit.point != null)
+                        {
+                            //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
+                            AGMCam.fieldOfView = Mathf.Max(Mathf.Lerp(AGMCam.fieldOfView, 2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f);
+                        }
+
                         EffectsControl.IsFiringGun = false;
                         AGMZoomLastFrame = false;
                         break;
@@ -938,7 +975,7 @@ public class EngineController : UdonSharpBehaviour
                     if (!LGripLastFrame)
                     {
                         ThrottleZeroPoint = handpos;
-                        TempThrottle = ThrottleInput;
+                        TempThrottle = PlayerThrottle;
                     }
                     ThrottleDifference = ThrottleZeroPoint - handpos;
                     ThrottleDifference *= -6;
@@ -963,7 +1000,7 @@ public class EngineController : UdonSharpBehaviour
                     VehicleMainObj.transform.Rotate(Vector3.up, Taxiinglerper);
                     StillWindMulti = Mathf.Clamp(Speed / 10, 0, 1);
 
-                    PitchStrength = StartPitchStrength + (TakeoffAssist * rotlift);//stronger pitch when moving fast and taxiing to help with taking off
+                    PitchStrength = StartPitchStrength + ((TakeoffAssist * Speed) / (TakeoffAssistSpeed));//stronger pitch when moving fast and taxiing to help with taking off
 
 
                     //check for catapult below us and attach if there's one                                                              
@@ -1153,7 +1190,7 @@ public class EngineController : UdonSharpBehaviour
 
                 //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it.
                 if (Speed < .2 && ThrottleInput > 0)
-                    VehicleRigidbody.velocity += VehicleRigidbody.transform.forward * 0.2f;
+                    VehicleRigidbody.velocity = VehicleRigidbody.transform.forward * 0.2f;
             }
             else
             {
@@ -1320,7 +1357,7 @@ public class EngineController : UdonSharpBehaviour
         if (InEditor || IsOwner)
         {
             //lerp velocity toward 0 to simulate air friction
-            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Wind * StillWindMulti, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag) * Atmosphere) * 90) * Time.deltaTime);
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, FinalWind * StillWindMulti, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag) * Atmosphere) * 90) * Time.deltaTime);
             if (Piloting)
             {
                 //apply pitching using pitch moment

@@ -104,7 +104,7 @@ public class SoundController : UdonSharpBehaviour
         PlaneIdlePitch = LastFramePlaneIdlePitch;
         PlaneThrustPitch = LastFramePlaneThrustPitch;
 
-        //the doppler code is done in a really scuffed hacky way to avoid having to do it in fixedupdate to avoid worse performance.
+        //the doppler code is done in a really scuffed hacky way to avoid having to do it in fixedupdate and have worse performance.
         //only calculate doppler every 5 frames to smooth out laggers and frame drops
         if (dopplecounter > 4)
         {

@@ -18,6 +18,8 @@ public class VehicleRespawnButton : UdonSharpBehaviour
             EngineControl.GearUp = false;
             EngineControl.Flaps = true;
             EngineControl.Health = EngineControl.FullHealth;
+            EngineControl.Fuel = EngineControl.FullFuel;
+            EngineControl.HookDown = false;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ButtonRespawn");
         }
     }

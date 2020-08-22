@@ -14,52 +14,90 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedUdonProgramAsset: {fileID: 11400000, guid: 65d8d88b9b196e342b2e328b6c4ee119,
     type: 2}
-  udonAssembly: ".data_start\n\n    .export Menu\n    .export WindSlider\n    .export
-    WindStr_text\n    .export WindApplySound\n    .export VehicleEngines\n    .sync
-    WindStrength, none\n\n    __refl_const_intnl_udonTypeID: %SystemInt64, null\n
-    \   __refl_const_intnl_udonTypeName: %SystemString, null\n    WindApplySound:
-    %UnityEngineAudioSource, null\n    VehicleEngines: %UnityEngineComponentArray,
-    null\n    Menu: %UnityEngineGameObject, null\n    WindSlider: %UnityEngineUISlider,
-    null\n    WindStr_text: %UnityEngineUIText, null\n    IsOwner: %SystemBoolean,
-    null\n    WindStrength: %SystemSingle, null\n    localPlayer: %VRCSDKBaseVRCPlayerApi,
-    null\n    __0_this_intnl_UnityEngineGameObject: %UnityEngineGameObject, this\n
-    \   __0_this_intnl_WindChanger: %VRCUdonUdonBehaviour, this\n    __0_vehicle_EngineController:
-    %VRCUdonUdonBehaviour, null\n    __0_newwinddir_Vector3: %UnityEngineVector3,
-    null\n    __0_const_intnl_SystemBoolean: %SystemBoolean, null\n    __1_const_intnl_SystemBoolean:
-    %SystemBoolean, null\n    __0_const_intnl_SystemInt32: %SystemInt32, null\n    __1_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __0_const_intnl_VRCUdonCommonInterfacesNetworkEventTarget:
+  udonAssembly: ".data_start\n\n    .export WindMenu\n    .export WindSlider\n    .export
+    WindStr_text\n    .export WindGustStrengthSlider\n    .export WindGustStrength_text\n
+    \   .export WindGustinessSlider\n    .export WindGustiness_text\n    .export WindTurbulanceScaleSlider\n
+    \   .export WindTurbulanceScale_text\n    .export WindApplySound\n    .export
+    VehicleEngines\n    .sync WindStrength, none\n    .sync WindGustStrength, none\n
+    \   .sync WindGustiness, none\n    .sync WindTurbulanceScale, none\n\n    __refl_const_intnl_udonTypeID:
+    %SystemInt64, null\n    __refl_const_intnl_udonTypeName: %SystemString, null\n
+    \   WindApplySound: %UnityEngineAudioSource, null\n    VehicleEngines: %UnityEngineComponentArray,
+    null\n    WindMenu: %UnityEngineGameObject, null\n    WindGustinessSlider: %UnityEngineUISlider,
+    null\n    WindGustStrengthSlider: %UnityEngineUISlider, null\n    WindSlider:
+    %UnityEngineUISlider, null\n    WindTurbulanceScaleSlider: %UnityEngineUISlider,
+    null\n    WindGustiness_text: %UnityEngineUIText, null\n    WindGustStrength_text:
+    %UnityEngineUIText, null\n    WindStr_text: %UnityEngineUIText, null\n    WindTurbulanceScale_text:
+    %UnityEngineUIText, null\n    WindGustiness: %SystemSingle, null\n    WindGustStrength:
+    %SystemSingle, null\n    WindStrength: %SystemSingle, null\n    WindTurbulanceScale:
+    %SystemSingle, null\n    localPlayer: %VRCSDKBaseVRCPlayerApi, null\n    __0_this_intnl_UnityEngineGameObject:
+    %UnityEngineGameObject, this\n    __0_this_intnl_WindChanger: %VRCUdonUdonBehaviour,
+    this\n    __0_vehicle_EngineController: %VRCUdonUdonBehaviour, null\n    __0_NewWindDir_Vector3:
+    %UnityEngineVector3, null\n    __0_const_intnl_SystemBoolean: %SystemBoolean,
+    null\n    __1_const_intnl_SystemBoolean: %SystemBoolean, null\n    __0_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __1_const_intnl_SystemInt32: %SystemInt32, null\n    __0_const_intnl_VRCUdonCommonInterfacesNetworkEventTarget:
     %VRCUdonCommonInterfacesNetworkEventTarget, null\n    __0_const_intnl_SystemString:
     %SystemString, null\n    __1_const_intnl_SystemString: %SystemString, null\n    __2_const_intnl_SystemString:
-    %SystemString, null\n    __0_const_intnl_SystemUInt32: %SystemUInt32, null\n    __0_intnl_SystemBoolean:
-    %SystemBoolean, null\n    __1_intnl_SystemBoolean: %SystemBoolean, null\n    __2_intnl_SystemBoolean:
-    %SystemBoolean, null\n    __0_intnl_UnityEngineGameObject: %UnityEngineGameObject,
-    null\n    __0_intnl_SystemInt32: %SystemInt32, null\n    __1_intnl_SystemInt32:
-    %SystemInt32, null\n    __0_intnl_UnityEngineQuaternion: %UnityEngineQuaternion,
-    null\n    __0_intnl_SystemSingle: %SystemSingle, null\n    __0_intnl_SystemString:
-    %SystemString, null\n    __0_intnl_UnityEngineTransform: %UnityEngineTransform,
-    null\n    __0_intnl_EngineController: %VRCUdonUdonBehaviour, null\n    __0_intnl_returnTarget_UInt32:
-    %SystemUInt32, null\n    __0_intnl_UnityEngineVector3: %UnityEngineVector3, null\n
-    \   __1_intnl_UnityEngineVector3: %UnityEngineVector3, null\n\n.data_end\n\n.code_start\n
-    \   .export _start\n        \n    _start:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, localPlayer\n        EXTERN, \"VRCSDKBaseNetworking.__get_LocalPlayer__VRCSDKBaseVRCPlayerApi\"\n
-    \       PUSH, Menu\n        PUSH, __0_const_intnl_SystemBoolean\n        EXTERN,
-    \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n        PUSH,
-    __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n        JUMP_INDIRECT,
-    __0_intnl_returnTarget_UInt32\n        \n    .export _update\n        \n    _update:\n
-    \       \n        PUSH, __0_const_intnl_SystemUInt32\n        PUSH, IsOwner\n
-    \       JUMP_IF_FALSE, 0x000000CC\n        PUSH, WindSlider\n        PUSH, WindStrength\n
-    \       EXTERN, \"UnityEngineUISlider.__get_value__SystemSingle\"\n        PUSH,
-    WindSlider\n        PUSH, __0_intnl_SystemSingle\n        EXTERN, \"UnityEngineUISlider.__get_value__SystemSingle\"\n
-    \       PUSH, __0_intnl_SystemSingle\n        PUSH, __0_const_intnl_SystemString\n
-    \       PUSH, __0_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
-    \       PUSH, WindStr_text\n        PUSH, __0_intnl_SystemString\n        EXTERN,
-    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        JUMP, 0x000000E4\n
-    \       PUSH, WindSlider\n        PUSH, WindStrength\n        EXTERN, \"UnityEngineUISlider.__set_value__SystemSingle__SystemVoid\"\n
+    %SystemString, null\n    __3_const_intnl_SystemString: %SystemString, null\n    __4_const_intnl_SystemString:
+    %SystemString, null\n    __5_const_intnl_SystemString: %SystemString, null\n    __6_const_intnl_SystemString:
+    %SystemString, null\n    __7_const_intnl_SystemString: %SystemString, null\n    __0_const_intnl_SystemUInt32:
+    %SystemUInt32, null\n    __0_intnl_SystemBoolean: %SystemBoolean, null\n    __1_intnl_SystemBoolean:
+    %SystemBoolean, null\n    __2_intnl_SystemBoolean: %SystemBoolean, null\n    __0_intnl_UnityEngineGameObject:
+    %UnityEngineGameObject, null\n    __0_intnl_SystemInt32: %SystemInt32, null\n
+    \   __1_intnl_SystemInt32: %SystemInt32, null\n    __0_intnl_UnityEngineQuaternion:
+    %UnityEngineQuaternion, null\n    __0_intnl_SystemSingle: %SystemSingle, null\n
+    \   __1_intnl_SystemSingle: %SystemSingle, null\n    __2_intnl_SystemSingle: %SystemSingle,
+    null\n    __3_intnl_SystemSingle: %SystemSingle, null\n    __0_intnl_SystemString:
+    %SystemString, null\n    __1_intnl_SystemString: %SystemString, null\n    __2_intnl_SystemString:
+    %SystemString, null\n    __3_intnl_SystemString: %SystemString, null\n    __0_intnl_UnityEngineTransform:
+    %UnityEngineTransform, null\n    __0_intnl_EngineController: %VRCUdonUdonBehaviour,
+    null\n    __0_intnl_returnTarget_UInt32: %SystemUInt32, null\n    __0_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __1_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n\n.data_end\n\n.code_start\n    .export _start\n        \n    _start:\n
+    \       \n        PUSH, __0_const_intnl_SystemUInt32\n        PUSH, localPlayer\n
+    \       EXTERN, \"VRCSDKBaseNetworking.__get_LocalPlayer__VRCSDKBaseVRCPlayerApi\"\n
+    \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
+    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _update\n
+    \       \n    _update:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
+    \       PUSH, localPlayer\n        PUSH, __0_this_intnl_UnityEngineGameObject\n
+    \       PUSH, __0_intnl_SystemBoolean\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__IsOwner__UnityEngineGameObject__SystemBoolean\"\n
+    \       PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000020C\n        PUSH,
+    WindSlider\n        PUSH, WindStrength\n        EXTERN, \"UnityEngineUISlider.__get_value__SystemSingle\"\n
+    \       PUSH, WindSlider\n        PUSH, __0_intnl_SystemSingle\n        EXTERN,
+    \"UnityEngineUISlider.__get_value__SystemSingle\"\n        PUSH, __0_intnl_SystemSingle\n
+    \       PUSH, __0_const_intnl_SystemString\n        PUSH, __0_intnl_SystemString\n
+    \       EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n        PUSH,
+    WindStr_text\n        PUSH, __0_intnl_SystemString\n        EXTERN, \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n
+    \       PUSH, WindGustStrengthSlider\n        PUSH, WindGustStrength\n        EXTERN,
+    \"UnityEngineUISlider.__get_value__SystemSingle\"\n        PUSH, WindGustStrengthSlider\n
+    \       PUSH, __1_intnl_SystemSingle\n        EXTERN, \"UnityEngineUISlider.__get_value__SystemSingle\"\n
+    \       PUSH, __1_intnl_SystemSingle\n        PUSH, __0_const_intnl_SystemString\n
+    \       PUSH, __1_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
+    \       PUSH, WindGustStrength_text\n        PUSH, __1_intnl_SystemString\n        EXTERN,
+    \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        PUSH, WindGustinessSlider\n
+    \       PUSH, WindGustiness\n        EXTERN, \"UnityEngineUISlider.__get_value__SystemSingle\"\n
+    \       PUSH, WindGustinessSlider\n        PUSH, __2_intnl_SystemSingle\n        EXTERN,
+    \"UnityEngineUISlider.__get_value__SystemSingle\"\n        PUSH, __2_intnl_SystemSingle\n
+    \       PUSH, __1_const_intnl_SystemString\n        PUSH, __2_intnl_SystemString\n
+    \       EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n        PUSH,
+    WindGustiness_text\n        PUSH, __2_intnl_SystemString\n        EXTERN, \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n
+    \       PUSH, WindTurbulanceScaleSlider\n        PUSH, WindTurbulanceScale\n        EXTERN,
+    \"UnityEngineUISlider.__get_value__SystemSingle\"\n        PUSH, WindTurbulanceScaleSlider\n
+    \       PUSH, __3_intnl_SystemSingle\n        EXTERN, \"UnityEngineUISlider.__get_value__SystemSingle\"\n
+    \       PUSH, __3_intnl_SystemSingle\n        PUSH, __2_const_intnl_SystemString\n
+    \       PUSH, __3_intnl_SystemString\n        EXTERN, \"SystemSingle.__ToString__SystemString__SystemString\"\n
+    \       PUSH, WindTurbulanceScale_text\n        PUSH, __3_intnl_SystemString\n
+    \       EXTERN, \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n        JUMP,
+    0x0000026C\n        PUSH, WindSlider\n        PUSH, WindStrength\n        EXTERN,
+    \"UnityEngineUISlider.__set_value__SystemSingle__SystemVoid\"\n        PUSH, WindGustStrengthSlider\n
+    \       PUSH, WindGustStrength\n        EXTERN, \"UnityEngineUISlider.__set_value__SystemSingle__SystemVoid\"\n
+    \       PUSH, WindGustinessSlider\n        PUSH, WindGustiness\n        EXTERN,
+    \"UnityEngineUISlider.__set_value__SystemSingle__SystemVoid\"\n        PUSH, WindTurbulanceScaleSlider\n
+    \       PUSH, WindTurbulanceScale\n        EXTERN, \"UnityEngineUISlider.__set_value__SystemSingle__SystemVoid\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _onPickupUseDown\n
     \       \n    _onPickupUseDown:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
     \       PUSH, __0_this_intnl_WindChanger\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesNetworkEventTarget\n
-    \       PUSH, __1_const_intnl_SystemString\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SendCustomNetworkEvent__VRCUdonCommonInterfacesNetworkEventTarget_SystemString__SystemVoid\"\n
+    \       PUSH, __3_const_intnl_SystemString\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SendCustomNetworkEvent__VRCUdonCommonInterfacesNetworkEventTarget_SystemString__SystemVoid\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export ApplyWindDir\n
     \       \n    ApplyWindDir:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
@@ -72,42 +110,43 @@ MonoBehaviour:
     \       PUSH, __0_intnl_UnityEngineQuaternion\n        PUSH, __0_intnl_UnityEngineVector3\n
     \       PUSH, __1_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineQuaternion.__op_Multiply__UnityEngineQuaternion_UnityEngineVector3__UnityEngineVector3\"\n
     \       PUSH, __1_intnl_UnityEngineVector3\n        PUSH, WindStrength\n        PUSH,
-    __0_newwinddir_Vector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
+    __0_NewWindDir_Vector3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n
     \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __0_intnl_SystemInt32\n
     \       COPY\n        PUSH, VehicleEngines\n        PUSH, __1_intnl_SystemInt32\n
     \       EXTERN, \"UnityEngineComponentArray.__get_Length__SystemInt32\"\n        PUSH,
-    __0_intnl_SystemInt32\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __0_intnl_SystemBoolean\n
+    __0_intnl_SystemInt32\n        PUSH, __1_intnl_SystemInt32\n        PUSH, __1_intnl_SystemBoolean\n
     \       EXTERN, \"SystemInt32.__op_LessThan__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000002EC\n        PUSH,
+    \       PUSH, __1_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000004D4\n        PUSH,
     VehicleEngines\n        PUSH, __0_intnl_SystemInt32\n        PUSH, __0_intnl_EngineController\n
     \       EXTERN, \"UnityEngineComponentArray.__Get__SystemInt32__UnityEngineComponent\"\n
     \       PUSH, __0_intnl_EngineController\n        PUSH, __0_vehicle_EngineController\n
     \       COPY\n        PUSH, __0_vehicle_EngineController\n        PUSH, __0_intnl_UnityEngineGameObject\n
     \       EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n
     \       PUSH, localPlayer\n        PUSH, __0_intnl_UnityEngineGameObject\n        PUSH,
-    __1_intnl_SystemBoolean\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__IsOwner__UnityEngineGameObject__SystemBoolean\"\n
-    \       PUSH, __1_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000002C4\n        PUSH,
-    __0_vehicle_EngineController\n        PUSH, __2_const_intnl_SystemString\n        PUSH,
-    __0_newwinddir_Vector3\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    __2_intnl_SystemBoolean\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__IsOwner__UnityEngineGameObject__SystemBoolean\"\n
+    \       PUSH, __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000004AC\n        PUSH,
+    __0_vehicle_EngineController\n        PUSH, __4_const_intnl_SystemString\n        PUSH,
+    __0_NewWindDir_Vector3\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       PUSH, __0_vehicle_EngineController\n        PUSH, __5_const_intnl_SystemString\n
+    \       PUSH, WindGustStrength\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       PUSH, __0_vehicle_EngineController\n        PUSH, __6_const_intnl_SystemString\n
+    \       PUSH, WindGustiness\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       PUSH, __0_vehicle_EngineController\n        PUSH, __7_const_intnl_SystemString\n
+    \       PUSH, WindTurbulanceScale\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
     \       PUSH, __0_intnl_SystemInt32\n        PUSH, __1_const_intnl_SystemInt32\n
     \       PUSH, __0_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_Addition__SystemInt32_SystemInt32__SystemInt32\"\n
-    \       JUMP, 0x000001F8\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
+    \       JUMP, 0x00000380\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
     epilogue\n        COPY\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n
     \       \n    .export _onPickup\n        \n    _onPickup:\n        \n        PUSH,
-    __0_const_intnl_SystemUInt32\n        PUSH, Menu\n        PUSH, __1_const_intnl_SystemBoolean\n
+    __0_const_intnl_SystemUInt32\n        PUSH, WindMenu\n        PUSH, __0_const_intnl_SystemBoolean\n
     \       EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _onOwnershipTransferred\n
     \       \n    _onOwnershipTransferred:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, localPlayer\n        PUSH, __0_this_intnl_UnityEngineGameObject\n
-    \       PUSH, __2_intnl_SystemBoolean\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__IsOwner__UnityEngineGameObject__SystemBoolean\"\n
-    \       PUSH, __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000388\n        PUSH,
-    __1_const_intnl_SystemBoolean\n        PUSH, IsOwner\n        COPY\n        JUMP,
-    0x0000039C\n        PUSH, __0_const_intnl_SystemBoolean\n        PUSH, IsOwner\n
-    \       COPY\n        PUSH, Menu\n        PUSH, __0_const_intnl_SystemBoolean\n
-    \       EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
-    \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
-    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n.code_end\n"
+    \       PUSH, WindMenu\n        PUSH, __1_const_intnl_SystemBoolean\n        EXTERN,
+    \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n        PUSH,
+    __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n        JUMP_INDIRECT,
+    __0_intnl_returnTarget_UInt32\n        \n.code_end\n"
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 34731718ce78b5340932eb18adaa4ea1, type: 3}
   behaviourIDHeapVarName: __refl_const_intnl_udonTypeID
@@ -138,13 +177,13 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 8
+      Data: 16
     - Name: 
       Entry: 7
       Data: 
     - Name: $k
       Entry: 1
-      Data: Menu
+      Data: WindMenu
     - Name: $v
       Entry: 7
       Data: 2|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -171,10 +210,10 @@ MonoBehaviour:
       Data: UnityEngineGameObject
     - Name: symbolOriginalName
       Entry: 1
-      Data: Menu
+      Data: WindMenu
     - Name: symbolUniqueName
       Entry: 1
-      Data: Menu
+      Data: WindMenu
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -333,7 +372,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: WindApplySound
+      Data: WindGustStrengthSlider
     - Name: $v
       Entry: 7
       Data: 14|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -341,8 +380,350 @@ MonoBehaviour:
       Entry: 7
       Data: 15|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
+      Entry: 9
+      Data: 8
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineUISlider
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindGustStrengthSlider
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindGustStrengthSlider
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
       Entry: 7
-      Data: 16|System.RuntimeType, mscorlib
+      Data: 16|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindGustStrength_text
+    - Name: $v
+      Entry: 7
+      Data: 17|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 18|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 12
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineUIText
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindGustStrength_text
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindGustStrength_text
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 19|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindGustinessSlider
+    - Name: $v
+      Entry: 7
+      Data: 20|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 21|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 8
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineUISlider
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindGustinessSlider
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindGustinessSlider
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 22|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindGustiness_text
+    - Name: $v
+      Entry: 7
+      Data: 23|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 24|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 12
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineUIText
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindGustiness_text
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindGustiness_text
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 25|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindTurbulanceScaleSlider
+    - Name: $v
+      Entry: 7
+      Data: 26|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 27|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 8
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineUISlider
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindTurbulanceScaleSlider
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindTurbulanceScaleSlider
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 28|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindTurbulanceScale_text
+    - Name: $v
+      Entry: 7
+      Data: 29|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 30|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 12
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineUIText
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindTurbulanceScale_text
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindTurbulanceScale_text
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 31|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindApplySound
+    - Name: $v
+      Entry: 7
+      Data: 32|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 33|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 7
+      Data: 34|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: UnityEngine.AudioSource, UnityEngine.AudioModule
@@ -372,7 +753,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 17|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 35|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -399,13 +780,13 @@ MonoBehaviour:
       Data: VehicleEngines
     - Name: $v
       Entry: 7
-      Data: 18|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 36|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 19|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 37|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 20|System.RuntimeType, mscorlib
+      Data: 38|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: EngineController[], Assembly-CSharp
@@ -435,7 +816,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 21|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 39|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -462,13 +843,13 @@ MonoBehaviour:
       Data: WindStrength
     - Name: $v
       Entry: 7
-      Data: 22|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 40|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 23|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 41|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 24|System.RuntimeType, mscorlib
+      Data: 42|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: System.Single, mscorlib
@@ -498,13 +879,202 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 25|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 43|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 26|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 44|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindGustStrength
+    - Name: $v
+      Entry: 7
+      Data: 45|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 46|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 42
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 1
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindGustStrength
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindGustStrength
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 47|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 48|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindGustiness
+    - Name: $v
+      Entry: 7
+      Data: 49|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 50|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 42
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 1
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindGustiness
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindGustiness
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 51|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 52|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindTurbulanceScale
+    - Name: $v
+      Entry: 7
+      Data: 53|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 54|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 42
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 1
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: WindTurbulanceScale
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: WindTurbulanceScale
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 55|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 56|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -531,13 +1101,13 @@ MonoBehaviour:
       Data: localPlayer
     - Name: $v
       Entry: 7
-      Data: 27|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 57|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 28|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 58|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 29|System.RuntimeType, mscorlib
+      Data: 59|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: VRC.SDKBase.VRCPlayerApi, VRCSDKBase
@@ -567,70 +1137,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 30|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: IsOwner
-    - Name: $v
-      Entry: 7
-      Data: 31|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 32|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 7
-      Data: 33|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: System.Boolean, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemBoolean
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: IsOwner
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: IsOwner
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 34|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 60|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
