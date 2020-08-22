@@ -8,6 +8,7 @@ public class PassengerSeat : UdonSharpBehaviour
 {
     public EngineController EngineControl;
     public GameObject LeaveButton;
+    public Transform PlaneMesh;
     public GameObject SeatAdjuster;
     //public GameObject Saccflight;
     public GameObject EnableOther;
@@ -23,6 +24,14 @@ public class PassengerSeat : UdonSharpBehaviour
         if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;
         else EngineControl.CanopyCloseTimer = -1;
         EngineControl.localPlayer.UseAttachedStation();
+        if (PlaneMesh != null)
+        {
+            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+            foreach (Transform child in children)
+            {
+                child.gameObject.layer = 19;
+            }
+        }
     }
     public void PassengerLeave()
     {
@@ -36,5 +45,13 @@ public class PassengerSeat : UdonSharpBehaviour
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
         if (EnableOther != null) { EnableOther.SetActive(false); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
+        if (PlaneMesh != null)
+        {
+            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+            foreach (Transform child in children)
+            {
+                child.gameObject.layer = 17;
+            }
+        }
     }
 }

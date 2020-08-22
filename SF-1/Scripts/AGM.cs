@@ -23,13 +23,13 @@ public class AAM : UdonSharpBehaviour
     {
         if (!ColliderActive)
         {
-            if (Lifetime > 0.5f)
+            if (Lifetime > 1f)
             {
                 AGMCollider.enabled = true;
                 ColliderActive = true;
             }
         }
-        if (Lifetime > 20)
+        if (Lifetime > 40)
         {
             DestroyImmediate(gameObject);
         }
@@ -66,7 +66,7 @@ public class AAM : UdonSharpBehaviour
                 }
                 else AGMani.SetTrigger("explode");
             }
-            Lifetime = 15;
+            Lifetime = 30;
         }
     }
 }

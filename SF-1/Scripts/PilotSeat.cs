@@ -58,7 +58,13 @@ public class PilotSeat : UdonSharpBehaviour
         if (EngineControl != null)
         {
             EngineControl.Piloting = false;
-            EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+            if (EngineControl.Ejected)
+            {
+                EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel + EngineControl.VehicleMainObj.transform.up * 25);
+                EngineControl.Ejected = false;
+            }
+            else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+            EngineControl.EjectTimer = 2;
             EngineControl.Hooked = 0;
             EngineControl.AirBrakeInput = 0;
             EngineControl.LTriggerTapTime = 1;

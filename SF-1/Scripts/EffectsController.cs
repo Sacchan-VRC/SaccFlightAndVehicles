@@ -8,7 +8,6 @@ public class EffectsController : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
-    public LeaveVehicleButton[] LeaveButtons; //so you can leave when exploded
     public Transform JoyStick;
     public Transform AileronL;
     public Transform AileronR;
@@ -246,7 +245,7 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl.SoundControl != null && EngineControl.SoundControl.Explosion != null) { EngineControl.SoundControl.Explosion.Play(); }
         if ((EngineControl.Piloting || EngineControl.Passenger) && !EngineControl.InEditor)
         {
-            foreach (LeaveVehicleButton seat in LeaveButtons)
+            foreach (LeaveVehicleButton seat in EngineControl.LeaveButtons)
             {
                 seat.ExitStation();
             }
