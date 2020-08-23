@@ -249,7 +249,7 @@ public class SoundController : UdonSharpBehaviour
         }
         else //no one is in the plane
         {
-            if (Leftplane == true) { Exitplane(); }//pilot left
+            if (Leftplane == true) { Exitplane(); }//pilot or passenger left
             PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * Time.deltaTime);
             PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, .09f * Time.deltaTime);
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * Time.deltaTime);

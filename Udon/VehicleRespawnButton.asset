@@ -61,10 +61,16 @@ MonoBehaviour:
     null\n    __2_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __0_intnl_VRCSDKBaseVRCPlayerApi:
     %VRCSDKBaseVRCPlayerApi, null\n    __1_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi,
     null\n    __2_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi, null\n    __3_intnl_VRCSDKBaseVRCPlayerApi:
-    %VRCSDKBaseVRCPlayerApi, null\n\n.data_end\n\n.code_start\n    .export _interact\n
-    \       \n    _interact:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, EngineControl\n        PUSH, __0_const_intnl_SystemString\n        PUSH,
-    __0_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    %VRCSDKBaseVRCPlayerApi, null\n\n.data_end\n\n        \n         # using UdonSharp;\n
+    \       \n         # using UnityEngine;\n        \n         # using VRC.SDKBase;\n
+    \       \n         # using VRC.Udon;\n        \n         # public class VehicleRespawnButton
+    : UdonSharpBehaviour\n.code_start\n        \n         # public GameObject VehicleMainObj;\n
+    \       \n         # public EngineController EngineControl;\n        \n         #
+    private void Interact()\n    .export _interact\n        \n    _interact:\n        \n
+    \       PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n        \n
+    \        # if (!EngineControl.Occupied && !EngineControl.dead)\n        PUSH,
+    EngineControl\n        PUSH, __0_const_intnl_SystemString\n        PUSH, __0_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __0_intnl_SystemObject\n        PUSH, __2_intnl_SystemBoolean\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
     __2_intnl_SystemBoolean\n        PUSH, __3_intnl_SystemBoolean\n        EXTERN,
@@ -81,11 +87,13 @@ MonoBehaviour:
     __7_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\n
     \       PUSH, __7_intnl_SystemBoolean\n        PUSH, __0_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000408\n
-    \       PUSH, EngineControl\n        PUSH, __2_const_intnl_SystemString\n        PUSH,
-    __2_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       \n         # {\n        \n         # Networking.SetOwner(EngineControl.localPlayer,
+    VehicleMainObj);\n        PUSH, EngineControl\n        PUSH, __2_const_intnl_SystemString\n
+    \       PUSH, __2_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __2_intnl_SystemObject\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n
     \       COPY\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, VehicleMainObj\n
     \       EXTERN, \"VRCSDKBaseNetworking.__SetOwner__VRCSDKBaseVRCPlayerApi_UnityEngineGameObject__SystemVoid\"\n
+    \       \n         # Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);\n
     \       PUSH, EngineControl\n        PUSH, __2_const_intnl_SystemString\n        PUSH,
     __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __3_intnl_SystemObject\n        PUSH, __3_intnl_VRCSDKBaseVRCPlayerApi\n
@@ -93,9 +101,10 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n
     \       PUSH, __3_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __0_intnl_UnityEngineGameObject\n
     \       EXTERN, \"VRCSDKBaseNetworking.__SetOwner__VRCSDKBaseVRCPlayerApi_UnityEngineGameObject__SystemVoid\"\n
-    \       PUSH, VehicleMainObj\n        PUSH, __0_intnl_UnityEngineTransform\n        EXTERN,
-    \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n        PUSH,
-    VehicleMainObj\n        PUSH, __1_intnl_UnityEngineTransform\n        EXTERN,
+    \       \n         # VehicleMainObj.transform.position = new Vector3(VehicleMainObj.transform.position.x,
+    -10000, VehicleMainObj.transform.position.z);\n        PUSH, VehicleMainObj\n
+    \       PUSH, __0_intnl_UnityEngineTransform\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
+    \       PUSH, VehicleMainObj\n        PUSH, __1_intnl_UnityEngineTransform\n        EXTERN,
     \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n        PUSH,
     __1_intnl_UnityEngineTransform\n        PUSH, __0_intnl_UnityEngineVector3\n        EXTERN,
     \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n        PUSH, __0_intnl_UnityEngineVector3\n
@@ -113,46 +122,60 @@ MonoBehaviour:
     __2_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n
     \       PUSH, __0_intnl_UnityEngineTransform\n        PUSH, __2_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineTransform.__set_position__UnityEngineVector3__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __3_const_intnl_SystemString\n        PUSH,
-    __0_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __4_const_intnl_SystemString\n        PUSH,
-    __1_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __5_const_intnl_SystemString\n        PUSH,
-    __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       \n         # EngineControl.GearUp = false;\n        PUSH, EngineControl\n
+    \       PUSH, __3_const_intnl_SystemString\n        PUSH, __0_const_intnl_SystemBoolean\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # EngineControl.Flaps = true;\n        PUSH, EngineControl\n
+    \       PUSH, __4_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # EngineControl.Health = EngineControl.FullHealth;\n        PUSH,
+    EngineControl\n        PUSH, __5_const_intnl_SystemString\n        PUSH, __4_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __4_intnl_SystemObject\n        PUSH, __4_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, EngineControl\n
     \       PUSH, __6_const_intnl_SystemString\n        PUSH, __4_intnl_SystemSingle\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __7_const_intnl_SystemString\n        PUSH,
-    __5_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       \n         # EngineControl.Fuel = EngineControl.FullFuel;\n        PUSH,
+    EngineControl\n        PUSH, __7_const_intnl_SystemString\n        PUSH, __5_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __5_intnl_SystemObject\n        PUSH, __6_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, EngineControl\n
     \       PUSH, __8_const_intnl_SystemString\n        PUSH, __6_intnl_SystemSingle\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __9_const_intnl_SystemString\n        PUSH,
-    __0_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, __0_this_intnl_VehicleRespawnButton\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesNetworkEventTarget\n
-    \       PUSH, __10_const_intnl_SystemString\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SendCustomNetworkEvent__VRCUdonCommonInterfacesNetworkEventTarget_SystemString__SystemVoid\"\n
+    \       \n         # EngineControl.HookDown = false;\n        PUSH, EngineControl\n
+    \       PUSH, __9_const_intnl_SystemString\n        PUSH, __0_const_intnl_SystemBoolean\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All,
+    \"ButtonRespawn\");\n        PUSH, __0_this_intnl_VehicleRespawnButton\n        PUSH,
+    __0_const_intnl_VRCUdonCommonInterfacesNetworkEventTarget\n        PUSH, __10_const_intnl_SystemString\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SendCustomNetworkEvent__VRCUdonCommonInterfacesNetworkEventTarget_SystemString__SystemVoid\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
-    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export ButtonRespawn\n
-    \       \n    ButtonRespawn:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, EngineControl\n        PUSH, __11_const_intnl_SystemString\n        PUSH,
-    __6_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n        \n         #
+    public void ButtonRespawn()\n    .export ButtonRespawn\n        \n    ButtonRespawn:\n
+    \       \n        PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n
+    \       \n         # EngineControl.EffectsControl.DoEffects = 6;\n        PUSH,
+    EngineControl\n        PUSH, __11_const_intnl_SystemString\n        PUSH, __6_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __6_intnl_SystemObject\n        PUSH, __0_intnl_EffectsController\n
     \       COPY\n        PUSH, __1_const_intnl_SystemInt32\n        PUSH, __7_intnl_SystemSingle\n
     \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
     __0_intnl_EffectsController\n        PUSH, __12_const_intnl_SystemString\n        PUSH,
     __7_intnl_SystemSingle\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
-    __1_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, EngineControl\n        PUSH, __11_const_intnl_SystemString\n        PUSH,
-    __7_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       \n         # EngineControl.dead = true;//this makes it invincible and
+    unable to be respawned again for 5s\n        PUSH, EngineControl\n        PUSH,
+    __1_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n        EXTERN,
+    \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # EngineControl.EffectsControl.PlaneAnimator.SetTrigger(\"respawn\");//this
+    animation disables EngineControl.dead\n        PUSH, EngineControl\n        PUSH,
+    __11_const_intnl_SystemString\n        PUSH, __7_intnl_SystemObject\n        EXTERN,
+    \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __7_intnl_SystemObject\n        PUSH, __1_intnl_EffectsController\n
     \       COPY\n        PUSH, __1_intnl_EffectsController\n        PUSH, __13_const_intnl_SystemString\n
     \       PUSH, __8_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __8_intnl_SystemObject\n        PUSH, __1_intnl_UnityEngineAnimator\n
     \       COPY\n        PUSH, __1_intnl_UnityEngineAnimator\n        PUSH, __14_const_intnl_SystemString\n
     \       EXTERN, \"UnityEngineAnimator.__SetTrigger__SystemString__SystemVoid\"\n
+    \       \n         # EngineControl.EffectsControl.PlaneAnimator.SetTrigger(\"instantgeardown\");\n
     \       PUSH, EngineControl\n        PUSH, __11_const_intnl_SystemString\n        PUSH,
     __9_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __9_intnl_SystemObject\n        PUSH, __2_intnl_EffectsController\n
@@ -168,7 +191,1199 @@ MonoBehaviour:
   behaviourIDHeapVarName: __refl_const_intnl_udonTypeID
   compileErrors: []
   debugInfo:
-    serializedDebugSpans: []
+    serializedDebugSpans:
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 0
+      endSourceChar: 2
+      line: 0
+      lineChar: 0
+      spanCodeSection: "\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 2
+      endSourceChar: 2
+      line: 1
+      lineChar: 0
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 2
+      endSourceChar: 8
+      line: 1
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 8
+      endSourceChar: 20
+      line: 1
+      lineChar: 6
+      spanCodeSection: "UdonSharp;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 20
+      endSourceChar: 26
+      line: 2
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 26
+      endSourceChar: 40
+      line: 2
+      lineChar: 6
+      spanCodeSection: "UnityEngine;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 40
+      endSourceChar: 46
+      line: 3
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 46
+      endSourceChar: 46
+      line: 3
+      lineChar: 6
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 46
+      endSourceChar: 50
+      line: 3
+      lineChar: 6
+      spanCodeSection: VRC.
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 50
+      endSourceChar: 60
+      line: 3
+      lineChar: 10
+      spanCodeSection: "SDKBase;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 60
+      endSourceChar: 66
+      line: 4
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 66
+      endSourceChar: 66
+      line: 4
+      lineChar: 6
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 66
+      endSourceChar: 70
+      line: 4
+      lineChar: 6
+      spanCodeSection: VRC.
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 70
+      endSourceChar: 79
+      line: 4
+      lineChar: 10
+      spanCodeSection: "Udon;\r\n\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 79
+      endSourceChar: 113
+      line: 6
+      lineChar: 0
+      spanCodeSection: 'public class VehicleRespawnButton '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 113
+      endSourceChar: 115
+      line: 6
+      lineChar: 34
+      spanCodeSection: ': '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 115
+      endSourceChar: 115
+      line: 6
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 115
+      endSourceChar: 142
+      line: 6
+      lineChar: 36
+      spanCodeSection: "UdonSharpBehaviour\r\n{\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 142
+      endSourceChar: 149
+      line: 8
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 149
+      endSourceChar: 149
+      line: 8
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 149
+      endSourceChar: 181
+      line: 8
+      lineChar: 11
+      spanCodeSection: "GameObject VehicleMainObj;\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 181
+      endSourceChar: 188
+      line: 9
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 188
+      endSourceChar: 188
+      line: 9
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 188
+      endSourceChar: 225
+      line: 9
+      lineChar: 11
+      spanCodeSection: "EngineController EngineControl;\r\n    "
+    - startInstruction: 0
+      endInstruction: 7
+      startSourceChar: 225
+      endSourceChar: 254
+      line: 10
+      lineChar: 4
+      spanCodeSection: "private void Interact()\r\n    "
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 254
+      endSourceChar: 265
+      line: 11
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 265
+      endSourceChar: 269
+      line: 12
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 269
+      endSourceChar: 269
+      line: 12
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 269
+      endSourceChar: 270
+      line: 12
+      lineChar: 12
+      spanCodeSection: '!'
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 270
+      endSourceChar: 270
+      line: 12
+      lineChar: 13
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 270
+      endSourceChar: 284
+      line: 12
+      lineChar: 13
+      spanCodeSection: EngineControl.
+    - startInstruction: 8
+      endInstruction: 123
+      startSourceChar: 284
+      endSourceChar: 296
+      line: 12
+      lineChar: 27
+      spanCodeSection: 'Occupied && '
+    - startInstruction: 124
+      endInstruction: 123
+      startSourceChar: 296
+      endSourceChar: 297
+      line: 12
+      lineChar: 39
+      spanCodeSection: '!'
+    - startInstruction: 124
+      endInstruction: 123
+      startSourceChar: 297
+      endSourceChar: 297
+      line: 12
+      lineChar: 40
+      spanCodeSection: 
+    - startInstruction: 124
+      endInstruction: 123
+      startSourceChar: 297
+      endSourceChar: 311
+      line: 12
+      lineChar: 40
+      spanCodeSection: EngineControl.
+    - startInstruction: 124
+      endInstruction: 271
+      startSourceChar: 311
+      endSourceChar: 326
+      line: 12
+      lineChar: 54
+      spanCodeSection: "dead)\r\n        "
+    - startInstruction: 272
+      endInstruction: 271
+      startSourceChar: 326
+      endSourceChar: 341
+      line: 13
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 272
+      endInstruction: 271
+      startSourceChar: 341
+      endSourceChar: 341
+      line: 14
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 272
+      endInstruction: 271
+      startSourceChar: 341
+      endSourceChar: 341
+      line: 14
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 272
+      endInstruction: 271
+      startSourceChar: 341
+      endSourceChar: 341
+      line: 14
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 272
+      endInstruction: 271
+      startSourceChar: 341
+      endSourceChar: 352
+      line: 14
+      lineChar: 12
+      spanCodeSection: Networking.
+    - startInstruction: 272
+      endInstruction: 271
+      startSourceChar: 352
+      endSourceChar: 361
+      line: 14
+      lineChar: 23
+      spanCodeSection: SetOwner(
+    - startInstruction: 272
+      endInstruction: 271
+      startSourceChar: 361
+      endSourceChar: 361
+      line: 14
+      lineChar: 32
+      spanCodeSection: 
+    - startInstruction: 272
+      endInstruction: 271
+      startSourceChar: 361
+      endSourceChar: 375
+      line: 14
+      lineChar: 32
+      spanCodeSection: EngineControl.
+    - startInstruction: 272
+      endInstruction: 323
+      startSourceChar: 375
+      endSourceChar: 388
+      line: 14
+      lineChar: 46
+      spanCodeSection: 'localPlayer, '
+    - startInstruction: 324
+      endInstruction: 347
+      startSourceChar: 388
+      endSourceChar: 418
+      line: 14
+      lineChar: 59
+      spanCodeSection: "VehicleMainObj);\r\n            "
+    - startInstruction: 348
+      endInstruction: 347
+      startSourceChar: 418
+      endSourceChar: 418
+      line: 15
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 348
+      endInstruction: 347
+      startSourceChar: 418
+      endSourceChar: 418
+      line: 15
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 348
+      endInstruction: 347
+      startSourceChar: 418
+      endSourceChar: 418
+      line: 15
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 348
+      endInstruction: 347
+      startSourceChar: 418
+      endSourceChar: 429
+      line: 15
+      lineChar: 12
+      spanCodeSection: Networking.
+    - startInstruction: 348
+      endInstruction: 347
+      startSourceChar: 429
+      endSourceChar: 438
+      line: 15
+      lineChar: 23
+      spanCodeSection: SetOwner(
+    - startInstruction: 348
+      endInstruction: 347
+      startSourceChar: 438
+      endSourceChar: 438
+      line: 15
+      lineChar: 32
+      spanCodeSection: 
+    - startInstruction: 348
+      endInstruction: 347
+      startSourceChar: 438
+      endSourceChar: 452
+      line: 15
+      lineChar: 32
+      spanCodeSection: EngineControl.
+    - startInstruction: 348
+      endInstruction: 399
+      startSourceChar: 452
+      endSourceChar: 465
+      line: 15
+      lineChar: 46
+      spanCodeSection: 'localPlayer, '
+    - startInstruction: 400
+      endInstruction: 399
+      startSourceChar: 465
+      endSourceChar: 465
+      line: 15
+      lineChar: 59
+      spanCodeSection: 
+    - startInstruction: 400
+      endInstruction: 399
+      startSourceChar: 465
+      endSourceChar: 479
+      line: 15
+      lineChar: 59
+      spanCodeSection: EngineControl.
+    - startInstruction: 400
+      endInstruction: 447
+      startSourceChar: 479
+      endSourceChar: 505
+      line: 15
+      lineChar: 73
+      spanCodeSection: "gameObject);\r\n            "
+    - startInstruction: 448
+      endInstruction: 447
+      startSourceChar: 505
+      endSourceChar: 505
+      line: 16
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 448
+      endInstruction: 447
+      startSourceChar: 505
+      endSourceChar: 505
+      line: 16
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 448
+      endInstruction: 447
+      startSourceChar: 505
+      endSourceChar: 505
+      line: 16
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 448
+      endInstruction: 447
+      startSourceChar: 505
+      endSourceChar: 505
+      line: 16
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 448
+      endInstruction: 447
+      startSourceChar: 505
+      endSourceChar: 520
+      line: 16
+      lineChar: 12
+      spanCodeSection: VehicleMainObj.
+    - startInstruction: 448
+      endInstruction: 447
+      startSourceChar: 520
+      endSourceChar: 530
+      line: 16
+      lineChar: 27
+      spanCodeSection: transform.
+    - startInstruction: 448
+      endInstruction: 471
+      startSourceChar: 530
+      endSourceChar: 541
+      line: 16
+      lineChar: 37
+      spanCodeSection: 'position = '
+    - startInstruction: 472
+      endInstruction: 471
+      startSourceChar: 541
+      endSourceChar: 545
+      line: 16
+      lineChar: 48
+      spanCodeSection: 'new '
+    - startInstruction: 472
+      endInstruction: 471
+      startSourceChar: 545
+      endSourceChar: 553
+      line: 16
+      lineChar: 52
+      spanCodeSection: Vector3(
+    - startInstruction: 472
+      endInstruction: 471
+      startSourceChar: 553
+      endSourceChar: 553
+      line: 16
+      lineChar: 60
+      spanCodeSection: 
+    - startInstruction: 472
+      endInstruction: 471
+      startSourceChar: 553
+      endSourceChar: 553
+      line: 16
+      lineChar: 60
+      spanCodeSection: 
+    - startInstruction: 472
+      endInstruction: 471
+      startSourceChar: 553
+      endSourceChar: 553
+      line: 16
+      lineChar: 60
+      spanCodeSection: 
+    - startInstruction: 472
+      endInstruction: 471
+      startSourceChar: 553
+      endSourceChar: 553
+      line: 16
+      lineChar: 60
+      spanCodeSection: 
+    - startInstruction: 472
+      endInstruction: 471
+      startSourceChar: 553
+      endSourceChar: 568
+      line: 16
+      lineChar: 60
+      spanCodeSection: VehicleMainObj.
+    - startInstruction: 472
+      endInstruction: 471
+      startSourceChar: 568
+      endSourceChar: 578
+      line: 16
+      lineChar: 75
+      spanCodeSection: transform.
+    - startInstruction: 472
+      endInstruction: 495
+      startSourceChar: 578
+      endSourceChar: 587
+      line: 16
+      lineChar: 85
+      spanCodeSection: position.
+    - startInstruction: 496
+      endInstruction: 543
+      startSourceChar: 587
+      endSourceChar: 590
+      line: 16
+      lineChar: 94
+      spanCodeSection: 'x, '
+    - startInstruction: 544
+      endInstruction: 543
+      startSourceChar: 590
+      endSourceChar: 590
+      line: 16
+      lineChar: 97
+      spanCodeSection: 
+    - startInstruction: 544
+      endInstruction: 543
+      startSourceChar: 590
+      endSourceChar: 591
+      line: 16
+      lineChar: 97
+      spanCodeSection: '-'
+    - startInstruction: 544
+      endInstruction: 567
+      startSourceChar: 591
+      endSourceChar: 598
+      line: 16
+      lineChar: 98
+      spanCodeSection: '10000, '
+    - startInstruction: 568
+      endInstruction: 567
+      startSourceChar: 598
+      endSourceChar: 598
+      line: 16
+      lineChar: 105
+      spanCodeSection: 
+    - startInstruction: 568
+      endInstruction: 567
+      startSourceChar: 598
+      endSourceChar: 598
+      line: 16
+      lineChar: 105
+      spanCodeSection: 
+    - startInstruction: 568
+      endInstruction: 567
+      startSourceChar: 598
+      endSourceChar: 598
+      line: 16
+      lineChar: 105
+      spanCodeSection: 
+    - startInstruction: 568
+      endInstruction: 567
+      startSourceChar: 598
+      endSourceChar: 598
+      line: 16
+      lineChar: 105
+      spanCodeSection: 
+    - startInstruction: 568
+      endInstruction: 567
+      startSourceChar: 598
+      endSourceChar: 613
+      line: 16
+      lineChar: 105
+      spanCodeSection: VehicleMainObj.
+    - startInstruction: 568
+      endInstruction: 567
+      startSourceChar: 613
+      endSourceChar: 623
+      line: 16
+      lineChar: 120
+      spanCodeSection: transform.
+    - startInstruction: 568
+      endInstruction: 591
+      startSourceChar: 623
+      endSourceChar: 632
+      line: 16
+      lineChar: 130
+      spanCodeSection: position.
+    - startInstruction: 592
+      endInstruction: 727
+      startSourceChar: 632
+      endSourceChar: 649
+      line: 16
+      lineChar: 139
+      spanCodeSection: "z);\r\n            "
+    - startInstruction: 728
+      endInstruction: 727
+      startSourceChar: 649
+      endSourceChar: 649
+      line: 17
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 728
+      endInstruction: 727
+      startSourceChar: 649
+      endSourceChar: 649
+      line: 17
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 728
+      endInstruction: 727
+      startSourceChar: 649
+      endSourceChar: 649
+      line: 17
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 728
+      endInstruction: 727
+      startSourceChar: 649
+      endSourceChar: 663
+      line: 17
+      lineChar: 12
+      spanCodeSection: EngineControl.
+    - startInstruction: 728
+      endInstruction: 727
+      startSourceChar: 663
+      endSourceChar: 672
+      line: 17
+      lineChar: 26
+      spanCodeSection: 'GearUp = '
+    - startInstruction: 728
+      endInstruction: 759
+      startSourceChar: 672
+      endSourceChar: 692
+      line: 17
+      lineChar: 35
+      spanCodeSection: "false;\r\n            "
+    - startInstruction: 760
+      endInstruction: 759
+      startSourceChar: 692
+      endSourceChar: 692
+      line: 18
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 760
+      endInstruction: 759
+      startSourceChar: 692
+      endSourceChar: 692
+      line: 18
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 760
+      endInstruction: 759
+      startSourceChar: 692
+      endSourceChar: 692
+      line: 18
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 760
+      endInstruction: 759
+      startSourceChar: 692
+      endSourceChar: 706
+      line: 18
+      lineChar: 12
+      spanCodeSection: EngineControl.
+    - startInstruction: 760
+      endInstruction: 759
+      startSourceChar: 706
+      endSourceChar: 714
+      line: 18
+      lineChar: 26
+      spanCodeSection: 'Flaps = '
+    - startInstruction: 760
+      endInstruction: 791
+      startSourceChar: 714
+      endSourceChar: 733
+      line: 18
+      lineChar: 34
+      spanCodeSection: "true;\r\n            "
+    - startInstruction: 792
+      endInstruction: 791
+      startSourceChar: 733
+      endSourceChar: 733
+      line: 19
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 792
+      endInstruction: 791
+      startSourceChar: 733
+      endSourceChar: 733
+      line: 19
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 792
+      endInstruction: 791
+      startSourceChar: 733
+      endSourceChar: 733
+      line: 19
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 792
+      endInstruction: 791
+      startSourceChar: 733
+      endSourceChar: 747
+      line: 19
+      lineChar: 12
+      spanCodeSection: EngineControl.
+    - startInstruction: 792
+      endInstruction: 791
+      startSourceChar: 747
+      endSourceChar: 756
+      line: 19
+      lineChar: 26
+      spanCodeSection: 'Health = '
+    - startInstruction: 792
+      endInstruction: 791
+      startSourceChar: 756
+      endSourceChar: 756
+      line: 19
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 792
+      endInstruction: 791
+      startSourceChar: 756
+      endSourceChar: 770
+      line: 19
+      lineChar: 35
+      spanCodeSection: EngineControl.
+    - startInstruction: 792
+      endInstruction: 879
+      startSourceChar: 770
+      endSourceChar: 795
+      line: 19
+      lineChar: 49
+      spanCodeSection: "FullHealth;\r\n            "
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 795
+      endSourceChar: 795
+      line: 20
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 795
+      endSourceChar: 795
+      line: 20
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 795
+      endSourceChar: 795
+      line: 20
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 795
+      endSourceChar: 809
+      line: 20
+      lineChar: 12
+      spanCodeSection: EngineControl.
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 809
+      endSourceChar: 816
+      line: 20
+      lineChar: 26
+      spanCodeSection: 'Fuel = '
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 816
+      endSourceChar: 816
+      line: 20
+      lineChar: 33
+      spanCodeSection: 
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 816
+      endSourceChar: 830
+      line: 20
+      lineChar: 33
+      spanCodeSection: EngineControl.
+    - startInstruction: 880
+      endInstruction: 967
+      startSourceChar: 830
+      endSourceChar: 853
+      line: 20
+      lineChar: 47
+      spanCodeSection: "FullFuel;\r\n            "
+    - startInstruction: 968
+      endInstruction: 967
+      startSourceChar: 853
+      endSourceChar: 853
+      line: 21
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 968
+      endInstruction: 967
+      startSourceChar: 853
+      endSourceChar: 853
+      line: 21
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 968
+      endInstruction: 967
+      startSourceChar: 853
+      endSourceChar: 853
+      line: 21
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 968
+      endInstruction: 967
+      startSourceChar: 853
+      endSourceChar: 867
+      line: 21
+      lineChar: 12
+      spanCodeSection: EngineControl.
+    - startInstruction: 968
+      endInstruction: 967
+      startSourceChar: 867
+      endSourceChar: 878
+      line: 21
+      lineChar: 26
+      spanCodeSection: 'HookDown = '
+    - startInstruction: 968
+      endInstruction: 999
+      startSourceChar: 878
+      endSourceChar: 898
+      line: 21
+      lineChar: 37
+      spanCodeSection: "false;\r\n            "
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 898
+      endSourceChar: 898
+      line: 22
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 898
+      endSourceChar: 898
+      line: 22
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 898
+      endSourceChar: 921
+      line: 22
+      lineChar: 12
+      spanCodeSection: SendCustomNetworkEvent(
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 921
+      endSourceChar: 921
+      line: 22
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 921
+      endSourceChar: 921
+      line: 22
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 921
+      endSourceChar: 921
+      line: 22
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 921
+      endSourceChar: 921
+      line: 22
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 921
+      endSourceChar: 921
+      line: 22
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 921
+      endSourceChar: 925
+      line: 22
+      lineChar: 35
+      spanCodeSection: VRC.
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 925
+      endSourceChar: 930
+      line: 22
+      lineChar: 39
+      spanCodeSection: Udon.
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 930
+      endSourceChar: 937
+      line: 22
+      lineChar: 44
+      spanCodeSection: Common.
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 937
+      endSourceChar: 948
+      line: 22
+      lineChar: 51
+      spanCodeSection: Interfaces.
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 948
+      endSourceChar: 967
+      line: 22
+      lineChar: 62
+      spanCodeSection: NetworkEventTarget.
+    - startInstruction: 1000
+      endInstruction: 999
+      startSourceChar: 967
+      endSourceChar: 972
+      line: 22
+      lineChar: 81
+      spanCodeSection: 'All, '
+    - startInstruction: 1000
+      endInstruction: 1051
+      startSourceChar: 972
+      endSourceChar: 1013
+      line: 22
+      lineChar: 86
+      spanCodeSection: "\"ButtonRespawn\");\r\n        }\r\n    }\r\n    "
+    - startInstruction: 1052
+      endInstruction: 1059
+      startSourceChar: 1013
+      endSourceChar: 1046
+      line: 25
+      lineChar: 4
+      spanCodeSection: "public void ButtonRespawn()\r\n    "
+    - startInstruction: 1060
+      endInstruction: 1059
+      startSourceChar: 1046
+      endSourceChar: 1057
+      line: 26
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 1060
+      endInstruction: 1059
+      startSourceChar: 1057
+      endSourceChar: 1057
+      line: 27
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1060
+      endInstruction: 1059
+      startSourceChar: 1057
+      endSourceChar: 1057
+      line: 27
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1060
+      endInstruction: 1059
+      startSourceChar: 1057
+      endSourceChar: 1057
+      line: 27
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1060
+      endInstruction: 1059
+      startSourceChar: 1057
+      endSourceChar: 1057
+      line: 27
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1060
+      endInstruction: 1059
+      startSourceChar: 1057
+      endSourceChar: 1071
+      line: 27
+      lineChar: 8
+      spanCodeSection: EngineControl.
+    - startInstruction: 1060
+      endInstruction: 1059
+      startSourceChar: 1071
+      endSourceChar: 1086
+      line: 27
+      lineChar: 22
+      spanCodeSection: EffectsControl.
+    - startInstruction: 1060
+      endInstruction: 1111
+      startSourceChar: 1086
+      endSourceChar: 1098
+      line: 27
+      lineChar: 37
+      spanCodeSection: 'DoEffects = '
+    - startInstruction: 1112
+      endInstruction: 1167
+      startSourceChar: 1098
+      endSourceChar: 1110
+      line: 27
+      lineChar: 49
+      spanCodeSection: "6;\r\n        "
+    - startInstruction: 1168
+      endInstruction: 1167
+      startSourceChar: 1110
+      endSourceChar: 1110
+      line: 28
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1168
+      endInstruction: 1167
+      startSourceChar: 1110
+      endSourceChar: 1110
+      line: 28
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1168
+      endInstruction: 1167
+      startSourceChar: 1110
+      endSourceChar: 1110
+      line: 28
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1168
+      endInstruction: 1167
+      startSourceChar: 1110
+      endSourceChar: 1124
+      line: 28
+      lineChar: 8
+      spanCodeSection: EngineControl.
+    - startInstruction: 1168
+      endInstruction: 1167
+      startSourceChar: 1124
+      endSourceChar: 1131
+      line: 28
+      lineChar: 22
+      spanCodeSection: 'dead = '
+    - startInstruction: 1168
+      endInstruction: 1199
+      startSourceChar: 1131
+      endSourceChar: 1212
+      line: 28
+      lineChar: 29
+      spanCodeSection: "true;//this makes it invincible and unable to be respawned
+        again for 5s\r\n        "
+    - startInstruction: 1200
+      endInstruction: 1199
+      startSourceChar: 1212
+      endSourceChar: 1212
+      line: 29
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1200
+      endInstruction: 1199
+      startSourceChar: 1212
+      endSourceChar: 1212
+      line: 29
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1200
+      endInstruction: 1199
+      startSourceChar: 1212
+      endSourceChar: 1212
+      line: 29
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1200
+      endInstruction: 1199
+      startSourceChar: 1212
+      endSourceChar: 1212
+      line: 29
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1200
+      endInstruction: 1199
+      startSourceChar: 1212
+      endSourceChar: 1212
+      line: 29
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1200
+      endInstruction: 1199
+      startSourceChar: 1212
+      endSourceChar: 1226
+      line: 29
+      lineChar: 8
+      spanCodeSection: EngineControl.
+    - startInstruction: 1200
+      endInstruction: 1199
+      startSourceChar: 1226
+      endSourceChar: 1241
+      line: 29
+      lineChar: 22
+      spanCodeSection: EffectsControl.
+    - startInstruction: 1200
+      endInstruction: 1251
+      startSourceChar: 1241
+      endSourceChar: 1255
+      line: 29
+      lineChar: 37
+      spanCodeSection: PlaneAnimator.
+    - startInstruction: 1252
+      endInstruction: 1303
+      startSourceChar: 1255
+      endSourceChar: 1266
+      line: 29
+      lineChar: 51
+      spanCodeSection: SetTrigger(
+    - startInstruction: 1304
+      endInstruction: 1327
+      startSourceChar: 1266
+      endSourceChar: 1331
+      line: 29
+      lineChar: 62
+      spanCodeSection: "\"respawn\");//this animation disables EngineControl.dead\r\n
+        \       "
+    - startInstruction: 1328
+      endInstruction: 1327
+      startSourceChar: 1331
+      endSourceChar: 1331
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1328
+      endInstruction: 1327
+      startSourceChar: 1331
+      endSourceChar: 1331
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1328
+      endInstruction: 1327
+      startSourceChar: 1331
+      endSourceChar: 1331
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1328
+      endInstruction: 1327
+      startSourceChar: 1331
+      endSourceChar: 1331
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1328
+      endInstruction: 1327
+      startSourceChar: 1331
+      endSourceChar: 1331
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1328
+      endInstruction: 1327
+      startSourceChar: 1331
+      endSourceChar: 1345
+      line: 30
+      lineChar: 8
+      spanCodeSection: EngineControl.
+    - startInstruction: 1328
+      endInstruction: 1327
+      startSourceChar: 1345
+      endSourceChar: 1360
+      line: 30
+      lineChar: 22
+      spanCodeSection: EffectsControl.
+    - startInstruction: 1328
+      endInstruction: 1379
+      startSourceChar: 1360
+      endSourceChar: 1374
+      line: 30
+      lineChar: 37
+      spanCodeSection: PlaneAnimator.
+    - startInstruction: 1380
+      endInstruction: 1431
+      startSourceChar: 1374
+      endSourceChar: 1385
+      line: 30
+      lineChar: 51
+      spanCodeSection: SetTrigger(
+    - startInstruction: 1432
+      endInstruction: 1432
+      startSourceChar: 1385
+      endSourceChar: 1385
+      line: 30
+      lineChar: 62
+      spanCodeSection: 
   hasInteractEvent: 1
   serializationData:
     SerializedFormat: 2

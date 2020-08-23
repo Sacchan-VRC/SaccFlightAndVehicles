@@ -36,9 +36,15 @@ MonoBehaviour:
     %SystemObject, null\n    __0_intnl_SystemSingle: %SystemSingle, null\n    __1_intnl_SystemSingle:
     %SystemSingle, null\n    __2_intnl_SystemSingle: %SystemSingle, null\n    __0_intnl_returnTarget_UInt32:
     %SystemUInt32, null\n    __0_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi,
-    null\n    __1_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi, null\n\n.data_end\n\n.code_start\n
-    \   .export _interact\n        \n    _interact:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, EngineControl\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
+    null\n    __1_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi, null\n\n.data_end\n\n
+    \       \n         # using UdonSharp;\n        \n         # using UnityEngine;\n
+    \       \n         # using VRC.SDKBase;\n        \n         # using VRC.Udon;\n
+    \       \n         # public class LeaveVehicleButton : UdonSharpBehaviour\n.code_start\n
+    \       \n         # public EngineController EngineControl;\n        \n         #
+    public VRCStation Seat;\n        \n         # private void Interact()\n    .export
+    _interact\n        \n    _interact:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
+    \       \n         # {\n        \n         # if (EngineControl != null && EngineControl.Speed
+    < 1)\n        PUSH, EngineControl\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __1_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __1_intnl_SystemBoolean\n        PUSH, __0_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000000F0\n
@@ -53,15 +59,19 @@ MonoBehaviour:
     \       PUSH, __3_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_ConditionalAnd__SystemBoolean_SystemBoolean__SystemBoolean\"\n
     \       PUSH, __3_intnl_SystemBoolean\n        PUSH, __0_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000118\n
-    \       PUSH, __0_const_intnl_exitJumpLoc_UInt32\n        JUMP, 0x00000250\n        JUMP,
-    0x00000158\n        PUSH, EngineControl\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
+    \       \n         # {\n        \n         # ExitStation();\n        PUSH, __0_const_intnl_exitJumpLoc_UInt32\n
+    \       JUMP, 0x00000250\n        JUMP, 0x00000158\n        \n         # else
+    if (EngineControl == null)\n        PUSH, EngineControl\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __4_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Equality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000158\n        PUSH,
-    __1_const_intnl_exitJumpLoc_UInt32\n        JUMP, 0x00000250\n        PUSH, __0_intnl_returnTarget_UInt32
-    #Function epilogue\n        COPY\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n
-    \       \n    .export _update\n        \n    _update:\n        \n        PUSH,
-    __0_const_intnl_SystemUInt32\n        PUSH, __0_const_intnl_UnityEngineKeyCode\n
-    \       PUSH, __6_intnl_SystemBoolean\n        EXTERN, \"UnityEngineInput.__GetKeyDown__UnityEngineKeyCode__SystemBoolean\"\n
+    \       PUSH, __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000158\n        \n
+    \        # {\n        \n         # ExitStation();\n        PUSH, __1_const_intnl_exitJumpLoc_UInt32\n
+    \       JUMP, 0x00000250\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
+    epilogue\n        COPY\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n
+    \       \n        \n         # public void Update()\n    .export _update\n        \n
+    \   _update:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n        \n
+    \        # {\n        \n         # if (Input.GetKeyDown(KeyCode.T) || (Input.GetButtonDown(\"Oculus_CrossPlatform_Button4\")))\n
+    \       PUSH, __0_const_intnl_UnityEngineKeyCode\n        PUSH, __6_intnl_SystemBoolean\n
+    \       EXTERN, \"UnityEngineInput.__GetKeyDown__UnityEngineKeyCode__SystemBoolean\"\n
     \       PUSH, __6_intnl_SystemBoolean\n        PUSH, __5_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __5_intnl_SystemBoolean\n        PUSH, __7_intnl_SystemBoolean\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
@@ -72,14 +82,18 @@ MonoBehaviour:
     __9_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\n
     \       PUSH, __9_intnl_SystemBoolean\n        PUSH, __5_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __5_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000234\n
-    \       PUSH, __2_const_intnl_exitJumpLoc_UInt32\n        JUMP, 0x00000250\n        PUSH,
-    __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n        JUMP_INDIRECT,
-    __0_intnl_returnTarget_UInt32\n        \n    .export ExitStation\n        \n    ExitStation:\n
-    \       \n        PUSH, __0_const_intnl_SystemUInt32\n        PUSH, __0_this_intnl_UnityEngineGameObject\n
-    \       PUSH, __10_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__get_activeSelf__SystemBoolean\"\n
-    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000002F4\n        PUSH,
-    Seat\n        PUSH, __0_const_intnl_VRCSDK3ComponentsVRCStation\n        PUSH,
-    __11_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
+    \       \n         # {\n        \n         # ExitStation();\n        PUSH, __2_const_intnl_exitJumpLoc_UInt32\n
+    \       JUMP, 0x00000250\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
+    epilogue\n        COPY\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n
+    \       \n        \n         # public void ExitStation()\n    .export ExitStation\n
+    \       \n    ExitStation:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
+    \       \n         # {\n        \n         # if (gameObject.activeSelf)//so we
+    only exit our own seat\n        PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH,
+    __10_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__get_activeSelf__SystemBoolean\"\n
+    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000002F4\n        \n
+    \        # if (Seat != null) { Seat.ExitStation(EngineControl.localPlayer); }\n
+    \       PUSH, Seat\n        PUSH, __0_const_intnl_VRCSDK3ComponentsVRCStation\n
+    \       PUSH, __11_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __11_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000002F4\n        PUSH,
     EngineControl\n        PUSH, __2_const_intnl_SystemString\n        PUSH, __1_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
@@ -93,7 +107,630 @@ MonoBehaviour:
   behaviourIDHeapVarName: __refl_const_intnl_udonTypeID
   compileErrors: []
   debugInfo:
-    serializedDebugSpans: []
+    serializedDebugSpans:
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 0
+      endSourceChar: 2
+      line: 0
+      lineChar: 0
+      spanCodeSection: "\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 2
+      endSourceChar: 2
+      line: 1
+      lineChar: 0
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 2
+      endSourceChar: 8
+      line: 1
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 8
+      endSourceChar: 20
+      line: 1
+      lineChar: 6
+      spanCodeSection: "UdonSharp;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 20
+      endSourceChar: 26
+      line: 2
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 26
+      endSourceChar: 40
+      line: 2
+      lineChar: 6
+      spanCodeSection: "UnityEngine;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 40
+      endSourceChar: 46
+      line: 3
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 46
+      endSourceChar: 46
+      line: 3
+      lineChar: 6
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 46
+      endSourceChar: 50
+      line: 3
+      lineChar: 6
+      spanCodeSection: VRC.
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 50
+      endSourceChar: 60
+      line: 3
+      lineChar: 10
+      spanCodeSection: "SDKBase;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 60
+      endSourceChar: 66
+      line: 4
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 66
+      endSourceChar: 66
+      line: 4
+      lineChar: 6
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 66
+      endSourceChar: 70
+      line: 4
+      lineChar: 6
+      spanCodeSection: VRC.
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 70
+      endSourceChar: 79
+      line: 4
+      lineChar: 10
+      spanCodeSection: "Udon;\r\n\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 79
+      endSourceChar: 111
+      line: 6
+      lineChar: 0
+      spanCodeSection: 'public class LeaveVehicleButton '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 111
+      endSourceChar: 113
+      line: 6
+      lineChar: 32
+      spanCodeSection: ': '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 113
+      endSourceChar: 113
+      line: 6
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 113
+      endSourceChar: 140
+      line: 6
+      lineChar: 34
+      spanCodeSection: "UdonSharpBehaviour\r\n{\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 140
+      endSourceChar: 147
+      line: 8
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 147
+      endSourceChar: 147
+      line: 8
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 147
+      endSourceChar: 184
+      line: 8
+      lineChar: 11
+      spanCodeSection: "EngineController EngineControl;\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 184
+      endSourceChar: 191
+      line: 9
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 191
+      endSourceChar: 191
+      line: 9
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 191
+      endSourceChar: 213
+      line: 9
+      lineChar: 11
+      spanCodeSection: "VRCStation Seat;\r\n    "
+    - startInstruction: 0
+      endInstruction: 7
+      startSourceChar: 213
+      endSourceChar: 242
+      line: 10
+      lineChar: 4
+      spanCodeSection: "private void Interact()\r\n    "
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 242
+      endSourceChar: 253
+      line: 11
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 253
+      endSourceChar: 257
+      line: 12
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 257
+      endSourceChar: 257
+      line: 12
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 257
+      endSourceChar: 257
+      line: 12
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 257
+      endSourceChar: 274
+      line: 12
+      lineChar: 12
+      spanCodeSection: 'EngineControl != '
+    - startInstruction: 8
+      endInstruction: 75
+      startSourceChar: 274
+      endSourceChar: 282
+      line: 12
+      lineChar: 29
+      spanCodeSection: 'null && '
+    - startInstruction: 76
+      endInstruction: 75
+      startSourceChar: 282
+      endSourceChar: 282
+      line: 12
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 76
+      endInstruction: 75
+      startSourceChar: 282
+      endSourceChar: 282
+      line: 12
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 76
+      endInstruction: 75
+      startSourceChar: 282
+      endSourceChar: 296
+      line: 12
+      lineChar: 37
+      spanCodeSection: EngineControl.
+    - startInstruction: 76
+      endInstruction: 131
+      startSourceChar: 296
+      endSourceChar: 304
+      line: 12
+      lineChar: 51
+      spanCodeSection: 'Speed < '
+    - startInstruction: 132
+      endInstruction: 255
+      startSourceChar: 304
+      endSourceChar: 316
+      line: 12
+      lineChar: 59
+      spanCodeSection: "1)\r\n        "
+    - startInstruction: 256
+      endInstruction: 255
+      startSourceChar: 316
+      endSourceChar: 331
+      line: 13
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 256
+      endInstruction: 255
+      startSourceChar: 331
+      endSourceChar: 331
+      line: 14
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 256
+      endInstruction: 255
+      startSourceChar: 331
+      endSourceChar: 331
+      line: 14
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 256
+      endInstruction: 279
+      startSourceChar: 331
+      endSourceChar: 366
+      line: 14
+      lineChar: 12
+      spanCodeSection: "ExitStation();\r\n        }\r\n        "
+    - startInstruction: 280
+      endInstruction: 279
+      startSourceChar: 366
+      endSourceChar: 371
+      line: 16
+      lineChar: 8
+      spanCodeSection: 'else '
+    - startInstruction: 280
+      endInstruction: 279
+      startSourceChar: 371
+      endSourceChar: 375
+      line: 16
+      lineChar: 13
+      spanCodeSection: if (
+    - startInstruction: 280
+      endInstruction: 279
+      startSourceChar: 375
+      endSourceChar: 375
+      line: 16
+      lineChar: 17
+      spanCodeSection: 
+    - startInstruction: 280
+      endInstruction: 279
+      startSourceChar: 375
+      endSourceChar: 392
+      line: 16
+      lineChar: 17
+      spanCodeSection: 'EngineControl == '
+    - startInstruction: 280
+      endInstruction: 327
+      startSourceChar: 392
+      endSourceChar: 407
+      line: 16
+      lineChar: 34
+      spanCodeSection: "null)\r\n        "
+    - startInstruction: 328
+      endInstruction: 327
+      startSourceChar: 407
+      endSourceChar: 422
+      line: 17
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 328
+      endInstruction: 327
+      startSourceChar: 422
+      endSourceChar: 422
+      line: 18
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 328
+      endInstruction: 327
+      startSourceChar: 422
+      endSourceChar: 422
+      line: 18
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 328
+      endInstruction: 363
+      startSourceChar: 422
+      endSourceChar: 462
+      line: 18
+      lineChar: 12
+      spanCodeSection: "ExitStation();\r\n        }\r\n    }\r\n\r\n    "
+    - startInstruction: 364
+      endInstruction: 371
+      startSourceChar: 462
+      endSourceChar: 488
+      line: 22
+      lineChar: 4
+      spanCodeSection: "public void Update()\r\n    "
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 488
+      endSourceChar: 499
+      line: 23
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 499
+      endSourceChar: 503
+      line: 24
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 503
+      endSourceChar: 503
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 503
+      endSourceChar: 503
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 503
+      endSourceChar: 503
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 503
+      endSourceChar: 509
+      line: 24
+      lineChar: 12
+      spanCodeSection: Input.
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 509
+      endSourceChar: 520
+      line: 24
+      lineChar: 18
+      spanCodeSection: GetKeyDown(
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 520
+      endSourceChar: 520
+      line: 24
+      lineChar: 29
+      spanCodeSection: 
+    - startInstruction: 372
+      endInstruction: 371
+      startSourceChar: 520
+      endSourceChar: 528
+      line: 24
+      lineChar: 29
+      spanCodeSection: KeyCode.
+    - startInstruction: 372
+      endInstruction: 455
+      startSourceChar: 528
+      endSourceChar: 534
+      line: 24
+      lineChar: 37
+      spanCodeSection: 'T) || '
+    - startInstruction: 456
+      endInstruction: 455
+      startSourceChar: 534
+      endSourceChar: 535
+      line: 24
+      lineChar: 43
+      spanCodeSection: (
+    - startInstruction: 456
+      endInstruction: 455
+      startSourceChar: 535
+      endSourceChar: 535
+      line: 24
+      lineChar: 44
+      spanCodeSection: 
+    - startInstruction: 456
+      endInstruction: 455
+      startSourceChar: 535
+      endSourceChar: 535
+      line: 24
+      lineChar: 44
+      spanCodeSection: 
+    - startInstruction: 456
+      endInstruction: 455
+      startSourceChar: 535
+      endSourceChar: 541
+      line: 24
+      lineChar: 44
+      spanCodeSection: Input.
+    - startInstruction: 456
+      endInstruction: 455
+      startSourceChar: 541
+      endSourceChar: 555
+      line: 24
+      lineChar: 50
+      spanCodeSection: GetButtonDown(
+    - startInstruction: 456
+      endInstruction: 547
+      startSourceChar: 555
+      endSourceChar: 598
+      line: 24
+      lineChar: 64
+      spanCodeSection: "\"Oculus_CrossPlatform_Button4\")))\r\n        "
+    - startInstruction: 548
+      endInstruction: 547
+      startSourceChar: 598
+      endSourceChar: 613
+      line: 25
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 548
+      endInstruction: 547
+      startSourceChar: 613
+      endSourceChar: 613
+      line: 26
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 548
+      endInstruction: 547
+      startSourceChar: 613
+      endSourceChar: 613
+      line: 26
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 548
+      endInstruction: 583
+      startSourceChar: 613
+      endSourceChar: 653
+      line: 26
+      lineChar: 12
+      spanCodeSection: "ExitStation();\r\n        }\r\n    }\r\n\r\n    "
+    - startInstruction: 584
+      endInstruction: 591
+      startSourceChar: 653
+      endSourceChar: 684
+      line: 30
+      lineChar: 4
+      spanCodeSection: "public void ExitStation()\r\n    "
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 684
+      endSourceChar: 695
+      line: 31
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 695
+      endSourceChar: 699
+      line: 32
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 699
+      endSourceChar: 699
+      line: 32
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 699
+      endSourceChar: 710
+      line: 32
+      lineChar: 12
+      spanCodeSection: gameObject.
+    - startInstruction: 592
+      endInstruction: 631
+      startSourceChar: 710
+      endSourceChar: 765
+      line: 32
+      lineChar: 23
+      spanCodeSection: "activeSelf)//so we only exit our own seat\r\n            "
+    - startInstruction: 632
+      endInstruction: 631
+      startSourceChar: 765
+      endSourceChar: 769
+      line: 33
+      lineChar: 12
+      spanCodeSection: if (
+    - startInstruction: 632
+      endInstruction: 631
+      startSourceChar: 769
+      endSourceChar: 769
+      line: 33
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 632
+      endInstruction: 631
+      startSourceChar: 769
+      endSourceChar: 777
+      line: 33
+      lineChar: 16
+      spanCodeSection: 'Seat != '
+    - startInstruction: 632
+      endInstruction: 679
+      startSourceChar: 777
+      endSourceChar: 783
+      line: 33
+      lineChar: 24
+      spanCodeSection: 'null) '
+    - startInstruction: 680
+      endInstruction: 679
+      startSourceChar: 783
+      endSourceChar: 785
+      line: 33
+      lineChar: 30
+      spanCodeSection: '{ '
+    - startInstruction: 680
+      endInstruction: 679
+      startSourceChar: 785
+      endSourceChar: 785
+      line: 33
+      lineChar: 32
+      spanCodeSection: 
+    - startInstruction: 680
+      endInstruction: 679
+      startSourceChar: 785
+      endSourceChar: 785
+      line: 33
+      lineChar: 32
+      spanCodeSection: 
+    - startInstruction: 680
+      endInstruction: 679
+      startSourceChar: 785
+      endSourceChar: 785
+      line: 33
+      lineChar: 32
+      spanCodeSection: 
+    - startInstruction: 680
+      endInstruction: 679
+      startSourceChar: 785
+      endSourceChar: 790
+      line: 33
+      lineChar: 32
+      spanCodeSection: Seat.
+    - startInstruction: 680
+      endInstruction: 679
+      startSourceChar: 790
+      endSourceChar: 802
+      line: 33
+      lineChar: 37
+      spanCodeSection: ExitStation(
+    - startInstruction: 680
+      endInstruction: 679
+      startSourceChar: 802
+      endSourceChar: 802
+      line: 33
+      lineChar: 49
+      spanCodeSection: 
+    - startInstruction: 680
+      endInstruction: 679
+      startSourceChar: 802
+      endSourceChar: 816
+      line: 33
+      lineChar: 49
+      spanCodeSection: EngineControl.
+    - startInstruction: 680
+      endInstruction: 680
+      startSourceChar: 816
+      endSourceChar: 816
+      line: 33
+      lineChar: 63
+      spanCodeSection: 
   hasInteractEvent: 1
   serializationData:
     SerializedFormat: 2

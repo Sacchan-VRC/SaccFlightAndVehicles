@@ -24,12 +24,17 @@ MonoBehaviour:
     %SystemBoolean, null\n    __4_intnl_SystemBoolean: %SystemBoolean, null\n    __5_intnl_SystemBoolean:
     %SystemBoolean, null\n    __6_intnl_SystemBoolean: %SystemBoolean, null\n    __7_intnl_SystemBoolean:
     %SystemBoolean, null\n    __8_intnl_SystemBoolean: %SystemBoolean, null\n    __0_intnl_returnTarget_UInt32:
-    %SystemUInt32, null\n\n.data_end\n\n.code_start\n    .export _update\n        \n
-    \   _update:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n        PUSH,
-    __0_const_intnl_UnityEngineKeyCode\n        PUSH, __1_intnl_SystemBoolean\n        EXTERN,
-    \"UnityEngineInput.__GetKeyDown__UnityEngineKeyCode__SystemBoolean\"\n        PUSH,
-    __1_intnl_SystemBoolean\n        PUSH, __0_intnl_SystemBoolean\n        COPY\n
-    \       PUSH, __0_intnl_SystemBoolean\n        PUSH, __2_intnl_SystemBoolean\n
+    %SystemUInt32, null\n\n.data_end\n\n        \n         # using UdonSharp;\n        \n
+    \        # using UnityEngine;\n        \n         # using VRC.SDKBase;\n        \n
+    \        # using VRC.Udon;\n        \n         # public class SwivelScreenToggle
+    : UdonSharpBehaviour\n.code_start\n        \n         # public Animator Screen;\n
+    \       \n         # private void Update()\n    .export _update\n        \n    _update:\n
+    \       \n        PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n
+    \       \n         # if (Input.GetKeyDown(KeyCode.Q) || Input.GetButtonDown(\"Oculus_CrossPlatform_PrimaryThumbstick\"))\n
+    \       PUSH, __0_const_intnl_UnityEngineKeyCode\n        PUSH, __1_intnl_SystemBoolean\n
+    \       EXTERN, \"UnityEngineInput.__GetKeyDown__UnityEngineKeyCode__SystemBoolean\"\n
+    \       PUSH, __1_intnl_SystemBoolean\n        PUSH, __0_intnl_SystemBoolean\n
+    \       COPY\n        PUSH, __0_intnl_SystemBoolean\n        PUSH, __2_intnl_SystemBoolean\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
     \       PUSH, __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000000A8\n        PUSH,
     __0_const_intnl_SystemString\n        PUSH, __3_intnl_SystemBoolean\n        EXTERN,
@@ -38,6 +43,7 @@ MonoBehaviour:
     __4_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\n
     \       PUSH, __4_intnl_SystemBoolean\n        PUSH, __0_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000110\n
+    \       \n         # {\n        \n         # Screen.SetBool(\"swiveled\", !Screen.GetBool(\"swiveled\"));\n
     \       PUSH, Screen\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
     __5_intnl_SystemBoolean\n        EXTERN, \"UnityEngineAnimator.__GetBool__SystemString__SystemBoolean\"\n
     \       PUSH, __5_intnl_SystemBoolean\n        PUSH, __6_intnl_SystemBoolean\n
@@ -45,10 +51,12 @@ MonoBehaviour:
     \       PUSH, Screen\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
     __6_intnl_SystemBoolean\n        EXTERN, \"UnityEngineAnimator.__SetBool__SystemString_SystemBoolean__SystemVoid\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
-    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _interact\n
-    \       \n    _interact:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, Screen\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
-    __7_intnl_SystemBoolean\n        EXTERN, \"UnityEngineAnimator.__GetBool__SystemString__SystemBoolean\"\n
+    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n        \n         #
+    private void Interact()\n    .export _interact\n        \n    _interact:\n        \n
+    \       PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n        \n
+    \        # Screen.SetBool(\"swiveled\", !Screen.GetBool(\"swiveled\"));\n        PUSH,
+    Screen\n        PUSH, __1_const_intnl_SystemString\n        PUSH, __7_intnl_SystemBoolean\n
+    \       EXTERN, \"UnityEngineAnimator.__GetBool__SystemString__SystemBoolean\"\n
     \       PUSH, __7_intnl_SystemBoolean\n        PUSH, __8_intnl_SystemBoolean\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
     \       PUSH, Screen\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
@@ -60,7 +68,455 @@ MonoBehaviour:
   behaviourIDHeapVarName: __refl_const_intnl_udonTypeID
   compileErrors: []
   debugInfo:
-    serializedDebugSpans: []
+    serializedDebugSpans:
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 0
+      endSourceChar: 2
+      line: 0
+      lineChar: 0
+      spanCodeSection: "\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 2
+      endSourceChar: 2
+      line: 1
+      lineChar: 0
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 2
+      endSourceChar: 8
+      line: 1
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 8
+      endSourceChar: 20
+      line: 1
+      lineChar: 6
+      spanCodeSection: "UdonSharp;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 20
+      endSourceChar: 26
+      line: 2
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 26
+      endSourceChar: 40
+      line: 2
+      lineChar: 6
+      spanCodeSection: "UnityEngine;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 40
+      endSourceChar: 46
+      line: 3
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 46
+      endSourceChar: 46
+      line: 3
+      lineChar: 6
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 46
+      endSourceChar: 50
+      line: 3
+      lineChar: 6
+      spanCodeSection: VRC.
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 50
+      endSourceChar: 60
+      line: 3
+      lineChar: 10
+      spanCodeSection: "SDKBase;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 60
+      endSourceChar: 66
+      line: 4
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 66
+      endSourceChar: 66
+      line: 4
+      lineChar: 6
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 66
+      endSourceChar: 70
+      line: 4
+      lineChar: 6
+      spanCodeSection: VRC.
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 70
+      endSourceChar: 79
+      line: 4
+      lineChar: 10
+      spanCodeSection: "Udon;\r\n\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 79
+      endSourceChar: 111
+      line: 6
+      lineChar: 0
+      spanCodeSection: 'public class SwivelScreenToggle '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 111
+      endSourceChar: 113
+      line: 6
+      lineChar: 32
+      spanCodeSection: ': '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 113
+      endSourceChar: 113
+      line: 6
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 113
+      endSourceChar: 140
+      line: 6
+      lineChar: 34
+      spanCodeSection: "UdonSharpBehaviour\r\n{\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 140
+      endSourceChar: 147
+      line: 8
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 147
+      endSourceChar: 147
+      line: 8
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 147
+      endSourceChar: 169
+      line: 8
+      lineChar: 11
+      spanCodeSection: "Animator Screen;\r\n    "
+    - startInstruction: 0
+      endInstruction: 7
+      startSourceChar: 169
+      endSourceChar: 196
+      line: 9
+      lineChar: 4
+      spanCodeSection: "private void Update()\r\n    "
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 196
+      endSourceChar: 207
+      line: 10
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 207
+      endSourceChar: 211
+      line: 11
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 211
+      endSourceChar: 211
+      line: 11
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 211
+      endSourceChar: 211
+      line: 11
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 211
+      endSourceChar: 211
+      line: 11
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 211
+      endSourceChar: 217
+      line: 11
+      lineChar: 12
+      spanCodeSection: Input.
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 217
+      endSourceChar: 228
+      line: 11
+      lineChar: 18
+      spanCodeSection: GetKeyDown(
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 228
+      endSourceChar: 228
+      line: 11
+      lineChar: 29
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 228
+      endSourceChar: 236
+      line: 11
+      lineChar: 29
+      spanCodeSection: KeyCode.
+    - startInstruction: 8
+      endInstruction: 91
+      startSourceChar: 236
+      endSourceChar: 242
+      line: 11
+      lineChar: 37
+      spanCodeSection: 'Q) || '
+    - startInstruction: 92
+      endInstruction: 91
+      startSourceChar: 242
+      endSourceChar: 242
+      line: 11
+      lineChar: 43
+      spanCodeSection: 
+    - startInstruction: 92
+      endInstruction: 91
+      startSourceChar: 242
+      endSourceChar: 242
+      line: 11
+      lineChar: 43
+      spanCodeSection: 
+    - startInstruction: 92
+      endInstruction: 91
+      startSourceChar: 242
+      endSourceChar: 248
+      line: 11
+      lineChar: 43
+      spanCodeSection: Input.
+    - startInstruction: 92
+      endInstruction: 91
+      startSourceChar: 248
+      endSourceChar: 262
+      line: 11
+      lineChar: 49
+      spanCodeSection: GetButtonDown(
+    - startInstruction: 92
+      endInstruction: 183
+      startSourceChar: 262
+      endSourceChar: 314
+      line: 11
+      lineChar: 63
+      spanCodeSection: "\"Oculus_CrossPlatform_PrimaryThumbstick\"))\r\n        "
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 314
+      endSourceChar: 329
+      line: 12
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 329
+      endSourceChar: 329
+      line: 13
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 329
+      endSourceChar: 329
+      line: 13
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 329
+      endSourceChar: 329
+      line: 13
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 329
+      endSourceChar: 336
+      line: 13
+      lineChar: 12
+      spanCodeSection: Screen.
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 336
+      endSourceChar: 344
+      line: 13
+      lineChar: 19
+      spanCodeSection: SetBool(
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 344
+      endSourceChar: 356
+      line: 13
+      lineChar: 27
+      spanCodeSection: '"swiveled", '
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 356
+      endSourceChar: 357
+      line: 13
+      lineChar: 39
+      spanCodeSection: '!'
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 357
+      endSourceChar: 357
+      line: 13
+      lineChar: 40
+      spanCodeSection: 
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 357
+      endSourceChar: 357
+      line: 13
+      lineChar: 40
+      spanCodeSection: 
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 357
+      endSourceChar: 364
+      line: 13
+      lineChar: 40
+      spanCodeSection: Screen.
+    - startInstruction: 184
+      endInstruction: 183
+      startSourceChar: 364
+      endSourceChar: 372
+      line: 13
+      lineChar: 47
+      spanCodeSection: GetBool(
+    - startInstruction: 184
+      endInstruction: 291
+      startSourceChar: 372
+      endSourceChar: 409
+      line: 13
+      lineChar: 55
+      spanCodeSection: "\"swiveled\"));\r\n        }\r\n    }\r\n    "
+    - startInstruction: 292
+      endInstruction: 299
+      startSourceChar: 409
+      endSourceChar: 438
+      line: 16
+      lineChar: 4
+      spanCodeSection: "private void Interact()\r\n    "
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 438
+      endSourceChar: 449
+      line: 17
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 449
+      endSourceChar: 449
+      line: 18
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 449
+      endSourceChar: 449
+      line: 18
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 449
+      endSourceChar: 449
+      line: 18
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 449
+      endSourceChar: 456
+      line: 18
+      lineChar: 8
+      spanCodeSection: Screen.
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 456
+      endSourceChar: 464
+      line: 18
+      lineChar: 15
+      spanCodeSection: SetBool(
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 464
+      endSourceChar: 476
+      line: 18
+      lineChar: 23
+      spanCodeSection: '"swiveled", '
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 476
+      endSourceChar: 477
+      line: 18
+      lineChar: 35
+      spanCodeSection: '!'
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 477
+      endSourceChar: 477
+      line: 18
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 477
+      endSourceChar: 477
+      line: 18
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 477
+      endSourceChar: 484
+      line: 18
+      lineChar: 36
+      spanCodeSection: Screen.
+    - startInstruction: 300
+      endInstruction: 299
+      startSourceChar: 484
+      endSourceChar: 492
+      line: 18
+      lineChar: 43
+      spanCodeSection: GetBool(
+    - startInstruction: 300
+      endInstruction: 300
+      startSourceChar: 492
+      endSourceChar: 492
+      line: 18
+      lineChar: 51
+      spanCodeSection: 
   hasInteractEvent: 1
   serializationData:
     SerializedFormat: 2

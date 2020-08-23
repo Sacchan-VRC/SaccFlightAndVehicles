@@ -21,6 +21,8 @@ public class EngineController : UdonSharpBehaviour
     public Transform CatapultDetector;
     public LayerMask CatapultLayer;
     public GameObject AGM;
+    public LayerMask AAMTargetsLayer;
+    public GameObject AAM;
     public bool HasCruise = true;
     public bool HasLIMITS = true;
     public bool HasCatapult = true;
@@ -262,6 +264,10 @@ public class EngineController : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     public float FuelConsumption = 2;
     public float FuelConsumptionABMulti = 4.4f;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
+    [System.NonSerializedAttribute] [HideInInspector] public GameObject[] Targets = new GameObject[80];
+    [System.NonSerializedAttribute] [HideInInspector] public int NumTargets = 0;
+    private int AAMTargetChecker = 0;
     [System.NonSerializedAttribute] [HideInInspector] public float FullFuel;
     [System.NonSerializedAttribute] [HideInInspector] public bool AGMLocked;
     [System.NonSerializedAttribute] [HideInInspector] private int AGMUnlocking = 0;
@@ -283,6 +289,65 @@ public class EngineController : UdonSharpBehaviour
         {
             InEditor = false; if (localPlayer.IsUserInVR()) { InVR = true; }
         }
+
+        RaycastHit[] targs = Physics.SphereCastAll(CenterOfMass.transform.position, 100000, VehicleMainObj.transform.forward, 5, AAMTargetsLayer, QueryTriggerInteraction.Collide);
+        int n = 0;
+
+        if (targs.Length > 0)
+        {
+            NumTargets = Mathf.Clamp(targs.Length - 1, 0, 999);
+        }
+
+        //work out which index in the targs array is our own plane
+        //found our own plane by finding the closest target object to our plane
+        float dist = 999999;
+        int self = 0;
+        n = 0;
+        foreach (RaycastHit target in targs)
+        {
+            float thisdist = Vector3.Distance(CenterOfMass.transform.position, target.collider.gameObject.transform.position);
+            if (thisdist < dist)
+            {
+                dist = thisdist;
+                self = n;
+            }
+            n++;
+        }
+
+        //populate targets list excluding our own plane
+        n = 0;
+        int foundself = 0;
+        foreach (RaycastHit target in targs)
+        {
+            if (n == self) { foundself = 1; n++; }
+            else
+            {
+                Targets[n - foundself] = target.collider.gameObject;
+                n++;
+            }
+        }
+
+
+        n = 0;
+        //create a unique number based on position in the hierarchy in order to sort the Targets array order later, to make sure they're synced among clients 
+        float[] order = new float[NumTargets];
+        for (int i = 0; Targets[n] != null; i++)
+        {
+            Transform parent = Targets[n].transform;
+            for (int x = 0; parent != null; x++)
+            {
+                order[n] = float.Parse(order[n].ToString() + parent.transform.GetSiblingIndex().ToString());
+                parent = parent.transform.parent;
+            }
+            n++;
+        }
+
+        if (Targets.Length != 0)
+        {
+            SortTargets(Targets, order);
+        }
+
+
 
         float scaleratio = CenterOfMass.transform.lossyScale.magnitude / Vector3.one.magnitude;
         VehicleRigidbody.centerOfMass = CenterOfMass.localPosition * scaleratio;//correct position if scaled
@@ -733,13 +798,39 @@ public class EngineController : UdonSharpBehaviour
                         else { EffectsControl.IsFiringGun = false; RTriggerLastFrame = false; }
                         AGMZoomLastFrame = false;
                         break;
-                    case 2://AirtoAirMissile
+                    case 2://AAM
                         if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha5)))
                         {
-                            EffectsControl.IsFiringGun = false;
+                            if (!RTriggerLastFrame)
+                            {
+                                if (InEditor)
+                                    LaunchAAM();
+                                else
+                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
+                            }
                             RTriggerLastFrame = true;
                         }
-                        else { RTriggerLastFrame = false; }
+                        else RTriggerLastFrame = false;
+
+                        if (NumTargets != 0)
+                        {
+                            Vector3 TargetDirection = (Targets[AAMTargetChecker].transform.position - CenterOfMass.transform.position);
+                            float targetangle = Vector3.Angle(VehicleMainObj.transform.forward, TargetDirection);
+                            if (targetangle < 15)
+                            {
+                                float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (Targets[AAMTarget].transform.position - CenterOfMass.transform.position));
+                                if (targetangle < AAMCurrentTargetAngle)
+                                {
+                                    AAMTarget = AAMTargetChecker;
+                                }
+                            }
+                            AAMTargetChecker++;
+                            if (AAMTargetChecker == NumTargets)
+                            {
+                                AAMTargetChecker = 0;
+                            }
+                        }
+
                         EffectsControl.IsFiringGun = false;
                         AGMZoomLastFrame = false;
                         break;
@@ -1190,7 +1281,7 @@ public class EngineController : UdonSharpBehaviour
 
                 //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it.
                 if (Speed < .2 && ThrottleInput > 0)
-                    VehicleRigidbody.velocity = VehicleRigidbody.transform.forward * 0.2f;
+                    VehicleRigidbody.velocity = VehicleRigidbody.transform.forward * 0.25f;
             }
             else
             {
@@ -1405,5 +1496,32 @@ public class EngineController : UdonSharpBehaviour
         AGMMissile.transform.rotation = AGM.transform.rotation;
         Rigidbody MissileRigidbody = AGMMissile.GetComponent<Rigidbody>();
         MissileRigidbody.velocity = CurrentVel;
+    }
+    public void LaunchAAM()
+    {
+        GameObject AAMMissile = VRCInstantiate(AAM);
+        AAMMissile.SetActive(true);
+        AAMMissile.transform.position = AGM.transform.position;
+        AAMMissile.transform.rotation = AGM.transform.rotation;
+        Rigidbody MissileRigidbody = AAMMissile.GetComponent<Rigidbody>();
+        MissileRigidbody.velocity = CurrentVel;
+    }
+    void SortTargets(GameObject[] Targets, float[] order)
+    {
+        for (int i = 1; i < order.Length; i++)
+        {
+            for (int j = 0; j < (order.Length - i); j++)
+            {
+                if (order[j] > order[j + 1])
+                {
+                    var h = order[j + 1];
+                    order[j + 1] = order[j];
+                    order[j] = h;
+                    var k = Targets[j + 1];
+                    Targets[j + 1] = Targets[j];
+                    Targets[j] = k;
+                }
+            }
+        }
     }
 }
