@@ -44,6 +44,18 @@ public class EffectsController : UdonSharpBehaviour
     private float brake;
     private void Start()
     {
+        enginelerperL = new Vector3(0, EngineL.localRotation.eulerAngles.y, EngineL.localRotation.eulerAngles.z);
+        enginelerperR = new Vector3(0, EngineR.localRotation.eulerAngles.y, EngineR.localRotation.eulerAngles.z);
+
+        if (EnginefireL != null)
+        {
+            enginefirelerper = new Vector3(EnginefireL.localScale.x, 0, EnginefireL.localScale.z);
+        }
+        else if (EnginefireR != null) enginefirelerper = new Vector3(EnginefireR.localScale.x, 0, EnginefireR.localScale.z);
+
+
+
+
         if (VehicleMainObj != null) { PlaneAnimator = VehicleMainObj.GetComponent<Animator>(); }
         Spawnposition = VehicleMainObj.transform.position;
         Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
@@ -93,7 +105,7 @@ public class EffectsController : UdonSharpBehaviour
             rotationinputs.z = EngineControl.RollInput * 35;
 
             //joystick movement
-            Vector3 tempjoy = new Vector3(EngineControl.PitchInput * 45f, -EngineControl.RollInput * 45f, EngineControl.YawInput * 45);
+            Vector3 tempjoy = new Vector3(EngineControl.PitchInput * 45f, EngineControl.YawInput * 45, EngineControl.RollInput * 45f);
             JoyStick.localRotation = Quaternion.Euler(tempjoy);
         }
         vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever

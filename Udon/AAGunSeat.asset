@@ -62,9 +62,17 @@ MonoBehaviour:
     null\n    __1_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi, null\n    __2_intnl_VRCSDKBaseVRCPlayerApi:
     %VRCSDKBaseVRCPlayerApi, null\n    __3_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi,
     null\n    __4_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi, null\n    __5_intnl_VRCSDKBaseVRCPlayerApi:
-    %VRCSDKBaseVRCPlayerApi, null\n\n.data_end\n\n.code_start\n    .export _start\n
-    \       \n    _start:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, AAGunControl\n        PUSH, __0_const_intnl_SystemString\n        PUSH,
+    %VRCSDKBaseVRCPlayerApi, null\n\n.data_end\n\n        \n         # using UdonSharp;\n
+    \       \n         # using UnityEngine;\n        \n         # using VRC.SDKBase;\n
+    \       \n         # using VRC.Udon;\n        \n         # public class AAGunSeat
+    : UdonSharpBehaviour\n.code_start\n        \n         # public AAGunController
+    AAGunControl;\n        \n         # public GameObject HUDControl;\n        \n
+    \        # public GameObject Saccflight;\n        \n         # public GameObject
+    SeatAdjuster;\n        \n         # private Animator AAGunAnimator;\n        \n
+    \        # void Start()\n    .export _start\n        \n    _start:\n        \n
+    \       PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n        \n
+    \        # if (AAGunControl.VehicleMainObj != null) { AAGunAnimator = AAGunControl.VehicleMainObj.GetComponent<Animator>();
+    }\n        PUSH, AAGunControl\n        PUSH, __0_const_intnl_SystemString\n        PUSH,
     __0_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __0_intnl_SystemObject\n        PUSH, __1_intnl_UnityEngineGameObject\n
     \       COPY\n        PUSH, __1_intnl_UnityEngineGameObject\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
@@ -78,23 +86,28 @@ MonoBehaviour:
     \       PUSH, __0_intnl_UnityEngineTransform\n        PUSH, __0_const_intnl_SystemType\n
     \       PUSH, AAGunAnimator\n        EXTERN, \"UnityEngineAnimator.__GetComponent__T\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
-    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _interact\n
-    \       \n    _interact:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, Saccflight\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
-    \       PUSH, __1_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
+    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n        \n         #
+    private void Interact()\n    .export _interact\n        \n    _interact:\n        \n
+    \       PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n        \n
+    \        # if (Saccflight != null) { Saccflight.SetActive(false); }\n        PUSH,
+    Saccflight\n        PUSH, __0_const_intnl_UnityEngineGameObject\n        PUSH,
+    __1_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __1_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000013C\n        PUSH,
     Saccflight\n        PUSH, __0_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
-    \       PUSH, AAGunControl\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
-    \       PUSH, __2_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000002F0\n        PUSH,
-    AAGunControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH, __2_intnl_SystemObject\n
-    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       \n         # if (AAGunControl != null)\n        PUSH, AAGunControl\n        PUSH,
+    __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n        PUSH, __2_intnl_SystemBoolean\n
+    \       EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
+    \       PUSH, __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000002F0\n        \n
+    \        # {\n        \n         # Networking.SetOwner(AAGunControl.localPlayer,
+    AAGunControl.VehicleMainObj);\n        PUSH, AAGunControl\n        PUSH, __1_const_intnl_SystemString\n
+    \       PUSH, __2_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __2_intnl_SystemObject\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n
     \       COPY\n        PUSH, AAGunControl\n        PUSH, __0_const_intnl_SystemString\n
     \       PUSH, __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __3_intnl_SystemObject\n        PUSH, __5_intnl_UnityEngineGameObject\n
     \       COPY\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __5_intnl_UnityEngineGameObject\n
     \       EXTERN, \"VRCSDKBaseNetworking.__SetOwner__VRCSDKBaseVRCPlayerApi_UnityEngineGameObject__SystemVoid\"\n
+    \       \n         # Networking.SetOwner(AAGunControl.localPlayer, AAGunControl.gameObject);\n
     \       PUSH, AAGunControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
     __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __4_intnl_SystemObject\n        PUSH, __3_intnl_VRCSDKBaseVRCPlayerApi\n
@@ -102,6 +115,7 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n
     \       PUSH, __3_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __6_intnl_UnityEngineGameObject\n
     \       EXTERN, \"VRCSDKBaseNetworking.__SetOwner__VRCSDKBaseVRCPlayerApi_UnityEngineGameObject__SystemVoid\"\n
+    \       \n         # Networking.SetOwner(AAGunControl.localPlayer, AAGunControl.Rotator);\n
     \       PUSH, AAGunControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
     __5_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __5_intnl_SystemObject\n        PUSH, __5_intnl_VRCSDKBaseVRCPlayerApi\n
@@ -110,26 +124,30 @@ MonoBehaviour:
     \       PUSH, __6_intnl_SystemObject\n        PUSH, __8_intnl_UnityEngineGameObject\n
     \       COPY\n        PUSH, __5_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __8_intnl_UnityEngineGameObject\n
     \       EXTERN, \"VRCSDKBaseNetworking.__SetOwner__VRCSDKBaseVRCPlayerApi_UnityEngineGameObject__SystemVoid\"\n
-    \       PUSH, AAGunControl\n        PUSH, __3_const_intnl_SystemString\n        PUSH,
-    __1_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, AAGunAnimator\n        PUSH, __0_const_intnl_UnityEngineAnimator\n
+    \       \n         # AAGunControl.Manning = true;\n        PUSH, AAGunControl\n
+    \       PUSH, __3_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # if (AAGunAnimator != null) AAGunAnimator.SetBool(\"inside\",
+    true);\n        PUSH, AAGunAnimator\n        PUSH, __0_const_intnl_UnityEngineAnimator\n
     \       PUSH, __3_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __3_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000340\n        PUSH,
     AAGunAnimator\n        PUSH, __4_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
     \       EXTERN, \"UnityEngineAnimator.__SetBool__SystemString_SystemBoolean__SystemVoid\"\n
-    \       PUSH, SeatAdjuster\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
+    \       \n         # if (SeatAdjuster != null) { SeatAdjuster.SetActive(true);
+    }\n        PUSH, SeatAdjuster\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __4_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000388\n        PUSH,
     SeatAdjuster\n        PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
-    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __0_intnl_SystemSingle\n
-    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    AAGunControl\n        PUSH, __5_const_intnl_SystemString\n        PUSH, __0_intnl_SystemSingle\n
-    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __1_intnl_SystemSingle\n
-    \       EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH,
-    AAGunControl\n        PUSH, __6_const_intnl_SystemString\n        PUSH, __1_intnl_SystemSingle\n
-    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, AAGunControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
+    \       \n         # AAGunControl.InputXLerper = 0;\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __0_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, AAGunControl\n        PUSH, __5_const_intnl_SystemString\n        PUSH,
+    __0_intnl_SystemSingle\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # AAGunControl.InputYLerper = 0;\n        PUSH, __0_const_intnl_SystemInt32\n
+    \       PUSH, __1_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, AAGunControl\n        PUSH, __6_const_intnl_SystemString\n        PUSH,
+    __1_intnl_SystemSingle\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # if (AAGunControl.localPlayer != null) { AAGunControl.localPlayer.UseAttachedStation();
+    }\n        PUSH, AAGunControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH,
     __2_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __2_intnl_SystemObject\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n
     \       COPY\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __0_const_intnl_VRCSDKBaseVRCPlayerApi\n
@@ -141,32 +159,42 @@ MonoBehaviour:
     \       COPY\n        PUSH, __3_intnl_VRCSDKBaseVRCPlayerApi\n        EXTERN,
     \"VRCSDKBaseVRCPlayerApi.__UseAttachedStation__SystemVoid\"\n        PUSH, __0_intnl_returnTarget_UInt32
     #Function epilogue\n        COPY\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n
-    \       \n    .export GunnerLeave\n        \n    GunnerLeave:\n        \n        PUSH,
-    __0_const_intnl_SystemUInt32\n        PUSH, Saccflight\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
+    \       \n        \n         # public void GunnerLeave()\n    .export GunnerLeave\n
+    \       \n    GunnerLeave:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
+    \       \n         # {\n        \n         # if (Saccflight != null) { Saccflight.SetActive(true);
+    }\n        PUSH, Saccflight\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __6_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __6_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000504\n        PUSH,
     Saccflight\n        PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
-    \       PUSH, AAGunControl\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
-    \       PUSH, __7_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __7_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000574\n        PUSH,
+    \       \n         # if (AAGunControl != null)\n        PUSH, AAGunControl\n        PUSH,
+    __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n        PUSH, __7_intnl_SystemBoolean\n
+    \       EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
+    \       PUSH, __7_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000574\n        \n
+    \        # {\n        \n         # AAGunControl.Manning = false;\n        PUSH,
     AAGunControl\n        PUSH, __3_const_intnl_SystemString\n        PUSH, __0_const_intnl_SystemBoolean\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, AAGunControl\n        PUSH, __7_const_intnl_SystemString\n        PUSH,
-    __0_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       PUSH, AAGunAnimator\n        PUSH, __0_const_intnl_UnityEngineAnimator\n
+    \       \n         # AAGunControl.firing = false;\n        PUSH, AAGunControl\n
+    \       PUSH, __7_const_intnl_SystemString\n        PUSH, __0_const_intnl_SystemBoolean\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # if (AAGunAnimator != null) { AAGunAnimator.SetBool(\"inside\",
+    false); }\n        PUSH, AAGunAnimator\n        PUSH, __0_const_intnl_UnityEngineAnimator\n
     \       PUSH, __8_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000005C4\n        PUSH,
     AAGunAnimator\n        PUSH, __4_const_intnl_SystemString\n        PUSH, __0_const_intnl_SystemBoolean\n
     \       EXTERN, \"UnityEngineAnimator.__SetBool__SystemString_SystemBoolean__SystemVoid\"\n
-    \       PUSH, AAGunAnimator\n        PUSH, __0_const_intnl_UnityEngineAnimator\n
+    \       \n         # if (AAGunAnimator != null) { AAGunAnimator.SetBool(\"firing\",
+    false); }\n        PUSH, AAGunAnimator\n        PUSH, __0_const_intnl_UnityEngineAnimator\n
     \       PUSH, __9_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __9_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000614\n        PUSH,
     AAGunAnimator\n        PUSH, __7_const_intnl_SystemString\n        PUSH, __0_const_intnl_SystemBoolean\n
     \       EXTERN, \"UnityEngineAnimator.__SetBool__SystemString_SystemBoolean__SystemVoid\"\n
-    \       PUSH, SeatAdjuster\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
+    \       \n         # if (SeatAdjuster != null) { SeatAdjuster.SetActive(false);
+    }\n        PUSH, SeatAdjuster\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __10_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000065C\n        PUSH,
     SeatAdjuster\n        PUSH, __0_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
+    \       \n         # AAGunControl.Rotator.transform.localRotation = Quaternion.Euler(new
+    Vector3(0, AAGunControl.Rotator.transform.localRotation.eulerAngles.y, 0));\n
     \       PUSH, AAGunControl\n        PUSH, __2_const_intnl_SystemString\n        PUSH,
     __7_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __7_intnl_SystemObject\n        PUSH, __10_intnl_UnityEngineGameObject\n
@@ -193,10 +221,12 @@ MonoBehaviour:
     \       PUSH, __1_intnl_UnityEngineTransform\n        PUSH, __1_intnl_UnityEngineQuaternion\n
     \       EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
-    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n    .export _onOwnershipTransferred\n
-    \       \n    _onOwnershipTransferred:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
-    \       PUSH, AAGunControl\n        PUSH, __7_const_intnl_SystemString\n        PUSH,
-    __0_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n        \n         #
+    private void OnOwnershipTransferred()\n    .export _onOwnershipTransferred\n        \n
+    \   _onOwnershipTransferred:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
+    \       \n         # {\n        \n         # AAGunControl.firing = false;\n        PUSH,
+    AAGunControl\n        PUSH, __7_const_intnl_SystemString\n        PUSH, __0_const_intnl_SystemBoolean\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n.code_end\n"
   assemblyError: 
@@ -204,7 +234,1842 @@ MonoBehaviour:
   behaviourIDHeapVarName: __refl_const_intnl_udonTypeID
   compileErrors: []
   debugInfo:
-    serializedDebugSpans: []
+    serializedDebugSpans:
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 0
+      endSourceChar: 2
+      line: 0
+      lineChar: 0
+      spanCodeSection: "\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 2
+      endSourceChar: 2
+      line: 1
+      lineChar: 0
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 2
+      endSourceChar: 8
+      line: 1
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 8
+      endSourceChar: 20
+      line: 1
+      lineChar: 6
+      spanCodeSection: "UdonSharp;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 20
+      endSourceChar: 26
+      line: 2
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 26
+      endSourceChar: 40
+      line: 2
+      lineChar: 6
+      spanCodeSection: "UnityEngine;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 40
+      endSourceChar: 46
+      line: 3
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 46
+      endSourceChar: 46
+      line: 3
+      lineChar: 6
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 46
+      endSourceChar: 50
+      line: 3
+      lineChar: 6
+      spanCodeSection: VRC.
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 50
+      endSourceChar: 60
+      line: 3
+      lineChar: 10
+      spanCodeSection: "SDKBase;\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 60
+      endSourceChar: 66
+      line: 4
+      lineChar: 0
+      spanCodeSection: 'using '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 66
+      endSourceChar: 66
+      line: 4
+      lineChar: 6
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 66
+      endSourceChar: 70
+      line: 4
+      lineChar: 6
+      spanCodeSection: VRC.
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 70
+      endSourceChar: 79
+      line: 4
+      lineChar: 10
+      spanCodeSection: "Udon;\r\n\r\n"
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 79
+      endSourceChar: 102
+      line: 6
+      lineChar: 0
+      spanCodeSection: 'public class AAGunSeat '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 102
+      endSourceChar: 104
+      line: 6
+      lineChar: 23
+      spanCodeSection: ': '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 104
+      endSourceChar: 104
+      line: 6
+      lineChar: 25
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 104
+      endSourceChar: 131
+      line: 6
+      lineChar: 25
+      spanCodeSection: "UdonSharpBehaviour\r\n{\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 131
+      endSourceChar: 138
+      line: 8
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 138
+      endSourceChar: 138
+      line: 8
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 138
+      endSourceChar: 173
+      line: 8
+      lineChar: 11
+      spanCodeSection: "AAGunController AAGunControl;\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 173
+      endSourceChar: 180
+      line: 9
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 180
+      endSourceChar: 180
+      line: 9
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 180
+      endSourceChar: 208
+      line: 9
+      lineChar: 11
+      spanCodeSection: "GameObject HUDControl;\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 208
+      endSourceChar: 215
+      line: 10
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 215
+      endSourceChar: 215
+      line: 10
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 215
+      endSourceChar: 243
+      line: 10
+      lineChar: 11
+      spanCodeSection: "GameObject Saccflight;\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 243
+      endSourceChar: 250
+      line: 11
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 250
+      endSourceChar: 250
+      line: 11
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 250
+      endSourceChar: 280
+      line: 11
+      lineChar: 11
+      spanCodeSection: "GameObject SeatAdjuster;\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 280
+      endSourceChar: 288
+      line: 12
+      lineChar: 4
+      spanCodeSection: 'private '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 288
+      endSourceChar: 288
+      line: 12
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 288
+      endSourceChar: 317
+      line: 12
+      lineChar: 12
+      spanCodeSection: "Animator AAGunAnimator;\r\n    "
+    - startInstruction: 0
+      endInstruction: 7
+      startSourceChar: 317
+      endSourceChar: 335
+      line: 13
+      lineChar: 4
+      spanCodeSection: "void Start()\r\n    "
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 335
+      endSourceChar: 346
+      line: 14
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 346
+      endSourceChar: 350
+      line: 15
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 350
+      endSourceChar: 350
+      line: 15
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 350
+      endSourceChar: 350
+      line: 15
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 350
+      endSourceChar: 363
+      line: 15
+      lineChar: 12
+      spanCodeSection: AAGunControl.
+    - startInstruction: 8
+      endInstruction: 59
+      startSourceChar: 363
+      endSourceChar: 381
+      line: 15
+      lineChar: 25
+      spanCodeSection: 'VehicleMainObj != '
+    - startInstruction: 60
+      endInstruction: 107
+      startSourceChar: 381
+      endSourceChar: 387
+      line: 15
+      lineChar: 43
+      spanCodeSection: 'null) '
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 387
+      endSourceChar: 389
+      line: 15
+      lineChar: 49
+      spanCodeSection: '{ '
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 389
+      endSourceChar: 389
+      line: 15
+      lineChar: 51
+      spanCodeSection: 
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 389
+      endSourceChar: 389
+      line: 15
+      lineChar: 51
+      spanCodeSection: 
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 389
+      endSourceChar: 405
+      line: 15
+      lineChar: 51
+      spanCodeSection: 'AAGunAnimator = '
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 405
+      endSourceChar: 405
+      line: 15
+      lineChar: 67
+      spanCodeSection: 
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 405
+      endSourceChar: 405
+      line: 15
+      lineChar: 67
+      spanCodeSection: 
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 405
+      endSourceChar: 405
+      line: 15
+      lineChar: 67
+      spanCodeSection: 
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 405
+      endSourceChar: 418
+      line: 15
+      lineChar: 67
+      spanCodeSection: AAGunControl.
+    - startInstruction: 108
+      endInstruction: 107
+      startSourceChar: 418
+      endSourceChar: 433
+      line: 15
+      lineChar: 80
+      spanCodeSection: VehicleMainObj.
+    - startInstruction: 108
+      endInstruction: 159
+      startSourceChar: 433
+      endSourceChar: 445
+      line: 15
+      lineChar: 95
+      spanCodeSection: GetComponent
+    - startInstruction: 160
+      endInstruction: 159
+      startSourceChar: 445
+      endSourceChar: 446
+      line: 15
+      lineChar: 107
+      spanCodeSection: <
+    - startInstruction: 160
+      endInstruction: 235
+      startSourceChar: 446
+      endSourceChar: 473
+      line: 15
+      lineChar: 108
+      spanCodeSection: "Animator>(); }\r\n    }\r\n    "
+    - startInstruction: 236
+      endInstruction: 243
+      startSourceChar: 473
+      endSourceChar: 502
+      line: 17
+      lineChar: 4
+      spanCodeSection: "private void Interact()\r\n    "
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 502
+      endSourceChar: 513
+      line: 18
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 513
+      endSourceChar: 517
+      line: 19
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 517
+      endSourceChar: 517
+      line: 19
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 517
+      endSourceChar: 531
+      line: 19
+      lineChar: 12
+      spanCodeSection: 'Saccflight != '
+    - startInstruction: 244
+      endInstruction: 291
+      startSourceChar: 531
+      endSourceChar: 537
+      line: 19
+      lineChar: 26
+      spanCodeSection: 'null) '
+    - startInstruction: 292
+      endInstruction: 291
+      startSourceChar: 537
+      endSourceChar: 539
+      line: 19
+      lineChar: 32
+      spanCodeSection: '{ '
+    - startInstruction: 292
+      endInstruction: 291
+      startSourceChar: 539
+      endSourceChar: 539
+      line: 19
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 292
+      endInstruction: 291
+      startSourceChar: 539
+      endSourceChar: 539
+      line: 19
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 292
+      endInstruction: 291
+      startSourceChar: 539
+      endSourceChar: 539
+      line: 19
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 292
+      endInstruction: 291
+      startSourceChar: 539
+      endSourceChar: 550
+      line: 19
+      lineChar: 34
+      spanCodeSection: Saccflight.
+    - startInstruction: 292
+      endInstruction: 291
+      startSourceChar: 550
+      endSourceChar: 560
+      line: 19
+      lineChar: 45
+      spanCodeSection: SetActive(
+    - startInstruction: 292
+      endInstruction: 315
+      startSourceChar: 560
+      endSourceChar: 579
+      line: 19
+      lineChar: 55
+      spanCodeSection: "false); }\r\n        "
+    - startInstruction: 316
+      endInstruction: 315
+      startSourceChar: 579
+      endSourceChar: 583
+      line: 20
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 316
+      endInstruction: 315
+      startSourceChar: 583
+      endSourceChar: 583
+      line: 20
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 316
+      endInstruction: 315
+      startSourceChar: 583
+      endSourceChar: 599
+      line: 20
+      lineChar: 12
+      spanCodeSection: 'AAGunControl != '
+    - startInstruction: 316
+      endInstruction: 363
+      startSourceChar: 599
+      endSourceChar: 614
+      line: 20
+      lineChar: 28
+      spanCodeSection: "null)\r\n        "
+    - startInstruction: 364
+      endInstruction: 363
+      startSourceChar: 614
+      endSourceChar: 629
+      line: 21
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 364
+      endInstruction: 363
+      startSourceChar: 629
+      endSourceChar: 629
+      line: 22
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 364
+      endInstruction: 363
+      startSourceChar: 629
+      endSourceChar: 629
+      line: 22
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 364
+      endInstruction: 363
+      startSourceChar: 629
+      endSourceChar: 629
+      line: 22
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 364
+      endInstruction: 363
+      startSourceChar: 629
+      endSourceChar: 640
+      line: 22
+      lineChar: 12
+      spanCodeSection: Networking.
+    - startInstruction: 364
+      endInstruction: 363
+      startSourceChar: 640
+      endSourceChar: 649
+      line: 22
+      lineChar: 23
+      spanCodeSection: SetOwner(
+    - startInstruction: 364
+      endInstruction: 363
+      startSourceChar: 649
+      endSourceChar: 649
+      line: 22
+      lineChar: 32
+      spanCodeSection: 
+    - startInstruction: 364
+      endInstruction: 363
+      startSourceChar: 649
+      endSourceChar: 662
+      line: 22
+      lineChar: 32
+      spanCodeSection: AAGunControl.
+    - startInstruction: 364
+      endInstruction: 415
+      startSourceChar: 662
+      endSourceChar: 675
+      line: 22
+      lineChar: 45
+      spanCodeSection: 'localPlayer, '
+    - startInstruction: 416
+      endInstruction: 415
+      startSourceChar: 675
+      endSourceChar: 675
+      line: 22
+      lineChar: 58
+      spanCodeSection: 
+    - startInstruction: 416
+      endInstruction: 415
+      startSourceChar: 675
+      endSourceChar: 688
+      line: 22
+      lineChar: 58
+      spanCodeSection: AAGunControl.
+    - startInstruction: 416
+      endInstruction: 491
+      startSourceChar: 688
+      endSourceChar: 718
+      line: 22
+      lineChar: 71
+      spanCodeSection: "VehicleMainObj);\r\n            "
+    - startInstruction: 492
+      endInstruction: 491
+      startSourceChar: 718
+      endSourceChar: 718
+      line: 23
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 492
+      endInstruction: 491
+      startSourceChar: 718
+      endSourceChar: 718
+      line: 23
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 492
+      endInstruction: 491
+      startSourceChar: 718
+      endSourceChar: 718
+      line: 23
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 492
+      endInstruction: 491
+      startSourceChar: 718
+      endSourceChar: 729
+      line: 23
+      lineChar: 12
+      spanCodeSection: Networking.
+    - startInstruction: 492
+      endInstruction: 491
+      startSourceChar: 729
+      endSourceChar: 738
+      line: 23
+      lineChar: 23
+      spanCodeSection: SetOwner(
+    - startInstruction: 492
+      endInstruction: 491
+      startSourceChar: 738
+      endSourceChar: 738
+      line: 23
+      lineChar: 32
+      spanCodeSection: 
+    - startInstruction: 492
+      endInstruction: 491
+      startSourceChar: 738
+      endSourceChar: 751
+      line: 23
+      lineChar: 32
+      spanCodeSection: AAGunControl.
+    - startInstruction: 492
+      endInstruction: 543
+      startSourceChar: 751
+      endSourceChar: 764
+      line: 23
+      lineChar: 45
+      spanCodeSection: 'localPlayer, '
+    - startInstruction: 544
+      endInstruction: 543
+      startSourceChar: 764
+      endSourceChar: 764
+      line: 23
+      lineChar: 58
+      spanCodeSection: 
+    - startInstruction: 544
+      endInstruction: 543
+      startSourceChar: 764
+      endSourceChar: 777
+      line: 23
+      lineChar: 58
+      spanCodeSection: AAGunControl.
+    - startInstruction: 544
+      endInstruction: 591
+      startSourceChar: 777
+      endSourceChar: 803
+      line: 23
+      lineChar: 71
+      spanCodeSection: "gameObject);\r\n            "
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 803
+      endSourceChar: 803
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 803
+      endSourceChar: 803
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 803
+      endSourceChar: 803
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 803
+      endSourceChar: 814
+      line: 24
+      lineChar: 12
+      spanCodeSection: Networking.
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 814
+      endSourceChar: 823
+      line: 24
+      lineChar: 23
+      spanCodeSection: SetOwner(
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 823
+      endSourceChar: 823
+      line: 24
+      lineChar: 32
+      spanCodeSection: 
+    - startInstruction: 592
+      endInstruction: 591
+      startSourceChar: 823
+      endSourceChar: 836
+      line: 24
+      lineChar: 32
+      spanCodeSection: AAGunControl.
+    - startInstruction: 592
+      endInstruction: 643
+      startSourceChar: 836
+      endSourceChar: 849
+      line: 24
+      lineChar: 45
+      spanCodeSection: 'localPlayer, '
+    - startInstruction: 644
+      endInstruction: 643
+      startSourceChar: 849
+      endSourceChar: 849
+      line: 24
+      lineChar: 58
+      spanCodeSection: 
+    - startInstruction: 644
+      endInstruction: 643
+      startSourceChar: 849
+      endSourceChar: 862
+      line: 24
+      lineChar: 58
+      spanCodeSection: AAGunControl.
+    - startInstruction: 644
+      endInstruction: 719
+      startSourceChar: 862
+      endSourceChar: 885
+      line: 24
+      lineChar: 71
+      spanCodeSection: "Rotator);\r\n            "
+    - startInstruction: 720
+      endInstruction: 719
+      startSourceChar: 885
+      endSourceChar: 885
+      line: 25
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 720
+      endInstruction: 719
+      startSourceChar: 885
+      endSourceChar: 885
+      line: 25
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 720
+      endInstruction: 719
+      startSourceChar: 885
+      endSourceChar: 885
+      line: 25
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 720
+      endInstruction: 719
+      startSourceChar: 885
+      endSourceChar: 898
+      line: 25
+      lineChar: 12
+      spanCodeSection: AAGunControl.
+    - startInstruction: 720
+      endInstruction: 719
+      startSourceChar: 898
+      endSourceChar: 908
+      line: 25
+      lineChar: 25
+      spanCodeSection: 'Manning = '
+    - startInstruction: 720
+      endInstruction: 751
+      startSourceChar: 908
+      endSourceChar: 934
+      line: 25
+      lineChar: 35
+      spanCodeSection: "true;\r\n        }\r\n        "
+    - startInstruction: 752
+      endInstruction: 751
+      startSourceChar: 934
+      endSourceChar: 938
+      line: 27
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 752
+      endInstruction: 751
+      startSourceChar: 938
+      endSourceChar: 938
+      line: 27
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 752
+      endInstruction: 751
+      startSourceChar: 938
+      endSourceChar: 955
+      line: 27
+      lineChar: 12
+      spanCodeSection: 'AAGunAnimator != '
+    - startInstruction: 752
+      endInstruction: 799
+      startSourceChar: 955
+      endSourceChar: 961
+      line: 27
+      lineChar: 29
+      spanCodeSection: 'null) '
+    - startInstruction: 800
+      endInstruction: 799
+      startSourceChar: 961
+      endSourceChar: 961
+      line: 27
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 800
+      endInstruction: 799
+      startSourceChar: 961
+      endSourceChar: 961
+      line: 27
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 800
+      endInstruction: 799
+      startSourceChar: 961
+      endSourceChar: 961
+      line: 27
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 800
+      endInstruction: 799
+      startSourceChar: 961
+      endSourceChar: 975
+      line: 27
+      lineChar: 35
+      spanCodeSection: AAGunAnimator.
+    - startInstruction: 800
+      endInstruction: 799
+      startSourceChar: 975
+      endSourceChar: 983
+      line: 27
+      lineChar: 49
+      spanCodeSection: SetBool(
+    - startInstruction: 800
+      endInstruction: 799
+      startSourceChar: 983
+      endSourceChar: 993
+      line: 27
+      lineChar: 57
+      spanCodeSection: '"inside", '
+    - startInstruction: 800
+      endInstruction: 831
+      startSourceChar: 993
+      endSourceChar: 1009
+      line: 27
+      lineChar: 67
+      spanCodeSection: "true);\r\n        "
+    - startInstruction: 832
+      endInstruction: 831
+      startSourceChar: 1009
+      endSourceChar: 1013
+      line: 28
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 832
+      endInstruction: 831
+      startSourceChar: 1013
+      endSourceChar: 1013
+      line: 28
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 832
+      endInstruction: 831
+      startSourceChar: 1013
+      endSourceChar: 1029
+      line: 28
+      lineChar: 12
+      spanCodeSection: 'SeatAdjuster != '
+    - startInstruction: 832
+      endInstruction: 879
+      startSourceChar: 1029
+      endSourceChar: 1035
+      line: 28
+      lineChar: 28
+      spanCodeSection: 'null) '
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 1035
+      endSourceChar: 1037
+      line: 28
+      lineChar: 34
+      spanCodeSection: '{ '
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 1037
+      endSourceChar: 1037
+      line: 28
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 1037
+      endSourceChar: 1037
+      line: 28
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 1037
+      endSourceChar: 1037
+      line: 28
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 1037
+      endSourceChar: 1050
+      line: 28
+      lineChar: 36
+      spanCodeSection: SeatAdjuster.
+    - startInstruction: 880
+      endInstruction: 879
+      startSourceChar: 1050
+      endSourceChar: 1060
+      line: 28
+      lineChar: 49
+      spanCodeSection: SetActive(
+    - startInstruction: 880
+      endInstruction: 903
+      startSourceChar: 1060
+      endSourceChar: 1078
+      line: 28
+      lineChar: 59
+      spanCodeSection: "true); }\r\n        "
+    - startInstruction: 904
+      endInstruction: 903
+      startSourceChar: 1078
+      endSourceChar: 1078
+      line: 29
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 904
+      endInstruction: 903
+      startSourceChar: 1078
+      endSourceChar: 1078
+      line: 29
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 904
+      endInstruction: 903
+      startSourceChar: 1078
+      endSourceChar: 1078
+      line: 29
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 904
+      endInstruction: 903
+      startSourceChar: 1078
+      endSourceChar: 1091
+      line: 29
+      lineChar: 8
+      spanCodeSection: AAGunControl.
+    - startInstruction: 904
+      endInstruction: 903
+      startSourceChar: 1091
+      endSourceChar: 1106
+      line: 29
+      lineChar: 21
+      spanCodeSection: 'InputXLerper = '
+    - startInstruction: 904
+      endInstruction: 959
+      startSourceChar: 1106
+      endSourceChar: 1118
+      line: 29
+      lineChar: 36
+      spanCodeSection: "0;\r\n        "
+    - startInstruction: 960
+      endInstruction: 959
+      startSourceChar: 1118
+      endSourceChar: 1118
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 960
+      endInstruction: 959
+      startSourceChar: 1118
+      endSourceChar: 1118
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 960
+      endInstruction: 959
+      startSourceChar: 1118
+      endSourceChar: 1118
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 960
+      endInstruction: 959
+      startSourceChar: 1118
+      endSourceChar: 1131
+      line: 30
+      lineChar: 8
+      spanCodeSection: AAGunControl.
+    - startInstruction: 960
+      endInstruction: 959
+      startSourceChar: 1131
+      endSourceChar: 1146
+      line: 30
+      lineChar: 21
+      spanCodeSection: 'InputYLerper = '
+    - startInstruction: 960
+      endInstruction: 1015
+      startSourceChar: 1146
+      endSourceChar: 1158
+      line: 30
+      lineChar: 36
+      spanCodeSection: "0;\r\n        "
+    - startInstruction: 1016
+      endInstruction: 1015
+      startSourceChar: 1158
+      endSourceChar: 1162
+      line: 31
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 1016
+      endInstruction: 1015
+      startSourceChar: 1162
+      endSourceChar: 1162
+      line: 31
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1016
+      endInstruction: 1015
+      startSourceChar: 1162
+      endSourceChar: 1162
+      line: 31
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1016
+      endInstruction: 1015
+      startSourceChar: 1162
+      endSourceChar: 1175
+      line: 31
+      lineChar: 12
+      spanCodeSection: AAGunControl.
+    - startInstruction: 1016
+      endInstruction: 1067
+      startSourceChar: 1175
+      endSourceChar: 1190
+      line: 31
+      lineChar: 25
+      spanCodeSection: 'localPlayer != '
+    - startInstruction: 1068
+      endInstruction: 1115
+      startSourceChar: 1190
+      endSourceChar: 1196
+      line: 31
+      lineChar: 40
+      spanCodeSection: 'null) '
+    - startInstruction: 1116
+      endInstruction: 1115
+      startSourceChar: 1196
+      endSourceChar: 1198
+      line: 31
+      lineChar: 46
+      spanCodeSection: '{ '
+    - startInstruction: 1116
+      endInstruction: 1115
+      startSourceChar: 1198
+      endSourceChar: 1198
+      line: 31
+      lineChar: 48
+      spanCodeSection: 
+    - startInstruction: 1116
+      endInstruction: 1115
+      startSourceChar: 1198
+      endSourceChar: 1198
+      line: 31
+      lineChar: 48
+      spanCodeSection: 
+    - startInstruction: 1116
+      endInstruction: 1115
+      startSourceChar: 1198
+      endSourceChar: 1198
+      line: 31
+      lineChar: 48
+      spanCodeSection: 
+    - startInstruction: 1116
+      endInstruction: 1115
+      startSourceChar: 1198
+      endSourceChar: 1198
+      line: 31
+      lineChar: 48
+      spanCodeSection: 
+    - startInstruction: 1116
+      endInstruction: 1115
+      startSourceChar: 1198
+      endSourceChar: 1211
+      line: 31
+      lineChar: 48
+      spanCodeSection: AAGunControl.
+    - startInstruction: 1116
+      endInstruction: 1115
+      startSourceChar: 1211
+      endSourceChar: 1223
+      line: 31
+      lineChar: 61
+      spanCodeSection: localPlayer.
+    - startInstruction: 1116
+      endInstruction: 1203
+      startSourceChar: 1223
+      endSourceChar: 1259
+      line: 31
+      lineChar: 73
+      spanCodeSection: "UseAttachedStation(); }\r\n    }\r\n    "
+    - startInstruction: 1204
+      endInstruction: 1211
+      startSourceChar: 1259
+      endSourceChar: 1290
+      line: 33
+      lineChar: 4
+      spanCodeSection: "public void GunnerLeave()\r\n    "
+    - startInstruction: 1212
+      endInstruction: 1211
+      startSourceChar: 1290
+      endSourceChar: 1301
+      line: 34
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 1212
+      endInstruction: 1211
+      startSourceChar: 1301
+      endSourceChar: 1305
+      line: 35
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 1212
+      endInstruction: 1211
+      startSourceChar: 1305
+      endSourceChar: 1305
+      line: 35
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1212
+      endInstruction: 1211
+      startSourceChar: 1305
+      endSourceChar: 1319
+      line: 35
+      lineChar: 12
+      spanCodeSection: 'Saccflight != '
+    - startInstruction: 1212
+      endInstruction: 1259
+      startSourceChar: 1319
+      endSourceChar: 1325
+      line: 35
+      lineChar: 26
+      spanCodeSection: 'null) '
+    - startInstruction: 1260
+      endInstruction: 1259
+      startSourceChar: 1325
+      endSourceChar: 1327
+      line: 35
+      lineChar: 32
+      spanCodeSection: '{ '
+    - startInstruction: 1260
+      endInstruction: 1259
+      startSourceChar: 1327
+      endSourceChar: 1327
+      line: 35
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 1260
+      endInstruction: 1259
+      startSourceChar: 1327
+      endSourceChar: 1327
+      line: 35
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 1260
+      endInstruction: 1259
+      startSourceChar: 1327
+      endSourceChar: 1327
+      line: 35
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 1260
+      endInstruction: 1259
+      startSourceChar: 1327
+      endSourceChar: 1338
+      line: 35
+      lineChar: 34
+      spanCodeSection: Saccflight.
+    - startInstruction: 1260
+      endInstruction: 1259
+      startSourceChar: 1338
+      endSourceChar: 1348
+      line: 35
+      lineChar: 45
+      spanCodeSection: SetActive(
+    - startInstruction: 1260
+      endInstruction: 1283
+      startSourceChar: 1348
+      endSourceChar: 1366
+      line: 35
+      lineChar: 55
+      spanCodeSection: "true); }\r\n        "
+    - startInstruction: 1284
+      endInstruction: 1283
+      startSourceChar: 1366
+      endSourceChar: 1370
+      line: 36
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 1284
+      endInstruction: 1283
+      startSourceChar: 1370
+      endSourceChar: 1370
+      line: 36
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1284
+      endInstruction: 1283
+      startSourceChar: 1370
+      endSourceChar: 1386
+      line: 36
+      lineChar: 12
+      spanCodeSection: 'AAGunControl != '
+    - startInstruction: 1284
+      endInstruction: 1331
+      startSourceChar: 1386
+      endSourceChar: 1401
+      line: 36
+      lineChar: 28
+      spanCodeSection: "null)\r\n        "
+    - startInstruction: 1332
+      endInstruction: 1331
+      startSourceChar: 1401
+      endSourceChar: 1416
+      line: 37
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 1332
+      endInstruction: 1331
+      startSourceChar: 1416
+      endSourceChar: 1416
+      line: 38
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1332
+      endInstruction: 1331
+      startSourceChar: 1416
+      endSourceChar: 1416
+      line: 38
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1332
+      endInstruction: 1331
+      startSourceChar: 1416
+      endSourceChar: 1416
+      line: 38
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1332
+      endInstruction: 1331
+      startSourceChar: 1416
+      endSourceChar: 1429
+      line: 38
+      lineChar: 12
+      spanCodeSection: AAGunControl.
+    - startInstruction: 1332
+      endInstruction: 1331
+      startSourceChar: 1429
+      endSourceChar: 1439
+      line: 38
+      lineChar: 25
+      spanCodeSection: 'Manning = '
+    - startInstruction: 1332
+      endInstruction: 1363
+      startSourceChar: 1439
+      endSourceChar: 1459
+      line: 38
+      lineChar: 35
+      spanCodeSection: "false;\r\n            "
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1459
+      endSourceChar: 1459
+      line: 39
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1459
+      endSourceChar: 1459
+      line: 39
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1459
+      endSourceChar: 1459
+      line: 39
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1459
+      endSourceChar: 1472
+      line: 39
+      lineChar: 12
+      spanCodeSection: AAGunControl.
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1472
+      endSourceChar: 1481
+      line: 39
+      lineChar: 25
+      spanCodeSection: 'firing = '
+    - startInstruction: 1364
+      endInstruction: 1395
+      startSourceChar: 1481
+      endSourceChar: 1508
+      line: 39
+      lineChar: 34
+      spanCodeSection: "false;\r\n        }\r\n        "
+    - startInstruction: 1396
+      endInstruction: 1395
+      startSourceChar: 1508
+      endSourceChar: 1512
+      line: 41
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 1396
+      endInstruction: 1395
+      startSourceChar: 1512
+      endSourceChar: 1512
+      line: 41
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1396
+      endInstruction: 1395
+      startSourceChar: 1512
+      endSourceChar: 1529
+      line: 41
+      lineChar: 12
+      spanCodeSection: 'AAGunAnimator != '
+    - startInstruction: 1396
+      endInstruction: 1443
+      startSourceChar: 1529
+      endSourceChar: 1535
+      line: 41
+      lineChar: 29
+      spanCodeSection: 'null) '
+    - startInstruction: 1444
+      endInstruction: 1443
+      startSourceChar: 1535
+      endSourceChar: 1537
+      line: 41
+      lineChar: 35
+      spanCodeSection: '{ '
+    - startInstruction: 1444
+      endInstruction: 1443
+      startSourceChar: 1537
+      endSourceChar: 1537
+      line: 41
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 1444
+      endInstruction: 1443
+      startSourceChar: 1537
+      endSourceChar: 1537
+      line: 41
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 1444
+      endInstruction: 1443
+      startSourceChar: 1537
+      endSourceChar: 1537
+      line: 41
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 1444
+      endInstruction: 1443
+      startSourceChar: 1537
+      endSourceChar: 1551
+      line: 41
+      lineChar: 37
+      spanCodeSection: AAGunAnimator.
+    - startInstruction: 1444
+      endInstruction: 1443
+      startSourceChar: 1551
+      endSourceChar: 1559
+      line: 41
+      lineChar: 51
+      spanCodeSection: SetBool(
+    - startInstruction: 1444
+      endInstruction: 1443
+      startSourceChar: 1559
+      endSourceChar: 1569
+      line: 41
+      lineChar: 59
+      spanCodeSection: '"inside", '
+    - startInstruction: 1444
+      endInstruction: 1475
+      startSourceChar: 1569
+      endSourceChar: 1588
+      line: 41
+      lineChar: 69
+      spanCodeSection: "false); }\r\n        "
+    - startInstruction: 1476
+      endInstruction: 1475
+      startSourceChar: 1588
+      endSourceChar: 1592
+      line: 42
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 1476
+      endInstruction: 1475
+      startSourceChar: 1592
+      endSourceChar: 1592
+      line: 42
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1476
+      endInstruction: 1475
+      startSourceChar: 1592
+      endSourceChar: 1609
+      line: 42
+      lineChar: 12
+      spanCodeSection: 'AAGunAnimator != '
+    - startInstruction: 1476
+      endInstruction: 1523
+      startSourceChar: 1609
+      endSourceChar: 1615
+      line: 42
+      lineChar: 29
+      spanCodeSection: 'null) '
+    - startInstruction: 1524
+      endInstruction: 1523
+      startSourceChar: 1615
+      endSourceChar: 1617
+      line: 42
+      lineChar: 35
+      spanCodeSection: '{ '
+    - startInstruction: 1524
+      endInstruction: 1523
+      startSourceChar: 1617
+      endSourceChar: 1617
+      line: 42
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 1524
+      endInstruction: 1523
+      startSourceChar: 1617
+      endSourceChar: 1617
+      line: 42
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 1524
+      endInstruction: 1523
+      startSourceChar: 1617
+      endSourceChar: 1617
+      line: 42
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 1524
+      endInstruction: 1523
+      startSourceChar: 1617
+      endSourceChar: 1631
+      line: 42
+      lineChar: 37
+      spanCodeSection: AAGunAnimator.
+    - startInstruction: 1524
+      endInstruction: 1523
+      startSourceChar: 1631
+      endSourceChar: 1639
+      line: 42
+      lineChar: 51
+      spanCodeSection: SetBool(
+    - startInstruction: 1524
+      endInstruction: 1523
+      startSourceChar: 1639
+      endSourceChar: 1649
+      line: 42
+      lineChar: 59
+      spanCodeSection: '"firing", '
+    - startInstruction: 1524
+      endInstruction: 1555
+      startSourceChar: 1649
+      endSourceChar: 1668
+      line: 42
+      lineChar: 69
+      spanCodeSection: "false); }\r\n        "
+    - startInstruction: 1556
+      endInstruction: 1555
+      startSourceChar: 1668
+      endSourceChar: 1672
+      line: 43
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 1556
+      endInstruction: 1555
+      startSourceChar: 1672
+      endSourceChar: 1672
+      line: 43
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1556
+      endInstruction: 1555
+      startSourceChar: 1672
+      endSourceChar: 1688
+      line: 43
+      lineChar: 12
+      spanCodeSection: 'SeatAdjuster != '
+    - startInstruction: 1556
+      endInstruction: 1603
+      startSourceChar: 1688
+      endSourceChar: 1694
+      line: 43
+      lineChar: 28
+      spanCodeSection: 'null) '
+    - startInstruction: 1604
+      endInstruction: 1603
+      startSourceChar: 1694
+      endSourceChar: 1696
+      line: 43
+      lineChar: 34
+      spanCodeSection: '{ '
+    - startInstruction: 1604
+      endInstruction: 1603
+      startSourceChar: 1696
+      endSourceChar: 1696
+      line: 43
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 1604
+      endInstruction: 1603
+      startSourceChar: 1696
+      endSourceChar: 1696
+      line: 43
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 1604
+      endInstruction: 1603
+      startSourceChar: 1696
+      endSourceChar: 1696
+      line: 43
+      lineChar: 36
+      spanCodeSection: 
+    - startInstruction: 1604
+      endInstruction: 1603
+      startSourceChar: 1696
+      endSourceChar: 1709
+      line: 43
+      lineChar: 36
+      spanCodeSection: SeatAdjuster.
+    - startInstruction: 1604
+      endInstruction: 1603
+      startSourceChar: 1709
+      endSourceChar: 1719
+      line: 43
+      lineChar: 49
+      spanCodeSection: SetActive(
+    - startInstruction: 1604
+      endInstruction: 1627
+      startSourceChar: 1719
+      endSourceChar: 1821
+      line: 43
+      lineChar: 59
+      spanCodeSection: "false); }\r\n        //set X rotation 0 so people don't get
+        the seat bug when they enter again\r\n        "
+    - startInstruction: 1628
+      endInstruction: 1627
+      startSourceChar: 1821
+      endSourceChar: 1821
+      line: 45
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1628
+      endInstruction: 1627
+      startSourceChar: 1821
+      endSourceChar: 1821
+      line: 45
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1628
+      endInstruction: 1627
+      startSourceChar: 1821
+      endSourceChar: 1821
+      line: 45
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1628
+      endInstruction: 1627
+      startSourceChar: 1821
+      endSourceChar: 1821
+      line: 45
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1628
+      endInstruction: 1627
+      startSourceChar: 1821
+      endSourceChar: 1821
+      line: 45
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1628
+      endInstruction: 1627
+      startSourceChar: 1821
+      endSourceChar: 1834
+      line: 45
+      lineChar: 8
+      spanCodeSection: AAGunControl.
+    - startInstruction: 1628
+      endInstruction: 1627
+      startSourceChar: 1834
+      endSourceChar: 1842
+      line: 45
+      lineChar: 21
+      spanCodeSection: Rotator.
+    - startInstruction: 1628
+      endInstruction: 1679
+      startSourceChar: 1842
+      endSourceChar: 1852
+      line: 45
+      lineChar: 29
+      spanCodeSection: transform.
+    - startInstruction: 1680
+      endInstruction: 1703
+      startSourceChar: 1852
+      endSourceChar: 1868
+      line: 45
+      lineChar: 39
+      spanCodeSection: 'localRotation = '
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1868
+      endSourceChar: 1868
+      line: 45
+      lineChar: 55
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1868
+      endSourceChar: 1868
+      line: 45
+      lineChar: 55
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1868
+      endSourceChar: 1879
+      line: 45
+      lineChar: 55
+      spanCodeSection: Quaternion.
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1879
+      endSourceChar: 1885
+      line: 45
+      lineChar: 66
+      spanCodeSection: Euler(
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1885
+      endSourceChar: 1889
+      line: 45
+      lineChar: 72
+      spanCodeSection: 'new '
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1889
+      endSourceChar: 1897
+      line: 45
+      lineChar: 76
+      spanCodeSection: Vector3(
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1897
+      endSourceChar: 1897
+      line: 45
+      lineChar: 84
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1897
+      endSourceChar: 1900
+      line: 45
+      lineChar: 84
+      spanCodeSection: '0, '
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1900
+      endSourceChar: 1900
+      line: 45
+      lineChar: 87
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1900
+      endSourceChar: 1900
+      line: 45
+      lineChar: 87
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1900
+      endSourceChar: 1900
+      line: 45
+      lineChar: 87
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1900
+      endSourceChar: 1900
+      line: 45
+      lineChar: 87
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1900
+      endSourceChar: 1900
+      line: 45
+      lineChar: 87
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1900
+      endSourceChar: 1900
+      line: 45
+      lineChar: 87
+      spanCodeSection: 
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1900
+      endSourceChar: 1913
+      line: 45
+      lineChar: 87
+      spanCodeSection: AAGunControl.
+    - startInstruction: 1704
+      endInstruction: 1703
+      startSourceChar: 1913
+      endSourceChar: 1921
+      line: 45
+      lineChar: 100
+      spanCodeSection: Rotator.
+    - startInstruction: 1704
+      endInstruction: 1755
+      startSourceChar: 1921
+      endSourceChar: 1931
+      line: 45
+      lineChar: 108
+      spanCodeSection: transform.
+    - startInstruction: 1756
+      endInstruction: 1779
+      startSourceChar: 1931
+      endSourceChar: 1945
+      line: 45
+      lineChar: 118
+      spanCodeSection: localRotation.
+    - startInstruction: 1780
+      endInstruction: 1803
+      startSourceChar: 1945
+      endSourceChar: 1957
+      line: 45
+      lineChar: 132
+      spanCodeSection: eulerAngles.
+    - startInstruction: 1804
+      endInstruction: 1851
+      startSourceChar: 1957
+      endSourceChar: 1960
+      line: 45
+      lineChar: 144
+      spanCodeSection: 'y, '
+    - startInstruction: 1852
+      endInstruction: 1851
+      startSourceChar: 1960
+      endSourceChar: 1960
+      line: 45
+      lineChar: 147
+      spanCodeSection: 
+    - startInstruction: 1852
+      endInstruction: 2007
+      startSourceChar: 1960
+      endSourceChar: 1977
+      line: 45
+      lineChar: 147
+      spanCodeSection: "0));\r\n    }\r\n    "
+    - startInstruction: 2008
+      endInstruction: 2015
+      startSourceChar: 1977
+      endSourceChar: 2020
+      line: 47
+      lineChar: 4
+      spanCodeSection: "private void OnOwnershipTransferred()\r\n    "
+    - startInstruction: 2016
+      endInstruction: 2015
+      startSourceChar: 2020
+      endSourceChar: 2031
+      line: 48
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 2016
+      endInstruction: 2015
+      startSourceChar: 2031
+      endSourceChar: 2031
+      line: 49
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 2016
+      endInstruction: 2015
+      startSourceChar: 2031
+      endSourceChar: 2031
+      line: 49
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 2016
+      endInstruction: 2015
+      startSourceChar: 2031
+      endSourceChar: 2031
+      line: 49
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 2016
+      endInstruction: 2015
+      startSourceChar: 2031
+      endSourceChar: 2044
+      line: 49
+      lineChar: 8
+      spanCodeSection: AAGunControl.
+    - startInstruction: 2016
+      endInstruction: 2015
+      startSourceChar: 2044
+      endSourceChar: 2053
+      line: 49
+      lineChar: 21
+      spanCodeSection: 'firing = '
+    - startInstruction: 2016
+      endInstruction: 2016
+      startSourceChar: 2053
+      endSourceChar: 2053
+      line: 49
+      lineChar: 30
+      spanCodeSection: 
   hasInteractEvent: 1
   serializationData:
     SerializedFormat: 2

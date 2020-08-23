@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-public class AAM : UdonSharpBehaviour
+public class AGM : UdonSharpBehaviour
 {
     public float LockAngle;
     public float RotSpeed = 15;
@@ -23,29 +23,26 @@ public class AAM : UdonSharpBehaviour
     {
         if (!ColliderActive)
         {
-            if (Lifetime > 1f)
+            if (Lifetime > 0.5f)
             {
                 AGMCollider.enabled = true;
                 ColliderActive = true;
             }
         }
-        if (Lifetime > 40)
+        if (Vector3.Angle(gameObject.transform.forward, (Target - gameObject.transform.position)) < (LockAngle))
         {
-            DestroyImmediate(gameObject);
+            // homing to target, thx Guribo
+            var missileToTargetVector = Target - gameObject.transform.position;
+            var missileForward = gameObject.transform.forward;
+            var targetDirection = missileToTargetVector.normalized;
+            var rotationAxis = Vector3.Cross(missileForward, targetDirection);
+            var deltaAngle = Vector3.Angle(missileForward, targetDirection);
+            gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
         }
         Lifetime += Time.deltaTime;
-        if (Vector3.Angle(gameObject.transform.forward, (Target - gameObject.transform.position).normalized) < (LockAngle))
+        if (Lifetime > 40)
         {
-            Vector3 a = gameObject.transform.position;
-            Vector3 b = gameObject.transform.position + gameObject.transform.forward;
-            Vector3 c = Target;
-            a = b - a;
-            b = c - a;
-            a = Vector3.Cross(a, b);
-            Quaternion currentrot = gameObject.transform.rotation;
-            gameObject.transform.LookAt(Target, a);
-            currentrot = Quaternion.RotateTowards(currentrot, gameObject.transform.rotation, RotSpeed * Time.deltaTime);
-            gameObject.transform.rotation = currentrot;
+            Destroy(gameObject);
         }
     }
     private void OnCollisionEnter(Collision other)
