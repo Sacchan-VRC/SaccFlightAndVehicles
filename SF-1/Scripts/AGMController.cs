@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-public class AGM : UdonSharpBehaviour
+public class AGMController : UdonSharpBehaviour
 {
     public float LockAngle;
     public float RotSpeed = 15;

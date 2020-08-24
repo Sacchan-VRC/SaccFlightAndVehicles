@@ -23,7 +23,6 @@ public class AAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool firing;
     private float RTrigger = 0;
     [System.NonSerializedAttribute] [HideInInspector] public float FullHealth;
-    private Vector3 Rotinputlerper;
     [System.NonSerializedAttribute] [HideInInspector] public bool Manning;//like Piloting in the plane
     [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
     public float InputXLerper = 0f;

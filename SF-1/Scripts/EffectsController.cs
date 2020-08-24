@@ -125,8 +125,7 @@ public class EffectsController : UdonSharpBehaviour
             if (EngineControl.Smoking)
             {
                 var main = DisplaySmoke.main;
-                Color newsmoke = new Color(EngineControl.SmokeColor.x, EngineControl.SmokeColor.y, EngineControl.SmokeColor.z);
-                main.startColor = new ParticleSystem.MinMaxGradient(newsmoke, newsmoke * .85f);
+                main.startColor = new ParticleSystem.MinMaxGradient(EngineControl.SmokeColor_Color, EngineControl.SmokeColor_Color * .8f);
             }
         }
         else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }

@@ -4,12 +4,14 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-public class AAM : UdonSharpBehaviour
+public class AAMController : UdonSharpBehaviour
 {
     public float LockAngle;
     public float RotSpeed = 15;
     public EngineController EngineControl;
+    private bool NonOwnerLockHack = true;
     private float Lifetime = 0;
+    private float StartLockAngle = 0;
     private Transform Target;
     private bool ColliderActive = false;
     private bool Exploding = false;
@@ -18,17 +20,19 @@ public class AAM : UdonSharpBehaviour
     private bool Owner = false;
     void Start()
     {
-        if (EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
+        StartLockAngle = LockAngle;
+        if (EngineControl.InEditor || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
         {
             Owner = true;
+            NonOwnerLockHack = false;//don't do netcode help hack if owner
         }
-        else if (!EngineControl.Taxiing)
+        else
         {
-            LockAngle = 70;//help missiles fired during a lagged turnfight actually fly towards their targets for the people who didn't fire them
+            LockAngle = 180;//help missiles fired during a lagged turnfight actually fly towards their targets for the people who didn't fire them (for the first 2 seconds)
         }
-        if (EngineControl.NumTargets != 0)
+        if (EngineControl.NumAAMTargets != 0)
         {
-            Target = EngineControl.Targets[EngineControl.AAMTarget].transform;
+            Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
         }
         else NoTarget = true;
 
@@ -36,6 +40,7 @@ public class AAM : UdonSharpBehaviour
     }
     void LateUpdate()
     {
+        Debug.Log(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
         if (!ColliderActive)
         {
             if (Lifetime > 0.5f)
@@ -44,6 +49,15 @@ public class AAM : UdonSharpBehaviour
                 ColliderActive = true;
             }
         }
+        if (NonOwnerLockHack)
+        {
+            if (Lifetime > 2)
+            {
+                LockAngle = StartLockAngle;
+                NonOwnerLockHack = false;
+            }
+        }
+
         if (!NoTarget)
         {
             if (Vector3.Angle(gameObject.transform.forward, (Target.position - gameObject.transform.position)) < (LockAngle))

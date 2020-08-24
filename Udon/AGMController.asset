@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
-  m_Name: AGM
+  m_Name: AGMController
   m_EditorClassIdentifier: 
   serializedUdonProgramAsset: {fileID: 11400000, guid: 80f2033cea02dd543abd190ea496ea72,
     type: 2}
@@ -21,8 +21,8 @@ MonoBehaviour:
     null\n    Exploding: %SystemBoolean, null\n    AGMCollider: %UnityEngineCapsuleCollider,
     null\n    onCollisionEnterOther: %UnityEngineCollision, null\n    Lifetime: %SystemSingle,
     null\n    Target: %UnityEngineVector3, null\n    __0_this_intnl_UnityEngineGameObject:
-    %UnityEngineGameObject, this\n    __0_this_intnl_AGM: %VRCUdonUdonBehaviour, this\n
-    \   __0_AGMani_Animator: %UnityEngineAnimator, null\n    __0_other_Collision:
+    %UnityEngineGameObject, this\n    __0_this_intnl_AGMController: %VRCUdonUdonBehaviour,
+    this\n    __0_AGMani_Animator: %UnityEngineAnimator, null\n    __0_other_Collision:
     %UnityEngineCollision, null\n    __0_deltaAngle_Single: %SystemSingle, null\n
     \   __0_missileForward_Vector3: %UnityEngineVector3, null\n    __0_missileToTargetVector_Vector3:
     %UnityEngineVector3, null\n    __0_rotationAxis_Vector3: %UnityEngineVector3,
@@ -58,7 +58,7 @@ MonoBehaviour:
     %VRCSDKBaseVRCPlayerApi, null\n    __1_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi,
     null\n\n.data_end\n\n        \n         # using UdonSharp;\n        \n         #
     using UnityEngine;\n        \n         # using VRC.SDKBase;\n        \n         #
-    using VRC.Udon;\n        \n         # public class AGM : UdonSharpBehaviour\n.code_start\n
+    using VRC.Udon;\n        \n         # public class AGMController : UdonSharpBehaviour\n.code_start\n
     \       \n         # public float LockAngle;\n        \n         # public float
     RotSpeed = 15;\n        \n         # public EngineController EngineControl;\n
     \       \n         # private Vector3 Target;\n        \n         # private float
@@ -305,1652 +305,1652 @@ MonoBehaviour:
     - startInstruction: 0
       endInstruction: -1
       startSourceChar: 79
-      endSourceChar: 96
+      endSourceChar: 106
       line: 6
       lineChar: 0
-      spanCodeSection: 'public class AGM '
+      spanCodeSection: 'public class AGMController '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 96
-      endSourceChar: 98
+      startSourceChar: 106
+      endSourceChar: 108
       line: 6
-      lineChar: 17
+      lineChar: 27
       spanCodeSection: ': '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 98
-      endSourceChar: 98
+      startSourceChar: 108
+      endSourceChar: 108
       line: 6
-      lineChar: 19
+      lineChar: 29
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 98
-      endSourceChar: 125
+      startSourceChar: 108
+      endSourceChar: 135
       line: 6
-      lineChar: 19
+      lineChar: 29
       spanCodeSection: "UdonSharpBehaviour\r\n{\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 125
-      endSourceChar: 132
+      startSourceChar: 135
+      endSourceChar: 142
       line: 8
       lineChar: 4
       spanCodeSection: 'public '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 132
-      endSourceChar: 132
+      startSourceChar: 142
+      endSourceChar: 142
       line: 8
       lineChar: 11
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 132
-      endSourceChar: 154
+      startSourceChar: 142
+      endSourceChar: 164
       line: 8
       lineChar: 11
       spanCodeSection: "float LockAngle;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 154
-      endSourceChar: 161
+      startSourceChar: 164
+      endSourceChar: 171
       line: 9
       lineChar: 4
       spanCodeSection: 'public '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 161
-      endSourceChar: 161
+      startSourceChar: 171
+      endSourceChar: 171
       line: 9
       lineChar: 11
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 161
-      endSourceChar: 187
+      startSourceChar: 171
+      endSourceChar: 197
       line: 9
       lineChar: 11
       spanCodeSection: "float RotSpeed = 15;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 187
-      endSourceChar: 194
+      startSourceChar: 197
+      endSourceChar: 204
       line: 10
       lineChar: 4
       spanCodeSection: 'public '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 194
-      endSourceChar: 194
+      startSourceChar: 204
+      endSourceChar: 204
       line: 10
       lineChar: 11
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 194
-      endSourceChar: 231
+      startSourceChar: 204
+      endSourceChar: 241
       line: 10
       lineChar: 11
       spanCodeSection: "EngineController EngineControl;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 231
-      endSourceChar: 239
+      startSourceChar: 241
+      endSourceChar: 249
       line: 11
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 239
-      endSourceChar: 239
+      startSourceChar: 249
+      endSourceChar: 249
       line: 11
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 239
-      endSourceChar: 260
+      startSourceChar: 249
+      endSourceChar: 270
       line: 11
       lineChar: 12
       spanCodeSection: "Vector3 Target;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 260
-      endSourceChar: 268
+      startSourceChar: 270
+      endSourceChar: 278
       line: 12
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 268
-      endSourceChar: 268
+      startSourceChar: 278
+      endSourceChar: 278
       line: 12
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 268
-      endSourceChar: 293
+      startSourceChar: 278
+      endSourceChar: 303
       line: 12
       lineChar: 12
       spanCodeSection: "float Lifetime = 0;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 293
-      endSourceChar: 301
+      startSourceChar: 303
+      endSourceChar: 311
       line: 13
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 301
-      endSourceChar: 301
+      startSourceChar: 311
+      endSourceChar: 311
       line: 13
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 301
-      endSourceChar: 335
+      startSourceChar: 311
+      endSourceChar: 345
       line: 13
       lineChar: 12
       spanCodeSection: "bool ColliderActive = false;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 335
-      endSourceChar: 343
+      startSourceChar: 345
+      endSourceChar: 353
       line: 14
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 343
-      endSourceChar: 343
+      startSourceChar: 353
+      endSourceChar: 353
       line: 14
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 343
-      endSourceChar: 372
+      startSourceChar: 353
+      endSourceChar: 382
       line: 14
       lineChar: 12
       spanCodeSection: "bool Exploding = false;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 372
-      endSourceChar: 380
+      startSourceChar: 382
+      endSourceChar: 390
       line: 15
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 380
-      endSourceChar: 380
+      startSourceChar: 390
+      endSourceChar: 390
       line: 15
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 380
-      endSourceChar: 414
+      startSourceChar: 390
+      endSourceChar: 424
       line: 15
       lineChar: 12
       spanCodeSection: "CapsuleCollider AGMCollider;\r\n    "
     - startInstruction: 0
       endInstruction: 7
-      startSourceChar: 414
-      endSourceChar: 432
+      startSourceChar: 424
+      endSourceChar: 442
       line: 16
       lineChar: 4
       spanCodeSection: "void Start()\r\n    "
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 432
-      endSourceChar: 443
+      startSourceChar: 442
+      endSourceChar: 453
       line: 17
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 443
-      endSourceChar: 443
+      startSourceChar: 453
+      endSourceChar: 453
       line: 18
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 443
-      endSourceChar: 443
+      startSourceChar: 453
+      endSourceChar: 453
       line: 18
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 443
-      endSourceChar: 452
+      startSourceChar: 453
+      endSourceChar: 462
       line: 18
       lineChar: 8
       spanCodeSection: 'Target = '
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 452
-      endSourceChar: 452
+      startSourceChar: 462
+      endSourceChar: 462
       line: 18
       lineChar: 17
       spanCodeSection: 
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 452
-      endSourceChar: 466
+      startSourceChar: 462
+      endSourceChar: 476
       line: 18
       lineChar: 17
       spanCodeSection: EngineControl.
     - startInstruction: 8
       endInstruction: 79
-      startSourceChar: 466
-      endSourceChar: 486
+      startSourceChar: 476
+      endSourceChar: 496
       line: 18
       lineChar: 31
       spanCodeSection: "AGMTarget;\r\n        "
     - startInstruction: 80
       endInstruction: 79
-      startSourceChar: 486
-      endSourceChar: 486
+      startSourceChar: 496
+      endSourceChar: 496
       line: 19
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 80
       endInstruction: 79
-      startSourceChar: 486
-      endSourceChar: 486
+      startSourceChar: 496
+      endSourceChar: 496
       line: 19
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 80
       endInstruction: 79
-      startSourceChar: 486
-      endSourceChar: 500
+      startSourceChar: 496
+      endSourceChar: 510
       line: 19
       lineChar: 8
       spanCodeSection: 'AGMCollider = '
     - startInstruction: 80
       endInstruction: 79
-      startSourceChar: 500
-      endSourceChar: 500
+      startSourceChar: 510
+      endSourceChar: 510
       line: 19
       lineChar: 22
       spanCodeSection: 
     - startInstruction: 80
       endInstruction: 79
-      startSourceChar: 500
-      endSourceChar: 500
+      startSourceChar: 510
+      endSourceChar: 510
       line: 19
       lineChar: 22
       spanCodeSection: 
     - startInstruction: 80
       endInstruction: 79
-      startSourceChar: 500
-      endSourceChar: 511
+      startSourceChar: 510
+      endSourceChar: 521
       line: 19
       lineChar: 22
       spanCodeSection: gameObject.
     - startInstruction: 80
       endInstruction: 79
-      startSourceChar: 511
-      endSourceChar: 523
+      startSourceChar: 521
+      endSourceChar: 533
       line: 19
       lineChar: 33
       spanCodeSection: GetComponent
     - startInstruction: 80
       endInstruction: 79
-      startSourceChar: 523
-      endSourceChar: 524
+      startSourceChar: 533
+      endSourceChar: 534
       line: 19
       lineChar: 45
       spanCodeSection: <
     - startInstruction: 80
       endInstruction: 155
-      startSourceChar: 524
-      endSourceChar: 556
+      startSourceChar: 534
+      endSourceChar: 566
       line: 19
       lineChar: 46
       spanCodeSection: "CapsuleCollider>();\r\n    }\r\n    "
     - startInstruction: 156
       endInstruction: 163
-      startSourceChar: 556
-      endSourceChar: 579
+      startSourceChar: 566
+      endSourceChar: 589
       line: 21
       lineChar: 4
       spanCodeSection: "void LateUpdate()\r\n    "
     - startInstruction: 164
       endInstruction: 163
-      startSourceChar: 579
-      endSourceChar: 590
+      startSourceChar: 589
+      endSourceChar: 600
       line: 22
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 164
       endInstruction: 163
-      startSourceChar: 590
-      endSourceChar: 594
+      startSourceChar: 600
+      endSourceChar: 604
       line: 23
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 164
       endInstruction: 163
-      startSourceChar: 594
-      endSourceChar: 595
+      startSourceChar: 604
+      endSourceChar: 605
       line: 23
       lineChar: 12
       spanCodeSection: '!'
     - startInstruction: 164
       endInstruction: 203
-      startSourceChar: 595
-      endSourceChar: 620
+      startSourceChar: 605
+      endSourceChar: 630
       line: 23
       lineChar: 13
       spanCodeSection: "ColliderActive)\r\n        "
     - startInstruction: 204
       endInstruction: 203
-      startSourceChar: 620
-      endSourceChar: 635
+      startSourceChar: 630
+      endSourceChar: 645
       line: 24
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 204
       endInstruction: 203
-      startSourceChar: 635
-      endSourceChar: 639
+      startSourceChar: 645
+      endSourceChar: 649
       line: 25
       lineChar: 12
       spanCodeSection: if (
     - startInstruction: 204
       endInstruction: 203
-      startSourceChar: 639
-      endSourceChar: 639
+      startSourceChar: 649
+      endSourceChar: 649
       line: 25
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 204
       endInstruction: 203
-      startSourceChar: 639
-      endSourceChar: 650
+      startSourceChar: 649
+      endSourceChar: 660
       line: 25
       lineChar: 16
       spanCodeSection: 'Lifetime > '
     - startInstruction: 204
       endInstruction: 251
-      startSourceChar: 650
-      endSourceChar: 669
+      startSourceChar: 660
+      endSourceChar: 679
       line: 25
       lineChar: 27
       spanCodeSection: "0.5f)\r\n            "
     - startInstruction: 252
       endInstruction: 251
-      startSourceChar: 669
-      endSourceChar: 688
+      startSourceChar: 679
+      endSourceChar: 698
       line: 26
       lineChar: 12
       spanCodeSection: "{\r\n                "
     - startInstruction: 252
       endInstruction: 251
-      startSourceChar: 688
-      endSourceChar: 688
+      startSourceChar: 698
+      endSourceChar: 698
       line: 27
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 252
       endInstruction: 251
-      startSourceChar: 688
-      endSourceChar: 688
+      startSourceChar: 698
+      endSourceChar: 698
       line: 27
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 252
       endInstruction: 251
-      startSourceChar: 688
-      endSourceChar: 688
+      startSourceChar: 698
+      endSourceChar: 698
       line: 27
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 252
       endInstruction: 251
-      startSourceChar: 688
-      endSourceChar: 700
+      startSourceChar: 698
+      endSourceChar: 710
       line: 27
       lineChar: 16
       spanCodeSection: AGMCollider.
     - startInstruction: 252
       endInstruction: 251
-      startSourceChar: 700
-      endSourceChar: 710
+      startSourceChar: 710
+      endSourceChar: 720
       line: 27
       lineChar: 28
       spanCodeSection: 'enabled = '
     - startInstruction: 252
       endInstruction: 275
-      startSourceChar: 710
-      endSourceChar: 733
+      startSourceChar: 720
+      endSourceChar: 743
       line: 27
       lineChar: 38
       spanCodeSection: "true;\r\n                "
     - startInstruction: 276
       endInstruction: 275
-      startSourceChar: 733
-      endSourceChar: 733
+      startSourceChar: 743
+      endSourceChar: 743
       line: 28
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 276
       endInstruction: 275
-      startSourceChar: 733
-      endSourceChar: 733
+      startSourceChar: 743
+      endSourceChar: 743
       line: 28
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 276
       endInstruction: 275
-      startSourceChar: 733
-      endSourceChar: 750
+      startSourceChar: 743
+      endSourceChar: 760
       line: 28
       lineChar: 16
       spanCodeSection: 'ColliderActive = '
     - startInstruction: 276
       endInstruction: 295
-      startSourceChar: 750
-      endSourceChar: 791
+      startSourceChar: 760
+      endSourceChar: 801
       line: 28
       lineChar: 33
       spanCodeSection: "true;\r\n            }\r\n        }\r\n        "
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 791
-      endSourceChar: 795
+      startSourceChar: 801
+      endSourceChar: 805
       line: 31
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 795
-      endSourceChar: 795
+      startSourceChar: 805
+      endSourceChar: 805
       line: 31
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 795
-      endSourceChar: 795
+      startSourceChar: 805
+      endSourceChar: 805
       line: 31
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 795
-      endSourceChar: 795
+      startSourceChar: 805
+      endSourceChar: 805
       line: 31
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 795
-      endSourceChar: 803
+      startSourceChar: 805
+      endSourceChar: 813
       line: 31
       lineChar: 12
       spanCodeSection: Vector3.
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 803
-      endSourceChar: 809
+      startSourceChar: 813
+      endSourceChar: 819
       line: 31
       lineChar: 20
       spanCodeSection: Angle(
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 809
-      endSourceChar: 809
+      startSourceChar: 819
+      endSourceChar: 819
       line: 31
       lineChar: 26
       spanCodeSection: 
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 809
-      endSourceChar: 809
+      startSourceChar: 819
+      endSourceChar: 819
       line: 31
       lineChar: 26
       spanCodeSection: 
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 809
-      endSourceChar: 820
+      startSourceChar: 819
+      endSourceChar: 830
       line: 31
       lineChar: 26
       spanCodeSection: gameObject.
     - startInstruction: 296
       endInstruction: 295
-      startSourceChar: 820
-      endSourceChar: 830
+      startSourceChar: 830
+      endSourceChar: 840
       line: 31
       lineChar: 37
       spanCodeSection: transform.
     - startInstruction: 296
       endInstruction: 343
-      startSourceChar: 830
-      endSourceChar: 839
+      startSourceChar: 840
+      endSourceChar: 849
       line: 31
       lineChar: 47
       spanCodeSection: 'forward, '
     - startInstruction: 344
       endInstruction: 343
-      startSourceChar: 839
-      endSourceChar: 840
+      startSourceChar: 849
+      endSourceChar: 850
       line: 31
       lineChar: 56
       spanCodeSection: (
     - startInstruction: 344
       endInstruction: 343
-      startSourceChar: 840
-      endSourceChar: 840
+      startSourceChar: 850
+      endSourceChar: 850
       line: 31
       lineChar: 57
       spanCodeSection: 
     - startInstruction: 344
       endInstruction: 343
-      startSourceChar: 840
-      endSourceChar: 849
+      startSourceChar: 850
+      endSourceChar: 859
       line: 31
       lineChar: 57
       spanCodeSection: 'Target - '
     - startInstruction: 344
       endInstruction: 343
-      startSourceChar: 849
-      endSourceChar: 849
+      startSourceChar: 859
+      endSourceChar: 859
       line: 31
       lineChar: 66
       spanCodeSection: 
     - startInstruction: 344
       endInstruction: 343
-      startSourceChar: 849
-      endSourceChar: 849
+      startSourceChar: 859
+      endSourceChar: 859
       line: 31
       lineChar: 66
       spanCodeSection: 
     - startInstruction: 344
       endInstruction: 343
-      startSourceChar: 849
-      endSourceChar: 860
+      startSourceChar: 859
+      endSourceChar: 870
       line: 31
       lineChar: 66
       spanCodeSection: gameObject.
     - startInstruction: 344
       endInstruction: 343
-      startSourceChar: 860
-      endSourceChar: 870
+      startSourceChar: 870
+      endSourceChar: 880
       line: 31
       lineChar: 77
       spanCodeSection: transform.
     - startInstruction: 344
       endInstruction: 455
-      startSourceChar: 870
-      endSourceChar: 883
+      startSourceChar: 880
+      endSourceChar: 893
       line: 31
       lineChar: 87
       spanCodeSection: 'position)) < '
     - startInstruction: 456
       endInstruction: 455
-      startSourceChar: 883
-      endSourceChar: 884
+      startSourceChar: 893
+      endSourceChar: 894
       line: 31
       lineChar: 100
       spanCodeSection: (
     - startInstruction: 456
       endInstruction: 503
-      startSourceChar: 884
-      endSourceChar: 905
+      startSourceChar: 894
+      endSourceChar: 915
       line: 31
       lineChar: 101
       spanCodeSection: "LockAngle))\r\n        "
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 905
-      endSourceChar: 965
+      startSourceChar: 915
+      endSourceChar: 975
       line: 32
       lineChar: 8
       spanCodeSection: "{\r\n            // homing to target, thx Guribo\r\n            "
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 965
-      endSourceChar: 965
+      startSourceChar: 975
+      endSourceChar: 975
       line: 34
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 965
-      endSourceChar: 965
+      startSourceChar: 975
+      endSourceChar: 975
       line: 34
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 965
-      endSourceChar: 991
+      startSourceChar: 975
+      endSourceChar: 1001
       line: 34
       lineChar: 12
       spanCodeSection: 'var missileToTargetVector '
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 991
-      endSourceChar: 993
+      startSourceChar: 1001
+      endSourceChar: 1003
       line: 34
       lineChar: 38
       spanCodeSection: '= '
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 993
-      endSourceChar: 993
+      startSourceChar: 1003
+      endSourceChar: 1003
       line: 34
       lineChar: 40
       spanCodeSection: 
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 993
-      endSourceChar: 1002
+      startSourceChar: 1003
+      endSourceChar: 1012
       line: 34
       lineChar: 40
       spanCodeSection: 'Target - '
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 1002
-      endSourceChar: 1002
+      startSourceChar: 1012
+      endSourceChar: 1012
       line: 34
       lineChar: 49
       spanCodeSection: 
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 1002
-      endSourceChar: 1002
+      startSourceChar: 1012
+      endSourceChar: 1012
       line: 34
       lineChar: 49
       spanCodeSection: 
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 1002
-      endSourceChar: 1013
+      startSourceChar: 1012
+      endSourceChar: 1023
       line: 34
       lineChar: 49
       spanCodeSection: gameObject.
     - startInstruction: 504
       endInstruction: 503
-      startSourceChar: 1013
-      endSourceChar: 1023
+      startSourceChar: 1023
+      endSourceChar: 1033
       line: 34
       lineChar: 60
       spanCodeSection: transform.
     - startInstruction: 504
       endInstruction: 603
-      startSourceChar: 1023
-      endSourceChar: 1046
+      startSourceChar: 1033
+      endSourceChar: 1056
       line: 34
       lineChar: 70
       spanCodeSection: "position;\r\n            "
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1046
-      endSourceChar: 1046
+      startSourceChar: 1056
+      endSourceChar: 1056
       line: 35
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1046
-      endSourceChar: 1046
+      startSourceChar: 1056
+      endSourceChar: 1056
       line: 35
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1046
-      endSourceChar: 1065
+      startSourceChar: 1056
+      endSourceChar: 1075
       line: 35
       lineChar: 12
       spanCodeSection: 'var missileForward '
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1065
-      endSourceChar: 1067
+      startSourceChar: 1075
+      endSourceChar: 1077
       line: 35
       lineChar: 31
       spanCodeSection: '= '
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1067
-      endSourceChar: 1067
+      startSourceChar: 1077
+      endSourceChar: 1077
       line: 35
       lineChar: 33
       spanCodeSection: 
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1067
-      endSourceChar: 1067
+      startSourceChar: 1077
+      endSourceChar: 1077
       line: 35
       lineChar: 33
       spanCodeSection: 
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1067
-      endSourceChar: 1078
+      startSourceChar: 1077
+      endSourceChar: 1088
       line: 35
       lineChar: 33
       spanCodeSection: gameObject.
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1078
-      endSourceChar: 1088
+      startSourceChar: 1088
+      endSourceChar: 1098
       line: 35
       lineChar: 44
       spanCodeSection: transform.
     - startInstruction: 604
       endInstruction: 671
-      startSourceChar: 1088
-      endSourceChar: 1110
+      startSourceChar: 1098
+      endSourceChar: 1120
       line: 35
       lineChar: 54
       spanCodeSection: "forward;\r\n            "
     - startInstruction: 672
       endInstruction: 671
-      startSourceChar: 1110
-      endSourceChar: 1110
+      startSourceChar: 1120
+      endSourceChar: 1120
       line: 36
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 672
       endInstruction: 671
-      startSourceChar: 1110
-      endSourceChar: 1110
+      startSourceChar: 1120
+      endSourceChar: 1120
       line: 36
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 672
       endInstruction: 671
-      startSourceChar: 1110
-      endSourceChar: 1130
+      startSourceChar: 1120
+      endSourceChar: 1140
       line: 36
       lineChar: 12
       spanCodeSection: 'var targetDirection '
     - startInstruction: 672
       endInstruction: 671
-      startSourceChar: 1130
-      endSourceChar: 1132
+      startSourceChar: 1140
+      endSourceChar: 1142
       line: 36
       lineChar: 32
       spanCodeSection: '= '
     - startInstruction: 672
       endInstruction: 671
-      startSourceChar: 1132
-      endSourceChar: 1132
+      startSourceChar: 1142
+      endSourceChar: 1142
       line: 36
       lineChar: 34
       spanCodeSection: 
     - startInstruction: 672
       endInstruction: 671
-      startSourceChar: 1132
-      endSourceChar: 1154
+      startSourceChar: 1142
+      endSourceChar: 1164
       line: 36
       lineChar: 34
       spanCodeSection: missileToTargetVector.
     - startInstruction: 672
       endInstruction: 715
-      startSourceChar: 1154
-      endSourceChar: 1179
+      startSourceChar: 1164
+      endSourceChar: 1189
       line: 36
       lineChar: 56
       spanCodeSection: "normalized;\r\n            "
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1179
-      endSourceChar: 1179
+      startSourceChar: 1189
+      endSourceChar: 1189
       line: 37
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1179
-      endSourceChar: 1179
+      startSourceChar: 1189
+      endSourceChar: 1189
       line: 37
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1179
-      endSourceChar: 1196
+      startSourceChar: 1189
+      endSourceChar: 1206
       line: 37
       lineChar: 12
       spanCodeSection: 'var rotationAxis '
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1196
-      endSourceChar: 1198
+      startSourceChar: 1206
+      endSourceChar: 1208
       line: 37
       lineChar: 29
       spanCodeSection: '= '
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1198
-      endSourceChar: 1198
+      startSourceChar: 1208
+      endSourceChar: 1208
       line: 37
       lineChar: 31
       spanCodeSection: 
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1198
-      endSourceChar: 1198
+      startSourceChar: 1208
+      endSourceChar: 1208
       line: 37
       lineChar: 31
       spanCodeSection: 
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1198
-      endSourceChar: 1206
+      startSourceChar: 1208
+      endSourceChar: 1216
       line: 37
       lineChar: 31
       spanCodeSection: Vector3.
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1206
-      endSourceChar: 1212
+      startSourceChar: 1216
+      endSourceChar: 1222
       line: 37
       lineChar: 39
       spanCodeSection: Cross(
     - startInstruction: 716
       endInstruction: 715
-      startSourceChar: 1212
-      endSourceChar: 1228
+      startSourceChar: 1222
+      endSourceChar: 1238
       line: 37
       lineChar: 45
       spanCodeSection: 'missileForward, '
     - startInstruction: 716
       endInstruction: 767
-      startSourceChar: 1228
-      endSourceChar: 1259
+      startSourceChar: 1238
+      endSourceChar: 1269
       line: 37
       lineChar: 61
       spanCodeSection: "targetDirection);\r\n            "
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1259
-      endSourceChar: 1259
+      startSourceChar: 1269
+      endSourceChar: 1269
       line: 38
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1259
-      endSourceChar: 1259
+      startSourceChar: 1269
+      endSourceChar: 1269
       line: 38
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1259
-      endSourceChar: 1274
+      startSourceChar: 1269
+      endSourceChar: 1284
       line: 38
       lineChar: 12
       spanCodeSection: 'var deltaAngle '
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1274
-      endSourceChar: 1276
+      startSourceChar: 1284
+      endSourceChar: 1286
       line: 38
       lineChar: 27
       spanCodeSection: '= '
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1276
-      endSourceChar: 1276
+      startSourceChar: 1286
+      endSourceChar: 1286
       line: 38
       lineChar: 29
       spanCodeSection: 
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1276
-      endSourceChar: 1276
+      startSourceChar: 1286
+      endSourceChar: 1286
       line: 38
       lineChar: 29
       spanCodeSection: 
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1276
-      endSourceChar: 1284
+      startSourceChar: 1286
+      endSourceChar: 1294
       line: 38
       lineChar: 29
       spanCodeSection: Vector3.
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1284
-      endSourceChar: 1290
+      startSourceChar: 1294
+      endSourceChar: 1300
       line: 38
       lineChar: 37
       spanCodeSection: Angle(
     - startInstruction: 768
       endInstruction: 767
-      startSourceChar: 1290
-      endSourceChar: 1306
+      startSourceChar: 1300
+      endSourceChar: 1316
       line: 38
       lineChar: 43
       spanCodeSection: 'missileForward, '
     - startInstruction: 768
       endInstruction: 819
-      startSourceChar: 1306
-      endSourceChar: 1337
+      startSourceChar: 1316
+      endSourceChar: 1347
       line: 38
       lineChar: 59
       spanCodeSection: "targetDirection);\r\n            "
     - startInstruction: 820
       endInstruction: 819
-      startSourceChar: 1337
-      endSourceChar: 1337
+      startSourceChar: 1347
+      endSourceChar: 1347
       line: 39
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 820
       endInstruction: 819
-      startSourceChar: 1337
-      endSourceChar: 1337
+      startSourceChar: 1347
+      endSourceChar: 1347
       line: 39
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 820
       endInstruction: 819
-      startSourceChar: 1337
-      endSourceChar: 1337
+      startSourceChar: 1347
+      endSourceChar: 1347
       line: 39
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 820
       endInstruction: 819
-      startSourceChar: 1337
-      endSourceChar: 1337
+      startSourceChar: 1347
+      endSourceChar: 1347
       line: 39
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 820
       endInstruction: 819
-      startSourceChar: 1337
-      endSourceChar: 1348
+      startSourceChar: 1347
+      endSourceChar: 1358
       line: 39
       lineChar: 12
       spanCodeSection: gameObject.
     - startInstruction: 820
       endInstruction: 819
-      startSourceChar: 1348
-      endSourceChar: 1358
+      startSourceChar: 1358
+      endSourceChar: 1368
       line: 39
       lineChar: 23
       spanCodeSection: transform.
     - startInstruction: 820
       endInstruction: 843
-      startSourceChar: 1358
-      endSourceChar: 1365
+      startSourceChar: 1368
+      endSourceChar: 1375
       line: 39
       lineChar: 33
       spanCodeSection: Rotate(
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1365
-      endSourceChar: 1379
+      startSourceChar: 1375
+      endSourceChar: 1389
       line: 39
       lineChar: 40
       spanCodeSection: 'rotationAxis, '
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1379
-      endSourceChar: 1379
+      startSourceChar: 1389
+      endSourceChar: 1389
       line: 39
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1379
-      endSourceChar: 1379
+      startSourceChar: 1389
+      endSourceChar: 1389
       line: 39
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1379
-      endSourceChar: 1385
+      startSourceChar: 1389
+      endSourceChar: 1395
       line: 39
       lineChar: 54
       spanCodeSection: Mathf.
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1385
-      endSourceChar: 1389
+      startSourceChar: 1395
+      endSourceChar: 1399
       line: 39
       lineChar: 60
       spanCodeSection: Min(
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1389
-      endSourceChar: 1389
+      startSourceChar: 1399
+      endSourceChar: 1399
       line: 39
       lineChar: 64
       spanCodeSection: 
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1389
-      endSourceChar: 1400
+      startSourceChar: 1399
+      endSourceChar: 1410
       line: 39
       lineChar: 64
       spanCodeSection: 'RotSpeed * '
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1400
-      endSourceChar: 1400
+      startSourceChar: 1410
+      endSourceChar: 1410
       line: 39
       lineChar: 75
       spanCodeSection: 
     - startInstruction: 844
       endInstruction: 843
-      startSourceChar: 1400
-      endSourceChar: 1405
+      startSourceChar: 1410
+      endSourceChar: 1415
       line: 39
       lineChar: 75
       spanCodeSection: Time.
     - startInstruction: 844
       endInstruction: 891
-      startSourceChar: 1405
-      endSourceChar: 1416
+      startSourceChar: 1415
+      endSourceChar: 1426
       line: 39
       lineChar: 80
       spanCodeSection: 'deltaTime, '
     - startInstruction: 892
       endInstruction: 923
-      startSourceChar: 1416
-      endSourceChar: 1429
+      startSourceChar: 1426
+      endSourceChar: 1439
       line: 39
       lineChar: 91
       spanCodeSection: 'deltaAngle), '
     - startInstruction: 924
       endInstruction: 923
-      startSourceChar: 1429
-      endSourceChar: 1429
+      startSourceChar: 1439
+      endSourceChar: 1439
       line: 39
       lineChar: 104
       spanCodeSection: 
     - startInstruction: 924
       endInstruction: 923
-      startSourceChar: 1429
-      endSourceChar: 1435
+      startSourceChar: 1439
+      endSourceChar: 1445
       line: 39
       lineChar: 104
       spanCodeSection: Space.
     - startInstruction: 924
       endInstruction: 963
-      startSourceChar: 1435
-      endSourceChar: 1463
+      startSourceChar: 1445
+      endSourceChar: 1473
       line: 39
       lineChar: 110
       spanCodeSection: "World);\r\n        }\r\n        "
     - startInstruction: 964
       endInstruction: 963
-      startSourceChar: 1463
-      endSourceChar: 1463
+      startSourceChar: 1473
+      endSourceChar: 1473
       line: 41
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 964
       endInstruction: 963
-      startSourceChar: 1463
-      endSourceChar: 1463
+      startSourceChar: 1473
+      endSourceChar: 1473
       line: 41
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 964
       endInstruction: 963
-      startSourceChar: 1463
-      endSourceChar: 1475
+      startSourceChar: 1473
+      endSourceChar: 1485
       line: 41
       lineChar: 8
       spanCodeSection: 'Lifetime += '
     - startInstruction: 964
       endInstruction: 963
-      startSourceChar: 1475
-      endSourceChar: 1475
+      startSourceChar: 1485
+      endSourceChar: 1485
       line: 41
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 964
       endInstruction: 963
-      startSourceChar: 1475
-      endSourceChar: 1480
+      startSourceChar: 1485
+      endSourceChar: 1490
       line: 41
       lineChar: 20
       spanCodeSection: Time.
     - startInstruction: 964
       endInstruction: 1031
-      startSourceChar: 1480
-      endSourceChar: 1500
+      startSourceChar: 1490
+      endSourceChar: 1510
       line: 41
       lineChar: 25
       spanCodeSection: "deltaTime;\r\n        "
     - startInstruction: 1032
       endInstruction: 1031
-      startSourceChar: 1500
-      endSourceChar: 1504
+      startSourceChar: 1510
+      endSourceChar: 1514
       line: 42
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 1032
       endInstruction: 1031
-      startSourceChar: 1504
-      endSourceChar: 1504
+      startSourceChar: 1514
+      endSourceChar: 1514
       line: 42
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1032
       endInstruction: 1031
-      startSourceChar: 1504
-      endSourceChar: 1515
+      startSourceChar: 1514
+      endSourceChar: 1525
       line: 42
       lineChar: 12
       spanCodeSection: 'Lifetime > '
     - startInstruction: 1032
       endInstruction: 1103
-      startSourceChar: 1515
-      endSourceChar: 1528
+      startSourceChar: 1525
+      endSourceChar: 1538
       line: 42
       lineChar: 23
       spanCodeSection: "40)\r\n        "
     - startInstruction: 1104
       endInstruction: 1103
-      startSourceChar: 1528
-      endSourceChar: 1543
+      startSourceChar: 1538
+      endSourceChar: 1553
       line: 43
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 1104
       endInstruction: 1103
-      startSourceChar: 1543
-      endSourceChar: 1543
+      startSourceChar: 1553
+      endSourceChar: 1553
       line: 44
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1104
       endInstruction: 1103
-      startSourceChar: 1543
-      endSourceChar: 1543
+      startSourceChar: 1553
+      endSourceChar: 1553
       line: 44
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1104
       endInstruction: 1103
-      startSourceChar: 1543
-      endSourceChar: 1551
+      startSourceChar: 1553
+      endSourceChar: 1561
       line: 44
       lineChar: 12
       spanCodeSection: Destroy(
     - startInstruction: 1104
       endInstruction: 1139
-      startSourceChar: 1551
-      endSourceChar: 1587
+      startSourceChar: 1561
+      endSourceChar: 1597
       line: 44
       lineChar: 20
       spanCodeSection: "gameObject);\r\n        }\r\n    }\r\n    "
     - startInstruction: 1140
       endInstruction: 1139
-      startSourceChar: 1587
-      endSourceChar: 1617
+      startSourceChar: 1597
+      endSourceChar: 1627
       line: 47
       lineChar: 4
       spanCodeSection: private void OnCollisionEnter(
     - startInstruction: 1140
       endInstruction: 1167
-      startSourceChar: 1617
-      endSourceChar: 1639
+      startSourceChar: 1627
+      endSourceChar: 1649
       line: 47
       lineChar: 34
       spanCodeSection: "Collision other)\r\n    "
     - startInstruction: 1168
       endInstruction: 1167
-      startSourceChar: 1639
-      endSourceChar: 1650
+      startSourceChar: 1649
+      endSourceChar: 1660
       line: 48
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 1168
       endInstruction: 1167
-      startSourceChar: 1650
-      endSourceChar: 1654
+      startSourceChar: 1660
+      endSourceChar: 1664
       line: 49
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 1168
       endInstruction: 1167
-      startSourceChar: 1654
-      endSourceChar: 1655
+      startSourceChar: 1664
+      endSourceChar: 1665
       line: 49
       lineChar: 12
       spanCodeSection: '!'
     - startInstruction: 1168
       endInstruction: 1207
-      startSourceChar: 1655
-      endSourceChar: 1675
+      startSourceChar: 1665
+      endSourceChar: 1685
       line: 49
       lineChar: 13
       spanCodeSection: "Exploding)\r\n        "
     - startInstruction: 1208
       endInstruction: 1207
-      startSourceChar: 1675
-      endSourceChar: 1690
+      startSourceChar: 1685
+      endSourceChar: 1700
       line: 50
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 1208
       endInstruction: 1207
-      startSourceChar: 1690
-      endSourceChar: 1690
+      startSourceChar: 1700
+      endSourceChar: 1700
       line: 51
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1208
       endInstruction: 1207
-      startSourceChar: 1690
-      endSourceChar: 1690
+      startSourceChar: 1700
+      endSourceChar: 1700
       line: 51
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1208
       endInstruction: 1207
-      startSourceChar: 1690
-      endSourceChar: 1690
+      startSourceChar: 1700
+      endSourceChar: 1700
       line: 51
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1208
       endInstruction: 1207
-      startSourceChar: 1690
-      endSourceChar: 1702
+      startSourceChar: 1700
+      endSourceChar: 1712
       line: 51
       lineChar: 12
       spanCodeSection: AGMCollider.
     - startInstruction: 1208
       endInstruction: 1207
-      startSourceChar: 1702
-      endSourceChar: 1712
+      startSourceChar: 1712
+      endSourceChar: 1722
       line: 51
       lineChar: 24
       spanCodeSection: 'enabled = '
     - startInstruction: 1208
       endInstruction: 1231
-      startSourceChar: 1712
-      endSourceChar: 1732
+      startSourceChar: 1722
+      endSourceChar: 1742
       line: 51
       lineChar: 34
       spanCodeSection: "false;\r\n            "
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1732
-      endSourceChar: 1732
+      startSourceChar: 1742
+      endSourceChar: 1742
       line: 52
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1732
-      endSourceChar: 1732
+      startSourceChar: 1742
+      endSourceChar: 1742
       line: 52
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1732
-      endSourceChar: 1732
+      startSourceChar: 1742
+      endSourceChar: 1742
       line: 52
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1732
-      endSourceChar: 1748
+      startSourceChar: 1742
+      endSourceChar: 1758
       line: 52
       lineChar: 12
       spanCodeSection: 'Animator AGMani '
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1748
-      endSourceChar: 1750
+      startSourceChar: 1758
+      endSourceChar: 1760
       line: 52
       lineChar: 28
       spanCodeSection: '= '
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1750
-      endSourceChar: 1750
+      startSourceChar: 1760
+      endSourceChar: 1760
       line: 52
       lineChar: 30
       spanCodeSection: 
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1750
-      endSourceChar: 1750
+      startSourceChar: 1760
+      endSourceChar: 1760
       line: 52
       lineChar: 30
       spanCodeSection: 
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1750
-      endSourceChar: 1761
+      startSourceChar: 1760
+      endSourceChar: 1771
       line: 52
       lineChar: 30
       spanCodeSection: gameObject.
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1761
-      endSourceChar: 1773
+      startSourceChar: 1771
+      endSourceChar: 1783
       line: 52
       lineChar: 41
       spanCodeSection: GetComponent
     - startInstruction: 1232
       endInstruction: 1231
-      startSourceChar: 1773
-      endSourceChar: 1774
+      startSourceChar: 1783
+      endSourceChar: 1784
       line: 52
       lineChar: 53
       spanCodeSection: <
     - startInstruction: 1232
       endInstruction: 1287
-      startSourceChar: 1774
-      endSourceChar: 1800
+      startSourceChar: 1784
+      endSourceChar: 1810
       line: 52
       lineChar: 54
       spanCodeSection: "Animator>();\r\n            "
     - startInstruction: 1288
       endInstruction: 1287
-      startSourceChar: 1800
-      endSourceChar: 1804
+      startSourceChar: 1810
+      endSourceChar: 1814
       line: 53
       lineChar: 12
       spanCodeSection: if (
     - startInstruction: 1288
       endInstruction: 1287
-      startSourceChar: 1804
-      endSourceChar: 1804
+      startSourceChar: 1814
+      endSourceChar: 1814
       line: 53
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1288
       endInstruction: 1287
-      startSourceChar: 1804
-      endSourceChar: 1818
+      startSourceChar: 1814
+      endSourceChar: 1828
       line: 53
       lineChar: 16
       spanCodeSection: EngineControl.
     - startInstruction: 1288
       endInstruction: 1359
-      startSourceChar: 1818
-      endSourceChar: 1841
+      startSourceChar: 1828
+      endSourceChar: 1851
       line: 53
       lineChar: 30
       spanCodeSection: "InEditor)\r\n            "
     - startInstruction: 1360
       endInstruction: 1359
-      startSourceChar: 1841
-      endSourceChar: 1860
+      startSourceChar: 1851
+      endSourceChar: 1870
       line: 54
       lineChar: 12
       spanCodeSection: "{\r\n                "
     - startInstruction: 1360
       endInstruction: 1359
-      startSourceChar: 1860
-      endSourceChar: 1860
+      startSourceChar: 1870
+      endSourceChar: 1870
       line: 55
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1360
       endInstruction: 1359
-      startSourceChar: 1860
-      endSourceChar: 1860
+      startSourceChar: 1870
+      endSourceChar: 1870
       line: 55
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1360
       endInstruction: 1359
-      startSourceChar: 1860
-      endSourceChar: 1860
+      startSourceChar: 1870
+      endSourceChar: 1870
       line: 55
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1360
       endInstruction: 1359
-      startSourceChar: 1860
-      endSourceChar: 1867
+      startSourceChar: 1870
+      endSourceChar: 1877
       line: 55
       lineChar: 16
       spanCodeSection: AGMani.
     - startInstruction: 1360
       endInstruction: 1359
-      startSourceChar: 1867
-      endSourceChar: 1878
+      startSourceChar: 1877
+      endSourceChar: 1888
       line: 55
       lineChar: 23
       spanCodeSection: SetTrigger(
     - startInstruction: 1360
       endInstruction: 1391
-      startSourceChar: 1878
-      endSourceChar: 1923
+      startSourceChar: 1888
+      endSourceChar: 1933
       line: 55
       lineChar: 34
       spanCodeSection: "\"explodeowner\");\r\n            }\r\n            "
     - startInstruction: 1392
       endInstruction: 1391
-      startSourceChar: 1923
-      endSourceChar: 1941
+      startSourceChar: 1933
+      endSourceChar: 1951
       line: 57
       lineChar: 12
       spanCodeSection: "else\r\n            "
     - startInstruction: 1392
       endInstruction: 1391
-      startSourceChar: 1941
-      endSourceChar: 1960
+      startSourceChar: 1951
+      endSourceChar: 1970
       line: 58
       lineChar: 12
       spanCodeSection: "{\r\n                "
     - startInstruction: 1392
       endInstruction: 1391
-      startSourceChar: 1960
-      endSourceChar: 1964
+      startSourceChar: 1970
+      endSourceChar: 1974
       line: 59
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 1392
       endInstruction: 1391
-      startSourceChar: 1964
-      endSourceChar: 1964
+      startSourceChar: 1974
+      endSourceChar: 1974
       line: 59
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1392
       endInstruction: 1391
-      startSourceChar: 1964
-      endSourceChar: 1964
+      startSourceChar: 1974
+      endSourceChar: 1974
       line: 59
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1392
       endInstruction: 1391
-      startSourceChar: 1964
-      endSourceChar: 1964
+      startSourceChar: 1974
+      endSourceChar: 1974
       line: 59
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1392
       endInstruction: 1391
-      startSourceChar: 1964
-      endSourceChar: 1978
+      startSourceChar: 1974
+      endSourceChar: 1988
       line: 59
       lineChar: 20
       spanCodeSection: EngineControl.
     - startInstruction: 1392
       endInstruction: 1391
-      startSourceChar: 1978
-      endSourceChar: 1990
+      startSourceChar: 1988
+      endSourceChar: 2000
       line: 59
       lineChar: 34
       spanCodeSection: localPlayer.
     - startInstruction: 1392
       endInstruction: 1443
-      startSourceChar: 1990
-      endSourceChar: 1998
+      startSourceChar: 2000
+      endSourceChar: 2008
       line: 59
       lineChar: 46
       spanCodeSection: IsOwner(
     - startInstruction: 1444
       endInstruction: 1443
-      startSourceChar: 1998
-      endSourceChar: 1998
+      startSourceChar: 2008
+      endSourceChar: 2008
       line: 59
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 1444
       endInstruction: 1443
-      startSourceChar: 1998
-      endSourceChar: 2012
+      startSourceChar: 2008
+      endSourceChar: 2022
       line: 59
       lineChar: 54
       spanCodeSection: EngineControl.
     - startInstruction: 1444
       endInstruction: 1515
-      startSourceChar: 2012
-      endSourceChar: 2042
+      startSourceChar: 2022
+      endSourceChar: 2052
       line: 59
       lineChar: 68
       spanCodeSection: "gameObject))\r\n                "
     - startInstruction: 1516
       endInstruction: 1515
-      startSourceChar: 2042
-      endSourceChar: 2065
+      startSourceChar: 2052
+      endSourceChar: 2075
       line: 60
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 1516
       endInstruction: 1515
-      startSourceChar: 2065
-      endSourceChar: 2065
+      startSourceChar: 2075
+      endSourceChar: 2075
       line: 61
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1516
       endInstruction: 1515
-      startSourceChar: 2065
-      endSourceChar: 2065
+      startSourceChar: 2075
+      endSourceChar: 2075
       line: 61
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1516
       endInstruction: 1515
-      startSourceChar: 2065
-      endSourceChar: 2065
+      startSourceChar: 2075
+      endSourceChar: 2075
       line: 61
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1516
       endInstruction: 1515
-      startSourceChar: 2065
-      endSourceChar: 2072
+      startSourceChar: 2075
+      endSourceChar: 2082
       line: 61
       lineChar: 20
       spanCodeSection: AGMani.
     - startInstruction: 1516
       endInstruction: 1515
-      startSourceChar: 2072
-      endSourceChar: 2083
+      startSourceChar: 2082
+      endSourceChar: 2093
       line: 61
       lineChar: 27
       spanCodeSection: SetTrigger(
     - startInstruction: 1516
       endInstruction: 1547
-      startSourceChar: 2083
-      endSourceChar: 2136
+      startSourceChar: 2093
+      endSourceChar: 2146
       line: 61
       lineChar: 38
       spanCodeSection: "\"explodeowner\");\r\n                }\r\n                "
     - startInstruction: 1548
       endInstruction: 1547
-      startSourceChar: 2136
-      endSourceChar: 2141
+      startSourceChar: 2146
+      endSourceChar: 2151
       line: 63
       lineChar: 16
       spanCodeSection: 'else '
     - startInstruction: 1548
       endInstruction: 1547
-      startSourceChar: 2141
-      endSourceChar: 2141
+      startSourceChar: 2151
+      endSourceChar: 2151
       line: 63
       lineChar: 21
       spanCodeSection: 
     - startInstruction: 1548
       endInstruction: 1547
-      startSourceChar: 2141
-      endSourceChar: 2141
+      startSourceChar: 2151
+      endSourceChar: 2151
       line: 63
       lineChar: 21
       spanCodeSection: 
     - startInstruction: 1548
       endInstruction: 1547
-      startSourceChar: 2141
-      endSourceChar: 2141
+      startSourceChar: 2151
+      endSourceChar: 2151
       line: 63
       lineChar: 21
       spanCodeSection: 
     - startInstruction: 1548
       endInstruction: 1547
-      startSourceChar: 2141
-      endSourceChar: 2148
+      startSourceChar: 2151
+      endSourceChar: 2158
       line: 63
       lineChar: 21
       spanCodeSection: AGMani.
     - startInstruction: 1548
       endInstruction: 1547
-      startSourceChar: 2148
-      endSourceChar: 2159
+      startSourceChar: 2158
+      endSourceChar: 2169
       line: 63
       lineChar: 28
       spanCodeSection: SetTrigger(
     - startInstruction: 1548
       endInstruction: 1571
-      startSourceChar: 2159
-      endSourceChar: 2199
+      startSourceChar: 2169
+      endSourceChar: 2209
       line: 63
       lineChar: 39
       spanCodeSection: "\"explode\");\r\n            }\r\n            "
     - startInstruction: 1572
       endInstruction: 1571
-      startSourceChar: 2199
-      endSourceChar: 2199
+      startSourceChar: 2209
+      endSourceChar: 2209
       line: 65
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1572
       endInstruction: 1571
-      startSourceChar: 2199
-      endSourceChar: 2199
+      startSourceChar: 2209
+      endSourceChar: 2209
       line: 65
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 1572
       endInstruction: 1571
-      startSourceChar: 2199
-      endSourceChar: 2210
+      startSourceChar: 2209
+      endSourceChar: 2220
       line: 65
       lineChar: 12
       spanCodeSection: 'Lifetime = '
     - startInstruction: 1572
       endInstruction: 1572
-      startSourceChar: 2210
-      endSourceChar: 2210
+      startSourceChar: 2220
+      endSourceChar: 2220
       line: 65
       lineChar: 23
       spanCodeSection: 
