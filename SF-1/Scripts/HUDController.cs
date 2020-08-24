@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class HUDController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
+    public Material SmokeColorIndicator;
     private float maxGs = 0f;
     public Text HUDText_G;
     public Text HUDText_mach;
@@ -22,6 +23,7 @@ public class HUDController : UdonSharpBehaviour
     public Transform ElevationIndicator;
     public Transform HeadingIndicator;
     public Transform VelocityIndicator;
+    public Transform AAMTargetIndicator;
     public Transform LStickDisplayHighlighter;
     public Transform RStickDisplayHighlighter;
     public Transform PitchRoll;
@@ -31,7 +33,6 @@ public class HUDController : UdonSharpBehaviour
     public GameObject HudSAFE;
     public GameObject HudAB;
     public GameObject AGMScreen;
-    public GameObject AGMCam;
     public GameObject LStick_funcon1;
     public GameObject LStick_funcon2;
     public GameObject LStick_funcon3;
@@ -51,6 +52,7 @@ public class HUDController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float MenuSoundCheckLast = 0;
     private Vector3 temprot;
     private int showvel;
+    const float InputSquareSize = 0.0284317f;
     private void Start()
     {
         InputsZeroPos = PitchRoll.localPosition;
@@ -61,7 +63,6 @@ public class HUDController : UdonSharpBehaviour
     }
     private void Update()
     {
-        const float InputSquareSize = 0.0284317f;
         //RollPitch Indicator
         PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.RollInput, EngineControl.PitchInput, 0)) * InputSquareSize;
 
@@ -87,6 +88,27 @@ public class HUDController : UdonSharpBehaviour
         VelocityIndicator.position = transform.position + tempvel;
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
         /////////////////
+
+        //AAM Target Indicator
+        if (EngineControl.AAMHasTarget)
+        {
+            AAMTargetIndicator.localScale = new Vector3(1, 1, 1);
+            AAMTargetIndicator.position = transform.position + EngineControl.AAMCurrentTargetDirection;
+            AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
+            if (EngineControl.AAMLock)
+            {
+                AAMTargetIndicator.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));//back of mesh is locked version
+            }
+            else
+            {
+                AAMTargetIndicator.localRotation = Quaternion.identity;
+            }
+        }
+        else AAMTargetIndicator.localScale = Vector3.zero;
+        /////////////////
+
+        //Smoke Color Indicator
+        SmokeColorIndicator.color = EngineControl.SmokeColor_Color;
 
         //Heading indicator
         temprot = EngineControl.VehicleMainObj.transform.rotation.eulerAngles;
@@ -240,15 +262,33 @@ public class HUDController : UdonSharpBehaviour
         MenuSoundCheckLast = MenuSoundCheck;
 
         //AGMScreen
-        if (EngineControl.RStickSelection == 3)
+        if (EngineControl.RStickSelection == 3 && !EngineControl.AGMLocked)
         {
             if (EngineControl.AGMCam != null)
             {
                 AGMScreen.SetActive(true);
                 EngineControl.AGMCam.gameObject.SetActive(true);
+                RaycastHit camhit;
+                Physics.Raycast(EngineControl.AGMCam.transform.position, EngineControl.AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
+                if (camhit.point != null)
+                {
+                    //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
+                    EngineControl.AGMCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, 2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f);
+                }
             }
         }
-        else if (!EngineControl.AGMLocked)
+        else if (EngineControl.AGMLocked)
+        {
+            if (EngineControl.AGMCam != null) EngineControl.AGMCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
+            RaycastHit camhit;
+            Physics.Raycast(EngineControl.AGMCam.transform.position, EngineControl.AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
+            if (camhit.point != null)
+            {
+                //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
+                EngineControl.AGMCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f);
+            }
+        }
+        else
         {
             if (EngineControl.AGMCam != null)
             {

@@ -30,12 +30,12 @@ MonoBehaviour:
     \   firing: %SystemBoolean, null\n    Manning: %SystemBoolean, null\n    FullHealth:
     %SystemSingle, null\n    LstickV: %SystemSingle, null\n    RstickH: %SystemSingle,
     null\n    RstickV: %SystemSingle, null\n    RTrigger: %SystemSingle, null\n    ZoomLevel:
-    %SystemSingle, null\n    Rotinputlerper: %UnityEngineVector3, null\n    StartRot:
-    %UnityEngineVector3, null\n    localPlayer: %VRCSDKBaseVRCPlayerApi, null\n    __0_this_intnl_AAGunController:
-    %VRCUdonUdonBehaviour, this\n    __0_Af_Single: %SystemSingle, null\n    __0_Df_Single:
-    %SystemSingle, null\n    __0_InputX_Single: %SystemSingle, null\n    __0_InputY_Single:
-    %SystemSingle, null\n    __0_Sf_Single: %SystemSingle, null\n    __0_temprot_Single:
-    %SystemSingle, null\n    __0_Wf_Single: %SystemSingle, null\n    __0_const_intnl_SystemBoolean:
+    %SystemSingle, null\n    StartRot: %UnityEngineVector3, null\n    localPlayer:
+    %VRCSDKBaseVRCPlayerApi, null\n    __0_this_intnl_AAGunController: %VRCUdonUdonBehaviour,
+    this\n    __0_Af_Single: %SystemSingle, null\n    __0_Df_Single: %SystemSingle,
+    null\n    __0_InputX_Single: %SystemSingle, null\n    __0_InputY_Single: %SystemSingle,
+    null\n    __0_Sf_Single: %SystemSingle, null\n    __0_temprot_Single: %SystemSingle,
+    null\n    __0_Wf_Single: %SystemSingle, null\n    __0_const_intnl_SystemBoolean:
     %SystemBoolean, null\n    __1_const_intnl_SystemBoolean: %SystemBoolean, null\n
     \   __0_const_intnl_UnityEngineCamera: %UnityEngineCamera, null\n    __0_const_intnl_SystemDouble:
     %SystemDouble, null\n    __1_const_intnl_SystemDouble: %SystemDouble, null\n    __0_const_intnl_UnityEngineGameObject:
@@ -133,18 +133,18 @@ MonoBehaviour:
     \       \n         # private float LstickV;\n        \n         # [System.NonSerializedAttribute]
     [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool firing;\n        \n
     \        # private float RTrigger = 0;\n        \n         # [System.NonSerializedAttribute]
-    [HideInInspector] public float FullHealth;\n        \n         # private Vector3
-    Rotinputlerper;\n        \n         # [System.NonSerializedAttribute] [HideInInspector]
-    public bool Manning;//like Piloting in the plane\n        \n         # [System.NonSerializedAttribute]
-    [HideInInspector] public VRCPlayerApi localPlayer;\n        \n         # public
-    float InputXLerper = 0f;\n        \n         # public float InputYLerper = 0f;\n
-    \       \n         # private Vector3 StartRot;\n        \n         # private float
-    RstickV;\n        \n         # private float ZoomLevel;\n        \n         #
-    void Start()\n    .export _start\n        \n    _start:\n        \n        PUSH,
-    __0_const_intnl_SystemUInt32\n        \n         # {\n        \n         # if
-    (VehicleMainObj != null) { AAGunAnimator = VehicleMainObj.GetComponent<Animator>();
-    }\n        PUSH, VehicleMainObj\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
-    \       PUSH, __0_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
+    [HideInInspector] public float FullHealth;\n        \n         # [System.NonSerializedAttribute]
+    [HideInInspector] public bool Manning;//like Piloting in the plane\n        \n
+    \        # [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi
+    localPlayer;\n        \n         # public float InputXLerper = 0f;\n        \n
+    \        # public float InputYLerper = 0f;\n        \n         # private Vector3
+    StartRot;\n        \n         # private float RstickV;\n        \n         # private
+    float ZoomLevel;\n        \n         # void Start()\n    .export _start\n        \n
+    \   _start:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n        \n
+    \        # {\n        \n         # if (VehicleMainObj != null) { AAGunAnimator
+    = VehicleMainObj.GetComponent<Animator>(); }\n        PUSH, VehicleMainObj\n        PUSH,
+    __0_const_intnl_UnityEngineGameObject\n        PUSH, __0_intnl_SystemBoolean\n
+    \       EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000070\n        PUSH,
     VehicleMainObj\n        PUSH, __0_intnl_UnityEngineTransform\n        EXTERN,
     \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n        PUSH,
@@ -1265,136 +1265,136 @@ MonoBehaviour:
     - startInstruction: 0
       endInstruction: -1
       startSourceChar: 912
-      endSourceChar: 920
+      endSourceChar: 913
       line: 25
-      lineChar: 4
-      spanCodeSection: 'private '
-    - startInstruction: 0
-      endInstruction: -1
-      startSourceChar: 920
-      endSourceChar: 920
-      line: 25
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 0
-      endInstruction: -1
-      startSourceChar: 920
-      endSourceChar: 949
-      line: 25
-      lineChar: 12
-      spanCodeSection: "Vector3 Rotinputlerper;\r\n    "
-    - startInstruction: 0
-      endInstruction: -1
-      startSourceChar: 949
-      endSourceChar: 950
-      line: 26
       lineChar: 4
       spanCodeSection: '['
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 950
-      endSourceChar: 950
-      line: 26
+      startSourceChar: 913
+      endSourceChar: 913
+      line: 25
       lineChar: 5
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 950
-      endSourceChar: 957
-      line: 26
+      startSourceChar: 913
+      endSourceChar: 920
+      line: 25
       lineChar: 5
       spanCodeSection: System.
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 957
-      endSourceChar: 982
-      line: 26
+      startSourceChar: 920
+      endSourceChar: 945
+      line: 25
       lineChar: 12
       spanCodeSection: NonSerializedAttribute] [
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 982
-      endSourceChar: 982
-      line: 26
+      startSourceChar: 945
+      endSourceChar: 945
+      line: 25
       lineChar: 37
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 982
-      endSourceChar: 1006
-      line: 26
+      startSourceChar: 945
+      endSourceChar: 969
+      line: 25
       lineChar: 37
       spanCodeSection: 'HideInInspector] public '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1006
-      endSourceChar: 1006
-      line: 26
+      startSourceChar: 969
+      endSourceChar: 969
+      line: 25
       lineChar: 61
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1006
-      endSourceChar: 1053
-      line: 26
+      startSourceChar: 969
+      endSourceChar: 1016
+      line: 25
       lineChar: 61
       spanCodeSection: "bool Manning;//like Piloting in the plane\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1053
-      endSourceChar: 1054
-      line: 27
+      startSourceChar: 1016
+      endSourceChar: 1017
+      line: 26
       lineChar: 4
       spanCodeSection: '['
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1054
-      endSourceChar: 1054
-      line: 27
+      startSourceChar: 1017
+      endSourceChar: 1017
+      line: 26
       lineChar: 5
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1054
-      endSourceChar: 1061
-      line: 27
+      startSourceChar: 1017
+      endSourceChar: 1024
+      line: 26
       lineChar: 5
       spanCodeSection: System.
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1061
-      endSourceChar: 1086
-      line: 27
+      startSourceChar: 1024
+      endSourceChar: 1049
+      line: 26
       lineChar: 12
       spanCodeSection: NonSerializedAttribute] [
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1086
-      endSourceChar: 1086
-      line: 27
+      startSourceChar: 1049
+      endSourceChar: 1049
+      line: 26
       lineChar: 37
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1086
-      endSourceChar: 1110
-      line: 27
+      startSourceChar: 1049
+      endSourceChar: 1073
+      line: 26
       lineChar: 37
       spanCodeSection: 'HideInInspector] public '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1110
-      endSourceChar: 1110
-      line: 27
+      startSourceChar: 1073
+      endSourceChar: 1073
+      line: 26
       lineChar: 61
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1110
-      endSourceChar: 1141
-      line: 27
+      startSourceChar: 1073
+      endSourceChar: 1104
+      line: 26
       lineChar: 61
       spanCodeSection: "VRCPlayerApi localPlayer;\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 1104
+      endSourceChar: 1111
+      line: 27
+      lineChar: 4
+      spanCodeSection: 'public '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 1111
+      endSourceChar: 1111
+      line: 27
+      lineChar: 11
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 1111
+      endSourceChar: 1141
+      line: 27
+      lineChar: 11
+      spanCodeSection: "float InputXLerper = 0f;\r\n    "
     - startInstruction: 0
       endInstruction: -1
       startSourceChar: 1141
@@ -1415,4653 +1415,4632 @@ MonoBehaviour:
       endSourceChar: 1178
       line: 28
       lineChar: 11
-      spanCodeSection: "float InputXLerper = 0f;\r\n    "
-    - startInstruction: 0
-      endInstruction: -1
-      startSourceChar: 1178
-      endSourceChar: 1185
-      line: 29
-      lineChar: 4
-      spanCodeSection: 'public '
-    - startInstruction: 0
-      endInstruction: -1
-      startSourceChar: 1185
-      endSourceChar: 1185
-      line: 29
-      lineChar: 11
-      spanCodeSection: 
-    - startInstruction: 0
-      endInstruction: -1
-      startSourceChar: 1185
-      endSourceChar: 1215
-      line: 29
-      lineChar: 11
       spanCodeSection: "float InputYLerper = 0f;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1215
-      endSourceChar: 1223
-      line: 30
+      startSourceChar: 1178
+      endSourceChar: 1186
+      line: 29
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1223
-      endSourceChar: 1223
-      line: 30
+      startSourceChar: 1186
+      endSourceChar: 1186
+      line: 29
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1223
-      endSourceChar: 1246
-      line: 30
+      startSourceChar: 1186
+      endSourceChar: 1209
+      line: 29
       lineChar: 12
       spanCodeSection: "Vector3 StartRot;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1246
-      endSourceChar: 1254
-      line: 31
+      startSourceChar: 1209
+      endSourceChar: 1217
+      line: 30
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1254
-      endSourceChar: 1254
-      line: 31
+      startSourceChar: 1217
+      endSourceChar: 1217
+      line: 30
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1254
-      endSourceChar: 1274
-      line: 31
+      startSourceChar: 1217
+      endSourceChar: 1237
+      line: 30
       lineChar: 12
       spanCodeSection: "float RstickV;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1274
-      endSourceChar: 1282
-      line: 32
+      startSourceChar: 1237
+      endSourceChar: 1245
+      line: 31
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1282
-      endSourceChar: 1282
-      line: 32
+      startSourceChar: 1245
+      endSourceChar: 1245
+      line: 31
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 1282
-      endSourceChar: 1304
-      line: 32
+      startSourceChar: 1245
+      endSourceChar: 1267
+      line: 31
       lineChar: 12
       spanCodeSection: "float ZoomLevel;\r\n    "
     - startInstruction: 0
       endInstruction: 7
-      startSourceChar: 1304
-      endSourceChar: 1322
-      line: 33
+      startSourceChar: 1267
+      endSourceChar: 1285
+      line: 32
       lineChar: 4
       spanCodeSection: "void Start()\r\n    "
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 1322
-      endSourceChar: 1333
-      line: 34
+      startSourceChar: 1285
+      endSourceChar: 1296
+      line: 33
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 1333
-      endSourceChar: 1337
-      line: 35
+      startSourceChar: 1296
+      endSourceChar: 1300
+      line: 34
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 1337
-      endSourceChar: 1337
-      line: 35
+      startSourceChar: 1300
+      endSourceChar: 1300
+      line: 34
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 1337
-      endSourceChar: 1355
-      line: 35
+      startSourceChar: 1300
+      endSourceChar: 1318
+      line: 34
       lineChar: 12
       spanCodeSection: 'VehicleMainObj != '
     - startInstruction: 8
       endInstruction: 55
-      startSourceChar: 1355
-      endSourceChar: 1361
-      line: 35
+      startSourceChar: 1318
+      endSourceChar: 1324
+      line: 34
       lineChar: 30
       spanCodeSection: 'null) '
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1361
-      endSourceChar: 1363
-      line: 35
+      startSourceChar: 1324
+      endSourceChar: 1326
+      line: 34
       lineChar: 36
       spanCodeSection: '{ '
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1363
-      endSourceChar: 1363
-      line: 35
+      startSourceChar: 1326
+      endSourceChar: 1326
+      line: 34
       lineChar: 38
       spanCodeSection: 
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1363
-      endSourceChar: 1363
-      line: 35
+      startSourceChar: 1326
+      endSourceChar: 1326
+      line: 34
       lineChar: 38
       spanCodeSection: 
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1363
-      endSourceChar: 1379
-      line: 35
+      startSourceChar: 1326
+      endSourceChar: 1342
+      line: 34
       lineChar: 38
       spanCodeSection: 'AAGunAnimator = '
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1379
-      endSourceChar: 1379
-      line: 35
+      startSourceChar: 1342
+      endSourceChar: 1342
+      line: 34
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1379
-      endSourceChar: 1379
-      line: 35
+      startSourceChar: 1342
+      endSourceChar: 1342
+      line: 34
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1379
-      endSourceChar: 1394
-      line: 35
+      startSourceChar: 1342
+      endSourceChar: 1357
+      line: 34
       lineChar: 54
       spanCodeSection: VehicleMainObj.
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1394
-      endSourceChar: 1406
-      line: 35
+      startSourceChar: 1357
+      endSourceChar: 1369
+      line: 34
       lineChar: 69
       spanCodeSection: GetComponent
     - startInstruction: 56
       endInstruction: 55
-      startSourceChar: 1406
-      endSourceChar: 1407
-      line: 35
+      startSourceChar: 1369
+      endSourceChar: 1370
+      line: 34
       lineChar: 81
       spanCodeSection: <
     - startInstruction: 56
       endInstruction: 111
-      startSourceChar: 1407
-      endSourceChar: 1431
-      line: 35
+      startSourceChar: 1370
+      endSourceChar: 1394
+      line: 34
       lineChar: 82
       spanCodeSection: "Animator>(); }\r\n        "
     - startInstruction: 112
       endInstruction: 111
-      startSourceChar: 1431
-      endSourceChar: 1431
-      line: 36
+      startSourceChar: 1394
+      endSourceChar: 1394
+      line: 35
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 112
       endInstruction: 111
-      startSourceChar: 1431
-      endSourceChar: 1431
-      line: 36
+      startSourceChar: 1394
+      endSourceChar: 1394
+      line: 35
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 112
       endInstruction: 111
-      startSourceChar: 1431
-      endSourceChar: 1444
-      line: 36
+      startSourceChar: 1394
+      endSourceChar: 1407
+      line: 35
       lineChar: 8
       spanCodeSection: 'FullHealth = '
     - startInstruction: 112
       endInstruction: 131
-      startSourceChar: 1444
-      endSourceChar: 1461
-      line: 36
+      startSourceChar: 1407
+      endSourceChar: 1424
+      line: 35
       lineChar: 21
       spanCodeSection: "Health;\r\n        "
     - startInstruction: 132
       endInstruction: 131
-      startSourceChar: 1461
-      endSourceChar: 1461
-      line: 37
+      startSourceChar: 1424
+      endSourceChar: 1424
+      line: 36
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 132
       endInstruction: 131
-      startSourceChar: 1461
-      endSourceChar: 1461
-      line: 37
+      startSourceChar: 1424
+      endSourceChar: 1424
+      line: 36
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 132
       endInstruction: 131
-      startSourceChar: 1461
-      endSourceChar: 1475
-      line: 37
+      startSourceChar: 1424
+      endSourceChar: 1438
+      line: 36
       lineChar: 8
       spanCodeSection: 'localPlayer = '
     - startInstruction: 132
       endInstruction: 131
-      startSourceChar: 1475
-      endSourceChar: 1475
-      line: 37
+      startSourceChar: 1438
+      endSourceChar: 1438
+      line: 36
       lineChar: 22
       spanCodeSection: 
     - startInstruction: 132
       endInstruction: 131
-      startSourceChar: 1475
-      endSourceChar: 1486
-      line: 37
+      startSourceChar: 1438
+      endSourceChar: 1449
+      line: 36
       lineChar: 22
       spanCodeSection: Networking.
     - startInstruction: 132
       endInstruction: 147
-      startSourceChar: 1486
-      endSourceChar: 1508
-      line: 37
+      startSourceChar: 1449
+      endSourceChar: 1471
+      line: 36
       lineChar: 33
       spanCodeSection: "LocalPlayer;\r\n        "
     - startInstruction: 148
       endInstruction: 147
-      startSourceChar: 1508
-      endSourceChar: 1508
-      line: 38
+      startSourceChar: 1471
+      endSourceChar: 1471
+      line: 37
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 148
       endInstruction: 147
-      startSourceChar: 1508
-      endSourceChar: 1508
-      line: 38
+      startSourceChar: 1471
+      endSourceChar: 1471
+      line: 37
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 148
       endInstruction: 147
-      startSourceChar: 1508
-      endSourceChar: 1519
-      line: 38
+      startSourceChar: 1471
+      endSourceChar: 1482
+      line: 37
       lineChar: 8
       spanCodeSection: 'StartRot = '
     - startInstruction: 148
       endInstruction: 147
-      startSourceChar: 1519
-      endSourceChar: 1519
-      line: 38
+      startSourceChar: 1482
+      endSourceChar: 1482
+      line: 37
       lineChar: 19
       spanCodeSection: 
     - startInstruction: 148
       endInstruction: 147
-      startSourceChar: 1519
-      endSourceChar: 1519
-      line: 38
+      startSourceChar: 1482
+      endSourceChar: 1482
+      line: 37
       lineChar: 19
       spanCodeSection: 
     - startInstruction: 148
       endInstruction: 147
-      startSourceChar: 1519
-      endSourceChar: 1519
-      line: 38
+      startSourceChar: 1482
+      endSourceChar: 1482
+      line: 37
       lineChar: 19
       spanCodeSection: 
     - startInstruction: 148
       endInstruction: 147
-      startSourceChar: 1519
-      endSourceChar: 1527
-      line: 38
+      startSourceChar: 1482
+      endSourceChar: 1490
+      line: 37
       lineChar: 19
       spanCodeSection: Rotator.
     - startInstruction: 148
       endInstruction: 147
-      startSourceChar: 1527
-      endSourceChar: 1537
-      line: 38
+      startSourceChar: 1490
+      endSourceChar: 1500
+      line: 37
       lineChar: 27
       spanCodeSection: transform.
     - startInstruction: 148
       endInstruction: 171
-      startSourceChar: 1537
-      endSourceChar: 1551
-      line: 38
+      startSourceChar: 1500
+      endSourceChar: 1514
+      line: 37
       lineChar: 37
       spanCodeSection: localRotation.
     - startInstruction: 172
       endInstruction: 219
-      startSourceChar: 1551
-      endSourceChar: 1573
-      line: 38
+      startSourceChar: 1514
+      endSourceChar: 1536
+      line: 37
       lineChar: 51
       spanCodeSection: "eulerAngles;\r\n        "
     - startInstruction: 220
       endInstruction: 219
-      startSourceChar: 1573
-      endSourceChar: 1577
-      line: 39
+      startSourceChar: 1536
+      endSourceChar: 1540
+      line: 38
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 220
       endInstruction: 219
-      startSourceChar: 1577
-      endSourceChar: 1577
-      line: 39
+      startSourceChar: 1540
+      endSourceChar: 1540
+      line: 38
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 220
       endInstruction: 219
-      startSourceChar: 1577
-      endSourceChar: 1589
-      line: 39
+      startSourceChar: 1540
+      endSourceChar: 1552
+      line: 38
       lineChar: 12
       spanCodeSection: 'StopSpeed > '
     - startInstruction: 220
       endInstruction: 291
-      startSourceChar: 1589
-      endSourceChar: 1592
-      line: 39
+      startSourceChar: 1552
+      endSourceChar: 1555
+      line: 38
       lineChar: 24
       spanCodeSection: '1) '
     - startInstruction: 292
       endInstruction: 291
-      startSourceChar: 1592
-      endSourceChar: 1592
-      line: 39
+      startSourceChar: 1555
+      endSourceChar: 1555
+      line: 38
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 292
       endInstruction: 291
-      startSourceChar: 1592
-      endSourceChar: 1592
-      line: 39
+      startSourceChar: 1555
+      endSourceChar: 1555
+      line: 38
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 292
       endInstruction: 291
-      startSourceChar: 1592
-      endSourceChar: 1604
-      line: 39
+      startSourceChar: 1555
+      endSourceChar: 1567
+      line: 38
       lineChar: 27
       spanCodeSection: 'StopSpeed = '
     - startInstruction: 292
       endInstruction: 331
-      startSourceChar: 1604
-      endSourceChar: 1623
-      line: 39
+      startSourceChar: 1567
+      endSourceChar: 1586
+      line: 38
       lineChar: 39
       spanCodeSection: ".999f;\r\n    }\r\n    "
     - startInstruction: 332
       endInstruction: 339
-      startSourceChar: 1623
-      endSourceChar: 1642
-      line: 41
+      startSourceChar: 1586
+      endSourceChar: 1605
+      line: 40
       lineChar: 4
       spanCodeSection: "void Update()\r\n    "
     - startInstruction: 340
       endInstruction: 339
-      startSourceChar: 1642
-      endSourceChar: 1653
-      line: 42
+      startSourceChar: 1605
+      endSourceChar: 1616
+      line: 41
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 340
       endInstruction: 339
-      startSourceChar: 1653
-      endSourceChar: 1657
-      line: 43
+      startSourceChar: 1616
+      endSourceChar: 1620
+      line: 42
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 340
       endInstruction: 339
-      startSourceChar: 1657
-      endSourceChar: 1657
-      line: 43
+      startSourceChar: 1620
+      endSourceChar: 1620
+      line: 42
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 340
       endInstruction: 339
-      startSourceChar: 1657
-      endSourceChar: 1657
-      line: 43
+      startSourceChar: 1620
+      endSourceChar: 1620
+      line: 42
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 340
       endInstruction: 339
-      startSourceChar: 1657
-      endSourceChar: 1672
-      line: 43
+      startSourceChar: 1620
+      endSourceChar: 1635
+      line: 42
       lineChar: 12
       spanCodeSection: 'localPlayer == '
     - startInstruction: 340
       endInstruction: 431
-      startSourceChar: 1672
-      endSourceChar: 1680
-      line: 43
+      startSourceChar: 1635
+      endSourceChar: 1643
+      line: 42
       lineChar: 27
       spanCodeSection: 'null || '
     - startInstruction: 432
       endInstruction: 431
-      startSourceChar: 1680
-      endSourceChar: 1680
-      line: 43
+      startSourceChar: 1643
+      endSourceChar: 1643
+      line: 42
       lineChar: 35
       spanCodeSection: 
     - startInstruction: 432
       endInstruction: 431
-      startSourceChar: 1680
-      endSourceChar: 1680
-      line: 43
+      startSourceChar: 1643
+      endSourceChar: 1643
+      line: 42
       lineChar: 35
       spanCodeSection: 
     - startInstruction: 432
       endInstruction: 431
-      startSourceChar: 1680
-      endSourceChar: 1692
-      line: 43
+      startSourceChar: 1643
+      endSourceChar: 1655
+      line: 42
       lineChar: 35
       spanCodeSection: localPlayer.
     - startInstruction: 432
       endInstruction: 431
-      startSourceChar: 1692
-      endSourceChar: 1700
-      line: 43
+      startSourceChar: 1655
+      endSourceChar: 1663
+      line: 42
       lineChar: 47
       spanCodeSection: IsOwner(
     - startInstruction: 432
       endInstruction: 531
-      startSourceChar: 1700
-      endSourceChar: 1726
-      line: 43
+      startSourceChar: 1663
+      endSourceChar: 1689
+      line: 42
       lineChar: 55
       spanCodeSection: "VehicleMainObj))\r\n        "
     - startInstruction: 532
       endInstruction: 531
-      startSourceChar: 1726
-      endSourceChar: 1741
-      line: 44
+      startSourceChar: 1689
+      endSourceChar: 1704
+      line: 43
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 532
       endInstruction: 531
-      startSourceChar: 1741
-      endSourceChar: 1745
-      line: 45
+      startSourceChar: 1704
+      endSourceChar: 1708
+      line: 44
       lineChar: 12
       spanCodeSection: if (
     - startInstruction: 532
       endInstruction: 531
-      startSourceChar: 1745
-      endSourceChar: 1745
-      line: 45
+      startSourceChar: 1708
+      endSourceChar: 1708
+      line: 44
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 532
       endInstruction: 531
-      startSourceChar: 1745
-      endSourceChar: 1755
-      line: 45
+      startSourceChar: 1708
+      endSourceChar: 1718
+      line: 44
       lineChar: 16
       spanCodeSection: 'Health <= '
     - startInstruction: 532
       endInstruction: 603
-      startSourceChar: 1755
-      endSourceChar: 1771
-      line: 45
+      startSourceChar: 1718
+      endSourceChar: 1734
+      line: 44
       lineChar: 26
       spanCodeSection: "0)\r\n            "
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1771
-      endSourceChar: 1790
-      line: 46
+      startSourceChar: 1734
+      endSourceChar: 1753
+      line: 45
       lineChar: 12
       spanCodeSection: "{\r\n                "
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1790
-      endSourceChar: 1794
-      line: 47
+      startSourceChar: 1753
+      endSourceChar: 1757
+      line: 46
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1794
-      endSourceChar: 1794
-      line: 47
+      startSourceChar: 1757
+      endSourceChar: 1757
+      line: 46
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 604
       endInstruction: 603
-      startSourceChar: 1794
-      endSourceChar: 1809
-      line: 47
+      startSourceChar: 1757
+      endSourceChar: 1772
+      line: 46
       lineChar: 20
       spanCodeSection: 'localPlayer == '
     - startInstruction: 604
       endInstruction: 651
-      startSourceChar: 1809
-      endSourceChar: 1832
-      line: 47
+      startSourceChar: 1772
+      endSourceChar: 1795
+      line: 46
       lineChar: 35
       spanCodeSection: "null)\r\n                "
     - startInstruction: 652
       endInstruction: 651
-      startSourceChar: 1832
-      endSourceChar: 1855
-      line: 48
+      startSourceChar: 1795
+      endSourceChar: 1818
+      line: 47
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 652
       endInstruction: 651
-      startSourceChar: 1855
-      endSourceChar: 1855
-      line: 49
+      startSourceChar: 1818
+      endSourceChar: 1818
+      line: 48
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 652
       endInstruction: 651
-      startSourceChar: 1855
-      endSourceChar: 1855
-      line: 49
+      startSourceChar: 1818
+      endSourceChar: 1818
+      line: 48
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 652
       endInstruction: 675
-      startSourceChar: 1855
-      endSourceChar: 1902
-      line: 49
+      startSourceChar: 1818
+      endSourceChar: 1865
+      line: 48
       lineChar: 20
       spanCodeSection: "Explode();\r\n                }\r\n                "
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1902
-      endSourceChar: 1924
-      line: 51
+      startSourceChar: 1865
+      endSourceChar: 1887
+      line: 50
       lineChar: 16
       spanCodeSection: "else\r\n                "
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1924
-      endSourceChar: 1947
-      line: 52
+      startSourceChar: 1887
+      endSourceChar: 1910
+      line: 51
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1947
-      endSourceChar: 1947
-      line: 53
+      startSourceChar: 1910
+      endSourceChar: 1910
+      line: 52
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1947
-      endSourceChar: 1947
-      line: 53
+      startSourceChar: 1910
+      endSourceChar: 1910
+      line: 52
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1947
-      endSourceChar: 1970
-      line: 53
+      startSourceChar: 1910
+      endSourceChar: 1933
+      line: 52
       lineChar: 20
       spanCodeSection: SendCustomNetworkEvent(
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1970
-      endSourceChar: 1970
-      line: 53
+      startSourceChar: 1933
+      endSourceChar: 1933
+      line: 52
       lineChar: 43
       spanCodeSection: 
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1970
-      endSourceChar: 1970
-      line: 53
+      startSourceChar: 1933
+      endSourceChar: 1933
+      line: 52
       lineChar: 43
       spanCodeSection: 
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1970
-      endSourceChar: 1970
-      line: 53
+      startSourceChar: 1933
+      endSourceChar: 1933
+      line: 52
       lineChar: 43
       spanCodeSection: 
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1970
-      endSourceChar: 1970
-      line: 53
+      startSourceChar: 1933
+      endSourceChar: 1933
+      line: 52
       lineChar: 43
       spanCodeSection: 
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1970
-      endSourceChar: 1970
-      line: 53
+      startSourceChar: 1933
+      endSourceChar: 1933
+      line: 52
       lineChar: 43
       spanCodeSection: 
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1970
-      endSourceChar: 1974
-      line: 53
+      startSourceChar: 1933
+      endSourceChar: 1937
+      line: 52
       lineChar: 43
       spanCodeSection: VRC.
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1974
-      endSourceChar: 1979
-      line: 53
+      startSourceChar: 1937
+      endSourceChar: 1942
+      line: 52
       lineChar: 47
       spanCodeSection: Udon.
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1979
-      endSourceChar: 1986
-      line: 53
+      startSourceChar: 1942
+      endSourceChar: 1949
+      line: 52
       lineChar: 52
       spanCodeSection: Common.
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1986
-      endSourceChar: 1997
-      line: 53
+      startSourceChar: 1949
+      endSourceChar: 1960
+      line: 52
       lineChar: 59
       spanCodeSection: Interfaces.
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 1997
-      endSourceChar: 2016
-      line: 53
+      startSourceChar: 1960
+      endSourceChar: 1979
+      line: 52
       lineChar: 70
       spanCodeSection: NetworkEventTarget.
     - startInstruction: 676
       endInstruction: 675
-      startSourceChar: 2016
-      endSourceChar: 2021
-      line: 53
+      startSourceChar: 1979
+      endSourceChar: 1984
+      line: 52
       lineChar: 89
       spanCodeSection: 'All, '
     - startInstruction: 676
       endInstruction: 707
-      startSourceChar: 2021
-      endSourceChar: 2080
-      line: 53
+      startSourceChar: 1984
+      endSourceChar: 2043
+      line: 52
       lineChar: 94
       spanCodeSection: "\"Explode\");\r\n                }\r\n            }\r\n            "
     - startInstruction: 708
       endInstruction: 707
-      startSourceChar: 2080
-      endSourceChar: 2084
-      line: 56
+      startSourceChar: 2043
+      endSourceChar: 2047
+      line: 55
       lineChar: 12
       spanCodeSection: if (
     - startInstruction: 708
       endInstruction: 707
-      startSourceChar: 2084
-      endSourceChar: 2084
-      line: 56
+      startSourceChar: 2047
+      endSourceChar: 2047
+      line: 55
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 708
       endInstruction: 707
-      startSourceChar: 2084
-      endSourceChar: 2084
-      line: 56
+      startSourceChar: 2047
+      endSourceChar: 2047
+      line: 55
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 708
       endInstruction: 707
-      startSourceChar: 2084
-      endSourceChar: 2099
-      line: 56
+      startSourceChar: 2047
+      endSourceChar: 2062
+      line: 55
       lineChar: 16
       spanCodeSection: 'localPlayer == '
     - startInstruction: 708
       endInstruction: 799
-      startSourceChar: 2099
-      endSourceChar: 2107
-      line: 56
+      startSourceChar: 2062
+      endSourceChar: 2070
+      line: 55
       lineChar: 31
       spanCodeSection: 'null || '
     - startInstruction: 800
       endInstruction: 867
-      startSourceChar: 2107
-      endSourceChar: 2129
-      line: 56
+      startSourceChar: 2070
+      endSourceChar: 2092
+      line: 55
       lineChar: 39
       spanCodeSection: "Manning)\r\n            "
     - startInstruction: 868
       endInstruction: 867
-      startSourceChar: 2129
-      endSourceChar: 2182
-      line: 57
+      startSourceChar: 2092
+      endSourceChar: 2145
+      line: 56
       lineChar: 12
       spanCodeSection: "{\r\n                //Camera control\r\n                "
     - startInstruction: 868
       endInstruction: 867
-      startSourceChar: 2182
-      endSourceChar: 2186
-      line: 59
+      startSourceChar: 2145
+      endSourceChar: 2149
+      line: 58
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 868
       endInstruction: 867
-      startSourceChar: 2186
-      endSourceChar: 2186
-      line: 59
+      startSourceChar: 2149
+      endSourceChar: 2149
+      line: 58
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 868
       endInstruction: 867
-      startSourceChar: 2186
-      endSourceChar: 2195
-      line: 59
+      startSourceChar: 2149
+      endSourceChar: 2158
+      line: 58
       lineChar: 20
       spanCodeSection: 'AACam != '
     - startInstruction: 868
       endInstruction: 915
-      startSourceChar: 2195
-      endSourceChar: 2201
-      line: 59
+      startSourceChar: 2158
+      endSourceChar: 2164
+      line: 58
       lineChar: 29
       spanCodeSection: 'null) '
     - startInstruction: 916
       endInstruction: 915
-      startSourceChar: 2201
-      endSourceChar: 2203
-      line: 59
+      startSourceChar: 2164
+      endSourceChar: 2166
+      line: 58
       lineChar: 35
       spanCodeSection: '{ '
     - startInstruction: 916
       endInstruction: 915
-      startSourceChar: 2203
-      endSourceChar: 2203
-      line: 59
+      startSourceChar: 2166
+      endSourceChar: 2166
+      line: 58
       lineChar: 37
       spanCodeSection: 
     - startInstruction: 916
       endInstruction: 915
-      startSourceChar: 2203
-      endSourceChar: 2203
-      line: 59
+      startSourceChar: 2166
+      endSourceChar: 2166
+      line: 58
       lineChar: 37
       spanCodeSection: 
     - startInstruction: 916
       endInstruction: 915
-      startSourceChar: 2203
-      endSourceChar: 2215
-      line: 59
+      startSourceChar: 2166
+      endSourceChar: 2178
+      line: 58
       lineChar: 37
       spanCodeSection: 'ZoomLevel = '
     - startInstruction: 916
       endInstruction: 915
-      startSourceChar: 2215
-      endSourceChar: 2215
-      line: 59
+      startSourceChar: 2178
+      endSourceChar: 2178
+      line: 58
       lineChar: 49
       spanCodeSection: 
     - startInstruction: 916
       endInstruction: 915
-      startSourceChar: 2215
-      endSourceChar: 2215
-      line: 59
+      startSourceChar: 2178
+      endSourceChar: 2178
+      line: 58
       lineChar: 49
       spanCodeSection: 
     - startInstruction: 916
       endInstruction: 915
-      startSourceChar: 2215
-      endSourceChar: 2221
-      line: 59
+      startSourceChar: 2178
+      endSourceChar: 2184
+      line: 58
       lineChar: 49
       spanCodeSection: AACam.
     - startInstruction: 916
       endInstruction: 939
-      startSourceChar: 2221
-      endSourceChar: 2235
-      line: 59
+      startSourceChar: 2184
+      endSourceChar: 2198
+      line: 58
       lineChar: 55
       spanCodeSection: 'fieldOfView / '
     - startInstruction: 940
       endInstruction: 995
-      startSourceChar: 2235
-      endSourceChar: 2258
-      line: 59
+      startSourceChar: 2198
+      endSourceChar: 2221
+      line: 58
       lineChar: 69
       spanCodeSection: "90; }\r\n                "
     - startInstruction: 996
       endInstruction: 995
-      startSourceChar: 2258
-      endSourceChar: 2258
-      line: 60
+      startSourceChar: 2221
+      endSourceChar: 2221
+      line: 59
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 996
       endInstruction: 995
-      startSourceChar: 2258
-      endSourceChar: 2258
-      line: 60
+      startSourceChar: 2221
+      endSourceChar: 2221
+      line: 59
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 996
       endInstruction: 995
-      startSourceChar: 2258
-      endSourceChar: 2268
-      line: 60
+      startSourceChar: 2221
+      endSourceChar: 2231
+      line: 59
       lineChar: 16
       spanCodeSection: 'LstickV = '
     - startInstruction: 996
       endInstruction: 995
-      startSourceChar: 2268
-      endSourceChar: 2268
-      line: 60
+      startSourceChar: 2231
+      endSourceChar: 2231
+      line: 59
       lineChar: 26
       spanCodeSection: 
     - startInstruction: 996
       endInstruction: 995
-      startSourceChar: 2268
-      endSourceChar: 2268
-      line: 60
+      startSourceChar: 2231
+      endSourceChar: 2231
+      line: 59
       lineChar: 26
       spanCodeSection: 
     - startInstruction: 996
       endInstruction: 995
-      startSourceChar: 2268
-      endSourceChar: 2274
-      line: 60
+      startSourceChar: 2231
+      endSourceChar: 2237
+      line: 59
       lineChar: 26
       spanCodeSection: Input.
     - startInstruction: 996
       endInstruction: 995
-      startSourceChar: 2274
-      endSourceChar: 2285
-      line: 60
+      startSourceChar: 2237
+      endSourceChar: 2248
+      line: 59
       lineChar: 32
       spanCodeSection: GetAxisRaw(
     - startInstruction: 996
       endInstruction: 1019
-      startSourceChar: 2285
-      endSourceChar: 2353
-      line: 60
+      startSourceChar: 2248
+      endSourceChar: 2316
+      line: 59
       lineChar: 43
       spanCodeSection: "\"Oculus_CrossPlatform_PrimaryThumbstickVertical\");\r\n                "
     - startInstruction: 1020
       endInstruction: 1019
-      startSourceChar: 2353
-      endSourceChar: 2357
-      line: 61
+      startSourceChar: 2316
+      endSourceChar: 2320
+      line: 60
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 1020
       endInstruction: 1019
-      startSourceChar: 2357
-      endSourceChar: 2357
-      line: 61
+      startSourceChar: 2320
+      endSourceChar: 2320
+      line: 60
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1020
       endInstruction: 1019
-      startSourceChar: 2357
-      endSourceChar: 2357
-      line: 61
+      startSourceChar: 2320
+      endSourceChar: 2320
+      line: 60
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1020
       endInstruction: 1019
-      startSourceChar: 2357
-      endSourceChar: 2357
-      line: 61
+      startSourceChar: 2320
+      endSourceChar: 2320
+      line: 60
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1020
       endInstruction: 1019
-      startSourceChar: 2357
-      endSourceChar: 2363
-      line: 61
+      startSourceChar: 2320
+      endSourceChar: 2326
+      line: 60
       lineChar: 20
       spanCodeSection: Mathf.
     - startInstruction: 1020
       endInstruction: 1019
-      startSourceChar: 2363
-      endSourceChar: 2367
-      line: 61
+      startSourceChar: 2326
+      endSourceChar: 2330
+      line: 60
       lineChar: 26
       spanCodeSection: Abs(
     - startInstruction: 1020
       endInstruction: 1043
-      startSourceChar: 2367
-      endSourceChar: 2378
-      line: 61
+      startSourceChar: 2330
+      endSourceChar: 2341
+      line: 60
       lineChar: 30
       spanCodeSection: 'LstickV) > '
     - startInstruction: 1044
       endInstruction: 1115
-      startSourceChar: 2378
-      endSourceChar: 2399
-      line: 61
+      startSourceChar: 2341
+      endSourceChar: 2362
+      line: 60
       lineChar: 41
       spanCodeSection: ".1)\r\n                "
     - startInstruction: 1116
       endInstruction: 1115
-      startSourceChar: 2399
-      endSourceChar: 2422
-      line: 62
+      startSourceChar: 2362
+      endSourceChar: 2385
+      line: 61
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 1116
       endInstruction: 1115
-      startSourceChar: 2422
-      endSourceChar: 2426
-      line: 63
+      startSourceChar: 2385
+      endSourceChar: 2389
+      line: 62
       lineChar: 20
       spanCodeSection: if (
     - startInstruction: 1116
       endInstruction: 1115
-      startSourceChar: 2426
-      endSourceChar: 2426
-      line: 63
+      startSourceChar: 2389
+      endSourceChar: 2389
+      line: 62
       lineChar: 24
       spanCodeSection: 
     - startInstruction: 1116
       endInstruction: 1115
-      startSourceChar: 2426
-      endSourceChar: 2435
-      line: 63
+      startSourceChar: 2389
+      endSourceChar: 2398
+      line: 62
       lineChar: 24
       spanCodeSection: 'AACam != '
     - startInstruction: 1116
       endInstruction: 1163
-      startSourceChar: 2435
-      endSourceChar: 2441
-      line: 63
+      startSourceChar: 2398
+      endSourceChar: 2404
+      line: 62
       lineChar: 33
       spanCodeSection: 'null) '
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2441
-      endSourceChar: 2443
-      line: 63
+      startSourceChar: 2404
+      endSourceChar: 2406
+      line: 62
       lineChar: 39
       spanCodeSection: '{ '
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2443
-      endSourceChar: 2443
-      line: 63
+      startSourceChar: 2406
+      endSourceChar: 2406
+      line: 62
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2443
-      endSourceChar: 2443
-      line: 63
+      startSourceChar: 2406
+      endSourceChar: 2406
+      line: 62
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2443
-      endSourceChar: 2443
-      line: 63
+      startSourceChar: 2406
+      endSourceChar: 2406
+      line: 62
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2443
-      endSourceChar: 2449
-      line: 63
+      startSourceChar: 2406
+      endSourceChar: 2412
+      line: 62
       lineChar: 41
       spanCodeSection: AACam.
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2449
-      endSourceChar: 2463
-      line: 63
+      startSourceChar: 2412
+      endSourceChar: 2426
+      line: 62
       lineChar: 47
       spanCodeSection: 'fieldOfView = '
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2463
-      endSourceChar: 2463
-      line: 63
+      startSourceChar: 2426
+      endSourceChar: 2426
+      line: 62
       lineChar: 61
       spanCodeSection: 
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2463
-      endSourceChar: 2463
-      line: 63
+      startSourceChar: 2426
+      endSourceChar: 2426
+      line: 62
       lineChar: 61
       spanCodeSection: 
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2463
-      endSourceChar: 2469
-      line: 63
+      startSourceChar: 2426
+      endSourceChar: 2432
+      line: 62
       lineChar: 61
       spanCodeSection: Mathf.
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2469
-      endSourceChar: 2475
-      line: 63
+      startSourceChar: 2432
+      endSourceChar: 2438
+      line: 62
       lineChar: 67
       spanCodeSection: Clamp(
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2475
-      endSourceChar: 2475
-      line: 63
+      startSourceChar: 2438
+      endSourceChar: 2438
+      line: 62
       lineChar: 73
       spanCodeSection: 
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2475
-      endSourceChar: 2475
-      line: 63
+      startSourceChar: 2438
+      endSourceChar: 2438
+      line: 62
       lineChar: 73
       spanCodeSection: 
     - startInstruction: 1164
       endInstruction: 1163
-      startSourceChar: 2475
-      endSourceChar: 2481
-      line: 63
+      startSourceChar: 2438
+      endSourceChar: 2444
+      line: 62
       lineChar: 73
       spanCodeSection: AACam.
     - startInstruction: 1164
       endInstruction: 1187
-      startSourceChar: 2481
-      endSourceChar: 2495
-      line: 63
+      startSourceChar: 2444
+      endSourceChar: 2458
+      line: 62
       lineChar: 79
       spanCodeSection: 'fieldOfView - '
     - startInstruction: 1188
       endInstruction: 1187
-      startSourceChar: 2495
-      endSourceChar: 2495
-      line: 63
+      startSourceChar: 2458
+      endSourceChar: 2458
+      line: 62
       lineChar: 93
       spanCodeSection: 
     - startInstruction: 1188
       endInstruction: 1187
-      startSourceChar: 2495
-      endSourceChar: 2495
-      line: 63
+      startSourceChar: 2458
+      endSourceChar: 2458
+      line: 62
       lineChar: 93
       spanCodeSection: 
     - startInstruction: 1188
       endInstruction: 1187
-      startSourceChar: 2495
-      endSourceChar: 2502
-      line: 63
+      startSourceChar: 2458
+      endSourceChar: 2465
+      line: 62
       lineChar: 93
       spanCodeSection: '3.2f * '
     - startInstruction: 1188
       endInstruction: 1219
-      startSourceChar: 2502
-      endSourceChar: 2512
-      line: 63
+      startSourceChar: 2465
+      endSourceChar: 2475
+      line: 62
       lineChar: 100
       spanCodeSection: 'LstickV * '
     - startInstruction: 1220
       endInstruction: 1283
-      startSourceChar: 2512
-      endSourceChar: 2523
-      line: 63
+      startSourceChar: 2475
+      endSourceChar: 2486
+      line: 62
       lineChar: 110
       spanCodeSection: 'ZoomLevel, '
     - startInstruction: 1284
       endInstruction: 1283
-      startSourceChar: 2523
-      endSourceChar: 2532
-      line: 63
+      startSourceChar: 2486
+      endSourceChar: 2495
+      line: 62
       lineChar: 121
       spanCodeSection: 'ZoomFov, '
     - startInstruction: 1284
       endInstruction: 1347
-      startSourceChar: 2532
-      endSourceChar: 2583
-      line: 63
+      startSourceChar: 2495
+      endSourceChar: 2546
+      line: 62
       lineChar: 130
       spanCodeSection: "ZoomOutFov); }\r\n                }\r\n                "
     - startInstruction: 1348
       endInstruction: 1347
-      startSourceChar: 2583
-      endSourceChar: 2587
-      line: 65
+      startSourceChar: 2546
+      endSourceChar: 2550
+      line: 64
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 1348
       endInstruction: 1347
-      startSourceChar: 2587
-      endSourceChar: 2587
-      line: 65
+      startSourceChar: 2550
+      endSourceChar: 2550
+      line: 64
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1348
       endInstruction: 1347
-      startSourceChar: 2587
-      endSourceChar: 2587
-      line: 65
+      startSourceChar: 2550
+      endSourceChar: 2550
+      line: 64
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1348
       endInstruction: 1347
-      startSourceChar: 2587
-      endSourceChar: 2593
-      line: 65
+      startSourceChar: 2550
+      endSourceChar: 2556
+      line: 64
       lineChar: 20
       spanCodeSection: Input.
     - startInstruction: 1348
       endInstruction: 1347
-      startSourceChar: 2593
-      endSourceChar: 2600
-      line: 65
+      startSourceChar: 2556
+      endSourceChar: 2563
+      line: 64
       lineChar: 26
       spanCodeSection: GetKey(
     - startInstruction: 1348
       endInstruction: 1347
-      startSourceChar: 2600
-      endSourceChar: 2600
-      line: 65
+      startSourceChar: 2563
+      endSourceChar: 2563
+      line: 64
       lineChar: 33
       spanCodeSection: 
     - startInstruction: 1348
       endInstruction: 1347
-      startSourceChar: 2600
-      endSourceChar: 2608
-      line: 65
+      startSourceChar: 2563
+      endSourceChar: 2571
+      line: 64
       lineChar: 33
       spanCodeSection: KeyCode.
     - startInstruction: 1348
       endInstruction: 1387
-      startSourceChar: 2608
-      endSourceChar: 2637
-      line: 65
+      startSourceChar: 2571
+      endSourceChar: 2600
+      line: 64
       lineChar: 41
       spanCodeSection: "LeftShift))\r\n                "
     - startInstruction: 1388
       endInstruction: 1387
-      startSourceChar: 2637
-      endSourceChar: 2660
-      line: 66
+      startSourceChar: 2600
+      endSourceChar: 2623
+      line: 65
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 1388
       endInstruction: 1387
-      startSourceChar: 2660
-      endSourceChar: 2664
-      line: 67
+      startSourceChar: 2623
+      endSourceChar: 2627
+      line: 66
       lineChar: 20
       spanCodeSection: if (
     - startInstruction: 1388
       endInstruction: 1387
-      startSourceChar: 2664
-      endSourceChar: 2664
-      line: 67
+      startSourceChar: 2627
+      endSourceChar: 2627
+      line: 66
       lineChar: 24
       spanCodeSection: 
     - startInstruction: 1388
       endInstruction: 1387
-      startSourceChar: 2664
-      endSourceChar: 2673
-      line: 67
+      startSourceChar: 2627
+      endSourceChar: 2636
+      line: 66
       lineChar: 24
       spanCodeSection: 'AACam != '
     - startInstruction: 1388
       endInstruction: 1435
-      startSourceChar: 2673
-      endSourceChar: 2679
-      line: 67
+      startSourceChar: 2636
+      endSourceChar: 2642
+      line: 66
       lineChar: 33
       spanCodeSection: 'null) '
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2679
-      endSourceChar: 2681
-      line: 67
+      startSourceChar: 2642
+      endSourceChar: 2644
+      line: 66
       lineChar: 39
       spanCodeSection: '{ '
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2681
-      endSourceChar: 2681
-      line: 67
+      startSourceChar: 2644
+      endSourceChar: 2644
+      line: 66
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2681
-      endSourceChar: 2681
-      line: 67
+      startSourceChar: 2644
+      endSourceChar: 2644
+      line: 66
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2681
-      endSourceChar: 2681
-      line: 67
+      startSourceChar: 2644
+      endSourceChar: 2644
+      line: 66
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2681
-      endSourceChar: 2687
-      line: 67
+      startSourceChar: 2644
+      endSourceChar: 2650
+      line: 66
       lineChar: 41
       spanCodeSection: AACam.
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2687
-      endSourceChar: 2701
-      line: 67
+      startSourceChar: 2650
+      endSourceChar: 2664
+      line: 66
       lineChar: 47
       spanCodeSection: 'fieldOfView = '
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2701
-      endSourceChar: 2701
-      line: 67
+      startSourceChar: 2664
+      endSourceChar: 2664
+      line: 66
       lineChar: 61
       spanCodeSection: 
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2701
-      endSourceChar: 2701
-      line: 67
+      startSourceChar: 2664
+      endSourceChar: 2664
+      line: 66
       lineChar: 61
       spanCodeSection: 
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2701
-      endSourceChar: 2707
-      line: 67
+      startSourceChar: 2664
+      endSourceChar: 2670
+      line: 66
       lineChar: 61
       spanCodeSection: Mathf.
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2707
-      endSourceChar: 2713
-      line: 67
+      startSourceChar: 2670
+      endSourceChar: 2676
+      line: 66
       lineChar: 67
       spanCodeSection: Clamp(
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2713
-      endSourceChar: 2713
-      line: 67
+      startSourceChar: 2676
+      endSourceChar: 2676
+      line: 66
       lineChar: 73
       spanCodeSection: 
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2713
-      endSourceChar: 2713
-      line: 67
+      startSourceChar: 2676
+      endSourceChar: 2676
+      line: 66
       lineChar: 73
       spanCodeSection: 
     - startInstruction: 1436
       endInstruction: 1435
-      startSourceChar: 2713
-      endSourceChar: 2719
-      line: 67
+      startSourceChar: 2676
+      endSourceChar: 2682
+      line: 66
       lineChar: 73
       spanCodeSection: AACam.
     - startInstruction: 1436
       endInstruction: 1459
-      startSourceChar: 2719
-      endSourceChar: 2733
-      line: 67
+      startSourceChar: 2682
+      endSourceChar: 2696
+      line: 66
       lineChar: 79
       spanCodeSection: 'fieldOfView - '
     - startInstruction: 1460
       endInstruction: 1459
-      startSourceChar: 2733
-      endSourceChar: 2733
-      line: 67
+      startSourceChar: 2696
+      endSourceChar: 2696
+      line: 66
       lineChar: 93
       spanCodeSection: 
     - startInstruction: 1460
       endInstruction: 1459
-      startSourceChar: 2733
-      endSourceChar: 2740
-      line: 67
+      startSourceChar: 2696
+      endSourceChar: 2703
+      line: 66
       lineChar: 93
       spanCodeSection: '1.6f * '
     - startInstruction: 1460
       endInstruction: 1523
-      startSourceChar: 2740
-      endSourceChar: 2751
-      line: 67
+      startSourceChar: 2703
+      endSourceChar: 2714
+      line: 66
       lineChar: 100
       spanCodeSection: 'ZoomLevel, '
     - startInstruction: 1524
       endInstruction: 1523
-      startSourceChar: 2751
-      endSourceChar: 2760
-      line: 67
+      startSourceChar: 2714
+      endSourceChar: 2723
+      line: 66
       lineChar: 111
       spanCodeSection: 'ZoomFov, '
     - startInstruction: 1524
       endInstruction: 1587
-      startSourceChar: 2760
-      endSourceChar: 2811
-      line: 67
+      startSourceChar: 2723
+      endSourceChar: 2774
+      line: 66
       lineChar: 120
       spanCodeSection: "ZoomOutFov); }\r\n                }\r\n                "
     - startInstruction: 1588
       endInstruction: 1587
-      startSourceChar: 2811
-      endSourceChar: 2815
-      line: 69
+      startSourceChar: 2774
+      endSourceChar: 2778
+      line: 68
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 1588
       endInstruction: 1587
-      startSourceChar: 2815
-      endSourceChar: 2815
-      line: 69
+      startSourceChar: 2778
+      endSourceChar: 2778
+      line: 68
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1588
       endInstruction: 1587
-      startSourceChar: 2815
-      endSourceChar: 2815
-      line: 69
+      startSourceChar: 2778
+      endSourceChar: 2778
+      line: 68
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 1588
       endInstruction: 1587
-      startSourceChar: 2815
-      endSourceChar: 2821
-      line: 69
+      startSourceChar: 2778
+      endSourceChar: 2784
+      line: 68
       lineChar: 20
       spanCodeSection: Input.
     - startInstruction: 1588
       endInstruction: 1587
-      startSourceChar: 2821
-      endSourceChar: 2828
-      line: 69
+      startSourceChar: 2784
+      endSourceChar: 2791
+      line: 68
       lineChar: 26
       spanCodeSection: GetKey(
     - startInstruction: 1588
       endInstruction: 1587
-      startSourceChar: 2828
-      endSourceChar: 2828
-      line: 69
+      startSourceChar: 2791
+      endSourceChar: 2791
+      line: 68
       lineChar: 33
       spanCodeSection: 
     - startInstruction: 1588
       endInstruction: 1587
-      startSourceChar: 2828
-      endSourceChar: 2836
-      line: 69
+      startSourceChar: 2791
+      endSourceChar: 2799
+      line: 68
       lineChar: 33
       spanCodeSection: KeyCode.
     - startInstruction: 1588
       endInstruction: 1627
-      startSourceChar: 2836
-      endSourceChar: 2867
-      line: 69
+      startSourceChar: 2799
+      endSourceChar: 2830
+      line: 68
       lineChar: 41
       spanCodeSection: "LeftControl))\r\n                "
     - startInstruction: 1628
       endInstruction: 1627
-      startSourceChar: 2867
-      endSourceChar: 2890
-      line: 70
+      startSourceChar: 2830
+      endSourceChar: 2853
+      line: 69
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 1628
       endInstruction: 1627
-      startSourceChar: 2890
-      endSourceChar: 2894
-      line: 71
+      startSourceChar: 2853
+      endSourceChar: 2857
+      line: 70
       lineChar: 20
       spanCodeSection: if (
     - startInstruction: 1628
       endInstruction: 1627
-      startSourceChar: 2894
-      endSourceChar: 2894
-      line: 71
+      startSourceChar: 2857
+      endSourceChar: 2857
+      line: 70
       lineChar: 24
       spanCodeSection: 
     - startInstruction: 1628
       endInstruction: 1627
-      startSourceChar: 2894
-      endSourceChar: 2903
-      line: 71
+      startSourceChar: 2857
+      endSourceChar: 2866
+      line: 70
       lineChar: 24
       spanCodeSection: 'AACam != '
     - startInstruction: 1628
       endInstruction: 1675
-      startSourceChar: 2903
-      endSourceChar: 2909
-      line: 71
+      startSourceChar: 2866
+      endSourceChar: 2872
+      line: 70
       lineChar: 33
       spanCodeSection: 'null) '
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2909
-      endSourceChar: 2911
-      line: 71
+      startSourceChar: 2872
+      endSourceChar: 2874
+      line: 70
       lineChar: 39
       spanCodeSection: '{ '
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2911
-      endSourceChar: 2911
-      line: 71
+      startSourceChar: 2874
+      endSourceChar: 2874
+      line: 70
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2911
-      endSourceChar: 2911
-      line: 71
+      startSourceChar: 2874
+      endSourceChar: 2874
+      line: 70
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2911
-      endSourceChar: 2911
-      line: 71
+      startSourceChar: 2874
+      endSourceChar: 2874
+      line: 70
       lineChar: 41
       spanCodeSection: 
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2911
-      endSourceChar: 2917
-      line: 71
+      startSourceChar: 2874
+      endSourceChar: 2880
+      line: 70
       lineChar: 41
       spanCodeSection: AACam.
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2917
-      endSourceChar: 2931
-      line: 71
+      startSourceChar: 2880
+      endSourceChar: 2894
+      line: 70
       lineChar: 47
       spanCodeSection: 'fieldOfView = '
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2931
-      endSourceChar: 2931
-      line: 71
+      startSourceChar: 2894
+      endSourceChar: 2894
+      line: 70
       lineChar: 61
       spanCodeSection: 
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2931
-      endSourceChar: 2931
-      line: 71
+      startSourceChar: 2894
+      endSourceChar: 2894
+      line: 70
       lineChar: 61
       spanCodeSection: 
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2931
-      endSourceChar: 2937
-      line: 71
+      startSourceChar: 2894
+      endSourceChar: 2900
+      line: 70
       lineChar: 61
       spanCodeSection: Mathf.
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2937
-      endSourceChar: 2943
-      line: 71
+      startSourceChar: 2900
+      endSourceChar: 2906
+      line: 70
       lineChar: 67
       spanCodeSection: Clamp(
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2943
-      endSourceChar: 2943
-      line: 71
+      startSourceChar: 2906
+      endSourceChar: 2906
+      line: 70
       lineChar: 73
       spanCodeSection: 
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2943
-      endSourceChar: 2943
-      line: 71
+      startSourceChar: 2906
+      endSourceChar: 2906
+      line: 70
       lineChar: 73
       spanCodeSection: 
     - startInstruction: 1676
       endInstruction: 1675
-      startSourceChar: 2943
-      endSourceChar: 2949
-      line: 71
+      startSourceChar: 2906
+      endSourceChar: 2912
+      line: 70
       lineChar: 73
       spanCodeSection: AACam.
     - startInstruction: 1676
       endInstruction: 1699
-      startSourceChar: 2949
-      endSourceChar: 2963
-      line: 71
+      startSourceChar: 2912
+      endSourceChar: 2926
+      line: 70
       lineChar: 79
       spanCodeSection: 'fieldOfView + '
     - startInstruction: 1700
       endInstruction: 1699
-      startSourceChar: 2963
-      endSourceChar: 2963
-      line: 71
+      startSourceChar: 2926
+      endSourceChar: 2926
+      line: 70
       lineChar: 93
       spanCodeSection: 
     - startInstruction: 1700
       endInstruction: 1699
-      startSourceChar: 2963
-      endSourceChar: 2970
-      line: 71
+      startSourceChar: 2926
+      endSourceChar: 2933
+      line: 70
       lineChar: 93
       spanCodeSection: '1.6f * '
     - startInstruction: 1700
       endInstruction: 1763
-      startSourceChar: 2970
-      endSourceChar: 2981
-      line: 71
+      startSourceChar: 2933
+      endSourceChar: 2944
+      line: 70
       lineChar: 100
       spanCodeSection: 'ZoomLevel, '
     - startInstruction: 1764
       endInstruction: 1763
-      startSourceChar: 2981
-      endSourceChar: 2990
-      line: 71
+      startSourceChar: 2944
+      endSourceChar: 2953
+      line: 70
       lineChar: 111
       spanCodeSection: 'ZoomFov, '
     - startInstruction: 1764
       endInstruction: 1827
-      startSourceChar: 2990
-      endSourceChar: 3075
-      line: 71
+      startSourceChar: 2953
+      endSourceChar: 3038
+      line: 70
       lineChar: 120
       spanCodeSection: "ZoomOutFov); }\r\n                }\r\n\r\n\r\n                //get
         inputs\r\n                "
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3075
-      endSourceChar: 3075
-      line: 76
+      startSourceChar: 3038
+      endSourceChar: 3038
+      line: 75
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3075
-      endSourceChar: 3075
-      line: 76
+      startSourceChar: 3038
+      endSourceChar: 3038
+      line: 75
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3075
-      endSourceChar: 3075
-      line: 76
+      startSourceChar: 3038
+      endSourceChar: 3038
+      line: 75
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3075
-      endSourceChar: 3084
-      line: 76
+      startSourceChar: 3038
+      endSourceChar: 3047
+      line: 75
       lineChar: 16
       spanCodeSection: 'float Wf '
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3084
-      endSourceChar: 3086
-      line: 76
+      startSourceChar: 3047
+      endSourceChar: 3049
+      line: 75
       lineChar: 25
       spanCodeSection: '= '
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3086
-      endSourceChar: 3086
-      line: 76
+      startSourceChar: 3049
+      endSourceChar: 3049
+      line: 75
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3086
-      endSourceChar: 3086
-      line: 76
+      startSourceChar: 3049
+      endSourceChar: 3049
+      line: 75
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3086
-      endSourceChar: 3086
-      line: 76
+      startSourceChar: 3049
+      endSourceChar: 3049
+      line: 75
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3086
-      endSourceChar: 3092
-      line: 76
+      startSourceChar: 3049
+      endSourceChar: 3055
+      line: 75
       lineChar: 27
       spanCodeSection: Input.
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3092
-      endSourceChar: 3099
-      line: 76
+      startSourceChar: 3055
+      endSourceChar: 3062
+      line: 75
       lineChar: 33
       spanCodeSection: GetKey(
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3099
-      endSourceChar: 3099
-      line: 76
+      startSourceChar: 3062
+      endSourceChar: 3062
+      line: 75
       lineChar: 40
       spanCodeSection: 
     - startInstruction: 1828
       endInstruction: 1827
-      startSourceChar: 3099
-      endSourceChar: 3107
-      line: 76
+      startSourceChar: 3062
+      endSourceChar: 3070
+      line: 75
       lineChar: 40
       spanCodeSection: KeyCode.
     - startInstruction: 1828
       endInstruction: 1867
-      startSourceChar: 3107
-      endSourceChar: 3112
-      line: 76
+      startSourceChar: 3070
+      endSourceChar: 3075
+      line: 75
       lineChar: 48
       spanCodeSection: 'W) ? '
     - startInstruction: 1868
       endInstruction: 1867
-      startSourceChar: 3112
-      endSourceChar: 3113
-      line: 76
+      startSourceChar: 3075
+      endSourceChar: 3076
+      line: 75
       lineChar: 53
       spanCodeSection: '-'
     - startInstruction: 1868
       endInstruction: 1923
-      startSourceChar: 3113
-      endSourceChar: 3117
-      line: 76
+      startSourceChar: 3076
+      endSourceChar: 3080
+      line: 75
       lineChar: 54
       spanCodeSection: '1 : '
     - startInstruction: 1924
       endInstruction: 1947
-      startSourceChar: 3117
-      endSourceChar: 3156
-      line: 76
+      startSourceChar: 3080
+      endSourceChar: 3119
+      line: 75
       lineChar: 58
       spanCodeSection: "0; //inputs as floats\r\n                "
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3156
-      endSourceChar: 3156
-      line: 77
+      startSourceChar: 3119
+      endSourceChar: 3119
+      line: 76
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3156
-      endSourceChar: 3156
-      line: 77
+      startSourceChar: 3119
+      endSourceChar: 3119
+      line: 76
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3156
-      endSourceChar: 3156
-      line: 77
+      startSourceChar: 3119
+      endSourceChar: 3119
+      line: 76
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3156
-      endSourceChar: 3165
-      line: 77
+      startSourceChar: 3119
+      endSourceChar: 3128
+      line: 76
       lineChar: 16
       spanCodeSection: 'float Sf '
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3165
-      endSourceChar: 3167
-      line: 77
+      startSourceChar: 3128
+      endSourceChar: 3130
+      line: 76
       lineChar: 25
       spanCodeSection: '= '
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3167
-      endSourceChar: 3167
-      line: 77
+      startSourceChar: 3130
+      endSourceChar: 3130
+      line: 76
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3167
-      endSourceChar: 3167
-      line: 77
+      startSourceChar: 3130
+      endSourceChar: 3130
+      line: 76
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3167
-      endSourceChar: 3167
-      line: 77
+      startSourceChar: 3130
+      endSourceChar: 3130
+      line: 76
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3167
-      endSourceChar: 3173
-      line: 77
+      startSourceChar: 3130
+      endSourceChar: 3136
+      line: 76
       lineChar: 27
       spanCodeSection: Input.
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3173
-      endSourceChar: 3180
-      line: 77
+      startSourceChar: 3136
+      endSourceChar: 3143
+      line: 76
       lineChar: 33
       spanCodeSection: GetKey(
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3180
-      endSourceChar: 3180
-      line: 77
+      startSourceChar: 3143
+      endSourceChar: 3143
+      line: 76
       lineChar: 40
       spanCodeSection: 
     - startInstruction: 1948
       endInstruction: 1947
-      startSourceChar: 3180
-      endSourceChar: 3188
-      line: 77
+      startSourceChar: 3143
+      endSourceChar: 3151
+      line: 76
       lineChar: 40
       spanCodeSection: KeyCode.
     - startInstruction: 1948
       endInstruction: 1987
-      startSourceChar: 3188
-      endSourceChar: 3193
-      line: 77
+      startSourceChar: 3151
+      endSourceChar: 3156
+      line: 76
       lineChar: 48
       spanCodeSection: 'S) ? '
     - startInstruction: 1988
       endInstruction: 2019
-      startSourceChar: 3193
-      endSourceChar: 3197
-      line: 77
+      startSourceChar: 3156
+      endSourceChar: 3160
+      line: 76
       lineChar: 53
       spanCodeSection: '1 : '
     - startInstruction: 2020
       endInstruction: 2043
-      startSourceChar: 3197
-      endSourceChar: 3217
-      line: 77
+      startSourceChar: 3160
+      endSourceChar: 3180
+      line: 76
       lineChar: 57
       spanCodeSection: "0;\r\n                "
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3217
-      endSourceChar: 3217
-      line: 78
+      startSourceChar: 3180
+      endSourceChar: 3180
+      line: 77
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3217
-      endSourceChar: 3217
-      line: 78
+      startSourceChar: 3180
+      endSourceChar: 3180
+      line: 77
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3217
-      endSourceChar: 3217
-      line: 78
+      startSourceChar: 3180
+      endSourceChar: 3180
+      line: 77
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3217
-      endSourceChar: 3226
-      line: 78
+      startSourceChar: 3180
+      endSourceChar: 3189
+      line: 77
       lineChar: 16
       spanCodeSection: 'float Af '
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3226
-      endSourceChar: 3228
-      line: 78
+      startSourceChar: 3189
+      endSourceChar: 3191
+      line: 77
       lineChar: 25
       spanCodeSection: '= '
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3228
-      endSourceChar: 3228
-      line: 78
+      startSourceChar: 3191
+      endSourceChar: 3191
+      line: 77
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3228
-      endSourceChar: 3228
-      line: 78
+      startSourceChar: 3191
+      endSourceChar: 3191
+      line: 77
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3228
-      endSourceChar: 3228
-      line: 78
+      startSourceChar: 3191
+      endSourceChar: 3191
+      line: 77
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3228
-      endSourceChar: 3234
-      line: 78
+      startSourceChar: 3191
+      endSourceChar: 3197
+      line: 77
       lineChar: 27
       spanCodeSection: Input.
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3234
-      endSourceChar: 3241
-      line: 78
+      startSourceChar: 3197
+      endSourceChar: 3204
+      line: 77
       lineChar: 33
       spanCodeSection: GetKey(
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3241
-      endSourceChar: 3241
-      line: 78
+      startSourceChar: 3204
+      endSourceChar: 3204
+      line: 77
       lineChar: 40
       spanCodeSection: 
     - startInstruction: 2044
       endInstruction: 2043
-      startSourceChar: 3241
-      endSourceChar: 3249
-      line: 78
+      startSourceChar: 3204
+      endSourceChar: 3212
+      line: 77
       lineChar: 40
       spanCodeSection: KeyCode.
     - startInstruction: 2044
       endInstruction: 2083
-      startSourceChar: 3249
-      endSourceChar: 3254
-      line: 78
+      startSourceChar: 3212
+      endSourceChar: 3217
+      line: 77
       lineChar: 48
       spanCodeSection: 'A) ? '
     - startInstruction: 2084
       endInstruction: 2083
-      startSourceChar: 3254
-      endSourceChar: 3255
-      line: 78
+      startSourceChar: 3217
+      endSourceChar: 3218
+      line: 77
       lineChar: 53
       spanCodeSection: '-'
     - startInstruction: 2084
       endInstruction: 2139
-      startSourceChar: 3255
-      endSourceChar: 3259
-      line: 78
+      startSourceChar: 3218
+      endSourceChar: 3222
+      line: 77
       lineChar: 54
       spanCodeSection: '1 : '
     - startInstruction: 2140
       endInstruction: 2163
-      startSourceChar: 3259
-      endSourceChar: 3279
-      line: 78
+      startSourceChar: 3222
+      endSourceChar: 3242
+      line: 77
       lineChar: 58
       spanCodeSection: "0;\r\n                "
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3279
-      endSourceChar: 3279
-      line: 79
+      startSourceChar: 3242
+      endSourceChar: 3242
+      line: 78
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3279
-      endSourceChar: 3279
-      line: 79
+      startSourceChar: 3242
+      endSourceChar: 3242
+      line: 78
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3279
-      endSourceChar: 3279
-      line: 79
+      startSourceChar: 3242
+      endSourceChar: 3242
+      line: 78
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3279
-      endSourceChar: 3288
-      line: 79
+      startSourceChar: 3242
+      endSourceChar: 3251
+      line: 78
       lineChar: 16
       spanCodeSection: 'float Df '
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3288
-      endSourceChar: 3290
-      line: 79
+      startSourceChar: 3251
+      endSourceChar: 3253
+      line: 78
       lineChar: 25
       spanCodeSection: '= '
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3290
-      endSourceChar: 3290
-      line: 79
+      startSourceChar: 3253
+      endSourceChar: 3253
+      line: 78
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3290
-      endSourceChar: 3290
-      line: 79
+      startSourceChar: 3253
+      endSourceChar: 3253
+      line: 78
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3290
-      endSourceChar: 3290
-      line: 79
+      startSourceChar: 3253
+      endSourceChar: 3253
+      line: 78
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3290
-      endSourceChar: 3296
-      line: 79
+      startSourceChar: 3253
+      endSourceChar: 3259
+      line: 78
       lineChar: 27
       spanCodeSection: Input.
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3296
-      endSourceChar: 3303
-      line: 79
+      startSourceChar: 3259
+      endSourceChar: 3266
+      line: 78
       lineChar: 33
       spanCodeSection: GetKey(
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3303
-      endSourceChar: 3303
-      line: 79
+      startSourceChar: 3266
+      endSourceChar: 3266
+      line: 78
       lineChar: 40
       spanCodeSection: 
     - startInstruction: 2164
       endInstruction: 2163
-      startSourceChar: 3303
-      endSourceChar: 3311
-      line: 79
+      startSourceChar: 3266
+      endSourceChar: 3274
+      line: 78
       lineChar: 40
       spanCodeSection: KeyCode.
     - startInstruction: 2164
       endInstruction: 2203
-      startSourceChar: 3311
-      endSourceChar: 3316
-      line: 79
+      startSourceChar: 3274
+      endSourceChar: 3279
+      line: 78
       lineChar: 48
       spanCodeSection: 'D) ? '
     - startInstruction: 2204
       endInstruction: 2235
-      startSourceChar: 3316
-      endSourceChar: 3320
-      line: 79
+      startSourceChar: 3279
+      endSourceChar: 3283
+      line: 78
       lineChar: 53
       spanCodeSection: '1 : '
     - startInstruction: 2236
       endInstruction: 2259
-      startSourceChar: 3320
-      endSourceChar: 3340
-      line: 79
+      startSourceChar: 3283
+      endSourceChar: 3303
+      line: 78
       lineChar: 57
       spanCodeSection: "0;\r\n                "
     - startInstruction: 2260
       endInstruction: 2259
-      startSourceChar: 3340
-      endSourceChar: 3340
-      line: 80
+      startSourceChar: 3303
+      endSourceChar: 3303
+      line: 79
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2260
       endInstruction: 2259
-      startSourceChar: 3340
-      endSourceChar: 3340
-      line: 80
+      startSourceChar: 3303
+      endSourceChar: 3303
+      line: 79
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2260
       endInstruction: 2259
-      startSourceChar: 3340
-      endSourceChar: 3350
-      line: 80
+      startSourceChar: 3303
+      endSourceChar: 3313
+      line: 79
       lineChar: 16
       spanCodeSection: 'RstickH = '
     - startInstruction: 2260
       endInstruction: 2259
-      startSourceChar: 3350
-      endSourceChar: 3350
-      line: 80
+      startSourceChar: 3313
+      endSourceChar: 3313
+      line: 79
       lineChar: 26
       spanCodeSection: 
     - startInstruction: 2260
       endInstruction: 2259
-      startSourceChar: 3350
-      endSourceChar: 3350
-      line: 80
+      startSourceChar: 3313
+      endSourceChar: 3313
+      line: 79
       lineChar: 26
       spanCodeSection: 
     - startInstruction: 2260
       endInstruction: 2259
-      startSourceChar: 3350
-      endSourceChar: 3356
-      line: 80
+      startSourceChar: 3313
+      endSourceChar: 3319
+      line: 79
       lineChar: 26
       spanCodeSection: Input.
     - startInstruction: 2260
       endInstruction: 2259
-      startSourceChar: 3356
-      endSourceChar: 3367
-      line: 80
+      startSourceChar: 3319
+      endSourceChar: 3330
+      line: 79
       lineChar: 32
       spanCodeSection: GetAxisRaw(
     - startInstruction: 2260
       endInstruction: 2283
-      startSourceChar: 3367
-      endSourceChar: 3439
-      line: 80
+      startSourceChar: 3330
+      endSourceChar: 3402
+      line: 79
       lineChar: 43
       spanCodeSection: "\"Oculus_CrossPlatform_SecondaryThumbstickHorizontal\");\r\n
         \               "
     - startInstruction: 2284
       endInstruction: 2283
-      startSourceChar: 3439
-      endSourceChar: 3439
-      line: 81
+      startSourceChar: 3402
+      endSourceChar: 3402
+      line: 80
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2284
       endInstruction: 2283
-      startSourceChar: 3439
-      endSourceChar: 3439
-      line: 81
+      startSourceChar: 3402
+      endSourceChar: 3402
+      line: 80
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2284
       endInstruction: 2283
-      startSourceChar: 3439
-      endSourceChar: 3449
-      line: 81
+      startSourceChar: 3402
+      endSourceChar: 3412
+      line: 80
       lineChar: 16
       spanCodeSection: 'RstickV = '
     - startInstruction: 2284
       endInstruction: 2283
-      startSourceChar: 3449
-      endSourceChar: 3450
-      line: 81
+      startSourceChar: 3412
+      endSourceChar: 3413
+      line: 80
       lineChar: 26
       spanCodeSection: '-'
     - startInstruction: 2284
       endInstruction: 2283
-      startSourceChar: 3450
-      endSourceChar: 3450
-      line: 81
+      startSourceChar: 3413
+      endSourceChar: 3413
+      line: 80
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 2284
       endInstruction: 2283
-      startSourceChar: 3450
-      endSourceChar: 3450
-      line: 81
+      startSourceChar: 3413
+      endSourceChar: 3413
+      line: 80
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 2284
       endInstruction: 2283
-      startSourceChar: 3450
-      endSourceChar: 3456
-      line: 81
+      startSourceChar: 3413
+      endSourceChar: 3419
+      line: 80
       lineChar: 27
       spanCodeSection: Input.
     - startInstruction: 2284
       endInstruction: 2283
-      startSourceChar: 3456
-      endSourceChar: 3467
-      line: 81
+      startSourceChar: 3419
+      endSourceChar: 3430
+      line: 80
       lineChar: 33
       spanCodeSection: GetAxisRaw(
     - startInstruction: 2284
       endInstruction: 2331
-      startSourceChar: 3467
-      endSourceChar: 3589
-      line: 81
+      startSourceChar: 3430
+      endSourceChar: 3552
+      line: 80
       lineChar: 44
       spanCodeSection: "\"Oculus_CrossPlatform_SecondaryThumbstickVertical\");\r\n
         \               //lerp to inputs for smooth motion\r\n                "
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3589
-      endSourceChar: 3589
-      line: 83
+      startSourceChar: 3552
+      endSourceChar: 3552
+      line: 82
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3589
-      endSourceChar: 3589
-      line: 83
+      startSourceChar: 3552
+      endSourceChar: 3552
+      line: 82
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3589
-      endSourceChar: 3589
-      line: 83
+      startSourceChar: 3552
+      endSourceChar: 3552
+      line: 82
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3589
-      endSourceChar: 3602
-      line: 83
+      startSourceChar: 3552
+      endSourceChar: 3565
+      line: 82
       lineChar: 16
       spanCodeSection: 'float InputY '
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3602
-      endSourceChar: 3604
-      line: 83
+      startSourceChar: 3565
+      endSourceChar: 3567
+      line: 82
       lineChar: 29
       spanCodeSection: '= '
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3604
-      endSourceChar: 3604
-      line: 83
+      startSourceChar: 3567
+      endSourceChar: 3567
+      line: 82
       lineChar: 31
       spanCodeSection: 
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3604
-      endSourceChar: 3604
-      line: 83
+      startSourceChar: 3567
+      endSourceChar: 3567
+      line: 82
       lineChar: 31
       spanCodeSection: 
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3604
-      endSourceChar: 3604
-      line: 83
+      startSourceChar: 3567
+      endSourceChar: 3567
+      line: 82
       lineChar: 31
       spanCodeSection: 
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3604
-      endSourceChar: 3610
-      line: 83
+      startSourceChar: 3567
+      endSourceChar: 3573
+      line: 82
       lineChar: 31
       spanCodeSection: Mathf.
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3610
-      endSourceChar: 3616
-      line: 83
+      startSourceChar: 3573
+      endSourceChar: 3579
+      line: 82
       lineChar: 37
       spanCodeSection: Clamp(
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3616
-      endSourceChar: 3617
-      line: 83
+      startSourceChar: 3579
+      endSourceChar: 3580
+      line: 82
       lineChar: 43
       spanCodeSection: (
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3617
-      endSourceChar: 3617
-      line: 83
+      startSourceChar: 3580
+      endSourceChar: 3580
+      line: 82
       lineChar: 44
       spanCodeSection: 
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3617
-      endSourceChar: 3617
-      line: 83
+      startSourceChar: 3580
+      endSourceChar: 3580
+      line: 82
       lineChar: 44
       spanCodeSection: 
     - startInstruction: 2332
       endInstruction: 2331
-      startSourceChar: 3617
-      endSourceChar: 3627
-      line: 83
+      startSourceChar: 3580
+      endSourceChar: 3590
+      line: 82
       lineChar: 44
       spanCodeSection: 'RstickH + '
     - startInstruction: 2332
       endInstruction: 2363
-      startSourceChar: 3627
-      endSourceChar: 3632
-      line: 83
+      startSourceChar: 3590
+      endSourceChar: 3595
+      line: 82
       lineChar: 54
       spanCodeSection: 'Af + '
     - startInstruction: 2364
       endInstruction: 2395
-      startSourceChar: 3632
-      endSourceChar: 3637
-      line: 83
+      startSourceChar: 3595
+      endSourceChar: 3600
+      line: 82
       lineChar: 59
       spanCodeSection: 'Df), '
     - startInstruction: 2396
       endInstruction: 2395
-      startSourceChar: 3637
-      endSourceChar: 3638
-      line: 83
+      startSourceChar: 3600
+      endSourceChar: 3601
+      line: 82
       lineChar: 64
       spanCodeSection: '-'
     - startInstruction: 2396
       endInstruction: 2419
-      startSourceChar: 3638
-      endSourceChar: 3641
-      line: 83
+      startSourceChar: 3601
+      endSourceChar: 3604
+      line: 82
       lineChar: 65
       spanCodeSection: '1, '
     - startInstruction: 2420
       endInstruction: 2507
-      startSourceChar: 3641
-      endSourceChar: 3646
-      line: 83
+      startSourceChar: 3604
+      endSourceChar: 3609
+      line: 82
       lineChar: 68
       spanCodeSection: '1) * '
     - startInstruction: 2508
       endInstruction: 2539
-      startSourceChar: 3646
-      endSourceChar: 3679
-      line: 83
+      startSourceChar: 3609
+      endSourceChar: 3642
+      line: 82
       lineChar: 73
       spanCodeSection: "TurnSpeedMulti;\r\n                "
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3679
-      endSourceChar: 3679
-      line: 84
+      startSourceChar: 3642
+      endSourceChar: 3642
+      line: 83
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3679
-      endSourceChar: 3679
-      line: 84
+      startSourceChar: 3642
+      endSourceChar: 3642
+      line: 83
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3679
-      endSourceChar: 3679
-      line: 84
+      startSourceChar: 3642
+      endSourceChar: 3642
+      line: 83
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3679
-      endSourceChar: 3692
-      line: 84
+      startSourceChar: 3642
+      endSourceChar: 3655
+      line: 83
       lineChar: 16
       spanCodeSection: 'float InputX '
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3692
-      endSourceChar: 3694
-      line: 84
+      startSourceChar: 3655
+      endSourceChar: 3657
+      line: 83
       lineChar: 29
       spanCodeSection: '= '
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3694
-      endSourceChar: 3694
-      line: 84
+      startSourceChar: 3657
+      endSourceChar: 3657
+      line: 83
       lineChar: 31
       spanCodeSection: 
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3694
-      endSourceChar: 3694
-      line: 84
+      startSourceChar: 3657
+      endSourceChar: 3657
+      line: 83
       lineChar: 31
       spanCodeSection: 
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3694
-      endSourceChar: 3694
-      line: 84
+      startSourceChar: 3657
+      endSourceChar: 3657
+      line: 83
       lineChar: 31
       spanCodeSection: 
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3694
-      endSourceChar: 3700
-      line: 84
+      startSourceChar: 3657
+      endSourceChar: 3663
+      line: 83
       lineChar: 31
       spanCodeSection: Mathf.
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3700
-      endSourceChar: 3706
-      line: 84
+      startSourceChar: 3663
+      endSourceChar: 3669
+      line: 83
       lineChar: 37
       spanCodeSection: Clamp(
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3706
-      endSourceChar: 3707
-      line: 84
+      startSourceChar: 3669
+      endSourceChar: 3670
+      line: 83
       lineChar: 43
       spanCodeSection: (
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3707
-      endSourceChar: 3707
-      line: 84
+      startSourceChar: 3670
+      endSourceChar: 3670
+      line: 83
       lineChar: 44
       spanCodeSection: 
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3707
-      endSourceChar: 3707
-      line: 84
+      startSourceChar: 3670
+      endSourceChar: 3670
+      line: 83
       lineChar: 44
       spanCodeSection: 
     - startInstruction: 2540
       endInstruction: 2539
-      startSourceChar: 3707
-      endSourceChar: 3717
-      line: 84
+      startSourceChar: 3670
+      endSourceChar: 3680
+      line: 83
       lineChar: 44
       spanCodeSection: 'RstickV + '
     - startInstruction: 2540
       endInstruction: 2571
-      startSourceChar: 3717
-      endSourceChar: 3722
-      line: 84
+      startSourceChar: 3680
+      endSourceChar: 3685
+      line: 83
       lineChar: 54
       spanCodeSection: 'Wf + '
     - startInstruction: 2572
       endInstruction: 2603
-      startSourceChar: 3722
-      endSourceChar: 3727
-      line: 84
+      startSourceChar: 3685
+      endSourceChar: 3690
+      line: 83
       lineChar: 59
       spanCodeSection: 'Sf), '
     - startInstruction: 2604
       endInstruction: 2603
-      startSourceChar: 3727
-      endSourceChar: 3728
-      line: 84
+      startSourceChar: 3690
+      endSourceChar: 3691
+      line: 83
       lineChar: 64
       spanCodeSection: '-'
     - startInstruction: 2604
       endInstruction: 2627
-      startSourceChar: 3728
-      endSourceChar: 3731
-      line: 84
+      startSourceChar: 3691
+      endSourceChar: 3694
+      line: 83
       lineChar: 65
       spanCodeSection: '1, '
     - startInstruction: 2628
       endInstruction: 2715
-      startSourceChar: 3731
-      endSourceChar: 3736
-      line: 84
+      startSourceChar: 3694
+      endSourceChar: 3699
+      line: 83
       lineChar: 68
       spanCodeSection: '1) * '
     - startInstruction: 2716
       endInstruction: 2747
-      startSourceChar: 3736
-      endSourceChar: 3864
-      line: 84
+      startSourceChar: 3699
+      endSourceChar: 3827
+      line: 83
       lineChar: 73
       spanCodeSection: "TurnSpeedMulti;\r\n                //only do friction if slowing
         down or trying to turn in the oposite direction\r\n                "
     - startInstruction: 2748
       endInstruction: 2747
-      startSourceChar: 3864
-      endSourceChar: 3868
-      line: 86
+      startSourceChar: 3827
+      endSourceChar: 3831
+      line: 85
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 2748
       endInstruction: 2747
-      startSourceChar: 3868
-      endSourceChar: 3868
-      line: 86
+      startSourceChar: 3831
+      endSourceChar: 3831
+      line: 85
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 2748
       endInstruction: 2747
-      startSourceChar: 3868
-      endSourceChar: 3868
-      line: 86
+      startSourceChar: 3831
+      endSourceChar: 3831
+      line: 85
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 2748
       endInstruction: 2747
-      startSourceChar: 3868
-      endSourceChar: 3868
-      line: 86
+      startSourceChar: 3831
+      endSourceChar: 3831
+      line: 85
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 2748
       endInstruction: 2747
-      startSourceChar: 3868
-      endSourceChar: 3868
-      line: 86
+      startSourceChar: 3831
+      endSourceChar: 3831
+      line: 85
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 2748
       endInstruction: 2747
-      startSourceChar: 3868
-      endSourceChar: 3877
-      line: 86
+      startSourceChar: 3831
+      endSourceChar: 3840
+      line: 85
       lineChar: 20
       spanCodeSection: 'InputY > '
     - startInstruction: 2748
       endInstruction: 2839
-      startSourceChar: 3877
-      endSourceChar: 3882
-      line: 86
+      startSourceChar: 3840
+      endSourceChar: 3845
+      line: 85
       lineChar: 29
       spanCodeSection: '0 && '
     - startInstruction: 2840
       endInstruction: 2839
-      startSourceChar: 3882
-      endSourceChar: 3882
-      line: 86
+      startSourceChar: 3845
+      endSourceChar: 3845
+      line: 85
       lineChar: 34
       spanCodeSection: 
     - startInstruction: 2840
       endInstruction: 2839
-      startSourceChar: 3882
-      endSourceChar: 3897
-      line: 86
+      startSourceChar: 3845
+      endSourceChar: 3860
+      line: 85
       lineChar: 34
       spanCodeSection: 'InputYLerper < '
     - startInstruction: 2840
       endInstruction: 3007
-      startSourceChar: 3897
-      endSourceChar: 3902
-      line: 86
+      startSourceChar: 3860
+      endSourceChar: 3865
+      line: 85
       lineChar: 49
       spanCodeSection: '0 || '
     - startInstruction: 3008
       endInstruction: 3007
-      startSourceChar: 3902
-      endSourceChar: 3902
-      line: 86
+      startSourceChar: 3865
+      endSourceChar: 3865
+      line: 85
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 3008
       endInstruction: 3007
-      startSourceChar: 3902
-      endSourceChar: 3902
-      line: 86
+      startSourceChar: 3865
+      endSourceChar: 3865
+      line: 85
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 3008
       endInstruction: 3007
-      startSourceChar: 3902
-      endSourceChar: 3911
-      line: 86
+      startSourceChar: 3865
+      endSourceChar: 3874
+      line: 85
       lineChar: 54
       spanCodeSection: 'InputY < '
     - startInstruction: 3008
       endInstruction: 3099
-      startSourceChar: 3911
-      endSourceChar: 3916
-      line: 86
+      startSourceChar: 3874
+      endSourceChar: 3879
+      line: 85
       lineChar: 63
       spanCodeSection: '0 && '
     - startInstruction: 3100
       endInstruction: 3099
-      startSourceChar: 3916
-      endSourceChar: 3916
-      line: 86
+      startSourceChar: 3879
+      endSourceChar: 3879
+      line: 85
       lineChar: 68
       spanCodeSection: 
     - startInstruction: 3100
       endInstruction: 3099
-      startSourceChar: 3916
-      endSourceChar: 3931
-      line: 86
+      startSourceChar: 3879
+      endSourceChar: 3894
+      line: 85
       lineChar: 68
       spanCodeSection: 'InputYLerper > '
     - startInstruction: 3100
       endInstruction: 3319
-      startSourceChar: 3931
-      endSourceChar: 3936
-      line: 86
+      startSourceChar: 3894
+      endSourceChar: 3899
+      line: 85
       lineChar: 83
       spanCodeSection: '0 || '
     - startInstruction: 3320
       endInstruction: 3319
-      startSourceChar: 3936
-      endSourceChar: 3936
-      line: 86
+      startSourceChar: 3899
+      endSourceChar: 3899
+      line: 85
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 3320
       endInstruction: 3319
-      startSourceChar: 3936
-      endSourceChar: 3936
-      line: 86
+      startSourceChar: 3899
+      endSourceChar: 3899
+      line: 85
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 3320
       endInstruction: 3319
-      startSourceChar: 3936
-      endSourceChar: 3936
-      line: 86
+      startSourceChar: 3899
+      endSourceChar: 3899
+      line: 85
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 3320
       endInstruction: 3319
-      startSourceChar: 3936
-      endSourceChar: 3942
-      line: 86
+      startSourceChar: 3899
+      endSourceChar: 3905
+      line: 85
       lineChar: 88
       spanCodeSection: Mathf.
     - startInstruction: 3320
       endInstruction: 3319
-      startSourceChar: 3942
-      endSourceChar: 3946
-      line: 86
+      startSourceChar: 3905
+      endSourceChar: 3909
+      line: 85
       lineChar: 94
       spanCodeSection: Abs(
     - startInstruction: 3320
       endInstruction: 3343
-      startSourceChar: 3946
-      endSourceChar: 3962
-      line: 86
+      startSourceChar: 3909
+      endSourceChar: 3925
+      line: 85
       lineChar: 98
       spanCodeSection: 'InputYLerper) > '
     - startInstruction: 3344
       endInstruction: 3343
-      startSourceChar: 3962
-      endSourceChar: 3962
-      line: 86
+      startSourceChar: 3925
+      endSourceChar: 3925
+      line: 85
       lineChar: 114
       spanCodeSection: 
     - startInstruction: 3344
       endInstruction: 3343
-      startSourceChar: 3962
-      endSourceChar: 3962
-      line: 86
+      startSourceChar: 3925
+      endSourceChar: 3925
+      line: 85
       lineChar: 114
       spanCodeSection: 
     - startInstruction: 3344
       endInstruction: 3343
-      startSourceChar: 3962
-      endSourceChar: 3968
-      line: 86
+      startSourceChar: 3925
+      endSourceChar: 3931
+      line: 85
       lineChar: 114
       spanCodeSection: Mathf.
     - startInstruction: 3344
       endInstruction: 3343
-      startSourceChar: 3968
-      endSourceChar: 3972
-      line: 86
+      startSourceChar: 3931
+      endSourceChar: 3935
+      line: 85
       lineChar: 120
       spanCodeSection: Abs(
     - startInstruction: 3344
       endInstruction: 3467
-      startSourceChar: 3972
-      endSourceChar: 3998
-      line: 86
+      startSourceChar: 3935
+      endSourceChar: 3961
+      line: 85
       lineChar: 124
       spanCodeSection: "InputY))\r\n                "
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 3998
-      endSourceChar: 4021
-      line: 87
+      startSourceChar: 3961
+      endSourceChar: 3984
+      line: 86
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4021
-      endSourceChar: 4021
-      line: 88
+      startSourceChar: 3984
+      endSourceChar: 3984
+      line: 87
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4021
-      endSourceChar: 4021
-      line: 88
+      startSourceChar: 3984
+      endSourceChar: 3984
+      line: 87
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4021
-      endSourceChar: 4036
-      line: 88
+      startSourceChar: 3984
+      endSourceChar: 3999
+      line: 87
       lineChar: 20
       spanCodeSection: 'InputYLerper = '
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4036
-      endSourceChar: 4036
-      line: 88
+      startSourceChar: 3999
+      endSourceChar: 3999
+      line: 87
       lineChar: 35
       spanCodeSection: 
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4036
-      endSourceChar: 4036
-      line: 88
+      startSourceChar: 3999
+      endSourceChar: 3999
+      line: 87
       lineChar: 35
       spanCodeSection: 
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4036
-      endSourceChar: 4042
-      line: 88
+      startSourceChar: 3999
+      endSourceChar: 4005
+      line: 87
       lineChar: 35
       spanCodeSection: Mathf.
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4042
-      endSourceChar: 4047
-      line: 88
+      startSourceChar: 4005
+      endSourceChar: 4010
+      line: 87
       lineChar: 41
       spanCodeSection: Lerp(
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4047
-      endSourceChar: 4061
-      line: 88
+      startSourceChar: 4010
+      endSourceChar: 4024
+      line: 87
       lineChar: 46
       spanCodeSection: 'InputYLerper, '
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4061
-      endSourceChar: 4069
-      line: 88
+      startSourceChar: 4024
+      endSourceChar: 4032
+      line: 87
       lineChar: 60
       spanCodeSection: 'InputY, '
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4069
-      endSourceChar: 4069
-      line: 88
+      startSourceChar: 4032
+      endSourceChar: 4032
+      line: 87
       lineChar: 68
       spanCodeSection: 
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4069
-      endSourceChar: 4087
-      line: 88
+      startSourceChar: 4032
+      endSourceChar: 4050
+      line: 87
       lineChar: 68
       spanCodeSection: 'TurningResponse * '
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4087
-      endSourceChar: 4087
-      line: 88
+      startSourceChar: 4050
+      endSourceChar: 4050
+      line: 87
       lineChar: 86
       spanCodeSection: 
     - startInstruction: 3468
       endInstruction: 3467
-      startSourceChar: 4087
-      endSourceChar: 4092
-      line: 88
+      startSourceChar: 4050
+      endSourceChar: 4055
+      line: 87
       lineChar: 86
       spanCodeSection: Time.
     - startInstruction: 3468
       endInstruction: 3575
-      startSourceChar: 4092
-      endSourceChar: 4125
-      line: 88
+      startSourceChar: 4055
+      endSourceChar: 4088
+      line: 87
       lineChar: 91
       spanCodeSection: "deltaTime);\r\n                    "
     - startInstruction: 3576
       endInstruction: 3575
-      startSourceChar: 4125
-      endSourceChar: 4125
-      line: 89
+      startSourceChar: 4088
+      endSourceChar: 4088
+      line: 88
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 3576
       endInstruction: 3575
-      startSourceChar: 4125
-      endSourceChar: 4125
-      line: 89
+      startSourceChar: 4088
+      endSourceChar: 4088
+      line: 88
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 3576
       endInstruction: 3575
-      startSourceChar: 4125
-      endSourceChar: 4141
-      line: 89
+      startSourceChar: 4088
+      endSourceChar: 4104
+      line: 88
       lineChar: 20
       spanCodeSection: 'InputYLerper *= '
     - startInstruction: 3576
       endInstruction: 3635
-      startSourceChar: 4141
-      endSourceChar: 4188
-      line: 89
+      startSourceChar: 4104
+      endSourceChar: 4151
+      line: 88
       lineChar: 36
       spanCodeSection: "StopSpeed;\r\n                }\r\n                "
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4188
-      endSourceChar: 4193
-      line: 91
+      startSourceChar: 4151
+      endSourceChar: 4156
+      line: 90
       lineChar: 16
       spanCodeSection: 'else '
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4193
-      endSourceChar: 4195
-      line: 91
+      startSourceChar: 4156
+      endSourceChar: 4158
+      line: 90
       lineChar: 21
       spanCodeSection: '{ '
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4195
-      endSourceChar: 4195
-      line: 91
+      startSourceChar: 4158
+      endSourceChar: 4158
+      line: 90
       lineChar: 23
       spanCodeSection: 
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4195
-      endSourceChar: 4195
-      line: 91
+      startSourceChar: 4158
+      endSourceChar: 4158
+      line: 90
       lineChar: 23
       spanCodeSection: 
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4195
-      endSourceChar: 4210
-      line: 91
+      startSourceChar: 4158
+      endSourceChar: 4173
+      line: 90
       lineChar: 23
       spanCodeSection: 'InputYLerper = '
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4210
-      endSourceChar: 4210
-      line: 91
+      startSourceChar: 4173
+      endSourceChar: 4173
+      line: 90
       lineChar: 38
       spanCodeSection: 
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4210
-      endSourceChar: 4210
-      line: 91
+      startSourceChar: 4173
+      endSourceChar: 4173
+      line: 90
       lineChar: 38
       spanCodeSection: 
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4210
-      endSourceChar: 4216
-      line: 91
+      startSourceChar: 4173
+      endSourceChar: 4179
+      line: 90
       lineChar: 38
       spanCodeSection: Mathf.
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4216
-      endSourceChar: 4221
-      line: 91
+      startSourceChar: 4179
+      endSourceChar: 4184
+      line: 90
       lineChar: 44
       spanCodeSection: Lerp(
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4221
-      endSourceChar: 4235
-      line: 91
+      startSourceChar: 4184
+      endSourceChar: 4198
+      line: 90
       lineChar: 49
       spanCodeSection: 'InputYLerper, '
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4235
-      endSourceChar: 4243
-      line: 91
+      startSourceChar: 4198
+      endSourceChar: 4206
+      line: 90
       lineChar: 63
       spanCodeSection: 'InputY, '
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4243
-      endSourceChar: 4243
-      line: 91
+      startSourceChar: 4206
+      endSourceChar: 4206
+      line: 90
       lineChar: 71
       spanCodeSection: 
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4243
-      endSourceChar: 4261
-      line: 91
+      startSourceChar: 4206
+      endSourceChar: 4224
+      line: 90
       lineChar: 71
       spanCodeSection: 'TurningResponse * '
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4261
-      endSourceChar: 4261
-      line: 91
+      startSourceChar: 4224
+      endSourceChar: 4224
+      line: 90
       lineChar: 89
       spanCodeSection: 
     - startInstruction: 3636
       endInstruction: 3635
-      startSourceChar: 4261
-      endSourceChar: 4266
-      line: 91
+      startSourceChar: 4224
+      endSourceChar: 4229
+      line: 90
       lineChar: 89
       spanCodeSection: Time.
     - startInstruction: 3636
       endInstruction: 3743
-      startSourceChar: 4266
-      endSourceChar: 4299
-      line: 91
+      startSourceChar: 4229
+      endSourceChar: 4262
+      line: 90
       lineChar: 94
       spanCodeSection: "deltaTime); }\r\n\r\n                "
     - startInstruction: 3744
       endInstruction: 3743
-      startSourceChar: 4299
-      endSourceChar: 4303
-      line: 93
+      startSourceChar: 4262
+      endSourceChar: 4266
+      line: 92
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 3744
       endInstruction: 3743
-      startSourceChar: 4303
-      endSourceChar: 4303
-      line: 93
+      startSourceChar: 4266
+      endSourceChar: 4266
+      line: 92
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 3744
       endInstruction: 3743
-      startSourceChar: 4303
-      endSourceChar: 4303
-      line: 93
+      startSourceChar: 4266
+      endSourceChar: 4266
+      line: 92
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 3744
       endInstruction: 3743
-      startSourceChar: 4303
-      endSourceChar: 4303
-      line: 93
+      startSourceChar: 4266
+      endSourceChar: 4266
+      line: 92
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 3744
       endInstruction: 3743
-      startSourceChar: 4303
-      endSourceChar: 4303
-      line: 93
+      startSourceChar: 4266
+      endSourceChar: 4266
+      line: 92
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 3744
       endInstruction: 3743
-      startSourceChar: 4303
-      endSourceChar: 4312
-      line: 93
+      startSourceChar: 4266
+      endSourceChar: 4275
+      line: 92
       lineChar: 20
       spanCodeSection: 'InputX > '
     - startInstruction: 3744
       endInstruction: 3835
-      startSourceChar: 4312
-      endSourceChar: 4317
-      line: 93
+      startSourceChar: 4275
+      endSourceChar: 4280
+      line: 92
       lineChar: 29
       spanCodeSection: '0 && '
     - startInstruction: 3836
       endInstruction: 3835
-      startSourceChar: 4317
-      endSourceChar: 4317
-      line: 93
+      startSourceChar: 4280
+      endSourceChar: 4280
+      line: 92
       lineChar: 34
       spanCodeSection: 
     - startInstruction: 3836
       endInstruction: 3835
-      startSourceChar: 4317
-      endSourceChar: 4332
-      line: 93
+      startSourceChar: 4280
+      endSourceChar: 4295
+      line: 92
       lineChar: 34
       spanCodeSection: 'InputXLerper < '
     - startInstruction: 3836
       endInstruction: 4003
-      startSourceChar: 4332
-      endSourceChar: 4337
-      line: 93
+      startSourceChar: 4295
+      endSourceChar: 4300
+      line: 92
       lineChar: 49
       spanCodeSection: '0 || '
     - startInstruction: 4004
       endInstruction: 4003
-      startSourceChar: 4337
-      endSourceChar: 4337
-      line: 93
+      startSourceChar: 4300
+      endSourceChar: 4300
+      line: 92
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 4004
       endInstruction: 4003
-      startSourceChar: 4337
-      endSourceChar: 4337
-      line: 93
+      startSourceChar: 4300
+      endSourceChar: 4300
+      line: 92
       lineChar: 54
       spanCodeSection: 
     - startInstruction: 4004
       endInstruction: 4003
-      startSourceChar: 4337
-      endSourceChar: 4346
-      line: 93
+      startSourceChar: 4300
+      endSourceChar: 4309
+      line: 92
       lineChar: 54
       spanCodeSection: 'InputX < '
     - startInstruction: 4004
       endInstruction: 4095
-      startSourceChar: 4346
-      endSourceChar: 4351
-      line: 93
+      startSourceChar: 4309
+      endSourceChar: 4314
+      line: 92
       lineChar: 63
       spanCodeSection: '0 && '
     - startInstruction: 4096
       endInstruction: 4095
-      startSourceChar: 4351
-      endSourceChar: 4351
-      line: 93
+      startSourceChar: 4314
+      endSourceChar: 4314
+      line: 92
       lineChar: 68
       spanCodeSection: 
     - startInstruction: 4096
       endInstruction: 4095
-      startSourceChar: 4351
-      endSourceChar: 4366
-      line: 93
+      startSourceChar: 4314
+      endSourceChar: 4329
+      line: 92
       lineChar: 68
       spanCodeSection: 'InputXLerper > '
     - startInstruction: 4096
       endInstruction: 4315
-      startSourceChar: 4366
-      endSourceChar: 4371
-      line: 93
+      startSourceChar: 4329
+      endSourceChar: 4334
+      line: 92
       lineChar: 83
       spanCodeSection: '0 || '
     - startInstruction: 4316
       endInstruction: 4315
-      startSourceChar: 4371
-      endSourceChar: 4371
-      line: 93
+      startSourceChar: 4334
+      endSourceChar: 4334
+      line: 92
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 4316
       endInstruction: 4315
-      startSourceChar: 4371
-      endSourceChar: 4371
-      line: 93
+      startSourceChar: 4334
+      endSourceChar: 4334
+      line: 92
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 4316
       endInstruction: 4315
-      startSourceChar: 4371
-      endSourceChar: 4371
-      line: 93
+      startSourceChar: 4334
+      endSourceChar: 4334
+      line: 92
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 4316
       endInstruction: 4315
-      startSourceChar: 4371
-      endSourceChar: 4377
-      line: 93
+      startSourceChar: 4334
+      endSourceChar: 4340
+      line: 92
       lineChar: 88
       spanCodeSection: Mathf.
     - startInstruction: 4316
       endInstruction: 4315
-      startSourceChar: 4377
-      endSourceChar: 4381
-      line: 93
+      startSourceChar: 4340
+      endSourceChar: 4344
+      line: 92
       lineChar: 94
       spanCodeSection: Abs(
     - startInstruction: 4316
       endInstruction: 4339
-      startSourceChar: 4381
-      endSourceChar: 4397
-      line: 93
+      startSourceChar: 4344
+      endSourceChar: 4360
+      line: 92
       lineChar: 98
       spanCodeSection: 'InputXLerper) > '
     - startInstruction: 4340
       endInstruction: 4339
-      startSourceChar: 4397
-      endSourceChar: 4397
-      line: 93
+      startSourceChar: 4360
+      endSourceChar: 4360
+      line: 92
       lineChar: 114
       spanCodeSection: 
     - startInstruction: 4340
       endInstruction: 4339
-      startSourceChar: 4397
-      endSourceChar: 4397
-      line: 93
+      startSourceChar: 4360
+      endSourceChar: 4360
+      line: 92
       lineChar: 114
       spanCodeSection: 
     - startInstruction: 4340
       endInstruction: 4339
-      startSourceChar: 4397
-      endSourceChar: 4403
-      line: 93
+      startSourceChar: 4360
+      endSourceChar: 4366
+      line: 92
       lineChar: 114
       spanCodeSection: Mathf.
     - startInstruction: 4340
       endInstruction: 4339
-      startSourceChar: 4403
-      endSourceChar: 4407
-      line: 93
+      startSourceChar: 4366
+      endSourceChar: 4370
+      line: 92
       lineChar: 120
       spanCodeSection: Abs(
     - startInstruction: 4340
       endInstruction: 4463
-      startSourceChar: 4407
-      endSourceChar: 4433
-      line: 93
+      startSourceChar: 4370
+      endSourceChar: 4396
+      line: 92
       lineChar: 124
       spanCodeSection: "InputX))\r\n                "
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4433
-      endSourceChar: 4456
-      line: 94
+      startSourceChar: 4396
+      endSourceChar: 4419
+      line: 93
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4456
-      endSourceChar: 4456
-      line: 95
+      startSourceChar: 4419
+      endSourceChar: 4419
+      line: 94
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4456
-      endSourceChar: 4456
-      line: 95
+      startSourceChar: 4419
+      endSourceChar: 4419
+      line: 94
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4456
-      endSourceChar: 4471
-      line: 95
+      startSourceChar: 4419
+      endSourceChar: 4434
+      line: 94
       lineChar: 20
       spanCodeSection: 'InputXLerper = '
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4471
-      endSourceChar: 4471
-      line: 95
+      startSourceChar: 4434
+      endSourceChar: 4434
+      line: 94
       lineChar: 35
       spanCodeSection: 
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4471
-      endSourceChar: 4471
-      line: 95
+      startSourceChar: 4434
+      endSourceChar: 4434
+      line: 94
       lineChar: 35
       spanCodeSection: 
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4471
-      endSourceChar: 4477
-      line: 95
+      startSourceChar: 4434
+      endSourceChar: 4440
+      line: 94
       lineChar: 35
       spanCodeSection: Mathf.
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4477
-      endSourceChar: 4482
-      line: 95
+      startSourceChar: 4440
+      endSourceChar: 4445
+      line: 94
       lineChar: 41
       spanCodeSection: Lerp(
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4482
-      endSourceChar: 4496
-      line: 95
+      startSourceChar: 4445
+      endSourceChar: 4459
+      line: 94
       lineChar: 46
       spanCodeSection: 'InputXLerper, '
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4496
-      endSourceChar: 4504
-      line: 95
+      startSourceChar: 4459
+      endSourceChar: 4467
+      line: 94
       lineChar: 60
       spanCodeSection: 'InputX, '
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4504
-      endSourceChar: 4504
-      line: 95
+      startSourceChar: 4467
+      endSourceChar: 4467
+      line: 94
       lineChar: 68
       spanCodeSection: 
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4504
-      endSourceChar: 4522
-      line: 95
+      startSourceChar: 4467
+      endSourceChar: 4485
+      line: 94
       lineChar: 68
       spanCodeSection: 'TurningResponse * '
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4522
-      endSourceChar: 4522
-      line: 95
+      startSourceChar: 4485
+      endSourceChar: 4485
+      line: 94
       lineChar: 86
       spanCodeSection: 
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4522
-      endSourceChar: 4527
-      line: 95
+      startSourceChar: 4485
+      endSourceChar: 4490
+      line: 94
       lineChar: 86
       spanCodeSection: Time.
     - startInstruction: 4464
       endInstruction: 4571
-      startSourceChar: 4527
-      endSourceChar: 4560
-      line: 95
+      startSourceChar: 4490
+      endSourceChar: 4523
+      line: 94
       lineChar: 91
       spanCodeSection: "deltaTime);\r\n                    "
     - startInstruction: 4572
       endInstruction: 4571
-      startSourceChar: 4560
-      endSourceChar: 4560
-      line: 96
+      startSourceChar: 4523
+      endSourceChar: 4523
+      line: 95
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 4572
       endInstruction: 4571
-      startSourceChar: 4560
-      endSourceChar: 4560
-      line: 96
+      startSourceChar: 4523
+      endSourceChar: 4523
+      line: 95
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 4572
       endInstruction: 4571
-      startSourceChar: 4560
-      endSourceChar: 4576
-      line: 96
+      startSourceChar: 4523
+      endSourceChar: 4539
+      line: 95
       lineChar: 20
       spanCodeSection: 'InputXLerper *= '
     - startInstruction: 4572
       endInstruction: 4631
-      startSourceChar: 4576
-      endSourceChar: 4623
-      line: 96
+      startSourceChar: 4539
+      endSourceChar: 4586
+      line: 95
       lineChar: 36
       spanCodeSection: "StopSpeed;\r\n                }\r\n                "
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4623
-      endSourceChar: 4628
-      line: 98
+      startSourceChar: 4586
+      endSourceChar: 4591
+      line: 97
       lineChar: 16
       spanCodeSection: 'else '
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4628
-      endSourceChar: 4630
-      line: 98
+      startSourceChar: 4591
+      endSourceChar: 4593
+      line: 97
       lineChar: 21
       spanCodeSection: '{ '
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4630
-      endSourceChar: 4630
-      line: 98
+      startSourceChar: 4593
+      endSourceChar: 4593
+      line: 97
       lineChar: 23
       spanCodeSection: 
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4630
-      endSourceChar: 4630
-      line: 98
+      startSourceChar: 4593
+      endSourceChar: 4593
+      line: 97
       lineChar: 23
       spanCodeSection: 
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4630
-      endSourceChar: 4645
-      line: 98
+      startSourceChar: 4593
+      endSourceChar: 4608
+      line: 97
       lineChar: 23
       spanCodeSection: 'InputXLerper = '
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4645
-      endSourceChar: 4645
-      line: 98
+      startSourceChar: 4608
+      endSourceChar: 4608
+      line: 97
       lineChar: 38
       spanCodeSection: 
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4645
-      endSourceChar: 4645
-      line: 98
+      startSourceChar: 4608
+      endSourceChar: 4608
+      line: 97
       lineChar: 38
       spanCodeSection: 
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4645
-      endSourceChar: 4651
-      line: 98
+      startSourceChar: 4608
+      endSourceChar: 4614
+      line: 97
       lineChar: 38
       spanCodeSection: Mathf.
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4651
-      endSourceChar: 4656
-      line: 98
+      startSourceChar: 4614
+      endSourceChar: 4619
+      line: 97
       lineChar: 44
       spanCodeSection: Lerp(
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4656
-      endSourceChar: 4670
-      line: 98
+      startSourceChar: 4619
+      endSourceChar: 4633
+      line: 97
       lineChar: 49
       spanCodeSection: 'InputXLerper, '
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4670
-      endSourceChar: 4678
-      line: 98
+      startSourceChar: 4633
+      endSourceChar: 4641
+      line: 97
       lineChar: 63
       spanCodeSection: 'InputX, '
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4678
-      endSourceChar: 4678
-      line: 98
+      startSourceChar: 4641
+      endSourceChar: 4641
+      line: 97
       lineChar: 71
       spanCodeSection: 
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4678
-      endSourceChar: 4696
-      line: 98
+      startSourceChar: 4641
+      endSourceChar: 4659
+      line: 97
       lineChar: 71
       spanCodeSection: 'TurningResponse * '
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4696
-      endSourceChar: 4696
-      line: 98
+      startSourceChar: 4659
+      endSourceChar: 4659
+      line: 97
       lineChar: 89
       spanCodeSection: 
     - startInstruction: 4632
       endInstruction: 4631
-      startSourceChar: 4696
-      endSourceChar: 4701
-      line: 98
+      startSourceChar: 4659
+      endSourceChar: 4664
+      line: 97
       lineChar: 89
       spanCodeSection: Time.
     - startInstruction: 4632
       endInstruction: 4739
-      startSourceChar: 4701
-      endSourceChar: 4736
-      line: 98
+      startSourceChar: 4664
+      endSourceChar: 4699
+      line: 97
       lineChar: 94
       spanCodeSection: "deltaTime); }\r\n\r\n\r\n                "
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4736
-      endSourceChar: 4736
-      line: 101
+      startSourceChar: 4699
+      endSourceChar: 4699
+      line: 100
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4736
-      endSourceChar: 4736
-      line: 101
+      startSourceChar: 4699
+      endSourceChar: 4699
+      line: 100
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4736
-      endSourceChar: 4736
-      line: 101
+      startSourceChar: 4699
+      endSourceChar: 4699
+      line: 100
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4736
-      endSourceChar: 4750
-      line: 101
+      startSourceChar: 4699
+      endSourceChar: 4713
+      line: 100
       lineChar: 16
       spanCodeSection: 'float temprot '
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4750
-      endSourceChar: 4752
-      line: 101
+      startSourceChar: 4713
+      endSourceChar: 4715
+      line: 100
       lineChar: 30
       spanCodeSection: '= '
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4752
-      endSourceChar: 4752
-      line: 101
+      startSourceChar: 4715
+      endSourceChar: 4715
+      line: 100
       lineChar: 32
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4752
-      endSourceChar: 4752
-      line: 101
+      startSourceChar: 4715
+      endSourceChar: 4715
+      line: 100
       lineChar: 32
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4752
-      endSourceChar: 4752
-      line: 101
+      startSourceChar: 4715
+      endSourceChar: 4715
+      line: 100
       lineChar: 32
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4752
-      endSourceChar: 4752
-      line: 101
+      startSourceChar: 4715
+      endSourceChar: 4715
+      line: 100
       lineChar: 32
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4752
-      endSourceChar: 4760
-      line: 101
+      startSourceChar: 4715
+      endSourceChar: 4723
+      line: 100
       lineChar: 32
       spanCodeSection: Rotator.
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4760
-      endSourceChar: 4770
-      line: 101
+      startSourceChar: 4723
+      endSourceChar: 4733
+      line: 100
       lineChar: 40
       spanCodeSection: transform.
     - startInstruction: 4740
       endInstruction: 4763
-      startSourceChar: 4770
-      endSourceChar: 4784
-      line: 101
+      startSourceChar: 4733
+      endSourceChar: 4747
+      line: 100
       lineChar: 50
       spanCodeSection: localRotation.
     - startInstruction: 4764
       endInstruction: 4787
-      startSourceChar: 4784
-      endSourceChar: 4796
-      line: 101
+      startSourceChar: 4747
+      endSourceChar: 4759
+      line: 100
       lineChar: 64
       spanCodeSection: eulerAngles.
     - startInstruction: 4788
       endInstruction: 4835
-      startSourceChar: 4796
-      endSourceChar: 4816
-      line: 101
+      startSourceChar: 4759
+      endSourceChar: 4779
+      line: 100
       lineChar: 76
       spanCodeSection: "x;\r\n                "
     - startInstruction: 4836
       endInstruction: 4835
-      startSourceChar: 4816
-      endSourceChar: 4816
-      line: 102
+      startSourceChar: 4779
+      endSourceChar: 4779
+      line: 101
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4836
       endInstruction: 4835
-      startSourceChar: 4816
-      endSourceChar: 4816
-      line: 102
+      startSourceChar: 4779
+      endSourceChar: 4779
+      line: 101
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4836
       endInstruction: 4835
-      startSourceChar: 4816
-      endSourceChar: 4827
-      line: 102
+      startSourceChar: 4779
+      endSourceChar: 4790
+      line: 101
       lineChar: 16
       spanCodeSection: 'temprot += '
     - startInstruction: 4836
       endInstruction: 4835
-      startSourceChar: 4827
-      endSourceChar: 4827
-      line: 102
+      startSourceChar: 4790
+      endSourceChar: 4790
+      line: 101
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 4836
       endInstruction: 4835
-      startSourceChar: 4827
-      endSourceChar: 4842
-      line: 102
+      startSourceChar: 4790
+      endSourceChar: 4805
+      line: 101
       lineChar: 27
       spanCodeSection: 'InputXLerper * '
     - startInstruction: 4836
       endInstruction: 4919
-      startSourceChar: 4842
-      endSourceChar: 4870
-      line: 102
+      startSourceChar: 4805
+      endSourceChar: 4833
+      line: 101
       lineChar: 42
       spanCodeSection: "ZoomLevel;\r\n                "
     - startInstruction: 4920
       endInstruction: 4919
-      startSourceChar: 4870
-      endSourceChar: 4874
-      line: 103
+      startSourceChar: 4833
+      endSourceChar: 4837
+      line: 102
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 4920
       endInstruction: 4919
-      startSourceChar: 4874
-      endSourceChar: 4874
-      line: 103
+      startSourceChar: 4837
+      endSourceChar: 4837
+      line: 102
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 4920
       endInstruction: 4919
-      startSourceChar: 4874
-      endSourceChar: 4884
-      line: 103
+      startSourceChar: 4837
+      endSourceChar: 4847
+      line: 102
       lineChar: 20
       spanCodeSection: 'temprot > '
     - startInstruction: 4920
       endInstruction: 4991
-      startSourceChar: 4884
-      endSourceChar: 4889
-      line: 103
+      startSourceChar: 4847
+      endSourceChar: 4852
+      line: 102
       lineChar: 30
       spanCodeSection: '180) '
     - startInstruction: 4992
       endInstruction: 4991
-      startSourceChar: 4889
-      endSourceChar: 4891
-      line: 103
+      startSourceChar: 4852
+      endSourceChar: 4854
+      line: 102
       lineChar: 35
       spanCodeSection: '{ '
     - startInstruction: 4992
       endInstruction: 4991
-      startSourceChar: 4891
-      endSourceChar: 4891
-      line: 103
+      startSourceChar: 4854
+      endSourceChar: 4854
+      line: 102
       lineChar: 37
       spanCodeSection: 
     - startInstruction: 4992
       endInstruction: 4991
-      startSourceChar: 4891
-      endSourceChar: 4891
-      line: 103
+      startSourceChar: 4854
+      endSourceChar: 4854
+      line: 102
       lineChar: 37
       spanCodeSection: 
     - startInstruction: 4992
       endInstruction: 4991
-      startSourceChar: 4891
-      endSourceChar: 4902
-      line: 103
+      startSourceChar: 4854
+      endSourceChar: 4865
+      line: 102
       lineChar: 37
       spanCodeSection: 'temprot -= '
     - startInstruction: 4992
       endInstruction: 5067
-      startSourceChar: 4902
-      endSourceChar: 4926
-      line: 103
+      startSourceChar: 4865
+      endSourceChar: 4889
+      line: 102
       lineChar: 48
       spanCodeSection: "360; }\r\n                "
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4926
-      endSourceChar: 4926
-      line: 104
+      startSourceChar: 4889
+      endSourceChar: 4889
+      line: 103
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4926
-      endSourceChar: 4926
-      line: 104
+      startSourceChar: 4889
+      endSourceChar: 4889
+      line: 103
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4926
-      endSourceChar: 4936
-      line: 104
+      startSourceChar: 4889
+      endSourceChar: 4899
+      line: 103
       lineChar: 16
       spanCodeSection: 'temprot = '
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4936
-      endSourceChar: 4936
-      line: 104
+      startSourceChar: 4899
+      endSourceChar: 4899
+      line: 103
       lineChar: 26
       spanCodeSection: 
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4936
-      endSourceChar: 4936
-      line: 104
+      startSourceChar: 4899
+      endSourceChar: 4899
+      line: 103
       lineChar: 26
       spanCodeSection: 
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4936
-      endSourceChar: 4942
-      line: 104
+      startSourceChar: 4899
+      endSourceChar: 4905
+      line: 103
       lineChar: 26
       spanCodeSection: Mathf.
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4942
-      endSourceChar: 4948
-      line: 104
+      startSourceChar: 4905
+      endSourceChar: 4911
+      line: 103
       lineChar: 32
       spanCodeSection: Clamp(
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4948
-      endSourceChar: 4957
-      line: 104
+      startSourceChar: 4911
+      endSourceChar: 4920
+      line: 103
       lineChar: 38
       spanCodeSection: 'temprot, '
     - startInstruction: 5068
       endInstruction: 5067
-      startSourceChar: 4957
-      endSourceChar: 4958
-      line: 104
+      startSourceChar: 4920
+      endSourceChar: 4921
+      line: 103
       lineChar: 47
       spanCodeSection: '-'
     - startInstruction: 5068
       endInstruction: 5091
-      startSourceChar: 4958
-      endSourceChar: 4962
-      line: 104
+      startSourceChar: 4921
+      endSourceChar: 4925
+      line: 103
       lineChar: 48
       spanCodeSection: '89, '
     - startInstruction: 5092
       endInstruction: 5199
-      startSourceChar: 4962
-      endSourceChar: 4984
-      line: 104
+      startSourceChar: 4925
+      endSourceChar: 4947
+      line: 103
       lineChar: 52
       spanCodeSection: "35);\r\n                "
     - startInstruction: 5200
       endInstruction: 5199
-      startSourceChar: 4984
-      endSourceChar: 4984
-      line: 105
+      startSourceChar: 4947
+      endSourceChar: 4947
+      line: 104
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 5200
       endInstruction: 5199
-      startSourceChar: 4984
-      endSourceChar: 4984
-      line: 105
+      startSourceChar: 4947
+      endSourceChar: 4947
+      line: 104
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 5200
       endInstruction: 5199
-      startSourceChar: 4984
-      endSourceChar: 4984
-      line: 105
+      startSourceChar: 4947
+      endSourceChar: 4947
+      line: 104
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 5200
       endInstruction: 5199
-      startSourceChar: 4984
-      endSourceChar: 4984
-      line: 105
+      startSourceChar: 4947
+      endSourceChar: 4947
+      line: 104
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 5200
       endInstruction: 5199
-      startSourceChar: 4984
-      endSourceChar: 4992
-      line: 105
+      startSourceChar: 4947
+      endSourceChar: 4955
+      line: 104
       lineChar: 16
       spanCodeSection: Rotator.
     - startInstruction: 5200
       endInstruction: 5199
-      startSourceChar: 4992
-      endSourceChar: 5002
-      line: 105
+      startSourceChar: 4955
+      endSourceChar: 4965
+      line: 104
       lineChar: 24
       spanCodeSection: transform.
     - startInstruction: 5200
       endInstruction: 5223
-      startSourceChar: 5002
-      endSourceChar: 5018
-      line: 105
+      startSourceChar: 4965
+      endSourceChar: 4981
+      line: 104
       lineChar: 34
       spanCodeSection: 'localRotation = '
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5018
-      endSourceChar: 5018
-      line: 105
+      startSourceChar: 4981
+      endSourceChar: 4981
+      line: 104
       lineChar: 50
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5018
-      endSourceChar: 5018
-      line: 105
+      startSourceChar: 4981
+      endSourceChar: 4981
+      line: 104
       lineChar: 50
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5018
-      endSourceChar: 5029
-      line: 105
+      startSourceChar: 4981
+      endSourceChar: 4992
+      line: 104
       lineChar: 50
       spanCodeSection: Quaternion.
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5029
-      endSourceChar: 5035
-      line: 105
+      startSourceChar: 4992
+      endSourceChar: 4998
+      line: 104
       lineChar: 61
       spanCodeSection: Euler(
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5035
-      endSourceChar: 5039
-      line: 105
+      startSourceChar: 4998
+      endSourceChar: 5002
+      line: 104
       lineChar: 67
       spanCodeSection: 'new '
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5039
-      endSourceChar: 5047
-      line: 105
+      startSourceChar: 5002
+      endSourceChar: 5010
+      line: 104
       lineChar: 71
       spanCodeSection: Vector3(
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5047
-      endSourceChar: 5047
-      line: 105
+      startSourceChar: 5010
+      endSourceChar: 5010
+      line: 104
       lineChar: 79
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5047
-      endSourceChar: 5056
-      line: 105
+      startSourceChar: 5010
+      endSourceChar: 5019
+      line: 104
       lineChar: 79
       spanCodeSection: 'temprot, '
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5056
-      endSourceChar: 5056
-      line: 105
+      startSourceChar: 5019
+      endSourceChar: 5019
+      line: 104
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5056
-      endSourceChar: 5056
-      line: 105
+      startSourceChar: 5019
+      endSourceChar: 5019
+      line: 104
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5056
-      endSourceChar: 5056
-      line: 105
+      startSourceChar: 5019
+      endSourceChar: 5019
+      line: 104
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5056
-      endSourceChar: 5056
-      line: 105
+      startSourceChar: 5019
+      endSourceChar: 5019
+      line: 104
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5056
-      endSourceChar: 5056
-      line: 105
+      startSourceChar: 5019
+      endSourceChar: 5019
+      line: 104
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5056
-      endSourceChar: 5056
-      line: 105
+      startSourceChar: 5019
+      endSourceChar: 5019
+      line: 104
       lineChar: 88
       spanCodeSection: 
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5056
-      endSourceChar: 5064
-      line: 105
+      startSourceChar: 5019
+      endSourceChar: 5027
+      line: 104
       lineChar: 88
       spanCodeSection: Rotator.
     - startInstruction: 5224
       endInstruction: 5223
-      startSourceChar: 5064
-      endSourceChar: 5074
-      line: 105
+      startSourceChar: 5027
+      endSourceChar: 5037
+      line: 104
       lineChar: 96
       spanCodeSection: transform.
     - startInstruction: 5224
       endInstruction: 5247
-      startSourceChar: 5074
-      endSourceChar: 5088
-      line: 105
+      startSourceChar: 5037
+      endSourceChar: 5051
+      line: 104
       lineChar: 106
       spanCodeSection: localRotation.
     - startInstruction: 5248
       endInstruction: 5271
-      startSourceChar: 5088
-      endSourceChar: 5100
-      line: 105
+      startSourceChar: 5051
+      endSourceChar: 5063
+      line: 104
       lineChar: 120
       spanCodeSection: eulerAngles.
     - startInstruction: 5272
       endInstruction: 5319
-      startSourceChar: 5100
-      endSourceChar: 5104
-      line: 105
+      startSourceChar: 5063
+      endSourceChar: 5067
+      line: 104
       lineChar: 132
       spanCodeSection: 'y + '
     - startInstruction: 5320
       endInstruction: 5319
-      startSourceChar: 5104
-      endSourceChar: 5105
-      line: 105
+      startSourceChar: 5067
+      endSourceChar: 5068
+      line: 104
       lineChar: 136
       spanCodeSection: (
     - startInstruction: 5320
       endInstruction: 5319
-      startSourceChar: 5105
-      endSourceChar: 5105
-      line: 105
+      startSourceChar: 5068
+      endSourceChar: 5068
+      line: 104
       lineChar: 137
       spanCodeSection: 
     - startInstruction: 5320
       endInstruction: 5319
-      startSourceChar: 5105
-      endSourceChar: 5120
-      line: 105
+      startSourceChar: 5068
+      endSourceChar: 5083
+      line: 104
       lineChar: 137
       spanCodeSection: 'InputYLerper * '
     - startInstruction: 5320
       endInstruction: 5383
-      startSourceChar: 5120
-      endSourceChar: 5132
-      line: 105
+      startSourceChar: 5083
+      endSourceChar: 5095
+      line: 104
       lineChar: 152
       spanCodeSection: 'ZoomLevel), '
     - startInstruction: 5384
       endInstruction: 5383
-      startSourceChar: 5132
-      endSourceChar: 5132
-      line: 105
+      startSourceChar: 5095
+      endSourceChar: 5095
+      line: 104
       lineChar: 164
       spanCodeSection: 
     - startInstruction: 5384
       endInstruction: 5495
-      startSourceChar: 5132
-      endSourceChar: 5156
-      line: 105
+      startSourceChar: 5095
+      endSourceChar: 5119
+      line: 104
       lineChar: 164
       spanCodeSection: "0));\r\n\r\n                "
     - startInstruction: 5496
       endInstruction: 5495
-      startSourceChar: 5156
-      endSourceChar: 5156
-      line: 107
+      startSourceChar: 5119
+      endSourceChar: 5119
+      line: 106
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 5496
       endInstruction: 5495
-      startSourceChar: 5156
-      endSourceChar: 5156
-      line: 107
+      startSourceChar: 5119
+      endSourceChar: 5119
+      line: 106
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 5496
       endInstruction: 5495
-      startSourceChar: 5156
-      endSourceChar: 5167
-      line: 107
+      startSourceChar: 5119
+      endSourceChar: 5130
+      line: 106
       lineChar: 16
       spanCodeSection: 'RTrigger = '
     - startInstruction: 5496
       endInstruction: 5495
-      startSourceChar: 5167
-      endSourceChar: 5167
-      line: 107
+      startSourceChar: 5130
+      endSourceChar: 5130
+      line: 106
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 5496
       endInstruction: 5495
-      startSourceChar: 5167
-      endSourceChar: 5167
-      line: 107
+      startSourceChar: 5130
+      endSourceChar: 5130
+      line: 106
       lineChar: 27
       spanCodeSection: 
     - startInstruction: 5496
       endInstruction: 5495
-      startSourceChar: 5167
-      endSourceChar: 5173
-      line: 107
+      startSourceChar: 5130
+      endSourceChar: 5136
+      line: 106
       lineChar: 27
       spanCodeSection: Input.
     - startInstruction: 5496
       endInstruction: 5495
-      startSourceChar: 5173
-      endSourceChar: 5184
-      line: 107
+      startSourceChar: 5136
+      endSourceChar: 5147
+      line: 106
       lineChar: 33
       spanCodeSection: GetAxisRaw(
     - startInstruction: 5496
       endInstruction: 5519
-      startSourceChar: 5184
-      endSourceChar: 5282
-      line: 107
+      startSourceChar: 5147
+      endSourceChar: 5245
+      line: 106
       lineChar: 44
       spanCodeSection: "\"Oculus_CrossPlatform_SecondaryIndexTrigger\");\r\n                //Firing
         the gun\r\n                "
     - startInstruction: 5520
       endInstruction: 5519
-      startSourceChar: 5282
-      endSourceChar: 5286
-      line: 109
+      startSourceChar: 5245
+      endSourceChar: 5249
+      line: 108
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 5520
       endInstruction: 5519
-      startSourceChar: 5286
-      endSourceChar: 5286
-      line: 109
+      startSourceChar: 5249
+      endSourceChar: 5249
+      line: 108
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 5520
       endInstruction: 5519
-      startSourceChar: 5286
-      endSourceChar: 5286
-      line: 109
+      startSourceChar: 5249
+      endSourceChar: 5249
+      line: 108
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 5520
       endInstruction: 5519
-      startSourceChar: 5286
-      endSourceChar: 5298
-      line: 109
+      startSourceChar: 5249
+      endSourceChar: 5261
+      line: 108
       lineChar: 20
       spanCodeSection: 'RTrigger >= '
     - startInstruction: 5520
       endInstruction: 5635
-      startSourceChar: 5298
-      endSourceChar: 5306
-      line: 109
+      startSourceChar: 5261
+      endSourceChar: 5269
+      line: 108
       lineChar: 32
       spanCodeSection: '0.75 || '
     - startInstruction: 5636
       endInstruction: 5635
-      startSourceChar: 5306
-      endSourceChar: 5306
-      line: 109
+      startSourceChar: 5269
+      endSourceChar: 5269
+      line: 108
       lineChar: 40
       spanCodeSection: 
     - startInstruction: 5636
       endInstruction: 5635
-      startSourceChar: 5306
-      endSourceChar: 5306
-      line: 109
+      startSourceChar: 5269
+      endSourceChar: 5269
+      line: 108
       lineChar: 40
       spanCodeSection: 
     - startInstruction: 5636
       endInstruction: 5635
-      startSourceChar: 5306
-      endSourceChar: 5312
-      line: 109
+      startSourceChar: 5269
+      endSourceChar: 5275
+      line: 108
       lineChar: 40
       spanCodeSection: Input.
     - startInstruction: 5636
       endInstruction: 5635
-      startSourceChar: 5312
-      endSourceChar: 5319
-      line: 109
+      startSourceChar: 5275
+      endSourceChar: 5282
+      line: 108
       lineChar: 46
       spanCodeSection: GetKey(
     - startInstruction: 5636
       endInstruction: 5635
-      startSourceChar: 5319
-      endSourceChar: 5319
-      line: 109
+      startSourceChar: 5282
+      endSourceChar: 5282
+      line: 108
       lineChar: 53
       spanCodeSection: 
     - startInstruction: 5636
       endInstruction: 5635
-      startSourceChar: 5319
-      endSourceChar: 5327
-      line: 109
+      startSourceChar: 5282
+      endSourceChar: 5290
+      line: 108
       lineChar: 53
       spanCodeSection: KeyCode.
     - startInstruction: 5636
       endInstruction: 5727
-      startSourceChar: 5327
-      endSourceChar: 5352
-      line: 109
+      startSourceChar: 5290
+      endSourceChar: 5315
+      line: 108
       lineChar: 61
       spanCodeSection: "Space))\r\n                "
     - startInstruction: 5728
       endInstruction: 5727
-      startSourceChar: 5352
-      endSourceChar: 5375
-      line: 110
+      startSourceChar: 5315
+      endSourceChar: 5338
+      line: 109
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 5728
       endInstruction: 5727
-      startSourceChar: 5375
-      endSourceChar: 5375
-      line: 111
+      startSourceChar: 5338
+      endSourceChar: 5338
+      line: 110
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 5728
       endInstruction: 5727
-      startSourceChar: 5375
-      endSourceChar: 5375
-      line: 111
+      startSourceChar: 5338
+      endSourceChar: 5338
+      line: 110
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 5728
       endInstruction: 5727
-      startSourceChar: 5375
-      endSourceChar: 5384
-      line: 111
+      startSourceChar: 5338
+      endSourceChar: 5347
+      line: 110
       lineChar: 20
       spanCodeSection: 'firing = '
     - startInstruction: 5728
       endInstruction: 5755
-      startSourceChar: 5384
-      endSourceChar: 5426
-      line: 111
+      startSourceChar: 5347
+      endSourceChar: 5389
+      line: 110
       lineChar: 29
       spanCodeSection: "true;\r\n                }\r\n                "
     - startInstruction: 5756
       endInstruction: 5755
-      startSourceChar: 5426
-      endSourceChar: 5431
-      line: 113
+      startSourceChar: 5389
+      endSourceChar: 5394
+      line: 112
       lineChar: 16
       spanCodeSection: 'else '
     - startInstruction: 5756
       endInstruction: 5755
-      startSourceChar: 5431
-      endSourceChar: 5433
-      line: 113
+      startSourceChar: 5394
+      endSourceChar: 5396
+      line: 112
       lineChar: 21
       spanCodeSection: '{ '
     - startInstruction: 5756
       endInstruction: 5755
-      startSourceChar: 5433
-      endSourceChar: 5433
-      line: 113
+      startSourceChar: 5396
+      endSourceChar: 5396
+      line: 112
       lineChar: 23
       spanCodeSection: 
     - startInstruction: 5756
       endInstruction: 5755
-      startSourceChar: 5433
-      endSourceChar: 5433
-      line: 113
+      startSourceChar: 5396
+      endSourceChar: 5396
+      line: 112
       lineChar: 23
       spanCodeSection: 
     - startInstruction: 5756
       endInstruction: 5755
-      startSourceChar: 5433
-      endSourceChar: 5442
-      line: 113
+      startSourceChar: 5396
+      endSourceChar: 5405
+      line: 112
       lineChar: 23
       spanCodeSection: 'firing = '
     - startInstruction: 5756
       endInstruction: 5775
-      startSourceChar: 5442
-      endSourceChar: 5486
-      line: 113
+      startSourceChar: 5405
+      endSourceChar: 5449
+      line: 112
       lineChar: 32
       spanCodeSection: "false; }\r\n            }\r\n        }\r\n        "
     - startInstruction: 5776
       endInstruction: 5775
-      startSourceChar: 5486
-      endSourceChar: 5490
-      line: 116
+      startSourceChar: 5449
+      endSourceChar: 5453
+      line: 115
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 5776
       endInstruction: 5791
-      startSourceChar: 5490
-      endSourceChar: 5507
-      line: 116
+      startSourceChar: 5453
+      endSourceChar: 5470
+      line: 115
       lineChar: 12
       spanCodeSection: "firing)\r\n        "
     - startInstruction: 5792
       endInstruction: 5791
-      startSourceChar: 5507
-      endSourceChar: 5522
-      line: 117
+      startSourceChar: 5470
+      endSourceChar: 5485
+      line: 116
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 5792
       endInstruction: 5791
-      startSourceChar: 5522
-      endSourceChar: 5522
-      line: 118
+      startSourceChar: 5485
+      endSourceChar: 5485
+      line: 117
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5792
       endInstruction: 5791
-      startSourceChar: 5522
-      endSourceChar: 5522
-      line: 118
+      startSourceChar: 5485
+      endSourceChar: 5485
+      line: 117
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5792
       endInstruction: 5791
-      startSourceChar: 5522
-      endSourceChar: 5522
-      line: 118
+      startSourceChar: 5485
+      endSourceChar: 5485
+      line: 117
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5792
       endInstruction: 5791
-      startSourceChar: 5522
-      endSourceChar: 5536
-      line: 118
+      startSourceChar: 5485
+      endSourceChar: 5499
+      line: 117
       lineChar: 12
       spanCodeSection: AAGunAnimator.
     - startInstruction: 5792
       endInstruction: 5791
-      startSourceChar: 5536
-      endSourceChar: 5544
-      line: 118
+      startSourceChar: 5499
+      endSourceChar: 5507
+      line: 117
       lineChar: 26
       spanCodeSection: SetBool(
     - startInstruction: 5792
       endInstruction: 5791
-      startSourceChar: 5544
-      endSourceChar: 5554
-      line: 118
+      startSourceChar: 5507
+      endSourceChar: 5517
+      line: 117
       lineChar: 34
       spanCodeSection: '"firing", '
     - startInstruction: 5792
       endInstruction: 5831
-      startSourceChar: 5554
-      endSourceChar: 5581
-      line: 118
+      startSourceChar: 5517
+      endSourceChar: 5544
+      line: 117
       lineChar: 44
       spanCodeSection: "true);\r\n        }\r\n        "
     - startInstruction: 5832
       endInstruction: 5831
-      startSourceChar: 5581
-      endSourceChar: 5595
-      line: 120
+      startSourceChar: 5544
+      endSourceChar: 5558
+      line: 119
       lineChar: 8
       spanCodeSection: "else\r\n        "
     - startInstruction: 5832
       endInstruction: 5831
-      startSourceChar: 5595
-      endSourceChar: 5610
-      line: 121
+      startSourceChar: 5558
+      endSourceChar: 5573
+      line: 120
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 5832
       endInstruction: 5831
-      startSourceChar: 5610
-      endSourceChar: 5610
-      line: 122
+      startSourceChar: 5573
+      endSourceChar: 5573
+      line: 121
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5832
       endInstruction: 5831
-      startSourceChar: 5610
-      endSourceChar: 5610
-      line: 122
+      startSourceChar: 5573
+      endSourceChar: 5573
+      line: 121
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5832
       endInstruction: 5831
-      startSourceChar: 5610
-      endSourceChar: 5610
-      line: 122
+      startSourceChar: 5573
+      endSourceChar: 5573
+      line: 121
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5832
       endInstruction: 5831
-      startSourceChar: 5610
-      endSourceChar: 5624
-      line: 122
+      startSourceChar: 5573
+      endSourceChar: 5587
+      line: 121
       lineChar: 12
       spanCodeSection: AAGunAnimator.
     - startInstruction: 5832
       endInstruction: 5831
-      startSourceChar: 5624
-      endSourceChar: 5632
-      line: 122
+      startSourceChar: 5587
+      endSourceChar: 5595
+      line: 121
       lineChar: 26
       spanCodeSection: SetBool(
     - startInstruction: 5832
       endInstruction: 5831
-      startSourceChar: 5632
-      endSourceChar: 5642
-      line: 122
+      startSourceChar: 5595
+      endSourceChar: 5605
+      line: 121
       lineChar: 34
       spanCodeSection: '"firing", '
     - startInstruction: 5832
       endInstruction: 5863
-      startSourceChar: 5642
-      endSourceChar: 5670
-      line: 122
+      startSourceChar: 5605
+      endSourceChar: 5633
+      line: 121
       lineChar: 44
       spanCodeSection: "false);\r\n        }\r\n        "
     - startInstruction: 5864
       endInstruction: 5863
-      startSourceChar: 5670
-      endSourceChar: 5674
-      line: 124
+      startSourceChar: 5633
+      endSourceChar: 5637
+      line: 123
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 5864
       endInstruction: 5863
-      startSourceChar: 5674
-      endSourceChar: 5675
-      line: 124
+      startSourceChar: 5637
+      endSourceChar: 5638
+      line: 123
       lineChar: 12
       spanCodeSection: '!'
     - startInstruction: 5864
       endInstruction: 5903
-      startSourceChar: 5675
-      endSourceChar: 5690
-      line: 124
+      startSourceChar: 5638
+      endSourceChar: 5653
+      line: 123
       lineChar: 13
       spanCodeSection: "dead)\r\n        "
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5690
-      endSourceChar: 5705
-      line: 125
+      startSourceChar: 5653
+      endSourceChar: 5668
+      line: 124
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5705
-      endSourceChar: 5705
-      line: 126
+      startSourceChar: 5668
+      endSourceChar: 5668
+      line: 125
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5705
-      endSourceChar: 5705
-      line: 126
+      startSourceChar: 5668
+      endSourceChar: 5668
+      line: 125
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5705
-      endSourceChar: 5705
-      line: 126
+      startSourceChar: 5668
+      endSourceChar: 5668
+      line: 125
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5705
-      endSourceChar: 5719
-      line: 126
+      startSourceChar: 5668
+      endSourceChar: 5682
+      line: 125
       lineChar: 12
       spanCodeSection: AAGunAnimator.
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5719
-      endSourceChar: 5728
-      line: 126
+      startSourceChar: 5682
+      endSourceChar: 5691
+      line: 125
       lineChar: 26
       spanCodeSection: SetFloat(
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5728
-      endSourceChar: 5738
-      line: 126
+      startSourceChar: 5691
+      endSourceChar: 5701
+      line: 125
       lineChar: 35
       spanCodeSection: '"health", '
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5738
-      endSourceChar: 5738
-      line: 126
+      startSourceChar: 5701
+      endSourceChar: 5701
+      line: 125
       lineChar: 45
       spanCodeSection: 
     - startInstruction: 5904
       endInstruction: 5903
-      startSourceChar: 5738
-      endSourceChar: 5747
-      line: 126
+      startSourceChar: 5701
+      endSourceChar: 5710
+      line: 125
       lineChar: 45
       spanCodeSection: 'Health / '
     - startInstruction: 5904
       endInstruction: 5975
-      startSourceChar: 5747
-      endSourceChar: 5780
-      line: 126
+      startSourceChar: 5710
+      endSourceChar: 5743
+      line: 125
       lineChar: 54
       spanCodeSection: "FullHealth);\r\n        }\r\n        "
     - startInstruction: 5976
       endInstruction: 5975
-      startSourceChar: 5780
-      endSourceChar: 5794
-      line: 128
+      startSourceChar: 5743
+      endSourceChar: 5757
+      line: 127
       lineChar: 8
       spanCodeSection: "else\r\n        "
     - startInstruction: 5976
       endInstruction: 5975
-      startSourceChar: 5794
-      endSourceChar: 5809
-      line: 129
+      startSourceChar: 5757
+      endSourceChar: 5772
+      line: 128
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 5976
       endInstruction: 5975
-      startSourceChar: 5809
-      endSourceChar: 5809
-      line: 130
+      startSourceChar: 5772
+      endSourceChar: 5772
+      line: 129
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5976
       endInstruction: 5975
-      startSourceChar: 5809
-      endSourceChar: 5809
-      line: 130
+      startSourceChar: 5772
+      endSourceChar: 5772
+      line: 129
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5976
       endInstruction: 5975
-      startSourceChar: 5809
-      endSourceChar: 5809
-      line: 130
+      startSourceChar: 5772
+      endSourceChar: 5772
+      line: 129
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 5976
       endInstruction: 5975
-      startSourceChar: 5809
-      endSourceChar: 5823
-      line: 130
+      startSourceChar: 5772
+      endSourceChar: 5786
+      line: 129
       lineChar: 12
       spanCodeSection: AAGunAnimator.
     - startInstruction: 5976
       endInstruction: 5975
-      startSourceChar: 5823
-      endSourceChar: 5832
-      line: 130
+      startSourceChar: 5786
+      endSourceChar: 5795
+      line: 129
       lineChar: 26
       spanCodeSection: SetFloat(
     - startInstruction: 5976
       endInstruction: 5975
-      startSourceChar: 5832
-      endSourceChar: 5842
-      line: 130
+      startSourceChar: 5795
+      endSourceChar: 5805
+      line: 129
       lineChar: 35
       spanCodeSection: '"health", '
     - startInstruction: 5976
       endInstruction: 6051
-      startSourceChar: 5842
-      endSourceChar: 5945
-      line: 130
+      startSourceChar: 5805
+      endSourceChar: 5908
+      line: 129
       lineChar: 45
       spanCodeSection: "1);//dead, set animator health to full so that there's no
         phantom healthsmoke\r\n        }\r\n\r\n    }\r\n    "
     - startInstruction: 6052
       endInstruction: 6059
-      startSourceChar: 5945
-      endSourceChar: 6033
-      line: 134
+      startSourceChar: 5908
+      endSourceChar: 5996
+      line: 133
       lineChar: 4
       spanCodeSection: "public void Explode()//all the things players see happen when
         the vehicle explodes\r\n    "
     - startInstruction: 6060
       endInstruction: 6059
-      startSourceChar: 6033
-      endSourceChar: 6044
-      line: 135
+      startSourceChar: 5996
+      endSourceChar: 6007
+      line: 134
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 6060
       endInstruction: 6059
-      startSourceChar: 6044
-      endSourceChar: 6048
-      line: 136
+      startSourceChar: 6007
+      endSourceChar: 6011
+      line: 135
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 6060
       endInstruction: 6075
-      startSourceChar: 6048
-      endSourceChar: 6066
-      line: 136
+      startSourceChar: 6011
+      endSourceChar: 6029
+      line: 135
       lineChar: 12
       spanCodeSection: "Manning)\r\n        "
     - startInstruction: 6076
       endInstruction: 6075
-      startSourceChar: 6066
-      endSourceChar: 6081
-      line: 137
+      startSourceChar: 6029
+      endSourceChar: 6044
+      line: 136
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 6076
       endInstruction: 6075
-      startSourceChar: 6081
-      endSourceChar: 6085
-      line: 138
+      startSourceChar: 6044
+      endSourceChar: 6048
+      line: 137
       lineChar: 12
       spanCodeSection: if (
     - startInstruction: 6076
       endInstruction: 6075
-      startSourceChar: 6085
-      endSourceChar: 6085
-      line: 138
+      startSourceChar: 6048
+      endSourceChar: 6048
+      line: 137
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 6076
       endInstruction: 6075
-      startSourceChar: 6085
-      endSourceChar: 6105
-      line: 138
+      startSourceChar: 6048
+      endSourceChar: 6068
+      line: 137
       lineChar: 16
       spanCodeSection: 'AAGunSeatStation != '
     - startInstruction: 6076
       endInstruction: 6123
-      startSourceChar: 6105
-      endSourceChar: 6111
-      line: 138
+      startSourceChar: 6068
+      endSourceChar: 6074
+      line: 137
       lineChar: 36
       spanCodeSection: 'null) '
     - startInstruction: 6124
       endInstruction: 6123
-      startSourceChar: 6111
-      endSourceChar: 6113
-      line: 138
+      startSourceChar: 6074
+      endSourceChar: 6076
+      line: 137
       lineChar: 42
       spanCodeSection: '{ '
     - startInstruction: 6124
       endInstruction: 6123
-      startSourceChar: 6113
-      endSourceChar: 6113
-      line: 138
+      startSourceChar: 6076
+      endSourceChar: 6076
+      line: 137
       lineChar: 44
       spanCodeSection: 
     - startInstruction: 6124
       endInstruction: 6123
-      startSourceChar: 6113
-      endSourceChar: 6113
-      line: 138
+      startSourceChar: 6076
+      endSourceChar: 6076
+      line: 137
       lineChar: 44
       spanCodeSection: 
     - startInstruction: 6124
       endInstruction: 6123
-      startSourceChar: 6113
-      endSourceChar: 6113
-      line: 138
+      startSourceChar: 6076
+      endSourceChar: 6076
+      line: 137
       lineChar: 44
       spanCodeSection: 
     - startInstruction: 6124
       endInstruction: 6123
-      startSourceChar: 6113
-      endSourceChar: 6130
-      line: 138
+      startSourceChar: 6076
+      endSourceChar: 6093
+      line: 137
       lineChar: 44
       spanCodeSection: AAGunSeatStation.
     - startInstruction: 6124
       endInstruction: 6123
-      startSourceChar: 6130
-      endSourceChar: 6142
-      line: 138
+      startSourceChar: 6093
+      endSourceChar: 6105
+      line: 137
       lineChar: 61
       spanCodeSection: ExitStation(
     - startInstruction: 6124
       endInstruction: 6147
-      startSourceChar: 6142
-      endSourceChar: 6178
-      line: 138
+      startSourceChar: 6105
+      endSourceChar: 6141
+      line: 137
       lineChar: 73
       spanCodeSection: "localPlayer); }\r\n        }\r\n        "
     - startInstruction: 6148
       endInstruction: 6147
-      startSourceChar: 6178
-      endSourceChar: 6178
-      line: 140
+      startSourceChar: 6141
+      endSourceChar: 6141
+      line: 139
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 6148
       endInstruction: 6147
-      startSourceChar: 6178
-      endSourceChar: 6178
-      line: 140
+      startSourceChar: 6141
+      endSourceChar: 6141
+      line: 139
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 6148
       endInstruction: 6147
-      startSourceChar: 6178
-      endSourceChar: 6185
-      line: 140
+      startSourceChar: 6141
+      endSourceChar: 6148
+      line: 139
       lineChar: 8
       spanCodeSection: 'dead = '
     - startInstruction: 6148
       endInstruction: 6167
-      startSourceChar: 6185
-      endSourceChar: 6200
-      line: 140
+      startSourceChar: 6148
+      endSourceChar: 6163
+      line: 139
       lineChar: 15
       spanCodeSection: "true;\r\n        "
     - startInstruction: 6168
       endInstruction: 6167
-      startSourceChar: 6200
-      endSourceChar: 6200
-      line: 141
+      startSourceChar: 6163
+      endSourceChar: 6163
+      line: 140
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 6168
       endInstruction: 6167
-      startSourceChar: 6200
-      endSourceChar: 6200
-      line: 141
+      startSourceChar: 6163
+      endSourceChar: 6163
+      line: 140
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 6168
       endInstruction: 6167
-      startSourceChar: 6200
-      endSourceChar: 6200
-      line: 141
+      startSourceChar: 6163
+      endSourceChar: 6163
+      line: 140
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 6168
       endInstruction: 6167
-      startSourceChar: 6200
-      endSourceChar: 6214
-      line: 141
+      startSourceChar: 6163
+      endSourceChar: 6177
+      line: 140
       lineChar: 8
       spanCodeSection: AAGunAnimator.
     - startInstruction: 6168
       endInstruction: 6167
-      startSourceChar: 6214
-      endSourceChar: 6225
-      line: 141
+      startSourceChar: 6177
+      endSourceChar: 6188
+      line: 140
       lineChar: 22
       spanCodeSection: SetTrigger(
     - startInstruction: 6168
       endInstruction: 6191
-      startSourceChar: 6225
-      endSourceChar: 6246
-      line: 141
+      startSourceChar: 6188
+      endSourceChar: 6209
+      line: 140
       lineChar: 33
       spanCodeSection: "\"explode\");\r\n        "
     - startInstruction: 6192
       endInstruction: 6191
-      startSourceChar: 6246
-      endSourceChar: 6246
-      line: 142
+      startSourceChar: 6209
+      endSourceChar: 6209
+      line: 141
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 6192
       endInstruction: 6191
-      startSourceChar: 6246
-      endSourceChar: 6246
-      line: 142
+      startSourceChar: 6209
+      endSourceChar: 6209
+      line: 141
       lineChar: 8
       spanCodeSection: 
     - startInstruction: 6192
       endInstruction: 6191
-      startSourceChar: 6246
-      endSourceChar: 6255
-      line: 142
+      startSourceChar: 6209
+      endSourceChar: 6218
+      line: 141
       lineChar: 8
       spanCodeSection: 'Health = '
     - startInstruction: 6192
       endInstruction: 6211
-      startSourceChar: 6255
-      endSourceChar: 6304
-      line: 142
+      startSourceChar: 6218
+      endSourceChar: 6267
+      line: 141
       lineChar: 17
       spanCodeSection: "FullHealth;//turns off low health smoke\r\n        "
     - startInstruction: 6212
       endInstruction: 6211
-      startSourceChar: 6304
-      endSourceChar: 6308
-      line: 143
+      startSourceChar: 6267
+      endSourceChar: 6271
+      line: 142
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 6212
       endInstruction: 6211
-      startSourceChar: 6308
-      endSourceChar: 6308
-      line: 143
+      startSourceChar: 6271
+      endSourceChar: 6271
+      line: 142
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 6212
       endInstruction: 6211
-      startSourceChar: 6308
-      endSourceChar: 6308
-      line: 143
+      startSourceChar: 6271
+      endSourceChar: 6271
+      line: 142
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 6212
       endInstruction: 6211
-      startSourceChar: 6308
-      endSourceChar: 6320
-      line: 143
+      startSourceChar: 6271
+      endSourceChar: 6283
+      line: 142
       lineChar: 12
       spanCodeSection: localPlayer.
     - startInstruction: 6212
       endInstruction: 6211
-      startSourceChar: 6320
-      endSourceChar: 6328
-      line: 143
+      startSourceChar: 6283
+      endSourceChar: 6291
+      line: 142
       lineChar: 24
       spanCodeSection: IsOwner(
     - startInstruction: 6212
       endInstruction: 6259
-      startSourceChar: 6328
-      endSourceChar: 6354
-      line: 143
+      startSourceChar: 6291
+      endSourceChar: 6317
+      line: 142
       lineChar: 32
       spanCodeSection: "VehicleMainObj))\r\n        "
     - startInstruction: 6260
       endInstruction: 6259
-      startSourceChar: 6354
-      endSourceChar: 6369
-      line: 144
+      startSourceChar: 6317
+      endSourceChar: 6332
+      line: 143
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 6260
       endInstruction: 6259
-      startSourceChar: 6369
-      endSourceChar: 6369
-      line: 145
+      startSourceChar: 6332
+      endSourceChar: 6332
+      line: 144
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 6260
       endInstruction: 6259
-      startSourceChar: 6369
-      endSourceChar: 6369
-      line: 145
+      startSourceChar: 6332
+      endSourceChar: 6332
+      line: 144
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 6260
       endInstruction: 6259
-      startSourceChar: 6369
-      endSourceChar: 6369
-      line: 145
+      startSourceChar: 6332
+      endSourceChar: 6332
+      line: 144
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 6260
       endInstruction: 6259
-      startSourceChar: 6369
-      endSourceChar: 6369
-      line: 145
+      startSourceChar: 6332
+      endSourceChar: 6332
+      line: 144
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 6260
       endInstruction: 6259
-      startSourceChar: 6369
-      endSourceChar: 6377
-      line: 145
+      startSourceChar: 6332
+      endSourceChar: 6340
+      line: 144
       lineChar: 12
       spanCodeSection: Rotator.
     - startInstruction: 6260
       endInstruction: 6259
-      startSourceChar: 6377
-      endSourceChar: 6387
-      line: 145
+      startSourceChar: 6340
+      endSourceChar: 6350
+      line: 144
       lineChar: 20
       spanCodeSection: transform.
     - startInstruction: 6260
       endInstruction: 6283
-      startSourceChar: 6387
-      endSourceChar: 6403
-      line: 145
+      startSourceChar: 6350
+      endSourceChar: 6366
+      line: 144
       lineChar: 30
       spanCodeSection: 'localRotation = '
     - startInstruction: 6284
       endInstruction: 6283
-      startSourceChar: 6403
-      endSourceChar: 6403
-      line: 145
+      startSourceChar: 6366
+      endSourceChar: 6366
+      line: 144
       lineChar: 46
       spanCodeSection: 
     - startInstruction: 6284
       endInstruction: 6283
-      startSourceChar: 6403
-      endSourceChar: 6403
-      line: 145
+      startSourceChar: 6366
+      endSourceChar: 6366
+      line: 144
       lineChar: 46
       spanCodeSection: 
     - startInstruction: 6284
       endInstruction: 6283
-      startSourceChar: 6403
-      endSourceChar: 6414
-      line: 145
+      startSourceChar: 6366
+      endSourceChar: 6377
+      line: 144
       lineChar: 46
       spanCodeSection: Quaternion.
     - startInstruction: 6284
       endInstruction: 6283
-      startSourceChar: 6414
-      endSourceChar: 6420
-      line: 145
+      startSourceChar: 6377
+      endSourceChar: 6383
+      line: 144
       lineChar: 57
       spanCodeSection: Euler(
     - startInstruction: 6284
       endInstruction: 6284
-      startSourceChar: 6420
-      endSourceChar: 6420
-      line: 145
+      startSourceChar: 6383
+      endSourceChar: 6383
+      line: 144
       lineChar: 63
       spanCodeSection: 
   hasInteractEvent: 0
@@ -6087,7 +6066,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 25
+      Data: 24
     - Name: 
       Entry: 7
       Data: 
@@ -7146,76 +7125,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Rotinputlerper
+      Data: Manning
     - Name: $v
       Entry: 7
       Data: 67|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
       Data: 68|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 7
-      Data: 69|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: UnityEngine.Vector3, UnityEngine.CoreModule
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: UnityEngineVector3
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: Rotinputlerper
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: Rotinputlerper
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 70|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Manning
-    - Name: $v
-      Entry: 7
-      Data: 71|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 72|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 43
@@ -7242,19 +7158,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 73|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 69|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 74|System.NonSerializedAttribute, mscorlib
+      Data: 70|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 75|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 71|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -7281,13 +7197,13 @@ MonoBehaviour:
       Data: localPlayer
     - Name: $v
       Entry: 7
-      Data: 76|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 72|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 77|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 73|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 78|System.RuntimeType, mscorlib
+      Data: 74|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: VRC.SDKBase.VRCPlayerApi, VRCSDKBase
@@ -7317,19 +7233,19 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 79|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 75|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 80|System.NonSerializedAttribute, mscorlib
+      Data: 76|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 81|UnityEngine.HideInInspector, UnityEngine.CoreModule
+      Data: 77|UnityEngine.HideInInspector, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -7356,10 +7272,10 @@ MonoBehaviour:
       Data: InputXLerper
     - Name: $v
       Entry: 7
-      Data: 82|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 78|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 83|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 79|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 23
@@ -7386,7 +7302,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 84|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 80|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -7413,10 +7329,10 @@ MonoBehaviour:
       Data: InputYLerper
     - Name: $v
       Entry: 7
-      Data: 85|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 81|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 86|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 82|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 23
@@ -7435,6 +7351,69 @@ MonoBehaviour:
     - Name: symbolUniqueName
       Entry: 1
       Data: InputYLerper
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 83|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: StartRot
+    - Name: $v
+      Entry: 7
+      Data: 84|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 85|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 7
+      Data: 86|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UnityEngine.Vector3, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineVector3
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: StartRot
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: StartRot
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -7467,7 +7446,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: StartRot
+      Data: RstickV
     - Name: $v
       Entry: 7
       Data: 88|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -7476,7 +7455,7 @@ MonoBehaviour:
       Data: 89|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 69
+      Data: 23
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -7485,13 +7464,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineVector3
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: StartRot
+      Data: RstickV
     - Name: symbolUniqueName
       Entry: 1
-      Data: StartRot
+      Data: RstickV
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -7524,7 +7503,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RstickV
+      Data: ZoomLevel
     - Name: $v
       Entry: 7
       Data: 91|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -7545,10 +7524,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: RstickV
+      Data: ZoomLevel
     - Name: symbolUniqueName
       Entry: 1
-      Data: RstickV
+      Data: ZoomLevel
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -7558,63 +7537,6 @@ MonoBehaviour:
     - Name: fieldAttributes
       Entry: 7
       Data: 93|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: ZoomLevel
-    - Name: $v
-      Entry: 7
-      Data: 94|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 95|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 23
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: ZoomLevel
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: ZoomLevel
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 96|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

@@ -6,7 +6,6 @@ using VRC.Udon;
 
 public class PilotSeat : UdonSharpBehaviour
 {
-    public GameObject VehicleMainObj;
     public EngineController EngineControl;
     public GameObject LeaveButton;
     //public GameObject Saccflight; 
@@ -17,7 +16,7 @@ public class PilotSeat : UdonSharpBehaviour
     private void Interact()//entering the plane
     {
         //if (Saccflight != null) { Saccflight.SetActive(false); }
-        if (VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, VehicleMainObj); }
+        if (EngineControl.VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.VehicleMainObj); }
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (EngineControl != null)
         {
