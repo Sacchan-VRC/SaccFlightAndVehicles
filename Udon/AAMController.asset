@@ -19,234 +19,312 @@ MonoBehaviour:
     %SystemString, null\n    LockAngle: %SystemSingle, null\n    RotSpeed: %SystemSingle,
     null\n    EngineControl: %VRCUdonUdonBehaviour, null\n    ColliderActive: %SystemBoolean,
     null\n    Exploding: %SystemBoolean, null\n    NonOwnerLockHack: %SystemBoolean,
-    null\n    NoTarget: %SystemBoolean, null\n    Owner: %SystemBoolean, null\n    AAMCollider:
-    %UnityEngineCapsuleCollider, null\n    onCollisionEnterOther: %UnityEngineCollision,
-    null\n    Lifetime: %SystemSingle, null\n    StartLockAngle: %SystemSingle, null\n
-    \   Target: %UnityEngineTransform, null\n    __0_this_intnl_UnityEngineGameObject:
-    %UnityEngineGameObject, this\n    __0_this_intnl_AAMController: %VRCUdonUdonBehaviour,
-    this\n    __0_AGMani_Animator: %UnityEngineAnimator, null\n    __0_other_Collision:
-    %UnityEngineCollision, null\n    __0_deltaAngle_Single: %SystemSingle, null\n
-    \   __0_missileForward_Vector3: %UnityEngineVector3, null\n    __0_missileToTargetVector_Vector3:
-    %UnityEngineVector3, null\n    __0_rotationAxis_Vector3: %UnityEngineVector3,
-    null\n    __0_targetDirection_Vector3: %UnityEngineVector3, null\n    __0_const_intnl_SystemBoolean:
-    %SystemBoolean, null\n    __1_const_intnl_SystemBoolean: %SystemBoolean, null\n
-    \   __0_const_intnl_SystemInt32: %SystemInt32, null\n    __1_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __2_const_intnl_SystemInt32: %SystemInt32, null\n    __3_const_intnl_SystemInt32:
-    %SystemInt32, null\n    __4_const_intnl_SystemInt32: %SystemInt32, null\n    __0_const_intnl_SystemSingle:
-    %SystemSingle, null\n    __0_const_intnl_UnityEngineSpace: %UnityEngineSpace,
-    null\n    __0_const_intnl_SystemString: %SystemString, null\n    __1_const_intnl_SystemString:
-    %SystemString, null\n    __2_const_intnl_SystemString: %SystemString, null\n    __3_const_intnl_SystemString:
-    %SystemString, null\n    __4_const_intnl_SystemString: %SystemString, null\n    __5_const_intnl_SystemString:
-    %SystemString, null\n    __6_const_intnl_SystemString: %SystemString, null\n    __0_const_intnl_SystemType:
-    %SystemType, null\n    __1_const_intnl_SystemType: %SystemType, null\n    __2_const_intnl_SystemType:
-    %SystemType, null\n    __0_const_intnl_SystemUInt32: %SystemUInt32, null\n    __0_intnl_SystemBoolean:
+    null\n    NoTarget: %SystemBoolean, null\n    Owner: %SystemBoolean, null\n    TargetIsPlane:
+    %SystemBoolean, null\n    AAMCollider: %UnityEngineCapsuleCollider, null\n    onCollisionEnterOther:
+    %UnityEngineCollision, null\n    Lifetime: %SystemSingle, null\n    StartLockAngle:
+    %SystemSingle, null\n    Target: %UnityEngineTransform, null\n    TargetEngineControl:
+    %VRCUdonUdonBehaviour, null\n    __0_this_intnl_UnityEngineGameObject: %UnityEngineGameObject,
+    this\n    __0_this_intnl_AAMController: %VRCUdonUdonBehaviour, this\n    __0_AGMani_Animator:
+    %UnityEngineAnimator, null\n    __0_other_Collision: %UnityEngineCollision, null\n
+    \   __0_deltaAngle_Single: %SystemSingle, null\n    __0_missileForward_Vector3:
+    %UnityEngineVector3, null\n    __0_missileToTargetVector_Vector3: %UnityEngineVector3,
+    null\n    __0_rotationAxis_Vector3: %UnityEngineVector3, null\n    __0_targetDirection_Vector3:
+    %UnityEngineVector3, null\n    __0_const_intnl_SystemBoolean: %SystemBoolean,
+    null\n    __1_const_intnl_SystemBoolean: %SystemBoolean, null\n    __0_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __1_const_intnl_SystemInt32: %SystemInt32, null\n    __2_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __3_const_intnl_SystemInt32: %SystemInt32, null\n    __4_const_intnl_SystemInt32:
+    %SystemInt32, null\n    __5_const_intnl_SystemInt32: %SystemInt32, null\n    __0_const_intnl_SystemInt64:
+    %SystemInt64, null\n    __1_const_intnl_SystemInt64: %SystemInt64, null\n    __0_const_intnl_SystemObject:
+    %SystemObject, null\n    __0_const_intnl_SystemSingle: %SystemSingle, null\n    __0_const_intnl_UnityEngineSpace:
+    %UnityEngineSpace, null\n    __0_const_intnl_SystemString: %SystemString, null\n
+    \   __1_const_intnl_SystemString: %SystemString, null\n    __2_const_intnl_SystemString:
+    %SystemString, null\n    __3_const_intnl_SystemString: %SystemString, null\n    __4_const_intnl_SystemString:
+    %SystemString, null\n    __5_const_intnl_SystemString: %SystemString, null\n    __6_const_intnl_SystemString:
+    %SystemString, null\n    __7_const_intnl_SystemString: %SystemString, null\n    __8_const_intnl_SystemString:
+    %SystemString, null\n    __0_const_intnl_UnityEngineTransform: %UnityEngineTransform,
+    null\n    __0_const_intnl_SystemType: %SystemType, null\n    __1_const_intnl_SystemType:
+    %SystemType, null\n    __2_const_intnl_SystemType: %SystemType, null\n    __3_const_intnl_SystemType:
+    %SystemType, null\n    __0_const_intnl_EngineController: %VRCUdonUdonBehaviour,
+    null\n    __0_const_intnl_SystemUInt32: %SystemUInt32, null\n    __0_intnl_SystemBoolean:
     %SystemBoolean, null\n    __1_intnl_SystemBoolean: %SystemBoolean, null\n    __10_intnl_SystemBoolean:
     %SystemBoolean, null\n    __11_intnl_SystemBoolean: %SystemBoolean, null\n    __12_intnl_SystemBoolean:
+    %SystemBoolean, null\n    __13_intnl_SystemBoolean: %SystemBoolean, null\n    __14_intnl_SystemBoolean:
     %SystemBoolean, null\n    __2_intnl_SystemBoolean: %SystemBoolean, null\n    __3_intnl_SystemBoolean:
     %SystemBoolean, null\n    __4_intnl_SystemBoolean: %SystemBoolean, null\n    __5_intnl_SystemBoolean:
     %SystemBoolean, null\n    __6_intnl_SystemBoolean: %SystemBoolean, null\n    __7_intnl_SystemBoolean:
     %SystemBoolean, null\n    __8_intnl_SystemBoolean: %SystemBoolean, null\n    __9_intnl_SystemBoolean:
-    %SystemBoolean, null\n    __0_intnl_UnityEngineGameObject: %UnityEngineGameObject,
-    null\n    __1_intnl_UnityEngineGameObject: %UnityEngineGameObject, null\n    __0_intnl_UnityEngineGameObjectArray:
-    %UnityEngineGameObjectArray, null\n    __1_intnl_UnityEngineGameObjectArray: %UnityEngineGameObjectArray,
-    null\n    __0_intnl_SystemInt32: %SystemInt32, null\n    __1_intnl_SystemInt32:
-    %SystemInt32, null\n    __2_intnl_SystemInt32: %SystemInt32, null\n    __3_intnl_SystemInt32:
-    %SystemInt32, null\n    __0_intnl_SystemObject: %SystemObject, null\n    __1_intnl_SystemObject:
-    %SystemObject, null\n    __2_intnl_SystemObject: %SystemObject, null\n    __3_intnl_SystemObject:
-    %SystemObject, null\n    __4_intnl_SystemObject: %SystemObject, null\n    __5_intnl_SystemObject:
-    %SystemObject, null\n    __0_intnl_UnityEngineRigidbody: %UnityEngineRigidbody,
-    null\n    __0_intnl_SystemSingle: %SystemSingle, null\n    __1_intnl_SystemSingle:
-    %SystemSingle, null\n    __2_intnl_SystemSingle: %SystemSingle, null\n    __3_intnl_SystemSingle:
-    %SystemSingle, null\n    __4_intnl_SystemSingle: %SystemSingle, null\n    __5_intnl_SystemSingle:
+    %SystemBoolean, null\n    __0_intnl_UnityEngineComponent: %UnityEngineComponent,
+    null\n    __0_intnl_UnityEngineComponentArray: %UnityEngineComponentArray, null\n
+    \   __0_intnl_UnityEngineGameObject: %UnityEngineGameObject, null\n    __1_intnl_UnityEngineGameObject:
+    %UnityEngineGameObject, null\n    __2_intnl_UnityEngineGameObject: %UnityEngineGameObject,
+    null\n    __0_intnl_UnityEngineGameObjectArray: %UnityEngineGameObjectArray, null\n
+    \   __1_intnl_UnityEngineGameObjectArray: %UnityEngineGameObjectArray, null\n
+    \   __2_intnl_UnityEngineGameObjectArray: %UnityEngineGameObjectArray, null\n
+    \   __3_intnl_UnityEngineGameObjectArray: %UnityEngineGameObjectArray, null\n
+    \   __0_intnl_SystemInt32: %SystemInt32, null\n    __1_intnl_SystemInt32: %SystemInt32,
+    null\n    __2_intnl_SystemInt32: %SystemInt32, null\n    __3_intnl_SystemInt32:
+    %SystemInt32, null\n    __4_intnl_SystemInt32: %SystemInt32, null\n    __5_intnl_SystemInt32:
+    %SystemInt32, null\n    __6_intnl_SystemInt32: %SystemInt32, null\n    __0_intnl_SystemInt64:
+    %SystemInt64, null\n    __1_intnl_SystemInt64: %SystemInt64, null\n    __0_intnl_SystemObject:
+    %SystemObject, null\n    __1_intnl_SystemObject: %SystemObject, null\n    __2_intnl_SystemObject:
+    %SystemObject, null\n    __3_intnl_SystemObject: %SystemObject, null\n    __4_intnl_SystemObject:
+    %SystemObject, null\n    __5_intnl_SystemObject: %SystemObject, null\n    __6_intnl_SystemObject:
+    %SystemObject, null\n    __7_intnl_SystemObject: %SystemObject, null\n    __0_intnl_UnityEngineRigidbody:
+    %UnityEngineRigidbody, null\n    __0_intnl_SystemSingle: %SystemSingle, null\n
+    \   __1_intnl_SystemSingle: %SystemSingle, null\n    __2_intnl_SystemSingle: %SystemSingle,
+    null\n    __3_intnl_SystemSingle: %SystemSingle, null\n    __4_intnl_SystemSingle:
     %SystemSingle, null\n    __0_intnl_UnityEngineTransform: %UnityEngineTransform,
     null\n    __1_intnl_UnityEngineTransform: %UnityEngineTransform, null\n    __2_intnl_UnityEngineTransform:
     %UnityEngineTransform, null\n    __3_intnl_UnityEngineTransform: %UnityEngineTransform,
     null\n    __4_intnl_UnityEngineTransform: %UnityEngineTransform, null\n    __5_intnl_UnityEngineTransform:
     %UnityEngineTransform, null\n    __6_intnl_UnityEngineTransform: %UnityEngineTransform,
-    null\n    __7_intnl_UnityEngineTransform: %UnityEngineTransform, null\n    __0_intnl_returnTarget_UInt32:
-    %SystemUInt32, null\n    __0_intnl_UnityEngineVector3: %UnityEngineVector3, null\n
-    \   __1_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __10_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __2_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __3_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __4_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __5_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __6_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __7_intnl_UnityEngineVector3:
-    %UnityEngineVector3, null\n    __8_intnl_UnityEngineVector3: %UnityEngineVector3,
-    null\n    __9_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __0_intnl_VRCSDKBaseVRCPlayerApi:
-    %VRCSDKBaseVRCPlayerApi, null\n    __1_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi,
-    null\n\n.data_end\n\n        \n         # using UdonSharp;\n        \n         #
-    using UnityEngine;\n        \n         # using VRC.SDKBase;\n        \n         #
-    using VRC.Udon;\n        \n         # public class AAMController : UdonSharpBehaviour\n.code_start\n
-    \       \n         # public float LockAngle;\n        \n         # public float
-    RotSpeed = 15;\n        \n         # public EngineController EngineControl;\n
-    \       \n         # private bool NonOwnerLockHack = true;\n        \n         #
-    private float Lifetime = 0;\n        \n         # private float StartLockAngle
-    = 0;\n        \n         # private Transform Target;\n        \n         # private
-    bool ColliderActive = false;\n        \n         # private bool Exploding = false;\n
-    \       \n         # private CapsuleCollider AAMCollider;\n        \n         #
-    private bool NoTarget = false;\n        \n         # private bool Owner = false;\n
+    null\n    __7_intnl_UnityEngineTransform: %UnityEngineTransform, null\n    __8_intnl_UnityEngineTransform:
+    %UnityEngineTransform, null\n    __9_intnl_UnityEngineTransform: %UnityEngineTransform,
+    null\n    __0_intnl_EngineController: %VRCUdonUdonBehaviour, null\n    __1_intnl_EngineController:
+    %VRCUdonUdonBehaviour, null\n    __0_intnl_returnTarget_UInt32: %SystemUInt32,
+    null\n    __0_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __1_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __10_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __11_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __2_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __3_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __4_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __5_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __6_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __7_intnl_UnityEngineVector3: %UnityEngineVector3, null\n    __8_intnl_UnityEngineVector3:
+    %UnityEngineVector3, null\n    __9_intnl_UnityEngineVector3: %UnityEngineVector3,
+    null\n    __0_intnl_VRCSDKBaseVRCPlayerApi: %VRCSDKBaseVRCPlayerApi, null\n    __1_intnl_VRCSDKBaseVRCPlayerApi:
+    %VRCSDKBaseVRCPlayerApi, null\n\n.data_end\n\n        \n         # using UdonSharp;\n
+    \       \n         # using UnityEngine;\n        \n         # using VRC.SDKBase;\n
+    \       \n         # using VRC.Udon;\n        \n         # public class AAMController
+    : UdonSharpBehaviour\n.code_start\n        \n         # public float LockAngle;\n
+    \       \n         # public float RotSpeed = 15;\n        \n         # public
+    EngineController EngineControl;\n        \n         # private EngineController
+    TargetEngineControl;\n        \n         # private bool NonOwnerLockHack = true;\n
+    \       \n         # private float Lifetime = 0;\n        \n         # private
+    float StartLockAngle = 0;\n        \n         # private Transform Target;\n        \n
+    \        # private bool ColliderActive = false;\n        \n         # private
+    bool Exploding = false;\n        \n         # private CapsuleCollider AAMCollider;\n
+    \       \n         # private bool NoTarget = false;\n        \n         # private
+    bool Owner = false;\n        \n         # private bool TargetIsPlane = false;\n
     \       \n         # void Start()\n    .export _start\n        \n    _start:\n
     \       \n        PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n
-    \       \n         # StartLockAngle = LockAngle;\n        PUSH, LockAngle\n        PUSH,
+    \       \n         # if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent
+    != null)\n        PUSH, EngineControl\n        PUSH, __0_const_intnl_SystemString\n
+    \       PUSH, __0_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __0_intnl_SystemObject\n        PUSH, __1_intnl_SystemInt32\n        EXTERN,
+    \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, EngineControl\n
+    \       PUSH, __1_const_intnl_SystemString\n        PUSH, __1_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __1_intnl_SystemObject\n        PUSH, __1_intnl_UnityEngineGameObjectArray\n
+    \       COPY\n        PUSH, __1_intnl_UnityEngineGameObjectArray\n        PUSH,
+    __1_intnl_SystemInt32\n        PUSH, __0_intnl_UnityEngineGameObject\n        EXTERN,
+    \"UnityEngineGameObjectArray.__Get__SystemInt32__UnityEngineGameObject\"\n        PUSH,
+    __0_intnl_UnityEngineGameObject\n        PUSH, __0_intnl_UnityEngineTransform\n
+    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
+    \       PUSH, __0_intnl_UnityEngineTransform\n        PUSH, __1_intnl_UnityEngineTransform\n
+    \       EXTERN, \"UnityEngineTransform.__get_parent__UnityEngineTransform\"\n
+    \       PUSH, __1_intnl_UnityEngineTransform\n        PUSH, __0_const_intnl_UnityEngineTransform\n
+    \       PUSH, __0_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
+    \       PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000003EC\n        \n
+    \        # {\n        \n         # TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();\n
+    \       PUSH, EngineControl\n        PUSH, __0_const_intnl_SystemString\n        PUSH,
+    __2_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __2_intnl_SystemObject\n        PUSH, __3_intnl_SystemInt32\n        EXTERN,
+    \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, EngineControl\n
+    \       PUSH, __1_const_intnl_SystemString\n        PUSH, __3_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __3_intnl_SystemObject\n        PUSH, __3_intnl_UnityEngineGameObjectArray\n
+    \       COPY\n        PUSH, __3_intnl_UnityEngineGameObjectArray\n        PUSH,
+    __3_intnl_SystemInt32\n        PUSH, __1_intnl_UnityEngineGameObject\n        EXTERN,
+    \"UnityEngineGameObjectArray.__Get__SystemInt32__UnityEngineGameObject\"\n        PUSH,
+    __1_intnl_UnityEngineGameObject\n        PUSH, __2_intnl_UnityEngineTransform\n
+    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
+    \       PUSH, __2_intnl_UnityEngineTransform\n        PUSH, __3_intnl_UnityEngineTransform\n
+    \       EXTERN, \"UnityEngineTransform.__get_parent__UnityEngineTransform\"\n
+    \       PUSH, __3_intnl_UnityEngineTransform\n        PUSH, __0_const_intnl_SystemType\n
+    \       PUSH, __0_intnl_UnityEngineComponentArray\n        EXTERN, \"UnityEngineComponent.__GetComponents__SystemType__UnityEngineComponentArray\"\n
+    \       PUSH, __0_const_intnl_EngineController\n        PUSH, __0_intnl_EngineController\n
+    \       COPY\n        PUSH, __0_intnl_UnityEngineComponentArray\n        PUSH,
+    __4_intnl_SystemInt32\n        EXTERN, \"UnityEngineComponentArray.__get_Length__SystemInt32\"\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __5_intnl_SystemInt32\n
+    \       COPY\n        PUSH, __5_intnl_SystemInt32\n        PUSH, __4_intnl_SystemInt32\n
+    \       PUSH, __1_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_LessThan__SystemInt32_SystemInt32__SystemBoolean\"\n
+    \       PUSH, __1_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000394\n        PUSH,
+    __0_intnl_UnityEngineComponentArray\n        PUSH, __5_intnl_SystemInt32\n        PUSH,
+    __0_intnl_UnityEngineComponent\n        EXTERN, \"UnityEngineComponentArray.__Get__SystemInt32__UnityEngineComponent\"\n
+    \       PUSH, __0_intnl_UnityEngineComponent\n        PUSH, __1_intnl_EngineController\n
+    \       COPY\n        PUSH, __1_intnl_EngineController\n        PUSH, __2_const_intnl_SystemString\n
+    \       PUSH, __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __4_intnl_SystemObject\n        PUSH, __0_const_intnl_SystemObject\n
+    \       PUSH, __2_intnl_SystemBoolean\n        EXTERN, \"SystemObject.__op_Inequality__SystemObject_SystemObject__SystemBoolean\"\n
+    \       PUSH, __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000002F8\n        PUSH,
+    __4_intnl_SystemObject\n        PUSH, __1_intnl_SystemInt64\n        EXTERN, \"SystemConvert.__ToInt64__SystemObject__SystemInt64\"\n
+    \       PUSH, __1_intnl_SystemInt64\n        PUSH, __0_intnl_SystemInt64\n        COPY\n
+    \       JUMP, 0x0000030C\n        PUSH, __1_const_intnl_SystemInt64\n        PUSH,
+    __0_intnl_SystemInt64\n        COPY\n        PUSH, __0_intnl_SystemInt64\n        PUSH,
+    __0_const_intnl_SystemInt64\n        PUSH, __3_intnl_SystemBoolean\n        EXTERN,
+    \"SystemInt64.__op_Equality__SystemInt64_SystemInt64__SystemBoolean\"\n        PUSH,
+    __3_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000358\n        PUSH, __1_intnl_EngineController\n
+    \       PUSH, __0_intnl_EngineController\n        COPY\n        JUMP, 0x00000394\n
+    \       PUSH, __5_intnl_SystemInt32\n        PUSH, __1_const_intnl_SystemInt32\n
+    \       PUSH, __6_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_Addition__SystemInt32_SystemInt32__SystemInt32\"\n
+    \       PUSH, __6_intnl_SystemInt32\n        PUSH, __5_intnl_SystemInt32\n        COPY\n
+    \       JUMP, 0x00000210\n        PUSH, __0_intnl_EngineController\n        PUSH,
+    TargetEngineControl\n        COPY\n        \n         # if (TargetEngineControl
+    != null) TargetIsPlane = true;\n        PUSH, TargetEngineControl\n        PUSH,
+    __0_const_intnl_EngineController\n        PUSH, __1_intnl_SystemBoolean\n        EXTERN,
+    \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
+    \       PUSH, __1_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000003EC\n        PUSH,
+    __0_const_intnl_SystemBoolean\n        PUSH, TargetIsPlane\n        COPY\n        \n
+    \        # StartLockAngle = LockAngle;\n        PUSH, LockAngle\n        PUSH,
     StartLockAngle\n        COPY\n        \n         # if (EngineControl.InEditor
     || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))\n        PUSH,
-    EngineControl\n        PUSH, __0_const_intnl_SystemString\n        PUSH, __0_intnl_SystemObject\n
+    EngineControl\n        PUSH, __3_const_intnl_SystemString\n        PUSH, __2_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __0_intnl_SystemObject\n        PUSH, __2_intnl_SystemBoolean\n
+    \       PUSH, __2_intnl_SystemObject\n        PUSH, __3_intnl_SystemBoolean\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
-    __2_intnl_SystemBoolean\n        PUSH, __0_intnl_SystemBoolean\n        COPY\n
-    \       PUSH, __0_intnl_SystemBoolean\n        PUSH, __3_intnl_SystemBoolean\n
+    __3_intnl_SystemBoolean\n        PUSH, __1_intnl_SystemBoolean\n        COPY\n
+    \       PUSH, __1_intnl_SystemBoolean\n        PUSH, __4_intnl_SystemBoolean\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
-    \       PUSH, __3_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000130\n        PUSH,
-    EngineControl\n        PUSH, __1_const_intnl_SystemString\n        PUSH, __1_intnl_SystemObject\n
+    \       PUSH, __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000514\n        PUSH,
+    EngineControl\n        PUSH, __4_const_intnl_SystemString\n        PUSH, __3_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __1_intnl_SystemObject\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n
-    \       COPY\n        PUSH, EngineControl\n        PUSH, __0_intnl_UnityEngineGameObject\n
+    \       PUSH, __3_intnl_SystemObject\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n
+    \       COPY\n        PUSH, EngineControl\n        PUSH, __1_intnl_UnityEngineGameObject\n
     \       EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n
-    \       PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __0_intnl_UnityEngineGameObject\n
-    \       PUSH, __4_intnl_SystemBoolean\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__IsOwner__UnityEngineGameObject__SystemBoolean\"\n
-    \       PUSH, __0_intnl_SystemBoolean\n        PUSH, __4_intnl_SystemBoolean\n
-    \       PUSH, __5_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\n
-    \       PUSH, __5_intnl_SystemBoolean\n        PUSH, __0_intnl_SystemBoolean\n
-    \       COPY\n        PUSH, __0_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000170\n
+    \       PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __1_intnl_UnityEngineGameObject\n
+    \       PUSH, __5_intnl_SystemBoolean\n        EXTERN, \"VRCSDKBaseVRCPlayerApi.__IsOwner__UnityEngineGameObject__SystemBoolean\"\n
+    \       PUSH, __1_intnl_SystemBoolean\n        PUSH, __5_intnl_SystemBoolean\n
+    \       PUSH, __6_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\n
+    \       PUSH, __6_intnl_SystemBoolean\n        PUSH, __1_intnl_SystemBoolean\n
+    \       COPY\n        PUSH, __1_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000554\n
     \       \n         # {\n        \n         # Owner = true;\n        PUSH, __0_const_intnl_SystemBoolean\n
     \       PUSH, Owner\n        COPY\n        \n         # NonOwnerLockHack = false;//don't
     do netcode help hack if owner\n        PUSH, __1_const_intnl_SystemBoolean\n        PUSH,
-    NonOwnerLockHack\n        COPY\n        JUMP, 0x00000188\n        \n         #
+    NonOwnerLockHack\n        COPY\n        JUMP, 0x0000056C\n        \n         #
     else\n        \n         # {\n        \n         # LockAngle = 180;//help missiles
     fired during a lagged turnfight actually fly towards their targets for the people
-    who didn't fire them (for the first 2 seconds)\n        PUSH, __0_const_intnl_SystemInt32\n
+    who didn't fire them (for the first 2 seconds)\n        PUSH, __2_const_intnl_SystemInt32\n
     \       PUSH, LockAngle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
     \       \n         # if (EngineControl.NumAAMTargets != 0)\n        PUSH, EngineControl\n
-    \       PUSH, __2_const_intnl_SystemString\n        PUSH, __2_intnl_SystemObject\n
+    \       PUSH, __5_const_intnl_SystemString\n        PUSH, __4_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __2_intnl_SystemObject\n        PUSH, __1_intnl_SystemInt32\n        EXTERN,
-    \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, __1_intnl_SystemInt32\n
-    \       PUSH, __1_const_intnl_SystemInt32\n        PUSH, __6_intnl_SystemBoolean\n
+    \       PUSH, __4_intnl_SystemObject\n        PUSH, __3_intnl_SystemInt32\n        EXTERN,
+    \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, __3_intnl_SystemInt32\n
+    \       PUSH, __0_const_intnl_SystemInt32\n        PUSH, __7_intnl_SystemBoolean\n
     \       EXTERN, \"SystemInt32.__op_Inequality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __6_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000029C\n        \n
+    \       PUSH, __7_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000680\n        \n
     \        # {\n        \n         # Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;\n
-    \       PUSH, EngineControl\n        PUSH, __3_const_intnl_SystemString\n        PUSH,
-    __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __3_intnl_SystemObject\n        PUSH, __3_intnl_SystemInt32\n        EXTERN,
+    \       PUSH, EngineControl\n        PUSH, __0_const_intnl_SystemString\n        PUSH,
+    __5_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __5_intnl_SystemObject\n        PUSH, __5_intnl_SystemInt32\n        EXTERN,
     \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, EngineControl\n
-    \       PUSH, __4_const_intnl_SystemString\n        PUSH, __4_intnl_SystemObject\n
+    \       PUSH, __1_const_intnl_SystemString\n        PUSH, __6_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __4_intnl_SystemObject\n        PUSH, __1_intnl_UnityEngineGameObjectArray\n
-    \       COPY\n        PUSH, __1_intnl_UnityEngineGameObjectArray\n        PUSH,
-    __3_intnl_SystemInt32\n        PUSH, __1_intnl_UnityEngineGameObject\n        EXTERN,
+    \       PUSH, __6_intnl_SystemObject\n        PUSH, __3_intnl_UnityEngineGameObjectArray\n
+    \       COPY\n        PUSH, __3_intnl_UnityEngineGameObjectArray\n        PUSH,
+    __5_intnl_SystemInt32\n        PUSH, __2_intnl_UnityEngineGameObject\n        EXTERN,
     \"UnityEngineGameObjectArray.__Get__SystemInt32__UnityEngineGameObject\"\n        PUSH,
-    __1_intnl_UnityEngineGameObject\n        PUSH, Target\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       JUMP, 0x000002B0\n        \n         # else NoTarget = true;\n        PUSH,
+    __2_intnl_UnityEngineGameObject\n        PUSH, Target\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
+    \       JUMP, 0x00000694\n        \n         # else NoTarget = true;\n        PUSH,
     __0_const_intnl_SystemBoolean\n        PUSH, NoTarget\n        COPY\n        \n
     \        # AAMCollider = gameObject.GetComponent<CapsuleCollider>();\n        PUSH,
-    __0_this_intnl_UnityEngineGameObject\n        PUSH, __0_intnl_UnityEngineTransform\n
+    __0_this_intnl_UnityEngineGameObject\n        PUSH, __2_intnl_UnityEngineTransform\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __0_intnl_UnityEngineTransform\n        PUSH, __0_const_intnl_SystemType\n
+    \       PUSH, __2_intnl_UnityEngineTransform\n        PUSH, __1_const_intnl_SystemType\n
     \       PUSH, AAMCollider\n        EXTERN, \"UnityEngineCapsuleCollider.__GetComponent__T\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n        \n         #
     void LateUpdate()\n    .export _lateUpdate\n        \n    _lateUpdate:\n        \n
     \       PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n        \n
-    \        # Debug.Log(gameObject.GetComponent<Rigidbody>().velocity.magnitude);\n
-    \       PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH, __1_intnl_UnityEngineTransform\n
-    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __1_intnl_UnityEngineTransform\n        PUSH, __1_const_intnl_SystemType\n
-    \       PUSH, __0_intnl_UnityEngineRigidbody\n        EXTERN, \"UnityEngineRigidbody.__GetComponent__T\"\n
-    \       PUSH, __0_intnl_UnityEngineRigidbody\n        PUSH, __0_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineRigidbody.__get_velocity__UnityEngineVector3\"\n
-    \       PUSH, __0_intnl_UnityEngineVector3\n        PUSH, __0_intnl_SystemSingle\n
-    \       EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\n        PUSH,
-    __0_intnl_SystemSingle\n        EXTERN, \"UnityEngineDebug.__Log__SystemObject__SystemVoid\"\n
-    \       \n         # if (!ColliderActive)\n        PUSH, ColliderActive\n        PUSH,
-    __7_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
-    \       PUSH, __7_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000400\n        \n
+    \        # if (!ColliderActive)\n        PUSH, ColliderActive\n        PUSH, __8_intnl_SystemBoolean\n
+    \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
+    \       PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000076C\n        \n
     \        # {\n        \n         # if (Lifetime > 0.5f)\n        PUSH, Lifetime\n
-    \       PUSH, __0_const_intnl_SystemSingle\n        PUSH, __8_intnl_SystemBoolean\n
+    \       PUSH, __0_const_intnl_SystemSingle\n        PUSH, __9_intnl_SystemBoolean\n
     \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\n
-    \       PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000400\n        \n
+    \       PUSH, __9_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000076C\n        \n
     \        # {\n        \n         # AAMCollider.enabled = true;\n        PUSH,
     AAMCollider\n        PUSH, __0_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineCapsuleCollider.__set_enabled__SystemBoolean__SystemVoid\"\n
     \       \n         # ColliderActive = true;\n        PUSH, __0_const_intnl_SystemBoolean\n
     \       PUSH, ColliderActive\n        COPY\n        \n         # if (NonOwnerLockHack)\n
-    \       PUSH, NonOwnerLockHack\n        JUMP_IF_FALSE, 0x00000480\n        \n
-    \        # {\n        \n         # if (Lifetime > 2)\n        PUSH, __2_const_intnl_SystemInt32\n
-    \       PUSH, __1_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, Lifetime\n        PUSH, __1_intnl_SystemSingle\n        PUSH, __8_intnl_SystemBoolean\n
+    \       PUSH, NonOwnerLockHack\n        JUMP_IF_FALSE, 0x000007EC\n        \n
+    \        # {\n        \n         # if (Lifetime > 2)\n        PUSH, __3_const_intnl_SystemInt32\n
+    \       PUSH, __0_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, Lifetime\n        PUSH, __0_intnl_SystemSingle\n        PUSH, __9_intnl_SystemBoolean\n
     \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\n
-    \       PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000480\n        \n
+    \       PUSH, __9_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000007EC\n        \n
     \        # {\n        \n         # LockAngle = StartLockAngle;\n        PUSH,
     StartLockAngle\n        PUSH, LockAngle\n        COPY\n        \n         # NonOwnerLockHack
     = false;\n        PUSH, __1_const_intnl_SystemBoolean\n        PUSH, NonOwnerLockHack\n
     \       COPY\n        \n         # if (!NoTarget)\n        PUSH, NoTarget\n        PUSH,
-    __8_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
-    \       PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000774\n        \n
+    __9_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
+    \       PUSH, __9_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000AE0\n        \n
     \        # {\n        \n         # if (Vector3.Angle(gameObject.transform.forward,
     (Target.position - gameObject.transform.position)) < (LockAngle))\n        PUSH,
-    __0_this_intnl_UnityEngineGameObject\n        PUSH, __2_intnl_UnityEngineTransform\n
+    __0_this_intnl_UnityEngineGameObject\n        PUSH, __4_intnl_UnityEngineTransform\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __2_intnl_UnityEngineTransform\n        PUSH, __1_intnl_UnityEngineVector3\n
+    \       PUSH, __4_intnl_UnityEngineTransform\n        PUSH, __0_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineTransform.__get_forward__UnityEngineVector3\"\n        PUSH,
-    Target\n        PUSH, __2_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
-    \       PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH, __3_intnl_UnityEngineTransform\n
-    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __3_intnl_UnityEngineTransform\n        PUSH, __3_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
-    \       PUSH, __2_intnl_UnityEngineVector3\n        PUSH, __3_intnl_UnityEngineVector3\n
-    \       PUSH, __4_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
-    \       PUSH, __1_intnl_UnityEngineVector3\n        PUSH, __4_intnl_UnityEngineVector3\n
-    \       PUSH, __1_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__Angle__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n
-    \       PUSH, __1_intnl_SystemSingle\n        PUSH, LockAngle\n        PUSH, __9_intnl_SystemBoolean\n
-    \       EXTERN, \"SystemSingle.__op_LessThan__SystemSingle_SystemSingle__SystemBoolean\"\n
-    \       PUSH, __9_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000774\n        \n
-    \        # {\n        \n         # var missileToTargetVector = Target.position
-    - gameObject.transform.position;\n        PUSH, Target\n        PUSH, __5_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
-    \       PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH, __4_intnl_UnityEngineTransform\n
-    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __4_intnl_UnityEngineTransform\n        PUSH, __6_intnl_UnityEngineVector3\n
-    \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
-    \       PUSH, __5_intnl_UnityEngineVector3\n        PUSH, __6_intnl_UnityEngineVector3\n
-    \       PUSH, __7_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
-    \       PUSH, __7_intnl_UnityEngineVector3\n        PUSH, __0_missileToTargetVector_Vector3\n
-    \       COPY\n        \n         # var missileForward = gameObject.transform.forward;\n
+    Target\n        PUSH, __1_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
     \       PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH, __5_intnl_UnityEngineTransform\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __5_intnl_UnityEngineTransform\n        PUSH, __8_intnl_UnityEngineVector3\n
+    \       PUSH, __5_intnl_UnityEngineTransform\n        PUSH, __2_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
+    \       PUSH, __1_intnl_UnityEngineVector3\n        PUSH, __2_intnl_UnityEngineVector3\n
+    \       PUSH, __3_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, __0_intnl_UnityEngineVector3\n        PUSH, __3_intnl_UnityEngineVector3\n
+    \       PUSH, __0_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__Angle__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n
+    \       PUSH, __0_intnl_SystemSingle\n        PUSH, LockAngle\n        PUSH, __10_intnl_SystemBoolean\n
+    \       EXTERN, \"SystemSingle.__op_LessThan__SystemSingle_SystemSingle__SystemBoolean\"\n
+    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000AE0\n        \n
+    \        # {\n        \n         # var missileToTargetVector = Target.position
+    - gameObject.transform.position;\n        PUSH, Target\n        PUSH, __4_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
+    \       PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH, __6_intnl_UnityEngineTransform\n
+    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
+    \       PUSH, __6_intnl_UnityEngineTransform\n        PUSH, __5_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n
+    \       PUSH, __4_intnl_UnityEngineVector3\n        PUSH, __5_intnl_UnityEngineVector3\n
+    \       PUSH, __6_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, __6_intnl_UnityEngineVector3\n        PUSH, __0_missileToTargetVector_Vector3\n
+    \       COPY\n        \n         # var missileForward = gameObject.transform.forward;\n
+    \       PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH, __7_intnl_UnityEngineTransform\n
+    \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
+    \       PUSH, __7_intnl_UnityEngineTransform\n        PUSH, __7_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineTransform.__get_forward__UnityEngineVector3\"\n        PUSH,
-    __8_intnl_UnityEngineVector3\n        PUSH, __0_missileForward_Vector3\n        COPY\n
+    __7_intnl_UnityEngineVector3\n        PUSH, __0_missileForward_Vector3\n        COPY\n
     \       \n         # var targetDirection = missileToTargetVector.normalized;\n
-    \       PUSH, __0_missileToTargetVector_Vector3\n        PUSH, __9_intnl_UnityEngineVector3\n
+    \       PUSH, __0_missileToTargetVector_Vector3\n        PUSH, __8_intnl_UnityEngineVector3\n
     \       EXTERN, \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\n
-    \       PUSH, __9_intnl_UnityEngineVector3\n        PUSH, __0_targetDirection_Vector3\n
+    \       PUSH, __8_intnl_UnityEngineVector3\n        PUSH, __0_targetDirection_Vector3\n
     \       COPY\n        \n         # var rotationAxis = Vector3.Cross(missileForward,
     targetDirection);\n        PUSH, __0_missileForward_Vector3\n        PUSH, __0_targetDirection_Vector3\n
-    \       PUSH, __10_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__Cross__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
-    \       PUSH, __10_intnl_UnityEngineVector3\n        PUSH, __0_rotationAxis_Vector3\n
+    \       PUSH, __9_intnl_UnityEngineVector3\n        EXTERN, \"UnityEngineVector3.__Cross__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n
+    \       PUSH, __9_intnl_UnityEngineVector3\n        PUSH, __0_rotationAxis_Vector3\n
     \       COPY\n        \n         # var deltaAngle = Vector3.Angle(missileForward,
     targetDirection);\n        PUSH, __0_missileForward_Vector3\n        PUSH, __0_targetDirection_Vector3\n
-    \       PUSH, __2_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__Angle__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n
-    \       PUSH, __2_intnl_SystemSingle\n        PUSH, __0_deltaAngle_Single\n        COPY\n
+    \       PUSH, __1_intnl_SystemSingle\n        EXTERN, \"UnityEngineVector3.__Angle__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n
+    \       PUSH, __1_intnl_SystemSingle\n        PUSH, __0_deltaAngle_Single\n        COPY\n
     \       \n         # gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed
     * Time.deltaTime, deltaAngle), Space.World);\n        PUSH, __0_this_intnl_UnityEngineGameObject\n
-    \       PUSH, __6_intnl_UnityEngineTransform\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __3_intnl_SystemSingle\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\n
-    \       PUSH, RotSpeed\n        PUSH, __3_intnl_SystemSingle\n        PUSH, __4_intnl_SystemSingle\n
+    \       PUSH, __8_intnl_UnityEngineTransform\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
+    \       PUSH, __2_intnl_SystemSingle\n        EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\n
+    \       PUSH, RotSpeed\n        PUSH, __2_intnl_SystemSingle\n        PUSH, __3_intnl_SystemSingle\n
     \       EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __4_intnl_SystemSingle\n        PUSH, __0_deltaAngle_Single\n        PUSH,
-    __5_intnl_SystemSingle\n        EXTERN, \"UnityEngineMathf.__Min__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __6_intnl_UnityEngineTransform\n        PUSH, __0_rotationAxis_Vector3\n
-    \       PUSH, __5_intnl_SystemSingle\n        PUSH, __0_const_intnl_UnityEngineSpace\n
+    \       PUSH, __3_intnl_SystemSingle\n        PUSH, __0_deltaAngle_Single\n        PUSH,
+    __4_intnl_SystemSingle\n        EXTERN, \"UnityEngineMathf.__Min__SystemSingle_SystemSingle__SystemSingle\"\n
+    \       PUSH, __8_intnl_UnityEngineTransform\n        PUSH, __0_rotationAxis_Vector3\n
+    \       PUSH, __4_intnl_SystemSingle\n        PUSH, __0_const_intnl_UnityEngineSpace\n
     \       EXTERN, \"UnityEngineTransform.__Rotate__UnityEngineVector3_SystemSingle_UnityEngineSpace__SystemVoid\"\n
-    \       \n         # Lifetime += Time.deltaTime;\n        PUSH, __1_intnl_SystemSingle\n
+    \       \n         # Lifetime += Time.deltaTime;\n        PUSH, __0_intnl_SystemSingle\n
     \       EXTERN, \"UnityEngineTime.__get_deltaTime__SystemSingle\"\n        PUSH,
-    Lifetime\n        PUSH, __1_intnl_SystemSingle\n        PUSH, __2_intnl_SystemSingle\n
+    Lifetime\n        PUSH, __0_intnl_SystemSingle\n        PUSH, __1_intnl_SystemSingle\n
     \       EXTERN, \"SystemSingle.__op_Addition__SystemSingle_SystemSingle__SystemSingle\"\n
-    \       PUSH, __2_intnl_SystemSingle\n        PUSH, Lifetime\n        COPY\n        \n
-    \        # if (Lifetime > 40)\n        PUSH, __3_const_intnl_SystemInt32\n        PUSH,
-    __3_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, Lifetime\n        PUSH, __3_intnl_SystemSingle\n        PUSH, __9_intnl_SystemBoolean\n
+    \       PUSH, __1_intnl_SystemSingle\n        PUSH, Lifetime\n        COPY\n        \n
+    \        # if (Lifetime > 40)\n        PUSH, __4_const_intnl_SystemInt32\n        PUSH,
+    __2_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    \       PUSH, Lifetime\n        PUSH, __2_intnl_SystemSingle\n        PUSH, __10_intnl_SystemBoolean\n
     \       EXTERN, \"SystemSingle.__op_GreaterThan__SystemSingle_SystemSingle__SystemBoolean\"\n
-    \       PUSH, __9_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000810\n        \n
+    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000B7C\n        \n
     \        # {\n        \n         # Destroy(gameObject);\n        PUSH, __0_this_intnl_UnityEngineGameObject\n
     \       EXTERN, \"UnityEngineObject.__Destroy__UnityEngineObject__SystemVoid\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
@@ -255,33 +333,48 @@ MonoBehaviour:
     \       \n    _onCollisionEnter:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
     \       PUSH, onCollisionEnterOther\n        PUSH, __0_other_Collision\n        COPY\n
     \       \n         # {\n        \n         # if (!Exploding)\n        PUSH, Exploding\n
-    \       PUSH, __10_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
-    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000980\n        \n
-    \        # {\n        \n         # AAMCollider.enabled = false;\n        PUSH,
-    AAMCollider\n        PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineCapsuleCollider.__set_enabled__SystemBoolean__SystemVoid\"\n
+    \       PUSH, __11_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
+    \       PUSH, __11_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000DA0\n        \n
+    \        # {\n        \n         # if (TargetEngineControl != null)\n        PUSH,
+    TargetEngineControl\n        PUSH, __0_const_intnl_EngineController\n        PUSH,
+    __12_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
+    \       PUSH, __12_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000C88\n        \n
+    \        # {\n        \n         # gameObject.GetComponent<Rigidbody>().velocity
+    = TargetEngineControl.CurrentVel; // damage particles inherit the velocity of
+    the missile, so this should help them hit the target plane\n        PUSH, __0_this_intnl_UnityEngineGameObject\n
+    \       PUSH, __9_intnl_UnityEngineTransform\n        EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
+    \       PUSH, __9_intnl_UnityEngineTransform\n        PUSH, __2_const_intnl_SystemType\n
+    \       PUSH, __0_intnl_UnityEngineRigidbody\n        EXTERN, \"UnityEngineRigidbody.__GetComponent__T\"\n
+    \       PUSH, TargetEngineControl\n        PUSH, __6_const_intnl_SystemString\n
+    \       PUSH, __7_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __7_intnl_SystemObject\n        PUSH, __11_intnl_UnityEngineVector3\n
+    \       COPY\n        PUSH, __0_intnl_UnityEngineRigidbody\n        PUSH, __11_intnl_UnityEngineVector3\n
+    \       EXTERN, \"UnityEngineRigidbody.__set_velocity__UnityEngineVector3__SystemVoid\"\n
+    \       \n         # AAMCollider.enabled = false;\n        PUSH, AAMCollider\n
+    \       PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineCapsuleCollider.__set_enabled__SystemBoolean__SystemVoid\"\n
     \       \n         # Animator AGMani = gameObject.GetComponent<Animator>();\n
-    \       PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH, __7_intnl_UnityEngineTransform\n
+    \       PUSH, __0_this_intnl_UnityEngineGameObject\n        PUSH, __9_intnl_UnityEngineTransform\n
     \       EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n
-    \       PUSH, __7_intnl_UnityEngineTransform\n        PUSH, __2_const_intnl_SystemType\n
+    \       PUSH, __9_intnl_UnityEngineTransform\n        PUSH, __3_const_intnl_SystemType\n
     \       PUSH, __0_AGMani_Animator\n        EXTERN, \"UnityEngineAnimator.__GetComponent__T\"\n
     \       \n         # if (EngineControl.InEditor)\n        PUSH, EngineControl\n
-    \       PUSH, __0_const_intnl_SystemString\n        PUSH, __5_intnl_SystemObject\n
+    \       PUSH, __3_const_intnl_SystemString\n        PUSH, __7_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __5_intnl_SystemObject\n        PUSH, __12_intnl_SystemBoolean\n
+    \       PUSH, __7_intnl_SystemObject\n        PUSH, __14_intnl_SystemBoolean\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
-    __12_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000920\n        \n         #
+    __14_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000D40\n        \n         #
     {\n        \n         # AGMani.SetTrigger(\"explodeowner\");\n        PUSH, __0_AGMani_Animator\n
-    \       PUSH, __5_const_intnl_SystemString\n        EXTERN, \"UnityEngineAnimator.__SetTrigger__SystemString__SystemVoid\"\n
-    \       JUMP, 0x00000968\n        \n         # else\n        \n         # {\n
-    \       \n         # if (Owner)\n        PUSH, Owner\n        JUMP_IF_FALSE, 0x00000950\n
+    \       PUSH, __7_const_intnl_SystemString\n        EXTERN, \"UnityEngineAnimator.__SetTrigger__SystemString__SystemVoid\"\n
+    \       JUMP, 0x00000D88\n        \n         # else\n        \n         # {\n
+    \       \n         # if (Owner)\n        PUSH, Owner\n        JUMP_IF_FALSE, 0x00000D70\n
     \       \n         # {\n        \n         # AGMani.SetTrigger(\"explodeowner\");\n
-    \       PUSH, __0_AGMani_Animator\n        PUSH, __5_const_intnl_SystemString\n
+    \       PUSH, __0_AGMani_Animator\n        PUSH, __7_const_intnl_SystemString\n
     \       EXTERN, \"UnityEngineAnimator.__SetTrigger__SystemString__SystemVoid\"\n
-    \       JUMP, 0x00000968\n        \n         # else AGMani.SetTrigger(\"explode\");\n
-    \       PUSH, __0_AGMani_Animator\n        PUSH, __6_const_intnl_SystemString\n
+    \       JUMP, 0x00000D88\n        \n         # else AGMani.SetTrigger(\"explode\");\n
+    \       PUSH, __0_AGMani_Animator\n        PUSH, __8_const_intnl_SystemString\n
     \       EXTERN, \"UnityEngineAnimator.__SetTrigger__SystemString__SystemVoid\"\n
     \       \n         # Lifetime = 30;//10 seconds to finish exploding\n        PUSH,
-    __4_const_intnl_SystemInt32\n        PUSH, Lifetime\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
+    __5_const_intnl_SystemInt32\n        PUSH, Lifetime\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
     \       PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n.code_end\n"
   assemblyError: 
@@ -496,2216 +589,2589 @@ MonoBehaviour:
     - startInstruction: 0
       endInstruction: -1
       startSourceChar: 249
-      endSourceChar: 284
+      endSourceChar: 292
       line: 11
+      lineChar: 12
+      spanCodeSection: "EngineController TargetEngineControl;\r\n    "
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 292
+      endSourceChar: 300
+      line: 12
+      lineChar: 4
+      spanCodeSection: 'private '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 300
+      endSourceChar: 300
+      line: 12
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 300
+      endSourceChar: 335
+      line: 12
       lineChar: 12
       spanCodeSection: "bool NonOwnerLockHack = true;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 284
-      endSourceChar: 292
-      line: 12
+      startSourceChar: 335
+      endSourceChar: 343
+      line: 13
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 292
-      endSourceChar: 292
-      line: 12
+      startSourceChar: 343
+      endSourceChar: 343
+      line: 13
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 292
-      endSourceChar: 317
-      line: 12
+      startSourceChar: 343
+      endSourceChar: 368
+      line: 13
       lineChar: 12
       spanCodeSection: "float Lifetime = 0;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 317
-      endSourceChar: 325
-      line: 13
+      startSourceChar: 368
+      endSourceChar: 376
+      line: 14
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 325
-      endSourceChar: 325
-      line: 13
+      startSourceChar: 376
+      endSourceChar: 376
+      line: 14
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 325
-      endSourceChar: 356
-      line: 13
+      startSourceChar: 376
+      endSourceChar: 407
+      line: 14
       lineChar: 12
       spanCodeSection: "float StartLockAngle = 0;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 356
-      endSourceChar: 364
-      line: 14
+      startSourceChar: 407
+      endSourceChar: 415
+      line: 15
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 364
-      endSourceChar: 364
-      line: 14
+      startSourceChar: 415
+      endSourceChar: 415
+      line: 15
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 364
-      endSourceChar: 387
-      line: 14
+      startSourceChar: 415
+      endSourceChar: 438
+      line: 15
       lineChar: 12
       spanCodeSection: "Transform Target;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 387
-      endSourceChar: 395
-      line: 15
+      startSourceChar: 438
+      endSourceChar: 446
+      line: 16
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 395
-      endSourceChar: 395
-      line: 15
+      startSourceChar: 446
+      endSourceChar: 446
+      line: 16
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 395
-      endSourceChar: 429
-      line: 15
+      startSourceChar: 446
+      endSourceChar: 480
+      line: 16
       lineChar: 12
       spanCodeSection: "bool ColliderActive = false;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 429
-      endSourceChar: 437
-      line: 16
+      startSourceChar: 480
+      endSourceChar: 488
+      line: 17
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 437
-      endSourceChar: 437
-      line: 16
+      startSourceChar: 488
+      endSourceChar: 488
+      line: 17
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 437
-      endSourceChar: 466
-      line: 16
+      startSourceChar: 488
+      endSourceChar: 517
+      line: 17
       lineChar: 12
       spanCodeSection: "bool Exploding = false;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 466
-      endSourceChar: 474
-      line: 17
+      startSourceChar: 517
+      endSourceChar: 525
+      line: 18
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 474
-      endSourceChar: 474
-      line: 17
+      startSourceChar: 525
+      endSourceChar: 525
+      line: 18
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 474
-      endSourceChar: 508
-      line: 17
+      startSourceChar: 525
+      endSourceChar: 559
+      line: 18
       lineChar: 12
       spanCodeSection: "CapsuleCollider AAMCollider;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 508
-      endSourceChar: 516
-      line: 18
+      startSourceChar: 559
+      endSourceChar: 567
+      line: 19
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 516
-      endSourceChar: 516
-      line: 18
+      startSourceChar: 567
+      endSourceChar: 567
+      line: 19
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 516
-      endSourceChar: 544
-      line: 18
+      startSourceChar: 567
+      endSourceChar: 595
+      line: 19
       lineChar: 12
       spanCodeSection: "bool NoTarget = false;\r\n    "
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 544
-      endSourceChar: 552
-      line: 19
+      startSourceChar: 595
+      endSourceChar: 603
+      line: 20
       lineChar: 4
       spanCodeSection: 'private '
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 552
-      endSourceChar: 552
-      line: 19
+      startSourceChar: 603
+      endSourceChar: 603
+      line: 20
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 0
       endInstruction: -1
-      startSourceChar: 552
-      endSourceChar: 577
-      line: 19
+      startSourceChar: 603
+      endSourceChar: 628
+      line: 20
       lineChar: 12
       spanCodeSection: "bool Owner = false;\r\n    "
     - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 628
+      endSourceChar: 636
+      line: 21
+      lineChar: 4
+      spanCodeSection: 'private '
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 636
+      endSourceChar: 636
+      line: 21
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 0
+      endInstruction: -1
+      startSourceChar: 636
+      endSourceChar: 669
+      line: 21
+      lineChar: 12
+      spanCodeSection: "bool TargetIsPlane = false;\r\n    "
+    - startInstruction: 0
       endInstruction: 7
-      startSourceChar: 577
-      endSourceChar: 595
-      line: 20
+      startSourceChar: 669
+      endSourceChar: 687
+      line: 22
       lineChar: 4
       spanCodeSection: "void Start()\r\n    "
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 595
-      endSourceChar: 606
-      line: 21
+      startSourceChar: 687
+      endSourceChar: 698
+      line: 23
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 8
       endInstruction: 7
-      startSourceChar: 606
-      endSourceChar: 606
-      line: 22
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 8
-      endInstruction: 7
-      startSourceChar: 606
-      endSourceChar: 606
-      line: 22
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 8
-      endInstruction: 7
-      startSourceChar: 606
-      endSourceChar: 623
-      line: 22
-      lineChar: 8
-      spanCodeSection: 'StartLockAngle = '
-    - startInstruction: 8
-      endInstruction: 27
-      startSourceChar: 623
-      endSourceChar: 643
-      line: 22
-      lineChar: 25
-      spanCodeSection: "LockAngle;\r\n        "
-    - startInstruction: 28
-      endInstruction: 27
-      startSourceChar: 643
-      endSourceChar: 647
-      line: 23
-      lineChar: 8
-      spanCodeSection: if (
-    - startInstruction: 28
-      endInstruction: 27
-      startSourceChar: 647
-      endSourceChar: 647
-      line: 23
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 28
-      endInstruction: 27
-      startSourceChar: 647
-      endSourceChar: 647
-      line: 23
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 28
-      endInstruction: 27
-      startSourceChar: 647
-      endSourceChar: 661
-      line: 23
-      lineChar: 12
-      spanCodeSection: EngineControl.
-    - startInstruction: 28
-      endInstruction: 143
-      startSourceChar: 661
-      endSourceChar: 673
-      line: 23
-      lineChar: 26
-      spanCodeSection: 'InEditor || '
-    - startInstruction: 144
-      endInstruction: 143
-      startSourceChar: 673
-      endSourceChar: 673
-      line: 23
-      lineChar: 38
-      spanCodeSection: 
-    - startInstruction: 144
-      endInstruction: 143
-      startSourceChar: 673
-      endSourceChar: 673
-      line: 23
-      lineChar: 38
-      spanCodeSection: 
-    - startInstruction: 144
-      endInstruction: 143
-      startSourceChar: 673
-      endSourceChar: 673
-      line: 23
-      lineChar: 38
-      spanCodeSection: 
-    - startInstruction: 144
-      endInstruction: 143
-      startSourceChar: 673
-      endSourceChar: 687
-      line: 23
-      lineChar: 38
-      spanCodeSection: EngineControl.
-    - startInstruction: 144
-      endInstruction: 143
-      startSourceChar: 687
-      endSourceChar: 699
-      line: 23
-      lineChar: 52
-      spanCodeSection: localPlayer.
-    - startInstruction: 144
-      endInstruction: 195
-      startSourceChar: 699
-      endSourceChar: 707
-      line: 23
-      lineChar: 64
-      spanCodeSection: IsOwner(
-    - startInstruction: 196
-      endInstruction: 195
-      startSourceChar: 707
-      endSourceChar: 707
-      line: 23
-      lineChar: 72
-      spanCodeSection: 
-    - startInstruction: 196
-      endInstruction: 195
-      startSourceChar: 707
-      endSourceChar: 721
-      line: 23
-      lineChar: 72
-      spanCodeSection: EngineControl.
-    - startInstruction: 196
-      endInstruction: 319
-      startSourceChar: 721
-      endSourceChar: 743
-      line: 23
-      lineChar: 86
-      spanCodeSection: "gameObject))\r\n        "
-    - startInstruction: 320
-      endInstruction: 319
-      startSourceChar: 743
-      endSourceChar: 758
+      startSourceChar: 698
+      endSourceChar: 702
       line: 24
       lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 702
+      endSourceChar: 702
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 702
+      endSourceChar: 702
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 702
+      endSourceChar: 702
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 702
+      endSourceChar: 702
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 702
+      endSourceChar: 702
+      line: 24
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 702
+      endSourceChar: 716
+      line: 24
+      lineChar: 12
+      spanCodeSection: EngineControl.
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 716
+      endSourceChar: 727
+      line: 24
+      lineChar: 26
+      spanCodeSection: AAMTargets[
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 727
+      endSourceChar: 727
+      line: 24
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 727
+      endSourceChar: 727
+      line: 24
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 8
+      endInstruction: 7
+      startSourceChar: 727
+      endSourceChar: 741
+      line: 24
+      lineChar: 37
+      spanCodeSection: EngineControl.
+    - startInstruction: 8
+      endInstruction: 115
+      startSourceChar: 741
+      endSourceChar: 752
+      line: 24
+      lineChar: 51
+      spanCodeSection: AAMTarget].
+    - startInstruction: 116
+      endInstruction: 147
+      startSourceChar: 752
+      endSourceChar: 762
+      line: 24
+      lineChar: 62
+      spanCodeSection: transform.
+    - startInstruction: 148
+      endInstruction: 195
+      startSourceChar: 762
+      endSourceChar: 772
+      line: 24
+      lineChar: 72
+      spanCodeSection: 'parent != '
+    - startInstruction: 196
+      endInstruction: 243
+      startSourceChar: 772
+      endSourceChar: 787
+      line: 24
+      lineChar: 82
+      spanCodeSection: "null)\r\n        "
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 787
+      endSourceChar: 802
+      line: 25
+      lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 320
-      endInstruction: 319
-      startSourceChar: 758
-      endSourceChar: 758
-      line: 25
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 802
+      endSourceChar: 802
+      line: 26
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 320
-      endInstruction: 319
-      startSourceChar: 758
-      endSourceChar: 758
-      line: 25
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 802
+      endSourceChar: 802
+      line: 26
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 320
-      endInstruction: 319
-      startSourceChar: 758
-      endSourceChar: 766
-      line: 25
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 802
+      endSourceChar: 824
+      line: 26
+      lineChar: 12
+      spanCodeSection: 'TargetEngineControl = '
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 824
+      endSourceChar: 824
+      line: 26
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 824
+      endSourceChar: 824
+      line: 26
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 824
+      endSourceChar: 824
+      line: 26
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 824
+      endSourceChar: 824
+      line: 26
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 824
+      endSourceChar: 824
+      line: 26
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 824
+      endSourceChar: 824
+      line: 26
+      lineChar: 34
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 824
+      endSourceChar: 838
+      line: 26
+      lineChar: 34
+      spanCodeSection: EngineControl.
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 838
+      endSourceChar: 849
+      line: 26
+      lineChar: 48
+      spanCodeSection: AAMTargets[
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 849
+      endSourceChar: 849
+      line: 26
+      lineChar: 59
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 849
+      endSourceChar: 849
+      line: 26
+      lineChar: 59
+      spanCodeSection: 
+    - startInstruction: 244
+      endInstruction: 243
+      startSourceChar: 849
+      endSourceChar: 863
+      line: 26
+      lineChar: 59
+      spanCodeSection: EngineControl.
+    - startInstruction: 244
+      endInstruction: 351
+      startSourceChar: 863
+      endSourceChar: 874
+      line: 26
+      lineChar: 73
+      spanCodeSection: AAMTarget].
+    - startInstruction: 352
+      endInstruction: 383
+      startSourceChar: 874
+      endSourceChar: 884
+      line: 26
+      lineChar: 84
+      spanCodeSection: transform.
+    - startInstruction: 384
+      endInstruction: 407
+      startSourceChar: 884
+      endSourceChar: 891
+      line: 26
+      lineChar: 94
+      spanCodeSection: parent.
+    - startInstruction: 408
+      endInstruction: 431
+      startSourceChar: 891
+      endSourceChar: 903
+      line: 26
+      lineChar: 101
+      spanCodeSection: GetComponent
+    - startInstruction: 432
+      endInstruction: 431
+      startSourceChar: 903
+      endSourceChar: 904
+      line: 26
+      lineChar: 113
+      spanCodeSection: <
+    - startInstruction: 432
+      endInstruction: 935
+      startSourceChar: 904
+      endSourceChar: 938
+      line: 26
+      lineChar: 114
+      spanCodeSection: "EngineController>();\r\n            "
+    - startInstruction: 936
+      endInstruction: 935
+      startSourceChar: 938
+      endSourceChar: 942
+      line: 27
+      lineChar: 12
+      spanCodeSection: if (
+    - startInstruction: 936
+      endInstruction: 935
+      startSourceChar: 942
+      endSourceChar: 942
+      line: 27
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 936
+      endInstruction: 935
+      startSourceChar: 942
+      endSourceChar: 965
+      line: 27
+      lineChar: 16
+      spanCodeSection: 'TargetEngineControl != '
+    - startInstruction: 936
+      endInstruction: 983
+      startSourceChar: 965
+      endSourceChar: 971
+      line: 27
+      lineChar: 39
+      spanCodeSection: 'null) '
+    - startInstruction: 984
+      endInstruction: 983
+      startSourceChar: 971
+      endSourceChar: 971
+      line: 27
+      lineChar: 45
+      spanCodeSection: 
+    - startInstruction: 984
+      endInstruction: 983
+      startSourceChar: 971
+      endSourceChar: 971
+      line: 27
+      lineChar: 45
+      spanCodeSection: 
+    - startInstruction: 984
+      endInstruction: 983
+      startSourceChar: 971
+      endSourceChar: 987
+      line: 27
+      lineChar: 45
+      spanCodeSection: 'TargetIsPlane = '
+    - startInstruction: 984
+      endInstruction: 1003
+      startSourceChar: 987
+      endSourceChar: 1015
+      line: 27
+      lineChar: 61
+      spanCodeSection: "true;\r\n        }\r\n\r\n        "
+    - startInstruction: 1004
+      endInstruction: 1003
+      startSourceChar: 1015
+      endSourceChar: 1015
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1004
+      endInstruction: 1003
+      startSourceChar: 1015
+      endSourceChar: 1015
+      line: 30
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 1004
+      endInstruction: 1003
+      startSourceChar: 1015
+      endSourceChar: 1032
+      line: 30
+      lineChar: 8
+      spanCodeSection: 'StartLockAngle = '
+    - startInstruction: 1004
+      endInstruction: 1023
+      startSourceChar: 1032
+      endSourceChar: 1052
+      line: 30
+      lineChar: 25
+      spanCodeSection: "LockAngle;\r\n        "
+    - startInstruction: 1024
+      endInstruction: 1023
+      startSourceChar: 1052
+      endSourceChar: 1056
+      line: 31
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 1024
+      endInstruction: 1023
+      startSourceChar: 1056
+      endSourceChar: 1056
+      line: 31
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1024
+      endInstruction: 1023
+      startSourceChar: 1056
+      endSourceChar: 1056
+      line: 31
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1024
+      endInstruction: 1023
+      startSourceChar: 1056
+      endSourceChar: 1070
+      line: 31
+      lineChar: 12
+      spanCodeSection: EngineControl.
+    - startInstruction: 1024
+      endInstruction: 1139
+      startSourceChar: 1070
+      endSourceChar: 1082
+      line: 31
+      lineChar: 26
+      spanCodeSection: 'InEditor || '
+    - startInstruction: 1140
+      endInstruction: 1139
+      startSourceChar: 1082
+      endSourceChar: 1082
+      line: 31
+      lineChar: 38
+      spanCodeSection: 
+    - startInstruction: 1140
+      endInstruction: 1139
+      startSourceChar: 1082
+      endSourceChar: 1082
+      line: 31
+      lineChar: 38
+      spanCodeSection: 
+    - startInstruction: 1140
+      endInstruction: 1139
+      startSourceChar: 1082
+      endSourceChar: 1082
+      line: 31
+      lineChar: 38
+      spanCodeSection: 
+    - startInstruction: 1140
+      endInstruction: 1139
+      startSourceChar: 1082
+      endSourceChar: 1096
+      line: 31
+      lineChar: 38
+      spanCodeSection: EngineControl.
+    - startInstruction: 1140
+      endInstruction: 1139
+      startSourceChar: 1096
+      endSourceChar: 1108
+      line: 31
+      lineChar: 52
+      spanCodeSection: localPlayer.
+    - startInstruction: 1140
+      endInstruction: 1191
+      startSourceChar: 1108
+      endSourceChar: 1116
+      line: 31
+      lineChar: 64
+      spanCodeSection: IsOwner(
+    - startInstruction: 1192
+      endInstruction: 1191
+      startSourceChar: 1116
+      endSourceChar: 1116
+      line: 31
+      lineChar: 72
+      spanCodeSection: 
+    - startInstruction: 1192
+      endInstruction: 1191
+      startSourceChar: 1116
+      endSourceChar: 1130
+      line: 31
+      lineChar: 72
+      spanCodeSection: EngineControl.
+    - startInstruction: 1192
+      endInstruction: 1315
+      startSourceChar: 1130
+      endSourceChar: 1152
+      line: 31
+      lineChar: 86
+      spanCodeSection: "gameObject))\r\n        "
+    - startInstruction: 1316
+      endInstruction: 1315
+      startSourceChar: 1152
+      endSourceChar: 1167
+      line: 32
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 1316
+      endInstruction: 1315
+      startSourceChar: 1167
+      endSourceChar: 1167
+      line: 33
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1316
+      endInstruction: 1315
+      startSourceChar: 1167
+      endSourceChar: 1167
+      line: 33
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1316
+      endInstruction: 1315
+      startSourceChar: 1167
+      endSourceChar: 1175
+      line: 33
       lineChar: 12
       spanCodeSection: 'Owner = '
-    - startInstruction: 320
-      endInstruction: 339
-      startSourceChar: 766
-      endSourceChar: 785
-      line: 25
+    - startInstruction: 1316
+      endInstruction: 1335
+      startSourceChar: 1175
+      endSourceChar: 1194
+      line: 33
       lineChar: 20
       spanCodeSection: "true;\r\n            "
-    - startInstruction: 340
-      endInstruction: 339
-      startSourceChar: 785
-      endSourceChar: 785
-      line: 26
+    - startInstruction: 1336
+      endInstruction: 1335
+      startSourceChar: 1194
+      endSourceChar: 1194
+      line: 34
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 340
-      endInstruction: 339
-      startSourceChar: 785
-      endSourceChar: 785
-      line: 26
+    - startInstruction: 1336
+      endInstruction: 1335
+      startSourceChar: 1194
+      endSourceChar: 1194
+      line: 34
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 340
-      endInstruction: 339
-      startSourceChar: 785
-      endSourceChar: 804
-      line: 26
+    - startInstruction: 1336
+      endInstruction: 1335
+      startSourceChar: 1194
+      endSourceChar: 1213
+      line: 34
       lineChar: 12
       spanCodeSection: 'NonOwnerLockHack = '
-    - startInstruction: 340
-      endInstruction: 367
-      startSourceChar: 804
-      endSourceChar: 868
-      line: 26
+    - startInstruction: 1336
+      endInstruction: 1363
+      startSourceChar: 1213
+      endSourceChar: 1277
+      line: 34
       lineChar: 31
       spanCodeSection: "false;//don't do netcode help hack if owner\r\n        }\r\n
         \       "
-    - startInstruction: 368
-      endInstruction: 367
-      startSourceChar: 868
-      endSourceChar: 882
-      line: 28
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1277
+      endSourceChar: 1291
+      line: 36
       lineChar: 8
       spanCodeSection: "else\r\n        "
-    - startInstruction: 368
-      endInstruction: 367
-      startSourceChar: 882
-      endSourceChar: 897
-      line: 29
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1291
+      endSourceChar: 1306
+      line: 37
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 368
-      endInstruction: 367
-      startSourceChar: 897
-      endSourceChar: 897
-      line: 30
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1306
+      endSourceChar: 1306
+      line: 38
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 368
-      endInstruction: 367
-      startSourceChar: 897
-      endSourceChar: 897
-      line: 30
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1306
+      endSourceChar: 1306
+      line: 38
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 368
-      endInstruction: 367
-      startSourceChar: 897
-      endSourceChar: 909
-      line: 30
+    - startInstruction: 1364
+      endInstruction: 1363
+      startSourceChar: 1306
+      endSourceChar: 1318
+      line: 38
       lineChar: 12
       spanCodeSection: 'LockAngle = '
-    - startInstruction: 368
-      endInstruction: 391
-      startSourceChar: 909
-      endSourceChar: 1078
-      line: 30
+    - startInstruction: 1364
+      endInstruction: 1387
+      startSourceChar: 1318
+      endSourceChar: 1487
+      line: 38
       lineChar: 24
       spanCodeSection: "180;//help missiles fired during a lagged turnfight actually
         fly towards their targets for the people who didn't fire them (for the first
         2 seconds)\r\n        }\r\n        "
-    - startInstruction: 392
-      endInstruction: 391
-      startSourceChar: 1078
-      endSourceChar: 1082
-      line: 32
+    - startInstruction: 1388
+      endInstruction: 1387
+      startSourceChar: 1487
+      endSourceChar: 1491
+      line: 40
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 392
-      endInstruction: 391
-      startSourceChar: 1082
-      endSourceChar: 1082
-      line: 32
+    - startInstruction: 1388
+      endInstruction: 1387
+      startSourceChar: 1491
+      endSourceChar: 1491
+      line: 40
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 392
-      endInstruction: 391
-      startSourceChar: 1082
-      endSourceChar: 1082
-      line: 32
+    - startInstruction: 1388
+      endInstruction: 1387
+      startSourceChar: 1491
+      endSourceChar: 1491
+      line: 40
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 392
-      endInstruction: 391
-      startSourceChar: 1082
-      endSourceChar: 1096
-      line: 32
+    - startInstruction: 1388
+      endInstruction: 1387
+      startSourceChar: 1491
+      endSourceChar: 1505
+      line: 40
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 392
-      endInstruction: 447
-      startSourceChar: 1096
-      endSourceChar: 1113
-      line: 32
+    - startInstruction: 1388
+      endInstruction: 1443
+      startSourceChar: 1505
+      endSourceChar: 1522
+      line: 40
       lineChar: 26
       spanCodeSection: 'NumAAMTargets != '
-    - startInstruction: 448
-      endInstruction: 495
-      startSourceChar: 1113
-      endSourceChar: 1125
-      line: 32
+    - startInstruction: 1444
+      endInstruction: 1491
+      startSourceChar: 1522
+      endSourceChar: 1534
+      line: 40
       lineChar: 43
       spanCodeSection: "0)\r\n        "
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1125
-      endSourceChar: 1140
-      line: 33
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1534
+      endSourceChar: 1549
+      line: 41
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1140
-      endSourceChar: 1140
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1549
+      endSourceChar: 1549
+      line: 42
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1140
-      endSourceChar: 1140
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1549
+      endSourceChar: 1549
+      line: 42
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1140
-      endSourceChar: 1149
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1549
+      endSourceChar: 1558
+      line: 42
       lineChar: 12
       spanCodeSection: 'Target = '
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1149
-      endSourceChar: 1149
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1558
+      endSourceChar: 1558
+      line: 42
       lineChar: 21
       spanCodeSection: 
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1149
-      endSourceChar: 1149
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1558
+      endSourceChar: 1558
+      line: 42
       lineChar: 21
       spanCodeSection: 
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1149
-      endSourceChar: 1149
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1558
+      endSourceChar: 1558
+      line: 42
       lineChar: 21
       spanCodeSection: 
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1149
-      endSourceChar: 1163
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1558
+      endSourceChar: 1572
+      line: 42
       lineChar: 21
       spanCodeSection: EngineControl.
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1163
-      endSourceChar: 1174
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1572
+      endSourceChar: 1583
+      line: 42
       lineChar: 35
       spanCodeSection: AAMTargets[
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1174
-      endSourceChar: 1174
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1583
+      endSourceChar: 1583
+      line: 42
       lineChar: 46
       spanCodeSection: 
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1174
-      endSourceChar: 1174
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1583
+      endSourceChar: 1583
+      line: 42
       lineChar: 46
       spanCodeSection: 
-    - startInstruction: 496
-      endInstruction: 495
-      startSourceChar: 1174
-      endSourceChar: 1188
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1583
+      endSourceChar: 1597
+      line: 42
       lineChar: 46
       spanCodeSection: EngineControl.
-    - startInstruction: 496
-      endInstruction: 603
-      startSourceChar: 1188
-      endSourceChar: 1199
-      line: 34
+    - startInstruction: 1492
+      endInstruction: 1599
+      startSourceChar: 1597
+      endSourceChar: 1608
+      line: 42
       lineChar: 60
       spanCodeSection: AAMTarget].
-    - startInstruction: 604
-      endInstruction: 667
-      startSourceChar: 1199
-      endSourceChar: 1230
-      line: 34
+    - startInstruction: 1600
+      endInstruction: 1663
+      startSourceChar: 1608
+      endSourceChar: 1639
+      line: 42
       lineChar: 71
       spanCodeSection: "transform;\r\n        }\r\n        "
-    - startInstruction: 668
-      endInstruction: 667
-      startSourceChar: 1230
-      endSourceChar: 1235
-      line: 36
-      lineChar: 8
-      spanCodeSection: 'else '
-    - startInstruction: 668
-      endInstruction: 667
-      startSourceChar: 1235
-      endSourceChar: 1235
-      line: 36
-      lineChar: 13
-      spanCodeSection: 
-    - startInstruction: 668
-      endInstruction: 667
-      startSourceChar: 1235
-      endSourceChar: 1235
-      line: 36
-      lineChar: 13
-      spanCodeSection: 
-    - startInstruction: 668
-      endInstruction: 667
-      startSourceChar: 1235
-      endSourceChar: 1246
-      line: 36
-      lineChar: 13
-      spanCodeSection: 'NoTarget = '
-    - startInstruction: 668
-      endInstruction: 687
-      startSourceChar: 1246
-      endSourceChar: 1263
-      line: 36
-      lineChar: 24
-      spanCodeSection: "true;\r\n\r\n        "
-    - startInstruction: 688
-      endInstruction: 687
-      startSourceChar: 1263
-      endSourceChar: 1263
-      line: 38
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 688
-      endInstruction: 687
-      startSourceChar: 1263
-      endSourceChar: 1263
-      line: 38
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 688
-      endInstruction: 687
-      startSourceChar: 1263
-      endSourceChar: 1277
-      line: 38
-      lineChar: 8
-      spanCodeSection: 'AAMCollider = '
-    - startInstruction: 688
-      endInstruction: 687
-      startSourceChar: 1277
-      endSourceChar: 1277
-      line: 38
-      lineChar: 22
-      spanCodeSection: 
-    - startInstruction: 688
-      endInstruction: 687
-      startSourceChar: 1277
-      endSourceChar: 1277
-      line: 38
-      lineChar: 22
-      spanCodeSection: 
-    - startInstruction: 688
-      endInstruction: 687
-      startSourceChar: 1277
-      endSourceChar: 1288
-      line: 38
-      lineChar: 22
-      spanCodeSection: gameObject.
-    - startInstruction: 688
-      endInstruction: 687
-      startSourceChar: 1288
-      endSourceChar: 1300
-      line: 38
-      lineChar: 33
-      spanCodeSection: GetComponent
-    - startInstruction: 688
-      endInstruction: 687
-      startSourceChar: 1300
-      endSourceChar: 1301
-      line: 38
-      lineChar: 45
-      spanCodeSection: <
-    - startInstruction: 688
-      endInstruction: 763
-      startSourceChar: 1301
-      endSourceChar: 1333
-      line: 38
-      lineChar: 46
-      spanCodeSection: "CapsuleCollider>();\r\n    }\r\n    "
-    - startInstruction: 764
-      endInstruction: 771
-      startSourceChar: 1333
-      endSourceChar: 1356
-      line: 40
-      lineChar: 4
-      spanCodeSection: "void LateUpdate()\r\n    "
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1356
-      endSourceChar: 1367
-      line: 41
-      lineChar: 4
-      spanCodeSection: "{\r\n        "
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1367
-      endSourceChar: 1367
-      line: 42
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1367
-      endSourceChar: 1367
-      line: 42
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1367
-      endSourceChar: 1367
-      line: 42
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1367
-      endSourceChar: 1373
-      line: 42
-      lineChar: 8
-      spanCodeSection: Debug.
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1373
-      endSourceChar: 1377
-      line: 42
-      lineChar: 14
-      spanCodeSection: Log(
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1377
-      endSourceChar: 1377
-      line: 42
-      lineChar: 18
-      spanCodeSection: 
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1377
-      endSourceChar: 1377
-      line: 42
-      lineChar: 18
-      spanCodeSection: 
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1377
-      endSourceChar: 1377
-      line: 42
-      lineChar: 18
-      spanCodeSection: 
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1377
-      endSourceChar: 1377
-      line: 42
-      lineChar: 18
-      spanCodeSection: 
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1377
-      endSourceChar: 1388
-      line: 42
-      lineChar: 18
-      spanCodeSection: gameObject.
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1388
-      endSourceChar: 1400
-      line: 42
-      lineChar: 29
-      spanCodeSection: GetComponent
-    - startInstruction: 772
-      endInstruction: 771
-      startSourceChar: 1400
-      endSourceChar: 1401
-      line: 42
-      lineChar: 41
-      spanCodeSection: <
-    - startInstruction: 772
-      endInstruction: 827
-      startSourceChar: 1401
-      endSourceChar: 1414
-      line: 42
-      lineChar: 42
-      spanCodeSection: Rigidbody>().
-    - startInstruction: 828
-      endInstruction: 827
-      startSourceChar: 1414
-      endSourceChar: 1423
-      line: 42
-      lineChar: 55
-      spanCodeSection: velocity.
-    - startInstruction: 828
-      endInstruction: 891
-      startSourceChar: 1423
-      endSourceChar: 1444
-      line: 42
-      lineChar: 64
-      spanCodeSection: "magnitude);\r\n        "
-    - startInstruction: 892
-      endInstruction: 891
-      startSourceChar: 1444
-      endSourceChar: 1448
-      line: 43
-      lineChar: 8
-      spanCodeSection: if (
-    - startInstruction: 892
-      endInstruction: 891
-      startSourceChar: 1448
-      endSourceChar: 1449
-      line: 43
-      lineChar: 12
-      spanCodeSection: '!'
-    - startInstruction: 892
-      endInstruction: 931
-      startSourceChar: 1449
-      endSourceChar: 1474
-      line: 43
-      lineChar: 13
-      spanCodeSection: "ColliderActive)\r\n        "
-    - startInstruction: 932
-      endInstruction: 931
-      startSourceChar: 1474
-      endSourceChar: 1489
+    - startInstruction: 1664
+      endInstruction: 1663
+      startSourceChar: 1639
+      endSourceChar: 1644
       line: 44
       lineChar: 8
-      spanCodeSection: "{\r\n            "
-    - startInstruction: 932
-      endInstruction: 931
-      startSourceChar: 1489
-      endSourceChar: 1493
-      line: 45
-      lineChar: 12
-      spanCodeSection: if (
-    - startInstruction: 932
-      endInstruction: 931
-      startSourceChar: 1493
-      endSourceChar: 1493
-      line: 45
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 932
-      endInstruction: 931
-      startSourceChar: 1493
-      endSourceChar: 1504
-      line: 45
-      lineChar: 16
-      spanCodeSection: 'Lifetime > '
-    - startInstruction: 932
-      endInstruction: 979
-      startSourceChar: 1504
-      endSourceChar: 1523
-      line: 45
-      lineChar: 27
-      spanCodeSection: "0.5f)\r\n            "
-    - startInstruction: 980
-      endInstruction: 979
-      startSourceChar: 1523
-      endSourceChar: 1542
-      line: 46
-      lineChar: 12
-      spanCodeSection: "{\r\n                "
-    - startInstruction: 980
-      endInstruction: 979
-      startSourceChar: 1542
-      endSourceChar: 1542
-      line: 47
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 980
-      endInstruction: 979
-      startSourceChar: 1542
-      endSourceChar: 1542
-      line: 47
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 980
-      endInstruction: 979
-      startSourceChar: 1542
-      endSourceChar: 1542
-      line: 47
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 980
-      endInstruction: 979
-      startSourceChar: 1542
-      endSourceChar: 1554
-      line: 47
-      lineChar: 16
-      spanCodeSection: AAMCollider.
-    - startInstruction: 980
-      endInstruction: 979
-      startSourceChar: 1554
-      endSourceChar: 1564
-      line: 47
-      lineChar: 28
-      spanCodeSection: 'enabled = '
-    - startInstruction: 980
-      endInstruction: 1003
-      startSourceChar: 1564
-      endSourceChar: 1587
-      line: 47
-      lineChar: 38
-      spanCodeSection: "true;\r\n                "
-    - startInstruction: 1004
-      endInstruction: 1003
-      startSourceChar: 1587
-      endSourceChar: 1587
-      line: 48
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1004
-      endInstruction: 1003
-      startSourceChar: 1587
-      endSourceChar: 1587
-      line: 48
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1004
-      endInstruction: 1003
-      startSourceChar: 1587
-      endSourceChar: 1604
-      line: 48
-      lineChar: 16
-      spanCodeSection: 'ColliderActive = '
-    - startInstruction: 1004
-      endInstruction: 1023
-      startSourceChar: 1604
-      endSourceChar: 1645
-      line: 48
-      lineChar: 33
-      spanCodeSection: "true;\r\n            }\r\n        }\r\n        "
-    - startInstruction: 1024
-      endInstruction: 1023
-      startSourceChar: 1645
-      endSourceChar: 1649
-      line: 51
-      lineChar: 8
-      spanCodeSection: if (
-    - startInstruction: 1024
-      endInstruction: 1039
-      startSourceChar: 1649
-      endSourceChar: 1676
-      line: 51
-      lineChar: 12
-      spanCodeSection: "NonOwnerLockHack)\r\n        "
-    - startInstruction: 1040
-      endInstruction: 1039
-      startSourceChar: 1676
-      endSourceChar: 1691
-      line: 52
-      lineChar: 8
-      spanCodeSection: "{\r\n            "
-    - startInstruction: 1040
-      endInstruction: 1039
-      startSourceChar: 1691
-      endSourceChar: 1695
-      line: 53
-      lineChar: 12
-      spanCodeSection: if (
-    - startInstruction: 1040
-      endInstruction: 1039
-      startSourceChar: 1695
-      endSourceChar: 1695
-      line: 53
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1040
-      endInstruction: 1039
-      startSourceChar: 1695
-      endSourceChar: 1706
-      line: 53
-      lineChar: 16
-      spanCodeSection: 'Lifetime > '
-    - startInstruction: 1040
-      endInstruction: 1111
-      startSourceChar: 1706
-      endSourceChar: 1722
-      line: 53
-      lineChar: 27
-      spanCodeSection: "2)\r\n            "
-    - startInstruction: 1112
-      endInstruction: 1111
-      startSourceChar: 1722
-      endSourceChar: 1741
-      line: 54
-      lineChar: 12
-      spanCodeSection: "{\r\n                "
-    - startInstruction: 1112
-      endInstruction: 1111
-      startSourceChar: 1741
-      endSourceChar: 1741
-      line: 55
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1112
-      endInstruction: 1111
-      startSourceChar: 1741
-      endSourceChar: 1741
-      line: 55
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1112
-      endInstruction: 1111
-      startSourceChar: 1741
-      endSourceChar: 1753
-      line: 55
-      lineChar: 16
-      spanCodeSection: 'LockAngle = '
-    - startInstruction: 1112
-      endInstruction: 1131
-      startSourceChar: 1753
-      endSourceChar: 1786
-      line: 55
-      lineChar: 28
-      spanCodeSection: "StartLockAngle;\r\n                "
-    - startInstruction: 1132
-      endInstruction: 1131
-      startSourceChar: 1786
-      endSourceChar: 1786
-      line: 56
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1132
-      endInstruction: 1131
-      startSourceChar: 1786
-      endSourceChar: 1786
-      line: 56
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1132
-      endInstruction: 1131
-      startSourceChar: 1786
-      endSourceChar: 1805
-      line: 56
-      lineChar: 16
-      spanCodeSection: 'NonOwnerLockHack = '
-    - startInstruction: 1132
-      endInstruction: 1151
-      startSourceChar: 1805
-      endSourceChar: 1849
-      line: 56
-      lineChar: 35
-      spanCodeSection: "false;\r\n            }\r\n        }\r\n\r\n        "
-    - startInstruction: 1152
-      endInstruction: 1151
-      startSourceChar: 1849
-      endSourceChar: 1853
-      line: 60
-      lineChar: 8
-      spanCodeSection: if (
-    - startInstruction: 1152
-      endInstruction: 1151
-      startSourceChar: 1853
-      endSourceChar: 1854
-      line: 60
-      lineChar: 12
-      spanCodeSection: '!'
-    - startInstruction: 1152
-      endInstruction: 1191
-      startSourceChar: 1854
-      endSourceChar: 1873
-      line: 60
+      spanCodeSection: 'else '
+    - startInstruction: 1664
+      endInstruction: 1663
+      startSourceChar: 1644
+      endSourceChar: 1644
+      line: 44
       lineChar: 13
-      spanCodeSection: "NoTarget)\r\n        "
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1873
-      endSourceChar: 1888
-      line: 61
-      lineChar: 8
-      spanCodeSection: "{\r\n            "
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1888
-      endSourceChar: 1892
-      line: 62
-      lineChar: 12
-      spanCodeSection: if (
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1892
-      endSourceChar: 1892
-      line: 62
-      lineChar: 16
       spanCodeSection: 
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1892
-      endSourceChar: 1892
-      line: 62
-      lineChar: 16
+    - startInstruction: 1664
+      endInstruction: 1663
+      startSourceChar: 1644
+      endSourceChar: 1644
+      line: 44
+      lineChar: 13
       spanCodeSection: 
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1892
-      endSourceChar: 1892
-      line: 62
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1892
-      endSourceChar: 1900
-      line: 62
-      lineChar: 16
-      spanCodeSection: Vector3.
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1900
-      endSourceChar: 1906
-      line: 62
+    - startInstruction: 1664
+      endInstruction: 1663
+      startSourceChar: 1644
+      endSourceChar: 1655
+      line: 44
+      lineChar: 13
+      spanCodeSection: 'NoTarget = '
+    - startInstruction: 1664
+      endInstruction: 1683
+      startSourceChar: 1655
+      endSourceChar: 1670
+      line: 44
       lineChar: 24
-      spanCodeSection: Angle(
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1906
-      endSourceChar: 1906
-      line: 62
-      lineChar: 30
+      spanCodeSection: "true;\r\n        "
+    - startInstruction: 1684
+      endInstruction: 1683
+      startSourceChar: 1670
+      endSourceChar: 1670
+      line: 45
+      lineChar: 8
       spanCodeSection: 
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1906
-      endSourceChar: 1906
-      line: 62
-      lineChar: 30
+    - startInstruction: 1684
+      endInstruction: 1683
+      startSourceChar: 1670
+      endSourceChar: 1670
+      line: 45
+      lineChar: 8
       spanCodeSection: 
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1906
-      endSourceChar: 1917
-      line: 62
-      lineChar: 30
+    - startInstruction: 1684
+      endInstruction: 1683
+      startSourceChar: 1670
+      endSourceChar: 1684
+      line: 45
+      lineChar: 8
+      spanCodeSection: 'AAMCollider = '
+    - startInstruction: 1684
+      endInstruction: 1683
+      startSourceChar: 1684
+      endSourceChar: 1684
+      line: 45
+      lineChar: 22
+      spanCodeSection: 
+    - startInstruction: 1684
+      endInstruction: 1683
+      startSourceChar: 1684
+      endSourceChar: 1684
+      line: 45
+      lineChar: 22
+      spanCodeSection: 
+    - startInstruction: 1684
+      endInstruction: 1683
+      startSourceChar: 1684
+      endSourceChar: 1695
+      line: 45
+      lineChar: 22
       spanCodeSection: gameObject.
-    - startInstruction: 1192
-      endInstruction: 1191
-      startSourceChar: 1917
-      endSourceChar: 1927
-      line: 62
-      lineChar: 41
-      spanCodeSection: transform.
-    - startInstruction: 1192
-      endInstruction: 1239
-      startSourceChar: 1927
-      endSourceChar: 1936
-      line: 62
-      lineChar: 51
-      spanCodeSection: 'forward, '
-    - startInstruction: 1240
-      endInstruction: 1239
-      startSourceChar: 1936
-      endSourceChar: 1937
-      line: 62
-      lineChar: 60
-      spanCodeSection: (
-    - startInstruction: 1240
-      endInstruction: 1239
-      startSourceChar: 1937
-      endSourceChar: 1937
-      line: 62
-      lineChar: 61
-      spanCodeSection: 
-    - startInstruction: 1240
-      endInstruction: 1239
-      startSourceChar: 1937
-      endSourceChar: 1937
-      line: 62
-      lineChar: 61
-      spanCodeSection: 
-    - startInstruction: 1240
-      endInstruction: 1239
-      startSourceChar: 1937
-      endSourceChar: 1944
-      line: 62
-      lineChar: 61
-      spanCodeSection: Target.
-    - startInstruction: 1240
-      endInstruction: 1263
-      startSourceChar: 1944
-      endSourceChar: 1955
-      line: 62
-      lineChar: 68
-      spanCodeSection: 'position - '
-    - startInstruction: 1264
-      endInstruction: 1263
-      startSourceChar: 1955
-      endSourceChar: 1955
-      line: 62
-      lineChar: 79
-      spanCodeSection: 
-    - startInstruction: 1264
-      endInstruction: 1263
-      startSourceChar: 1955
-      endSourceChar: 1955
-      line: 62
-      lineChar: 79
-      spanCodeSection: 
-    - startInstruction: 1264
-      endInstruction: 1263
-      startSourceChar: 1955
-      endSourceChar: 1966
-      line: 62
-      lineChar: 79
-      spanCodeSection: gameObject.
-    - startInstruction: 1264
-      endInstruction: 1263
-      startSourceChar: 1966
-      endSourceChar: 1976
-      line: 62
-      lineChar: 90
-      spanCodeSection: transform.
-    - startInstruction: 1264
-      endInstruction: 1375
-      startSourceChar: 1976
-      endSourceChar: 1989
-      line: 62
-      lineChar: 100
-      spanCodeSection: 'position)) < '
-    - startInstruction: 1376
-      endInstruction: 1375
-      startSourceChar: 1989
-      endSourceChar: 1990
-      line: 62
-      lineChar: 113
-      spanCodeSection: (
-    - startInstruction: 1376
-      endInstruction: 1423
-      startSourceChar: 1990
-      endSourceChar: 2015
-      line: 62
-      lineChar: 114
-      spanCodeSection: "LockAngle))\r\n            "
-    - startInstruction: 1424
-      endInstruction: 1423
-      startSourceChar: 2015
-      endSourceChar: 2083
-      line: 63
-      lineChar: 12
-      spanCodeSection: "{\r\n                // homing to target, thx Guribo\r\n                "
-    - startInstruction: 1424
-      endInstruction: 1423
-      startSourceChar: 2083
-      endSourceChar: 2083
-      line: 65
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1424
-      endInstruction: 1423
-      startSourceChar: 2083
-      endSourceChar: 2083
-      line: 65
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1424
-      endInstruction: 1423
-      startSourceChar: 2083
-      endSourceChar: 2109
-      line: 65
-      lineChar: 16
-      spanCodeSection: 'var missileToTargetVector '
-    - startInstruction: 1424
-      endInstruction: 1423
-      startSourceChar: 2109
-      endSourceChar: 2111
-      line: 65
-      lineChar: 42
-      spanCodeSection: '= '
-    - startInstruction: 1424
-      endInstruction: 1423
-      startSourceChar: 2111
-      endSourceChar: 2111
-      line: 65
-      lineChar: 44
-      spanCodeSection: 
-    - startInstruction: 1424
-      endInstruction: 1423
-      startSourceChar: 2111
-      endSourceChar: 2111
-      line: 65
-      lineChar: 44
-      spanCodeSection: 
-    - startInstruction: 1424
-      endInstruction: 1423
-      startSourceChar: 2111
-      endSourceChar: 2118
-      line: 65
-      lineChar: 44
-      spanCodeSection: Target.
-    - startInstruction: 1424
-      endInstruction: 1447
-      startSourceChar: 2118
-      endSourceChar: 2129
-      line: 65
-      lineChar: 51
-      spanCodeSection: 'position - '
-    - startInstruction: 1448
-      endInstruction: 1447
-      startSourceChar: 2129
-      endSourceChar: 2129
-      line: 65
-      lineChar: 62
-      spanCodeSection: 
-    - startInstruction: 1448
-      endInstruction: 1447
-      startSourceChar: 2129
-      endSourceChar: 2129
-      line: 65
-      lineChar: 62
-      spanCodeSection: 
-    - startInstruction: 1448
-      endInstruction: 1447
-      startSourceChar: 2129
-      endSourceChar: 2140
-      line: 65
-      lineChar: 62
-      spanCodeSection: gameObject.
-    - startInstruction: 1448
-      endInstruction: 1447
-      startSourceChar: 2140
-      endSourceChar: 2150
-      line: 65
-      lineChar: 73
-      spanCodeSection: transform.
-    - startInstruction: 1448
-      endInstruction: 1547
-      startSourceChar: 2150
-      endSourceChar: 2177
-      line: 65
-      lineChar: 83
-      spanCodeSection: "position;\r\n                "
-    - startInstruction: 1548
-      endInstruction: 1547
-      startSourceChar: 2177
-      endSourceChar: 2177
-      line: 66
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1548
-      endInstruction: 1547
-      startSourceChar: 2177
-      endSourceChar: 2177
-      line: 66
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1548
-      endInstruction: 1547
-      startSourceChar: 2177
-      endSourceChar: 2196
-      line: 66
-      lineChar: 16
-      spanCodeSection: 'var missileForward '
-    - startInstruction: 1548
-      endInstruction: 1547
-      startSourceChar: 2196
-      endSourceChar: 2198
-      line: 66
-      lineChar: 35
-      spanCodeSection: '= '
-    - startInstruction: 1548
-      endInstruction: 1547
-      startSourceChar: 2198
-      endSourceChar: 2198
-      line: 66
-      lineChar: 37
-      spanCodeSection: 
-    - startInstruction: 1548
-      endInstruction: 1547
-      startSourceChar: 2198
-      endSourceChar: 2198
-      line: 66
-      lineChar: 37
-      spanCodeSection: 
-    - startInstruction: 1548
-      endInstruction: 1547
-      startSourceChar: 2198
-      endSourceChar: 2209
-      line: 66
-      lineChar: 37
-      spanCodeSection: gameObject.
-    - startInstruction: 1548
-      endInstruction: 1547
-      startSourceChar: 2209
-      endSourceChar: 2219
-      line: 66
-      lineChar: 48
-      spanCodeSection: transform.
-    - startInstruction: 1548
-      endInstruction: 1615
-      startSourceChar: 2219
-      endSourceChar: 2245
-      line: 66
-      lineChar: 58
-      spanCodeSection: "forward;\r\n                "
-    - startInstruction: 1616
-      endInstruction: 1615
-      startSourceChar: 2245
-      endSourceChar: 2245
-      line: 67
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1616
-      endInstruction: 1615
-      startSourceChar: 2245
-      endSourceChar: 2245
-      line: 67
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1616
-      endInstruction: 1615
-      startSourceChar: 2245
-      endSourceChar: 2265
-      line: 67
-      lineChar: 16
-      spanCodeSection: 'var targetDirection '
-    - startInstruction: 1616
-      endInstruction: 1615
-      startSourceChar: 2265
-      endSourceChar: 2267
-      line: 67
-      lineChar: 36
-      spanCodeSection: '= '
-    - startInstruction: 1616
-      endInstruction: 1615
-      startSourceChar: 2267
-      endSourceChar: 2267
-      line: 67
-      lineChar: 38
-      spanCodeSection: 
-    - startInstruction: 1616
-      endInstruction: 1615
-      startSourceChar: 2267
-      endSourceChar: 2289
-      line: 67
-      lineChar: 38
-      spanCodeSection: missileToTargetVector.
-    - startInstruction: 1616
-      endInstruction: 1659
-      startSourceChar: 2289
-      endSourceChar: 2318
-      line: 67
-      lineChar: 60
-      spanCodeSection: "normalized;\r\n                "
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2318
-      endSourceChar: 2318
-      line: 68
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2318
-      endSourceChar: 2318
-      line: 68
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2318
-      endSourceChar: 2335
-      line: 68
-      lineChar: 16
-      spanCodeSection: 'var rotationAxis '
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2335
-      endSourceChar: 2337
-      line: 68
+    - startInstruction: 1684
+      endInstruction: 1683
+      startSourceChar: 1695
+      endSourceChar: 1707
+      line: 45
       lineChar: 33
-      spanCodeSection: '= '
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2337
-      endSourceChar: 2337
-      line: 68
-      lineChar: 35
-      spanCodeSection: 
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2337
-      endSourceChar: 2337
-      line: 68
-      lineChar: 35
-      spanCodeSection: 
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2337
-      endSourceChar: 2345
-      line: 68
-      lineChar: 35
-      spanCodeSection: Vector3.
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2345
-      endSourceChar: 2351
-      line: 68
-      lineChar: 43
-      spanCodeSection: Cross(
-    - startInstruction: 1660
-      endInstruction: 1659
-      startSourceChar: 2351
-      endSourceChar: 2367
-      line: 68
-      lineChar: 49
-      spanCodeSection: 'missileForward, '
-    - startInstruction: 1660
-      endInstruction: 1711
-      startSourceChar: 2367
-      endSourceChar: 2402
-      line: 68
-      lineChar: 65
-      spanCodeSection: "targetDirection);\r\n                "
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2402
-      endSourceChar: 2402
-      line: 69
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2402
-      endSourceChar: 2402
-      line: 69
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2402
-      endSourceChar: 2417
-      line: 69
-      lineChar: 16
-      spanCodeSection: 'var deltaAngle '
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2417
-      endSourceChar: 2419
-      line: 69
-      lineChar: 31
-      spanCodeSection: '= '
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2419
-      endSourceChar: 2419
-      line: 69
-      lineChar: 33
-      spanCodeSection: 
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2419
-      endSourceChar: 2419
-      line: 69
-      lineChar: 33
-      spanCodeSection: 
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2419
-      endSourceChar: 2427
-      line: 69
-      lineChar: 33
-      spanCodeSection: Vector3.
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2427
-      endSourceChar: 2433
-      line: 69
-      lineChar: 41
-      spanCodeSection: Angle(
-    - startInstruction: 1712
-      endInstruction: 1711
-      startSourceChar: 2433
-      endSourceChar: 2449
-      line: 69
-      lineChar: 47
-      spanCodeSection: 'missileForward, '
-    - startInstruction: 1712
-      endInstruction: 1763
-      startSourceChar: 2449
-      endSourceChar: 2484
-      line: 69
-      lineChar: 63
-      spanCodeSection: "targetDirection);\r\n                "
-    - startInstruction: 1764
-      endInstruction: 1763
-      startSourceChar: 2484
-      endSourceChar: 2484
-      line: 70
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1764
-      endInstruction: 1763
-      startSourceChar: 2484
-      endSourceChar: 2484
-      line: 70
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1764
-      endInstruction: 1763
-      startSourceChar: 2484
-      endSourceChar: 2484
-      line: 70
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1764
-      endInstruction: 1763
-      startSourceChar: 2484
-      endSourceChar: 2484
-      line: 70
-      lineChar: 16
-      spanCodeSection: 
-    - startInstruction: 1764
-      endInstruction: 1763
-      startSourceChar: 2484
-      endSourceChar: 2495
-      line: 70
-      lineChar: 16
-      spanCodeSection: gameObject.
-    - startInstruction: 1764
-      endInstruction: 1763
-      startSourceChar: 2495
-      endSourceChar: 2505
-      line: 70
-      lineChar: 27
-      spanCodeSection: transform.
-    - startInstruction: 1764
-      endInstruction: 1787
-      startSourceChar: 2505
-      endSourceChar: 2512
-      line: 70
-      lineChar: 37
-      spanCodeSection: Rotate(
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2512
-      endSourceChar: 2526
-      line: 70
-      lineChar: 44
-      spanCodeSection: 'rotationAxis, '
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2526
-      endSourceChar: 2526
-      line: 70
-      lineChar: 58
-      spanCodeSection: 
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2526
-      endSourceChar: 2526
-      line: 70
-      lineChar: 58
-      spanCodeSection: 
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2526
-      endSourceChar: 2532
-      line: 70
-      lineChar: 58
-      spanCodeSection: Mathf.
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2532
-      endSourceChar: 2536
-      line: 70
-      lineChar: 64
-      spanCodeSection: Min(
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2536
-      endSourceChar: 2536
-      line: 70
-      lineChar: 68
-      spanCodeSection: 
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2536
-      endSourceChar: 2547
-      line: 70
-      lineChar: 68
-      spanCodeSection: 'RotSpeed * '
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2547
-      endSourceChar: 2547
-      line: 70
-      lineChar: 79
-      spanCodeSection: 
-    - startInstruction: 1788
-      endInstruction: 1787
-      startSourceChar: 2547
-      endSourceChar: 2552
-      line: 70
-      lineChar: 79
-      spanCodeSection: Time.
-    - startInstruction: 1788
-      endInstruction: 1835
-      startSourceChar: 2552
-      endSourceChar: 2563
-      line: 70
-      lineChar: 84
-      spanCodeSection: 'deltaTime, '
-    - startInstruction: 1836
-      endInstruction: 1867
-      startSourceChar: 2563
-      endSourceChar: 2576
-      line: 70
-      lineChar: 95
-      spanCodeSection: 'deltaAngle), '
-    - startInstruction: 1868
-      endInstruction: 1867
-      startSourceChar: 2576
-      endSourceChar: 2576
-      line: 70
-      lineChar: 108
-      spanCodeSection: 
-    - startInstruction: 1868
-      endInstruction: 1867
-      startSourceChar: 2576
-      endSourceChar: 2582
-      line: 70
-      lineChar: 108
-      spanCodeSection: Space.
-    - startInstruction: 1868
-      endInstruction: 1907
-      startSourceChar: 2582
-      endSourceChar: 2625
-      line: 70
-      lineChar: 114
-      spanCodeSection: "World);\r\n            }\r\n        }\r\n        "
-    - startInstruction: 1908
-      endInstruction: 1907
-      startSourceChar: 2625
-      endSourceChar: 2625
-      line: 73
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 1908
-      endInstruction: 1907
-      startSourceChar: 2625
-      endSourceChar: 2625
-      line: 73
-      lineChar: 8
-      spanCodeSection: 
-    - startInstruction: 1908
-      endInstruction: 1907
-      startSourceChar: 2625
-      endSourceChar: 2637
-      line: 73
-      lineChar: 8
-      spanCodeSection: 'Lifetime += '
-    - startInstruction: 1908
-      endInstruction: 1907
-      startSourceChar: 2637
-      endSourceChar: 2637
-      line: 73
-      lineChar: 20
-      spanCodeSection: 
-    - startInstruction: 1908
-      endInstruction: 1907
-      startSourceChar: 2637
-      endSourceChar: 2642
-      line: 73
-      lineChar: 20
-      spanCodeSection: Time.
-    - startInstruction: 1908
-      endInstruction: 1975
-      startSourceChar: 2642
-      endSourceChar: 2662
-      line: 73
-      lineChar: 25
-      spanCodeSection: "deltaTime;\r\n        "
-    - startInstruction: 1976
-      endInstruction: 1975
-      startSourceChar: 2662
-      endSourceChar: 2666
-      line: 74
-      lineChar: 8
-      spanCodeSection: if (
-    - startInstruction: 1976
-      endInstruction: 1975
-      startSourceChar: 2666
-      endSourceChar: 2666
-      line: 74
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 1976
-      endInstruction: 1975
-      startSourceChar: 2666
-      endSourceChar: 2677
-      line: 74
-      lineChar: 12
-      spanCodeSection: 'Lifetime > '
-    - startInstruction: 1976
-      endInstruction: 2047
-      startSourceChar: 2677
-      endSourceChar: 2690
-      line: 74
-      lineChar: 23
-      spanCodeSection: "40)\r\n        "
-    - startInstruction: 2048
-      endInstruction: 2047
-      startSourceChar: 2690
-      endSourceChar: 2705
-      line: 75
-      lineChar: 8
-      spanCodeSection: "{\r\n            "
-    - startInstruction: 2048
-      endInstruction: 2047
-      startSourceChar: 2705
-      endSourceChar: 2705
-      line: 76
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 2048
-      endInstruction: 2047
-      startSourceChar: 2705
-      endSourceChar: 2705
-      line: 76
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 2048
-      endInstruction: 2047
-      startSourceChar: 2705
-      endSourceChar: 2713
-      line: 76
-      lineChar: 12
-      spanCodeSection: Destroy(
-    - startInstruction: 2048
-      endInstruction: 2083
-      startSourceChar: 2713
-      endSourceChar: 2749
-      line: 76
-      lineChar: 20
-      spanCodeSection: "gameObject);\r\n        }\r\n    }\r\n    "
-    - startInstruction: 2084
-      endInstruction: 2083
-      startSourceChar: 2749
-      endSourceChar: 2779
-      line: 79
+      spanCodeSection: GetComponent
+    - startInstruction: 1684
+      endInstruction: 1683
+      startSourceChar: 1707
+      endSourceChar: 1708
+      line: 45
+      lineChar: 45
+      spanCodeSection: <
+    - startInstruction: 1684
+      endInstruction: 1759
+      startSourceChar: 1708
+      endSourceChar: 1740
+      line: 45
+      lineChar: 46
+      spanCodeSection: "CapsuleCollider>();\r\n    }\r\n    "
+    - startInstruction: 1760
+      endInstruction: 1767
+      startSourceChar: 1740
+      endSourceChar: 1763
+      line: 47
       lineChar: 4
-      spanCodeSection: private void OnCollisionEnter(
-    - startInstruction: 2084
-      endInstruction: 2111
-      startSourceChar: 2779
-      endSourceChar: 2801
-      line: 79
-      lineChar: 34
-      spanCodeSection: "Collision other)\r\n    "
-    - startInstruction: 2112
-      endInstruction: 2111
-      startSourceChar: 2801
-      endSourceChar: 2812
-      line: 80
+      spanCodeSection: "void LateUpdate()\r\n    "
+    - startInstruction: 1768
+      endInstruction: 1767
+      startSourceChar: 1763
+      endSourceChar: 1774
+      line: 48
       lineChar: 4
       spanCodeSection: "{\r\n        "
-    - startInstruction: 2112
-      endInstruction: 2111
-      startSourceChar: 2812
-      endSourceChar: 2816
-      line: 81
+    - startInstruction: 1768
+      endInstruction: 1767
+      startSourceChar: 1774
+      endSourceChar: 1778
+      line: 49
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 2112
-      endInstruction: 2111
-      startSourceChar: 2816
-      endSourceChar: 2817
-      line: 81
+    - startInstruction: 1768
+      endInstruction: 1767
+      startSourceChar: 1778
+      endSourceChar: 1779
+      line: 49
       lineChar: 12
       spanCodeSection: '!'
-    - startInstruction: 2112
-      endInstruction: 2151
-      startSourceChar: 2817
-      endSourceChar: 2837
-      line: 81
+    - startInstruction: 1768
+      endInstruction: 1807
+      startSourceChar: 1779
+      endSourceChar: 1804
+      line: 49
       lineChar: 13
-      spanCodeSection: "Exploding)\r\n        "
-    - startInstruction: 2152
-      endInstruction: 2151
-      startSourceChar: 2837
-      endSourceChar: 2852
-      line: 82
+      spanCodeSection: "ColliderActive)\r\n        "
+    - startInstruction: 1808
+      endInstruction: 1807
+      startSourceChar: 1804
+      endSourceChar: 1819
+      line: 50
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 2152
-      endInstruction: 2151
-      startSourceChar: 2852
-      endSourceChar: 2852
-      line: 83
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 2152
-      endInstruction: 2151
-      startSourceChar: 2852
-      endSourceChar: 2852
-      line: 83
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 2152
-      endInstruction: 2151
-      startSourceChar: 2852
-      endSourceChar: 2852
-      line: 83
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 2152
-      endInstruction: 2151
-      startSourceChar: 2852
-      endSourceChar: 2864
-      line: 83
-      lineChar: 12
-      spanCodeSection: AAMCollider.
-    - startInstruction: 2152
-      endInstruction: 2151
-      startSourceChar: 2864
-      endSourceChar: 2874
-      line: 83
-      lineChar: 24
-      spanCodeSection: 'enabled = '
-    - startInstruction: 2152
-      endInstruction: 2175
-      startSourceChar: 2874
-      endSourceChar: 2894
-      line: 83
-      lineChar: 34
-      spanCodeSection: "false;\r\n            "
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2894
-      endSourceChar: 2894
-      line: 84
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2894
-      endSourceChar: 2894
-      line: 84
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2894
-      endSourceChar: 2894
-      line: 84
-      lineChar: 12
-      spanCodeSection: 
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2894
-      endSourceChar: 2910
-      line: 84
-      lineChar: 12
-      spanCodeSection: 'Animator AGMani '
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2910
-      endSourceChar: 2912
-      line: 84
-      lineChar: 28
-      spanCodeSection: '= '
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2912
-      endSourceChar: 2912
-      line: 84
-      lineChar: 30
-      spanCodeSection: 
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2912
-      endSourceChar: 2912
-      line: 84
-      lineChar: 30
-      spanCodeSection: 
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2912
-      endSourceChar: 2923
-      line: 84
-      lineChar: 30
-      spanCodeSection: gameObject.
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2923
-      endSourceChar: 2935
-      line: 84
-      lineChar: 41
-      spanCodeSection: GetComponent
-    - startInstruction: 2176
-      endInstruction: 2175
-      startSourceChar: 2935
-      endSourceChar: 2936
-      line: 84
-      lineChar: 53
-      spanCodeSection: <
-    - startInstruction: 2176
-      endInstruction: 2231
-      startSourceChar: 2936
-      endSourceChar: 2962
-      line: 84
-      lineChar: 54
-      spanCodeSection: "Animator>();\r\n            "
-    - startInstruction: 2232
-      endInstruction: 2231
-      startSourceChar: 2962
-      endSourceChar: 2966
-      line: 85
+    - startInstruction: 1808
+      endInstruction: 1807
+      startSourceChar: 1819
+      endSourceChar: 1823
+      line: 51
       lineChar: 12
       spanCodeSection: if (
-    - startInstruction: 2232
-      endInstruction: 2231
-      startSourceChar: 2966
-      endSourceChar: 2966
-      line: 85
+    - startInstruction: 1808
+      endInstruction: 1807
+      startSourceChar: 1823
+      endSourceChar: 1823
+      line: 51
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2232
-      endInstruction: 2231
-      startSourceChar: 2966
-      endSourceChar: 2980
-      line: 85
+    - startInstruction: 1808
+      endInstruction: 1807
+      startSourceChar: 1823
+      endSourceChar: 1834
+      line: 51
       lineChar: 16
-      spanCodeSection: EngineControl.
-    - startInstruction: 2232
-      endInstruction: 2303
-      startSourceChar: 2980
-      endSourceChar: 3003
-      line: 85
-      lineChar: 30
-      spanCodeSection: "InEditor)\r\n            "
-    - startInstruction: 2304
-      endInstruction: 2303
-      startSourceChar: 3003
-      endSourceChar: 3022
-      line: 86
+      spanCodeSection: 'Lifetime > '
+    - startInstruction: 1808
+      endInstruction: 1855
+      startSourceChar: 1834
+      endSourceChar: 1853
+      line: 51
+      lineChar: 27
+      spanCodeSection: "0.5f)\r\n            "
+    - startInstruction: 1856
+      endInstruction: 1855
+      startSourceChar: 1853
+      endSourceChar: 1872
+      line: 52
       lineChar: 12
       spanCodeSection: "{\r\n                "
-    - startInstruction: 2304
-      endInstruction: 2303
-      startSourceChar: 3022
-      endSourceChar: 3022
-      line: 87
+    - startInstruction: 1856
+      endInstruction: 1855
+      startSourceChar: 1872
+      endSourceChar: 1872
+      line: 53
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2304
-      endInstruction: 2303
-      startSourceChar: 3022
-      endSourceChar: 3022
-      line: 87
+    - startInstruction: 1856
+      endInstruction: 1855
+      startSourceChar: 1872
+      endSourceChar: 1872
+      line: 53
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2304
-      endInstruction: 2303
-      startSourceChar: 3022
-      endSourceChar: 3022
-      line: 87
+    - startInstruction: 1856
+      endInstruction: 1855
+      startSourceChar: 1872
+      endSourceChar: 1872
+      line: 53
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2304
-      endInstruction: 2303
-      startSourceChar: 3022
-      endSourceChar: 3029
-      line: 87
+    - startInstruction: 1856
+      endInstruction: 1855
+      startSourceChar: 1872
+      endSourceChar: 1884
+      line: 53
       lineChar: 16
-      spanCodeSection: AGMani.
-    - startInstruction: 2304
-      endInstruction: 2303
-      startSourceChar: 3029
-      endSourceChar: 3040
-      line: 87
+      spanCodeSection: AAMCollider.
+    - startInstruction: 1856
+      endInstruction: 1855
+      startSourceChar: 1884
+      endSourceChar: 1894
+      line: 53
+      lineChar: 28
+      spanCodeSection: 'enabled = '
+    - startInstruction: 1856
+      endInstruction: 1879
+      startSourceChar: 1894
+      endSourceChar: 1917
+      line: 53
+      lineChar: 38
+      spanCodeSection: "true;\r\n                "
+    - startInstruction: 1880
+      endInstruction: 1879
+      startSourceChar: 1917
+      endSourceChar: 1917
+      line: 54
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 1880
+      endInstruction: 1879
+      startSourceChar: 1917
+      endSourceChar: 1917
+      line: 54
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 1880
+      endInstruction: 1879
+      startSourceChar: 1917
+      endSourceChar: 1934
+      line: 54
+      lineChar: 16
+      spanCodeSection: 'ColliderActive = '
+    - startInstruction: 1880
+      endInstruction: 1899
+      startSourceChar: 1934
+      endSourceChar: 1975
+      line: 54
+      lineChar: 33
+      spanCodeSection: "true;\r\n            }\r\n        }\r\n        "
+    - startInstruction: 1900
+      endInstruction: 1899
+      startSourceChar: 1975
+      endSourceChar: 1979
+      line: 57
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 1900
+      endInstruction: 1915
+      startSourceChar: 1979
+      endSourceChar: 2006
+      line: 57
+      lineChar: 12
+      spanCodeSection: "NonOwnerLockHack)\r\n        "
+    - startInstruction: 1916
+      endInstruction: 1915
+      startSourceChar: 2006
+      endSourceChar: 2021
+      line: 58
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 1916
+      endInstruction: 1915
+      startSourceChar: 2021
+      endSourceChar: 2025
+      line: 59
+      lineChar: 12
+      spanCodeSection: if (
+    - startInstruction: 1916
+      endInstruction: 1915
+      startSourceChar: 2025
+      endSourceChar: 2025
+      line: 59
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 1916
+      endInstruction: 1915
+      startSourceChar: 2025
+      endSourceChar: 2036
+      line: 59
+      lineChar: 16
+      spanCodeSection: 'Lifetime > '
+    - startInstruction: 1916
+      endInstruction: 1987
+      startSourceChar: 2036
+      endSourceChar: 2052
+      line: 59
+      lineChar: 27
+      spanCodeSection: "2)\r\n            "
+    - startInstruction: 1988
+      endInstruction: 1987
+      startSourceChar: 2052
+      endSourceChar: 2071
+      line: 60
+      lineChar: 12
+      spanCodeSection: "{\r\n                "
+    - startInstruction: 1988
+      endInstruction: 1987
+      startSourceChar: 2071
+      endSourceChar: 2071
+      line: 61
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 1988
+      endInstruction: 1987
+      startSourceChar: 2071
+      endSourceChar: 2071
+      line: 61
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 1988
+      endInstruction: 1987
+      startSourceChar: 2071
+      endSourceChar: 2083
+      line: 61
+      lineChar: 16
+      spanCodeSection: 'LockAngle = '
+    - startInstruction: 1988
+      endInstruction: 2007
+      startSourceChar: 2083
+      endSourceChar: 2116
+      line: 61
+      lineChar: 28
+      spanCodeSection: "StartLockAngle;\r\n                "
+    - startInstruction: 2008
+      endInstruction: 2007
+      startSourceChar: 2116
+      endSourceChar: 2116
+      line: 62
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2008
+      endInstruction: 2007
+      startSourceChar: 2116
+      endSourceChar: 2116
+      line: 62
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2008
+      endInstruction: 2007
+      startSourceChar: 2116
+      endSourceChar: 2135
+      line: 62
+      lineChar: 16
+      spanCodeSection: 'NonOwnerLockHack = '
+    - startInstruction: 2008
+      endInstruction: 2027
+      startSourceChar: 2135
+      endSourceChar: 2179
+      line: 62
+      lineChar: 35
+      spanCodeSection: "false;\r\n            }\r\n        }\r\n\r\n        "
+    - startInstruction: 2028
+      endInstruction: 2027
+      startSourceChar: 2179
+      endSourceChar: 2183
+      line: 66
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 2028
+      endInstruction: 2027
+      startSourceChar: 2183
+      endSourceChar: 2184
+      line: 66
+      lineChar: 12
+      spanCodeSection: '!'
+    - startInstruction: 2028
+      endInstruction: 2067
+      startSourceChar: 2184
+      endSourceChar: 2203
+      line: 66
+      lineChar: 13
+      spanCodeSection: "NoTarget)\r\n        "
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2203
+      endSourceChar: 2218
+      line: 67
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2218
+      endSourceChar: 2222
+      line: 68
+      lineChar: 12
+      spanCodeSection: if (
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2222
+      endSourceChar: 2222
+      line: 68
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2222
+      endSourceChar: 2222
+      line: 68
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2222
+      endSourceChar: 2222
+      line: 68
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2222
+      endSourceChar: 2230
+      line: 68
+      lineChar: 16
+      spanCodeSection: Vector3.
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2230
+      endSourceChar: 2236
+      line: 68
+      lineChar: 24
+      spanCodeSection: Angle(
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2236
+      endSourceChar: 2236
+      line: 68
+      lineChar: 30
+      spanCodeSection: 
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2236
+      endSourceChar: 2236
+      line: 68
+      lineChar: 30
+      spanCodeSection: 
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2236
+      endSourceChar: 2247
+      line: 68
+      lineChar: 30
+      spanCodeSection: gameObject.
+    - startInstruction: 2068
+      endInstruction: 2067
+      startSourceChar: 2247
+      endSourceChar: 2257
+      line: 68
+      lineChar: 41
+      spanCodeSection: transform.
+    - startInstruction: 2068
+      endInstruction: 2115
+      startSourceChar: 2257
+      endSourceChar: 2266
+      line: 68
+      lineChar: 51
+      spanCodeSection: 'forward, '
+    - startInstruction: 2116
+      endInstruction: 2115
+      startSourceChar: 2266
+      endSourceChar: 2267
+      line: 68
+      lineChar: 60
+      spanCodeSection: (
+    - startInstruction: 2116
+      endInstruction: 2115
+      startSourceChar: 2267
+      endSourceChar: 2267
+      line: 68
+      lineChar: 61
+      spanCodeSection: 
+    - startInstruction: 2116
+      endInstruction: 2115
+      startSourceChar: 2267
+      endSourceChar: 2267
+      line: 68
+      lineChar: 61
+      spanCodeSection: 
+    - startInstruction: 2116
+      endInstruction: 2115
+      startSourceChar: 2267
+      endSourceChar: 2274
+      line: 68
+      lineChar: 61
+      spanCodeSection: Target.
+    - startInstruction: 2116
+      endInstruction: 2139
+      startSourceChar: 2274
+      endSourceChar: 2285
+      line: 68
+      lineChar: 68
+      spanCodeSection: 'position - '
+    - startInstruction: 2140
+      endInstruction: 2139
+      startSourceChar: 2285
+      endSourceChar: 2285
+      line: 68
+      lineChar: 79
+      spanCodeSection: 
+    - startInstruction: 2140
+      endInstruction: 2139
+      startSourceChar: 2285
+      endSourceChar: 2285
+      line: 68
+      lineChar: 79
+      spanCodeSection: 
+    - startInstruction: 2140
+      endInstruction: 2139
+      startSourceChar: 2285
+      endSourceChar: 2296
+      line: 68
+      lineChar: 79
+      spanCodeSection: gameObject.
+    - startInstruction: 2140
+      endInstruction: 2139
+      startSourceChar: 2296
+      endSourceChar: 2306
+      line: 68
+      lineChar: 90
+      spanCodeSection: transform.
+    - startInstruction: 2140
+      endInstruction: 2251
+      startSourceChar: 2306
+      endSourceChar: 2319
+      line: 68
+      lineChar: 100
+      spanCodeSection: 'position)) < '
+    - startInstruction: 2252
+      endInstruction: 2251
+      startSourceChar: 2319
+      endSourceChar: 2320
+      line: 68
+      lineChar: 113
+      spanCodeSection: (
+    - startInstruction: 2252
+      endInstruction: 2299
+      startSourceChar: 2320
+      endSourceChar: 2345
+      line: 68
+      lineChar: 114
+      spanCodeSection: "LockAngle))\r\n            "
+    - startInstruction: 2300
+      endInstruction: 2299
+      startSourceChar: 2345
+      endSourceChar: 2413
+      line: 69
+      lineChar: 12
+      spanCodeSection: "{\r\n                // homing to target, thx Guribo\r\n                "
+    - startInstruction: 2300
+      endInstruction: 2299
+      startSourceChar: 2413
+      endSourceChar: 2413
+      line: 71
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2300
+      endInstruction: 2299
+      startSourceChar: 2413
+      endSourceChar: 2413
+      line: 71
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2300
+      endInstruction: 2299
+      startSourceChar: 2413
+      endSourceChar: 2439
+      line: 71
+      lineChar: 16
+      spanCodeSection: 'var missileToTargetVector '
+    - startInstruction: 2300
+      endInstruction: 2299
+      startSourceChar: 2439
+      endSourceChar: 2441
+      line: 71
+      lineChar: 42
+      spanCodeSection: '= '
+    - startInstruction: 2300
+      endInstruction: 2299
+      startSourceChar: 2441
+      endSourceChar: 2441
+      line: 71
+      lineChar: 44
+      spanCodeSection: 
+    - startInstruction: 2300
+      endInstruction: 2299
+      startSourceChar: 2441
+      endSourceChar: 2441
+      line: 71
+      lineChar: 44
+      spanCodeSection: 
+    - startInstruction: 2300
+      endInstruction: 2299
+      startSourceChar: 2441
+      endSourceChar: 2448
+      line: 71
+      lineChar: 44
+      spanCodeSection: Target.
+    - startInstruction: 2300
+      endInstruction: 2323
+      startSourceChar: 2448
+      endSourceChar: 2459
+      line: 71
+      lineChar: 51
+      spanCodeSection: 'position - '
+    - startInstruction: 2324
+      endInstruction: 2323
+      startSourceChar: 2459
+      endSourceChar: 2459
+      line: 71
+      lineChar: 62
+      spanCodeSection: 
+    - startInstruction: 2324
+      endInstruction: 2323
+      startSourceChar: 2459
+      endSourceChar: 2459
+      line: 71
+      lineChar: 62
+      spanCodeSection: 
+    - startInstruction: 2324
+      endInstruction: 2323
+      startSourceChar: 2459
+      endSourceChar: 2470
+      line: 71
+      lineChar: 62
+      spanCodeSection: gameObject.
+    - startInstruction: 2324
+      endInstruction: 2323
+      startSourceChar: 2470
+      endSourceChar: 2480
+      line: 71
+      lineChar: 73
+      spanCodeSection: transform.
+    - startInstruction: 2324
+      endInstruction: 2423
+      startSourceChar: 2480
+      endSourceChar: 2507
+      line: 71
+      lineChar: 83
+      spanCodeSection: "position;\r\n                "
+    - startInstruction: 2424
+      endInstruction: 2423
+      startSourceChar: 2507
+      endSourceChar: 2507
+      line: 72
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2424
+      endInstruction: 2423
+      startSourceChar: 2507
+      endSourceChar: 2507
+      line: 72
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2424
+      endInstruction: 2423
+      startSourceChar: 2507
+      endSourceChar: 2526
+      line: 72
+      lineChar: 16
+      spanCodeSection: 'var missileForward '
+    - startInstruction: 2424
+      endInstruction: 2423
+      startSourceChar: 2526
+      endSourceChar: 2528
+      line: 72
+      lineChar: 35
+      spanCodeSection: '= '
+    - startInstruction: 2424
+      endInstruction: 2423
+      startSourceChar: 2528
+      endSourceChar: 2528
+      line: 72
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 2424
+      endInstruction: 2423
+      startSourceChar: 2528
+      endSourceChar: 2528
+      line: 72
+      lineChar: 37
+      spanCodeSection: 
+    - startInstruction: 2424
+      endInstruction: 2423
+      startSourceChar: 2528
+      endSourceChar: 2539
+      line: 72
+      lineChar: 37
+      spanCodeSection: gameObject.
+    - startInstruction: 2424
+      endInstruction: 2423
+      startSourceChar: 2539
+      endSourceChar: 2549
+      line: 72
+      lineChar: 48
+      spanCodeSection: transform.
+    - startInstruction: 2424
+      endInstruction: 2491
+      startSourceChar: 2549
+      endSourceChar: 2575
+      line: 72
+      lineChar: 58
+      spanCodeSection: "forward;\r\n                "
+    - startInstruction: 2492
+      endInstruction: 2491
+      startSourceChar: 2575
+      endSourceChar: 2575
+      line: 73
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2492
+      endInstruction: 2491
+      startSourceChar: 2575
+      endSourceChar: 2575
+      line: 73
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2492
+      endInstruction: 2491
+      startSourceChar: 2575
+      endSourceChar: 2595
+      line: 73
+      lineChar: 16
+      spanCodeSection: 'var targetDirection '
+    - startInstruction: 2492
+      endInstruction: 2491
+      startSourceChar: 2595
+      endSourceChar: 2597
+      line: 73
+      lineChar: 36
+      spanCodeSection: '= '
+    - startInstruction: 2492
+      endInstruction: 2491
+      startSourceChar: 2597
+      endSourceChar: 2597
+      line: 73
+      lineChar: 38
+      spanCodeSection: 
+    - startInstruction: 2492
+      endInstruction: 2491
+      startSourceChar: 2597
+      endSourceChar: 2619
+      line: 73
+      lineChar: 38
+      spanCodeSection: missileToTargetVector.
+    - startInstruction: 2492
+      endInstruction: 2535
+      startSourceChar: 2619
+      endSourceChar: 2648
+      line: 73
+      lineChar: 60
+      spanCodeSection: "normalized;\r\n                "
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2648
+      endSourceChar: 2648
+      line: 74
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2648
+      endSourceChar: 2648
+      line: 74
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2648
+      endSourceChar: 2665
+      line: 74
+      lineChar: 16
+      spanCodeSection: 'var rotationAxis '
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2665
+      endSourceChar: 2667
+      line: 74
+      lineChar: 33
+      spanCodeSection: '= '
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2667
+      endSourceChar: 2667
+      line: 74
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2667
+      endSourceChar: 2667
+      line: 74
+      lineChar: 35
+      spanCodeSection: 
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2667
+      endSourceChar: 2675
+      line: 74
+      lineChar: 35
+      spanCodeSection: Vector3.
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2675
+      endSourceChar: 2681
+      line: 74
+      lineChar: 43
+      spanCodeSection: Cross(
+    - startInstruction: 2536
+      endInstruction: 2535
+      startSourceChar: 2681
+      endSourceChar: 2697
+      line: 74
+      lineChar: 49
+      spanCodeSection: 'missileForward, '
+    - startInstruction: 2536
+      endInstruction: 2587
+      startSourceChar: 2697
+      endSourceChar: 2732
+      line: 74
+      lineChar: 65
+      spanCodeSection: "targetDirection);\r\n                "
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2732
+      endSourceChar: 2732
+      line: 75
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2732
+      endSourceChar: 2732
+      line: 75
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2732
+      endSourceChar: 2747
+      line: 75
+      lineChar: 16
+      spanCodeSection: 'var deltaAngle '
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2747
+      endSourceChar: 2749
+      line: 75
+      lineChar: 31
+      spanCodeSection: '= '
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2749
+      endSourceChar: 2749
+      line: 75
+      lineChar: 33
+      spanCodeSection: 
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2749
+      endSourceChar: 2749
+      line: 75
+      lineChar: 33
+      spanCodeSection: 
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2749
+      endSourceChar: 2757
+      line: 75
+      lineChar: 33
+      spanCodeSection: Vector3.
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2757
+      endSourceChar: 2763
+      line: 75
+      lineChar: 41
+      spanCodeSection: Angle(
+    - startInstruction: 2588
+      endInstruction: 2587
+      startSourceChar: 2763
+      endSourceChar: 2779
+      line: 75
+      lineChar: 47
+      spanCodeSection: 'missileForward, '
+    - startInstruction: 2588
+      endInstruction: 2639
+      startSourceChar: 2779
+      endSourceChar: 2814
+      line: 75
+      lineChar: 63
+      spanCodeSection: "targetDirection);\r\n                "
+    - startInstruction: 2640
+      endInstruction: 2639
+      startSourceChar: 2814
+      endSourceChar: 2814
+      line: 76
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2640
+      endInstruction: 2639
+      startSourceChar: 2814
+      endSourceChar: 2814
+      line: 76
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2640
+      endInstruction: 2639
+      startSourceChar: 2814
+      endSourceChar: 2814
+      line: 76
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2640
+      endInstruction: 2639
+      startSourceChar: 2814
+      endSourceChar: 2814
+      line: 76
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 2640
+      endInstruction: 2639
+      startSourceChar: 2814
+      endSourceChar: 2825
+      line: 76
+      lineChar: 16
+      spanCodeSection: gameObject.
+    - startInstruction: 2640
+      endInstruction: 2639
+      startSourceChar: 2825
+      endSourceChar: 2835
+      line: 76
+      lineChar: 27
+      spanCodeSection: transform.
+    - startInstruction: 2640
+      endInstruction: 2663
+      startSourceChar: 2835
+      endSourceChar: 2842
+      line: 76
+      lineChar: 37
+      spanCodeSection: Rotate(
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2842
+      endSourceChar: 2856
+      line: 76
+      lineChar: 44
+      spanCodeSection: 'rotationAxis, '
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2856
+      endSourceChar: 2856
+      line: 76
+      lineChar: 58
+      spanCodeSection: 
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2856
+      endSourceChar: 2856
+      line: 76
+      lineChar: 58
+      spanCodeSection: 
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2856
+      endSourceChar: 2862
+      line: 76
+      lineChar: 58
+      spanCodeSection: Mathf.
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2862
+      endSourceChar: 2866
+      line: 76
+      lineChar: 64
+      spanCodeSection: Min(
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2866
+      endSourceChar: 2866
+      line: 76
+      lineChar: 68
+      spanCodeSection: 
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2866
+      endSourceChar: 2877
+      line: 76
+      lineChar: 68
+      spanCodeSection: 'RotSpeed * '
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2877
+      endSourceChar: 2877
+      line: 76
+      lineChar: 79
+      spanCodeSection: 
+    - startInstruction: 2664
+      endInstruction: 2663
+      startSourceChar: 2877
+      endSourceChar: 2882
+      line: 76
+      lineChar: 79
+      spanCodeSection: Time.
+    - startInstruction: 2664
+      endInstruction: 2711
+      startSourceChar: 2882
+      endSourceChar: 2893
+      line: 76
+      lineChar: 84
+      spanCodeSection: 'deltaTime, '
+    - startInstruction: 2712
+      endInstruction: 2743
+      startSourceChar: 2893
+      endSourceChar: 2906
+      line: 76
+      lineChar: 95
+      spanCodeSection: 'deltaAngle), '
+    - startInstruction: 2744
+      endInstruction: 2743
+      startSourceChar: 2906
+      endSourceChar: 2906
+      line: 76
+      lineChar: 108
+      spanCodeSection: 
+    - startInstruction: 2744
+      endInstruction: 2743
+      startSourceChar: 2906
+      endSourceChar: 2912
+      line: 76
+      lineChar: 108
+      spanCodeSection: Space.
+    - startInstruction: 2744
+      endInstruction: 2783
+      startSourceChar: 2912
+      endSourceChar: 2955
+      line: 76
+      lineChar: 114
+      spanCodeSection: "World);\r\n            }\r\n        }\r\n        "
+    - startInstruction: 2784
+      endInstruction: 2783
+      startSourceChar: 2955
+      endSourceChar: 2955
+      line: 79
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 2784
+      endInstruction: 2783
+      startSourceChar: 2955
+      endSourceChar: 2955
+      line: 79
+      lineChar: 8
+      spanCodeSection: 
+    - startInstruction: 2784
+      endInstruction: 2783
+      startSourceChar: 2955
+      endSourceChar: 2967
+      line: 79
+      lineChar: 8
+      spanCodeSection: 'Lifetime += '
+    - startInstruction: 2784
+      endInstruction: 2783
+      startSourceChar: 2967
+      endSourceChar: 2967
+      line: 79
+      lineChar: 20
+      spanCodeSection: 
+    - startInstruction: 2784
+      endInstruction: 2783
+      startSourceChar: 2967
+      endSourceChar: 2972
+      line: 79
+      lineChar: 20
+      spanCodeSection: Time.
+    - startInstruction: 2784
+      endInstruction: 2851
+      startSourceChar: 2972
+      endSourceChar: 2992
+      line: 79
+      lineChar: 25
+      spanCodeSection: "deltaTime;\r\n        "
+    - startInstruction: 2852
+      endInstruction: 2851
+      startSourceChar: 2992
+      endSourceChar: 2996
+      line: 80
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 2852
+      endInstruction: 2851
+      startSourceChar: 2996
+      endSourceChar: 2996
+      line: 80
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 2852
+      endInstruction: 2851
+      startSourceChar: 2996
+      endSourceChar: 3007
+      line: 80
+      lineChar: 12
+      spanCodeSection: 'Lifetime > '
+    - startInstruction: 2852
+      endInstruction: 2923
+      startSourceChar: 3007
+      endSourceChar: 3020
+      line: 80
       lineChar: 23
-      spanCodeSection: SetTrigger(
-    - startInstruction: 2304
-      endInstruction: 2335
-      startSourceChar: 3040
-      endSourceChar: 3085
-      line: 87
+      spanCodeSection: "40)\r\n        "
+    - startInstruction: 2924
+      endInstruction: 2923
+      startSourceChar: 3020
+      endSourceChar: 3035
+      line: 81
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 2924
+      endInstruction: 2923
+      startSourceChar: 3035
+      endSourceChar: 3035
+      line: 82
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 2924
+      endInstruction: 2923
+      startSourceChar: 3035
+      endSourceChar: 3035
+      line: 82
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 2924
+      endInstruction: 2923
+      startSourceChar: 3035
+      endSourceChar: 3043
+      line: 82
+      lineChar: 12
+      spanCodeSection: Destroy(
+    - startInstruction: 2924
+      endInstruction: 2959
+      startSourceChar: 3043
+      endSourceChar: 3079
+      line: 82
+      lineChar: 20
+      spanCodeSection: "gameObject);\r\n        }\r\n    }\r\n    "
+    - startInstruction: 2960
+      endInstruction: 2959
+      startSourceChar: 3079
+      endSourceChar: 3109
+      line: 85
+      lineChar: 4
+      spanCodeSection: private void OnCollisionEnter(
+    - startInstruction: 2960
+      endInstruction: 2987
+      startSourceChar: 3109
+      endSourceChar: 3131
+      line: 85
       lineChar: 34
-      spanCodeSection: "\"explodeowner\");\r\n            }\r\n            "
-    - startInstruction: 2336
-      endInstruction: 2335
-      startSourceChar: 3085
-      endSourceChar: 3103
+      spanCodeSection: "Collision other)\r\n    "
+    - startInstruction: 2988
+      endInstruction: 2987
+      startSourceChar: 3131
+      endSourceChar: 3142
+      line: 86
+      lineChar: 4
+      spanCodeSection: "{\r\n        "
+    - startInstruction: 2988
+      endInstruction: 2987
+      startSourceChar: 3142
+      endSourceChar: 3146
+      line: 87
+      lineChar: 8
+      spanCodeSection: if (
+    - startInstruction: 2988
+      endInstruction: 2987
+      startSourceChar: 3146
+      endSourceChar: 3147
+      line: 87
+      lineChar: 12
+      spanCodeSection: '!'
+    - startInstruction: 2988
+      endInstruction: 3027
+      startSourceChar: 3147
+      endSourceChar: 3167
+      line: 87
+      lineChar: 13
+      spanCodeSection: "Exploding)\r\n        "
+    - startInstruction: 3028
+      endInstruction: 3027
+      startSourceChar: 3167
+      endSourceChar: 3182
+      line: 88
+      lineChar: 8
+      spanCodeSection: "{\r\n            "
+    - startInstruction: 3028
+      endInstruction: 3027
+      startSourceChar: 3182
+      endSourceChar: 3186
       line: 89
       lineChar: 12
-      spanCodeSection: "else\r\n            "
-    - startInstruction: 2336
-      endInstruction: 2335
-      startSourceChar: 3103
-      endSourceChar: 3122
+      spanCodeSection: if (
+    - startInstruction: 3028
+      endInstruction: 3027
+      startSourceChar: 3186
+      endSourceChar: 3186
+      line: 89
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3028
+      endInstruction: 3027
+      startSourceChar: 3186
+      endSourceChar: 3209
+      line: 89
+      lineChar: 16
+      spanCodeSection: 'TargetEngineControl != '
+    - startInstruction: 3028
+      endInstruction: 3075
+      startSourceChar: 3209
+      endSourceChar: 3228
+      line: 89
+      lineChar: 39
+      spanCodeSection: "null)\r\n            "
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3228
+      endSourceChar: 3247
       line: 90
       lineChar: 12
       spanCodeSection: "{\r\n                "
-    - startInstruction: 2336
-      endInstruction: 2335
-      startSourceChar: 3122
-      endSourceChar: 3126
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3247
+      endSourceChar: 3247
       line: 91
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3247
+      endSourceChar: 3247
+      line: 91
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3247
+      endSourceChar: 3247
+      line: 91
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3247
+      endSourceChar: 3247
+      line: 91
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3247
+      endSourceChar: 3247
+      line: 91
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3247
+      endSourceChar: 3258
+      line: 91
+      lineChar: 16
+      spanCodeSection: gameObject.
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3258
+      endSourceChar: 3270
+      line: 91
+      lineChar: 27
+      spanCodeSection: GetComponent
+    - startInstruction: 3076
+      endInstruction: 3075
+      startSourceChar: 3270
+      endSourceChar: 3271
+      line: 91
+      lineChar: 39
+      spanCodeSection: <
+    - startInstruction: 3076
+      endInstruction: 3131
+      startSourceChar: 3271
+      endSourceChar: 3284
+      line: 91
+      lineChar: 40
+      spanCodeSection: Rigidbody>().
+    - startInstruction: 3132
+      endInstruction: 3131
+      startSourceChar: 3284
+      endSourceChar: 3295
+      line: 91
+      lineChar: 53
+      spanCodeSection: 'velocity = '
+    - startInstruction: 3132
+      endInstruction: 3131
+      startSourceChar: 3295
+      endSourceChar: 3295
+      line: 91
+      lineChar: 64
+      spanCodeSection: 
+    - startInstruction: 3132
+      endInstruction: 3131
+      startSourceChar: 3295
+      endSourceChar: 3315
+      line: 91
+      lineChar: 64
+      spanCodeSection: TargetEngineControl.
+    - startInstruction: 3132
+      endInstruction: 3207
+      startSourceChar: 3315
+      endSourceChar: 3458
+      line: 91
+      lineChar: 84
+      spanCodeSection: "CurrentVel; // damage particles inherit the velocity of the
+        missile, so this should help them hit the target plane\r\n            }\r\n
+        \           "
+    - startInstruction: 3208
+      endInstruction: 3207
+      startSourceChar: 3458
+      endSourceChar: 3458
+      line: 93
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 3208
+      endInstruction: 3207
+      startSourceChar: 3458
+      endSourceChar: 3458
+      line: 93
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 3208
+      endInstruction: 3207
+      startSourceChar: 3458
+      endSourceChar: 3458
+      line: 93
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 3208
+      endInstruction: 3207
+      startSourceChar: 3458
+      endSourceChar: 3470
+      line: 93
+      lineChar: 12
+      spanCodeSection: AAMCollider.
+    - startInstruction: 3208
+      endInstruction: 3207
+      startSourceChar: 3470
+      endSourceChar: 3480
+      line: 93
+      lineChar: 24
+      spanCodeSection: 'enabled = '
+    - startInstruction: 3208
+      endInstruction: 3231
+      startSourceChar: 3480
+      endSourceChar: 3500
+      line: 93
+      lineChar: 34
+      spanCodeSection: "false;\r\n            "
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3500
+      endSourceChar: 3500
+      line: 94
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3500
+      endSourceChar: 3500
+      line: 94
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3500
+      endSourceChar: 3500
+      line: 94
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3500
+      endSourceChar: 3516
+      line: 94
+      lineChar: 12
+      spanCodeSection: 'Animator AGMani '
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3516
+      endSourceChar: 3518
+      line: 94
+      lineChar: 28
+      spanCodeSection: '= '
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3518
+      endSourceChar: 3518
+      line: 94
+      lineChar: 30
+      spanCodeSection: 
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3518
+      endSourceChar: 3518
+      line: 94
+      lineChar: 30
+      spanCodeSection: 
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3518
+      endSourceChar: 3529
+      line: 94
+      lineChar: 30
+      spanCodeSection: gameObject.
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3529
+      endSourceChar: 3541
+      line: 94
+      lineChar: 41
+      spanCodeSection: GetComponent
+    - startInstruction: 3232
+      endInstruction: 3231
+      startSourceChar: 3541
+      endSourceChar: 3542
+      line: 94
+      lineChar: 53
+      spanCodeSection: <
+    - startInstruction: 3232
+      endInstruction: 3287
+      startSourceChar: 3542
+      endSourceChar: 3568
+      line: 94
+      lineChar: 54
+      spanCodeSection: "Animator>();\r\n            "
+    - startInstruction: 3288
+      endInstruction: 3287
+      startSourceChar: 3568
+      endSourceChar: 3572
+      line: 95
+      lineChar: 12
+      spanCodeSection: if (
+    - startInstruction: 3288
+      endInstruction: 3287
+      startSourceChar: 3572
+      endSourceChar: 3572
+      line: 95
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3288
+      endInstruction: 3287
+      startSourceChar: 3572
+      endSourceChar: 3586
+      line: 95
+      lineChar: 16
+      spanCodeSection: EngineControl.
+    - startInstruction: 3288
+      endInstruction: 3359
+      startSourceChar: 3586
+      endSourceChar: 3609
+      line: 95
+      lineChar: 30
+      spanCodeSection: "InEditor)\r\n            "
+    - startInstruction: 3360
+      endInstruction: 3359
+      startSourceChar: 3609
+      endSourceChar: 3628
+      line: 96
+      lineChar: 12
+      spanCodeSection: "{\r\n                "
+    - startInstruction: 3360
+      endInstruction: 3359
+      startSourceChar: 3628
+      endSourceChar: 3628
+      line: 97
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3360
+      endInstruction: 3359
+      startSourceChar: 3628
+      endSourceChar: 3628
+      line: 97
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3360
+      endInstruction: 3359
+      startSourceChar: 3628
+      endSourceChar: 3628
+      line: 97
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 3360
+      endInstruction: 3359
+      startSourceChar: 3628
+      endSourceChar: 3635
+      line: 97
+      lineChar: 16
+      spanCodeSection: AGMani.
+    - startInstruction: 3360
+      endInstruction: 3359
+      startSourceChar: 3635
+      endSourceChar: 3646
+      line: 97
+      lineChar: 23
+      spanCodeSection: SetTrigger(
+    - startInstruction: 3360
+      endInstruction: 3391
+      startSourceChar: 3646
+      endSourceChar: 3691
+      line: 97
+      lineChar: 34
+      spanCodeSection: "\"explodeowner\");\r\n            }\r\n            "
+    - startInstruction: 3392
+      endInstruction: 3391
+      startSourceChar: 3691
+      endSourceChar: 3709
+      line: 99
+      lineChar: 12
+      spanCodeSection: "else\r\n            "
+    - startInstruction: 3392
+      endInstruction: 3391
+      startSourceChar: 3709
+      endSourceChar: 3728
+      line: 100
+      lineChar: 12
+      spanCodeSection: "{\r\n                "
+    - startInstruction: 3392
+      endInstruction: 3391
+      startSourceChar: 3728
+      endSourceChar: 3732
+      line: 101
       lineChar: 16
       spanCodeSection: if (
-    - startInstruction: 2336
-      endInstruction: 2351
-      startSourceChar: 3126
-      endSourceChar: 3150
-      line: 91
+    - startInstruction: 3392
+      endInstruction: 3407
+      startSourceChar: 3732
+      endSourceChar: 3756
+      line: 101
       lineChar: 20
       spanCodeSection: "Owner)\r\n                "
-    - startInstruction: 2352
-      endInstruction: 2351
-      startSourceChar: 3150
-      endSourceChar: 3173
-      line: 92
+    - startInstruction: 3408
+      endInstruction: 3407
+      startSourceChar: 3756
+      endSourceChar: 3779
+      line: 102
       lineChar: 16
       spanCodeSection: "{\r\n                    "
-    - startInstruction: 2352
-      endInstruction: 2351
-      startSourceChar: 3173
-      endSourceChar: 3173
-      line: 93
+    - startInstruction: 3408
+      endInstruction: 3407
+      startSourceChar: 3779
+      endSourceChar: 3779
+      line: 103
       lineChar: 20
       spanCodeSection: 
-    - startInstruction: 2352
-      endInstruction: 2351
-      startSourceChar: 3173
-      endSourceChar: 3173
-      line: 93
+    - startInstruction: 3408
+      endInstruction: 3407
+      startSourceChar: 3779
+      endSourceChar: 3779
+      line: 103
       lineChar: 20
       spanCodeSection: 
-    - startInstruction: 2352
-      endInstruction: 2351
-      startSourceChar: 3173
-      endSourceChar: 3173
-      line: 93
+    - startInstruction: 3408
+      endInstruction: 3407
+      startSourceChar: 3779
+      endSourceChar: 3779
+      line: 103
       lineChar: 20
       spanCodeSection: 
-    - startInstruction: 2352
-      endInstruction: 2351
-      startSourceChar: 3173
-      endSourceChar: 3180
-      line: 93
+    - startInstruction: 3408
+      endInstruction: 3407
+      startSourceChar: 3779
+      endSourceChar: 3786
+      line: 103
       lineChar: 20
       spanCodeSection: AGMani.
-    - startInstruction: 2352
-      endInstruction: 2351
-      startSourceChar: 3180
-      endSourceChar: 3191
-      line: 93
+    - startInstruction: 3408
+      endInstruction: 3407
+      startSourceChar: 3786
+      endSourceChar: 3797
+      line: 103
       lineChar: 27
       spanCodeSection: SetTrigger(
-    - startInstruction: 2352
-      endInstruction: 2383
-      startSourceChar: 3191
-      endSourceChar: 3244
-      line: 93
+    - startInstruction: 3408
+      endInstruction: 3439
+      startSourceChar: 3797
+      endSourceChar: 3850
+      line: 103
       lineChar: 38
       spanCodeSection: "\"explodeowner\");\r\n                }\r\n                "
-    - startInstruction: 2384
-      endInstruction: 2383
-      startSourceChar: 3244
-      endSourceChar: 3249
-      line: 95
+    - startInstruction: 3440
+      endInstruction: 3439
+      startSourceChar: 3850
+      endSourceChar: 3855
+      line: 105
       lineChar: 16
       spanCodeSection: 'else '
-    - startInstruction: 2384
-      endInstruction: 2383
-      startSourceChar: 3249
-      endSourceChar: 3249
-      line: 95
+    - startInstruction: 3440
+      endInstruction: 3439
+      startSourceChar: 3855
+      endSourceChar: 3855
+      line: 105
       lineChar: 21
       spanCodeSection: 
-    - startInstruction: 2384
-      endInstruction: 2383
-      startSourceChar: 3249
-      endSourceChar: 3249
-      line: 95
+    - startInstruction: 3440
+      endInstruction: 3439
+      startSourceChar: 3855
+      endSourceChar: 3855
+      line: 105
       lineChar: 21
       spanCodeSection: 
-    - startInstruction: 2384
-      endInstruction: 2383
-      startSourceChar: 3249
-      endSourceChar: 3249
-      line: 95
+    - startInstruction: 3440
+      endInstruction: 3439
+      startSourceChar: 3855
+      endSourceChar: 3855
+      line: 105
       lineChar: 21
       spanCodeSection: 
-    - startInstruction: 2384
-      endInstruction: 2383
-      startSourceChar: 3249
-      endSourceChar: 3256
-      line: 95
+    - startInstruction: 3440
+      endInstruction: 3439
+      startSourceChar: 3855
+      endSourceChar: 3862
+      line: 105
       lineChar: 21
       spanCodeSection: AGMani.
-    - startInstruction: 2384
-      endInstruction: 2383
-      startSourceChar: 3256
-      endSourceChar: 3267
-      line: 95
+    - startInstruction: 3440
+      endInstruction: 3439
+      startSourceChar: 3862
+      endSourceChar: 3873
+      line: 105
       lineChar: 28
       spanCodeSection: SetTrigger(
-    - startInstruction: 2384
-      endInstruction: 2407
-      startSourceChar: 3267
-      endSourceChar: 3307
-      line: 95
+    - startInstruction: 3440
+      endInstruction: 3463
+      startSourceChar: 3873
+      endSourceChar: 3913
+      line: 105
       lineChar: 39
       spanCodeSection: "\"explode\");\r\n            }\r\n            "
-    - startInstruction: 2408
-      endInstruction: 2407
-      startSourceChar: 3307
-      endSourceChar: 3307
-      line: 97
+    - startInstruction: 3464
+      endInstruction: 3463
+      startSourceChar: 3913
+      endSourceChar: 3913
+      line: 107
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2408
-      endInstruction: 2407
-      startSourceChar: 3307
-      endSourceChar: 3307
-      line: 97
+    - startInstruction: 3464
+      endInstruction: 3463
+      startSourceChar: 3913
+      endSourceChar: 3913
+      line: 107
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2408
-      endInstruction: 2407
-      startSourceChar: 3307
-      endSourceChar: 3318
-      line: 97
+    - startInstruction: 3464
+      endInstruction: 3463
+      startSourceChar: 3913
+      endSourceChar: 3924
+      line: 107
       lineChar: 12
       spanCodeSection: 'Lifetime = '
-    - startInstruction: 2408
-      endInstruction: 2408
-      startSourceChar: 3318
-      endSourceChar: 3318
-      line: 97
+    - startInstruction: 3464
+      endInstruction: 3464
+      startSourceChar: 3924
+      endSourceChar: 3924
+      line: 107
       lineChar: 23
       spanCodeSection: 
   hasInteractEvent: 0
@@ -2732,7 +3198,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 12
+      Data: 14
     - Name: 
       Entry: 7
       Data: 
@@ -2921,7 +3387,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: NonOwnerLockHack
+      Data: TargetEngineControl
     - Name: $v
       Entry: 7
       Data: 13|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -2929,8 +3395,65 @@ MonoBehaviour:
       Entry: 7
       Data: 14|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
+      Entry: 9
+      Data: 11
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: VRCUdonUdonBehaviour
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: TargetEngineControl
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: TargetEngineControl
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
       Entry: 7
-      Data: 15|System.RuntimeType, mscorlib
+      Data: 15|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 10
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: NonOwnerLockHack
+    - Name: $v
+      Entry: 7
+      Data: 16|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 17|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 7
+      Data: 18|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: System.Boolean, mscorlib
@@ -2952,63 +3475,6 @@ MonoBehaviour:
     - Name: symbolUniqueName
       Entry: 1
       Data: NonOwnerLockHack
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 16|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Lifetime
-    - Name: $v
-      Entry: 7
-      Data: 17|UdonSharp.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 18|UdonSharp.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 4
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: Lifetime
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: Lifetime
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3041,7 +3507,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: StartLockAngle
+      Data: Lifetime
     - Name: $v
       Entry: 7
       Data: 20|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3062,10 +3528,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: StartLockAngle
+      Data: Lifetime
     - Name: symbolUniqueName
       Entry: 1
-      Data: StartLockAngle
+      Data: Lifetime
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3098,7 +3564,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Target
+      Data: StartLockAngle
     - Name: $v
       Entry: 7
       Data: 23|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3106,14 +3572,8 @@ MonoBehaviour:
       Entry: 7
       Data: 24|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 25|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: UnityEngine.Transform, UnityEngine.CoreModule
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 4
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3122,13 +3582,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineTransform
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: Target
+      Data: StartLockAngle
     - Name: symbolUniqueName
       Entry: 1
-      Data: Target
+      Data: StartLockAngle
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3137,7 +3597,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 25|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -3161,16 +3621,22 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ColliderActive
+      Data: Target
     - Name: $v
       Entry: 7
-      Data: 27|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 26|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 28|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 27|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 15
+      Entry: 7
+      Data: 28|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UnityEngine.Transform, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3179,13 +3645,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: UnityEngineTransform
     - Name: symbolOriginalName
       Entry: 1
-      Data: ColliderActive
+      Data: Target
     - Name: symbolUniqueName
       Entry: 1
-      Data: ColliderActive
+      Data: Target
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3218,7 +3684,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Exploding
+      Data: ColliderActive
     - Name: $v
       Entry: 7
       Data: 30|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3227,7 +3693,7 @@ MonoBehaviour:
       Data: 31|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 15
+      Data: 18
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3239,10 +3705,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: Exploding
+      Data: ColliderActive
     - Name: symbolUniqueName
       Entry: 1
-      Data: Exploding
+      Data: ColliderActive
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3275,7 +3741,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AAMCollider
+      Data: Exploding
     - Name: $v
       Entry: 7
       Data: 33|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3283,14 +3749,8 @@ MonoBehaviour:
       Entry: 7
       Data: 34|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 35|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: UnityEngine.CapsuleCollider, UnityEngine.PhysicsModule
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 18
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3299,13 +3759,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineCapsuleCollider
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: AAMCollider
+      Data: Exploding
     - Name: symbolUniqueName
       Entry: 1
-      Data: AAMCollider
+      Data: Exploding
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3314,7 +3774,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 36|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 35|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -3338,16 +3798,22 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: NoTarget
+      Data: AAMCollider
     - Name: $v
       Entry: 7
-      Data: 37|UdonSharp.FieldDefinition, UdonSharp.Editor
+      Data: 36|UdonSharp.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 38|UdonSharp.SymbolDefinition, UdonSharp.Editor
+      Data: 37|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 15
+      Entry: 7
+      Data: 38|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UnityEngine.CapsuleCollider, UnityEngine.PhysicsModule
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3356,13 +3822,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: UnityEngineCapsuleCollider
     - Name: symbolOriginalName
       Entry: 1
-      Data: NoTarget
+      Data: AAMCollider
     - Name: symbolUniqueName
       Entry: 1
-      Data: NoTarget
+      Data: AAMCollider
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3395,7 +3861,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Owner
+      Data: NoTarget
     - Name: $v
       Entry: 7
       Data: 40|UdonSharp.FieldDefinition, UdonSharp.Editor
@@ -3404,7 +3870,64 @@ MonoBehaviour:
       Data: 41|UdonSharp.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 15
+      Data: 18
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemBoolean
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: NoTarget
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: NoTarget
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 42|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Owner
+    - Name: $v
+      Entry: 7
+      Data: 43|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 44|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 18
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3428,7 +3951,64 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 42|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 45|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: TargetIsPlane
+    - Name: $v
+      Entry: 7
+      Data: 46|UdonSharp.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 47|UdonSharp.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 18
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemBoolean
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: TargetIsPlane
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: TargetIsPlane
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 48|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

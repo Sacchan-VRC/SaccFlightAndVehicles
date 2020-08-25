@@ -21,6 +21,7 @@ public class EffectsController : UdonSharpBehaviour
     public Transform RudderR;
     public Transform SlatsL;
     public Transform SlatsR;
+    public Transform FrontWheel;
     public ParticleSystem DisplaySmoke;
     private bool vapor;
     [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
@@ -28,7 +29,6 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
     private Vector3 pitchlerper = new Vector3(0, 0, 0);
     private Vector3 aileronLlerper = new Vector3(0, 0, 0);
-    private Vector3 aileronRlerper = new Vector3(0, 0, 0);
     private Vector3 yawlerper = new Vector3(0, 0, 0);
     private Vector3 FlapLerper = new Vector3(0, 0, 0);
     private Vector3 SlatsLerper = new Vector3(0, 35, 0);
@@ -111,6 +111,14 @@ public class EffectsController : UdonSharpBehaviour
         vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
 
+
+
+        pitchlerper.x = Mathf.Lerp(pitchlerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
+        aileronLlerper.y = Mathf.Lerp(aileronLlerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
+        SlatsLerper.y = Mathf.Lerp(SlatsLerper.y, Mathf.Max((-EngineControl.Speed * 0.005f) * 35f + 35f, 0f), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
+        yawlerper.y = Mathf.Lerp(yawlerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
+
+
         if (EngineControl.Occupied == true)
         {
             DoEffects = 0f;
@@ -122,11 +130,13 @@ public class EffectsController : UdonSharpBehaviour
             {
                 PlaneAnimator.SetBool("gunfiring", false);
             }
-            if (EngineControl.Smoking)
+            var main = DisplaySmoke.main;
+            main.startColor = new ParticleSystem.MinMaxGradient(EngineControl.SmokeColor_Color, EngineControl.SmokeColor_Color * .8f);
+            if (EngineControl.Taxiing)
             {
-                var main = DisplaySmoke.main;
-                main.startColor = new ParticleSystem.MinMaxGradient(EngineControl.SmokeColor_Color, EngineControl.SmokeColor_Color * .8f);
+                FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -yawlerper.y * 3, 0));
             }
+            else FrontWheel.localRotation = Quaternion.identity;
         }
         else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
 
@@ -140,22 +150,19 @@ public class EffectsController : UdonSharpBehaviour
         else { PlaneAnimator.SetBool("hookdown", false); }
 
 
-        //rotationinputs.x == pitch
-        //rotationinputs.y == yaw
-        //rotationinputs.z == roll
-        //rotating the control surfaces based on inputs
-        if (AileronL != null) { aileronLlerper.y = Mathf.Lerp(aileronLlerper.y, rotationinputs.z + (-rotationinputs.x * .5f), 4.5f * Time.deltaTime); ; AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
-        if (AileronR != null) { aileronRlerper.y = Mathf.Lerp(aileronRlerper.y, -rotationinputs.z + (-rotationinputs.x * .5f), 4.5f * Time.deltaTime); ; AileronR.localRotation = Quaternion.Euler(aileronRlerper); }
+        /* rotationinputs.x == pitch
+        rotationinputs.y == yaw
+        rotationinputs.z == roll
+        rotating the control surfaces based on inputs */
+        if (AileronL != null) { AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
+        if (AileronR != null) { AileronR.localRotation = Quaternion.Euler(-aileronLlerper); }
 
-        pitchlerper.x = Mathf.Lerp(pitchlerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
         if (Elevator != null) { Elevator.localRotation = Quaternion.Euler(-pitchlerper); }
         if (Canards != null) { Canards.localRotation = Quaternion.Euler(pitchlerper * .5f); }
 
-        yawlerper.y = Mathf.Lerp(yawlerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
         if (RudderL != null) { RudderL.localRotation = Quaternion.Euler(-yawlerper); }
         if (RudderR != null) { RudderR.localRotation = Quaternion.Euler(yawlerper); }
 
-        SlatsLerper.y = Mathf.Lerp(SlatsLerper.y, Mathf.Max((-EngineControl.Speed * 0.005f) * 35f + 35f, 0f), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
         if (SlatsL != null) { SlatsL.localRotation = Quaternion.Euler(SlatsLerper); }
         if (SlatsR != null) { SlatsR.localRotation = Quaternion.Euler(SlatsLerper); }
 
@@ -208,8 +215,9 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
         PlaneAnimator.SetFloat("brake", airbrakelerper);
         PlaneAnimator.SetBool("canopyopen", EngineControl.CanopyOpen);
-        PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
+        //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         PlaneAnimator.SetFloat("fuel", EngineControl.Fuel / EngineControl.FullFuel);
+        PlaneAnimator.SetFloat("AAMs",  EngineControl.CurrentAAMs / EngineControl.NumberOfAAMs);
         DoVapor();
     }
 
