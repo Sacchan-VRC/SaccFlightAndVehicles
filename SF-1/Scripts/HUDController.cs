@@ -90,7 +90,7 @@ public class HUDController : UdonSharpBehaviour
         /////////////////
 
         //AAM Target Indicator
-        if (EngineControl.AAMHasTarget)
+        if (EngineControl.AAMHasTarget && EngineControl.RStickSelection == 2)
         {
             AAMTargetIndicator.localScale = new Vector3(1, 1, 1);
             AAMTargetIndicator.position = transform.position + EngineControl.AAMCurrentTargetDirection;
@@ -128,7 +128,7 @@ public class HUDController : UdonSharpBehaviour
         /////////////////
 
         //Down indicator
-        DownIndicator.localRotation = Quaternion.Euler(-new Vector3(0, 0, new_z));
+        DownIndicator.localRotation = Quaternion.Euler(new Vector3(0, 0, -new_z));
         /////////////////
 
         //SAFE indicator
@@ -273,7 +273,7 @@ public class HUDController : UdonSharpBehaviour
                 if (camhit.point != null)
                 {
                     //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                    EngineControl.AGMCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, 2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f);
+                    EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, 2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f, 90);
                 }
             }
         }

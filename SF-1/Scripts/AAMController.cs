@@ -9,6 +9,7 @@ public class AAMController : UdonSharpBehaviour
     public float LockAngle;
     public float RotSpeed = 15;
     public EngineController EngineControl;
+    private EngineController TargetEngineControl;
     private bool NonOwnerLockHack = true;
     private float Lifetime = 0;
     private float StartLockAngle = 0;
@@ -18,8 +19,15 @@ public class AAMController : UdonSharpBehaviour
     private CapsuleCollider AAMCollider;
     private bool NoTarget = false;
     private bool Owner = false;
+    private bool TargetIsPlane = false;
     void Start()
     {
+        if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
+        {
+            TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
+            if (TargetEngineControl != null) TargetIsPlane = true;
+        }
+
         StartLockAngle = LockAngle;
         if (EngineControl.InEditor || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
         {
@@ -35,12 +43,10 @@ public class AAMController : UdonSharpBehaviour
             Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
         }
         else NoTarget = true;
-
         AAMCollider = gameObject.GetComponent<CapsuleCollider>();
     }
     void LateUpdate()
     {
-        Debug.Log(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
         if (!ColliderActive)
         {
             if (Lifetime > 0.5f)
@@ -81,6 +87,10 @@ public class AAMController : UdonSharpBehaviour
     {
         if (!Exploding)
         {
+            if (TargetEngineControl != null)
+            {
+                gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel; // damage particles inherit the velocity of the missile, so this should help them hit the target plane
+            }
             AAMCollider.enabled = false;
             Animator AGMani = gameObject.GetComponent<Animator>();
             if (EngineControl.InEditor)
