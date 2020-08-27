@@ -53,8 +53,8 @@ public class SoundController : UdonSharpBehaviour
     private float PlaneThrustInitialVolume;
     private float PlaneWindInitialVolume;
     float InVehicleThrustVolumeFactor = .09f;
-    float SonicBoomWave = 0f;
-    float SonicBoomDistance = -1f;
+    [System.NonSerializedAttribute] [HideInInspector] public float SonicBoomWave = 0f;
+    [System.NonSerializedAttribute] [HideInInspector] public float SonicBoomDistance = -1f;
     bool Landed = false;
     private int dopplecounter;
     [System.NonSerializedAttribute] [HideInInspector] public float DoSound = 32; //3 seconds before idle so late joiners hear sound
@@ -64,7 +64,7 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public bool soundsoff;
     float relativespeed;
     private float SonicBoomPreventer = 5f;//used to prevent sonic booms from occuring too often in case of laggers etc
-    bool playsonicboom;
+    [System.NonSerializedAttribute] [HideInInspector] public bool playsonicboom;
     private void Start()
     {
         PlaneIdleNull = (PlaneIdle == null) ? true : false;
@@ -315,7 +315,7 @@ public class SoundController : UdonSharpBehaviour
 
         if (!GunSoundNull)
         {
-            if (EngineControl.EffectsControl.IsFiringGun && !EngineControl.SoundControl.silent)
+            if (EngineControl.IsFiringGun && !EngineControl.SoundControl.silent)
             {
                 GunSound.pitch = Mathf.Clamp(((EngineControl.SoundControl.Doppler - 1) * .3f) + 1, 0, 1.2f);
                 if (!GunSound.isPlaying)
@@ -331,7 +331,7 @@ public class SoundController : UdonSharpBehaviour
                     GunSound.volume = Mathf.Lerp(GunSound.volume, GunSoundInitialVolume, 9f * Time.deltaTime);
                 }
             }
-            else if (!EngineControl.EffectsControl.IsFiringGun || EngineControl.SoundControl.silent && GunSound.isPlaying)
+            else if (!EngineControl.IsFiringGun || EngineControl.SoundControl.silent && GunSound.isPlaying)
             {
                 GunSound.Stop();
             }

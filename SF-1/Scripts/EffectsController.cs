@@ -27,31 +27,27 @@ public class EffectsController : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
-    private Vector3 pitchlerper = new Vector3(0, 0, 0);
-    private Vector3 aileronLlerper = new Vector3(0, 0, 0);
-    private Vector3 yawlerper = new Vector3(0, 0, 0);
-    private Vector3 FlapLerper = new Vector3(0, 0, 0);
+    private Vector3 PitchLerper = new Vector3(0, 0, 0);
+    private Vector3 AileronLerper = new Vector3(0, 0, 0);
+    private Vector3 YawLerper = new Vector3(0, 0, 0);
     private Vector3 SlatsLerper = new Vector3(0, 35, 0);
-    private Vector3 enginelerperL = new Vector3(0, 0, 0);
-    private Vector3 enginelerperR = new Vector3(0, 0, 0);
-    private Vector3 enginefirelerper = new Vector3(1, 0.6f, 1);
-    private float airbrakelerper;
+    private Vector3 EngineLerper = new Vector3(0, 0, 0);
+    private Vector3 EnginefireLerper = new Vector3(1, 0.6f, 1);
+    private float AirbrakeLerper;
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] public ParticleSystem.ColorOverLifetimeModule SmokeModule;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
     private float brake;
+    private Color SmokeColorLerper = Color.white;
     private void Start()
     {
-        enginelerperL = new Vector3(0, EngineL.localRotation.eulerAngles.y, EngineL.localRotation.eulerAngles.z);
-        enginelerperR = new Vector3(0, EngineR.localRotation.eulerAngles.y, EngineR.localRotation.eulerAngles.z);
-
+        if (EngineR != null) EngineLerper = new Vector3(0, EngineR.localRotation.eulerAngles.y, EngineR.localRotation.eulerAngles.z);
         if (EnginefireL != null)
         {
-            enginefirelerper = new Vector3(EnginefireL.localScale.x, 0, EnginefireL.localScale.z);
+            EnginefireLerper = new Vector3(EnginefireL.localScale.x, 0, EnginefireL.localScale.z);
         }
-        else if (EnginefireR != null) enginefirelerper = new Vector3(EnginefireR.localScale.x, 0, EnginefireR.localScale.z);
+        else if (EnginefireR != null) EnginefireLerper = new Vector3(EnginefireR.localScale.x, 0, EnginefireR.localScale.z);
 
 
 
@@ -63,32 +59,24 @@ public class EffectsController : UdonSharpBehaviour
     }
     private void Update()
     {
-        if ((EngineControl.InEditor || EngineControl.IsOwner) && !EngineControl.dead)//kill plane if in sea
+        if ((EngineControl.InEditor || EngineControl.IsOwner) && !EngineControl.dead)
         {
-            if (EngineControl.CenterOfMass.position.y < EngineControl.SeaLevel && !EngineControl.dead)
+            if (EngineControl.CenterOfMass.position.y < EngineControl.SeaLevel && !EngineControl.dead)//kill plane if in sea
             {
-                if (EngineControl.InEditor)//so it works in editor
-                {
+                if (EngineControl.InEditor)//editor
                     Explode();
-                }
-                else
-                {
+                else//VRC
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-                }
             }
 
             //G/crash Damage
             EngineControl.Health += -Mathf.Clamp((EngineControl.Gs - EngineControl.MaxGs) * Time.deltaTime * EngineControl.GDamage, 0f, 99999f); //take damage of GDamage per second per G above MaxGs
-            if (EngineControl.Health <= 0f) //plane is ded
+            if (EngineControl.Health <= 0f)//plane is ded
             {
-                if (EngineControl.InEditor)//so it works in editor
-                {
+                if (EngineControl.InEditor)//editor
                     Explode();
-                }
-                else
-                {
+                else//VRC
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-                }
             }
         }
 
@@ -105,24 +93,25 @@ public class EffectsController : UdonSharpBehaviour
             rotationinputs.z = EngineControl.RollInput * 35;
 
             //joystick movement
-            Vector3 tempjoy = new Vector3(EngineControl.PitchInput * 45f, EngineControl.YawInput * 45, EngineControl.RollInput * 45f);
-            JoyStick.localRotation = Quaternion.Euler(tempjoy);
+            if (JoyStick != null)
+            {
+                Vector3 tempjoy = new Vector3(EngineControl.PitchInput * 35f, EngineControl.YawInput * 35, EngineControl.RollInput * 35f);
+                JoyStick.localRotation = Quaternion.Euler(tempjoy);
+            }
         }
         vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
-
-
-
-        pitchlerper.x = Mathf.Lerp(pitchlerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
-        aileronLlerper.y = Mathf.Lerp(aileronLlerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
+        PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
+        AileronLerper.y = Mathf.Lerp(AileronLerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
         SlatsLerper.y = Mathf.Lerp(SlatsLerper.y, Mathf.Max((-EngineControl.Speed * 0.005f) * 35f + 35f, 0f), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
-        yawlerper.y = Mathf.Lerp(yawlerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
-
+        YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
+        EngineLerper.x = Mathf.Lerp(EngineLerper.x, (-rotationinputs.x * .65f), 4.5f * Time.deltaTime);
+        EnginefireLerper.y = Mathf.Lerp(EnginefireLerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
 
         if (EngineControl.Occupied == true)
         {
             DoEffects = 0f;
-            if (IsFiringGun) //send firing to animator
+            if (EngineControl.IsFiringGun) //send firing to animator
             {
                 PlaneAnimator.SetBool("gunfiring", true);
             }
@@ -130,13 +119,20 @@ public class EffectsController : UdonSharpBehaviour
             {
                 PlaneAnimator.SetBool("gunfiring", false);
             }
-            var main = DisplaySmoke.main;
-            main.startColor = new ParticleSystem.MinMaxGradient(EngineControl.SmokeColor_Color, EngineControl.SmokeColor_Color * .8f);
-            if (EngineControl.Taxiing)
+            if (DisplaySmoke != null)
             {
-                FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -yawlerper.y * 3, 0));
+                SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
+                var main = DisplaySmoke.main;
+                main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
             }
-            else FrontWheel.localRotation = Quaternion.identity;
+            if (FrontWheel != null)
+            {
+                if (EngineControl.Taxiing)
+                {
+                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -YawLerper.y * 3, 0));
+                }
+                else FrontWheel.localRotation = Quaternion.identity;
+            }
         }
         else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
 
@@ -154,31 +150,29 @@ public class EffectsController : UdonSharpBehaviour
         rotationinputs.y == yaw
         rotationinputs.z == roll
         rotating the control surfaces based on inputs */
-        if (AileronL != null) { AileronL.localRotation = Quaternion.Euler(aileronLlerper); }
-        if (AileronR != null) { AileronR.localRotation = Quaternion.Euler(-aileronLlerper); }
+        if (AileronL != null) { AileronL.localRotation = Quaternion.Euler(AileronLerper); }
+        if (AileronR != null) { AileronR.localRotation = Quaternion.Euler(-AileronLerper); }
 
-        if (Elevator != null) { Elevator.localRotation = Quaternion.Euler(-pitchlerper); }
-        if (Canards != null) { Canards.localRotation = Quaternion.Euler(pitchlerper * .5f); }
+        if (Elevator != null) { Elevator.localRotation = Quaternion.Euler(-PitchLerper); }
+        if (Canards != null) { Canards.localRotation = Quaternion.Euler(PitchLerper * .5f); }
 
-        if (RudderL != null) { RudderL.localRotation = Quaternion.Euler(-yawlerper); }
-        if (RudderR != null) { RudderR.localRotation = Quaternion.Euler(yawlerper); }
+        if (RudderL != null) { RudderL.localRotation = Quaternion.Euler(-YawLerper); }
+        if (RudderR != null) { RudderR.localRotation = Quaternion.Euler(YawLerper); }
 
         if (SlatsL != null) { SlatsL.localRotation = Quaternion.Euler(SlatsLerper); }
         if (SlatsR != null) { SlatsR.localRotation = Quaternion.Euler(SlatsLerper); }
 
-
-        if (EngineL != null) { enginelerperL.x = Mathf.Lerp(enginelerperL.x, (rotationinputs.z * .3f) + (-rotationinputs.x * .65f), 4.5f * Time.deltaTime); EngineL.localRotation = Quaternion.Euler(enginelerperL); }
-        if (EngineR != null) { enginelerperR.x = Mathf.Lerp(enginelerperR.x, (-rotationinputs.z * .3f) + (-rotationinputs.x * .65f), 4.5f * Time.deltaTime); EngineR.localRotation = Quaternion.Euler(enginelerperR); }
+        if (EngineL != null) { EngineL.localRotation = Quaternion.Euler(EngineLerper); }
+        if (EngineR != null) { EngineR.localRotation = Quaternion.Euler(EngineLerper); }
 
         //engine thrust animation
-        enginefirelerper.y = Mathf.Lerp(enginefirelerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
 
         if (EnginefireL != null)
         {
             if (EngineControl.AfterburnerOn)
             {
                 EnginefireL.gameObject.SetActive(true);
-                EnginefireL.localScale = enginefirelerper;
+                EnginefireL.localScale = EnginefireLerper;
             }
             else
             {
@@ -195,7 +189,7 @@ public class EffectsController : UdonSharpBehaviour
             if (EngineControl.AfterburnerOn)
             {
                 EnginefireR.gameObject.SetActive(true);
-                EnginefireR.localScale = enginefirelerper;
+                EnginefireR.localScale = EnginefireLerper;
             }
             else
             {
@@ -208,16 +202,17 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
-        airbrakelerper = Mathf.Lerp(airbrakelerper, EngineControl.AirBrakeInput, 5f * Time.deltaTime);
+        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.AirBrakeInput, 5f * Time.deltaTime);
 
         PlaneAnimator.SetBool("displaysmoke", (EngineControl.Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
-        PlaneAnimator.SetFloat("brake", airbrakelerper);
+        PlaneAnimator.SetFloat("brake", AirbrakeLerper);
         PlaneAnimator.SetBool("canopyopen", EngineControl.CanopyOpen);
         //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         PlaneAnimator.SetFloat("fuel", EngineControl.Fuel / EngineControl.FullFuel);
-        PlaneAnimator.SetFloat("AAMs",  EngineControl.CurrentAAMs / EngineControl.NumberOfAAMs);
+        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.AAMs / EngineControl.FullAAMs);
+        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.AGMs / EngineControl.FullAGMs);
         DoVapor();
     }
 
@@ -251,7 +246,16 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.Trim = Vector2.zero;
         EngineControl.CanopyOpen = true;
         EngineControl.CanopyCloseTimer = -100001;
-
+        EngineControl.AAMLaunchOpositeSide = false;
+        EngineControl.AGMLaunchOpositeSide = false;
+        //play sonic boom if it was going to play before it exploded
+        if (EngineControl.SoundControl.playsonicboom && EngineControl.SoundControl.silent)
+        {
+            EngineControl.SoundControl.SonicBoom.pitch = Random.Range(.94f, 1.2f);
+            EngineControl.SoundControl.SonicBoom.PlayDelayed((EngineControl.SoundControl.SonicBoomDistance - EngineControl.SoundControl.SonicBoomWave) / 343);
+        }
+        EngineControl.SoundControl.playsonicboom = false;
+        EngineControl.SoundControl.silent = false;
 
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
@@ -261,7 +265,9 @@ public class EffectsController : UdonSharpBehaviour
         }
 
         //pilot and passenger are dropped out of the plane
-        if (EngineControl.SoundControl != null && EngineControl.SoundControl.Explosion != null) { EngineControl.SoundControl.Explosion.Play(); }
+        if (EngineControl.SoundControl != null && EngineControl.SoundControl.Explosion != null)
+            EngineControl.SoundControl.Explosion.PlayDelayed(EngineControl.SoundControl.ThisFrameDist / 343);//explosion sound has travel time
+
         if ((EngineControl.Piloting || EngineControl.Passenger) && !EngineControl.InEditor)
         {
             foreach (LeaveVehicleButton seat in EngineControl.LeaveButtons)
