@@ -8,14 +8,12 @@ public class PilotSeat : UdonSharpBehaviour
 {
     public EngineController EngineControl;
     public GameObject LeaveButton;
-    //public GameObject Saccflight; 
     public GameObject Gun_pilot;
     public Transform PlaneMesh;
     public GameObject SeatAdjuster;
     public GameObject EnableOther;
     private void Interact()//entering the plane
     {
-        //if (Saccflight != null) { Saccflight.SetActive(false); }
         if (EngineControl.VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.VehicleMainObj); }
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (EngineControl != null)
@@ -24,10 +22,11 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.Piloting = true;
             if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;//has to be less than -100000
             else EngineControl.CanopyCloseTimer = -1;//less than 0
+            if (EngineControl.dead) EngineControl.Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
         }
         if (EngineControl.EffectsControl != null)
         {
-            EngineControl.EffectsControl.IsFiringGun = false;
+            EngineControl.IsFiringGun = false;
             EngineControl.Smoking = false;
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
@@ -42,7 +41,6 @@ public class PilotSeat : UdonSharpBehaviour
         if (EnableOther != null) { EnableOther.SetActive(true); }
         if (EngineControl.localPlayer != null) { EngineControl.localPlayer.UseAttachedStation(); }
         if (EngineControl.EffectsControl != null || EngineControl.SoundControl != null) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "WakeUp"); }
-        //set plane to a layer that doesn't collide with its own bullets
         if (PlaneMesh != null)
         {
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
@@ -82,11 +80,10 @@ public class PilotSeat : UdonSharpBehaviour
             if (EngineControl.CatapultStatus == 2) { }//keep launching if launching
             else EngineControl.CatapultStatus = 0;//else unhook from catapult
         }
-        //if (Saccflight != null) { Saccflight.SetActive(true); }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
         if (EngineControl.EffectsControl != null)
         {
-            EngineControl.EffectsControl.IsFiringGun = false;
+            EngineControl.IsFiringGun = false;
             EngineControl.Smoking = false;
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(false); }

@@ -9,7 +9,6 @@ public class HUDController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
     public Material SmokeColorIndicator;
-    private float maxGs = 0f;
     public Text HUDText_G;
     public Text HUDText_mach;
     public Text HUDText_altitude;
@@ -17,8 +16,10 @@ public class HUDController : UdonSharpBehaviour
     public Text HUDText_knots;
     public Text HUDText_knotsairspeed;
     public Text HUDText_angleofattack;
-    private string HUDText_angleofattack_temp;
-    private const float distance_from_head = 1.333f;
+    public GameObject HudCrosshairGun;
+    public GameObject HudCrosshair;
+    public GameObject HudLimit;
+    public GameObject HudAB;
     public Transform DownIndicator;
     public Transform ElevationIndicator;
     public Transform HeadingIndicator;
@@ -30,8 +31,6 @@ public class HUDController : UdonSharpBehaviour
     public Transform Yaw;
     public Transform TrimPitch;
     public Transform TrimYaw;
-    public GameObject HudSAFE;
-    public GameObject HudAB;
     public GameObject AGMScreen;
     public GameObject LStick_funcon1;
     public GameObject LStick_funcon2;
@@ -45,6 +44,8 @@ public class HUDController : UdonSharpBehaviour
     public GameObject RStick_funcon5;
     public GameObject RStick_funcon6;
     public GameObject RStick_funcon7;
+    private const float distance_from_head = 1.333f;
+    private float maxGs = 0f;
     private Vector3 InputsZeroPos;
     private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
@@ -88,6 +89,22 @@ public class HUDController : UdonSharpBehaviour
         VelocityIndicator.position = transform.position + tempvel;
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
         /////////////////
+
+        if (EngineControl.RStickSelection == 1)
+        {
+            HudCrosshairGun.SetActive(true);
+            HudCrosshair.SetActive(false);
+        }
+        else if (EngineControl.RStickSelection == 2 || EngineControl.RStickSelection == 3)
+        {
+            HudCrosshairGun.SetActive(false);
+            HudCrosshair.SetActive(false);
+        }
+        else
+        {
+            HudCrosshairGun.SetActive(false);
+            HudCrosshair.SetActive(true);
+        }
 
         //AAM Target Indicator
         if (EngineControl.AAMHasTarget && EngineControl.RStickSelection == 2)
@@ -134,9 +151,9 @@ public class HUDController : UdonSharpBehaviour
         //SAFE indicator
         if (EngineControl.FlightLimitsEnabled)
         {
-            HudSAFE.SetActive(true);
+            HudLimit.SetActive(true);
         }
-        else { HudSAFE.SetActive(false); }
+        else { HudLimit.SetActive(false); }
 
         //Left Stick Selector
         switch (EngineControl.LStickSelection)
