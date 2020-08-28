@@ -8,16 +8,18 @@ public class AAGunSeat : UdonSharpBehaviour
 {
     public AAGunController AAGunControl;
     public GameObject HUDControl;
-    public GameObject Saccflight;
     public GameObject SeatAdjuster;
     private Animator AAGunAnimator;
     void Start()
     {
+        Assert(AAGunControl != null, "Start: AAGunControl != null");
+        Assert(HUDControl != null, "Start: HUDControl != null");
+        Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
+
         if (AAGunControl.VehicleMainObj != null) { AAGunAnimator = AAGunControl.VehicleMainObj.GetComponent<Animator>(); }
     }
     private void Interact()
     {
-        if (Saccflight != null) { Saccflight.SetActive(false); }
         if (AAGunControl != null)
         {
             Networking.SetOwner(AAGunControl.localPlayer, AAGunControl.VehicleMainObj);
@@ -33,7 +35,6 @@ public class AAGunSeat : UdonSharpBehaviour
     }
     public void GunnerLeave()
     {
-        if (Saccflight != null) { Saccflight.SetActive(true); }
         if (AAGunControl != null)
         {
             AAGunControl.Manning = false;
@@ -48,5 +49,12 @@ public class AAGunSeat : UdonSharpBehaviour
     private void OnOwnershipTransferred()
     {
         AAGunControl.firing = false;
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }

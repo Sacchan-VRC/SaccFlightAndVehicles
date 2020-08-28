@@ -10,14 +10,19 @@ public class PassengerSeat : UdonSharpBehaviour
     public GameObject LeaveButton;
     public Transform PlaneMesh;
     public GameObject SeatAdjuster;
-    public GameObject EnableOther;
+    private void Start()
+    {
+        Assert(EngineControl != null, "Start: EngineControl != null");
+        Assert(LeaveButton != null, "Start: LeaveButton != null");
+        Assert(PlaneMesh != null, "Start: PlaneMesh != null");
+        Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
+    }
     private void Interact()
     {
         EngineControl.Passenger = true;
         Networking.SetOwner(EngineControl.localPlayer, gameObject);
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        if (EnableOther != null) { EnableOther.SetActive(true); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(true); }
         if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;
         else EngineControl.CanopyCloseTimer = -1;
@@ -40,7 +45,6 @@ public class PassengerSeat : UdonSharpBehaviour
         }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
-        if (EnableOther != null) { EnableOther.SetActive(false); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
         if (PlaneMesh != null)
         {
@@ -49,6 +53,13 @@ public class PassengerSeat : UdonSharpBehaviour
             {
                 child.gameObject.layer = 17;
             }
+        }
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

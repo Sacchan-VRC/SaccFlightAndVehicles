@@ -67,6 +67,22 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public bool playsonicboom;
     private void Start()
     {
+        Assert(EngineControl != null, "Start: EngineControl != null");
+        Assert(PlaneIdle != null, "Start: PlaneIdle != null");
+        Assert(PlaneInside != null, "Start: PlaneInside != null");
+        Assert(PlaneDistant != null, "Start: PlaneDistant != null");
+        Assert(PlaneThrust != null, "Start: PlaneThrust != null");
+        Assert(PlaneABOn != null, "Start: PlaneABOn != null");
+        Assert(TouchDown != null, "Start: TouchDown != null");
+        Assert(PlaneWind != null, "Start: PlaneWind != null");
+        Assert(SonicBoom != null, "Start: SonicBoom != null");
+        Assert(Explosion != null, "Start: Explosion != null");
+        Assert(GunSound != null, "Start: GunSound != null");
+        Assert(BulletHit != null, "Start: BulletHit != null");
+        Assert(MenuSelect != null, "Start: MenuSelect != null");
+
+
+
         PlaneIdleNull = (PlaneIdle == null) ? true : false;
         PlaneInsideNull = (PlaneInside == null) ? true : false;
         PlaneDistantNull = (PlaneDistant == null) ? true : false;
@@ -351,6 +367,13 @@ public class SoundController : UdonSharpBehaviour
         if (!PlaneABOnNull)
         {
             PlaneABOn.volume *= 4f;
+        }
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

@@ -7,7 +7,10 @@ using VRC.Udon;
 public class HitDetector : UdonSharpBehaviour
 {
     public EngineController EngineControl;
-    public SoundController SoundControl;
+    private void Start()
+    {
+        Assert(EngineControl != null, "Start: EngineControl != null");
+    }
     void OnParticleCollision(GameObject other)
     {
         if (other == null || EngineControl.dead) return;//avatars can't shoot you, and you can't get hurt when you're dead
@@ -28,13 +31,13 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.Health -= 10;
         }
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.DoEffects = 0f; }
-        if (SoundControl != null)
+        if (EngineControl.SoundControl != null)
         {
-            SoundControl.DoSound = 0f;
-            if (SoundControl.BulletHit != null)
+            EngineControl.SoundControl.DoSound = 0f;
+            if (EngineControl.SoundControl.BulletHit != null)
             {
-                SoundControl.BulletHit.pitch = Random.Range(.8f, 1.2f);
-                SoundControl.BulletHit.Play();
+                EngineControl.SoundControl.BulletHit.pitch = Random.Range(.8f, 1.2f);
+                EngineControl.SoundControl.BulletHit.Play();
             }
         }
     }
@@ -94,5 +97,12 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.Health = EngineControl.FullHealth;
         }
         EngineControl.dead = false;//because respawning gives us an immense number of Gs because we move so far in one frame, we stop being 'dead' 5 seconds after we respawn. Can't die when already dead. 
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }

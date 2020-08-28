@@ -25,6 +25,19 @@ public class WindChanger : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private void Start()
     {
+        Assert(WindMenu != null, "Start: WindMenu != null");
+        Assert(WindSlider != null, "Start: WindSlider != null");
+        Assert(WindStr_text != null, "Start: WindStr_text != null");
+        Assert(WindGustStrengthSlider != null, "Start: WindGustStrengthSlider != null");
+        Assert(WindGustStrength_text != null, "Start: WindGustStrength_text != null");
+        Assert(WindGustinessSlider != null, "Start: WindGustinessSlider != null");
+        Assert(WindGustiness_text != null, "Start: WindGustiness_text != null");
+        Assert(WindTurbulanceScaleSlider != null, "Start: WindTurbulanceScaleSlider != null");
+        Assert(WindTurbulanceScale_text != null, "Start: WindTurbulanceScale_text != null");
+        Assert(WindApplySound != null, "Start: WindApplySound != null");
+        Assert(VehicleEngines != null, "Start: VehicleEngines != null");
+
+
         localPlayer = Networking.LocalPlayer;
     }
     private void Update()
@@ -78,5 +91,12 @@ public class WindChanger : UdonSharpBehaviour
     private void OnOwnershipTransferred()
     {
         WindMenu.SetActive(false);
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }

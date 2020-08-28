@@ -16,6 +16,7 @@ public class AGMController : UdonSharpBehaviour
     private CapsuleCollider AGMCollider;
     void Start()
     {
+        Assert(EngineControl != null, "Start: EngineControl != null");
         Target = EngineControl.AGMTarget;
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
     }
@@ -64,6 +65,13 @@ public class AGMController : UdonSharpBehaviour
                 else AGMani.SetTrigger("explode");
             }
             Lifetime = 30;
+        }
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

@@ -8,6 +8,11 @@ public class VehicleRespawnButton : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
+    private void Start()
+    {
+        Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
+        Assert(EngineControl != null, "Start: EngineControl != null");
+    }
     private void Interact()
     {
         if (!EngineControl.Occupied && !EngineControl.dead)
@@ -29,5 +34,12 @@ public class VehicleRespawnButton : UdonSharpBehaviour
         EngineControl.dead = true;//this makes it invincible and unable to be respawned again for 5s
         EngineControl.EffectsControl.PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead
         EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }
