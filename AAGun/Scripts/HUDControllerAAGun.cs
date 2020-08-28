@@ -11,6 +11,12 @@ public class HUDControllerAAGun : UdonSharpBehaviour
     public Transform ElevationIndicator;
     public Transform HeadingIndicator;
     Vector3 temprot;
+    private void Start()
+    {
+        Assert(AAGunControl != null, "Start: AAGunControl != null");
+        Assert(ElevationIndicator != null, "Start: ElevationIndicator != null");
+        Assert(HeadingIndicator != null, "Start: HeadingIndicator != null");
+    }
     private void Update()
     {
         //Heading indicator
@@ -26,5 +32,12 @@ public class HUDControllerAAGun : UdonSharpBehaviour
         temprot.z = 0;
         ElevationIndicator.localRotation = Quaternion.Euler(-temprot);
         /////////////////
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }

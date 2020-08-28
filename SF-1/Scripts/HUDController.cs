@@ -16,6 +16,8 @@ public class HUDController : UdonSharpBehaviour
     public Text HUDText_knots;
     public Text HUDText_knotsairspeed;
     public Text HUDText_angleofattack;
+    public Text HUDText_AAM_ammo;
+    public Text HUDText_AGM_ammo;
     public GameObject HudCrosshairGun;
     public GameObject HudCrosshair;
     public GameObject HudLimit;
@@ -44,6 +46,7 @@ public class HUDController : UdonSharpBehaviour
     public GameObject RStick_funcon5;
     public GameObject RStick_funcon6;
     public GameObject RStick_funcon7;
+    private Animator PlaneAnimator;
     private const float distance_from_head = 1.333f;
     private float maxGs = 0f;
     private Vector3 InputsZeroPos;
@@ -56,6 +59,45 @@ public class HUDController : UdonSharpBehaviour
     const float InputSquareSize = 0.0284317f;
     private void Start()
     {
+        Assert(EngineControl != null, "Start: EngineControl != null");
+        Assert(SmokeColorIndicator != null, "Start: SmokeColorIndicator != null");
+        Assert(HUDText_G != null, "Start: HUDText_G != null");
+        Assert(HUDText_mach != null, "Start: HUDText_mach != null");
+        Assert(HUDText_altitude != null, "Start: HUDText_altitude != null");
+        Assert(HUDText_knotstarget != null, "Start: HUDText_knotstarget != null");
+        Assert(HUDText_knots != null, "Start: HUDText_knots != null");
+        Assert(HUDText_knotsairspeed != null, "Start: HUDText_knotsairspeed != null");
+        Assert(HUDText_angleofattack != null, "Start: HUDText_angleofattack != null");
+        Assert(HudCrosshairGun != null, "Start: HudCrosshairGun != null");
+        Assert(HudCrosshair != null, "Start: HudCrosshair != null");
+        Assert(HudLimit != null, "Start: HudLimit != null");
+        Assert(HudAB != null, "Start: HudAB != null");
+        Assert(DownIndicator != null, "Start: DownIndicator != null");
+        Assert(ElevationIndicator != null, "Start: ElevationIndicator != null");
+        Assert(HeadingIndicator != null, "Start: HeadingIndicator != null");
+        Assert(VelocityIndicator != null, "Start: VelocityIndicator != null");
+        Assert(AAMTargetIndicator != null, "Start: AAMTargetIndicator != null");
+        Assert(LStickDisplayHighlighter != null, "Start: LStickDisplayHighlighter != null");
+        Assert(RStickDisplayHighlighter != null, "Start: RStickDisplayHighlighter != null");
+        Assert(PitchRoll != null, "Start: PitchRoll != null");
+        Assert(Yaw != null, "Start: Yaw != null");
+        Assert(TrimPitch != null, "Start: TrimPitch != null");
+        Assert(TrimYaw != null, "Start: TrimYaw != null");
+        Assert(AGMScreen != null, "Start: AGMScreen != null");
+        Assert(LStick_funcon1 != null, "Start: LStick_funcon1 != null");
+        Assert(LStick_funcon2 != null, "Start: LStick_funcon2 != null");
+        Assert(LStick_funcon3 != null, "Start: LStick_funcon3 != null");
+        Assert(LStick_funcon4 != null, "Start: LStick_funcon4 != null");
+        Assert(LStick_funcon6 != null, "Start: LStick_funcon6 != null");
+        Assert(LStick_funcon7 != null, "Start: LStick_funcon7 != null");
+        Assert(LStick_funcon8 != null, "Start: LStick_funcon8 != null");
+        Assert(RStick_funcon3 != null, "Start: LStick_funcon3 != null");
+        Assert(RStick_funcon4 != null, "Start: LStick_funcon4 != null");
+        Assert(RStick_funcon5 != null, "Start: LStick_funcon5 != null");
+        Assert(RStick_funcon6 != null, "Start: LStick_funcon6 != null");
+        Assert(RStick_funcon7 != null, "Start: LStick_funcon7 != null");
+
+        PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
     }
     private void OnEnable()
@@ -93,11 +135,6 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.RStickSelection == 1)
         {
             HudCrosshairGun.SetActive(true);
-            HudCrosshair.SetActive(false);
-        }
-        else if (EngineControl.RStickSelection == 2 || EngineControl.RStickSelection == 3)
-        {
-            HudCrosshairGun.SetActive(false);
             HudCrosshair.SetActive(false);
         }
         else
@@ -335,5 +372,20 @@ public class HUDController : UdonSharpBehaviour
             check = 0;
         }
         check += Time.deltaTime;
+
+
+        HUDText_AAM_ammo.text = EngineControl.AAMs.ToString("F0");
+        HUDText_AGM_ammo.text = EngineControl.AGMs.ToString("F0");
+
+        PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
+        PlaneAnimator.SetFloat("fuel", EngineControl.Fuel / EngineControl.FullFuel);
+        PlaneAnimator.SetFloat("gunammo", EngineControl.GunAmmoInSeconds / EngineControl.FullGunAmmo);
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }

@@ -13,18 +13,16 @@ public class EffectsController : UdonSharpBehaviour
     public Transform AileronR;
     public Transform Canards;
     public Transform Elevator;
-    public Transform EngineL;
-    public Transform EngineR;
-    public Transform EnginefireL;
-    public Transform EnginefireR;
+    public Transform Engines;
+    public Transform Enginefire;
     public Transform RudderL;
     public Transform RudderR;
-    public Transform SlatsL;
-    public Transform SlatsR;
+    public Transform SlatL;
+    public Transform SlatR;
     public Transform FrontWheel;
     public ParticleSystem DisplaySmoke;
-    private bool vapor;
     [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
+    private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
     private Vector3 PitchLerper = new Vector3(0, 0, 0);
@@ -32,7 +30,7 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 YawLerper = new Vector3(0, 0, 0);
     private Vector3 SlatsLerper = new Vector3(0, 35, 0);
     private Vector3 EngineLerper = new Vector3(0, 0, 0);
-    private Vector3 EnginefireLerper = new Vector3(1, 0.6f, 1);
+    private Vector3 Enginefireerper = new Vector3(1, 0.6f, 1);
     private float AirbrakeLerper;
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] public ParticleSystem.ColorOverLifetimeModule SmokeModule;
@@ -42,17 +40,28 @@ public class EffectsController : UdonSharpBehaviour
     private Color SmokeColorLerper = Color.white;
     private void Start()
     {
-        if (EngineR != null) EngineLerper = new Vector3(0, EngineR.localRotation.eulerAngles.y, EngineR.localRotation.eulerAngles.z);
-        if (EnginefireL != null)
+        Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
+        Assert(EngineControl != null, "Start: EngineControl != null");
+        Assert(JoyStick != null, "Start: JoyStick != null");
+        Assert(AileronL != null, "Start: AileronL != null");
+        Assert(AileronR != null, "Start: AileronR != null");
+        Assert(Canards != null, "Start: Canards != null");
+        Assert(Elevator != null, "Start: Elevator != null");
+        Assert(Engines != null, "Start: Engines != null");
+        Assert(Enginefire != null, "Start: Enginefire != null");
+        Assert(RudderL != null, "Start: RudderL != null");
+        Assert(RudderR != null, "Start: RudderR != null");
+        Assert(SlatL != null, "Start: SlatsL != null");
+        Assert(SlatR != null, "Start: SlatsR != null");
+        Assert(FrontWheel != null, "Start: FrontWheel != null");
+
+        if (Engines != null) EngineLerper = new Vector3(0, Engines.localRotation.eulerAngles.y, Engines.localRotation.eulerAngles.z);
+        if (Enginefire != null)
         {
-            EnginefireLerper = new Vector3(EnginefireL.localScale.x, 0, EnginefireL.localScale.z);
+            Enginefireerper = new Vector3(Enginefire.localScale.x, 0, Enginefire.localScale.z);
         }
-        else if (EnginefireR != null) EnginefireLerper = new Vector3(EnginefireR.localScale.x, 0, EnginefireR.localScale.z);
 
-
-
-
-        if (VehicleMainObj != null) { PlaneAnimator = VehicleMainObj.GetComponent<Animator>(); }
+        PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
         Spawnposition = VehicleMainObj.transform.position;
         Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
         SmokeModule = DisplaySmoke.colorOverLifetime;
@@ -83,11 +92,10 @@ public class EffectsController : UdonSharpBehaviour
         if (DoEffects > 10) { return; }
 
         //if a long way away just skip effects except large vapor effects
-        if (EngineControl.SoundControl != null && EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner) { DoVapor(); return; }//udonsharp doesn't support goto yet, so i'm usnig a function instead
+        if (EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner) { DoVapor(); return; }//udonsharp doesn't support goto yet, so i'm usnig a function instead
 
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
-            PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
             rotationinputs.x = Mathf.Clamp(EngineControl.PitchInput + EngineControl.Trim.x, -1, 1) * 25;
             rotationinputs.y = Mathf.Clamp(EngineControl.YawInput + EngineControl.Trim.y, -1, 1) * 20;
             rotationinputs.z = EngineControl.RollInput * 35;
@@ -106,7 +114,7 @@ public class EffectsController : UdonSharpBehaviour
         SlatsLerper.y = Mathf.Lerp(SlatsLerper.y, Mathf.Max((-EngineControl.Speed * 0.005f) * 35f + 35f, 0f), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
         YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
         EngineLerper.x = Mathf.Lerp(EngineLerper.x, (-rotationinputs.x * .65f), 4.5f * Time.deltaTime);
-        EnginefireLerper.y = Mathf.Lerp(EnginefireLerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
+        Enginefireerper.y = Mathf.Lerp(Enginefireerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
 
         if (EngineControl.Occupied == true)
         {
@@ -119,12 +127,11 @@ public class EffectsController : UdonSharpBehaviour
             {
                 PlaneAnimator.SetBool("gunfiring", false);
             }
-            if (DisplaySmoke != null)
-            {
-                SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
-                var main = DisplaySmoke.main;
-                main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
-            }
+
+            SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
+            var main = DisplaySmoke.main;
+            main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
+
             if (FrontWheel != null)
             {
                 if (EngineControl.Taxiing)
@@ -159,46 +166,28 @@ public class EffectsController : UdonSharpBehaviour
         if (RudderL != null) { RudderL.localRotation = Quaternion.Euler(-YawLerper); }
         if (RudderR != null) { RudderR.localRotation = Quaternion.Euler(YawLerper); }
 
-        if (SlatsL != null) { SlatsL.localRotation = Quaternion.Euler(SlatsLerper); }
-        if (SlatsR != null) { SlatsR.localRotation = Quaternion.Euler(SlatsLerper); }
+        if (SlatL != null) { SlatL.localRotation = Quaternion.Euler(SlatsLerper); }
+        if (SlatR != null) { SlatR.localRotation = Quaternion.Euler(SlatsLerper); }
 
-        if (EngineL != null) { EngineL.localRotation = Quaternion.Euler(EngineLerper); }
-        if (EngineR != null) { EngineR.localRotation = Quaternion.Euler(EngineLerper); }
+        if (Engines != null) { Engines.localRotation = Quaternion.Euler(EngineLerper); }
 
         //engine thrust animation
 
-        if (EnginefireL != null)
+        if (Enginefire != null)
         {
             if (EngineControl.AfterburnerOn)
             {
-                EnginefireL.gameObject.SetActive(true);
-                EnginefireL.localScale = EnginefireLerper;
+                Enginefire.gameObject.SetActive(true);
+                Enginefire.localScale = Enginefireerper;
             }
             else
             {
-                EnginefireL.gameObject.SetActive(true);
-                EnginefireL.localScale = new Vector3(1, 0, 1);
+                Enginefire.gameObject.SetActive(true);
+                Enginefire.localScale = new Vector3(1, 0, 1);
             }
             if (EngineControl.Throttle <= .03f)
             {
-                EnginefireL.gameObject.SetActive(false);
-            }
-        }
-        if (EnginefireR != null)
-        {
-            if (EngineControl.AfterburnerOn)
-            {
-                EnginefireR.gameObject.SetActive(true);
-                EnginefireR.localScale = EnginefireLerper;
-            }
-            else
-            {
-                EnginefireR.gameObject.SetActive(true);
-                EnginefireR.localScale = new Vector3(1, 0, 1);
-            }
-            if (EngineControl.Throttle <= .03f)
-            {
-                EnginefireR.gameObject.SetActive(false);
+                Enginefire.gameObject.SetActive(false);
             }
         }
 
@@ -210,9 +199,8 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("brake", AirbrakeLerper);
         PlaneAnimator.SetBool("canopyopen", EngineControl.CanopyOpen);
         //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
-        PlaneAnimator.SetFloat("fuel", EngineControl.Fuel / EngineControl.FullFuel);
-        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.AAMs / EngineControl.FullAAMs);
-        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.AGMs / EngineControl.FullAGMs);
+        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.AAMs / (float)EngineControl.FullAAMs);
+        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.AGMs / (float)EngineControl.FullAGMs);
         DoVapor();
     }
 
@@ -280,5 +268,12 @@ public class EffectsController : UdonSharpBehaviour
     public void DropFlares()
     {
         PlaneAnimator.SetTrigger("flares");
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }

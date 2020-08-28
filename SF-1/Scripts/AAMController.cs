@@ -22,6 +22,9 @@ public class AAMController : UdonSharpBehaviour
     private bool TargetIsPlane = false;
     void Start()
     {
+        Assert(EngineControl != null, "Start: EngineControl != null");
+
+
         if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
         {
             TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
@@ -106,6 +109,13 @@ public class AAMController : UdonSharpBehaviour
                 else AGMani.SetTrigger("explode");
             }
             Lifetime = 30;//10 seconds to finish exploding
+        }
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

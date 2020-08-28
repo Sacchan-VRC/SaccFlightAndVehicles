@@ -11,7 +11,14 @@ public class PilotSeat : UdonSharpBehaviour
     public GameObject Gun_pilot;
     public Transform PlaneMesh;
     public GameObject SeatAdjuster;
-    public GameObject EnableOther;
+    private void Start()
+    {
+        Assert(EngineControl != null, "Start: EngineControl != null");
+        Assert(LeaveButton != null, "Start: LeaveButton != null");
+        Assert(Gun_pilot != null, "Start: Gun_pilot != null");
+        Assert(PlaneMesh != null, "Start: PlaneMesh != null");
+        Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
+    }
     private void Interact()//entering the plane
     {
         if (EngineControl.VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.VehicleMainObj); }
@@ -38,7 +45,6 @@ public class PilotSeat : UdonSharpBehaviour
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        if (EnableOther != null) { EnableOther.SetActive(true); }
         if (EngineControl.localPlayer != null) { EngineControl.localPlayer.UseAttachedStation(); }
         if (EngineControl.EffectsControl != null || EngineControl.SoundControl != null) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "WakeUp"); }
         if (PlaneMesh != null)
@@ -88,7 +94,6 @@ public class PilotSeat : UdonSharpBehaviour
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
-        if (EnableOther != null) { EnableOther.SetActive(false); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
         //set plane's layer back
         if (PlaneMesh != null)
@@ -104,5 +109,12 @@ public class PilotSeat : UdonSharpBehaviour
     {
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.DoEffects = 0f; }
         if (EngineControl.SoundControl != null) { EngineControl.SoundControl.DoSound = 0f; }
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }

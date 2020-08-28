@@ -8,6 +8,11 @@ public class LeaveAAGunButton : UdonSharpBehaviour
 {
     public AAGunController AAGunControl;
     public VRCStation Seat;
+    private void Start()
+    {
+        Assert(AAGunControl != null, "Start: AAGunControl != null");
+        Assert(Seat != null, "Start: Seat != null");
+    }
     public void Interact()
     {
         ExitStation();
@@ -24,5 +29,12 @@ public class LeaveAAGunButton : UdonSharpBehaviour
     public void ExitStation()
     {
         if (Seat != null) { Seat.ExitStation(AAGunControl.localPlayer); }
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }

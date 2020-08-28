@@ -8,7 +8,6 @@ public class AAGunController : UdonSharpBehaviour
 {
     public GameObject Rotator;
     public GameObject VehicleMainObj;
-    private Animator AAGunAnimator;
     public VRCStation AAGunSeatStation;
     public Camera AACam;
     public float TurnSpeedMulti = 10;
@@ -17,6 +16,7 @@ public class AAGunController : UdonSharpBehaviour
     public float ZoomFov = .1f;
     public float ZoomOutFov = 110f;
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
+    private Animator AAGunAnimator;
     [System.NonSerializedAttribute] [HideInInspector] public bool dead;
     private float RstickH;
     private float LstickV;
@@ -25,13 +25,18 @@ public class AAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float FullHealth;
     [System.NonSerializedAttribute] [HideInInspector] public bool Manning;//like Piloting in the plane
     [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
-    public float InputXLerper = 0f;
-    public float InputYLerper = 0f;
+    [System.NonSerializedAttribute] [HideInInspector] public float InputXLerper = 0f;
+    [System.NonSerializedAttribute] [HideInInspector] public float InputYLerper = 0f;
     private Vector3 StartRot;
     private float RstickV;
     private float ZoomLevel;
     void Start()
     {
+        Assert(Rotator != null, "Start: Rotator != null");
+        Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
+        Assert(AAGunSeatStation != null, "Start: AAGunSeatStation != null");
+        Assert(AACam != null, "Start: AACam != null");
+
         if (VehicleMainObj != null) { AAGunAnimator = VehicleMainObj.GetComponent<Animator>(); }
         FullHealth = Health;
         localPlayer = Networking.LocalPlayer;
@@ -143,6 +148,13 @@ public class AAGunController : UdonSharpBehaviour
         if (localPlayer.IsOwner(VehicleMainObj))
         {
             Rotator.transform.localRotation = Quaternion.Euler(StartRot);
+        }
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

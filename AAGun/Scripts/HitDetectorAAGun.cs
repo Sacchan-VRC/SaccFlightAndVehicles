@@ -8,6 +8,11 @@ public class HitDetectorAAGun : UdonSharpBehaviour
 {
     public AAGunController AAGunControl;
     public AudioSource BulletHit;
+    private void Start()
+    {
+        Assert(AAGunControl != null, "Start: AAGunControl != null");
+        Assert(BulletHit != null, "Start: BulletHit != null");
+    }
     void OnParticleCollision(GameObject other)
     {
         if (other == null || AAGunControl.dead) return;//avatars can't shoot you, and you can't take hits when you're dead
@@ -39,6 +44,13 @@ public class HitDetectorAAGun : UdonSharpBehaviour
         if (AAGunControl.localPlayer == null || AAGunControl.localPlayer.IsOwner(AAGunControl.gameObject))
         {
             AAGunControl.Health = AAGunControl.FullHealth;
+        }
+    }
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }
