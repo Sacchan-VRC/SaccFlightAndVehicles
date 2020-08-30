@@ -258,7 +258,7 @@ public class HUDController : UdonSharpBehaviour
 
 
         //AB
-        if (EngineControl.AfterburnerOn) { HudAB.SetActive(true); }
+        if (EngineControl.EffectsControl.AfterburnerOn) { HudAB.SetActive(true); }
         else { HudAB.SetActive(false); }
 
         //Cruise Control target knots
@@ -278,16 +278,16 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.CatapultStatus == 1) { LStick_funcon3.SetActive(true); }
         else { LStick_funcon3.SetActive(false); }
 
-        if (EngineControl.HookDown) { LStick_funcon4.SetActive(true); }
+        if (EngineControl.EffectsControl.HookDown) { LStick_funcon4.SetActive(true); }
         else { LStick_funcon4.SetActive(false); }
 
         if (EngineControl.Trim.x != 0) { LStick_funcon6.SetActive(true); }
         else { LStick_funcon6.SetActive(false); }
 
-        if (EngineControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
+        if (EngineControl.EffectsControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
         else { LStick_funcon7.SetActive(false); }
 
-        if (EngineControl.AfterburnerOn) { LStick_funcon8.SetActive(true); }
+        if (EngineControl.EffectsControl.AfterburnerOn) { LStick_funcon8.SetActive(true); }
         else { LStick_funcon8.SetActive(false); }
 
 
@@ -298,18 +298,18 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.LevelFlight) { RStick_funcon4.SetActive(true); }
         else { RStick_funcon4.SetActive(false); }
 
-        if (!EngineControl.GearUp) { RStick_funcon5.SetActive(true); }
+        if (!EngineControl.EffectsControl.GearUp) { RStick_funcon5.SetActive(true); }
         else { RStick_funcon5.SetActive(false); }
 
-        if (EngineControl.Flaps) { RStick_funcon6.SetActive(true); }
+        if (EngineControl.EffectsControl.Flaps) { RStick_funcon6.SetActive(true); }
         else { RStick_funcon6.SetActive(false); }
 
-        if (EngineControl.Smoking) { RStick_funcon7.SetActive(true); }
+        if (EngineControl.EffectsControl.Smoking) { RStick_funcon7.SetActive(true); }
         else { RStick_funcon7.SetActive(false); }
 
         //play menu sound if selection changed since last frame
         float MenuSoundCheck = EngineControl.RStickSelection + EngineControl.LStickSelection;
-        if (MenuSoundCheck != MenuSoundCheckLast)
+        if (!EngineControl.SoundControl.MenuSelectNull && MenuSoundCheck != MenuSoundCheckLast)
         {
             EngineControl.SoundControl.MenuSelect.Play();
         }
@@ -326,8 +326,18 @@ public class HUDController : UdonSharpBehaviour
                 Physics.Raycast(EngineControl.AGMCam.transform.position, EngineControl.AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
                 if (camhit.point != null)
                 {
-                    //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                    EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, 2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f, 90);
+                    //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
+                    float newzoom = 0;
+                    //zooming in is slower than zooming out
+                    if (EngineControl.AGMRotDif < .2f)
+                    {
+                        newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
+                    }
+                    else
+                    {
+                        newzoom = 80;
+                    }
+                    EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, newzoom, 1.5f * Time.deltaTime), 0.3f, 90);
                 }
             }
         }
@@ -374,8 +384,8 @@ public class HUDController : UdonSharpBehaviour
         check += Time.deltaTime;
 
 
-        HUDText_AAM_ammo.text = EngineControl.AAMs.ToString("F0");
-        HUDText_AGM_ammo.text = EngineControl.AGMs.ToString("F0");
+        HUDText_AAM_ammo.text = EngineControl.NumAAM.ToString("F0");
+        HUDText_AGM_ammo.text = EngineControl.NumAGM.ToString("F0");
 
         PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
         PlaneAnimator.SetFloat("fuel", EngineControl.Fuel / EngineControl.FullFuel);

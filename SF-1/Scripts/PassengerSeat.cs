@@ -24,7 +24,7 @@ public class PassengerSeat : UdonSharpBehaviour
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
         if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(true); }
-        if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;
+        if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;
         else EngineControl.CanopyCloseTimer = -1;
         EngineControl.localPlayer.UseAttachedStation();
         if (PlaneMesh != null)
