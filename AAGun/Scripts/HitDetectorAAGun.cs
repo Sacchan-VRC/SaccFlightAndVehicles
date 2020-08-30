@@ -7,11 +7,11 @@ using VRC.Udon;
 public class HitDetectorAAGun : UdonSharpBehaviour
 {
     public AAGunController AAGunControl;
-    public AudioSource BulletHit;
+    public AudioSource[] BulletHit;
     private void Start()
     {
         Assert(AAGunControl != null, "Start: AAGunControl != null");
-        Assert(BulletHit != null, "Start: BulletHit != null");
+        Assert(BulletHit[0] != null, "Start: BulletHit[0] != null");
     }
     void OnParticleCollision(GameObject other)
     {
@@ -34,8 +34,9 @@ public class HitDetectorAAGun : UdonSharpBehaviour
         }
         if (BulletHit != null)
         {
-            BulletHit.pitch = Random.Range(.8f, 1.2f);
-            BulletHit.Play();
+            int rand = Random.Range(0, BulletHit.Length);
+            BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
+            BulletHit[rand].Play();
         }
     }
     public void respawn()

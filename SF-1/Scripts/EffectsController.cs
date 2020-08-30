@@ -21,7 +21,38 @@ public class EffectsController : UdonSharpBehaviour
     public Transform SlatR;
     public Transform FrontWheel;
     public ParticleSystem DisplaySmoke;
+
+
+
+    private bool VehicleMainObjNull = true;
+    private bool EngineControlNull = true;
+    private bool JoyStickNull = true;
+    private bool AileronLNull = true;
+    private bool AileronRNull = true;
+    private bool CanardsNull = true;
+    private bool ElevatorNull = true;
+    private bool EnginesNull = true;
+    private bool EnginefireNull = true;
+    private bool RudderLNull = true;
+    private bool RudderRNull = true;
+    private bool SlatLNull = true;
+    private bool SlatRNull = true;
+    private bool FrontWheelNull = true;
+    private bool DisplaySmokeNull = true;
+
+
+
+    //best to remove synced variables if you aren't using them
+    //moved some here from enginecontroller because there's a limit per-udonbehaviour
     [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool AfterburnerOn;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool CanopyOpen = true;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool GearUp = false;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Flaps = true;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool HookDown = false;
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
+
+
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
@@ -42,7 +73,8 @@ public class EffectsController : UdonSharpBehaviour
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
         Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(JoyStick != null, "Start: JoyStick != null");
+        //should work withouth these
+        /* Assert(JoyStick != null, "Start: JoyStick != null");
         Assert(AileronL != null, "Start: AileronL != null");
         Assert(AileronR != null, "Start: AileronR != null");
         Assert(Canards != null, "Start: Canards != null");
@@ -53,10 +85,30 @@ public class EffectsController : UdonSharpBehaviour
         Assert(RudderR != null, "Start: RudderR != null");
         Assert(SlatL != null, "Start: SlatsL != null");
         Assert(SlatR != null, "Start: SlatsR != null");
-        Assert(FrontWheel != null, "Start: FrontWheel != null");
+        Assert(FrontWheel != null, "Start: FrontWheel != null"); */
 
-        if (Engines != null) EngineLerper = new Vector3(0, Engines.localRotation.eulerAngles.y, Engines.localRotation.eulerAngles.z);
-        if (Enginefire != null)
+
+
+        if (VehicleMainObj != null) VehicleMainObjNull = false;
+        if (EngineControl != null) EngineControlNull = false;
+        if (JoyStick != null) JoyStickNull = false;
+        if (AileronL != null) AileronLNull = false;
+        if (AileronR != null) AileronRNull = false;
+        if (Canards != null) CanardsNull = false;
+        if (Elevator != null) ElevatorNull = false;
+        if (Engines != null) EnginesNull = false;
+        if (Enginefire != null) EnginefireNull = false;
+        if (RudderL != null) RudderLNull = false;
+        if (RudderR != null) RudderRNull = false;
+        if (SlatL != null) SlatLNull = false;
+        if (SlatR != null) SlatRNull = false;
+        if (FrontWheel != null) FrontWheelNull = false;
+        if (DisplaySmoke != null) DisplaySmokeNull = false;
+
+
+
+        if (!EnginesNull) EngineLerper = new Vector3(0, Engines.localRotation.eulerAngles.y, Engines.localRotation.eulerAngles.z);
+        if (!EnginefireNull)
         {
             Enginefireerper = new Vector3(Enginefire.localScale.x, 0, Enginefire.localScale.z);
         }
@@ -101,7 +153,7 @@ public class EffectsController : UdonSharpBehaviour
             rotationinputs.z = EngineControl.RollInput * 35;
 
             //joystick movement
-            if (JoyStick != null)
+            if (!JoyStickNull)
             {
                 Vector3 tempjoy = new Vector3(EngineControl.PitchInput * 35f, EngineControl.YawInput * 35, EngineControl.RollInput * 35f);
                 JoyStick.localRotation = Quaternion.Euler(tempjoy);
@@ -128,11 +180,14 @@ public class EffectsController : UdonSharpBehaviour
                 PlaneAnimator.SetBool("gunfiring", false);
             }
 
-            SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
-            var main = DisplaySmoke.main;
-            main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
+            if (!DisplaySmokeNull)
+            {
+                SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
+                var main = DisplaySmoke.main;
+                main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
+            }
 
-            if (FrontWheel != null)
+            if (!FrontWheelNull)
             {
                 if (EngineControl.Taxiing)
                 {
@@ -143,13 +198,13 @@ public class EffectsController : UdonSharpBehaviour
         }
         else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
 
-        if (EngineControl.Flaps) { PlaneAnimator.SetBool("flaps", true); }
+        if (Flaps) { PlaneAnimator.SetBool("flaps", true); }
         else { PlaneAnimator.SetBool("flaps", false); }
 
-        if (EngineControl.GearUp) { PlaneAnimator.SetBool("gearup", true); }
+        if (GearUp) { PlaneAnimator.SetBool("gearup", true); }
         else { PlaneAnimator.SetBool("gearup", false); }
 
-        if (EngineControl.HookDown) { PlaneAnimator.SetBool("hookdown", true); }
+        if (HookDown) { PlaneAnimator.SetBool("hookdown", true); }
         else { PlaneAnimator.SetBool("hookdown", false); }
 
 
@@ -157,25 +212,25 @@ public class EffectsController : UdonSharpBehaviour
         rotationinputs.y == yaw
         rotationinputs.z == roll
         rotating the control surfaces based on inputs */
-        if (AileronL != null) { AileronL.localRotation = Quaternion.Euler(AileronLerper); }
-        if (AileronR != null) { AileronR.localRotation = Quaternion.Euler(-AileronLerper); }
+        if (!AileronLNull) { AileronL.localRotation = Quaternion.Euler(AileronLerper); }
+        if (!AileronRNull) { AileronR.localRotation = Quaternion.Euler(-AileronLerper); }
 
-        if (Elevator != null) { Elevator.localRotation = Quaternion.Euler(-PitchLerper); }
-        if (Canards != null) { Canards.localRotation = Quaternion.Euler(PitchLerper * .5f); }
+        if (!ElevatorNull) { Elevator.localRotation = Quaternion.Euler(-PitchLerper); }
+        if (!CanardsNull) { Canards.localRotation = Quaternion.Euler(PitchLerper * .5f); }
 
-        if (RudderL != null) { RudderL.localRotation = Quaternion.Euler(-YawLerper); }
-        if (RudderR != null) { RudderR.localRotation = Quaternion.Euler(YawLerper); }
+        if (!RudderLNull) { RudderL.localRotation = Quaternion.Euler(-YawLerper); }
+        if (!RudderRNull) { RudderR.localRotation = Quaternion.Euler(YawLerper); }
 
-        if (SlatL != null) { SlatL.localRotation = Quaternion.Euler(SlatsLerper); }
-        if (SlatR != null) { SlatR.localRotation = Quaternion.Euler(SlatsLerper); }
+        if (!SlatLNull) { SlatL.localRotation = Quaternion.Euler(SlatsLerper); }
+        if (!SlatRNull) { SlatR.localRotation = Quaternion.Euler(SlatsLerper); }
 
-        if (Engines != null) { Engines.localRotation = Quaternion.Euler(EngineLerper); }
+        if (!EnginesNull) { Engines.localRotation = Quaternion.Euler(EngineLerper); }
 
         //engine thrust animation
 
-        if (Enginefire != null)
+        if (!EnginefireNull)
         {
-            if (EngineControl.AfterburnerOn)
+            if (AfterburnerOn)
             {
                 Enginefire.gameObject.SetActive(true);
                 Enginefire.localScale = Enginefireerper;
@@ -193,14 +248,14 @@ public class EffectsController : UdonSharpBehaviour
 
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.AirBrakeInput, 5f * Time.deltaTime);
 
-        PlaneAnimator.SetBool("displaysmoke", (EngineControl.Smoking && EngineControl.Occupied) ? true : false);
+        PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
         PlaneAnimator.SetFloat("brake", AirbrakeLerper);
-        PlaneAnimator.SetBool("canopyopen", EngineControl.CanopyOpen);
+        PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
-        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.AAMs / (float)EngineControl.FullAAMs);
-        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.AGMs / (float)EngineControl.FullAGMs);
+        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM / (float)EngineControl.FullAAMs);
+        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM / (float)EngineControl.FullAGMs);
         DoVapor();
     }
 
@@ -225,22 +280,28 @@ public class EffectsController : UdonSharpBehaviour
         DoEffects = 0f; //keep awake
 
         EngineControl.dead = true;
-        EngineControl.GearUp = false;
-        EngineControl.HookDown = false;
+        GearUp = false;
+        HookDown = false;
         EngineControl.AirBrakeInput = 0;
         EngineControl.FlightLimitsEnabled = true;
-        EngineControl.CanopyOpen = false;
+        CanopyOpen = false;
         EngineControl.Cruise = false;
         EngineControl.Trim = Vector2.zero;
-        EngineControl.CanopyOpen = true;
+        CanopyOpen = true;
         EngineControl.CanopyCloseTimer = -100001;
         EngineControl.AAMLaunchOpositeSide = false;
         EngineControl.AGMLaunchOpositeSide = false;
+        EngineControl.NumAAM = EngineControl.FullAAMs;
+        EngineControl.NumAGM = EngineControl.FullAGMs;
+        EngineControl.GunAmmoInSeconds = EngineControl.FullGunAmmo;
+        EngineControl.Fuel = EngineControl.FullFuel;
+
         //play sonic boom if it was going to play before it exploded
         if (EngineControl.SoundControl.playsonicboom && EngineControl.SoundControl.silent)
         {
-            EngineControl.SoundControl.SonicBoom.pitch = Random.Range(.94f, 1.2f);
-            EngineControl.SoundControl.SonicBoom.PlayDelayed((EngineControl.SoundControl.SonicBoomDistance - EngineControl.SoundControl.SonicBoomWave) / 343);
+            int rand = Random.Range(0, EngineControl.SoundControl.SonicBoom.Length);
+            EngineControl.SoundControl.SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
+            EngineControl.SoundControl.SonicBoom[rand].PlayDelayed((EngineControl.SoundControl.SonicBoomDistance - EngineControl.SoundControl.SonicBoomWave) / 343);
         }
         EngineControl.SoundControl.playsonicboom = false;
         EngineControl.SoundControl.silent = false;
@@ -253,8 +314,11 @@ public class EffectsController : UdonSharpBehaviour
         }
 
         //pilot and passenger are dropped out of the plane
-        if (EngineControl.SoundControl != null && EngineControl.SoundControl.Explosion != null)
-            EngineControl.SoundControl.Explosion.PlayDelayed(EngineControl.SoundControl.ThisFrameDist / 343);//explosion sound has travel time
+        if (EngineControl.SoundControl != null && !EngineControl.SoundControl.ExplosionNull)
+        {
+            int rand = Random.Range(0, EngineControl.SoundControl.Explosion.Length);
+            EngineControl.SoundControl.Explosion[rand].Play();//explosion sound has travel time
+        }
 
         if ((EngineControl.Piloting || EngineControl.Passenger) && !EngineControl.InEditor)
         {

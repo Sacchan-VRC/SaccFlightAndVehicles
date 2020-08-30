@@ -31,14 +31,11 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.Health -= 10;
         }
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.DoEffects = 0f; }
-        if (EngineControl.SoundControl != null)
+        if (EngineControl.SoundControl != null && !EngineControl.SoundControl.BulletHitNull)
         {
-            EngineControl.SoundControl.DoSound = 0f;
-            if (EngineControl.SoundControl.BulletHit != null)
-            {
-                EngineControl.SoundControl.BulletHit.pitch = Random.Range(.8f, 1.2f);
-                EngineControl.SoundControl.BulletHit.Play();
-            }
+            int rand = Random.Range(0, EngineControl.SoundControl.BulletHit.Length);
+            EngineControl.SoundControl.BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
+            EngineControl.SoundControl.BulletHit[rand].Play();
         }
     }
     public void Respawn()//called by the explode animation on last frame
@@ -62,16 +59,16 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.EffectsControl.Spawnrotation);
             EngineControl.VehicleMainObj.transform.position = EngineControl.EffectsControl.Spawnposition;
             EngineControl.Health = EngineControl.FullHealth;
-            EngineControl.GearUp = false;
-            EngineControl.Flaps = true;
+            EngineControl.EffectsControl.GearUp = false;
+            EngineControl.EffectsControl.Flaps = true;
         }
         else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
         {
             EngineControl.Health = EngineControl.FullHealth;
             //this should respawn it in VRC, doesn't work in editor
             EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
-            EngineControl.GearUp = false;
-            EngineControl.Flaps = true;
+            EngineControl.EffectsControl.GearUp = false;
+            EngineControl.EffectsControl.Flaps = true;
         }
     }
     public void NotDead()//called by 'respawn' animation 5s in

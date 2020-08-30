@@ -27,14 +27,14 @@ public class PilotSeat : UdonSharpBehaviour
         {
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
             EngineControl.Piloting = true;
-            if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;//has to be less than -100000
+            if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;//has to be less than -100000
             else EngineControl.CanopyCloseTimer = -1;//less than 0
             if (EngineControl.dead) EngineControl.Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
         }
         if (EngineControl.EffectsControl != null)
         {
             EngineControl.IsFiringGun = false;
-            EngineControl.Smoking = false;
+            EngineControl.EffectsControl.Smoking = false;
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
         }
@@ -90,7 +90,7 @@ public class PilotSeat : UdonSharpBehaviour
         if (EngineControl.EffectsControl != null)
         {
             EngineControl.IsFiringGun = false;
-            EngineControl.Smoking = false;
+            EngineControl.EffectsControl.Smoking = false;
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }

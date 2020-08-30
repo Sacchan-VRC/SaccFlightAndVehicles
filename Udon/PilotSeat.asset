@@ -113,8 +113,9 @@ MonoBehaviour:
     null\n    __3_intnl_HUDController: %VRCUdonUdonBehaviour, null\n    __3_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
     %VRCUdonUdonBehaviour, null\n    __4_intnl_EffectsController: %VRCUdonUdonBehaviour,
     null\n    __4_intnl_HUDController: %VRCUdonUdonBehaviour, null\n    __4_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
-    %VRCUdonUdonBehaviour, null\n    __5_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
-    %VRCUdonUdonBehaviour, null\n    __6_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
+    %VRCUdonUdonBehaviour, null\n    __5_intnl_EffectsController: %VRCUdonUdonBehaviour,
+    null\n    __5_intnl_VRCUdonCommonInterfacesIUdonEventReceiver: %VRCUdonUdonBehaviour,
+    null\n    __6_intnl_EffectsController: %VRCUdonUdonBehaviour, null\n    __6_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
     %VRCUdonUdonBehaviour, null\n    __7_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
     %VRCUdonUdonBehaviour, null\n    __8_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
     %VRCUdonUdonBehaviour, null\n    __9_intnl_VRCUdonCommonInterfacesIUdonEventReceiver:
@@ -140,27 +141,27 @@ MonoBehaviour:
     \       EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __0_const_intnl_SystemString\n        PUSH, __0_message_String\n
     \       COPY\n        PUSH, __0_const_intnl_exitJumpLoc_UInt32\n        JUMP,
-    0x0000166C\n        \n         # Assert(LeaveButton != null, \"Start: LeaveButton
+    0x00001708\n        \n         # Assert(LeaveButton != null, \"Start: LeaveButton
     != null\");\n        PUSH, LeaveButton\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __0_condition_Boolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __1_const_intnl_SystemString\n        PUSH, __0_message_String\n
     \       COPY\n        PUSH, __1_const_intnl_exitJumpLoc_UInt32\n        JUMP,
-    0x0000166C\n        \n         # Assert(Gun_pilot != null, \"Start: Gun_pilot
+    0x00001708\n        \n         # Assert(Gun_pilot != null, \"Start: Gun_pilot
     != null\");\n        PUSH, Gun_pilot\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __0_condition_Boolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __2_const_intnl_SystemString\n        PUSH, __0_message_String\n
     \       COPY\n        PUSH, __2_const_intnl_exitJumpLoc_UInt32\n        JUMP,
-    0x0000166C\n        \n         # Assert(PlaneMesh != null, \"Start: PlaneMesh
+    0x00001708\n        \n         # Assert(PlaneMesh != null, \"Start: PlaneMesh
     != null\");\n        PUSH, PlaneMesh\n        PUSH, __0_const_intnl_UnityEngineTransform\n
     \       PUSH, __0_condition_Boolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __3_const_intnl_SystemString\n        PUSH, __0_message_String\n
     \       COPY\n        PUSH, __3_const_intnl_exitJumpLoc_UInt32\n        JUMP,
-    0x0000166C\n        \n         # Assert(SeatAdjuster != null, \"Start: SeatAdjuster
+    0x00001708\n        \n         # Assert(SeatAdjuster != null, \"Start: SeatAdjuster
     != null\");\n        PUSH, SeatAdjuster\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __0_condition_Boolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __4_const_intnl_SystemString\n        PUSH, __0_message_String\n
     \       COPY\n        PUSH, __4_const_intnl_exitJumpLoc_UInt32\n        JUMP,
-    0x0000166C\n        PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
+    0x00001708\n        PUSH, __0_intnl_returnTarget_UInt32 #Function epilogue\n        COPY\n
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n        \n         #
     private void Interact()//entering the plane\n    .export _interact\n        \n
     \   _interact:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n        \n
@@ -188,7 +189,7 @@ MonoBehaviour:
     \       \n         # if (EngineControl != null)\n        PUSH, EngineControl\n
     \       PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n        PUSH,
     __2_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000004C8\n        \n
+    \       PUSH, __2_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000004FC\n        \n
     \        # {\n        \n         # Networking.SetOwner(EngineControl.localPlayer,
     EngineControl.gameObject);\n        PUSH, EngineControl\n        PUSH, __6_const_intnl_SystemString\n
     \       PUSH, __1_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
@@ -200,55 +201,61 @@ MonoBehaviour:
     \       \n         # EngineControl.Piloting = true;\n        PUSH, EngineControl\n
     \       PUSH, __7_const_intnl_SystemString\n        PUSH, __0_const_intnl_SystemBoolean\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       \n         # if (EngineControl.CanopyOpen) EngineControl.CanopyCloseTimer
+    \       \n         # if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer
     = -100001;//has to be less than -100000\n        PUSH, EngineControl\n        PUSH,
     __8_const_intnl_SystemString\n        PUSH, __2_intnl_SystemObject\n        EXTERN,
     \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __2_intnl_SystemObject\n        PUSH, __4_intnl_SystemBoolean\n
+    \       PUSH, __2_intnl_SystemObject\n        PUSH, __0_intnl_EffectsController\n
+    \       COPY\n        PUSH, __0_intnl_EffectsController\n        PUSH, __9_const_intnl_SystemString\n
+    \       PUSH, __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __3_intnl_SystemObject\n        PUSH, __4_intnl_SystemBoolean\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
-    __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000003F8\n        PUSH, __0_const_intnl_SystemInt32\n
+    __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000042C\n        PUSH, __0_const_intnl_SystemInt32\n
     \       PUSH, __0_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n
     \       PUSH, __0_intnl_SystemInt32\n        PUSH, __0_intnl_SystemSingle\n        EXTERN,
     \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n        PUSH, EngineControl\n
-    \       PUSH, __9_const_intnl_SystemString\n        PUSH, __0_intnl_SystemSingle\n
+    \       PUSH, __10_const_intnl_SystemString\n        PUSH, __0_intnl_SystemSingle\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       JUMP, 0x00000448\n        \n         # else EngineControl.CanopyCloseTimer
+    \       JUMP, 0x0000047C\n        \n         # else EngineControl.CanopyCloseTimer
     = -1;//less than 0\n        PUSH, __1_const_intnl_SystemInt32\n        PUSH, __1_intnl_SystemInt32\n
     \       EXTERN, \"SystemInt32.__op_UnaryMinus__SystemInt32__SystemInt32\"\n        PUSH,
     __1_intnl_SystemInt32\n        PUSH, __1_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, EngineControl\n        PUSH, __9_const_intnl_SystemString\n        PUSH,
+    \       PUSH, EngineControl\n        PUSH, __10_const_intnl_SystemString\n        PUSH,
     __1_intnl_SystemSingle\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
     \       \n         # if (EngineControl.dead) EngineControl.Health = 100;//dead
     is true for the first 5 seconds after spawn, this might help with spontaneous
-    explosions\n        PUSH, EngineControl\n        PUSH, __10_const_intnl_SystemString\n
-    \       PUSH, __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __3_intnl_SystemObject\n        PUSH, __6_intnl_SystemBoolean\n
+    explosions\n        PUSH, EngineControl\n        PUSH, __11_const_intnl_SystemString\n
+    \       PUSH, __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __4_intnl_SystemObject\n        PUSH, __6_intnl_SystemBoolean\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
-    __6_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000004C8\n        PUSH, __2_const_intnl_SystemInt32\n
+    __6_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000004FC\n        PUSH, __2_const_intnl_SystemInt32\n
     \       PUSH, __2_intnl_SystemSingle\n        EXTERN, \"SystemConvert.__ToSingle__SystemInt32__SystemSingle\"\n
-    \       PUSH, EngineControl\n        PUSH, __11_const_intnl_SystemString\n        PUSH,
+    \       PUSH, EngineControl\n        PUSH, __12_const_intnl_SystemString\n        PUSH,
     __2_intnl_SystemSingle\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
     \       \n         # if (EngineControl.EffectsControl != null)\n        PUSH,
-    EngineControl\n        PUSH, __12_const_intnl_SystemString\n        PUSH, __1_intnl_SystemObject\n
+    EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH, __1_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __1_intnl_SystemObject\n        PUSH, __0_intnl_EffectsController\n
     \       COPY\n        PUSH, __0_intnl_EffectsController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __3_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __3_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000624\n        \n
+    \       PUSH, __3_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000068C\n        \n
     \        # {\n        \n         # EngineControl.IsFiringGun = false;\n        PUSH,
     EngineControl\n        PUSH, __13_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       \n         # EngineControl.Smoking = false;\n        PUSH, EngineControl\n
-    \       PUSH, __14_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
-    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # EngineControl.EffectsControl.Smoking = false;\n        PUSH,
+    EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH, __2_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __2_intnl_SystemObject\n        PUSH, __1_intnl_EffectsController\n
+    \       COPY\n        PUSH, __1_intnl_EffectsController\n        PUSH, __14_const_intnl_SystemString\n
+    \       PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
     \       \n         # Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);\n
     \       PUSH, EngineControl\n        PUSH, __6_const_intnl_SystemString\n        PUSH,
-    __2_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __2_intnl_SystemObject\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n
-    \       COPY\n        PUSH, EngineControl\n        PUSH, __12_const_intnl_SystemString\n
-    \       PUSH, __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __3_intnl_SystemObject\n        PUSH, __1_intnl_EffectsController\n
-    \       COPY\n        PUSH, __1_intnl_EffectsController\n        PUSH, __2_intnl_UnityEngineGameObject\n
+    __3_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __3_intnl_SystemObject\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n
+    \       COPY\n        PUSH, EngineControl\n        PUSH, __8_const_intnl_SystemString\n
+    \       PUSH, __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __4_intnl_SystemObject\n        PUSH, __2_intnl_EffectsController\n
+    \       COPY\n        PUSH, __2_intnl_EffectsController\n        PUSH, __2_intnl_UnityEngineGameObject\n
     \       EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n
     \       PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __2_intnl_UnityEngineGameObject\n
     \       EXTERN, \"VRCSDKBaseNetworking.__SetOwner__VRCSDKBaseVRCPlayerApi_UnityEngineGameObject__SystemVoid\"\n
@@ -261,7 +268,7 @@ MonoBehaviour:
     \       PUSH, __2_intnl_SystemObject\n        PUSH, __0_intnl_HUDController\n
     \       COPY\n        PUSH, __0_intnl_HUDController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __4_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000784\n        \n
+    \       PUSH, __4_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000007EC\n        \n
     \        # {\n        \n         # Networking.SetOwner(EngineControl.localPlayer,
     EngineControl.HUDControl.gameObject);\n        PUSH, EngineControl\n        PUSH,
     __6_const_intnl_SystemString\n        PUSH, __3_intnl_SystemObject\n        EXTERN,
@@ -285,12 +292,12 @@ MonoBehaviour:
     \       \n         # if (Gun_pilot != null) { Gun_pilot.SetActive(true); }\n        PUSH,
     Gun_pilot\n        PUSH, __0_const_intnl_UnityEngineGameObject\n        PUSH,
     __5_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __5_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000007CC\n        PUSH,
+    \       PUSH, __5_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000834\n        PUSH,
     Gun_pilot\n        PUSH, __0_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
     \       \n         # if (SeatAdjuster != null) { SeatAdjuster.SetActive(true);
     }\n        PUSH, SeatAdjuster\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __6_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __6_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000814\n        PUSH,
+    \       PUSH, __6_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000087C\n        PUSH,
     SeatAdjuster\n        PUSH, __0_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
     \       \n         # if (EngineControl.localPlayer != null) { EngineControl.localPlayer.UseAttachedStation();
     }\n        PUSH, EngineControl\n        PUSH, __6_const_intnl_SystemString\n        PUSH,
@@ -298,7 +305,7 @@ MonoBehaviour:
     \       PUSH, __3_intnl_SystemObject\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n
     \       COPY\n        PUSH, __1_intnl_VRCSDKBaseVRCPlayerApi\n        PUSH, __0_const_intnl_VRCSDKBaseVRCPlayerApi\n
     \       PUSH, __7_intnl_SystemBoolean\n        EXTERN, \"SystemObject.__op_Inequality__SystemObject_SystemObject__SystemBoolean\"\n
-    \       PUSH, __7_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000008BC\n        PUSH,
+    \       PUSH, __7_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000924\n        PUSH,
     EngineControl\n        PUSH, __6_const_intnl_SystemString\n        PUSH, __4_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __4_intnl_SystemObject\n        PUSH, __3_intnl_VRCSDKBaseVRCPlayerApi\n
@@ -306,15 +313,15 @@ MonoBehaviour:
     \"VRCSDKBaseVRCPlayerApi.__UseAttachedStation__SystemVoid\"\n        \n         #
     if (EngineControl.EffectsControl != null || EngineControl.SoundControl != null)
     { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, \"WakeUp\");
-    }\n        PUSH, EngineControl\n        PUSH, __12_const_intnl_SystemString\n
-    \       PUSH, __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    }\n        PUSH, EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH,
+    __4_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __4_intnl_SystemObject\n        PUSH, __1_intnl_EffectsController\n
     \       COPY\n        PUSH, __1_intnl_EffectsController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __9_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
     \       PUSH, __9_intnl_SystemBoolean\n        PUSH, __8_intnl_SystemBoolean\n
     \       COPY\n        PUSH, __8_intnl_SystemBoolean\n        PUSH, __10_intnl_SystemBoolean\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
-    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000009D4\n        PUSH,
+    \       PUSH, __10_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000A3C\n        PUSH,
     EngineControl\n        PUSH, __17_const_intnl_SystemString\n        PUSH, __5_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __5_intnl_SystemObject\n        PUSH, __0_intnl_SoundController\n
@@ -323,13 +330,13 @@ MonoBehaviour:
     \       PUSH, __8_intnl_SystemBoolean\n        PUSH, __11_intnl_SystemBoolean\n
     \       PUSH, __12_intnl_SystemBoolean\n        EXTERN, \"SystemBoolean.__op_ConditionalOr__SystemBoolean_SystemBoolean__SystemBoolean\"\n
     \       PUSH, __12_intnl_SystemBoolean\n        PUSH, __8_intnl_SystemBoolean\n
-    \       COPY\n        PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000A04\n
+    \       COPY\n        PUSH, __8_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000A6C\n
     \       PUSH, __0_this_intnl_PilotSeat\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesNetworkEventTarget\n
     \       PUSH, __18_const_intnl_SystemString\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SendCustomNetworkEvent__VRCUdonCommonInterfacesNetworkEventTarget_SystemString__SystemVoid\"\n
     \       \n         # if (PlaneMesh != null)\n        PUSH, PlaneMesh\n        PUSH,
     __0_const_intnl_UnityEngineTransform\n        PUSH, __13_intnl_SystemBoolean\n
     \       EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __13_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000B28\n        \n
+    \       PUSH, __13_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000B90\n        \n
     \        # {\n        \n         # Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();\n
     \       PUSH, PlaneMesh\n        PUSH, __0_const_intnl_SystemType\n        PUSH,
     __0_children_TransformArray\n        EXTERN, \"UnityEngineTransform.__GetComponentsInChildren__TArray\"\n
@@ -338,7 +345,7 @@ MonoBehaviour:
     \       PUSH, __1_intnl_SystemInt32\n        EXTERN, \"UnityEngineTransformArray.__get_Length__SystemInt32\"\n
     \       PUSH, __0_intnl_SystemInt32\n        PUSH, __1_intnl_SystemInt32\n        PUSH,
     __14_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_LessThan__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __14_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000B28\n        PUSH,
+    \       PUSH, __14_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000B90\n        PUSH,
     __0_children_TransformArray\n        PUSH, __0_intnl_SystemInt32\n        PUSH,
     __0_child_Transform\n        EXTERN, \"UnityEngineTransformArray.__Get__SystemInt32__UnityEngineTransform\"\n
     \       \n         # {\n        \n         # child.gameObject.layer = 19;\n        PUSH,
@@ -348,14 +355,14 @@ MonoBehaviour:
     \"UnityEngineGameObject.__set_layer__SystemInt32__SystemVoid\"\n        PUSH,
     __0_intnl_SystemInt32\n        PUSH, __1_const_intnl_SystemInt32\n        PUSH,
     __0_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_Addition__SystemInt32_SystemInt32__SystemInt32\"\n
-    \       JUMP, 0x00000A80\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
+    \       JUMP, 0x00000AE8\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
     epilogue\n        COPY\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n
     \       \n        \n         # public void PilotLeave()\n    .export PilotLeave\n
     \       \n    PilotLeave:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n
     \       \n         # {\n        \n         # if (EngineControl != null)\n        PUSH,
     EngineControl\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __15_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __15_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000115C\n        \n
+    \       PUSH, __15_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000011C4\n        \n
     \        # {\n        \n         # EngineControl.Piloting = false;\n        PUSH,
     EngineControl\n        PUSH, __7_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
@@ -364,7 +371,7 @@ MonoBehaviour:
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __6_intnl_SystemObject\n        PUSH, __17_intnl_SystemBoolean\n
     \       EXTERN, \"SystemConvert.__ToBoolean__SystemObject__SystemBoolean\"\n        PUSH,
-    __17_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000D40\n        \n         #
+    __17_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00000DA8\n        \n         #
     {\n        \n         # EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel
     + EngineControl.VehicleMainObj.transform.up * 25);\n        PUSH, EngineControl\n
     \       PUSH, __6_const_intnl_SystemString\n        PUSH, __7_intnl_SystemObject\n
@@ -391,7 +398,7 @@ MonoBehaviour:
     \       \n         # EngineControl.Ejected = false;\n        PUSH, EngineControl\n
     \       PUSH, __19_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       JUMP, 0x00000DC0\n        \n         # else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);\n
+    \       JUMP, 0x00000E28\n        \n         # else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);\n
     \       PUSH, EngineControl\n        PUSH, __6_const_intnl_SystemString\n        PUSH,
     __7_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __7_intnl_SystemObject\n        PUSH, __5_intnl_VRCSDKBaseVRCPlayerApi\n
@@ -468,37 +475,40 @@ MonoBehaviour:
     \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, __3_intnl_SystemInt32\n
     \       PUSH, __6_const_intnl_SystemInt32\n        PUSH, __18_intnl_SystemBoolean\n
     \       EXTERN, \"SystemInt32.__op_Equality__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __18_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000113C\n        JUMP,
-    0x0000115C\n        \n         # else EngineControl.CatapultStatus = 0;//else
+    \       PUSH, __18_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000011A4\n        JUMP,
+    0x000011C4\n        \n         # else EngineControl.CatapultStatus = 0;//else
     unhook from catapult\n        PUSH, EngineControl\n        PUSH, __35_const_intnl_SystemString\n
     \       PUSH, __3_const_intnl_SystemInt32\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
     \       \n         # if (LeaveButton != null) { LeaveButton.SetActive(false);
     }\n        PUSH, LeaveButton\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __16_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __16_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000011A4\n        PUSH,
+    \       PUSH, __16_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000120C\n        PUSH,
     LeaveButton\n        PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
     \       \n         # if (EngineControl.EffectsControl != null)\n        PUSH,
-    EngineControl\n        PUSH, __12_const_intnl_SystemString\n        PUSH, __6_intnl_SystemObject\n
+    EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH, __6_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __6_intnl_SystemObject\n        PUSH, __2_intnl_EffectsController\n
-    \       COPY\n        PUSH, __2_intnl_EffectsController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
+    \       PUSH, __6_intnl_SystemObject\n        PUSH, __3_intnl_EffectsController\n
+    \       COPY\n        PUSH, __3_intnl_EffectsController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __17_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __17_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001248\n        \n
+    \       PUSH, __17_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000012E4\n        \n
     \        # {\n        \n         # EngineControl.IsFiringGun = false;\n        PUSH,
     EngineControl\n        PUSH, __13_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
-    \       \n         # EngineControl.Smoking = false;\n        PUSH, EngineControl\n
-    \       PUSH, __14_const_intnl_SystemString\n        PUSH, __1_const_intnl_SystemBoolean\n
-    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
+    \       \n         # EngineControl.EffectsControl.Smoking = false;\n        PUSH,
+    EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH, __7_intnl_SystemObject\n
+    \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
+    \       PUSH, __7_intnl_SystemObject\n        PUSH, __4_intnl_EffectsController\n
+    \       COPY\n        PUSH, __4_intnl_EffectsController\n        PUSH, __14_const_intnl_SystemString\n
+    \       PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
     \       \n         # if (Gun_pilot != null) { Gun_pilot.SetActive(false); }\n
     \       PUSH, Gun_pilot\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __18_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __18_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001290\n        PUSH,
+    \       PUSH, __18_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000132C\n        PUSH,
     Gun_pilot\n        PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
     \       \n         # if (SeatAdjuster != null) { SeatAdjuster.SetActive(false);
     }\n        PUSH, SeatAdjuster\n        PUSH, __0_const_intnl_UnityEngineGameObject\n
     \       PUSH, __19_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __19_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000012D8\n        PUSH,
+    \       PUSH, __19_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001374\n        PUSH,
     SeatAdjuster\n        PUSH, __1_const_intnl_SystemBoolean\n        EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n
     \       \n         # if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false);
     }\n        PUSH, EngineControl\n        PUSH, __16_const_intnl_SystemString\n
@@ -506,7 +516,7 @@ MonoBehaviour:
     \       PUSH, __7_intnl_SystemObject\n        PUSH, __3_intnl_HUDController\n
     \       COPY\n        PUSH, __3_intnl_HUDController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __20_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __20_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000013A0\n        PUSH,
+    \       PUSH, __20_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000143C\n        PUSH,
     EngineControl\n        PUSH, __16_const_intnl_SystemString\n        PUSH, __8_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __8_intnl_SystemObject\n        PUSH, __4_intnl_HUDController\n
@@ -517,7 +527,7 @@ MonoBehaviour:
     \       \n         # if (PlaneMesh != null)\n        PUSH, PlaneMesh\n        PUSH,
     __0_const_intnl_UnityEngineTransform\n        PUSH, __21_intnl_SystemBoolean\n
     \       EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __21_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000014C4\n        \n
+    \       PUSH, __21_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001560\n        \n
     \        # {\n        \n         # Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();\n
     \       PUSH, PlaneMesh\n        PUSH, __0_const_intnl_SystemType\n        PUSH,
     __1_children_TransformArray\n        EXTERN, \"UnityEngineTransform.__GetComponentsInChildren__TArray\"\n
@@ -526,7 +536,7 @@ MonoBehaviour:
     \       PUSH, __3_intnl_SystemInt32\n        EXTERN, \"UnityEngineTransformArray.__get_Length__SystemInt32\"\n
     \       PUSH, __2_intnl_SystemInt32\n        PUSH, __3_intnl_SystemInt32\n        PUSH,
     __22_intnl_SystemBoolean\n        EXTERN, \"SystemInt32.__op_LessThan__SystemInt32_SystemInt32__SystemBoolean\"\n
-    \       PUSH, __22_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000014C4\n        PUSH,
+    \       PUSH, __22_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001560\n        PUSH,
     __1_children_TransformArray\n        PUSH, __2_intnl_SystemInt32\n        PUSH,
     __1_child_Transform\n        EXTERN, \"UnityEngineTransformArray.__Get__SystemInt32__UnityEngineTransform\"\n
     \       \n         # {\n        \n         # child.gameObject.layer = 17;\n        PUSH,
@@ -536,22 +546,22 @@ MonoBehaviour:
     \"UnityEngineGameObject.__set_layer__SystemInt32__SystemVoid\"\n        PUSH,
     __2_intnl_SystemInt32\n        PUSH, __1_const_intnl_SystemInt32\n        PUSH,
     __2_intnl_SystemInt32\n        EXTERN, \"SystemInt32.__op_Addition__SystemInt32_SystemInt32__SystemInt32\"\n
-    \       JUMP, 0x0000141C\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
+    \       JUMP, 0x000014B8\n        PUSH, __0_intnl_returnTarget_UInt32 #Function
     epilogue\n        COPY\n        JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n
     \       \n        \n         # public void WakeUp()\n    .export WakeUp\n        \n
     \   WakeUp:\n        \n        PUSH, __0_const_intnl_SystemUInt32\n        \n
     \        # {\n        \n         # if (EngineControl.EffectsControl != null) {
     EngineControl.EffectsControl.DoEffects = 0f; }\n        PUSH, EngineControl\n
-    \       PUSH, __12_const_intnl_SystemString\n        PUSH, __11_intnl_SystemObject\n
+    \       PUSH, __8_const_intnl_SystemString\n        PUSH, __11_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __11_intnl_SystemObject\n        PUSH, __3_intnl_EffectsController\n
-    \       COPY\n        PUSH, __3_intnl_EffectsController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
+    \       PUSH, __11_intnl_SystemObject\n        PUSH, __5_intnl_EffectsController\n
+    \       COPY\n        PUSH, __5_intnl_EffectsController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __23_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __23_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001598\n        PUSH,
-    EngineControl\n        PUSH, __12_const_intnl_SystemString\n        PUSH, __12_intnl_SystemObject\n
+    \       PUSH, __23_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001634\n        PUSH,
+    EngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH, __12_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
-    \       PUSH, __12_intnl_SystemObject\n        PUSH, __4_intnl_EffectsController\n
-    \       COPY\n        PUSH, __4_intnl_EffectsController\n        PUSH, __36_const_intnl_SystemString\n
+    \       PUSH, __12_intnl_SystemObject\n        PUSH, __6_intnl_EffectsController\n
+    \       COPY\n        PUSH, __6_intnl_EffectsController\n        PUSH, __36_const_intnl_SystemString\n
     \       PUSH, __0_const_intnl_SystemSingle\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__SetProgramVariable__SystemString_SystemObject__SystemVoid\"\n
     \       \n         # if (EngineControl.SoundControl != null) { EngineControl.SoundControl.DoSound
     = 0f; }\n        PUSH, EngineControl\n        PUSH, __17_const_intnl_SystemString\n
@@ -559,7 +569,7 @@ MonoBehaviour:
     \       PUSH, __12_intnl_SystemObject\n        PUSH, __1_intnl_SoundController\n
     \       COPY\n        PUSH, __1_intnl_SoundController\n        PUSH, __0_const_intnl_VRCUdonCommonInterfacesIUdonEventReceiver\n
     \       PUSH, __24_intnl_SystemBoolean\n        EXTERN, \"UnityEngineObject.__op_Inequality__UnityEngineObject_UnityEngineObject__SystemBoolean\"\n
-    \       PUSH, __24_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x00001650\n        PUSH,
+    \       PUSH, __24_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000016EC\n        PUSH,
     EngineControl\n        PUSH, __17_const_intnl_SystemString\n        PUSH, __13_intnl_SystemObject\n
     \       EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __13_intnl_SystemObject\n        PUSH, __2_intnl_SoundController\n
@@ -571,7 +581,7 @@ MonoBehaviour:
     __0_const_intnl_SystemUInt32\n        \n         # {\n        \n         # if
     (!condition)\n        PUSH, __0_condition_Boolean\n        PUSH, __25_intnl_SystemBoolean\n
     \       EXTERN, \"SystemBoolean.__op_UnaryNegation__SystemBoolean__SystemBoolean\"\n
-    \       PUSH, __25_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x0000175C\n        \n
+    \       PUSH, __25_intnl_SystemBoolean\n        JUMP_IF_FALSE, 0x000017F8\n        \n
     \        # {\n        \n         # Debug.LogError(\"Assertion failed : '\" + GetType()
     + \" : \" + message + \"'\", this);\n        PUSH, __0_this_intnl_PilotSeat\n
     \       PUSH, __0_intnl_SystemType\n        EXTERN, \"UnityEngineComponent.__GetType__SystemType\"\n
@@ -1473,3565 +1483,3607 @@ MonoBehaviour:
     - startInstruction: 856
       endInstruction: 855
       startSourceChar: 1139
+      endSourceChar: 1139
+      line: 29
+      lineChar: 16
+      spanCodeSection: 
+    - startInstruction: 856
+      endInstruction: 855
+      startSourceChar: 1139
       endSourceChar: 1153
       line: 29
       lineChar: 16
       spanCodeSection: EngineControl.
     - startInstruction: 856
-      endInstruction: 927
+      endInstruction: 855
       startSourceChar: 1153
-      endSourceChar: 1165
+      endSourceChar: 1168
       line: 29
       lineChar: 30
+      spanCodeSection: EffectsControl.
+    - startInstruction: 856
+      endInstruction: 979
+      startSourceChar: 1168
+      endSourceChar: 1180
+      line: 29
+      lineChar: 45
       spanCodeSection: 'CanopyOpen) '
-    - startInstruction: 928
-      endInstruction: 927
-      startSourceChar: 1165
-      endSourceChar: 1165
+    - startInstruction: 980
+      endInstruction: 979
+      startSourceChar: 1180
+      endSourceChar: 1180
       line: 29
-      lineChar: 42
+      lineChar: 57
       spanCodeSection: 
-    - startInstruction: 928
-      endInstruction: 927
-      startSourceChar: 1165
-      endSourceChar: 1165
+    - startInstruction: 980
+      endInstruction: 979
+      startSourceChar: 1180
+      endSourceChar: 1180
       line: 29
-      lineChar: 42
+      lineChar: 57
       spanCodeSection: 
-    - startInstruction: 928
-      endInstruction: 927
-      startSourceChar: 1165
-      endSourceChar: 1165
+    - startInstruction: 980
+      endInstruction: 979
+      startSourceChar: 1180
+      endSourceChar: 1180
       line: 29
-      lineChar: 42
+      lineChar: 57
       spanCodeSection: 
-    - startInstruction: 928
-      endInstruction: 927
-      startSourceChar: 1165
-      endSourceChar: 1179
+    - startInstruction: 980
+      endInstruction: 979
+      startSourceChar: 1180
+      endSourceChar: 1194
       line: 29
-      lineChar: 42
+      lineChar: 57
       spanCodeSection: EngineControl.
-    - startInstruction: 928
-      endInstruction: 927
-      startSourceChar: 1179
-      endSourceChar: 1198
+    - startInstruction: 980
+      endInstruction: 979
+      startSourceChar: 1194
+      endSourceChar: 1213
       line: 29
-      lineChar: 56
+      lineChar: 71
       spanCodeSection: 'CanopyCloseTimer = '
-    - startInstruction: 928
-      endInstruction: 927
-      startSourceChar: 1198
-      endSourceChar: 1199
+    - startInstruction: 980
+      endInstruction: 979
+      startSourceChar: 1213
+      endSourceChar: 1214
       line: 29
-      lineChar: 75
+      lineChar: 90
       spanCodeSection: '-'
-    - startInstruction: 928
-      endInstruction: 1015
-      startSourceChar: 1199
-      endSourceChar: 1249
+    - startInstruction: 980
+      endInstruction: 1067
+      startSourceChar: 1214
+      endSourceChar: 1264
       line: 29
-      lineChar: 76
+      lineChar: 91
       spanCodeSection: "100001;//has to be less than -100000\r\n            "
-    - startInstruction: 1016
-      endInstruction: 1015
-      startSourceChar: 1249
-      endSourceChar: 1254
+    - startInstruction: 1068
+      endInstruction: 1067
+      startSourceChar: 1264
+      endSourceChar: 1269
       line: 30
       lineChar: 12
       spanCodeSection: 'else '
-    - startInstruction: 1016
-      endInstruction: 1015
-      startSourceChar: 1254
-      endSourceChar: 1254
+    - startInstruction: 1068
+      endInstruction: 1067
+      startSourceChar: 1269
+      endSourceChar: 1269
       line: 30
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 1016
-      endInstruction: 1015
-      startSourceChar: 1254
-      endSourceChar: 1254
+    - startInstruction: 1068
+      endInstruction: 1067
+      startSourceChar: 1269
+      endSourceChar: 1269
       line: 30
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 1016
-      endInstruction: 1015
-      startSourceChar: 1254
-      endSourceChar: 1254
+    - startInstruction: 1068
+      endInstruction: 1067
+      startSourceChar: 1269
+      endSourceChar: 1269
       line: 30
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 1016
-      endInstruction: 1015
-      startSourceChar: 1254
-      endSourceChar: 1268
+    - startInstruction: 1068
+      endInstruction: 1067
+      startSourceChar: 1269
+      endSourceChar: 1283
       line: 30
       lineChar: 17
       spanCodeSection: EngineControl.
-    - startInstruction: 1016
-      endInstruction: 1015
-      startSourceChar: 1268
-      endSourceChar: 1287
+    - startInstruction: 1068
+      endInstruction: 1067
+      startSourceChar: 1283
+      endSourceChar: 1302
       line: 30
       lineChar: 31
       spanCodeSection: 'CanopyCloseTimer = '
-    - startInstruction: 1016
-      endInstruction: 1015
-      startSourceChar: 1287
-      endSourceChar: 1288
+    - startInstruction: 1068
+      endInstruction: 1067
+      startSourceChar: 1302
+      endSourceChar: 1303
       line: 30
       lineChar: 50
       spanCodeSection: '-'
-    - startInstruction: 1016
-      endInstruction: 1095
-      startSourceChar: 1288
-      endSourceChar: 1317
+    - startInstruction: 1068
+      endInstruction: 1147
+      startSourceChar: 1303
+      endSourceChar: 1332
       line: 30
       lineChar: 51
       spanCodeSection: "1;//less than 0\r\n            "
-    - startInstruction: 1096
-      endInstruction: 1095
-      startSourceChar: 1317
-      endSourceChar: 1321
+    - startInstruction: 1148
+      endInstruction: 1147
+      startSourceChar: 1332
+      endSourceChar: 1336
       line: 31
       lineChar: 12
       spanCodeSection: if (
-    - startInstruction: 1096
-      endInstruction: 1095
-      startSourceChar: 1321
-      endSourceChar: 1321
+    - startInstruction: 1148
+      endInstruction: 1147
+      startSourceChar: 1336
+      endSourceChar: 1336
       line: 31
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 1096
-      endInstruction: 1095
-      startSourceChar: 1321
-      endSourceChar: 1335
+    - startInstruction: 1148
+      endInstruction: 1147
+      startSourceChar: 1336
+      endSourceChar: 1350
       line: 31
       lineChar: 16
       spanCodeSection: EngineControl.
-    - startInstruction: 1096
-      endInstruction: 1167
-      startSourceChar: 1335
-      endSourceChar: 1341
+    - startInstruction: 1148
+      endInstruction: 1219
+      startSourceChar: 1350
+      endSourceChar: 1356
       line: 31
       lineChar: 30
       spanCodeSection: 'dead) '
-    - startInstruction: 1168
-      endInstruction: 1167
-      startSourceChar: 1341
-      endSourceChar: 1341
+    - startInstruction: 1220
+      endInstruction: 1219
+      startSourceChar: 1356
+      endSourceChar: 1356
       line: 31
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 1168
-      endInstruction: 1167
-      startSourceChar: 1341
-      endSourceChar: 1341
+    - startInstruction: 1220
+      endInstruction: 1219
+      startSourceChar: 1356
+      endSourceChar: 1356
       line: 31
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 1168
-      endInstruction: 1167
-      startSourceChar: 1341
-      endSourceChar: 1341
+    - startInstruction: 1220
+      endInstruction: 1219
+      startSourceChar: 1356
+      endSourceChar: 1356
       line: 31
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 1168
-      endInstruction: 1167
-      startSourceChar: 1341
-      endSourceChar: 1355
+    - startInstruction: 1220
+      endInstruction: 1219
+      startSourceChar: 1356
+      endSourceChar: 1370
       line: 31
       lineChar: 36
       spanCodeSection: EngineControl.
-    - startInstruction: 1168
-      endInstruction: 1167
-      startSourceChar: 1355
-      endSourceChar: 1364
+    - startInstruction: 1220
+      endInstruction: 1219
+      startSourceChar: 1370
+      endSourceChar: 1379
       line: 31
       lineChar: 50
       spanCodeSection: 'Health = '
-    - startInstruction: 1168
-      endInstruction: 1223
-      startSourceChar: 1364
-      endSourceChar: 1484
+    - startInstruction: 1220
+      endInstruction: 1275
+      startSourceChar: 1379
+      endSourceChar: 1499
       line: 31
       lineChar: 59
       spanCodeSection: "100;//dead is true for the first 5 seconds after spawn, this
         might help with spontaneous explosions\r\n        }\r\n        "
-    - startInstruction: 1224
-      endInstruction: 1223
-      startSourceChar: 1484
-      endSourceChar: 1488
+    - startInstruction: 1276
+      endInstruction: 1275
+      startSourceChar: 1499
+      endSourceChar: 1503
       line: 33
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 1224
-      endInstruction: 1223
-      startSourceChar: 1488
-      endSourceChar: 1488
+    - startInstruction: 1276
+      endInstruction: 1275
+      startSourceChar: 1503
+      endSourceChar: 1503
       line: 33
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1224
-      endInstruction: 1223
-      startSourceChar: 1488
-      endSourceChar: 1488
+    - startInstruction: 1276
+      endInstruction: 1275
+      startSourceChar: 1503
+      endSourceChar: 1503
       line: 33
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1224
-      endInstruction: 1223
-      startSourceChar: 1488
-      endSourceChar: 1502
+    - startInstruction: 1276
+      endInstruction: 1275
+      startSourceChar: 1503
+      endSourceChar: 1517
       line: 33
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 1224
-      endInstruction: 1275
-      startSourceChar: 1502
-      endSourceChar: 1520
+    - startInstruction: 1276
+      endInstruction: 1327
+      startSourceChar: 1517
+      endSourceChar: 1535
       line: 33
       lineChar: 26
       spanCodeSection: 'EffectsControl != '
-    - startInstruction: 1276
-      endInstruction: 1323
-      startSourceChar: 1520
-      endSourceChar: 1535
+    - startInstruction: 1328
+      endInstruction: 1375
+      startSourceChar: 1535
+      endSourceChar: 1550
       line: 33
       lineChar: 44
       spanCodeSection: "null)\r\n        "
-    - startInstruction: 1324
-      endInstruction: 1323
-      startSourceChar: 1535
-      endSourceChar: 1550
+    - startInstruction: 1376
+      endInstruction: 1375
+      startSourceChar: 1550
+      endSourceChar: 1565
       line: 34
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 1324
-      endInstruction: 1323
-      startSourceChar: 1550
-      endSourceChar: 1550
+    - startInstruction: 1376
+      endInstruction: 1375
+      startSourceChar: 1565
+      endSourceChar: 1565
       line: 35
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1324
-      endInstruction: 1323
-      startSourceChar: 1550
-      endSourceChar: 1550
+    - startInstruction: 1376
+      endInstruction: 1375
+      startSourceChar: 1565
+      endSourceChar: 1565
       line: 35
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1324
-      endInstruction: 1323
-      startSourceChar: 1550
-      endSourceChar: 1550
+    - startInstruction: 1376
+      endInstruction: 1375
+      startSourceChar: 1565
+      endSourceChar: 1565
       line: 35
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1324
-      endInstruction: 1323
-      startSourceChar: 1550
-      endSourceChar: 1564
+    - startInstruction: 1376
+      endInstruction: 1375
+      startSourceChar: 1565
+      endSourceChar: 1579
       line: 35
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 1324
-      endInstruction: 1323
-      startSourceChar: 1564
-      endSourceChar: 1578
+    - startInstruction: 1376
+      endInstruction: 1375
+      startSourceChar: 1579
+      endSourceChar: 1593
       line: 35
       lineChar: 26
       spanCodeSection: 'IsFiringGun = '
-    - startInstruction: 1324
-      endInstruction: 1355
-      startSourceChar: 1578
-      endSourceChar: 1598
+    - startInstruction: 1376
+      endInstruction: 1407
+      startSourceChar: 1593
+      endSourceChar: 1613
       line: 35
       lineChar: 40
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 1356
-      endInstruction: 1355
-      startSourceChar: 1598
-      endSourceChar: 1598
+    - startInstruction: 1408
+      endInstruction: 1407
+      startSourceChar: 1613
+      endSourceChar: 1613
       line: 36
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1356
-      endInstruction: 1355
-      startSourceChar: 1598
-      endSourceChar: 1598
+    - startInstruction: 1408
+      endInstruction: 1407
+      startSourceChar: 1613
+      endSourceChar: 1613
       line: 36
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1356
-      endInstruction: 1355
-      startSourceChar: 1598
-      endSourceChar: 1598
+    - startInstruction: 1408
+      endInstruction: 1407
+      startSourceChar: 1613
+      endSourceChar: 1613
       line: 36
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1356
-      endInstruction: 1355
-      startSourceChar: 1598
-      endSourceChar: 1612
+    - startInstruction: 1408
+      endInstruction: 1407
+      startSourceChar: 1613
+      endSourceChar: 1613
+      line: 36
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 1408
+      endInstruction: 1407
+      startSourceChar: 1613
+      endSourceChar: 1627
       line: 36
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 1356
-      endInstruction: 1355
-      startSourceChar: 1612
-      endSourceChar: 1622
+    - startInstruction: 1408
+      endInstruction: 1407
+      startSourceChar: 1627
+      endSourceChar: 1642
       line: 36
       lineChar: 26
-      spanCodeSection: 'Smoking = '
-    - startInstruction: 1356
-      endInstruction: 1387
-      startSourceChar: 1622
-      endSourceChar: 1642
+      spanCodeSection: EffectsControl.
+    - startInstruction: 1408
+      endInstruction: 1459
+      startSourceChar: 1642
+      endSourceChar: 1652
       line: 36
-      lineChar: 36
+      lineChar: 41
+      spanCodeSection: 'Smoking = '
+    - startInstruction: 1460
+      endInstruction: 1491
+      startSourceChar: 1652
+      endSourceChar: 1672
+      line: 36
+      lineChar: 51
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 1388
-      endInstruction: 1387
-      startSourceChar: 1642
-      endSourceChar: 1642
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1672
+      endSourceChar: 1672
       line: 37
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1388
-      endInstruction: 1387
-      startSourceChar: 1642
-      endSourceChar: 1642
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1672
+      endSourceChar: 1672
       line: 37
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1388
-      endInstruction: 1387
-      startSourceChar: 1642
-      endSourceChar: 1642
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1672
+      endSourceChar: 1672
       line: 37
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1388
-      endInstruction: 1387
-      startSourceChar: 1642
-      endSourceChar: 1653
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1672
+      endSourceChar: 1683
       line: 37
       lineChar: 12
       spanCodeSection: Networking.
-    - startInstruction: 1388
-      endInstruction: 1387
-      startSourceChar: 1653
-      endSourceChar: 1662
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1683
+      endSourceChar: 1692
       line: 37
       lineChar: 23
       spanCodeSection: SetOwner(
-    - startInstruction: 1388
-      endInstruction: 1387
-      startSourceChar: 1662
-      endSourceChar: 1662
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1692
+      endSourceChar: 1692
       line: 37
       lineChar: 32
       spanCodeSection: 
-    - startInstruction: 1388
-      endInstruction: 1387
-      startSourceChar: 1662
-      endSourceChar: 1676
+    - startInstruction: 1492
+      endInstruction: 1491
+      startSourceChar: 1692
+      endSourceChar: 1706
       line: 37
       lineChar: 32
       spanCodeSection: EngineControl.
-    - startInstruction: 1388
-      endInstruction: 1439
-      startSourceChar: 1676
-      endSourceChar: 1689
+    - startInstruction: 1492
+      endInstruction: 1543
+      startSourceChar: 1706
+      endSourceChar: 1719
       line: 37
       lineChar: 46
       spanCodeSection: 'localPlayer, '
-    - startInstruction: 1440
-      endInstruction: 1439
-      startSourceChar: 1689
-      endSourceChar: 1689
+    - startInstruction: 1544
+      endInstruction: 1543
+      startSourceChar: 1719
+      endSourceChar: 1719
       line: 37
       lineChar: 59
       spanCodeSection: 
-    - startInstruction: 1440
-      endInstruction: 1439
-      startSourceChar: 1689
-      endSourceChar: 1689
+    - startInstruction: 1544
+      endInstruction: 1543
+      startSourceChar: 1719
+      endSourceChar: 1719
       line: 37
       lineChar: 59
       spanCodeSection: 
-    - startInstruction: 1440
-      endInstruction: 1439
-      startSourceChar: 1689
-      endSourceChar: 1703
+    - startInstruction: 1544
+      endInstruction: 1543
+      startSourceChar: 1719
+      endSourceChar: 1733
       line: 37
       lineChar: 59
       spanCodeSection: EngineControl.
-    - startInstruction: 1440
-      endInstruction: 1439
-      startSourceChar: 1703
-      endSourceChar: 1718
+    - startInstruction: 1544
+      endInstruction: 1543
+      startSourceChar: 1733
+      endSourceChar: 1748
       line: 37
       lineChar: 73
       spanCodeSection: EffectsControl.
-    - startInstruction: 1440
-      endInstruction: 1539
-      startSourceChar: 1718
-      endSourceChar: 1744
+    - startInstruction: 1544
+      endInstruction: 1643
+      startSourceChar: 1748
+      endSourceChar: 1774
       line: 37
       lineChar: 88
       spanCodeSection: "gameObject);\r\n            "
-    - startInstruction: 1540
-      endInstruction: 1539
-      startSourceChar: 1744
-      endSourceChar: 1744
+    - startInstruction: 1644
+      endInstruction: 1643
+      startSourceChar: 1774
+      endSourceChar: 1774
       line: 38
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1540
-      endInstruction: 1539
-      startSourceChar: 1744
-      endSourceChar: 1744
+    - startInstruction: 1644
+      endInstruction: 1643
+      startSourceChar: 1774
+      endSourceChar: 1774
       line: 38
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1540
-      endInstruction: 1539
-      startSourceChar: 1744
-      endSourceChar: 1744
+    - startInstruction: 1644
+      endInstruction: 1643
+      startSourceChar: 1774
+      endSourceChar: 1774
       line: 38
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1540
-      endInstruction: 1539
-      startSourceChar: 1744
-      endSourceChar: 1758
+    - startInstruction: 1644
+      endInstruction: 1643
+      startSourceChar: 1774
+      endSourceChar: 1788
       line: 38
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 1540
-      endInstruction: 1539
-      startSourceChar: 1758
-      endSourceChar: 1775
+    - startInstruction: 1644
+      endInstruction: 1643
+      startSourceChar: 1788
+      endSourceChar: 1805
       line: 38
       lineChar: 26
       spanCodeSection: 'LGripLastFrame = '
-    - startInstruction: 1540
-      endInstruction: 1571
-      startSourceChar: 1775
-      endSourceChar: 1841
+    - startInstruction: 1644
+      endInstruction: 1675
+      startSourceChar: 1805
+      endSourceChar: 1871
       line: 38
       lineChar: 43
       spanCodeSection: "false; //prevent instant flares drop on enter\r\n        }\r\n
         \       "
-    - startInstruction: 1572
-      endInstruction: 1571
-      startSourceChar: 1841
-      endSourceChar: 1845
+    - startInstruction: 1676
+      endInstruction: 1675
+      startSourceChar: 1871
+      endSourceChar: 1875
       line: 40
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 1572
-      endInstruction: 1571
-      startSourceChar: 1845
-      endSourceChar: 1845
+    - startInstruction: 1676
+      endInstruction: 1675
+      startSourceChar: 1875
+      endSourceChar: 1875
       line: 40
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1572
-      endInstruction: 1571
-      startSourceChar: 1845
-      endSourceChar: 1845
+    - startInstruction: 1676
+      endInstruction: 1675
+      startSourceChar: 1875
+      endSourceChar: 1875
       line: 40
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1572
-      endInstruction: 1571
-      startSourceChar: 1845
-      endSourceChar: 1859
+    - startInstruction: 1676
+      endInstruction: 1675
+      startSourceChar: 1875
+      endSourceChar: 1889
       line: 40
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 1572
-      endInstruction: 1623
-      startSourceChar: 1859
-      endSourceChar: 1873
+    - startInstruction: 1676
+      endInstruction: 1727
+      startSourceChar: 1889
+      endSourceChar: 1903
       line: 40
       lineChar: 26
       spanCodeSection: 'HUDControl != '
-    - startInstruction: 1624
-      endInstruction: 1671
-      startSourceChar: 1873
-      endSourceChar: 1888
+    - startInstruction: 1728
+      endInstruction: 1775
+      startSourceChar: 1903
+      endSourceChar: 1918
       line: 40
       lineChar: 40
       spanCodeSection: "null)\r\n        "
-    - startInstruction: 1672
-      endInstruction: 1671
-      startSourceChar: 1888
-      endSourceChar: 1903
+    - startInstruction: 1776
+      endInstruction: 1775
+      startSourceChar: 1918
+      endSourceChar: 1933
       line: 41
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 1672
-      endInstruction: 1671
-      startSourceChar: 1903
-      endSourceChar: 1903
+    - startInstruction: 1776
+      endInstruction: 1775
+      startSourceChar: 1933
+      endSourceChar: 1933
       line: 42
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1672
-      endInstruction: 1671
-      startSourceChar: 1903
-      endSourceChar: 1903
+    - startInstruction: 1776
+      endInstruction: 1775
+      startSourceChar: 1933
+      endSourceChar: 1933
       line: 42
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1672
-      endInstruction: 1671
-      startSourceChar: 1903
-      endSourceChar: 1903
+    - startInstruction: 1776
+      endInstruction: 1775
+      startSourceChar: 1933
+      endSourceChar: 1933
       line: 42
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1672
-      endInstruction: 1671
-      startSourceChar: 1903
-      endSourceChar: 1914
+    - startInstruction: 1776
+      endInstruction: 1775
+      startSourceChar: 1933
+      endSourceChar: 1944
       line: 42
       lineChar: 12
       spanCodeSection: Networking.
-    - startInstruction: 1672
-      endInstruction: 1671
-      startSourceChar: 1914
-      endSourceChar: 1923
+    - startInstruction: 1776
+      endInstruction: 1775
+      startSourceChar: 1944
+      endSourceChar: 1953
       line: 42
       lineChar: 23
       spanCodeSection: SetOwner(
-    - startInstruction: 1672
-      endInstruction: 1671
-      startSourceChar: 1923
-      endSourceChar: 1923
+    - startInstruction: 1776
+      endInstruction: 1775
+      startSourceChar: 1953
+      endSourceChar: 1953
       line: 42
       lineChar: 32
       spanCodeSection: 
-    - startInstruction: 1672
-      endInstruction: 1671
-      startSourceChar: 1923
-      endSourceChar: 1937
+    - startInstruction: 1776
+      endInstruction: 1775
+      startSourceChar: 1953
+      endSourceChar: 1967
       line: 42
       lineChar: 32
       spanCodeSection: EngineControl.
-    - startInstruction: 1672
-      endInstruction: 1723
-      startSourceChar: 1937
-      endSourceChar: 1950
+    - startInstruction: 1776
+      endInstruction: 1827
+      startSourceChar: 1967
+      endSourceChar: 1980
       line: 42
       lineChar: 46
       spanCodeSection: 'localPlayer, '
-    - startInstruction: 1724
-      endInstruction: 1723
-      startSourceChar: 1950
-      endSourceChar: 1950
+    - startInstruction: 1828
+      endInstruction: 1827
+      startSourceChar: 1980
+      endSourceChar: 1980
       line: 42
       lineChar: 59
       spanCodeSection: 
-    - startInstruction: 1724
-      endInstruction: 1723
-      startSourceChar: 1950
-      endSourceChar: 1950
+    - startInstruction: 1828
+      endInstruction: 1827
+      startSourceChar: 1980
+      endSourceChar: 1980
       line: 42
       lineChar: 59
       spanCodeSection: 
-    - startInstruction: 1724
-      endInstruction: 1723
-      startSourceChar: 1950
-      endSourceChar: 1964
+    - startInstruction: 1828
+      endInstruction: 1827
+      startSourceChar: 1980
+      endSourceChar: 1994
       line: 42
       lineChar: 59
       spanCodeSection: EngineControl.
-    - startInstruction: 1724
-      endInstruction: 1723
-      startSourceChar: 1964
-      endSourceChar: 1975
+    - startInstruction: 1828
+      endInstruction: 1827
+      startSourceChar: 1994
+      endSourceChar: 2005
       line: 42
       lineChar: 73
       spanCodeSection: HUDControl.
-    - startInstruction: 1724
-      endInstruction: 1823
-      startSourceChar: 1975
-      endSourceChar: 2001
+    - startInstruction: 1828
+      endInstruction: 1927
+      startSourceChar: 2005
+      endSourceChar: 2031
       line: 42
       lineChar: 84
       spanCodeSection: "gameObject);\r\n            "
-    - startInstruction: 1824
-      endInstruction: 1823
-      startSourceChar: 2001
-      endSourceChar: 2001
+    - startInstruction: 1928
+      endInstruction: 1927
+      startSourceChar: 2031
+      endSourceChar: 2031
       line: 43
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1824
-      endInstruction: 1823
-      startSourceChar: 2001
-      endSourceChar: 2001
+    - startInstruction: 1928
+      endInstruction: 1927
+      startSourceChar: 2031
+      endSourceChar: 2031
       line: 43
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1824
-      endInstruction: 1823
-      startSourceChar: 2001
-      endSourceChar: 2001
+    - startInstruction: 1928
+      endInstruction: 1927
+      startSourceChar: 2031
+      endSourceChar: 2031
       line: 43
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1824
-      endInstruction: 1823
-      startSourceChar: 2001
-      endSourceChar: 2001
+    - startInstruction: 1928
+      endInstruction: 1927
+      startSourceChar: 2031
+      endSourceChar: 2031
       line: 43
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1824
-      endInstruction: 1823
-      startSourceChar: 2001
-      endSourceChar: 2001
+    - startInstruction: 1928
+      endInstruction: 1927
+      startSourceChar: 2031
+      endSourceChar: 2031
       line: 43
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1824
-      endInstruction: 1823
-      startSourceChar: 2001
-      endSourceChar: 2015
+    - startInstruction: 1928
+      endInstruction: 1927
+      startSourceChar: 2031
+      endSourceChar: 2045
       line: 43
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 1824
-      endInstruction: 1823
-      startSourceChar: 2015
-      endSourceChar: 2026
+    - startInstruction: 1928
+      endInstruction: 1927
+      startSourceChar: 2045
+      endSourceChar: 2056
       line: 43
       lineChar: 26
       spanCodeSection: HUDControl.
-    - startInstruction: 1824
-      endInstruction: 1875
-      startSourceChar: 2026
-      endSourceChar: 2037
+    - startInstruction: 1928
+      endInstruction: 1979
+      startSourceChar: 2056
+      endSourceChar: 2067
       line: 43
       lineChar: 37
       spanCodeSection: gameObject.
-    - startInstruction: 1876
-      endInstruction: 1899
-      startSourceChar: 2037
-      endSourceChar: 2047
+    - startInstruction: 1980
+      endInstruction: 2003
+      startSourceChar: 2067
+      endSourceChar: 2077
       line: 43
       lineChar: 48
       spanCodeSection: SetActive(
-    - startInstruction: 1900
-      endInstruction: 1923
-      startSourceChar: 2047
-      endSourceChar: 2074
+    - startInstruction: 2004
+      endInstruction: 2027
+      startSourceChar: 2077
+      endSourceChar: 2104
       line: 43
       lineChar: 58
       spanCodeSection: "true);\r\n        }\r\n        "
-    - startInstruction: 1924
-      endInstruction: 1923
-      startSourceChar: 2074
-      endSourceChar: 2078
+    - startInstruction: 2028
+      endInstruction: 2027
+      startSourceChar: 2104
+      endSourceChar: 2108
       line: 45
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 1924
-      endInstruction: 1923
-      startSourceChar: 2078
-      endSourceChar: 2078
+    - startInstruction: 2028
+      endInstruction: 2027
+      startSourceChar: 2108
+      endSourceChar: 2108
       line: 45
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1924
-      endInstruction: 1923
-      startSourceChar: 2078
-      endSourceChar: 2091
+    - startInstruction: 2028
+      endInstruction: 2027
+      startSourceChar: 2108
+      endSourceChar: 2121
       line: 45
       lineChar: 12
       spanCodeSection: 'Gun_pilot != '
-    - startInstruction: 1924
-      endInstruction: 1971
-      startSourceChar: 2091
-      endSourceChar: 2097
+    - startInstruction: 2028
+      endInstruction: 2075
+      startSourceChar: 2121
+      endSourceChar: 2127
       line: 45
       lineChar: 25
       spanCodeSection: 'null) '
-    - startInstruction: 1972
-      endInstruction: 1971
-      startSourceChar: 2097
-      endSourceChar: 2099
+    - startInstruction: 2076
+      endInstruction: 2075
+      startSourceChar: 2127
+      endSourceChar: 2129
       line: 45
       lineChar: 31
       spanCodeSection: '{ '
-    - startInstruction: 1972
-      endInstruction: 1971
-      startSourceChar: 2099
-      endSourceChar: 2099
+    - startInstruction: 2076
+      endInstruction: 2075
+      startSourceChar: 2129
+      endSourceChar: 2129
       line: 45
       lineChar: 33
       spanCodeSection: 
-    - startInstruction: 1972
-      endInstruction: 1971
-      startSourceChar: 2099
-      endSourceChar: 2099
+    - startInstruction: 2076
+      endInstruction: 2075
+      startSourceChar: 2129
+      endSourceChar: 2129
       line: 45
       lineChar: 33
       spanCodeSection: 
-    - startInstruction: 1972
-      endInstruction: 1971
-      startSourceChar: 2099
-      endSourceChar: 2099
+    - startInstruction: 2076
+      endInstruction: 2075
+      startSourceChar: 2129
+      endSourceChar: 2129
       line: 45
       lineChar: 33
       spanCodeSection: 
-    - startInstruction: 1972
-      endInstruction: 1971
-      startSourceChar: 2099
-      endSourceChar: 2109
+    - startInstruction: 2076
+      endInstruction: 2075
+      startSourceChar: 2129
+      endSourceChar: 2139
       line: 45
       lineChar: 33
       spanCodeSection: Gun_pilot.
-    - startInstruction: 1972
-      endInstruction: 1971
-      startSourceChar: 2109
-      endSourceChar: 2119
+    - startInstruction: 2076
+      endInstruction: 2075
+      startSourceChar: 2139
+      endSourceChar: 2149
       line: 45
       lineChar: 43
       spanCodeSection: SetActive(
-    - startInstruction: 1972
-      endInstruction: 1995
-      startSourceChar: 2119
-      endSourceChar: 2137
+    - startInstruction: 2076
+      endInstruction: 2099
+      startSourceChar: 2149
+      endSourceChar: 2167
       line: 45
       lineChar: 53
       spanCodeSection: "true); }\r\n        "
-    - startInstruction: 1996
-      endInstruction: 1995
-      startSourceChar: 2137
-      endSourceChar: 2141
+    - startInstruction: 2100
+      endInstruction: 2099
+      startSourceChar: 2167
+      endSourceChar: 2171
       line: 46
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 1996
-      endInstruction: 1995
-      startSourceChar: 2141
-      endSourceChar: 2141
+    - startInstruction: 2100
+      endInstruction: 2099
+      startSourceChar: 2171
+      endSourceChar: 2171
       line: 46
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 1996
-      endInstruction: 1995
-      startSourceChar: 2141
-      endSourceChar: 2157
+    - startInstruction: 2100
+      endInstruction: 2099
+      startSourceChar: 2171
+      endSourceChar: 2187
       line: 46
       lineChar: 12
       spanCodeSection: 'SeatAdjuster != '
-    - startInstruction: 1996
-      endInstruction: 2043
-      startSourceChar: 2157
-      endSourceChar: 2163
+    - startInstruction: 2100
+      endInstruction: 2147
+      startSourceChar: 2187
+      endSourceChar: 2193
       line: 46
       lineChar: 28
       spanCodeSection: 'null) '
-    - startInstruction: 2044
-      endInstruction: 2043
-      startSourceChar: 2163
-      endSourceChar: 2165
+    - startInstruction: 2148
+      endInstruction: 2147
+      startSourceChar: 2193
+      endSourceChar: 2195
       line: 46
       lineChar: 34
       spanCodeSection: '{ '
-    - startInstruction: 2044
-      endInstruction: 2043
-      startSourceChar: 2165
-      endSourceChar: 2165
+    - startInstruction: 2148
+      endInstruction: 2147
+      startSourceChar: 2195
+      endSourceChar: 2195
       line: 46
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 2044
-      endInstruction: 2043
-      startSourceChar: 2165
-      endSourceChar: 2165
+    - startInstruction: 2148
+      endInstruction: 2147
+      startSourceChar: 2195
+      endSourceChar: 2195
       line: 46
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 2044
-      endInstruction: 2043
-      startSourceChar: 2165
-      endSourceChar: 2165
+    - startInstruction: 2148
+      endInstruction: 2147
+      startSourceChar: 2195
+      endSourceChar: 2195
       line: 46
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 2044
-      endInstruction: 2043
-      startSourceChar: 2165
-      endSourceChar: 2178
+    - startInstruction: 2148
+      endInstruction: 2147
+      startSourceChar: 2195
+      endSourceChar: 2208
       line: 46
       lineChar: 36
       spanCodeSection: SeatAdjuster.
-    - startInstruction: 2044
-      endInstruction: 2043
-      startSourceChar: 2178
-      endSourceChar: 2188
+    - startInstruction: 2148
+      endInstruction: 2147
+      startSourceChar: 2208
+      endSourceChar: 2218
       line: 46
       lineChar: 49
       spanCodeSection: SetActive(
-    - startInstruction: 2044
-      endInstruction: 2067
-      startSourceChar: 2188
-      endSourceChar: 2206
+    - startInstruction: 2148
+      endInstruction: 2171
+      startSourceChar: 2218
+      endSourceChar: 2236
       line: 46
       lineChar: 59
       spanCodeSection: "true); }\r\n        "
-    - startInstruction: 2068
-      endInstruction: 2067
-      startSourceChar: 2206
-      endSourceChar: 2210
+    - startInstruction: 2172
+      endInstruction: 2171
+      startSourceChar: 2236
+      endSourceChar: 2240
       line: 47
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 2068
-      endInstruction: 2067
-      startSourceChar: 2210
-      endSourceChar: 2210
+    - startInstruction: 2172
+      endInstruction: 2171
+      startSourceChar: 2240
+      endSourceChar: 2240
       line: 47
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2068
-      endInstruction: 2067
-      startSourceChar: 2210
-      endSourceChar: 2210
+    - startInstruction: 2172
+      endInstruction: 2171
+      startSourceChar: 2240
+      endSourceChar: 2240
       line: 47
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2068
-      endInstruction: 2067
-      startSourceChar: 2210
-      endSourceChar: 2224
+    - startInstruction: 2172
+      endInstruction: 2171
+      startSourceChar: 2240
+      endSourceChar: 2254
       line: 47
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 2068
-      endInstruction: 2119
-      startSourceChar: 2224
-      endSourceChar: 2239
+    - startInstruction: 2172
+      endInstruction: 2223
+      startSourceChar: 2254
+      endSourceChar: 2269
       line: 47
       lineChar: 26
       spanCodeSection: 'localPlayer != '
-    - startInstruction: 2120
-      endInstruction: 2167
-      startSourceChar: 2239
-      endSourceChar: 2245
+    - startInstruction: 2224
+      endInstruction: 2271
+      startSourceChar: 2269
+      endSourceChar: 2275
       line: 47
       lineChar: 41
       spanCodeSection: 'null) '
-    - startInstruction: 2168
-      endInstruction: 2167
-      startSourceChar: 2245
-      endSourceChar: 2247
+    - startInstruction: 2272
+      endInstruction: 2271
+      startSourceChar: 2275
+      endSourceChar: 2277
       line: 47
       lineChar: 47
       spanCodeSection: '{ '
-    - startInstruction: 2168
-      endInstruction: 2167
-      startSourceChar: 2247
-      endSourceChar: 2247
+    - startInstruction: 2272
+      endInstruction: 2271
+      startSourceChar: 2277
+      endSourceChar: 2277
       line: 47
       lineChar: 49
       spanCodeSection: 
-    - startInstruction: 2168
-      endInstruction: 2167
-      startSourceChar: 2247
-      endSourceChar: 2247
+    - startInstruction: 2272
+      endInstruction: 2271
+      startSourceChar: 2277
+      endSourceChar: 2277
       line: 47
       lineChar: 49
       spanCodeSection: 
-    - startInstruction: 2168
-      endInstruction: 2167
-      startSourceChar: 2247
-      endSourceChar: 2247
+    - startInstruction: 2272
+      endInstruction: 2271
+      startSourceChar: 2277
+      endSourceChar: 2277
       line: 47
       lineChar: 49
       spanCodeSection: 
-    - startInstruction: 2168
-      endInstruction: 2167
-      startSourceChar: 2247
-      endSourceChar: 2247
+    - startInstruction: 2272
+      endInstruction: 2271
+      startSourceChar: 2277
+      endSourceChar: 2277
       line: 47
       lineChar: 49
       spanCodeSection: 
-    - startInstruction: 2168
-      endInstruction: 2167
-      startSourceChar: 2247
-      endSourceChar: 2261
+    - startInstruction: 2272
+      endInstruction: 2271
+      startSourceChar: 2277
+      endSourceChar: 2291
       line: 47
       lineChar: 49
       spanCodeSection: EngineControl.
-    - startInstruction: 2168
-      endInstruction: 2167
-      startSourceChar: 2261
-      endSourceChar: 2273
+    - startInstruction: 2272
+      endInstruction: 2271
+      startSourceChar: 2291
+      endSourceChar: 2303
       line: 47
       lineChar: 63
       spanCodeSection: localPlayer.
-    - startInstruction: 2168
-      endInstruction: 2235
-      startSourceChar: 2273
-      endSourceChar: 2306
+    - startInstruction: 2272
+      endInstruction: 2339
+      startSourceChar: 2303
+      endSourceChar: 2336
       line: 47
       lineChar: 75
       spanCodeSection: "UseAttachedStation(); }\r\n        "
-    - startInstruction: 2236
-      endInstruction: 2235
-      startSourceChar: 2306
-      endSourceChar: 2310
+    - startInstruction: 2340
+      endInstruction: 2339
+      startSourceChar: 2336
+      endSourceChar: 2340
       line: 48
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 2236
-      endInstruction: 2235
-      startSourceChar: 2310
-      endSourceChar: 2310
+    - startInstruction: 2340
+      endInstruction: 2339
+      startSourceChar: 2340
+      endSourceChar: 2340
       line: 48
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2236
-      endInstruction: 2235
-      startSourceChar: 2310
-      endSourceChar: 2310
+    - startInstruction: 2340
+      endInstruction: 2339
+      startSourceChar: 2340
+      endSourceChar: 2340
       line: 48
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2236
-      endInstruction: 2235
-      startSourceChar: 2310
-      endSourceChar: 2310
+    - startInstruction: 2340
+      endInstruction: 2339
+      startSourceChar: 2340
+      endSourceChar: 2340
       line: 48
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2236
-      endInstruction: 2235
-      startSourceChar: 2310
-      endSourceChar: 2324
+    - startInstruction: 2340
+      endInstruction: 2339
+      startSourceChar: 2340
+      endSourceChar: 2354
       line: 48
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 2236
-      endInstruction: 2287
-      startSourceChar: 2324
-      endSourceChar: 2342
+    - startInstruction: 2340
+      endInstruction: 2391
+      startSourceChar: 2354
+      endSourceChar: 2372
       line: 48
       lineChar: 26
       spanCodeSection: 'EffectsControl != '
-    - startInstruction: 2288
-      endInstruction: 2379
-      startSourceChar: 2342
-      endSourceChar: 2350
+    - startInstruction: 2392
+      endInstruction: 2483
+      startSourceChar: 2372
+      endSourceChar: 2380
       line: 48
       lineChar: 44
       spanCodeSection: 'null || '
-    - startInstruction: 2380
-      endInstruction: 2379
-      startSourceChar: 2350
-      endSourceChar: 2350
+    - startInstruction: 2484
+      endInstruction: 2483
+      startSourceChar: 2380
+      endSourceChar: 2380
       line: 48
       lineChar: 52
       spanCodeSection: 
-    - startInstruction: 2380
-      endInstruction: 2379
-      startSourceChar: 2350
-      endSourceChar: 2350
+    - startInstruction: 2484
+      endInstruction: 2483
+      startSourceChar: 2380
+      endSourceChar: 2380
       line: 48
       lineChar: 52
       spanCodeSection: 
-    - startInstruction: 2380
-      endInstruction: 2379
-      startSourceChar: 2350
-      endSourceChar: 2364
+    - startInstruction: 2484
+      endInstruction: 2483
+      startSourceChar: 2380
+      endSourceChar: 2394
       line: 48
       lineChar: 52
       spanCodeSection: EngineControl.
-    - startInstruction: 2380
-      endInstruction: 2431
-      startSourceChar: 2364
-      endSourceChar: 2380
+    - startInstruction: 2484
+      endInstruction: 2535
+      startSourceChar: 2394
+      endSourceChar: 2410
       line: 48
       lineChar: 66
       spanCodeSection: 'SoundControl != '
-    - startInstruction: 2432
-      endInstruction: 2531
-      startSourceChar: 2380
-      endSourceChar: 2386
+    - startInstruction: 2536
+      endInstruction: 2635
+      startSourceChar: 2410
+      endSourceChar: 2416
       line: 48
       lineChar: 82
       spanCodeSection: 'null) '
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2386
-      endSourceChar: 2388
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2416
+      endSourceChar: 2418
       line: 48
       lineChar: 88
       spanCodeSection: '{ '
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2388
-      endSourceChar: 2388
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2418
+      endSourceChar: 2418
       line: 48
       lineChar: 90
       spanCodeSection: 
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2388
-      endSourceChar: 2388
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2418
+      endSourceChar: 2418
       line: 48
       lineChar: 90
       spanCodeSection: 
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2388
-      endSourceChar: 2411
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2418
+      endSourceChar: 2441
       line: 48
       lineChar: 90
       spanCodeSection: SendCustomNetworkEvent(
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2411
-      endSourceChar: 2411
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2441
+      endSourceChar: 2441
       line: 48
       lineChar: 113
       spanCodeSection: 
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2411
-      endSourceChar: 2411
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2441
+      endSourceChar: 2441
       line: 48
       lineChar: 113
       spanCodeSection: 
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2411
-      endSourceChar: 2411
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2441
+      endSourceChar: 2441
       line: 48
       lineChar: 113
       spanCodeSection: 
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2411
-      endSourceChar: 2411
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2441
+      endSourceChar: 2441
       line: 48
       lineChar: 113
       spanCodeSection: 
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2411
-      endSourceChar: 2411
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2441
+      endSourceChar: 2441
       line: 48
       lineChar: 113
       spanCodeSection: 
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2411
-      endSourceChar: 2415
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2441
+      endSourceChar: 2445
       line: 48
       lineChar: 113
       spanCodeSection: VRC.
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2415
-      endSourceChar: 2420
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2445
+      endSourceChar: 2450
       line: 48
       lineChar: 117
       spanCodeSection: Udon.
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2420
-      endSourceChar: 2427
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2450
+      endSourceChar: 2457
       line: 48
       lineChar: 122
       spanCodeSection: Common.
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2427
-      endSourceChar: 2438
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2457
+      endSourceChar: 2468
       line: 48
       lineChar: 129
       spanCodeSection: Interfaces.
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2438
-      endSourceChar: 2457
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2468
+      endSourceChar: 2487
       line: 48
       lineChar: 140
       spanCodeSection: NetworkEventTarget.
-    - startInstruction: 2532
-      endInstruction: 2531
-      startSourceChar: 2457
-      endSourceChar: 2462
+    - startInstruction: 2636
+      endInstruction: 2635
+      startSourceChar: 2487
+      endSourceChar: 2492
       line: 48
       lineChar: 159
       spanCodeSection: 'All, '
-    - startInstruction: 2532
-      endInstruction: 2563
-      startSourceChar: 2462
-      endSourceChar: 2484
+    - startInstruction: 2636
+      endInstruction: 2667
+      startSourceChar: 2492
+      endSourceChar: 2514
       line: 48
       lineChar: 164
       spanCodeSection: "\"WakeUp\"); }\r\n        "
-    - startInstruction: 2564
-      endInstruction: 2563
-      startSourceChar: 2484
-      endSourceChar: 2488
+    - startInstruction: 2668
+      endInstruction: 2667
+      startSourceChar: 2514
+      endSourceChar: 2518
       line: 49
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 2564
-      endInstruction: 2563
-      startSourceChar: 2488
-      endSourceChar: 2488
+    - startInstruction: 2668
+      endInstruction: 2667
+      startSourceChar: 2518
+      endSourceChar: 2518
       line: 49
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2564
-      endInstruction: 2563
-      startSourceChar: 2488
-      endSourceChar: 2501
+    - startInstruction: 2668
+      endInstruction: 2667
+      startSourceChar: 2518
+      endSourceChar: 2531
       line: 49
       lineChar: 12
       spanCodeSection: 'PlaneMesh != '
-    - startInstruction: 2564
-      endInstruction: 2611
-      startSourceChar: 2501
-      endSourceChar: 2516
+    - startInstruction: 2668
+      endInstruction: 2715
+      startSourceChar: 2531
+      endSourceChar: 2546
       line: 49
       lineChar: 25
       spanCodeSection: "null)\r\n        "
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2516
-      endSourceChar: 2531
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2546
+      endSourceChar: 2561
       line: 50
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2531
-      endSourceChar: 2531
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2561
+      endSourceChar: 2561
       line: 51
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2531
-      endSourceChar: 2531
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2561
+      endSourceChar: 2561
       line: 51
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2531
-      endSourceChar: 2531
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2561
+      endSourceChar: 2561
       line: 51
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2531
-      endSourceChar: 2531
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2561
+      endSourceChar: 2561
       line: 51
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2531
-      endSourceChar: 2552
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2561
+      endSourceChar: 2582
       line: 51
       lineChar: 12
       spanCodeSection: 'Transform[] children '
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2552
-      endSourceChar: 2554
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2582
+      endSourceChar: 2584
       line: 51
       lineChar: 33
       spanCodeSection: '= '
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2554
-      endSourceChar: 2554
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2584
+      endSourceChar: 2584
       line: 51
       lineChar: 35
       spanCodeSection: 
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2554
-      endSourceChar: 2554
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2584
+      endSourceChar: 2584
       line: 51
       lineChar: 35
       spanCodeSection: 
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2554
-      endSourceChar: 2564
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2584
+      endSourceChar: 2594
       line: 51
       lineChar: 35
       spanCodeSection: PlaneMesh.
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2564
-      endSourceChar: 2587
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2594
+      endSourceChar: 2617
       line: 51
       lineChar: 45
       spanCodeSection: GetComponentsInChildren
-    - startInstruction: 2612
-      endInstruction: 2611
-      startSourceChar: 2587
-      endSourceChar: 2588
+    - startInstruction: 2716
+      endInstruction: 2715
+      startSourceChar: 2617
+      endSourceChar: 2618
       line: 51
       lineChar: 68
       spanCodeSection: <
-    - startInstruction: 2612
-      endInstruction: 2643
-      startSourceChar: 2588
-      endSourceChar: 2615
+    - startInstruction: 2716
+      endInstruction: 2747
+      startSourceChar: 2618
+      endSourceChar: 2645
       line: 51
       lineChar: 69
       spanCodeSection: "Transform>();\r\n            "
-    - startInstruction: 2644
-      endInstruction: 2643
-      startSourceChar: 2615
-      endSourceChar: 2624
+    - startInstruction: 2748
+      endInstruction: 2747
+      startSourceChar: 2645
+      endSourceChar: 2654
       line: 52
       lineChar: 12
       spanCodeSection: foreach (
-    - startInstruction: 2644
-      endInstruction: 2643
-      startSourceChar: 2624
-      endSourceChar: 2643
+    - startInstruction: 2748
+      endInstruction: 2747
+      startSourceChar: 2654
+      endSourceChar: 2673
       line: 52
       lineChar: 21
       spanCodeSection: 'Transform child in '
-    - startInstruction: 2644
-      endInstruction: 2767
-      startSourceChar: 2643
-      endSourceChar: 2666
+    - startInstruction: 2748
+      endInstruction: 2871
+      startSourceChar: 2673
+      endSourceChar: 2696
       line: 52
       lineChar: 40
       spanCodeSection: "children)\r\n            "
-    - startInstruction: 2768
-      endInstruction: 2767
-      startSourceChar: 2666
-      endSourceChar: 2685
+    - startInstruction: 2872
+      endInstruction: 2871
+      startSourceChar: 2696
+      endSourceChar: 2715
       line: 53
       lineChar: 12
       spanCodeSection: "{\r\n                "
-    - startInstruction: 2768
-      endInstruction: 2767
-      startSourceChar: 2685
-      endSourceChar: 2685
+    - startInstruction: 2872
+      endInstruction: 2871
+      startSourceChar: 2715
+      endSourceChar: 2715
       line: 54
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2768
-      endInstruction: 2767
-      startSourceChar: 2685
-      endSourceChar: 2685
+    - startInstruction: 2872
+      endInstruction: 2871
+      startSourceChar: 2715
+      endSourceChar: 2715
       line: 54
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2768
-      endInstruction: 2767
-      startSourceChar: 2685
-      endSourceChar: 2685
+    - startInstruction: 2872
+      endInstruction: 2871
+      startSourceChar: 2715
+      endSourceChar: 2715
       line: 54
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2768
-      endInstruction: 2767
-      startSourceChar: 2685
-      endSourceChar: 2685
+    - startInstruction: 2872
+      endInstruction: 2871
+      startSourceChar: 2715
+      endSourceChar: 2715
       line: 54
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2768
-      endInstruction: 2767
-      startSourceChar: 2685
-      endSourceChar: 2691
+    - startInstruction: 2872
+      endInstruction: 2871
+      startSourceChar: 2715
+      endSourceChar: 2721
       line: 54
       lineChar: 16
       spanCodeSection: child.
-    - startInstruction: 2768
-      endInstruction: 2767
-      startSourceChar: 2691
-      endSourceChar: 2702
+    - startInstruction: 2872
+      endInstruction: 2871
+      startSourceChar: 2721
+      endSourceChar: 2732
       line: 54
       lineChar: 22
       spanCodeSection: gameObject.
-    - startInstruction: 2768
-      endInstruction: 2791
-      startSourceChar: 2702
-      endSourceChar: 2710
+    - startInstruction: 2872
+      endInstruction: 2895
+      startSourceChar: 2732
+      endSourceChar: 2740
       line: 54
       lineChar: 33
       spanCodeSection: 'layer = '
-    - startInstruction: 2792
-      endInstruction: 2875
-      startSourceChar: 2710
-      endSourceChar: 2752
+    - startInstruction: 2896
+      endInstruction: 2979
+      startSourceChar: 2740
+      endSourceChar: 2782
       line: 54
       lineChar: 41
       spanCodeSection: "19;\r\n            }\r\n        }\r\n    }\r\n    "
-    - startInstruction: 2876
-      endInstruction: 2883
-      startSourceChar: 2752
-      endSourceChar: 2782
+    - startInstruction: 2980
+      endInstruction: 2987
+      startSourceChar: 2782
+      endSourceChar: 2812
       line: 58
       lineChar: 4
       spanCodeSection: "public void PilotLeave()\r\n    "
-    - startInstruction: 2884
-      endInstruction: 2883
-      startSourceChar: 2782
-      endSourceChar: 2793
+    - startInstruction: 2988
+      endInstruction: 2987
+      startSourceChar: 2812
+      endSourceChar: 2823
       line: 59
       lineChar: 4
       spanCodeSection: "{\r\n        "
-    - startInstruction: 2884
-      endInstruction: 2883
-      startSourceChar: 2793
-      endSourceChar: 2797
+    - startInstruction: 2988
+      endInstruction: 2987
+      startSourceChar: 2823
+      endSourceChar: 2827
       line: 60
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 2884
-      endInstruction: 2883
-      startSourceChar: 2797
-      endSourceChar: 2797
+    - startInstruction: 2988
+      endInstruction: 2987
+      startSourceChar: 2827
+      endSourceChar: 2827
       line: 60
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2884
-      endInstruction: 2883
-      startSourceChar: 2797
-      endSourceChar: 2814
+    - startInstruction: 2988
+      endInstruction: 2987
+      startSourceChar: 2827
+      endSourceChar: 2844
       line: 60
       lineChar: 12
       spanCodeSection: 'EngineControl != '
-    - startInstruction: 2884
-      endInstruction: 2931
-      startSourceChar: 2814
-      endSourceChar: 2829
+    - startInstruction: 2988
+      endInstruction: 3035
+      startSourceChar: 2844
+      endSourceChar: 2859
       line: 60
       lineChar: 29
       spanCodeSection: "null)\r\n        "
-    - startInstruction: 2932
-      endInstruction: 2931
-      startSourceChar: 2829
-      endSourceChar: 2844
+    - startInstruction: 3036
+      endInstruction: 3035
+      startSourceChar: 2859
+      endSourceChar: 2874
       line: 61
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 2932
-      endInstruction: 2931
-      startSourceChar: 2844
-      endSourceChar: 2844
+    - startInstruction: 3036
+      endInstruction: 3035
+      startSourceChar: 2874
+      endSourceChar: 2874
       line: 62
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2932
-      endInstruction: 2931
-      startSourceChar: 2844
-      endSourceChar: 2844
+    - startInstruction: 3036
+      endInstruction: 3035
+      startSourceChar: 2874
+      endSourceChar: 2874
       line: 62
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2932
-      endInstruction: 2931
-      startSourceChar: 2844
-      endSourceChar: 2844
+    - startInstruction: 3036
+      endInstruction: 3035
+      startSourceChar: 2874
+      endSourceChar: 2874
       line: 62
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 2932
-      endInstruction: 2931
-      startSourceChar: 2844
-      endSourceChar: 2858
+    - startInstruction: 3036
+      endInstruction: 3035
+      startSourceChar: 2874
+      endSourceChar: 2888
       line: 62
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 2932
-      endInstruction: 2931
-      startSourceChar: 2858
-      endSourceChar: 2869
+    - startInstruction: 3036
+      endInstruction: 3035
+      startSourceChar: 2888
+      endSourceChar: 2899
       line: 62
       lineChar: 26
       spanCodeSection: 'Piloting = '
-    - startInstruction: 2932
-      endInstruction: 2963
-      startSourceChar: 2869
-      endSourceChar: 2889
+    - startInstruction: 3036
+      endInstruction: 3067
+      startSourceChar: 2899
+      endSourceChar: 2919
       line: 62
       lineChar: 37
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 2964
-      endInstruction: 2963
-      startSourceChar: 2889
-      endSourceChar: 2893
+    - startInstruction: 3068
+      endInstruction: 3067
+      startSourceChar: 2919
+      endSourceChar: 2923
       line: 63
       lineChar: 12
       spanCodeSection: if (
-    - startInstruction: 2964
-      endInstruction: 2963
-      startSourceChar: 2893
-      endSourceChar: 2893
+    - startInstruction: 3068
+      endInstruction: 3067
+      startSourceChar: 2923
+      endSourceChar: 2923
       line: 63
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 2964
-      endInstruction: 2963
-      startSourceChar: 2893
-      endSourceChar: 2907
+    - startInstruction: 3068
+      endInstruction: 3067
+      startSourceChar: 2923
+      endSourceChar: 2937
       line: 63
       lineChar: 16
       spanCodeSection: EngineControl.
-    - startInstruction: 2964
-      endInstruction: 3035
-      startSourceChar: 2907
-      endSourceChar: 2929
+    - startInstruction: 3068
+      endInstruction: 3139
+      startSourceChar: 2937
+      endSourceChar: 2959
       line: 63
       lineChar: 30
       spanCodeSection: "Ejected)\r\n            "
-    - startInstruction: 3036
-      endInstruction: 3035
-      startSourceChar: 2929
-      endSourceChar: 2948
+    - startInstruction: 3140
+      endInstruction: 3139
+      startSourceChar: 2959
+      endSourceChar: 2978
       line: 64
       lineChar: 12
       spanCodeSection: "{\r\n                "
-    - startInstruction: 3036
-      endInstruction: 3035
-      startSourceChar: 2948
-      endSourceChar: 2948
+    - startInstruction: 3140
+      endInstruction: 3139
+      startSourceChar: 2978
+      endSourceChar: 2978
       line: 65
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 3036
-      endInstruction: 3035
-      startSourceChar: 2948
-      endSourceChar: 2948
+    - startInstruction: 3140
+      endInstruction: 3139
+      startSourceChar: 2978
+      endSourceChar: 2978
       line: 65
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 3036
-      endInstruction: 3035
-      startSourceChar: 2948
-      endSourceChar: 2948
+    - startInstruction: 3140
+      endInstruction: 3139
+      startSourceChar: 2978
+      endSourceChar: 2978
       line: 65
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 3036
-      endInstruction: 3035
-      startSourceChar: 2948
-      endSourceChar: 2948
+    - startInstruction: 3140
+      endInstruction: 3139
+      startSourceChar: 2978
+      endSourceChar: 2978
       line: 65
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 3036
-      endInstruction: 3035
-      startSourceChar: 2948
-      endSourceChar: 2962
+    - startInstruction: 3140
+      endInstruction: 3139
+      startSourceChar: 2978
+      endSourceChar: 2992
       line: 65
       lineChar: 16
       spanCodeSection: EngineControl.
-    - startInstruction: 3036
-      endInstruction: 3035
-      startSourceChar: 2962
-      endSourceChar: 2974
+    - startInstruction: 3140
+      endInstruction: 3139
+      startSourceChar: 2992
+      endSourceChar: 3004
       line: 65
       lineChar: 30
       spanCodeSection: localPlayer.
-    - startInstruction: 3036
-      endInstruction: 3087
-      startSourceChar: 2974
-      endSourceChar: 2986
+    - startInstruction: 3140
+      endInstruction: 3191
+      startSourceChar: 3004
+      endSourceChar: 3016
       line: 65
       lineChar: 42
       spanCodeSection: SetVelocity(
-    - startInstruction: 3088
-      endInstruction: 3087
-      startSourceChar: 2986
-      endSourceChar: 2986
+    - startInstruction: 3192
+      endInstruction: 3191
+      startSourceChar: 3016
+      endSourceChar: 3016
       line: 65
       lineChar: 54
       spanCodeSection: 
-    - startInstruction: 3088
-      endInstruction: 3087
-      startSourceChar: 2986
-      endSourceChar: 2986
+    - startInstruction: 3192
+      endInstruction: 3191
+      startSourceChar: 3016
+      endSourceChar: 3016
       line: 65
       lineChar: 54
       spanCodeSection: 
-    - startInstruction: 3088
-      endInstruction: 3087
-      startSourceChar: 2986
-      endSourceChar: 3000
+    - startInstruction: 3192
+      endInstruction: 3191
+      startSourceChar: 3016
+      endSourceChar: 3030
       line: 65
       lineChar: 54
       spanCodeSection: EngineControl.
-    - startInstruction: 3088
-      endInstruction: 3139
-      startSourceChar: 3000
-      endSourceChar: 3013
+    - startInstruction: 3192
+      endInstruction: 3243
+      startSourceChar: 3030
+      endSourceChar: 3043
       line: 65
       lineChar: 68
       spanCodeSection: 'CurrentVel + '
-    - startInstruction: 3140
-      endInstruction: 3139
-      startSourceChar: 3013
-      endSourceChar: 3013
+    - startInstruction: 3244
+      endInstruction: 3243
+      startSourceChar: 3043
+      endSourceChar: 3043
       line: 65
       lineChar: 81
       spanCodeSection: 
-    - startInstruction: 3140
-      endInstruction: 3139
-      startSourceChar: 3013
-      endSourceChar: 3013
+    - startInstruction: 3244
+      endInstruction: 3243
+      startSourceChar: 3043
+      endSourceChar: 3043
       line: 65
       lineChar: 81
       spanCodeSection: 
-    - startInstruction: 3140
-      endInstruction: 3139
-      startSourceChar: 3013
-      endSourceChar: 3013
+    - startInstruction: 3244
+      endInstruction: 3243
+      startSourceChar: 3043
+      endSourceChar: 3043
       line: 65
       lineChar: 81
       spanCodeSection: 
-    - startInstruction: 3140
-      endInstruction: 3139
-      startSourceChar: 3013
-      endSourceChar: 3013
+    - startInstruction: 3244
+      endInstruction: 3243
+      startSourceChar: 3043
+      endSourceChar: 3043
       line: 65
       lineChar: 81
       spanCodeSection: 
-    - startInstruction: 3140
-      endInstruction: 3139
-      startSourceChar: 3013
-      endSourceChar: 3027
+    - startInstruction: 3244
+      endInstruction: 3243
+      startSourceChar: 3043
+      endSourceChar: 3057
       line: 65
       lineChar: 81
       spanCodeSection: EngineControl.
-    - startInstruction: 3140
-      endInstruction: 3139
-      startSourceChar: 3027
-      endSourceChar: 3042
+    - startInstruction: 3244
+      endInstruction: 3243
+      startSourceChar: 3057
+      endSourceChar: 3072
       line: 65
       lineChar: 95
       spanCodeSection: VehicleMainObj.
-    - startInstruction: 3140
-      endInstruction: 3191
-      startSourceChar: 3042
-      endSourceChar: 3052
+    - startInstruction: 3244
+      endInstruction: 3295
+      startSourceChar: 3072
+      endSourceChar: 3082
       line: 65
       lineChar: 110
       spanCodeSection: transform.
-    - startInstruction: 3192
-      endInstruction: 3239
-      startSourceChar: 3052
-      endSourceChar: 3057
+    - startInstruction: 3296
+      endInstruction: 3343
+      startSourceChar: 3082
+      endSourceChar: 3087
       line: 65
       lineChar: 120
       spanCodeSection: 'up * '
-    - startInstruction: 3240
-      endInstruction: 3351
-      startSourceChar: 3057
-      endSourceChar: 3079
+    - startInstruction: 3344
+      endInstruction: 3455
+      startSourceChar: 3087
+      endSourceChar: 3109
       line: 65
       lineChar: 125
       spanCodeSection: "25);\r\n                "
-    - startInstruction: 3352
-      endInstruction: 3351
-      startSourceChar: 3079
-      endSourceChar: 3079
+    - startInstruction: 3456
+      endInstruction: 3455
+      startSourceChar: 3109
+      endSourceChar: 3109
       line: 66
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 3352
-      endInstruction: 3351
-      startSourceChar: 3079
-      endSourceChar: 3079
+    - startInstruction: 3456
+      endInstruction: 3455
+      startSourceChar: 3109
+      endSourceChar: 3109
       line: 66
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 3352
-      endInstruction: 3351
-      startSourceChar: 3079
-      endSourceChar: 3079
+    - startInstruction: 3456
+      endInstruction: 3455
+      startSourceChar: 3109
+      endSourceChar: 3109
       line: 66
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 3352
-      endInstruction: 3351
-      startSourceChar: 3079
-      endSourceChar: 3093
+    - startInstruction: 3456
+      endInstruction: 3455
+      startSourceChar: 3109
+      endSourceChar: 3123
       line: 66
       lineChar: 16
       spanCodeSection: EngineControl.
-    - startInstruction: 3352
-      endInstruction: 3351
-      startSourceChar: 3093
-      endSourceChar: 3103
+    - startInstruction: 3456
+      endInstruction: 3455
+      startSourceChar: 3123
+      endSourceChar: 3133
       line: 66
       lineChar: 30
       spanCodeSection: 'Ejected = '
-    - startInstruction: 3352
-      endInstruction: 3391
-      startSourceChar: 3103
-      endSourceChar: 3138
+    - startInstruction: 3456
+      endInstruction: 3495
+      startSourceChar: 3133
+      endSourceChar: 3168
       line: 66
       lineChar: 40
       spanCodeSection: "false;\r\n            }\r\n            "
-    - startInstruction: 3392
-      endInstruction: 3391
-      startSourceChar: 3138
-      endSourceChar: 3143
+    - startInstruction: 3496
+      endInstruction: 3495
+      startSourceChar: 3168
+      endSourceChar: 3173
       line: 68
       lineChar: 12
       spanCodeSection: 'else '
-    - startInstruction: 3392
-      endInstruction: 3391
-      startSourceChar: 3143
-      endSourceChar: 3143
+    - startInstruction: 3496
+      endInstruction: 3495
+      startSourceChar: 3173
+      endSourceChar: 3173
       line: 68
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 3392
-      endInstruction: 3391
-      startSourceChar: 3143
-      endSourceChar: 3143
+    - startInstruction: 3496
+      endInstruction: 3495
+      startSourceChar: 3173
+      endSourceChar: 3173
       line: 68
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 3392
-      endInstruction: 3391
-      startSourceChar: 3143
-      endSourceChar: 3143
+    - startInstruction: 3496
+      endInstruction: 3495
+      startSourceChar: 3173
+      endSourceChar: 3173
       line: 68
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 3392
-      endInstruction: 3391
-      startSourceChar: 3143
-      endSourceChar: 3143
+    - startInstruction: 3496
+      endInstruction: 3495
+      startSourceChar: 3173
+      endSourceChar: 3173
       line: 68
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 3392
-      endInstruction: 3391
-      startSourceChar: 3143
-      endSourceChar: 3157
+    - startInstruction: 3496
+      endInstruction: 3495
+      startSourceChar: 3173
+      endSourceChar: 3187
       line: 68
       lineChar: 17
       spanCodeSection: EngineControl.
-    - startInstruction: 3392
-      endInstruction: 3391
-      startSourceChar: 3157
-      endSourceChar: 3169
+    - startInstruction: 3496
+      endInstruction: 3495
+      startSourceChar: 3187
+      endSourceChar: 3199
       line: 68
       lineChar: 31
       spanCodeSection: localPlayer.
-    - startInstruction: 3392
-      endInstruction: 3443
-      startSourceChar: 3169
-      endSourceChar: 3181
+    - startInstruction: 3496
+      endInstruction: 3547
+      startSourceChar: 3199
+      endSourceChar: 3211
       line: 68
       lineChar: 43
       spanCodeSection: SetVelocity(
-    - startInstruction: 3444
-      endInstruction: 3443
-      startSourceChar: 3181
-      endSourceChar: 3181
+    - startInstruction: 3548
+      endInstruction: 3547
+      startSourceChar: 3211
+      endSourceChar: 3211
       line: 68
       lineChar: 55
       spanCodeSection: 
-    - startInstruction: 3444
-      endInstruction: 3443
-      startSourceChar: 3181
-      endSourceChar: 3195
+    - startInstruction: 3548
+      endInstruction: 3547
+      startSourceChar: 3211
+      endSourceChar: 3225
       line: 68
       lineChar: 55
       spanCodeSection: EngineControl.
-    - startInstruction: 3444
-      endInstruction: 3519
-      startSourceChar: 3195
-      endSourceChar: 3221
+    - startInstruction: 3548
+      endInstruction: 3623
+      startSourceChar: 3225
+      endSourceChar: 3251
       line: 68
       lineChar: 69
       spanCodeSection: "CurrentVel);\r\n            "
-    - startInstruction: 3520
-      endInstruction: 3519
-      startSourceChar: 3221
-      endSourceChar: 3221
+    - startInstruction: 3624
+      endInstruction: 3623
+      startSourceChar: 3251
+      endSourceChar: 3251
       line: 69
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3520
-      endInstruction: 3519
-      startSourceChar: 3221
-      endSourceChar: 3221
+    - startInstruction: 3624
+      endInstruction: 3623
+      startSourceChar: 3251
+      endSourceChar: 3251
       line: 69
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3520
-      endInstruction: 3519
-      startSourceChar: 3221
-      endSourceChar: 3221
+    - startInstruction: 3624
+      endInstruction: 3623
+      startSourceChar: 3251
+      endSourceChar: 3251
       line: 69
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3520
-      endInstruction: 3519
-      startSourceChar: 3221
-      endSourceChar: 3235
+    - startInstruction: 3624
+      endInstruction: 3623
+      startSourceChar: 3251
+      endSourceChar: 3265
       line: 69
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3520
-      endInstruction: 3519
-      startSourceChar: 3235
-      endSourceChar: 3248
+    - startInstruction: 3624
+      endInstruction: 3623
+      startSourceChar: 3265
+      endSourceChar: 3278
       line: 69
       lineChar: 26
       spanCodeSection: 'EjectTimer = '
-    - startInstruction: 3520
-      endInstruction: 3575
-      startSourceChar: 3248
-      endSourceChar: 3264
+    - startInstruction: 3624
+      endInstruction: 3679
+      startSourceChar: 3278
+      endSourceChar: 3294
       line: 69
       lineChar: 39
       spanCodeSection: "2;\r\n            "
-    - startInstruction: 3576
-      endInstruction: 3575
-      startSourceChar: 3264
-      endSourceChar: 3264
+    - startInstruction: 3680
+      endInstruction: 3679
+      startSourceChar: 3294
+      endSourceChar: 3294
       line: 70
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3576
-      endInstruction: 3575
-      startSourceChar: 3264
-      endSourceChar: 3264
+    - startInstruction: 3680
+      endInstruction: 3679
+      startSourceChar: 3294
+      endSourceChar: 3294
       line: 70
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3576
-      endInstruction: 3575
-      startSourceChar: 3264
-      endSourceChar: 3264
+    - startInstruction: 3680
+      endInstruction: 3679
+      startSourceChar: 3294
+      endSourceChar: 3294
       line: 70
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3576
-      endInstruction: 3575
-      startSourceChar: 3264
-      endSourceChar: 3278
+    - startInstruction: 3680
+      endInstruction: 3679
+      startSourceChar: 3294
+      endSourceChar: 3308
       line: 70
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3576
-      endInstruction: 3575
-      startSourceChar: 3278
-      endSourceChar: 3287
+    - startInstruction: 3680
+      endInstruction: 3679
+      startSourceChar: 3308
+      endSourceChar: 3317
       line: 70
       lineChar: 26
       spanCodeSection: 'Hooked = '
-    - startInstruction: 3576
-      endInstruction: 3631
-      startSourceChar: 3287
-      endSourceChar: 3303
+    - startInstruction: 3680
+      endInstruction: 3735
+      startSourceChar: 3317
+      endSourceChar: 3333
       line: 70
       lineChar: 35
       spanCodeSection: "0;\r\n            "
-    - startInstruction: 3632
-      endInstruction: 3631
-      startSourceChar: 3303
-      endSourceChar: 3303
+    - startInstruction: 3736
+      endInstruction: 3735
+      startSourceChar: 3333
+      endSourceChar: 3333
       line: 71
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3632
-      endInstruction: 3631
-      startSourceChar: 3303
-      endSourceChar: 3303
+    - startInstruction: 3736
+      endInstruction: 3735
+      startSourceChar: 3333
+      endSourceChar: 3333
       line: 71
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3632
-      endInstruction: 3631
-      startSourceChar: 3303
-      endSourceChar: 3303
+    - startInstruction: 3736
+      endInstruction: 3735
+      startSourceChar: 3333
+      endSourceChar: 3333
       line: 71
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3632
-      endInstruction: 3631
-      startSourceChar: 3303
-      endSourceChar: 3317
+    - startInstruction: 3736
+      endInstruction: 3735
+      startSourceChar: 3333
+      endSourceChar: 3347
       line: 71
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3632
-      endInstruction: 3631
-      startSourceChar: 3317
-      endSourceChar: 3333
+    - startInstruction: 3736
+      endInstruction: 3735
+      startSourceChar: 3347
+      endSourceChar: 3363
       line: 71
       lineChar: 26
       spanCodeSection: 'AirBrakeInput = '
-    - startInstruction: 3632
-      endInstruction: 3687
-      startSourceChar: 3333
-      endSourceChar: 3349
+    - startInstruction: 3736
+      endInstruction: 3791
+      startSourceChar: 3363
+      endSourceChar: 3379
       line: 71
       lineChar: 42
       spanCodeSection: "0;\r\n            "
-    - startInstruction: 3688
-      endInstruction: 3687
-      startSourceChar: 3349
-      endSourceChar: 3349
+    - startInstruction: 3792
+      endInstruction: 3791
+      startSourceChar: 3379
+      endSourceChar: 3379
       line: 72
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3688
-      endInstruction: 3687
-      startSourceChar: 3349
-      endSourceChar: 3349
+    - startInstruction: 3792
+      endInstruction: 3791
+      startSourceChar: 3379
+      endSourceChar: 3379
       line: 72
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3688
-      endInstruction: 3687
-      startSourceChar: 3349
-      endSourceChar: 3349
+    - startInstruction: 3792
+      endInstruction: 3791
+      startSourceChar: 3379
+      endSourceChar: 3379
       line: 72
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3688
-      endInstruction: 3687
-      startSourceChar: 3349
-      endSourceChar: 3363
+    - startInstruction: 3792
+      endInstruction: 3791
+      startSourceChar: 3379
+      endSourceChar: 3393
       line: 72
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3688
-      endInstruction: 3687
-      startSourceChar: 3363
-      endSourceChar: 3381
+    - startInstruction: 3792
+      endInstruction: 3791
+      startSourceChar: 3393
+      endSourceChar: 3411
       line: 72
       lineChar: 26
       spanCodeSection: 'LTriggerTapTime = '
-    - startInstruction: 3688
-      endInstruction: 3743
-      startSourceChar: 3381
-      endSourceChar: 3397
+    - startInstruction: 3792
+      endInstruction: 3847
+      startSourceChar: 3411
+      endSourceChar: 3427
       line: 72
       lineChar: 44
       spanCodeSection: "1;\r\n            "
-    - startInstruction: 3744
-      endInstruction: 3743
-      startSourceChar: 3397
-      endSourceChar: 3397
+    - startInstruction: 3848
+      endInstruction: 3847
+      startSourceChar: 3427
+      endSourceChar: 3427
       line: 73
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3744
-      endInstruction: 3743
-      startSourceChar: 3397
-      endSourceChar: 3397
+    - startInstruction: 3848
+      endInstruction: 3847
+      startSourceChar: 3427
+      endSourceChar: 3427
       line: 73
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3744
-      endInstruction: 3743
-      startSourceChar: 3397
-      endSourceChar: 3397
+    - startInstruction: 3848
+      endInstruction: 3847
+      startSourceChar: 3427
+      endSourceChar: 3427
       line: 73
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3744
-      endInstruction: 3743
-      startSourceChar: 3397
-      endSourceChar: 3411
+    - startInstruction: 3848
+      endInstruction: 3847
+      startSourceChar: 3427
+      endSourceChar: 3441
       line: 73
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3744
-      endInstruction: 3743
-      startSourceChar: 3411
-      endSourceChar: 3429
+    - startInstruction: 3848
+      endInstruction: 3847
+      startSourceChar: 3441
+      endSourceChar: 3459
       line: 73
       lineChar: 26
       spanCodeSection: 'RTriggerTapTime = '
-    - startInstruction: 3744
-      endInstruction: 3799
-      startSourceChar: 3429
-      endSourceChar: 3445
+    - startInstruction: 3848
+      endInstruction: 3903
+      startSourceChar: 3459
+      endSourceChar: 3475
       line: 73
       lineChar: 44
       spanCodeSection: "1;\r\n            "
-    - startInstruction: 3800
-      endInstruction: 3799
-      startSourceChar: 3445
-      endSourceChar: 3445
+    - startInstruction: 3904
+      endInstruction: 3903
+      startSourceChar: 3475
+      endSourceChar: 3475
       line: 74
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3800
-      endInstruction: 3799
-      startSourceChar: 3445
-      endSourceChar: 3445
+    - startInstruction: 3904
+      endInstruction: 3903
+      startSourceChar: 3475
+      endSourceChar: 3475
       line: 74
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3800
-      endInstruction: 3799
-      startSourceChar: 3445
-      endSourceChar: 3445
+    - startInstruction: 3904
+      endInstruction: 3903
+      startSourceChar: 3475
+      endSourceChar: 3475
       line: 74
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3800
-      endInstruction: 3799
-      startSourceChar: 3445
-      endSourceChar: 3459
+    - startInstruction: 3904
+      endInstruction: 3903
+      startSourceChar: 3475
+      endSourceChar: 3489
       line: 74
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3800
-      endInstruction: 3799
-      startSourceChar: 3459
-      endSourceChar: 3475
+    - startInstruction: 3904
+      endInstruction: 3903
+      startSourceChar: 3489
+      endSourceChar: 3505
       line: 74
       lineChar: 26
       spanCodeSection: 'Taxiinglerper = '
-    - startInstruction: 3800
-      endInstruction: 3855
-      startSourceChar: 3475
-      endSourceChar: 3491
+    - startInstruction: 3904
+      endInstruction: 3959
+      startSourceChar: 3505
+      endSourceChar: 3521
       line: 74
       lineChar: 42
       spanCodeSection: "0;\r\n            "
-    - startInstruction: 3856
-      endInstruction: 3855
-      startSourceChar: 3491
-      endSourceChar: 3491
+    - startInstruction: 3960
+      endInstruction: 3959
+      startSourceChar: 3521
+      endSourceChar: 3521
       line: 75
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3856
-      endInstruction: 3855
-      startSourceChar: 3491
-      endSourceChar: 3491
+    - startInstruction: 3960
+      endInstruction: 3959
+      startSourceChar: 3521
+      endSourceChar: 3521
       line: 75
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3856
-      endInstruction: 3855
-      startSourceChar: 3491
-      endSourceChar: 3491
+    - startInstruction: 3960
+      endInstruction: 3959
+      startSourceChar: 3521
+      endSourceChar: 3521
       line: 75
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3856
-      endInstruction: 3855
-      startSourceChar: 3491
-      endSourceChar: 3505
+    - startInstruction: 3960
+      endInstruction: 3959
+      startSourceChar: 3521
+      endSourceChar: 3535
       line: 75
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3856
-      endInstruction: 3855
-      startSourceChar: 3505
-      endSourceChar: 3522
+    - startInstruction: 3960
+      endInstruction: 3959
+      startSourceChar: 3535
+      endSourceChar: 3552
       line: 75
       lineChar: 26
       spanCodeSection: 'PlayerThrottle = '
-    - startInstruction: 3856
-      endInstruction: 3911
-      startSourceChar: 3522
-      endSourceChar: 3538
+    - startInstruction: 3960
+      endInstruction: 4015
+      startSourceChar: 3552
+      endSourceChar: 3568
       line: 75
       lineChar: 43
       spanCodeSection: "0;\r\n            "
-    - startInstruction: 3912
-      endInstruction: 3911
-      startSourceChar: 3538
-      endSourceChar: 3538
+    - startInstruction: 4016
+      endInstruction: 4015
+      startSourceChar: 3568
+      endSourceChar: 3568
       line: 76
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3912
-      endInstruction: 3911
-      startSourceChar: 3538
-      endSourceChar: 3538
+    - startInstruction: 4016
+      endInstruction: 4015
+      startSourceChar: 3568
+      endSourceChar: 3568
       line: 76
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3912
-      endInstruction: 3911
-      startSourceChar: 3538
-      endSourceChar: 3538
+    - startInstruction: 4016
+      endInstruction: 4015
+      startSourceChar: 3568
+      endSourceChar: 3568
       line: 76
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3912
-      endInstruction: 3911
-      startSourceChar: 3538
-      endSourceChar: 3552
+    - startInstruction: 4016
+      endInstruction: 4015
+      startSourceChar: 3568
+      endSourceChar: 3582
       line: 76
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3912
-      endInstruction: 3911
-      startSourceChar: 3552
-      endSourceChar: 3569
+    - startInstruction: 4016
+      endInstruction: 4015
+      startSourceChar: 3582
+      endSourceChar: 3599
       line: 76
       lineChar: 26
       spanCodeSection: 'LGripLastFrame = '
-    - startInstruction: 3912
-      endInstruction: 3943
-      startSourceChar: 3569
-      endSourceChar: 3589
+    - startInstruction: 4016
+      endInstruction: 4047
+      startSourceChar: 3599
+      endSourceChar: 3619
       line: 76
       lineChar: 43
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 3944
-      endInstruction: 3943
-      startSourceChar: 3589
-      endSourceChar: 3589
+    - startInstruction: 4048
+      endInstruction: 4047
+      startSourceChar: 3619
+      endSourceChar: 3619
       line: 77
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3944
-      endInstruction: 3943
-      startSourceChar: 3589
-      endSourceChar: 3589
+    - startInstruction: 4048
+      endInstruction: 4047
+      startSourceChar: 3619
+      endSourceChar: 3619
       line: 77
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3944
-      endInstruction: 3943
-      startSourceChar: 3589
-      endSourceChar: 3589
+    - startInstruction: 4048
+      endInstruction: 4047
+      startSourceChar: 3619
+      endSourceChar: 3619
       line: 77
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3944
-      endInstruction: 3943
-      startSourceChar: 3589
-      endSourceChar: 3603
+    - startInstruction: 4048
+      endInstruction: 4047
+      startSourceChar: 3619
+      endSourceChar: 3633
       line: 77
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3944
-      endInstruction: 3943
-      startSourceChar: 3603
-      endSourceChar: 3620
+    - startInstruction: 4048
+      endInstruction: 4047
+      startSourceChar: 3633
+      endSourceChar: 3650
       line: 77
       lineChar: 26
       spanCodeSection: 'RGripLastFrame = '
-    - startInstruction: 3944
-      endInstruction: 3975
-      startSourceChar: 3620
-      endSourceChar: 3640
+    - startInstruction: 4048
+      endInstruction: 4079
+      startSourceChar: 3650
+      endSourceChar: 3670
       line: 77
       lineChar: 43
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 3976
-      endInstruction: 3975
-      startSourceChar: 3640
-      endSourceChar: 3640
+    - startInstruction: 4080
+      endInstruction: 4079
+      startSourceChar: 3670
+      endSourceChar: 3670
       line: 78
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3976
-      endInstruction: 3975
-      startSourceChar: 3640
-      endSourceChar: 3640
+    - startInstruction: 4080
+      endInstruction: 4079
+      startSourceChar: 3670
+      endSourceChar: 3670
       line: 78
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3976
-      endInstruction: 3975
-      startSourceChar: 3640
-      endSourceChar: 3640
+    - startInstruction: 4080
+      endInstruction: 4079
+      startSourceChar: 3670
+      endSourceChar: 3670
       line: 78
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 3976
-      endInstruction: 3975
-      startSourceChar: 3640
-      endSourceChar: 3654
+    - startInstruction: 4080
+      endInstruction: 4079
+      startSourceChar: 3670
+      endSourceChar: 3684
       line: 78
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 3976
-      endInstruction: 3975
-      startSourceChar: 3654
-      endSourceChar: 3672
+    - startInstruction: 4080
+      endInstruction: 4079
+      startSourceChar: 3684
+      endSourceChar: 3702
       line: 78
       lineChar: 26
       spanCodeSection: 'LStickSelection = '
-    - startInstruction: 3976
-      endInstruction: 4007
-      startSourceChar: 3672
-      endSourceChar: 3688
+    - startInstruction: 4080
+      endInstruction: 4111
+      startSourceChar: 3702
+      endSourceChar: 3718
       line: 78
       lineChar: 44
       spanCodeSection: "0;\r\n            "
-    - startInstruction: 4008
-      endInstruction: 4007
-      startSourceChar: 3688
-      endSourceChar: 3688
+    - startInstruction: 4112
+      endInstruction: 4111
+      startSourceChar: 3718
+      endSourceChar: 3718
       line: 79
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4008
-      endInstruction: 4007
-      startSourceChar: 3688
-      endSourceChar: 3688
+    - startInstruction: 4112
+      endInstruction: 4111
+      startSourceChar: 3718
+      endSourceChar: 3718
       line: 79
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4008
-      endInstruction: 4007
-      startSourceChar: 3688
-      endSourceChar: 3688
+    - startInstruction: 4112
+      endInstruction: 4111
+      startSourceChar: 3718
+      endSourceChar: 3718
       line: 79
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4008
-      endInstruction: 4007
-      startSourceChar: 3688
-      endSourceChar: 3702
+    - startInstruction: 4112
+      endInstruction: 4111
+      startSourceChar: 3718
+      endSourceChar: 3732
       line: 79
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4008
-      endInstruction: 4007
-      startSourceChar: 3702
-      endSourceChar: 3720
+    - startInstruction: 4112
+      endInstruction: 4111
+      startSourceChar: 3732
+      endSourceChar: 3750
       line: 79
       lineChar: 26
       spanCodeSection: 'RStickSelection = '
-    - startInstruction: 4008
-      endInstruction: 4039
-      startSourceChar: 3720
-      endSourceChar: 3736
+    - startInstruction: 4112
+      endInstruction: 4143
+      startSourceChar: 3750
+      endSourceChar: 3766
       line: 79
       lineChar: 44
       spanCodeSection: "0;\r\n            "
-    - startInstruction: 4040
-      endInstruction: 4039
-      startSourceChar: 3736
-      endSourceChar: 3736
+    - startInstruction: 4144
+      endInstruction: 4143
+      startSourceChar: 3766
+      endSourceChar: 3766
       line: 80
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4040
-      endInstruction: 4039
-      startSourceChar: 3736
-      endSourceChar: 3736
+    - startInstruction: 4144
+      endInstruction: 4143
+      startSourceChar: 3766
+      endSourceChar: 3766
       line: 80
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4040
-      endInstruction: 4039
-      startSourceChar: 3736
-      endSourceChar: 3736
+    - startInstruction: 4144
+      endInstruction: 4143
+      startSourceChar: 3766
+      endSourceChar: 3766
       line: 80
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4040
-      endInstruction: 4039
-      startSourceChar: 3736
-      endSourceChar: 3750
+    - startInstruction: 4144
+      endInstruction: 4143
+      startSourceChar: 3766
+      endSourceChar: 3780
       line: 80
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4040
-      endInstruction: 4039
-      startSourceChar: 3750
-      endSourceChar: 3766
+    - startInstruction: 4144
+      endInstruction: 4143
+      startSourceChar: 3780
+      endSourceChar: 3796
       line: 80
       lineChar: 26
       spanCodeSection: 'AirBrakeInput = '
-    - startInstruction: 4040
-      endInstruction: 4095
-      startSourceChar: 3766
-      endSourceChar: 3782
+    - startInstruction: 4144
+      endInstruction: 4199
+      startSourceChar: 3796
+      endSourceChar: 3812
       line: 80
       lineChar: 42
       spanCodeSection: "0;\r\n            "
-    - startInstruction: 4096
-      endInstruction: 4095
-      startSourceChar: 3782
-      endSourceChar: 3782
+    - startInstruction: 4200
+      endInstruction: 4199
+      startSourceChar: 3812
+      endSourceChar: 3812
       line: 81
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4096
-      endInstruction: 4095
-      startSourceChar: 3782
-      endSourceChar: 3782
+    - startInstruction: 4200
+      endInstruction: 4199
+      startSourceChar: 3812
+      endSourceChar: 3812
       line: 81
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4096
-      endInstruction: 4095
-      startSourceChar: 3782
-      endSourceChar: 3782
+    - startInstruction: 4200
+      endInstruction: 4199
+      startSourceChar: 3812
+      endSourceChar: 3812
       line: 81
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4096
-      endInstruction: 4095
-      startSourceChar: 3782
-      endSourceChar: 3796
+    - startInstruction: 4200
+      endInstruction: 4199
+      startSourceChar: 3812
+      endSourceChar: 3826
       line: 81
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4096
-      endInstruction: 4095
-      startSourceChar: 3796
-      endSourceChar: 3816
+    - startInstruction: 4200
+      endInstruction: 4199
+      startSourceChar: 3826
+      endSourceChar: 3846
       line: 81
       lineChar: 26
       spanCodeSection: 'LTriggerLastFrame = '
-    - startInstruction: 4096
-      endInstruction: 4127
-      startSourceChar: 3816
-      endSourceChar: 3836
+    - startInstruction: 4200
+      endInstruction: 4231
+      startSourceChar: 3846
+      endSourceChar: 3866
       line: 81
       lineChar: 46
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 4128
-      endInstruction: 4127
-      startSourceChar: 3836
-      endSourceChar: 3836
+    - startInstruction: 4232
+      endInstruction: 4231
+      startSourceChar: 3866
+      endSourceChar: 3866
       line: 82
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4128
-      endInstruction: 4127
-      startSourceChar: 3836
-      endSourceChar: 3836
+    - startInstruction: 4232
+      endInstruction: 4231
+      startSourceChar: 3866
+      endSourceChar: 3866
       line: 82
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4128
-      endInstruction: 4127
-      startSourceChar: 3836
-      endSourceChar: 3836
+    - startInstruction: 4232
+      endInstruction: 4231
+      startSourceChar: 3866
+      endSourceChar: 3866
       line: 82
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4128
-      endInstruction: 4127
-      startSourceChar: 3836
-      endSourceChar: 3850
+    - startInstruction: 4232
+      endInstruction: 4231
+      startSourceChar: 3866
+      endSourceChar: 3880
       line: 82
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4128
-      endInstruction: 4127
-      startSourceChar: 3850
-      endSourceChar: 3870
+    - startInstruction: 4232
+      endInstruction: 4231
+      startSourceChar: 3880
+      endSourceChar: 3900
       line: 82
       lineChar: 26
       spanCodeSection: 'RTriggerLastFrame = '
-    - startInstruction: 4128
-      endInstruction: 4159
-      startSourceChar: 3870
-      endSourceChar: 3890
+    - startInstruction: 4232
+      endInstruction: 4263
+      startSourceChar: 3900
+      endSourceChar: 3920
       line: 82
       lineChar: 46
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 4160
-      endInstruction: 4159
-      startSourceChar: 3890
-      endSourceChar: 3890
+    - startInstruction: 4264
+      endInstruction: 4263
+      startSourceChar: 3920
+      endSourceChar: 3920
       line: 83
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4160
-      endInstruction: 4159
-      startSourceChar: 3890
-      endSourceChar: 3890
+    - startInstruction: 4264
+      endInstruction: 4263
+      startSourceChar: 3920
+      endSourceChar: 3920
       line: 83
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4160
-      endInstruction: 4159
-      startSourceChar: 3890
-      endSourceChar: 3890
+    - startInstruction: 4264
+      endInstruction: 4263
+      startSourceChar: 3920
+      endSourceChar: 3920
       line: 83
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4160
-      endInstruction: 4159
-      startSourceChar: 3890
-      endSourceChar: 3890
+    - startInstruction: 4264
+      endInstruction: 4263
+      startSourceChar: 3920
+      endSourceChar: 3920
       line: 83
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4160
-      endInstruction: 4159
-      startSourceChar: 3890
-      endSourceChar: 3904
+    - startInstruction: 4264
+      endInstruction: 4263
+      startSourceChar: 3920
+      endSourceChar: 3934
       line: 83
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4160
-      endInstruction: 4159
-      startSourceChar: 3904
-      endSourceChar: 3915
+    - startInstruction: 4264
+      endInstruction: 4263
+      startSourceChar: 3934
+      endSourceChar: 3945
       line: 83
       lineChar: 26
       spanCodeSection: HUDControl.
-    - startInstruction: 4160
-      endInstruction: 4211
-      startSourceChar: 3915
-      endSourceChar: 3936
+    - startInstruction: 4264
+      endInstruction: 4315
+      startSourceChar: 3945
+      endSourceChar: 3966
       line: 83
       lineChar: 37
       spanCodeSection: 'MenuSoundCheckLast = '
-    - startInstruction: 4212
-      endInstruction: 4267
-      startSourceChar: 3936
-      endSourceChar: 3952
+    - startInstruction: 4316
+      endInstruction: 4371
+      startSourceChar: 3966
+      endSourceChar: 3982
       line: 83
       lineChar: 58
       spanCodeSection: "0;\r\n            "
-    - startInstruction: 4268
-      endInstruction: 4267
-      startSourceChar: 3952
-      endSourceChar: 3952
+    - startInstruction: 4372
+      endInstruction: 4371
+      startSourceChar: 3982
+      endSourceChar: 3982
       line: 84
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4268
-      endInstruction: 4267
-      startSourceChar: 3952
-      endSourceChar: 3952
+    - startInstruction: 4372
+      endInstruction: 4371
+      startSourceChar: 3982
+      endSourceChar: 3982
       line: 84
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4268
-      endInstruction: 4267
-      startSourceChar: 3952
-      endSourceChar: 3952
+    - startInstruction: 4372
+      endInstruction: 4371
+      startSourceChar: 3982
+      endSourceChar: 3982
       line: 84
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4268
-      endInstruction: 4267
-      startSourceChar: 3952
-      endSourceChar: 3966
+    - startInstruction: 4372
+      endInstruction: 4371
+      startSourceChar: 3982
+      endSourceChar: 3996
       line: 84
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4268
-      endInstruction: 4267
-      startSourceChar: 3966
-      endSourceChar: 3978
+    - startInstruction: 4372
+      endInstruction: 4371
+      startSourceChar: 3996
+      endSourceChar: 4008
       line: 84
       lineChar: 26
       spanCodeSection: 'AGMLocked = '
-    - startInstruction: 4268
-      endInstruction: 4299
-      startSourceChar: 3978
-      endSourceChar: 3998
+    - startInstruction: 4372
+      endInstruction: 4403
+      startSourceChar: 4008
+      endSourceChar: 4028
       line: 84
       lineChar: 38
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 4300
-      endInstruction: 4299
-      startSourceChar: 3998
-      endSourceChar: 4002
+    - startInstruction: 4404
+      endInstruction: 4403
+      startSourceChar: 4028
+      endSourceChar: 4032
       line: 85
       lineChar: 12
       spanCodeSection: if (
-    - startInstruction: 4300
-      endInstruction: 4299
-      startSourceChar: 4002
-      endSourceChar: 4002
+    - startInstruction: 4404
+      endInstruction: 4403
+      startSourceChar: 4032
+      endSourceChar: 4032
       line: 85
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 4300
-      endInstruction: 4299
-      startSourceChar: 4002
-      endSourceChar: 4002
+    - startInstruction: 4404
+      endInstruction: 4403
+      startSourceChar: 4032
+      endSourceChar: 4032
       line: 85
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 4300
-      endInstruction: 4299
-      startSourceChar: 4002
-      endSourceChar: 4016
+    - startInstruction: 4404
+      endInstruction: 4403
+      startSourceChar: 4032
+      endSourceChar: 4046
       line: 85
       lineChar: 16
       spanCodeSection: EngineControl.
-    - startInstruction: 4300
-      endInstruction: 4355
-      startSourceChar: 4016
-      endSourceChar: 4034
+    - startInstruction: 4404
+      endInstruction: 4459
+      startSourceChar: 4046
+      endSourceChar: 4064
       line: 85
       lineChar: 30
       spanCodeSection: 'CatapultStatus == '
-    - startInstruction: 4356
-      endInstruction: 4403
-      startSourceChar: 4034
-      endSourceChar: 4037
+    - startInstruction: 4460
+      endInstruction: 4507
+      startSourceChar: 4064
+      endSourceChar: 4067
       line: 85
       lineChar: 48
       spanCodeSection: '2) '
-    - startInstruction: 4404
-      endInstruction: 4411
-      startSourceChar: 4037
-      endSourceChar: 4083
+    - startInstruction: 4508
+      endInstruction: 4515
+      startSourceChar: 4067
+      endSourceChar: 4113
       line: 85
       lineChar: 51
       spanCodeSection: "{ }//keep launching if launching\r\n            "
-    - startInstruction: 4412
-      endInstruction: 4411
-      startSourceChar: 4083
-      endSourceChar: 4088
+    - startInstruction: 4516
+      endInstruction: 4515
+      startSourceChar: 4113
+      endSourceChar: 4118
       line: 86
       lineChar: 12
       spanCodeSection: 'else '
-    - startInstruction: 4412
-      endInstruction: 4411
-      startSourceChar: 4088
-      endSourceChar: 4088
+    - startInstruction: 4516
+      endInstruction: 4515
+      startSourceChar: 4118
+      endSourceChar: 4118
       line: 86
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 4412
-      endInstruction: 4411
-      startSourceChar: 4088
-      endSourceChar: 4088
+    - startInstruction: 4516
+      endInstruction: 4515
+      startSourceChar: 4118
+      endSourceChar: 4118
       line: 86
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 4412
-      endInstruction: 4411
-      startSourceChar: 4088
-      endSourceChar: 4088
+    - startInstruction: 4516
+      endInstruction: 4515
+      startSourceChar: 4118
+      endSourceChar: 4118
       line: 86
       lineChar: 17
       spanCodeSection: 
-    - startInstruction: 4412
-      endInstruction: 4411
-      startSourceChar: 4088
-      endSourceChar: 4102
+    - startInstruction: 4516
+      endInstruction: 4515
+      startSourceChar: 4118
+      endSourceChar: 4132
       line: 86
       lineChar: 17
       spanCodeSection: EngineControl.
-    - startInstruction: 4412
-      endInstruction: 4411
-      startSourceChar: 4102
-      endSourceChar: 4119
+    - startInstruction: 4516
+      endInstruction: 4515
+      startSourceChar: 4132
+      endSourceChar: 4149
       line: 86
       lineChar: 31
       spanCodeSection: 'CatapultStatus = '
-    - startInstruction: 4412
-      endInstruction: 4443
-      startSourceChar: 4119
-      endSourceChar: 4169
+    - startInstruction: 4516
+      endInstruction: 4547
+      startSourceChar: 4149
+      endSourceChar: 4199
       line: 86
       lineChar: 48
       spanCodeSection: "0;//else unhook from catapult\r\n        }\r\n        "
-    - startInstruction: 4444
-      endInstruction: 4443
-      startSourceChar: 4169
-      endSourceChar: 4173
+    - startInstruction: 4548
+      endInstruction: 4547
+      startSourceChar: 4199
+      endSourceChar: 4203
       line: 88
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 4444
-      endInstruction: 4443
-      startSourceChar: 4173
-      endSourceChar: 4173
+    - startInstruction: 4548
+      endInstruction: 4547
+      startSourceChar: 4203
+      endSourceChar: 4203
       line: 88
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4444
-      endInstruction: 4443
-      startSourceChar: 4173
-      endSourceChar: 4188
+    - startInstruction: 4548
+      endInstruction: 4547
+      startSourceChar: 4203
+      endSourceChar: 4218
       line: 88
       lineChar: 12
       spanCodeSection: 'LeaveButton != '
-    - startInstruction: 4444
-      endInstruction: 4491
-      startSourceChar: 4188
-      endSourceChar: 4194
+    - startInstruction: 4548
+      endInstruction: 4595
+      startSourceChar: 4218
+      endSourceChar: 4224
       line: 88
       lineChar: 27
       spanCodeSection: 'null) '
-    - startInstruction: 4492
-      endInstruction: 4491
-      startSourceChar: 4194
-      endSourceChar: 4196
+    - startInstruction: 4596
+      endInstruction: 4595
+      startSourceChar: 4224
+      endSourceChar: 4226
       line: 88
       lineChar: 33
       spanCodeSection: '{ '
-    - startInstruction: 4492
-      endInstruction: 4491
-      startSourceChar: 4196
-      endSourceChar: 4196
+    - startInstruction: 4596
+      endInstruction: 4595
+      startSourceChar: 4226
+      endSourceChar: 4226
       line: 88
       lineChar: 35
       spanCodeSection: 
-    - startInstruction: 4492
-      endInstruction: 4491
-      startSourceChar: 4196
-      endSourceChar: 4196
+    - startInstruction: 4596
+      endInstruction: 4595
+      startSourceChar: 4226
+      endSourceChar: 4226
       line: 88
       lineChar: 35
       spanCodeSection: 
-    - startInstruction: 4492
-      endInstruction: 4491
-      startSourceChar: 4196
-      endSourceChar: 4196
+    - startInstruction: 4596
+      endInstruction: 4595
+      startSourceChar: 4226
+      endSourceChar: 4226
       line: 88
       lineChar: 35
       spanCodeSection: 
-    - startInstruction: 4492
-      endInstruction: 4491
-      startSourceChar: 4196
-      endSourceChar: 4208
+    - startInstruction: 4596
+      endInstruction: 4595
+      startSourceChar: 4226
+      endSourceChar: 4238
       line: 88
       lineChar: 35
       spanCodeSection: LeaveButton.
-    - startInstruction: 4492
-      endInstruction: 4491
-      startSourceChar: 4208
-      endSourceChar: 4218
+    - startInstruction: 4596
+      endInstruction: 4595
+      startSourceChar: 4238
+      endSourceChar: 4248
       line: 88
       lineChar: 47
       spanCodeSection: SetActive(
-    - startInstruction: 4492
-      endInstruction: 4515
-      startSourceChar: 4218
-      endSourceChar: 4237
+    - startInstruction: 4596
+      endInstruction: 4619
+      startSourceChar: 4248
+      endSourceChar: 4267
       line: 88
       lineChar: 57
       spanCodeSection: "false); }\r\n        "
-    - startInstruction: 4516
-      endInstruction: 4515
-      startSourceChar: 4237
-      endSourceChar: 4241
+    - startInstruction: 4620
+      endInstruction: 4619
+      startSourceChar: 4267
+      endSourceChar: 4271
       line: 89
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 4516
-      endInstruction: 4515
-      startSourceChar: 4241
-      endSourceChar: 4241
+    - startInstruction: 4620
+      endInstruction: 4619
+      startSourceChar: 4271
+      endSourceChar: 4271
       line: 89
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4516
-      endInstruction: 4515
-      startSourceChar: 4241
-      endSourceChar: 4241
+    - startInstruction: 4620
+      endInstruction: 4619
+      startSourceChar: 4271
+      endSourceChar: 4271
       line: 89
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4516
-      endInstruction: 4515
-      startSourceChar: 4241
-      endSourceChar: 4255
+    - startInstruction: 4620
+      endInstruction: 4619
+      startSourceChar: 4271
+      endSourceChar: 4285
       line: 89
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4516
-      endInstruction: 4567
-      startSourceChar: 4255
-      endSourceChar: 4273
+    - startInstruction: 4620
+      endInstruction: 4671
+      startSourceChar: 4285
+      endSourceChar: 4303
       line: 89
       lineChar: 26
       spanCodeSection: 'EffectsControl != '
-    - startInstruction: 4568
-      endInstruction: 4615
-      startSourceChar: 4273
-      endSourceChar: 4288
+    - startInstruction: 4672
+      endInstruction: 4719
+      startSourceChar: 4303
+      endSourceChar: 4318
       line: 89
       lineChar: 44
       spanCodeSection: "null)\r\n        "
-    - startInstruction: 4616
-      endInstruction: 4615
-      startSourceChar: 4288
-      endSourceChar: 4303
+    - startInstruction: 4720
+      endInstruction: 4719
+      startSourceChar: 4318
+      endSourceChar: 4333
       line: 90
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 4616
-      endInstruction: 4615
-      startSourceChar: 4303
-      endSourceChar: 4303
+    - startInstruction: 4720
+      endInstruction: 4719
+      startSourceChar: 4333
+      endSourceChar: 4333
       line: 91
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4616
-      endInstruction: 4615
-      startSourceChar: 4303
-      endSourceChar: 4303
+    - startInstruction: 4720
+      endInstruction: 4719
+      startSourceChar: 4333
+      endSourceChar: 4333
       line: 91
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4616
-      endInstruction: 4615
-      startSourceChar: 4303
-      endSourceChar: 4303
+    - startInstruction: 4720
+      endInstruction: 4719
+      startSourceChar: 4333
+      endSourceChar: 4333
       line: 91
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4616
-      endInstruction: 4615
-      startSourceChar: 4303
-      endSourceChar: 4317
+    - startInstruction: 4720
+      endInstruction: 4719
+      startSourceChar: 4333
+      endSourceChar: 4347
       line: 91
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4616
-      endInstruction: 4615
-      startSourceChar: 4317
-      endSourceChar: 4331
+    - startInstruction: 4720
+      endInstruction: 4719
+      startSourceChar: 4347
+      endSourceChar: 4361
       line: 91
       lineChar: 26
       spanCodeSection: 'IsFiringGun = '
-    - startInstruction: 4616
-      endInstruction: 4647
-      startSourceChar: 4331
-      endSourceChar: 4351
+    - startInstruction: 4720
+      endInstruction: 4751
+      startSourceChar: 4361
+      endSourceChar: 4381
       line: 91
       lineChar: 40
       spanCodeSection: "false;\r\n            "
-    - startInstruction: 4648
-      endInstruction: 4647
-      startSourceChar: 4351
-      endSourceChar: 4351
+    - startInstruction: 4752
+      endInstruction: 4751
+      startSourceChar: 4381
+      endSourceChar: 4381
       line: 92
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4648
-      endInstruction: 4647
-      startSourceChar: 4351
-      endSourceChar: 4351
+    - startInstruction: 4752
+      endInstruction: 4751
+      startSourceChar: 4381
+      endSourceChar: 4381
       line: 92
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4648
-      endInstruction: 4647
-      startSourceChar: 4351
-      endSourceChar: 4351
+    - startInstruction: 4752
+      endInstruction: 4751
+      startSourceChar: 4381
+      endSourceChar: 4381
       line: 92
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4648
-      endInstruction: 4647
-      startSourceChar: 4351
-      endSourceChar: 4365
+    - startInstruction: 4752
+      endInstruction: 4751
+      startSourceChar: 4381
+      endSourceChar: 4381
+      line: 92
+      lineChar: 12
+      spanCodeSection: 
+    - startInstruction: 4752
+      endInstruction: 4751
+      startSourceChar: 4381
+      endSourceChar: 4395
       line: 92
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4648
-      endInstruction: 4647
-      startSourceChar: 4365
-      endSourceChar: 4375
+    - startInstruction: 4752
+      endInstruction: 4751
+      startSourceChar: 4395
+      endSourceChar: 4410
       line: 92
       lineChar: 26
-      spanCodeSection: 'Smoking = '
-    - startInstruction: 4648
-      endInstruction: 4679
-      startSourceChar: 4375
-      endSourceChar: 4402
+      spanCodeSection: EffectsControl.
+    - startInstruction: 4752
+      endInstruction: 4803
+      startSourceChar: 4410
+      endSourceChar: 4420
       line: 92
-      lineChar: 36
+      lineChar: 41
+      spanCodeSection: 'Smoking = '
+    - startInstruction: 4804
+      endInstruction: 4835
+      startSourceChar: 4420
+      endSourceChar: 4447
+      line: 92
+      lineChar: 51
       spanCodeSection: "false;\r\n        }\r\n        "
-    - startInstruction: 4680
-      endInstruction: 4679
-      startSourceChar: 4402
-      endSourceChar: 4406
+    - startInstruction: 4836
+      endInstruction: 4835
+      startSourceChar: 4447
+      endSourceChar: 4451
       line: 94
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 4680
-      endInstruction: 4679
-      startSourceChar: 4406
-      endSourceChar: 4406
+    - startInstruction: 4836
+      endInstruction: 4835
+      startSourceChar: 4451
+      endSourceChar: 4451
       line: 94
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4680
-      endInstruction: 4679
-      startSourceChar: 4406
-      endSourceChar: 4419
+    - startInstruction: 4836
+      endInstruction: 4835
+      startSourceChar: 4451
+      endSourceChar: 4464
       line: 94
       lineChar: 12
       spanCodeSection: 'Gun_pilot != '
-    - startInstruction: 4680
-      endInstruction: 4727
-      startSourceChar: 4419
-      endSourceChar: 4425
+    - startInstruction: 4836
+      endInstruction: 4883
+      startSourceChar: 4464
+      endSourceChar: 4470
       line: 94
       lineChar: 25
       spanCodeSection: 'null) '
-    - startInstruction: 4728
-      endInstruction: 4727
-      startSourceChar: 4425
-      endSourceChar: 4427
+    - startInstruction: 4884
+      endInstruction: 4883
+      startSourceChar: 4470
+      endSourceChar: 4472
       line: 94
       lineChar: 31
       spanCodeSection: '{ '
-    - startInstruction: 4728
-      endInstruction: 4727
-      startSourceChar: 4427
-      endSourceChar: 4427
+    - startInstruction: 4884
+      endInstruction: 4883
+      startSourceChar: 4472
+      endSourceChar: 4472
       line: 94
       lineChar: 33
       spanCodeSection: 
-    - startInstruction: 4728
-      endInstruction: 4727
-      startSourceChar: 4427
-      endSourceChar: 4427
+    - startInstruction: 4884
+      endInstruction: 4883
+      startSourceChar: 4472
+      endSourceChar: 4472
       line: 94
       lineChar: 33
       spanCodeSection: 
-    - startInstruction: 4728
-      endInstruction: 4727
-      startSourceChar: 4427
-      endSourceChar: 4427
+    - startInstruction: 4884
+      endInstruction: 4883
+      startSourceChar: 4472
+      endSourceChar: 4472
       line: 94
       lineChar: 33
       spanCodeSection: 
-    - startInstruction: 4728
-      endInstruction: 4727
-      startSourceChar: 4427
-      endSourceChar: 4437
+    - startInstruction: 4884
+      endInstruction: 4883
+      startSourceChar: 4472
+      endSourceChar: 4482
       line: 94
       lineChar: 33
       spanCodeSection: Gun_pilot.
-    - startInstruction: 4728
-      endInstruction: 4727
-      startSourceChar: 4437
-      endSourceChar: 4447
+    - startInstruction: 4884
+      endInstruction: 4883
+      startSourceChar: 4482
+      endSourceChar: 4492
       line: 94
       lineChar: 43
       spanCodeSection: SetActive(
-    - startInstruction: 4728
-      endInstruction: 4751
-      startSourceChar: 4447
-      endSourceChar: 4466
+    - startInstruction: 4884
+      endInstruction: 4907
+      startSourceChar: 4492
+      endSourceChar: 4511
       line: 94
       lineChar: 53
       spanCodeSection: "false); }\r\n        "
-    - startInstruction: 4752
-      endInstruction: 4751
-      startSourceChar: 4466
-      endSourceChar: 4470
+    - startInstruction: 4908
+      endInstruction: 4907
+      startSourceChar: 4511
+      endSourceChar: 4515
       line: 95
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 4752
-      endInstruction: 4751
-      startSourceChar: 4470
-      endSourceChar: 4470
+    - startInstruction: 4908
+      endInstruction: 4907
+      startSourceChar: 4515
+      endSourceChar: 4515
       line: 95
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4752
-      endInstruction: 4751
-      startSourceChar: 4470
-      endSourceChar: 4486
+    - startInstruction: 4908
+      endInstruction: 4907
+      startSourceChar: 4515
+      endSourceChar: 4531
       line: 95
       lineChar: 12
       spanCodeSection: 'SeatAdjuster != '
-    - startInstruction: 4752
-      endInstruction: 4799
-      startSourceChar: 4486
-      endSourceChar: 4492
+    - startInstruction: 4908
+      endInstruction: 4955
+      startSourceChar: 4531
+      endSourceChar: 4537
       line: 95
       lineChar: 28
       spanCodeSection: 'null) '
-    - startInstruction: 4800
-      endInstruction: 4799
-      startSourceChar: 4492
-      endSourceChar: 4494
+    - startInstruction: 4956
+      endInstruction: 4955
+      startSourceChar: 4537
+      endSourceChar: 4539
       line: 95
       lineChar: 34
       spanCodeSection: '{ '
-    - startInstruction: 4800
-      endInstruction: 4799
-      startSourceChar: 4494
-      endSourceChar: 4494
+    - startInstruction: 4956
+      endInstruction: 4955
+      startSourceChar: 4539
+      endSourceChar: 4539
       line: 95
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 4800
-      endInstruction: 4799
-      startSourceChar: 4494
-      endSourceChar: 4494
+    - startInstruction: 4956
+      endInstruction: 4955
+      startSourceChar: 4539
+      endSourceChar: 4539
       line: 95
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 4800
-      endInstruction: 4799
-      startSourceChar: 4494
-      endSourceChar: 4494
+    - startInstruction: 4956
+      endInstruction: 4955
+      startSourceChar: 4539
+      endSourceChar: 4539
       line: 95
       lineChar: 36
       spanCodeSection: 
-    - startInstruction: 4800
-      endInstruction: 4799
-      startSourceChar: 4494
-      endSourceChar: 4507
+    - startInstruction: 4956
+      endInstruction: 4955
+      startSourceChar: 4539
+      endSourceChar: 4552
       line: 95
       lineChar: 36
       spanCodeSection: SeatAdjuster.
-    - startInstruction: 4800
-      endInstruction: 4799
-      startSourceChar: 4507
-      endSourceChar: 4517
+    - startInstruction: 4956
+      endInstruction: 4955
+      startSourceChar: 4552
+      endSourceChar: 4562
       line: 95
       lineChar: 49
       spanCodeSection: SetActive(
-    - startInstruction: 4800
-      endInstruction: 4823
-      startSourceChar: 4517
-      endSourceChar: 4536
+    - startInstruction: 4956
+      endInstruction: 4979
+      startSourceChar: 4562
+      endSourceChar: 4581
       line: 95
       lineChar: 59
       spanCodeSection: "false); }\r\n        "
-    - startInstruction: 4824
-      endInstruction: 4823
-      startSourceChar: 4536
-      endSourceChar: 4540
+    - startInstruction: 4980
+      endInstruction: 4979
+      startSourceChar: 4581
+      endSourceChar: 4585
       line: 96
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 4824
-      endInstruction: 4823
-      startSourceChar: 4540
-      endSourceChar: 4540
+    - startInstruction: 4980
+      endInstruction: 4979
+      startSourceChar: 4585
+      endSourceChar: 4585
       line: 96
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4824
-      endInstruction: 4823
-      startSourceChar: 4540
-      endSourceChar: 4540
+    - startInstruction: 4980
+      endInstruction: 4979
+      startSourceChar: 4585
+      endSourceChar: 4585
       line: 96
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 4824
-      endInstruction: 4823
-      startSourceChar: 4540
-      endSourceChar: 4554
+    - startInstruction: 4980
+      endInstruction: 4979
+      startSourceChar: 4585
+      endSourceChar: 4599
       line: 96
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 4824
-      endInstruction: 4875
-      startSourceChar: 4554
-      endSourceChar: 4568
+    - startInstruction: 4980
+      endInstruction: 5031
+      startSourceChar: 4599
+      endSourceChar: 4613
       line: 96
       lineChar: 26
       spanCodeSection: 'HUDControl != '
-    - startInstruction: 4876
-      endInstruction: 4923
-      startSourceChar: 4568
-      endSourceChar: 4574
+    - startInstruction: 5032
+      endInstruction: 5079
+      startSourceChar: 4613
+      endSourceChar: 4619
       line: 96
       lineChar: 40
       spanCodeSection: 'null) '
-    - startInstruction: 4924
-      endInstruction: 4923
-      startSourceChar: 4574
-      endSourceChar: 4576
+    - startInstruction: 5080
+      endInstruction: 5079
+      startSourceChar: 4619
+      endSourceChar: 4621
       line: 96
       lineChar: 46
       spanCodeSection: '{ '
-    - startInstruction: 4924
-      endInstruction: 4923
-      startSourceChar: 4576
-      endSourceChar: 4576
+    - startInstruction: 5080
+      endInstruction: 5079
+      startSourceChar: 4621
+      endSourceChar: 4621
       line: 96
       lineChar: 48
       spanCodeSection: 
-    - startInstruction: 4924
-      endInstruction: 4923
-      startSourceChar: 4576
-      endSourceChar: 4576
+    - startInstruction: 5080
+      endInstruction: 5079
+      startSourceChar: 4621
+      endSourceChar: 4621
       line: 96
       lineChar: 48
       spanCodeSection: 
-    - startInstruction: 4924
-      endInstruction: 4923
-      startSourceChar: 4576
-      endSourceChar: 4576
+    - startInstruction: 5080
+      endInstruction: 5079
+      startSourceChar: 4621
+      endSourceChar: 4621
       line: 96
       lineChar: 48
       spanCodeSection: 
-    - startInstruction: 4924
-      endInstruction: 4923
-      startSourceChar: 4576
-      endSourceChar: 4576
+    - startInstruction: 5080
+      endInstruction: 5079
+      startSourceChar: 4621
+      endSourceChar: 4621
       line: 96
       lineChar: 48
       spanCodeSection: 
-    - startInstruction: 4924
-      endInstruction: 4923
-      startSourceChar: 4576
-      endSourceChar: 4576
+    - startInstruction: 5080
+      endInstruction: 5079
+      startSourceChar: 4621
+      endSourceChar: 4621
       line: 96
       lineChar: 48
       spanCodeSection: 
-    - startInstruction: 4924
-      endInstruction: 4923
-      startSourceChar: 4576
-      endSourceChar: 4590
+    - startInstruction: 5080
+      endInstruction: 5079
+      startSourceChar: 4621
+      endSourceChar: 4635
       line: 96
       lineChar: 48
       spanCodeSection: EngineControl.
-    - startInstruction: 4924
-      endInstruction: 4923
-      startSourceChar: 4590
-      endSourceChar: 4601
+    - startInstruction: 5080
+      endInstruction: 5079
+      startSourceChar: 4635
+      endSourceChar: 4646
       line: 96
       lineChar: 62
       spanCodeSection: HUDControl.
-    - startInstruction: 4924
-      endInstruction: 4975
-      startSourceChar: 4601
-      endSourceChar: 4612
+    - startInstruction: 5080
+      endInstruction: 5131
+      startSourceChar: 4646
+      endSourceChar: 4657
       line: 96
       lineChar: 73
       spanCodeSection: gameObject.
-    - startInstruction: 4976
-      endInstruction: 4999
-      startSourceChar: 4612
-      endSourceChar: 4622
+    - startInstruction: 5132
+      endInstruction: 5155
+      startSourceChar: 4657
+      endSourceChar: 4667
       line: 96
       lineChar: 84
       spanCodeSection: SetActive(
-    - startInstruction: 5000
-      endInstruction: 5023
-      startSourceChar: 4622
-      endSourceChar: 4675
+    - startInstruction: 5156
+      endInstruction: 5179
+      startSourceChar: 4667
+      endSourceChar: 4720
       line: 96
       lineChar: 94
       spanCodeSection: "false); }\r\n        //set plane's layer back\r\n        "
-    - startInstruction: 5024
-      endInstruction: 5023
-      startSourceChar: 4675
-      endSourceChar: 4679
+    - startInstruction: 5180
+      endInstruction: 5179
+      startSourceChar: 4720
+      endSourceChar: 4724
       line: 98
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 5024
-      endInstruction: 5023
-      startSourceChar: 4679
-      endSourceChar: 4679
+    - startInstruction: 5180
+      endInstruction: 5179
+      startSourceChar: 4724
+      endSourceChar: 4724
       line: 98
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5024
-      endInstruction: 5023
-      startSourceChar: 4679
-      endSourceChar: 4692
+    - startInstruction: 5180
+      endInstruction: 5179
+      startSourceChar: 4724
+      endSourceChar: 4737
       line: 98
       lineChar: 12
       spanCodeSection: 'PlaneMesh != '
-    - startInstruction: 5024
-      endInstruction: 5071
-      startSourceChar: 4692
-      endSourceChar: 4707
+    - startInstruction: 5180
+      endInstruction: 5227
+      startSourceChar: 4737
+      endSourceChar: 4752
       line: 98
       lineChar: 25
       spanCodeSection: "null)\r\n        "
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4707
-      endSourceChar: 4722
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4752
+      endSourceChar: 4767
       line: 99
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4722
-      endSourceChar: 4722
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4767
+      endSourceChar: 4767
       line: 100
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4722
-      endSourceChar: 4722
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4767
+      endSourceChar: 4767
       line: 100
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4722
-      endSourceChar: 4722
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4767
+      endSourceChar: 4767
       line: 100
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4722
-      endSourceChar: 4722
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4767
+      endSourceChar: 4767
       line: 100
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4722
-      endSourceChar: 4743
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4767
+      endSourceChar: 4788
       line: 100
       lineChar: 12
       spanCodeSection: 'Transform[] children '
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4743
-      endSourceChar: 4745
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4788
+      endSourceChar: 4790
       line: 100
       lineChar: 33
       spanCodeSection: '= '
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4745
-      endSourceChar: 4745
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4790
+      endSourceChar: 4790
       line: 100
       lineChar: 35
       spanCodeSection: 
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4745
-      endSourceChar: 4745
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4790
+      endSourceChar: 4790
       line: 100
       lineChar: 35
       spanCodeSection: 
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4745
-      endSourceChar: 4755
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4790
+      endSourceChar: 4800
       line: 100
       lineChar: 35
       spanCodeSection: PlaneMesh.
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4755
-      endSourceChar: 4778
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4800
+      endSourceChar: 4823
       line: 100
       lineChar: 45
       spanCodeSection: GetComponentsInChildren
-    - startInstruction: 5072
-      endInstruction: 5071
-      startSourceChar: 4778
-      endSourceChar: 4779
+    - startInstruction: 5228
+      endInstruction: 5227
+      startSourceChar: 4823
+      endSourceChar: 4824
       line: 100
       lineChar: 68
       spanCodeSection: <
-    - startInstruction: 5072
-      endInstruction: 5103
-      startSourceChar: 4779
-      endSourceChar: 4806
+    - startInstruction: 5228
+      endInstruction: 5259
+      startSourceChar: 4824
+      endSourceChar: 4851
       line: 100
       lineChar: 69
       spanCodeSection: "Transform>();\r\n            "
-    - startInstruction: 5104
-      endInstruction: 5103
-      startSourceChar: 4806
-      endSourceChar: 4815
+    - startInstruction: 5260
+      endInstruction: 5259
+      startSourceChar: 4851
+      endSourceChar: 4860
       line: 101
       lineChar: 12
       spanCodeSection: foreach (
-    - startInstruction: 5104
-      endInstruction: 5103
-      startSourceChar: 4815
-      endSourceChar: 4834
+    - startInstruction: 5260
+      endInstruction: 5259
+      startSourceChar: 4860
+      endSourceChar: 4879
       line: 101
       lineChar: 21
       spanCodeSection: 'Transform child in '
-    - startInstruction: 5104
-      endInstruction: 5227
-      startSourceChar: 4834
-      endSourceChar: 4857
+    - startInstruction: 5260
+      endInstruction: 5383
+      startSourceChar: 4879
+      endSourceChar: 4902
       line: 101
       lineChar: 40
       spanCodeSection: "children)\r\n            "
-    - startInstruction: 5228
-      endInstruction: 5227
-      startSourceChar: 4857
-      endSourceChar: 4876
+    - startInstruction: 5384
+      endInstruction: 5383
+      startSourceChar: 4902
+      endSourceChar: 4921
       line: 102
       lineChar: 12
       spanCodeSection: "{\r\n                "
-    - startInstruction: 5228
-      endInstruction: 5227
-      startSourceChar: 4876
-      endSourceChar: 4876
+    - startInstruction: 5384
+      endInstruction: 5383
+      startSourceChar: 4921
+      endSourceChar: 4921
       line: 103
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 5228
-      endInstruction: 5227
-      startSourceChar: 4876
-      endSourceChar: 4876
+    - startInstruction: 5384
+      endInstruction: 5383
+      startSourceChar: 4921
+      endSourceChar: 4921
       line: 103
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 5228
-      endInstruction: 5227
-      startSourceChar: 4876
-      endSourceChar: 4876
+    - startInstruction: 5384
+      endInstruction: 5383
+      startSourceChar: 4921
+      endSourceChar: 4921
       line: 103
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 5228
-      endInstruction: 5227
-      startSourceChar: 4876
-      endSourceChar: 4876
+    - startInstruction: 5384
+      endInstruction: 5383
+      startSourceChar: 4921
+      endSourceChar: 4921
       line: 103
       lineChar: 16
       spanCodeSection: 
-    - startInstruction: 5228
-      endInstruction: 5227
-      startSourceChar: 4876
-      endSourceChar: 4882
+    - startInstruction: 5384
+      endInstruction: 5383
+      startSourceChar: 4921
+      endSourceChar: 4927
       line: 103
       lineChar: 16
       spanCodeSection: child.
-    - startInstruction: 5228
-      endInstruction: 5227
-      startSourceChar: 4882
-      endSourceChar: 4893
+    - startInstruction: 5384
+      endInstruction: 5383
+      startSourceChar: 4927
+      endSourceChar: 4938
       line: 103
       lineChar: 22
       spanCodeSection: gameObject.
-    - startInstruction: 5228
-      endInstruction: 5251
-      startSourceChar: 4893
-      endSourceChar: 4901
+    - startInstruction: 5384
+      endInstruction: 5407
+      startSourceChar: 4938
+      endSourceChar: 4946
       line: 103
       lineChar: 33
       spanCodeSection: 'layer = '
-    - startInstruction: 5252
-      endInstruction: 5335
-      startSourceChar: 4901
-      endSourceChar: 4943
+    - startInstruction: 5408
+      endInstruction: 5491
+      startSourceChar: 4946
+      endSourceChar: 4988
       line: 103
       lineChar: 41
       spanCodeSection: "17;\r\n            }\r\n        }\r\n    }\r\n    "
-    - startInstruction: 5336
-      endInstruction: 5343
-      startSourceChar: 4943
-      endSourceChar: 4969
+    - startInstruction: 5492
+      endInstruction: 5499
+      startSourceChar: 4988
+      endSourceChar: 5014
       line: 107
       lineChar: 4
       spanCodeSection: "public void WakeUp()\r\n    "
-    - startInstruction: 5344
-      endInstruction: 5343
-      startSourceChar: 4969
-      endSourceChar: 4980
+    - startInstruction: 5500
+      endInstruction: 5499
+      startSourceChar: 5014
+      endSourceChar: 5025
       line: 108
       lineChar: 4
       spanCodeSection: "{\r\n        "
-    - startInstruction: 5344
-      endInstruction: 5343
-      startSourceChar: 4980
-      endSourceChar: 4984
+    - startInstruction: 5500
+      endInstruction: 5499
+      startSourceChar: 5025
+      endSourceChar: 5029
       line: 109
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 5344
-      endInstruction: 5343
-      startSourceChar: 4984
-      endSourceChar: 4984
+    - startInstruction: 5500
+      endInstruction: 5499
+      startSourceChar: 5029
+      endSourceChar: 5029
       line: 109
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5344
-      endInstruction: 5343
-      startSourceChar: 4984
-      endSourceChar: 4984
+    - startInstruction: 5500
+      endInstruction: 5499
+      startSourceChar: 5029
+      endSourceChar: 5029
       line: 109
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5344
-      endInstruction: 5343
-      startSourceChar: 4984
-      endSourceChar: 4998
+    - startInstruction: 5500
+      endInstruction: 5499
+      startSourceChar: 5029
+      endSourceChar: 5043
       line: 109
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 5344
-      endInstruction: 5395
-      startSourceChar: 4998
-      endSourceChar: 5016
+    - startInstruction: 5500
+      endInstruction: 5551
+      startSourceChar: 5043
+      endSourceChar: 5061
       line: 109
       lineChar: 26
       spanCodeSection: 'EffectsControl != '
-    - startInstruction: 5396
-      endInstruction: 5443
-      startSourceChar: 5016
-      endSourceChar: 5022
+    - startInstruction: 5552
+      endInstruction: 5599
+      startSourceChar: 5061
+      endSourceChar: 5067
       line: 109
       lineChar: 44
       spanCodeSection: 'null) '
-    - startInstruction: 5444
-      endInstruction: 5443
-      startSourceChar: 5022
-      endSourceChar: 5024
+    - startInstruction: 5600
+      endInstruction: 5599
+      startSourceChar: 5067
+      endSourceChar: 5069
       line: 109
       lineChar: 50
       spanCodeSection: '{ '
-    - startInstruction: 5444
-      endInstruction: 5443
-      startSourceChar: 5024
-      endSourceChar: 5024
+    - startInstruction: 5600
+      endInstruction: 5599
+      startSourceChar: 5069
+      endSourceChar: 5069
       line: 109
       lineChar: 52
       spanCodeSection: 
-    - startInstruction: 5444
-      endInstruction: 5443
-      startSourceChar: 5024
-      endSourceChar: 5024
+    - startInstruction: 5600
+      endInstruction: 5599
+      startSourceChar: 5069
+      endSourceChar: 5069
       line: 109
       lineChar: 52
       spanCodeSection: 
-    - startInstruction: 5444
-      endInstruction: 5443
-      startSourceChar: 5024
-      endSourceChar: 5024
+    - startInstruction: 5600
+      endInstruction: 5599
+      startSourceChar: 5069
+      endSourceChar: 5069
       line: 109
       lineChar: 52
       spanCodeSection: 
-    - startInstruction: 5444
-      endInstruction: 5443
-      startSourceChar: 5024
-      endSourceChar: 5024
+    - startInstruction: 5600
+      endInstruction: 5599
+      startSourceChar: 5069
+      endSourceChar: 5069
       line: 109
       lineChar: 52
       spanCodeSection: 
-    - startInstruction: 5444
-      endInstruction: 5443
-      startSourceChar: 5024
-      endSourceChar: 5038
+    - startInstruction: 5600
+      endInstruction: 5599
+      startSourceChar: 5069
+      endSourceChar: 5083
       line: 109
       lineChar: 52
       spanCodeSection: EngineControl.
-    - startInstruction: 5444
-      endInstruction: 5443
-      startSourceChar: 5038
-      endSourceChar: 5053
+    - startInstruction: 5600
+      endInstruction: 5599
+      startSourceChar: 5083
+      endSourceChar: 5098
       line: 109
       lineChar: 66
       spanCodeSection: EffectsControl.
-    - startInstruction: 5444
-      endInstruction: 5495
-      startSourceChar: 5053
-      endSourceChar: 5065
+    - startInstruction: 5600
+      endInstruction: 5651
+      startSourceChar: 5098
+      endSourceChar: 5110
       line: 109
       lineChar: 81
       spanCodeSection: 'DoEffects = '
-    - startInstruction: 5496
-      endInstruction: 5527
-      startSourceChar: 5065
-      endSourceChar: 5080
+    - startInstruction: 5652
+      endInstruction: 5683
+      startSourceChar: 5110
+      endSourceChar: 5125
       line: 109
       lineChar: 93
       spanCodeSection: "0f; }\r\n        "
-    - startInstruction: 5528
-      endInstruction: 5527
-      startSourceChar: 5080
-      endSourceChar: 5084
+    - startInstruction: 5684
+      endInstruction: 5683
+      startSourceChar: 5125
+      endSourceChar: 5129
       line: 110
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 5528
-      endInstruction: 5527
-      startSourceChar: 5084
-      endSourceChar: 5084
+    - startInstruction: 5684
+      endInstruction: 5683
+      startSourceChar: 5129
+      endSourceChar: 5129
       line: 110
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5528
-      endInstruction: 5527
-      startSourceChar: 5084
-      endSourceChar: 5084
+    - startInstruction: 5684
+      endInstruction: 5683
+      startSourceChar: 5129
+      endSourceChar: 5129
       line: 110
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5528
-      endInstruction: 5527
-      startSourceChar: 5084
-      endSourceChar: 5098
+    - startInstruction: 5684
+      endInstruction: 5683
+      startSourceChar: 5129
+      endSourceChar: 5143
       line: 110
       lineChar: 12
       spanCodeSection: EngineControl.
-    - startInstruction: 5528
-      endInstruction: 5579
-      startSourceChar: 5098
-      endSourceChar: 5114
+    - startInstruction: 5684
+      endInstruction: 5735
+      startSourceChar: 5143
+      endSourceChar: 5159
       line: 110
       lineChar: 26
       spanCodeSection: 'SoundControl != '
-    - startInstruction: 5580
-      endInstruction: 5627
-      startSourceChar: 5114
-      endSourceChar: 5120
+    - startInstruction: 5736
+      endInstruction: 5783
+      startSourceChar: 5159
+      endSourceChar: 5165
       line: 110
       lineChar: 42
       spanCodeSection: 'null) '
-    - startInstruction: 5628
-      endInstruction: 5627
-      startSourceChar: 5120
-      endSourceChar: 5122
+    - startInstruction: 5784
+      endInstruction: 5783
+      startSourceChar: 5165
+      endSourceChar: 5167
       line: 110
       lineChar: 48
       spanCodeSection: '{ '
-    - startInstruction: 5628
-      endInstruction: 5627
-      startSourceChar: 5122
-      endSourceChar: 5122
+    - startInstruction: 5784
+      endInstruction: 5783
+      startSourceChar: 5167
+      endSourceChar: 5167
       line: 110
       lineChar: 50
       spanCodeSection: 
-    - startInstruction: 5628
-      endInstruction: 5627
-      startSourceChar: 5122
-      endSourceChar: 5122
+    - startInstruction: 5784
+      endInstruction: 5783
+      startSourceChar: 5167
+      endSourceChar: 5167
       line: 110
       lineChar: 50
       spanCodeSection: 
-    - startInstruction: 5628
-      endInstruction: 5627
-      startSourceChar: 5122
-      endSourceChar: 5122
+    - startInstruction: 5784
+      endInstruction: 5783
+      startSourceChar: 5167
+      endSourceChar: 5167
       line: 110
       lineChar: 50
       spanCodeSection: 
-    - startInstruction: 5628
-      endInstruction: 5627
-      startSourceChar: 5122
-      endSourceChar: 5122
+    - startInstruction: 5784
+      endInstruction: 5783
+      startSourceChar: 5167
+      endSourceChar: 5167
       line: 110
       lineChar: 50
       spanCodeSection: 
-    - startInstruction: 5628
-      endInstruction: 5627
-      startSourceChar: 5122
-      endSourceChar: 5136
+    - startInstruction: 5784
+      endInstruction: 5783
+      startSourceChar: 5167
+      endSourceChar: 5181
       line: 110
       lineChar: 50
       spanCodeSection: EngineControl.
-    - startInstruction: 5628
-      endInstruction: 5627
-      startSourceChar: 5136
-      endSourceChar: 5149
+    - startInstruction: 5784
+      endInstruction: 5783
+      startSourceChar: 5181
+      endSourceChar: 5194
       line: 110
       lineChar: 64
       spanCodeSection: SoundControl.
-    - startInstruction: 5628
-      endInstruction: 5679
-      startSourceChar: 5149
-      endSourceChar: 5159
+    - startInstruction: 5784
+      endInstruction: 5835
+      startSourceChar: 5194
+      endSourceChar: 5204
       line: 110
       lineChar: 77
       spanCodeSection: 'DoSound = '
-    - startInstruction: 5680
-      endInstruction: 5731
-      startSourceChar: 5159
-      endSourceChar: 5177
+    - startInstruction: 5836
+      endInstruction: 5887
+      startSourceChar: 5204
+      endSourceChar: 5222
       line: 110
       lineChar: 87
       spanCodeSection: "0f; }\r\n    }\r\n    "
-    - startInstruction: 5732
-      endInstruction: 5731
-      startSourceChar: 5177
-      endSourceChar: 5197
+    - startInstruction: 5888
+      endInstruction: 5887
+      startSourceChar: 5222
+      endSourceChar: 5242
       line: 112
       lineChar: 4
       spanCodeSection: private void Assert(
-    - startInstruction: 5732
-      endInstruction: 5731
-      startSourceChar: 5197
-      endSourceChar: 5213
+    - startInstruction: 5888
+      endInstruction: 5887
+      startSourceChar: 5242
+      endSourceChar: 5258
       line: 112
       lineChar: 24
       spanCodeSection: 'bool condition, '
-    - startInstruction: 5732
-      endInstruction: 5739
-      startSourceChar: 5213
-      endSourceChar: 5234
+    - startInstruction: 5888
+      endInstruction: 5895
+      startSourceChar: 5258
+      endSourceChar: 5279
       line: 112
       lineChar: 40
       spanCodeSection: "string message)\r\n    "
-    - startInstruction: 5740
-      endInstruction: 5739
-      startSourceChar: 5234
-      endSourceChar: 5245
+    - startInstruction: 5896
+      endInstruction: 5895
+      startSourceChar: 5279
+      endSourceChar: 5290
       line: 113
       lineChar: 4
       spanCodeSection: "{\r\n        "
-    - startInstruction: 5740
-      endInstruction: 5739
-      startSourceChar: 5245
-      endSourceChar: 5249
+    - startInstruction: 5896
+      endInstruction: 5895
+      startSourceChar: 5290
+      endSourceChar: 5294
       line: 114
       lineChar: 8
       spanCodeSection: if (
-    - startInstruction: 5740
-      endInstruction: 5739
-      startSourceChar: 5249
-      endSourceChar: 5250
+    - startInstruction: 5896
+      endInstruction: 5895
+      startSourceChar: 5294
+      endSourceChar: 5295
       line: 114
       lineChar: 12
       spanCodeSection: '!'
-    - startInstruction: 5740
-      endInstruction: 5779
-      startSourceChar: 5250
-      endSourceChar: 5270
+    - startInstruction: 5896
+      endInstruction: 5935
+      startSourceChar: 5295
+      endSourceChar: 5315
       line: 114
       lineChar: 13
       spanCodeSection: "condition)\r\n        "
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5270
-      endSourceChar: 5285
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5315
+      endSourceChar: 5330
       line: 115
       lineChar: 8
       spanCodeSection: "{\r\n            "
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5285
-      endSourceChar: 5285
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5330
+      endSourceChar: 5330
       line: 116
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5285
-      endSourceChar: 5285
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5330
+      endSourceChar: 5330
       line: 116
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5285
-      endSourceChar: 5285
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5330
+      endSourceChar: 5330
       line: 116
       lineChar: 12
       spanCodeSection: 
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5285
-      endSourceChar: 5291
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5330
+      endSourceChar: 5336
       line: 116
       lineChar: 12
       spanCodeSection: Debug.
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5291
-      endSourceChar: 5300
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5336
+      endSourceChar: 5345
       line: 116
       lineChar: 18
       spanCodeSection: LogError(
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5300
-      endSourceChar: 5300
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5345
+      endSourceChar: 5345
       line: 116
       lineChar: 27
       spanCodeSection: 
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5300
-      endSourceChar: 5300
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5345
+      endSourceChar: 5345
       line: 116
       lineChar: 27
       spanCodeSection: 
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5300
-      endSourceChar: 5300
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5345
+      endSourceChar: 5345
       line: 116
       lineChar: 27
       spanCodeSection: 
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5300
-      endSourceChar: 5300
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5345
+      endSourceChar: 5345
       line: 116
       lineChar: 27
       spanCodeSection: 
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5300
-      endSourceChar: 5325
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5345
+      endSourceChar: 5370
       line: 116
       lineChar: 27
       spanCodeSection: '"Assertion failed : ''" + '
-    - startInstruction: 5780
-      endInstruction: 5779
-      startSourceChar: 5325
-      endSourceChar: 5325
+    - startInstruction: 5936
+      endInstruction: 5935
+      startSourceChar: 5370
+      endSourceChar: 5370
       line: 116
       lineChar: 52
       spanCodeSection: 
-    - startInstruction: 5780
-      endInstruction: 5859
-      startSourceChar: 5325
-      endSourceChar: 5337
+    - startInstruction: 5936
+      endInstruction: 6015
+      startSourceChar: 5370
+      endSourceChar: 5382
       line: 116
       lineChar: 52
       spanCodeSection: 'GetType() + '
-    - startInstruction: 5860
-      endInstruction: 5891
-      startSourceChar: 5337
-      endSourceChar: 5345
+    - startInstruction: 6016
+      endInstruction: 6047
+      startSourceChar: 5382
+      endSourceChar: 5390
       line: 116
       lineChar: 64
       spanCodeSection: '" : " + '
-    - startInstruction: 5892
-      endInstruction: 5923
-      startSourceChar: 5345
-      endSourceChar: 5355
+    - startInstruction: 6048
+      endInstruction: 6079
+      startSourceChar: 5390
+      endSourceChar: 5400
       line: 116
       lineChar: 72
       spanCodeSection: 'message + '
-    - startInstruction: 5924
-      endInstruction: 5955
-      startSourceChar: 5355
-      endSourceChar: 5360
+    - startInstruction: 6080
+      endInstruction: 6111
+      startSourceChar: 5400
+      endSourceChar: 5405
       line: 116
       lineChar: 82
       spanCodeSection: '"''", '
-    - startInstruction: 5956
-      endInstruction: 5956
-      startSourceChar: 5360
-      endSourceChar: 5360
+    - startInstruction: 6112
+      endInstruction: 6112
+      startSourceChar: 5405
+      endSourceChar: 5405
       line: 116
       lineChar: 87
       spanCodeSection: 
