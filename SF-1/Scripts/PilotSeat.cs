@@ -68,7 +68,7 @@ public class PilotSeat : UdonSharpBehaviour
             }
             else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
             EngineControl.EjectTimer = 2;
-            EngineControl.Hooked = 0;
+            EngineControl.Hooked = -1;
             EngineControl.AirBrakeInput = 0;
             EngineControl.LTriggerTapTime = 1;
             EngineControl.RTriggerTapTime = 1;
@@ -83,6 +83,8 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.RTriggerLastFrame = false;
             EngineControl.HUDControl.MenuSoundCheckLast = 0;
             EngineControl.AGMLocked = false;
+            EngineControl.AAMHasTarget = false;
+            EngineControl.AAMLocked = false;
             if (EngineControl.CatapultStatus == 2) { }//keep launching if launching
             else EngineControl.CatapultStatus = 0;//else unhook from catapult
         }

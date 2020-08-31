@@ -19,16 +19,20 @@ public class AAMController : UdonSharpBehaviour
     private CapsuleCollider AAMCollider;
     private bool NoTarget = false;
     private bool Owner = false;
-    private bool TargetIsPlane = false;
+    private bool Locked = false;
     void Start()
     {
-        Assert(EngineControl != null, "Start: EngineControl != null");
-
-
         if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
         {
             TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
-            if (TargetEngineControl != null) TargetIsPlane = true;
+            if (TargetEngineControl != null)
+            {
+                if (TargetEngineControl.InEditor)
+                    TargetEngineControl.Locked();
+                else
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Locked");
+                Locked = true;
+            }
         }
 
         StartLockAngle = LockAngle;
@@ -47,6 +51,8 @@ public class AAMController : UdonSharpBehaviour
         }
         else NoTarget = true;
         AAMCollider = gameObject.GetComponent<CapsuleCollider>();
+
+
     }
     void LateUpdate()
     {
@@ -79,6 +85,14 @@ public class AAMController : UdonSharpBehaviour
                 var deltaAngle = Vector3.Angle(missileForward, targetDirection);
                 gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
             }
+            else if (Locked && TargetEngineControl != null)
+            {
+                if (TargetEngineControl.InEditor)
+                    TargetEngineControl.LockedOff();
+                else
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LockedOff");
+                Locked = false;
+            }
         }
         Lifetime += Time.deltaTime;
         if (Lifetime > 40)
@@ -92,7 +106,7 @@ public class AAMController : UdonSharpBehaviour
         {
             if (TargetEngineControl != null)
             {
-                gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel; // damage particles inherit the velocity of the missile, so this should help them hit the target plane
+                gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel;//damage particles inherit the velocity of the missile, so this should help them hit the target plane
             }
             AAMCollider.enabled = false;
             Animator AGMani = gameObject.GetComponent<Animator>();
@@ -109,13 +123,6 @@ public class AAMController : UdonSharpBehaviour
                 else AGMani.SetTrigger("explode");
             }
             Lifetime = 30;//10 seconds to finish exploding
-        }
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

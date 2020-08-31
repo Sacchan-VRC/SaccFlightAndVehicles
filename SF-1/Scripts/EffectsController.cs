@@ -246,7 +246,7 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
-        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.AirBrakeInput, 5f * Time.deltaTime);
+        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.AirBrakeInput, 1.3f * Time.deltaTime);
 
         PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
@@ -254,6 +254,7 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("brake", AirbrakeLerper);
         PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
+        //PlaneAnimator.SetInteger("rstickselection", EngineControl.RStickSelection);
         PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM / (float)EngineControl.FullAAMs);
         PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM / (float)EngineControl.FullAGMs);
         DoVapor();
@@ -289,6 +290,7 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.Trim = Vector2.zero;
         CanopyOpen = true;
         EngineControl.CanopyCloseTimer = -100001;
+        EngineControl.Hooked = -1;
         EngineControl.AAMLaunchOpositeSide = false;
         EngineControl.AGMLaunchOpositeSide = false;
         EngineControl.NumAAM = EngineControl.FullAAMs;
@@ -328,10 +330,6 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
         PlaneAnimator.SetTrigger("explode");
-    }
-    public void DropFlares()
-    {
-        PlaneAnimator.SetTrigger("flares");
     }
     private void Assert(bool condition, string message)
     {

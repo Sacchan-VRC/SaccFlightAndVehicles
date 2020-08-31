@@ -8,7 +8,7 @@ public class SoundController : UdonSharpBehaviour
 {
 
     public EngineController EngineControl;
-    public AudioSource PlaneIdle;
+    public AudioSource[] PlaneIdle;
     public AudioSource PlaneInside;
     public AudioSource PlaneDistant;
     public AudioSource[] PlaneThrust;
@@ -19,10 +19,11 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource[] Explosion;
     public AudioSource GunSound;
     public AudioSource[] BulletHit;
-    public AudioSource MissileFire;
+    public AudioSource RadarLocked;
+    public AudioSource MissileIncoming;
     public AudioSource AAMTargeting;
     public AudioSource AAMTargetLock;
-    public AudioSource AGMTargetLock;
+    public AudioSource AGMLock;
     public AudioSource AGMUnlock;
     public AudioSource Airbrake;
     public AudioSource CatapultLock;
@@ -40,6 +41,16 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public bool ExplosionNull;
     [System.NonSerializedAttribute] [HideInInspector] public bool GunSoundNull;
     [System.NonSerializedAttribute] [HideInInspector] public bool BulletHitNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool MissileIncomingNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool RadarLockedNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool AAMTargetingNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool AAMTargetLockNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool AGMTargetLockNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool AGMUnlockNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool AirbrakeNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool CatapultLockNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool CatapultLaunchNull;
+    [System.NonSerializedAttribute] [HideInInspector] public bool HookLandingNull;
     [System.NonSerializedAttribute] [HideInInspector] public bool MenuSelectNull;
     public Transform testcamera;
     private bool SuperSonic = false;
@@ -78,45 +89,76 @@ public class SoundController : UdonSharpBehaviour
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(PlaneIdle != null, "Start: PlaneIdle != null");
         Assert(PlaneInside != null, "Start: PlaneInside != null");
         Assert(PlaneDistant != null, "Start: PlaneDistant != null");
         Assert(PlaneABOn != null, "Start: PlaneABOn != null");
         Assert(PlaneWind != null, "Start: PlaneWind != null");
         Assert(GunSound != null, "Start: GunSound != null");
         Assert(MenuSelect != null, "Start: MenuSelect != null");
+        Assert(AAMTargeting != null, "Start: AAMTargeting != null");
+        Assert(AAMTargetLock != null, "Start: AAMTargetLock != null");
+        Assert(AGMLock != null, "Start: AGMTargetLock != null");
+        Assert(AGMUnlock != null, "Start: AGMUnlock != null");
+        Assert(Airbrake != null, "Start: Airbrake != null");
+        Assert(CatapultLock != null, "Start: CatapultLock != null");
+        Assert(CatapultLaunch != null, "Start: CatapultLaunch != null");
+        Assert(HookLanding != null, "Start: HookLanding != null");
+        Assert(RadarLocked != null, "Start: RadarLocked != null");
+        Assert(MissileIncoming != null, "Start: MissileIncoming != null");
+        Assert(PlaneIdle.Length > 0, "Start: PlaneIdle.Length > 0");
         Assert(PlaneThrust.Length > 0, "Start: PlaneThrust.Length > 0");
         Assert(TouchDown.Length > 0, "Start: TouchDown.Length > 0");
         Assert(SonicBoom.Length > 0, "Start: SonicBoom.Length > 0");
         Assert(Explosion.Length > 0, "Start: Explosion.Length > 0");
         Assert(BulletHit.Length > 0, "Start: BulletHit.Length > 0");
 
-
-        PlaneIdleNull = (PlaneIdle == null) ? true : false;
         PlaneInsideNull = (PlaneInside == null) ? true : false;
         PlaneDistantNull = (PlaneDistant == null) ? true : false;
         PlaneABOnNull = (PlaneABOn == null) ? true : false;
         PlaneWindNull = (PlaneWind == null) ? true : false;
         GunSoundNull = (GunSound == null) ? true : false;
         MenuSelectNull = (MenuSelect == null) ? true : false;
+        AAMTargetingNull = (AAMTargeting == null) ? true : false;
+        AAMTargetLockNull = (AAMTargetLock == null) ? true : false;
+        AGMTargetLockNull = (AGMLock == null) ? true : false;
+        AGMUnlockNull = (AGMUnlock == null) ? true : false;
+        AirbrakeNull = (Airbrake == null) ? true : false;
+        CatapultLockNull = (CatapultLock == null) ? true : false;
+        CatapultLaunchNull = (CatapultLaunch == null) ? true : false;
+        HookLandingNull = (HookLanding == null) ? true : false;
+        RadarLockedNull = (RadarLocked == null) ? true : false;
+        MissileIncomingNull = (MissileIncoming == null) ? true : false;
+        PlaneIdleNull = (PlaneIdle.Length < 1) ? true : false;
         PlaneThrustNull = (PlaneThrust.Length < 1) ? true : false;
         TouchDownNull = (TouchDown.Length < 1) ? true : false;
         SonicBoomNull = (SonicBoom.Length < 1) ? true : false;
         ExplosionNull = (Explosion.Length < 1) ? true : false;
         BulletHitNull = (BulletHit.Length < 1) ? true : false;
 
-        //used to make it so that changing the volume in unity will do something //set 0 to avoid ear destruction
-        if (!PlaneIdleNull) { PlaneIdleInitialVolume = PlaneIdle.volume; PlaneIdle.volume = 0f; }
-        if (!PlaneDistantNull) { PlaneDistantInitialVolume = PlaneDistant.volume; PlaneDistant.volume = 0f; }
 
-        foreach (AudioSource thrust in PlaneThrust)
+        //used to make it so that changing the volume in unity will do something //set 0 to avoid ear destruction
+        if (!PlaneIdleNull)
         {
-            thrust.volume = 0;
+            PlaneIdleInitialVolume = PlaneIdle[0].volume;
+            foreach (AudioSource idle in PlaneIdle)
+            {
+                idle.volume = 0;
+            }
         }
 
         if (!PlaneThrustNull)
         {
             PlaneThrustInitialVolume = PlaneThrust[0].volume;
+            foreach (AudioSource thrust in PlaneThrust)
+            {
+                thrust.volume = 0;
+            }
+        }
+
+        if (!PlaneDistantNull)
+        {
+            PlaneDistantInitialVolume = PlaneDistant.volume;
+            PlaneDistant.volume = 0f;
         }
 
         if (!SonicBoomNull) MaxAudibleDistance = SonicBoom[0].maxDistance;
@@ -213,10 +255,10 @@ public class SoundController : UdonSharpBehaviour
             if (Leftplane == false)//change stuff when you get in
             {
                 PlaneThrustPitch = 0.8f;
-                if (!PlaneInsideNull)
+                if (!PlaneInsideNull && !PlaneIdleNull)
                 {
-                    PlaneInside.pitch = PlaneIdle.pitch * .8f;
-                    PlaneInside.volume = PlaneIdle.volume * .4f;//it'll lerp up from here
+                    PlaneInside.pitch = PlaneIdle[0].pitch * .8f;
+                    PlaneInside.volume = PlaneIdle[0].volume * .4f;//it'll lerp up from here
                 }
                 if (!PlaneABOnNull)
                 {
@@ -240,9 +282,52 @@ public class SoundController : UdonSharpBehaviour
             {
                 PlaneInside.Play();
             }
-            if ((!PlaneIdleNull) && PlaneIdle.isPlaying)
+            if ((!PlaneIdleNull) && PlaneIdle[0].isPlaying)
             {
-                PlaneIdle.Stop();
+                foreach (AudioSource idle in PlaneIdle)
+                    idle.Stop();
+            }
+            if (EngineControl.AAMHasTarget && !EngineControl.AAMLocked)
+            {
+                AAMTargeting.gameObject.SetActive(true);
+                AAMTargetLock.gameObject.SetActive(false);
+            }
+            else if (EngineControl.AAMLocked)
+            {
+                AAMTargeting.gameObject.SetActive(false);
+                AAMTargetLock.gameObject.SetActive(true);
+            }
+            else
+            {
+                AAMTargeting.gameObject.SetActive(false);
+                AAMTargetLock.gameObject.SetActive(false);
+            }
+            if (EngineControl.MissilesIncoming > 0)
+            {
+                if (!MissileIncomingNull && !MissileIncoming.isPlaying) MissileIncoming.gameObject.SetActive(true);
+                if (!RadarLockedNull) RadarLocked.gameObject.SetActive(false);
+            }
+            else if (EngineControl.TargetingMe > 0)
+            {
+                if (!RadarLockedNull && !RadarLocked.isPlaying) RadarLocked.gameObject.SetActive(true);
+                if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
+            }
+            else
+            {
+                if (!RadarLockedNull) RadarLocked.gameObject.SetActive(false);
+                if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
+            }
+            if (!AirbrakeNull)
+            {
+                if (!Airbrake.isPlaying)
+                    Airbrake.Play();
+                Airbrake.pitch = EngineControl.AirBrakeInput * .2f + .9f;
+                Airbrake.volume = EngineControl.AirBrakeInput * EngineControl.rotlift;
+            }
+            else
+            {
+                if (!AirbrakeNull)
+                    Airbrake.Stop();
             }
             if ((EngineControl.Piloting || (EngineControl.Passenger && EngineControl.Occupied)) && EngineControl.Fuel > 1) //you're piloting or someone is piloting and you're a passenger
             {
@@ -266,7 +351,10 @@ public class SoundController : UdonSharpBehaviour
         }
         else if (EngineControl.Occupied && EngineControl.Fuel > 1)//someone else is piloting
         {
-            if (Leftplane == true) { Exitplane(); }//passenger left
+            if (Leftplane == true)
+            {
+                Exitplane();
+            }//passenger left or canopy opened
             foreach (AudioSource thrust in PlaneThrust)
             {
                 if (!thrust.isPlaying)
@@ -274,9 +362,10 @@ public class SoundController : UdonSharpBehaviour
                     thrust.Play();
                 }
             }
-            if (!PlaneIdleNull && !PlaneIdle.isPlaying)
+            if (!PlaneIdleNull && !PlaneIdle[0].isPlaying)
             {
-                PlaneIdle.Play();
+                foreach (AudioSource idle in PlaneIdle)
+                    idle.Play();
             }
             if (!PlaneDistantNull && !PlaneDistant.isPlaying)
             {
@@ -298,7 +387,7 @@ public class SoundController : UdonSharpBehaviour
         }
         else //no one is in the plane or its out of fuel
         {
-            if (Leftplane == true) { Exitplane(); }//pilot or passenger left
+            if (Leftplane == true) { Exitplane(); }//pilot or passenger left or canopy opened
             PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * Time.deltaTime);
             PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, .09f * Time.deltaTime);
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * Time.deltaTime);
@@ -332,35 +421,26 @@ public class SoundController : UdonSharpBehaviour
             }
             playsonicboom = false;
         }
-
-        if (!PlaneIdleNull)
+        foreach (AudioSource idle in PlaneIdle)
         {
-            PlaneIdle.volume = Mathf.Lerp(PlaneIdle.volume, PlaneIdleVolume, 30f * Time.deltaTime);
-            PlaneIdle.pitch = Mathf.Lerp(PlaneIdle.pitch, PlaneIdlePitch, 30f * Time.deltaTime);
-
-            PlaneIdle.volume *= silentint;
+            idle.volume = Mathf.Lerp(idle.volume, PlaneIdleVolume, 30f * Time.deltaTime) * silentint;
+            idle.pitch = Mathf.Lerp(idle.pitch, PlaneIdlePitch, 30f * Time.deltaTime);
         }
         if (!PlaneDistantNull)
         {
+            PlaneDistantVolume *= silentint;
             PlaneDistant.volume = Mathf.Lerp(PlaneDistant.volume, PlaneDistantVolume, 30f * Time.deltaTime);
             PlaneDistant.pitch = Mathf.Lerp(PlaneDistant.pitch, PlaneDistantPitch, 30f * Time.deltaTime);
-
-            PlaneDistantVolume *= silentint;
         }
         foreach (AudioSource thrust in PlaneThrust)
         {
-            thrust.volume = PlaneThrustVolume;
+            thrust.volume = PlaneThrustVolume * silentint;
             thrust.pitch = Mathf.Lerp(thrust.pitch, PlaneThrustPitch, 30f * Time.deltaTime);
-
-            thrust.volume *= silentint;
         }
         if (!PlaneWindNull)
         {
             PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
-            PlaneWind.volume = Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) * .2f);
-
-            PlaneWind.volume *= silentint;
-
+            PlaneWind.volume = (Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) * .2f)) * silentint;
         }
 
         if (!GunSoundNull)
@@ -389,16 +469,17 @@ public class SoundController : UdonSharpBehaviour
     }
     private void Exitplane()//sets sound values to give illusion of continuity of engine sound when exiting the plane
     {
+        if (!AAMTargetingNull) AAMTargeting.gameObject.SetActive(false);
+        if (!AAMTargetLockNull) AAMTargetLock.gameObject.SetActive(false);
+        if (!RadarLockedNull) RadarLocked.gameObject.SetActive(false);
+        if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
         if (!PlaneInsideNull)
         {
             PlaneInside.Stop();
             PlaneIdlePitch = PlaneInside.pitch;
         }
-        if (!PlaneIdleNull) PlaneIdle.Play();
-        foreach (AudioSource thrust in PlaneThrust)
-        {
-            thrust.Play();
-        }
+        foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
+        foreach (AudioSource thrust in PlaneThrust) { thrust.Play(); }
         if (!PlaneDistantNull) PlaneDistant.Play();
         Leftplane = false;
         PlaneThrustVolume *= 6.666666f;

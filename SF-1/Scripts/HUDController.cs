@@ -149,7 +149,7 @@ public class HUDController : UdonSharpBehaviour
             AAMTargetIndicator.localScale = new Vector3(1, 1, 1);
             AAMTargetIndicator.position = transform.position + EngineControl.AAMCurrentTargetDirection;
             AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
-            if (EngineControl.AAMLock)
+            if (EngineControl.AAMLocked)
             {
                 AAMTargetIndicator.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));//back of mesh is locked version
             }
