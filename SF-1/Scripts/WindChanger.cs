@@ -18,10 +18,14 @@ public class WindChanger : UdonSharpBehaviour
     public Text WindTurbulanceScale_text;
     public AudioSource WindApplySound;
     public EngineController[] VehicleEngines;
-    [UdonSynced(UdonSyncMode.None)] private float WindStrength;
-    [UdonSynced(UdonSyncMode.None)] private float WindGustStrength;
-    [UdonSynced(UdonSyncMode.None)] private float WindGustiness;
-    [UdonSynced(UdonSyncMode.None)] private float WindTurbulanceScale;
+    /* [UdonSynced(UdonSyncMode.None)] */
+    private float WindStrength;
+    /* [UdonSynced(UdonSyncMode.None)] */
+    private float WindGustStrength;
+    /* [UdonSynced(UdonSyncMode.None)] */
+    private float WindGustiness;
+    /* [UdonSynced(UdonSyncMode.None)] */
+    private float WindTurbulanceScale;
     private VRCPlayerApi localPlayer;
     private void Start()
     {
@@ -66,7 +70,8 @@ public class WindChanger : UdonSharpBehaviour
     }
     private void OnPickupUseDown()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ApplyWindDir");
+        ApplyWindDir();
+        //SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ApplyWindDir");
     }
     public void ApplyWindDir()
     {
@@ -74,7 +79,7 @@ public class WindChanger : UdonSharpBehaviour
         Vector3 NewWindDir = (gameObject.transform.rotation * Vector3.forward) * WindStrength;
         foreach (EngineController vehicle in VehicleEngines)
         {
-            if (localPlayer.IsOwner(vehicle.gameObject))
+            if (vehicle != null && localPlayer.IsOwner(vehicle.gameObject))
             {
                 vehicle.Wind = NewWindDir;
                 vehicle.WindGustStrength = WindGustStrength;

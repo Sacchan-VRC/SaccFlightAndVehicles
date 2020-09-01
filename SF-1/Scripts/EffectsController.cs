@@ -148,8 +148,8 @@ public class EffectsController : UdonSharpBehaviour
 
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
-            rotationinputs.x = Mathf.Clamp(EngineControl.PitchInput + EngineControl.Trim.x, -1, 1) * 25;
-            rotationinputs.y = Mathf.Clamp(EngineControl.YawInput + EngineControl.Trim.y, -1, 1) * 20;
+            rotationinputs.x = Mathf.Clamp(EngineControl.PitchInput/*  + EngineControl.Trim.x */, -1, 1) * 25;
+            rotationinputs.y = Mathf.Clamp(EngineControl.YawInput/*  + EngineControl.Trim.y */, -1, 1) * 20;
             rotationinputs.z = EngineControl.RollInput * 35;
 
             //joystick movement
@@ -255,6 +255,7 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         //PlaneAnimator.SetInteger("rstickselection", EngineControl.RStickSelection);
+        PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb / (float)EngineControl.FullBombs);
         PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM / (float)EngineControl.FullAAMs);
         PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM / (float)EngineControl.FullAGMs);
         DoVapor();
@@ -287,7 +288,7 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.FlightLimitsEnabled = true;
         CanopyOpen = false;
         EngineControl.Cruise = false;
-        EngineControl.Trim = Vector2.zero;
+        //EngineControl.Trim = Vector2.zero;
         CanopyOpen = true;
         EngineControl.CanopyCloseTimer = -100001;
         EngineControl.Hooked = -1;
