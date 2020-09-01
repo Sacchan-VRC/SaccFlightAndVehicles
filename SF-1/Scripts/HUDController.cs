@@ -18,6 +18,7 @@ public class HUDController : UdonSharpBehaviour
     public Text HUDText_angleofattack;
     public Text HUDText_AAM_ammo;
     public Text HUDText_AGM_ammo;
+    public Text HUDText_Bomb_ammo;
     public GameObject HudCrosshairGun;
     public GameObject HudCrosshair;
     public GameObject HudLimit;
@@ -31,8 +32,8 @@ public class HUDController : UdonSharpBehaviour
     public Transform RStickDisplayHighlighter;
     public Transform PitchRoll;
     public Transform Yaw;
-    public Transform TrimPitch;
-    public Transform TrimYaw;
+    /*     public Transform TrimPitch;
+        public Transform TrimYaw; */
     public GameObject AGMScreen;
     public GameObject LStick_funcon1;
     public GameObject LStick_funcon2;
@@ -42,7 +43,6 @@ public class HUDController : UdonSharpBehaviour
     public GameObject LStick_funcon7;
     public GameObject LStick_funcon8;
     public GameObject RStick_funcon3;
-    public GameObject RStick_funcon4;
     public GameObject RStick_funcon5;
     public GameObject RStick_funcon6;
     public GameObject RStick_funcon7;
@@ -56,6 +56,9 @@ public class HUDController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float MenuSoundCheckLast = 0;
     private Vector3 temprot;
     private int showvel;
+    private bool HasAAM = false;
+    private bool HasAGM = false;
+    private bool HasBombs = false;
     const float InputSquareSize = 0.0284317f;
     private void Start()
     {
@@ -81,8 +84,8 @@ public class HUDController : UdonSharpBehaviour
         Assert(RStickDisplayHighlighter != null, "Start: RStickDisplayHighlighter != null");
         Assert(PitchRoll != null, "Start: PitchRoll != null");
         Assert(Yaw != null, "Start: Yaw != null");
-        Assert(TrimPitch != null, "Start: TrimPitch != null");
-        Assert(TrimYaw != null, "Start: TrimYaw != null");
+        /*         Assert(TrimPitch != null, "Start: TrimPitch != null");
+                Assert(TrimYaw != null, "Start: TrimYaw != null"); */
         Assert(AGMScreen != null, "Start: AGMScreen != null");
         Assert(LStick_funcon1 != null, "Start: LStick_funcon1 != null");
         Assert(LStick_funcon2 != null, "Start: LStick_funcon2 != null");
@@ -92,10 +95,13 @@ public class HUDController : UdonSharpBehaviour
         Assert(LStick_funcon7 != null, "Start: LStick_funcon7 != null");
         Assert(LStick_funcon8 != null, "Start: LStick_funcon8 != null");
         Assert(RStick_funcon3 != null, "Start: LStick_funcon3 != null");
-        Assert(RStick_funcon4 != null, "Start: LStick_funcon4 != null");
         Assert(RStick_funcon5 != null, "Start: LStick_funcon5 != null");
         Assert(RStick_funcon6 != null, "Start: LStick_funcon6 != null");
         Assert(RStick_funcon7 != null, "Start: LStick_funcon7 != null");
+
+        if (EngineControl.NumAAM > 0) HasAAM = true;
+        if (EngineControl.NumAGM > 0) HasAGM = true;
+        if (EngineControl.NumBomb > 0) HasBombs = true;
 
         PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
@@ -112,11 +118,11 @@ public class HUDController : UdonSharpBehaviour
         //Yaw Indicator
         Yaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.YawInput, 0, 0)) * InputSquareSize;
 
-        //Yaw Trim Indicator
-        TrimYaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.Trim.y, 0, 0)) * InputSquareSize;
+        /*         //Yaw Trim Indicator
+                TrimYaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.Trim.y, 0, 0)) * InputSquareSize;
 
-        //Pitch Trim Indicator
-        TrimPitch.localPosition = InputsZeroPos + (new Vector3(0, EngineControl.Trim.x, 0)) * InputSquareSize;
+                //Pitch Trim Indicator
+                TrimPitch.localPosition = InputsZeroPos + (new Vector3(0, EngineControl.Trim.x, 0)) * InputSquareSize; */
 
         //Velocity indicator
         if (EngineControl.CurrentVel.magnitude < 2)
@@ -281,8 +287,11 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.EffectsControl.HookDown) { LStick_funcon4.SetActive(true); }
         else { LStick_funcon4.SetActive(false); }
 
-        if (EngineControl.Trim.x != 0) { LStick_funcon6.SetActive(true); }
+        if (EngineControl.AltHold) { LStick_funcon6.SetActive(true); }
         else { LStick_funcon6.SetActive(false); }
+
+        /*         if (EngineControl.Trim.x != 0) { LStick_funcon6.SetActive(true); }
+                else { LStick_funcon6.SetActive(false); } */
 
         if (EngineControl.EffectsControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
         else { LStick_funcon7.SetActive(false); }
@@ -294,9 +303,6 @@ public class HUDController : UdonSharpBehaviour
         //right stick toggles/functions on?
         if (EngineControl.AGMLocked) { RStick_funcon3.SetActive(true); }
         else { RStick_funcon3.SetActive(false); }
-
-        if (EngineControl.LevelFlight) { RStick_funcon4.SetActive(true); }
-        else { RStick_funcon4.SetActive(false); }
 
         if (!EngineControl.EffectsControl.GearUp) { RStick_funcon5.SetActive(true); }
         else { RStick_funcon5.SetActive(false); }
@@ -322,22 +328,24 @@ public class HUDController : UdonSharpBehaviour
             {
                 AGMScreen.SetActive(true);
                 EngineControl.AGMCam.gameObject.SetActive(true);
-                RaycastHit camhit;
-                Physics.Raycast(EngineControl.AGMCam.transform.position, EngineControl.AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
-                if (camhit.point != null)
+                float newzoom = 0;
+                //if turning camera fast, zoom out
+                if (EngineControl.AGMRotDif < .2f)
                 {
-                    //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
-                    float newzoom = 0;
-                    //zooming in is slower than zooming out
-                    if (EngineControl.AGMRotDif < .2f)
+                    RaycastHit camhit;
+                    Physics.Raycast(EngineControl.AGMCam.transform.position, EngineControl.AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
+                    if (camhit.point != null)
                     {
+                        //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
+
                         newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
+                        EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, newzoom, 1.5f * Time.deltaTime), 0.3f, 90);
                     }
-                    else
-                    {
-                        newzoom = 80;
-                    }
-                    EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, newzoom, 1.5f * Time.deltaTime), 0.3f, 90);
+                }
+                else
+                {
+                    newzoom = 80;
+                    EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, newzoom, 2f * Time.deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
             }
         }
@@ -383,9 +391,12 @@ public class HUDController : UdonSharpBehaviour
         }
         check += Time.deltaTime;
 
-
-        HUDText_AAM_ammo.text = EngineControl.NumAAM.ToString("F0");
-        HUDText_AGM_ammo.text = EngineControl.NumAGM.ToString("F0");
+        if (HasAAM) HUDText_AAM_ammo.text = EngineControl.NumAAM.ToString("F0");
+        else HUDText_AAM_ammo.text = string.Empty;
+        if (HasAGM) HUDText_AGM_ammo.text = EngineControl.NumAGM.ToString("F0");
+        else HUDText_AGM_ammo.text = string.Empty;
+        if (HasBombs) HUDText_Bomb_ammo.text = EngineControl.NumBomb.ToString("F0");
+        else HUDText_Bomb_ammo.text = string.Empty;
 
         PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
         PlaneAnimator.SetFloat("fuel", EngineControl.Fuel / EngineControl.FullFuel);

@@ -17,9 +17,8 @@ public class AAMController : UdonSharpBehaviour
     private bool ColliderActive = false;
     private bool Exploding = false;
     private CapsuleCollider AAMCollider;
-    private bool NoTarget = false;
     private bool Owner = false;
-    private bool Locked = false;
+    private bool LockedOn = false;
     void Start()
     {
         if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
@@ -28,10 +27,10 @@ public class AAMController : UdonSharpBehaviour
             if (TargetEngineControl != null)
             {
                 if (TargetEngineControl.InEditor)
-                    TargetEngineControl.Locked();
+                    Locked();
                 else
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Locked");
-                Locked = true;
+                LockedOn = true;
             }
         }
 
@@ -49,7 +48,6 @@ public class AAMController : UdonSharpBehaviour
         {
             Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
         }
-        else NoTarget = true;
         AAMCollider = gameObject.GetComponent<CapsuleCollider>();
 
 
@@ -68,37 +66,43 @@ public class AAMController : UdonSharpBehaviour
         {
             if (Lifetime > 2)
             {
-                LockAngle = StartLockAngle;
                 NonOwnerLockHack = false;
+                LockAngle = StartLockAngle;
             }
         }
-
-        if (!NoTarget)
+        if (Vector3.Angle(gameObject.transform.forward, (Target.position - gameObject.transform.position)) < (LockAngle))
         {
-            if (Vector3.Angle(gameObject.transform.forward, (Target.position - gameObject.transform.position)) < (LockAngle))
-            {
-                // homing to target, thx Guribo
-                var missileToTargetVector = Target.position - gameObject.transform.position;
-                var missileForward = gameObject.transform.forward;
-                var targetDirection = missileToTargetVector.normalized;
-                var rotationAxis = Vector3.Cross(missileForward, targetDirection);
-                var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-                gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
-            }
-            else if (Locked && TargetEngineControl != null)
-            {
-                if (TargetEngineControl.InEditor)
-                    TargetEngineControl.LockedOff();
-                else
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LockedOff");
-                Locked = false;
-            }
+            // homing to target, thx Guribo
+            var missileToTargetVector = Target.position - gameObject.transform.position;
+            var missileForward = gameObject.transform.forward;
+            var targetDirection = missileToTargetVector.normalized;
+            var rotationAxis = Vector3.Cross(missileForward, targetDirection);
+            var deltaAngle = Vector3.Angle(missileForward, targetDirection);
+            gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
+        }
+        else if (LockedOn && TargetEngineControl != null)
+        {
+            if (TargetEngineControl.InEditor)
+                LockedOff();
+            else
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LockedOff");
+            LockedOn = false;
         }
         Lifetime += Time.deltaTime;
         if (Lifetime > 40)
         {
             Destroy(gameObject);
         }
+    }
+    public void Locked()
+    {
+        if (TargetEngineControl.IsOwner || TargetEngineControl.Passenger)
+            TargetEngineControl.MissilesIncoming++;
+    }
+    public void LockedOff()
+    {
+        if (TargetEngineControl.IsOwner || TargetEngineControl.Passenger)
+            TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
     }
     private void OnCollisionEnter(Collision other)
     {

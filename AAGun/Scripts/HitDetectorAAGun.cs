@@ -11,7 +11,7 @@ public class HitDetectorAAGun : UdonSharpBehaviour
     private void Start()
     {
         Assert(AAGunControl != null, "Start: AAGunControl != null");
-        Assert(BulletHit[0] != null, "Start: BulletHit[0] != null");
+        Assert(BulletHit.Length > 0, "Start: BulletHit.Length > 0 != null");
     }
     void OnParticleCollision(GameObject other)
     {
