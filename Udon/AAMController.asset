@@ -380,7 +380,7 @@ MonoBehaviour:
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n        \n         #
     public void Locked()\n    .export Locked\n        \n    Locked:\n        \n        PUSH,
     __0_const_intnl_SystemUInt32\n        \n         # {\n        \n         # if
-    (TargetEngineControl.IsOwner || TargetEngineControl.Passenger)\n        PUSH,
+    (TargetEngineControl.Piloting || TargetEngineControl.Passenger)\n        PUSH,
     TargetEngineControl\n        PUSH, __8_const_intnl_SystemString\n        PUSH,
     __8_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __8_intnl_SystemObject\n        PUSH, __17_intnl_SystemBoolean\n
@@ -415,7 +415,7 @@ MonoBehaviour:
     \       JUMP_INDIRECT, __0_intnl_returnTarget_UInt32\n        \n        \n         #
     public void LockedOff()\n    .export LockedOff\n        \n    LockedOff:\n        \n
     \       PUSH, __0_const_intnl_SystemUInt32\n        \n         # {\n        \n
-    \        # if (TargetEngineControl.IsOwner || TargetEngineControl.Passenger)\n
+    \        # if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)\n
     \       PUSH, TargetEngineControl\n        PUSH, __8_const_intnl_SystemString\n
     \       PUSH, __12_intnl_SystemObject\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n
     \       PUSH, __12_intnl_SystemObject\n        PUSH, __24_intnl_SystemBoolean\n
@@ -3144,427 +3144,427 @@ MonoBehaviour:
     - startInstruction: 3320
       endInstruction: 3435
       startSourceChar: 3548
-      endSourceChar: 3559
+      endSourceChar: 3560
       line: 98
       lineChar: 32
-      spanCodeSection: 'IsOwner || '
+      spanCodeSection: 'Piloting || '
     - startInstruction: 3436
       endInstruction: 3435
-      startSourceChar: 3559
-      endSourceChar: 3559
+      startSourceChar: 3560
+      endSourceChar: 3560
       line: 98
-      lineChar: 43
+      lineChar: 44
       spanCodeSection: 
     - startInstruction: 3436
       endInstruction: 3435
-      startSourceChar: 3559
-      endSourceChar: 3579
+      startSourceChar: 3560
+      endSourceChar: 3580
       line: 98
-      lineChar: 43
+      lineChar: 44
       spanCodeSection: TargetEngineControl.
     - startInstruction: 3436
       endInstruction: 3559
-      startSourceChar: 3579
-      endSourceChar: 3603
+      startSourceChar: 3580
+      endSourceChar: 3604
       line: 98
-      lineChar: 63
+      lineChar: 64
       spanCodeSection: "Passenger)\r\n            "
     - startInstruction: 3560
       endInstruction: 3559
-      startSourceChar: 3603
-      endSourceChar: 3603
+      startSourceChar: 3604
+      endSourceChar: 3604
       line: 99
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 3560
       endInstruction: 3559
-      startSourceChar: 3603
-      endSourceChar: 3603
+      startSourceChar: 3604
+      endSourceChar: 3604
       line: 99
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 3560
       endInstruction: 3559
-      startSourceChar: 3603
-      endSourceChar: 3603
+      startSourceChar: 3604
+      endSourceChar: 3604
       line: 99
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 3560
       endInstruction: 3559
-      startSourceChar: 3603
-      endSourceChar: 3623
+      startSourceChar: 3604
+      endSourceChar: 3624
       line: 99
       lineChar: 12
       spanCodeSection: TargetEngineControl.
     - startInstruction: 3560
       endInstruction: 3775
-      startSourceChar: 3623
-      endSourceChar: 3655
+      startSourceChar: 3624
+      endSourceChar: 3656
       line: 99
       lineChar: 32
       spanCodeSection: "MissilesIncoming++;\r\n    }\r\n    "
     - startInstruction: 3776
       endInstruction: 3783
-      startSourceChar: 3655
-      endSourceChar: 3684
+      startSourceChar: 3656
+      endSourceChar: 3685
       line: 101
       lineChar: 4
       spanCodeSection: "public void LockedOff()\r\n    "
     - startInstruction: 3784
       endInstruction: 3783
-      startSourceChar: 3684
-      endSourceChar: 3695
+      startSourceChar: 3685
+      endSourceChar: 3696
       line: 102
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 3784
       endInstruction: 3783
-      startSourceChar: 3695
-      endSourceChar: 3699
+      startSourceChar: 3696
+      endSourceChar: 3700
       line: 103
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 3784
       endInstruction: 3783
-      startSourceChar: 3699
-      endSourceChar: 3699
+      startSourceChar: 3700
+      endSourceChar: 3700
       line: 103
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 3784
       endInstruction: 3783
-      startSourceChar: 3699
-      endSourceChar: 3699
+      startSourceChar: 3700
+      endSourceChar: 3700
       line: 103
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 3784
       endInstruction: 3783
-      startSourceChar: 3699
-      endSourceChar: 3719
+      startSourceChar: 3700
+      endSourceChar: 3720
       line: 103
       lineChar: 12
       spanCodeSection: TargetEngineControl.
     - startInstruction: 3784
       endInstruction: 3899
-      startSourceChar: 3719
-      endSourceChar: 3730
+      startSourceChar: 3720
+      endSourceChar: 3732
       line: 103
       lineChar: 32
-      spanCodeSection: 'IsOwner || '
+      spanCodeSection: 'Piloting || '
     - startInstruction: 3900
       endInstruction: 3899
-      startSourceChar: 3730
-      endSourceChar: 3730
+      startSourceChar: 3732
+      endSourceChar: 3732
       line: 103
-      lineChar: 43
+      lineChar: 44
       spanCodeSection: 
     - startInstruction: 3900
       endInstruction: 3899
-      startSourceChar: 3730
-      endSourceChar: 3750
+      startSourceChar: 3732
+      endSourceChar: 3752
       line: 103
-      lineChar: 43
+      lineChar: 44
       spanCodeSection: TargetEngineControl.
     - startInstruction: 3900
       endInstruction: 4023
-      startSourceChar: 3750
-      endSourceChar: 3774
+      startSourceChar: 3752
+      endSourceChar: 3776
       line: 103
-      lineChar: 63
+      lineChar: 64
       spanCodeSection: "Passenger)\r\n            "
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3774
-      endSourceChar: 3774
+      startSourceChar: 3776
+      endSourceChar: 3776
       line: 104
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3774
-      endSourceChar: 3774
+      startSourceChar: 3776
+      endSourceChar: 3776
       line: 104
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3774
-      endSourceChar: 3774
+      startSourceChar: 3776
+      endSourceChar: 3776
       line: 104
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3774
-      endSourceChar: 3794
+      startSourceChar: 3776
+      endSourceChar: 3796
       line: 104
       lineChar: 12
       spanCodeSection: TargetEngineControl.
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3794
-      endSourceChar: 3813
+      startSourceChar: 3796
+      endSourceChar: 3815
       line: 104
       lineChar: 32
       spanCodeSection: 'MissilesIncoming = '
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3813
-      endSourceChar: 3818
+      startSourceChar: 3815
+      endSourceChar: 3820
       line: 104
       lineChar: 51
       spanCodeSection: (int)
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3818
-      endSourceChar: 3818
+      startSourceChar: 3820
+      endSourceChar: 3820
       line: 104
       lineChar: 56
       spanCodeSection: 
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3818
-      endSourceChar: 3818
+      startSourceChar: 3820
+      endSourceChar: 3820
       line: 104
       lineChar: 56
       spanCodeSection: 
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3818
-      endSourceChar: 3824
+      startSourceChar: 3820
+      endSourceChar: 3826
       line: 104
       lineChar: 56
       spanCodeSection: Mathf.
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3824
-      endSourceChar: 3828
+      startSourceChar: 3826
+      endSourceChar: 3830
       line: 104
       lineChar: 62
       spanCodeSection: Max(
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3828
-      endSourceChar: 3828
+      startSourceChar: 3830
+      endSourceChar: 3830
       line: 104
       lineChar: 66
       spanCodeSection: 
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3828
-      endSourceChar: 3835
+      startSourceChar: 3830
+      endSourceChar: 3837
       line: 104
       lineChar: 66
       spanCodeSection: (float)
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3835
-      endSourceChar: 3835
+      startSourceChar: 3837
+      endSourceChar: 3837
       line: 104
       lineChar: 73
       spanCodeSection: 
     - startInstruction: 4024
       endInstruction: 4023
-      startSourceChar: 3835
-      endSourceChar: 3855
+      startSourceChar: 3837
+      endSourceChar: 3857
       line: 104
       lineChar: 73
       spanCodeSection: TargetEngineControl.
     - startInstruction: 4024
       endInstruction: 4103
-      startSourceChar: 3855
-      endSourceChar: 3874
+      startSourceChar: 3857
+      endSourceChar: 3876
       line: 104
       lineChar: 93
       spanCodeSection: 'MissilesIncoming - '
     - startInstruction: 4104
       endInstruction: 4135
-      startSourceChar: 3874
-      endSourceChar: 3878
+      startSourceChar: 3876
+      endSourceChar: 3880
       line: 104
       lineChar: 112
       spanCodeSection: '1f, '
     - startInstruction: 4136
       endInstruction: 4291
-      startSourceChar: 3878
-      endSourceChar: 3894
+      startSourceChar: 3880
+      endSourceChar: 3896
       line: 104
       lineChar: 116
       spanCodeSection: "0);\r\n    }\r\n    "
     - startInstruction: 4292
       endInstruction: 4291
-      startSourceChar: 3894
-      endSourceChar: 3924
+      startSourceChar: 3896
+      endSourceChar: 3926
       line: 106
       lineChar: 4
       spanCodeSection: private void OnCollisionEnter(
     - startInstruction: 4292
       endInstruction: 4319
-      startSourceChar: 3924
-      endSourceChar: 3946
+      startSourceChar: 3926
+      endSourceChar: 3948
       line: 106
       lineChar: 34
       spanCodeSection: "Collision other)\r\n    "
     - startInstruction: 4320
       endInstruction: 4319
-      startSourceChar: 3946
-      endSourceChar: 3957
+      startSourceChar: 3948
+      endSourceChar: 3959
       line: 107
       lineChar: 4
       spanCodeSection: "{\r\n        "
     - startInstruction: 4320
       endInstruction: 4319
-      startSourceChar: 3957
-      endSourceChar: 3961
+      startSourceChar: 3959
+      endSourceChar: 3963
       line: 108
       lineChar: 8
       spanCodeSection: if (
     - startInstruction: 4320
       endInstruction: 4319
-      startSourceChar: 3961
-      endSourceChar: 3962
+      startSourceChar: 3963
+      endSourceChar: 3964
       line: 108
       lineChar: 12
       spanCodeSection: '!'
     - startInstruction: 4320
       endInstruction: 4359
-      startSourceChar: 3962
-      endSourceChar: 3982
+      startSourceChar: 3964
+      endSourceChar: 3984
       line: 108
       lineChar: 13
       spanCodeSection: "Exploding)\r\n        "
     - startInstruction: 4360
       endInstruction: 4359
-      startSourceChar: 3982
-      endSourceChar: 3997
+      startSourceChar: 3984
+      endSourceChar: 3999
       line: 109
       lineChar: 8
       spanCodeSection: "{\r\n            "
     - startInstruction: 4360
       endInstruction: 4359
-      startSourceChar: 3997
-      endSourceChar: 4001
+      startSourceChar: 3999
+      endSourceChar: 4003
       line: 110
       lineChar: 12
       spanCodeSection: if (
     - startInstruction: 4360
       endInstruction: 4359
-      startSourceChar: 4001
-      endSourceChar: 4001
+      startSourceChar: 4003
+      endSourceChar: 4003
       line: 110
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4360
       endInstruction: 4359
-      startSourceChar: 4001
-      endSourceChar: 4024
+      startSourceChar: 4003
+      endSourceChar: 4026
       line: 110
       lineChar: 16
       spanCodeSection: 'TargetEngineControl != '
     - startInstruction: 4360
       endInstruction: 4407
-      startSourceChar: 4024
-      endSourceChar: 4043
+      startSourceChar: 4026
+      endSourceChar: 4045
       line: 110
       lineChar: 39
       spanCodeSection: "null)\r\n            "
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4043
-      endSourceChar: 4062
+      startSourceChar: 4045
+      endSourceChar: 4064
       line: 111
       lineChar: 12
       spanCodeSection: "{\r\n                "
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4062
-      endSourceChar: 4062
+      startSourceChar: 4064
+      endSourceChar: 4064
       line: 112
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4062
-      endSourceChar: 4062
+      startSourceChar: 4064
+      endSourceChar: 4064
       line: 112
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4062
-      endSourceChar: 4062
+      startSourceChar: 4064
+      endSourceChar: 4064
       line: 112
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4062
-      endSourceChar: 4062
+      startSourceChar: 4064
+      endSourceChar: 4064
       line: 112
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4062
-      endSourceChar: 4062
+      startSourceChar: 4064
+      endSourceChar: 4064
       line: 112
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4062
-      endSourceChar: 4073
+      startSourceChar: 4064
+      endSourceChar: 4075
       line: 112
       lineChar: 16
       spanCodeSection: gameObject.
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4073
-      endSourceChar: 4085
+      startSourceChar: 4075
+      endSourceChar: 4087
       line: 112
       lineChar: 27
       spanCodeSection: GetComponent
     - startInstruction: 4408
       endInstruction: 4407
-      startSourceChar: 4085
-      endSourceChar: 4086
+      startSourceChar: 4087
+      endSourceChar: 4088
       line: 112
       lineChar: 39
       spanCodeSection: <
     - startInstruction: 4408
       endInstruction: 4463
-      startSourceChar: 4086
-      endSourceChar: 4099
+      startSourceChar: 4088
+      endSourceChar: 4101
       line: 112
       lineChar: 40
       spanCodeSection: Rigidbody>().
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4099
-      endSourceChar: 4110
+      startSourceChar: 4101
+      endSourceChar: 4112
       line: 112
       lineChar: 53
       spanCodeSection: 'velocity = '
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4110
-      endSourceChar: 4110
+      startSourceChar: 4112
+      endSourceChar: 4112
       line: 112
       lineChar: 64
       spanCodeSection: 
     - startInstruction: 4464
       endInstruction: 4463
-      startSourceChar: 4110
-      endSourceChar: 4130
+      startSourceChar: 4112
+      endSourceChar: 4132
       line: 112
       lineChar: 64
       spanCodeSection: TargetEngineControl.
     - startInstruction: 4464
       endInstruction: 4539
-      startSourceChar: 4130
-      endSourceChar: 4271
+      startSourceChar: 4132
+      endSourceChar: 4273
       line: 112
       lineChar: 84
       spanCodeSection: "CurrentVel;//damage particles inherit the velocity of the
@@ -3572,351 +3572,351 @@ MonoBehaviour:
         \           "
     - startInstruction: 4540
       endInstruction: 4539
-      startSourceChar: 4271
-      endSourceChar: 4271
+      startSourceChar: 4273
+      endSourceChar: 4273
       line: 114
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4540
       endInstruction: 4539
-      startSourceChar: 4271
-      endSourceChar: 4271
+      startSourceChar: 4273
+      endSourceChar: 4273
       line: 114
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4540
       endInstruction: 4539
-      startSourceChar: 4271
-      endSourceChar: 4271
+      startSourceChar: 4273
+      endSourceChar: 4273
       line: 114
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4540
       endInstruction: 4539
-      startSourceChar: 4271
-      endSourceChar: 4283
+      startSourceChar: 4273
+      endSourceChar: 4285
       line: 114
       lineChar: 12
       spanCodeSection: AAMCollider.
     - startInstruction: 4540
       endInstruction: 4539
-      startSourceChar: 4283
-      endSourceChar: 4293
+      startSourceChar: 4285
+      endSourceChar: 4295
       line: 114
       lineChar: 24
       spanCodeSection: 'enabled = '
     - startInstruction: 4540
       endInstruction: 4563
-      startSourceChar: 4293
-      endSourceChar: 4313
+      startSourceChar: 4295
+      endSourceChar: 4315
       line: 114
       lineChar: 34
       spanCodeSection: "false;\r\n            "
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4313
-      endSourceChar: 4313
+      startSourceChar: 4315
+      endSourceChar: 4315
       line: 115
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4313
-      endSourceChar: 4313
+      startSourceChar: 4315
+      endSourceChar: 4315
       line: 115
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4313
-      endSourceChar: 4313
+      startSourceChar: 4315
+      endSourceChar: 4315
       line: 115
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4313
-      endSourceChar: 4329
+      startSourceChar: 4315
+      endSourceChar: 4331
       line: 115
       lineChar: 12
       spanCodeSection: 'Animator AGMani '
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4329
-      endSourceChar: 4331
+      startSourceChar: 4331
+      endSourceChar: 4333
       line: 115
       lineChar: 28
       spanCodeSection: '= '
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4331
-      endSourceChar: 4331
+      startSourceChar: 4333
+      endSourceChar: 4333
       line: 115
       lineChar: 30
       spanCodeSection: 
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4331
-      endSourceChar: 4331
+      startSourceChar: 4333
+      endSourceChar: 4333
       line: 115
       lineChar: 30
       spanCodeSection: 
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4331
-      endSourceChar: 4342
+      startSourceChar: 4333
+      endSourceChar: 4344
       line: 115
       lineChar: 30
       spanCodeSection: gameObject.
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4342
-      endSourceChar: 4354
+      startSourceChar: 4344
+      endSourceChar: 4356
       line: 115
       lineChar: 41
       spanCodeSection: GetComponent
     - startInstruction: 4564
       endInstruction: 4563
-      startSourceChar: 4354
-      endSourceChar: 4355
+      startSourceChar: 4356
+      endSourceChar: 4357
       line: 115
       lineChar: 53
       spanCodeSection: <
     - startInstruction: 4564
       endInstruction: 4619
-      startSourceChar: 4355
-      endSourceChar: 4381
+      startSourceChar: 4357
+      endSourceChar: 4383
       line: 115
       lineChar: 54
       spanCodeSection: "Animator>();\r\n            "
     - startInstruction: 4620
       endInstruction: 4619
-      startSourceChar: 4381
-      endSourceChar: 4385
+      startSourceChar: 4383
+      endSourceChar: 4387
       line: 116
       lineChar: 12
       spanCodeSection: if (
     - startInstruction: 4620
       endInstruction: 4619
-      startSourceChar: 4385
-      endSourceChar: 4385
+      startSourceChar: 4387
+      endSourceChar: 4387
       line: 116
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4620
       endInstruction: 4619
-      startSourceChar: 4385
-      endSourceChar: 4399
+      startSourceChar: 4387
+      endSourceChar: 4401
       line: 116
       lineChar: 16
       spanCodeSection: EngineControl.
     - startInstruction: 4620
       endInstruction: 4691
-      startSourceChar: 4399
-      endSourceChar: 4422
+      startSourceChar: 4401
+      endSourceChar: 4424
       line: 116
       lineChar: 30
       spanCodeSection: "InEditor)\r\n            "
     - startInstruction: 4692
       endInstruction: 4691
-      startSourceChar: 4422
-      endSourceChar: 4441
+      startSourceChar: 4424
+      endSourceChar: 4443
       line: 117
       lineChar: 12
       spanCodeSection: "{\r\n                "
     - startInstruction: 4692
       endInstruction: 4691
-      startSourceChar: 4441
-      endSourceChar: 4441
+      startSourceChar: 4443
+      endSourceChar: 4443
       line: 118
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4692
       endInstruction: 4691
-      startSourceChar: 4441
-      endSourceChar: 4441
+      startSourceChar: 4443
+      endSourceChar: 4443
       line: 118
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4692
       endInstruction: 4691
-      startSourceChar: 4441
-      endSourceChar: 4441
+      startSourceChar: 4443
+      endSourceChar: 4443
       line: 118
       lineChar: 16
       spanCodeSection: 
     - startInstruction: 4692
       endInstruction: 4691
-      startSourceChar: 4441
-      endSourceChar: 4448
+      startSourceChar: 4443
+      endSourceChar: 4450
       line: 118
       lineChar: 16
       spanCodeSection: AGMani.
     - startInstruction: 4692
       endInstruction: 4691
-      startSourceChar: 4448
-      endSourceChar: 4459
+      startSourceChar: 4450
+      endSourceChar: 4461
       line: 118
       lineChar: 23
       spanCodeSection: SetTrigger(
     - startInstruction: 4692
       endInstruction: 4723
-      startSourceChar: 4459
-      endSourceChar: 4504
+      startSourceChar: 4461
+      endSourceChar: 4506
       line: 118
       lineChar: 34
       spanCodeSection: "\"explodeowner\");\r\n            }\r\n            "
     - startInstruction: 4724
       endInstruction: 4723
-      startSourceChar: 4504
-      endSourceChar: 4522
+      startSourceChar: 4506
+      endSourceChar: 4524
       line: 120
       lineChar: 12
       spanCodeSection: "else\r\n            "
     - startInstruction: 4724
       endInstruction: 4723
-      startSourceChar: 4522
-      endSourceChar: 4541
+      startSourceChar: 4524
+      endSourceChar: 4543
       line: 121
       lineChar: 12
       spanCodeSection: "{\r\n                "
     - startInstruction: 4724
       endInstruction: 4723
-      startSourceChar: 4541
-      endSourceChar: 4545
+      startSourceChar: 4543
+      endSourceChar: 4547
       line: 122
       lineChar: 16
       spanCodeSection: if (
     - startInstruction: 4724
       endInstruction: 4739
-      startSourceChar: 4545
-      endSourceChar: 4569
+      startSourceChar: 4547
+      endSourceChar: 4571
       line: 122
       lineChar: 20
       spanCodeSection: "Owner)\r\n                "
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4569
-      endSourceChar: 4592
+      startSourceChar: 4571
+      endSourceChar: 4594
       line: 123
       lineChar: 16
       spanCodeSection: "{\r\n                    "
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4592
-      endSourceChar: 4592
+      startSourceChar: 4594
+      endSourceChar: 4594
       line: 124
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4592
-      endSourceChar: 4592
+      startSourceChar: 4594
+      endSourceChar: 4594
       line: 124
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4592
-      endSourceChar: 4592
+      startSourceChar: 4594
+      endSourceChar: 4594
       line: 124
       lineChar: 20
       spanCodeSection: 
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4592
-      endSourceChar: 4599
+      startSourceChar: 4594
+      endSourceChar: 4601
       line: 124
       lineChar: 20
       spanCodeSection: AGMani.
     - startInstruction: 4740
       endInstruction: 4739
-      startSourceChar: 4599
-      endSourceChar: 4610
+      startSourceChar: 4601
+      endSourceChar: 4612
       line: 124
       lineChar: 27
       spanCodeSection: SetTrigger(
     - startInstruction: 4740
       endInstruction: 4771
-      startSourceChar: 4610
-      endSourceChar: 4663
+      startSourceChar: 4612
+      endSourceChar: 4665
       line: 124
       lineChar: 38
       spanCodeSection: "\"explodeowner\");\r\n                }\r\n                "
     - startInstruction: 4772
       endInstruction: 4771
-      startSourceChar: 4663
-      endSourceChar: 4668
+      startSourceChar: 4665
+      endSourceChar: 4670
       line: 126
       lineChar: 16
       spanCodeSection: 'else '
     - startInstruction: 4772
       endInstruction: 4771
-      startSourceChar: 4668
-      endSourceChar: 4668
+      startSourceChar: 4670
+      endSourceChar: 4670
       line: 126
       lineChar: 21
       spanCodeSection: 
     - startInstruction: 4772
       endInstruction: 4771
-      startSourceChar: 4668
-      endSourceChar: 4668
+      startSourceChar: 4670
+      endSourceChar: 4670
       line: 126
       lineChar: 21
       spanCodeSection: 
     - startInstruction: 4772
       endInstruction: 4771
-      startSourceChar: 4668
-      endSourceChar: 4668
+      startSourceChar: 4670
+      endSourceChar: 4670
       line: 126
       lineChar: 21
       spanCodeSection: 
     - startInstruction: 4772
       endInstruction: 4771
-      startSourceChar: 4668
-      endSourceChar: 4675
+      startSourceChar: 4670
+      endSourceChar: 4677
       line: 126
       lineChar: 21
       spanCodeSection: AGMani.
     - startInstruction: 4772
       endInstruction: 4771
-      startSourceChar: 4675
-      endSourceChar: 4686
+      startSourceChar: 4677
+      endSourceChar: 4688
       line: 126
       lineChar: 28
       spanCodeSection: SetTrigger(
     - startInstruction: 4772
       endInstruction: 4795
-      startSourceChar: 4686
-      endSourceChar: 4726
+      startSourceChar: 4688
+      endSourceChar: 4728
       line: 126
       lineChar: 39
       spanCodeSection: "\"explode\");\r\n            }\r\n            "
     - startInstruction: 4796
       endInstruction: 4795
-      startSourceChar: 4726
-      endSourceChar: 4726
+      startSourceChar: 4728
+      endSourceChar: 4728
       line: 128
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4796
       endInstruction: 4795
-      startSourceChar: 4726
-      endSourceChar: 4726
+      startSourceChar: 4728
+      endSourceChar: 4728
       line: 128
       lineChar: 12
       spanCodeSection: 
     - startInstruction: 4796
       endInstruction: 4795
-      startSourceChar: 4726
-      endSourceChar: 4737
+      startSourceChar: 4728
+      endSourceChar: 4739
       line: 128
       lineChar: 12
       spanCodeSection: 'Lifetime = '
     - startInstruction: 4796
       endInstruction: 4796
-      startSourceChar: 4737
-      endSourceChar: 4737
+      startSourceChar: 4739
+      endSourceChar: 4739
       line: 128
       lineChar: 23
       spanCodeSection: 
