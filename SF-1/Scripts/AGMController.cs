@@ -16,7 +16,7 @@ public class AGMController : UdonSharpBehaviour
     private CapsuleCollider AGMCollider;
     private void Start()
     {
-
+        Target = EngineControl.AGMTarget;
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
     }
     void LateUpdate()

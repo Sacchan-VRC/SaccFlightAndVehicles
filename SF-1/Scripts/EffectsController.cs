@@ -296,6 +296,7 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.AGMLaunchOpositeSide = false;
         EngineControl.NumAAM = EngineControl.FullAAMs;
         EngineControl.NumAGM = EngineControl.FullAGMs;
+        EngineControl.NumBomb = EngineControl.FullBombs;
         EngineControl.GunAmmoInSeconds = EngineControl.FullGunAmmo;
         EngineControl.Fuel = EngineControl.FullFuel;
 

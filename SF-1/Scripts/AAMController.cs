@@ -10,7 +10,7 @@ public class AAMController : UdonSharpBehaviour
     public float RotSpeed = 15;
     public EngineController EngineControl;
     private EngineController TargetEngineControl;
-    private bool NonOwnerLockHack = true;
+    private bool LockHack = true;
     private float Lifetime = 0;
     private float StartLockAngle = 0;
     private Transform Target;
@@ -38,7 +38,7 @@ public class AAMController : UdonSharpBehaviour
         if (EngineControl.InEditor || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
         {
             Owner = true;
-            NonOwnerLockHack = false;//don't do netcode help hack if owner
+            LockHack = false;//don't do netcode help hack if owner
         }
         else
         {
@@ -62,15 +62,15 @@ public class AAMController : UdonSharpBehaviour
                 ColliderActive = true;
             }
         }
-        if (NonOwnerLockHack)
+        if (LockHack)
         {
             if (Lifetime > 2)
             {
-                NonOwnerLockHack = false;
+                LockHack = false;
                 LockAngle = StartLockAngle;
             }
         }
-        if (Vector3.Angle(gameObject.transform.forward, (Target.position - gameObject.transform.position)) < (LockAngle))
+        if (Vector3.Angle(gameObject.transform.forward, (Target.position - gameObject.transform.position)) < LockAngle)
         {
             // homing to target, thx Guribo
             var missileToTargetVector = Target.position - gameObject.transform.position;
@@ -96,12 +96,12 @@ public class AAMController : UdonSharpBehaviour
     }
     public void Locked()
     {
-        if (TargetEngineControl.IsOwner || TargetEngineControl.Passenger)
+        if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
             TargetEngineControl.MissilesIncoming++;
     }
     public void LockedOff()
     {
-        if (TargetEngineControl.IsOwner || TargetEngineControl.Passenger)
+        if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
             TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
     }
     private void OnCollisionEnter(Collision other)

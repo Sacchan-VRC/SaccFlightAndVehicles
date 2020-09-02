@@ -279,6 +279,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public int NumAAMTargets = 0;
     private int AAMTargetChecker = 0;
     [System.NonSerializedAttribute] [HideInInspector] public bool AAMHasTarget = false;
+    private float AAMTargetedTimer = 1.1f;
     [System.NonSerializedAttribute] [HideInInspector] public bool AAMLocked = false;
     private float AAMLockTime = 1.5f;
     private float AAMLockTimer = 0;
@@ -300,9 +301,9 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public int FullBombs;
     [System.NonSerializedAttribute] [HideInInspector] public float FullGunAmmo;
     private int PilotingInt;//1 if piloting 0 if not
-    [System.NonSerializedAttribute] [HideInInspector] public int TargetingMe = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public int MissilesIncoming = 0;
-    private EngineController AAMCurrentTargetEngineControl;//this will return null but unity doesn't like it otherwise
+    /* [System.NonSerializedAttribute] [HideInInspector] */
+    public int MissilesIncoming = 0;
+    private EngineController AAMCurrentTargetEngineControl;
     private float LastBombDropTime = 0f;
     //float MouseX;
     //float MouseY;
@@ -613,17 +614,6 @@ public class EngineController : UdonSharpBehaviour
                             RStickSelection = 4;
                     }
                     //need to tell our target he's no longer targeted if we switch away from AAM
-                    if (AAMHasTarget && RStickSelection != 2)
-                    {
-                        if (AAMCurrentTargetEngineControl != null)
-                        {
-                            if (InEditor)
-                                AAMCurrentTargetEngineControl.TargettedOff();
-                            else
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargettedOff");
-                        }
-                        AAMHasTarget = false;
-                    }
                 }
 
 
@@ -899,47 +889,25 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 if (AAMCurrentTargetAngle < AAMLockAngle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                                 {
-                                    if (!AAMHasTarget)
-                                    {
-                                        if (AAMCurrentTargetEngineControl != null)
-                                        {
-                                            if (InEditor)
-                                                AAMCurrentTargetEngineControl.Targeted();
-                                            else
-                                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted");
-                                        }
-                                    }
                                     AAMLockTimer += Time.deltaTime;
                                     AAMHasTarget = true;
+                                    AAMTargetedTimer += Time.deltaTime;
+                                    if (AAMTargetedTimer > 1)
+                                    {
+                                        AAMTargetedTimer = 0;
+                                        if (InEditor) Targeted();
+                                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted"); }
+                                    }
                                 }
                                 else
                                 {
-                                    if (AAMHasTarget)
-                                    {
-                                        if (AAMCurrentTargetEngineControl != null)
-                                        {
-                                            if (InEditor)
-                                                AAMCurrentTargetEngineControl.TargettedOff();
-                                            else
-                                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargettedOff");
-                                        }
-                                    }
+                                    AAMTargetedTimer = 1.1f;
                                     AAMLockTimer = 0;
                                     AAMHasTarget = false;
                                 }
                             }
                             else
                             {
-                                if (AAMHasTarget)
-                                {
-                                    if (AAMCurrentTargetEngineControl != null)
-                                    {
-                                        if (InEditor)
-                                            AAMCurrentTargetEngineControl.TargettedOff();
-                                        else
-                                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargettedOff");
-                                    }
-                                }
                                 AAMHasTarget = false;
                             }
 
@@ -960,17 +928,6 @@ public class EngineController : UdonSharpBehaviour
                                  && NextTargetDistance < AAMMaxTargetDistance && nexttargetangle < AAMCurrentTargetAngle
                                 && AAMTarget != AAMTargetChecker)
                                 {
-                                    if (AAMHasTarget)
-                                    {
-                                        if (AAMCurrentTargetEngineControl != null)
-                                        {
-                                            if (InEditor)
-                                                AAMCurrentTargetEngineControl.TargettedOff();
-                                            else
-                                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargettedOff");
-                                        }
-                                        AAMHasTarget = false;
-                                    }
                                     AAMTarget = AAMTargetChecker;
                                     AAMLockTimer = 0;
                                 }
@@ -1009,7 +966,9 @@ public class EngineController : UdonSharpBehaviour
                         AGMUnlockTimer += Time.deltaTime * AGMUnlocking;//AGMUnlocking is 1 if it was locked and just pressed, else 0, (waits for double tap delay to disable)
                         if (AGMUnlockTimer > 0.4f && AGMLocked == true)
                         {
-                            AGMLocked = false; AGMUnlockTimer = 0;
+                            AGMLocked = false;
+                            AGMUnlockTimer = 0;
+                            AGMUnlocking = 0;
                             SoundControl.AGMUnlock.Play();
                         }
                         if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha5)))
@@ -1033,10 +992,10 @@ public class EngineController : UdonSharpBehaviour
                                 }
                                 else if (!AGMLocked)
                                 {
-                                    RaycastHit lockpoint;
                                     if (AGMCam != null)
                                     {
-                                        float targetangle = 360;
+                                        float targetangle = 999;
+                                        RaycastHit lockpoint;
                                         RaycastHit[] agmtargs = Physics.SphereCastAll(AGMCam.transform.position, 40, AGMCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);
                                         if (agmtargs.Length > 0)
                                         {
@@ -1072,7 +1031,6 @@ public class EngineController : UdonSharpBehaviour
                                     RTriggerTapTime = 0;
                                     AGMUnlockTimer = 0;
                                     AGMUnlocking = 1;
-                                    RTriggerTapTime = 0;
                                 }
                             RTriggerLastFrame = true;
                         }
@@ -1811,7 +1769,7 @@ public class EngineController : UdonSharpBehaviour
         {
             GameObject NewBomb = VRCInstantiate(Bomb);
             NewBomb.transform.position = BombLaunchPoint[x].transform.position;
-            NewBomb.transform.rotation = Quaternion.Euler(new Vector3(BombLaunchPoint[x].transform.rotation.eulerAngles.x + (Random.Range(-5, 5)), BombLaunchPoint[x].transform.rotation.eulerAngles.y + (Random.Range(-5, 5)), BombLaunchPoint[x].transform.rotation.eulerAngles.z));
+            NewBomb.transform.rotation = Quaternion.Euler(new Vector3(BombLaunchPoint[x].transform.rotation.eulerAngles.x + (Random.Range(0, 8)), BombLaunchPoint[x].transform.rotation.eulerAngles.y + (Random.Range(-5, 5)), BombLaunchPoint[x].transform.rotation.eulerAngles.z));
             NewBomb.SetActive(true);
             NewBomb.GetComponent<Rigidbody>().velocity = CurrentVel;
         }
@@ -1842,13 +1800,14 @@ public class EngineController : UdonSharpBehaviour
     }
     public void Targeted()
     {
-        if (AAMCurrentTargetEngineControl.IsOwner || AAMCurrentTargetEngineControl.Passenger)
-            AAMCurrentTargetEngineControl.TargetingMe++;
-    }
-    public void TargettedOff()
-    {
-        if (AAMCurrentTargetEngineControl.IsOwner || AAMCurrentTargetEngineControl.Passenger)
-            AAMCurrentTargetEngineControl.TargetingMe = (int)Mathf.Max((float)TargetingMe - 1f, 0);
+        EngineController target = VehicleMainObj.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
+        if (AAMTargets[AAMTarget].transform.parent != null)
+            target = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
+        if (target != null)
+        {
+            if (target.Piloting || target.Passenger)
+                target.SoundControl.TargetedAlarm();
+        }
     }
     public void CatapultLockSound()
     {

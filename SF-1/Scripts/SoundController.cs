@@ -305,16 +305,10 @@ public class SoundController : UdonSharpBehaviour
             if (EngineControl.MissilesIncoming > 0)
             {
                 if (!MissileIncomingNull && !MissileIncoming.isPlaying) MissileIncoming.gameObject.SetActive(true);
-                if (!RadarLockedNull) RadarLocked.gameObject.SetActive(false);
-            }
-            else if (EngineControl.TargetingMe > 0)
-            {
-                if (!RadarLockedNull && !RadarLocked.isPlaying) RadarLocked.gameObject.SetActive(true);
-                if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
+                if (!RadarLockedNull && RadarLocked.isPlaying) { RadarLocked.Stop(); }
             }
             else
             {
-                if (!RadarLockedNull) RadarLocked.gameObject.SetActive(false);
                 if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
             }
             if (!AirbrakeNull)
@@ -489,6 +483,11 @@ public class SoundController : UdonSharpBehaviour
         {
             PlaneABOn.volume *= 4f;
         }
+    }
+    public void TargetedAlarm()
+    {
+        if (RadarLocked != null)
+            RadarLocked.Play();
     }
     private void Assert(bool condition, string message)
     {

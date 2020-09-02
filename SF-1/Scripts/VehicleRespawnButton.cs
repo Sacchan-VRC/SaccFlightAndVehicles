@@ -27,6 +27,7 @@ public class VehicleRespawnButton : UdonSharpBehaviour
             EngineControl.EffectsControl.HookDown = false;
             EngineControl.NumAAM = EngineControl.FullAAMs;
             EngineControl.NumAGM = EngineControl.FullAGMs;
+            EngineControl.NumBomb = EngineControl.FullBombs;
             EngineControl.GunAmmoInSeconds = EngineControl.FullGunAmmo;
             EngineControl.Fuel = EngineControl.FullFuel;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ButtonRespawn");
