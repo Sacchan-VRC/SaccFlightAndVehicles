@@ -6,9 +6,9 @@ using VRC.Udon;
 
 public class AGMController : UdonSharpBehaviour
 {
+    public EngineController EngineControl;
     public float LockAngle;
     public float RotSpeed = 15;
-    public EngineController EngineControl;
     private Vector3 Target;
     private float Lifetime = 0;
     private bool ColliderActive = false;

@@ -62,7 +62,7 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 SlatsLerper = new Vector3(0, 35, 0);
     private Vector3 EngineLerper = new Vector3(0, 0, 0);
     private Vector3 Enginefireerper = new Vector3(1, 0.6f, 1);
-    private float AirbrakeLerper;
+    [System.NonSerializedAttribute] [HideInInspector] public float AirbrakeLerper;
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     [System.NonSerializedAttribute] [HideInInspector] public ParticleSystem.ColorOverLifetimeModule SmokeModule;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
@@ -255,9 +255,9 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         //PlaneAnimator.SetInteger("rstickselection", EngineControl.RStickSelection);
-        PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb / (float)EngineControl.FullBombs);
         PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM / (float)EngineControl.FullAAMs);
         PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM / (float)EngineControl.FullAGMs);
+        PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb / (float)EngineControl.FullBombs);
         DoVapor();
     }
 
@@ -286,7 +286,6 @@ public class EffectsController : UdonSharpBehaviour
         HookDown = false;
         EngineControl.AirBrakeInput = 0;
         EngineControl.FlightLimitsEnabled = true;
-        CanopyOpen = false;
         EngineControl.Cruise = false;
         //EngineControl.Trim = Vector2.zero;
         CanopyOpen = true;
