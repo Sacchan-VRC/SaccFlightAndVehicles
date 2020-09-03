@@ -6,9 +6,9 @@ using VRC.Udon;
 
 public class AAMController : UdonSharpBehaviour
 {
+    public EngineController EngineControl;
     public float LockAngle;
     public float RotSpeed = 15;
-    public EngineController EngineControl;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
     private float Lifetime = 0;
@@ -21,12 +21,15 @@ public class AAMController : UdonSharpBehaviour
     private bool LockedOn = false;
     void Start()
     {
+        Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
+        AAMCollider = gameObject.GetComponent<CapsuleCollider>();
+        StartLockAngle = LockAngle;
         if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
         {
             TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
             if (TargetEngineControl != null)
             {
-                if (TargetEngineControl.InEditor)
+                if (EngineControl.InEditor)
                     Locked();
                 else
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Locked");
@@ -34,8 +37,7 @@ public class AAMController : UdonSharpBehaviour
             }
         }
 
-        StartLockAngle = LockAngle;
-        if (EngineControl.InEditor || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
+        if (EngineControl.InEditor || EngineControl.IsOwner)
         {
             Owner = true;
             LockHack = false;//don't do netcode help hack if owner
@@ -44,13 +46,6 @@ public class AAMController : UdonSharpBehaviour
         {
             LockAngle = 180;//help missiles fired during a lagged turnfight actually fly towards their targets for the people who didn't fire them (for the first 2 seconds)
         }
-        if (EngineControl.NumAAMTargets != 0)
-        {
-            Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
-        }
-        AAMCollider = gameObject.GetComponent<CapsuleCollider>();
-
-
     }
     void LateUpdate()
     {
@@ -80,9 +75,9 @@ public class AAMController : UdonSharpBehaviour
             var deltaAngle = Vector3.Angle(missileForward, targetDirection);
             gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
         }
-        else if (LockedOn && TargetEngineControl != null)
+        else if (LockedOn)
         {
-            if (TargetEngineControl.InEditor)
+            if (EngineControl.InEditor)
                 LockedOff();
             else
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LockedOff");
@@ -110,8 +105,29 @@ public class AAMController : UdonSharpBehaviour
         {
             if (TargetEngineControl != null)
             {
-                gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel;//damage particles inherit the velocity of the missile, so this should help them hit the target plane
+                //damage particles inherit the velocity of the missile, so this should help them hit the target plane
+                //this is why iskinematic is set 2 frameslater in the explode animation.
+                gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel;
             }
+
+            //would rather do it like this but udon wont let me
+            /*             if (TargetEngineControl != null)
+                        {
+                            //damage particles take the velocity of the target plane so they can hit it any speed
+                            var vel = DamageParticles.velocityOverLifetime;
+                            vel.enabled = true;
+                            vel.space = ParticleSystemSimulationSpace.World;
+
+                            AnimationCurve velcurvex = new AnimationCurve();
+                            AnimationCurve velcurvey = new AnimationCurve();
+                            AnimationCurve velcurvez = new AnimationCurve();
+                            velcurvex.AddKey(0.0f, TargetEngineControl.CurrentVel.x);
+                            velcurvey.AddKey(0.0f, TargetEngineControl.CurrentVel.y);
+                            velcurvez.AddKey(0.0f, TargetEngineControl.CurrentVel.z);
+                            vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvex);
+                            vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvey);
+                            vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvez);
+                        } */
             AAMCollider.enabled = false;
             Animator AGMani = gameObject.GetComponent<Animator>();
             if (EngineControl.InEditor)

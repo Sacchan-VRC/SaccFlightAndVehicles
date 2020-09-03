@@ -130,9 +130,6 @@ public class EngineController : UdonSharpBehaviour
 
 
 
-    //make this synced in order to animate bay doors opening when you select missiles, for example. Also remove uncomment the setinteger for it in effectscontroller.
-    [System.NonSerializedAttribute] [HideInInspector] /* [UdonSynced(UdonSyncMode.None)] */ public int RStickSelection = 0;
-
     [System.NonSerializedAttribute] [HideInInspector] public bool FlightLimitsEnabled = true;
     [System.NonSerializedAttribute] [HideInInspector] public ConstantForce VehicleConstantForce;
     [System.NonSerializedAttribute] [HideInInspector] public Rigidbody VehicleRigidbody;
@@ -142,6 +139,7 @@ public class EngineController : UdonSharpBehaviour
     private float LerpedYaw;
     private Vector2 LStick;
     private Vector2 RStick;
+    [System.NonSerializedAttribute] [HideInInspector] public int RStickSelection = 0;
     [System.NonSerializedAttribute] [HideInInspector] public int LStickSelection = 0;
     private Vector2 VRPitchRollInput;
     private float LGrip;
@@ -248,10 +246,10 @@ public class EngineController : UdonSharpBehaviour
     private float AltHoldPitchProportional = 1f;
     private float AltHoldPitchIntegral = 1f;
     private float AltHoldPitchIntegrator;
-    private float AltHoldPitchIntegratorMax = .05f;
-    private float AltHoldPitchIntegratorMin = -.05f;
-    private float AltHoldPitchDerivative = 4;
-    private float AltHoldPitchDerivator;
+    //private float AltHoldPitchIntegratorMax = .1f;
+    //private float AltHoldPitchIntegratorMin = -.1f;
+    //private float AltHoldPitchDerivative = 4;
+    //private float AltHoldPitchDerivator;
     private float AltHoldPitchlastframeerror;
     private float AltHoldRollProportional = -.005f;
     [System.NonSerializedAttribute] [HideInInspector] public bool AltHold;
@@ -302,7 +300,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float FullGunAmmo;
     private int PilotingInt;//1 if piloting 0 if not
     /* [System.NonSerializedAttribute] [HideInInspector] */
-    public int MissilesIncoming = 0;
+    [System.NonSerializedAttribute] [HideInInspector] public int MissilesIncoming = 0;
     private EngineController AAMCurrentTargetEngineControl;
     private float LastBombDropTime = 0f;
     //float MouseX;
@@ -613,7 +611,6 @@ public class EngineController : UdonSharpBehaviour
                         if (HasBomb)
                             RStickSelection = 4;
                     }
-                    //need to tell our target he's no longer targeted if we switch away from AAM
                 }
 
 
@@ -901,7 +898,7 @@ public class EngineController : UdonSharpBehaviour
                                 }
                                 else
                                 {
-                                    AAMTargetedTimer = 1.1f;
+                                    AAMTargetedTimer = 2f;//so it plays straight away next time it's targeted
                                     AAMLockTimer = 0;
                                     AAMHasTarget = false;
                                 }
@@ -930,6 +927,7 @@ public class EngineController : UdonSharpBehaviour
                                 {
                                     AAMTarget = AAMTargetChecker;
                                     AAMLockTimer = 0;
+                                    AAMTargetedTimer = .5f;//give the synced variable time to update before sending targeted
                                 }
                             }
 
@@ -1384,8 +1382,7 @@ public class EngineController : UdonSharpBehaviour
                     ThrottleInput = CruiseProportional * error;
                     ThrottleInput += CruiseIntegral * CruiseIntegrator;
                     //ThrottleInput += Derivative * Derivator; //works but spazzes out real bad
-                    ThrottleInput = Mathf.Clamp(ThrottleInput, 0, 1);
-
+                    ThrottleInput = PlayerThrottle = Mathf.Clamp(ThrottleInput, 0, 1);
                     Cruiselastframeerror = error;
                 }
                 else//if cruise control disabled, use inputs
@@ -1396,50 +1393,42 @@ public class EngineController : UdonSharpBehaviour
                 if (Fuel < 200) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / 200), 0, 1);
 
                 if (ThrottleInput < .6f) { EffectsControl.AfterburnerOn = false; Afterburner = 1; }
-
-                //Altitude hold PID Controller
                 if (AltHold && !RGripLastFrame)//level flight enabled, and player not holding joystick
                 {
+                    Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
+                    //Altitude hold PI Controller
                     FlightLimitsEnabled = true; //prevent the autopilot from killing you in various ways
-                    Vector3 straight = new Vector3(VehicleRigidbody.velocity.x, 0, VehicleRigidbody.velocity.z);
-                    Vector3 tempaxis = VehicleMainObj.transform.right;
-                    tempaxis.x = 0;
-                    float error = CurrentVel.normalized.y;//(Vector3.Dot(VehicleRigidbody.velocity.normalized, Vector3.up));
+
+                    int upsidedown = Vector3.Dot(Vector3.up, VehicleMainObj.transform.up) > 0 ? 1 : -1;
+                    float error = CurrentVel.normalized.y - (localAngularVelocity.x * upsidedown * 2.5f);//(Vector3.Dot(VehicleRigidbody.velocity.normalized, Vector3.up));
 
                     AltHoldPitchIntegrator += error * Time.deltaTime;
-                    AltHoldPitchIntegrator = Mathf.Clamp(AltHoldPitchIntegrator, AltHoldPitchIntegratorMin, AltHoldPitchIntegratorMax);
-
-                    AltHoldPitchDerivator = ((error - AltHoldPitchlastframeerror) / Time.deltaTime);
-
+                    //AltHoldPitchIntegrator = Mathf.Clamp(AltHoldPitchIntegrator, AltHoldPitchIntegratorMin, AltHoldPitchIntegratorMax);
+                    //AltHoldPitchDerivator = (error - AltHoldPitchlastframeerror) / Time.deltaTime;
                     AltHoldPitchlastframeerror = error;
-
                     PitchInput = AltHoldPitchProportional * error;
-
                     PitchInput += AltHoldPitchIntegral * AltHoldPitchIntegrator;
-
-                    PitchInput += AltHoldPitchDerivative * AltHoldPitchDerivator; //works but spazzes out real bad
-
+                    //PitchInput += AltHoldPitchDerivative * AltHoldPitchDerivator; //works but spazzes out real bad
                     PitchInput = Mathf.Clamp(PitchInput, -1, 1);
-
                     AltHoldPitchlastframeerror = error;
 
                     //Roll
-                    error = VehicleMainObj.transform.localEulerAngles.z;
-                    if (error > 180) { error -= 360; }
+                    float ErrorRoll = VehicleMainObj.transform.localEulerAngles.z;
+                    if (ErrorRoll > 180) { ErrorRoll -= 360; }
 
                     //lock upside down if rotated more than 90
-                    if (error > 90)
+                    if (ErrorRoll > 90)
                     {
-                        error -= 180;
+                        ErrorRoll -= 180;
                         PitchInput *= -1;
                     }
-                    else if (error < -90)
+                    else if (ErrorRoll < -90)
                     {
-                        error += 180;
+                        ErrorRoll += 180;
                         PitchInput *= -1;
                     }
 
-                    RollInput = Mathf.Clamp(AltHoldRollProportional * error, -1, 1);
+                    RollInput = Mathf.Clamp(AltHoldRollProportional * ErrorRoll, -1, 1);
 
                     YawInput = 0;
                 }

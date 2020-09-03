@@ -316,7 +316,7 @@ public class SoundController : UdonSharpBehaviour
                 if (!Airbrake.isPlaying)
                     Airbrake.Play();
                 Airbrake.pitch = EngineControl.AirBrakeInput * .2f + .9f;
-                Airbrake.volume = EngineControl.AirBrakeInput * EngineControl.rotlift;
+                Airbrake.volume = EngineControl.EffectsControl.AirbrakeLerper * EngineControl.rotlift;
             }
             else
             {
