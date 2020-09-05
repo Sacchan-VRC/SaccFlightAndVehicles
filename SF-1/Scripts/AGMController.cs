@@ -7,6 +7,7 @@ using VRC.Udon;
 public class AGMController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
+    public float ColliderActiveDistance = 30;
     public float LockAngle;
     public float RotSpeed = 15;
     private Vector3 Target;
@@ -23,7 +24,7 @@ public class AGMController : UdonSharpBehaviour
     {
         if (!ColliderActive)
         {
-            if (Lifetime > 0.5f)
+            if (Vector3.Distance(gameObject.transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
             {
                 AGMCollider.enabled = true;
                 ColliderActive = true;

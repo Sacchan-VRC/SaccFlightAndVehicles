@@ -25,17 +25,19 @@ public class PilotSeat : UdonSharpBehaviour
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (EngineControl != null)
         {
+            EngineControl.localPlayer.UseAttachedStation();
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
             EngineControl.Piloting = true;
+            //canopy closed/open sound
             if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;//has to be less than -100000
             else EngineControl.CanopyCloseTimer = -1;//less than 0
             if (EngineControl.dead) EngineControl.Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
         }
         if (EngineControl.EffectsControl != null)
         {
+            Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.IsFiringGun = false;
             EngineControl.EffectsControl.Smoking = false;
-            Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
         }
         if (EngineControl.HUDControl != null)
@@ -45,7 +47,6 @@ public class PilotSeat : UdonSharpBehaviour
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        if (EngineControl.localPlayer != null) { EngineControl.localPlayer.UseAttachedStation(); }
         if (EngineControl.EffectsControl != null || EngineControl.SoundControl != null) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "WakeUp"); }
         if (PlaneMesh != null)
         {

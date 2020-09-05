@@ -7,6 +7,7 @@ using VRC.Udon;
 public class BombController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
+    public float ColliderActiveDistance = 30;
     public float StraightenFactor = .1f;
     public float AirPhysicsStrength = .1f;
     private ConstantForce BombConstant;
@@ -30,7 +31,7 @@ public class BombController : UdonSharpBehaviour
         BombConstant.relativeForce = new Vector3(-sidespeed, -downspeed, 0);
         if (!ColliderActive)
         {
-            if (Lifetime > 1f)
+            if (Vector3.Distance(gameObject.transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
             {
                 BombCollider.enabled = true;
                 ColliderActive = true;

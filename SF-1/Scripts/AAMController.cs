@@ -7,6 +7,7 @@ using VRC.Udon;
 public class AAMController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
+    public float ColliderActiveDistance = 30;
     public float LockAngle;
     public float RotSpeed = 15;
     private EngineController TargetEngineControl;
@@ -29,10 +30,8 @@ public class AAMController : UdonSharpBehaviour
             TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
             if (TargetEngineControl != null)
             {
-                if (EngineControl.InEditor)
-                    Locked();
-                else
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Locked");
+                if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
+                    TargetEngineControl.MissilesIncoming++;
                 LockedOn = true;
             }
         }
@@ -51,7 +50,7 @@ public class AAMController : UdonSharpBehaviour
     {
         if (!ColliderActive)
         {
-            if (Lifetime > 0.5f)
+            if (Vector3.Distance(gameObject.transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
             {
                 AAMCollider.enabled = true;
                 ColliderActive = true;
@@ -59,7 +58,7 @@ public class AAMController : UdonSharpBehaviour
         }
         if (LockHack)
         {
-            if (Lifetime > 2)
+            if (Lifetime > 1)
             {
                 LockHack = false;
                 LockAngle = StartLockAngle;
@@ -77,32 +76,32 @@ public class AAMController : UdonSharpBehaviour
         }
         else if (LockedOn)
         {
-            if (EngineControl.InEditor)
-                LockedOff();
-            else
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LockedOff");
+            if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
+                TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
             LockedOn = false;
         }
         Lifetime += Time.deltaTime;
         if (Lifetime > 40)
         {
+            if (LockedOn)
+            {
+                if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
+                    TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
+                LockedOn = false;
+            }
             Destroy(gameObject);
         }
-    }
-    public void Locked()
-    {
-        if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-            TargetEngineControl.MissilesIncoming++;
-    }
-    public void LockedOff()
-    {
-        if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-            TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
     }
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
         {
+            if (LockedOn)
+            {
+                if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
+                    TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
+                LockedOn = false;
+            }
             if (TargetEngineControl != null)
             {
                 //damage particles inherit the velocity of the missile, so this should help them hit the target plane

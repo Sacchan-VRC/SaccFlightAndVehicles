@@ -24,6 +24,7 @@ public class EngineController : UdonSharpBehaviour
     public GameObject AAM;
     [UdonSynced(UdonSyncMode.None)] public int NumAAM;
     public float AAMMaxTargetDistance;
+    public float SendRadarLockInterval = 1;
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public GameObject AGM;
@@ -282,7 +283,7 @@ public class EngineController : UdonSharpBehaviour
     private float AAMLockTime = 1.5f;
     private float AAMLockTimer = 0;
     private float AAMLockAngle;
-    private float AALastFiredTime;
+    private float AAMLastFiredTime;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 AAMCurrentTargetDirection;
     [System.NonSerializedAttribute] [HideInInspector] public float FullFuel;
     [System.NonSerializedAttribute] [HideInInspector] public bool AGMLocked;
@@ -303,6 +304,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public int MissilesIncoming = 0;
     private EngineController AAMCurrentTargetEngineControl;
     private float LastBombDropTime = 0f;
+    private bool SteamOn = false;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -415,6 +417,9 @@ public class EngineController : UdonSharpBehaviour
         ReversingPitchStrengthZero = PitchThrustVecMulti == 0 ? -ReversingPitchStrengthMulti : 1;
         ReversingYawStrengthZero = YawThrustVecMulti == 0 ? -ReversingYawStrengthMulti : 1;
         ReversingRollStrengthZero = RollThrustVecMulti == 0 ? -ReversingRollStrengthMulti : 1;
+
+        if (AAMTargets[AAMTarget].transform.parent != null)
+            AAMCurrentTargetEngineControl = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
     }
 
     private void LateUpdate()
@@ -871,6 +876,7 @@ public class EngineController : UdonSharpBehaviour
 
                         AAMHasTarget = false;
                         AAMLocked = false;
+                        AAMLockTimer = 0;
                         break;
                     case 2://AAM
                         if (NumAAMTargets != 0 && NumAAM > 0)
@@ -878,22 +884,25 @@ public class EngineController : UdonSharpBehaviour
                             AAMCurrentTargetDirection = AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position;
                             float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position));
                             float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
-                            if (AAMTargets[AAMTarget].transform.parent != null)
-                                AAMCurrentTargetEngineControl = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
-                            //current target locking if within lock angle and range
-                            //if EngineController is null then it's a dummy target (or isn't set up properly)
+                            //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
                             if (AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || !AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead))
                             {
                                 if (AAMCurrentTargetAngle < AAMLockAngle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                                 {
-                                    AAMLockTimer += Time.deltaTime;
                                     AAMHasTarget = true;
-                                    AAMTargetedTimer += Time.deltaTime;
-                                    if (AAMTargetedTimer > 1)
+                                    AAMLockTimer += Time.deltaTime;
+                                    if (AAMCurrentTargetEngineControl != null)
                                     {
-                                        AAMTargetedTimer = 0;
-                                        if (InEditor) Targeted();
-                                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted"); }
+                                        //target is a plane
+                                        AAMTargetedTimer += Time.deltaTime;
+                                        if (AAMTargetedTimer > SendRadarLockInterval)
+                                        {
+                                            AAMTargetedTimer = 0;
+                                            if (InEditor)
+                                                Targeted();
+                                            else
+                                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted");
+                                        }
                                     }
                                 }
                                 else
@@ -915,24 +924,27 @@ public class EngineController : UdonSharpBehaviour
                             Vector3 AAMNextTargetDirection = (AAMTargets[AAMTargetChecker].transform.position - CenterOfMass.transform.position);
                             float nexttargetangle = Vector3.Angle(VehicleMainObj.transform.forward, AAMNextTargetDirection);
                             float NextTargetDistance = Vector3.Distance(CenterOfMass.position, AAMTargets[AAMTargetChecker].transform.position);
-                            EngineController NextTargetEngineControl = VehicleMainObj.GetComponent<EngineController>();//this will return null but unity doesn't like it otherwise
+                            EngineController NextTargetEngineControl = VehicleMainObj.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
                             if (AAMTargets[AAMTargetChecker].transform.parent != null)
                                 NextTargetEngineControl = AAMTargets[AAMTargetChecker].transform.parent.GetComponent<EngineController>();
-                            //if EngineController is null then it's a dummy target (or isn't set up properly)
+                            //if target EngineController is null then it's a dummy target (or isn't set up properly)
                             if (AAMTargets[AAMTargetChecker].activeInHierarchy && (NextTargetEngineControl == null || !NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead))
                             {
                                 if ((AAMTargets[AAMTargetChecker].activeSelf && nexttargetangle < AAMLockAngle)
-                                 && NextTargetDistance < AAMMaxTargetDistance && nexttargetangle < AAMCurrentTargetAngle
-                                && AAMTarget != AAMTargetChecker)
+                                 && NextTargetDistance < AAMMaxTargetDistance && nexttargetangle < AAMCurrentTargetAngle)
                                 {
+                                    //found new target
                                     AAMTarget = AAMTargetChecker;
+                                    if (AAMTargets[AAMTarget].transform.parent != null)
+                                        AAMCurrentTargetEngineControl = NextTargetEngineControl;
                                     AAMLockTimer = 0;
                                     AAMTargetedTimer = .5f;//give the synced variable time to update before sending targeted
                                 }
                             }
-
-
+                            //increase target checker ready for next frame
                             AAMTargetChecker++;
+                            if (AAMTargetChecker == AAMTarget)
+                                AAMTargetChecker++;
                             if (AAMTargetChecker == NumAAMTargets)
                             {
                                 AAMTargetChecker = 0;
@@ -940,13 +952,14 @@ public class EngineController : UdonSharpBehaviour
                         }
                         else { AAMLocked = false; AAMHasTarget = false; }
 
+                        //firing AAM
                         if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha5)))
                         {
                             if (!RTriggerLastFrame)
                             {
-                                if (AAMLocked && !Taxiing && Time.time - AALastFiredTime > 0.5)
+                                if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > 0.5 && !Taxiing)
                                 {
-                                    AALastFiredTime = Time.time;
+                                    AAMLastFiredTime = Time.time;
                                     if (InEditor)
                                         LaunchAAM();
                                     else
@@ -967,7 +980,8 @@ public class EngineController : UdonSharpBehaviour
                             AGMLocked = false;
                             AGMUnlockTimer = 0;
                             AGMUnlocking = 0;
-                            SoundControl.AGMUnlock.Play();
+                            if (!SoundControl.AGMUnlockNull)
+                                SoundControl.AGMUnlock.Play();
                         }
                         if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha5)))
                         {
@@ -977,7 +991,7 @@ public class EngineController : UdonSharpBehaviour
                                     if (AGMLocked)
                                     {
                                         //double tap detected
-                                        if (NumAGM > 0)
+                                        if (NumAGM > 0 && !Taxiing)
                                         {
                                             if (InEditor)
                                                 LaunchAGM();
@@ -1016,7 +1030,8 @@ public class EngineController : UdonSharpBehaviour
                                             Physics.Raycast(AGMCam.transform.position, AGMCam.transform.forward, out lockpoint, Mathf.Infinity, 1);
                                             if (lockpoint.point != null)
                                             {
-                                                SoundControl.AGMLock.Play();
+                                                if (!SoundControl.AGMUnlockNull)
+                                                    SoundControl.AGMLock.Play();
                                                 AGMTarget = lockpoint.point;
                                                 AGMLocked = true;
                                                 AGMUnlocking = 0;
@@ -1063,6 +1078,7 @@ public class EngineController : UdonSharpBehaviour
 
                         AAMHasTarget = false;
                         AAMLocked = false;
+                        AAMLockTimer = 0;
                         IsFiringGun = false;
                         break;
                     case 4://Bomb
@@ -1070,7 +1086,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (!RTriggerLastFrame)
                             {
-                                if (NumBomb > 0)
+                                if (NumBomb > 0 && !Taxiing)
                                 {
                                     LastBombDropTime = Time.time;
                                     if (InEditor)
@@ -1081,7 +1097,7 @@ public class EngineController : UdonSharpBehaviour
                                 }
                             }
                             else
-                                if (NumBomb > 0 && Time.time - LastBombDropTime > 0.5f)
+                                if (NumBomb > 0 && Time.time - LastBombDropTime > 0.5f && !Taxiing)//launch twice a second if you hold the button
                             {
                                 {
                                     LastBombDropTime = Time.time;
@@ -1097,6 +1113,9 @@ public class EngineController : UdonSharpBehaviour
                         }
                         else { RTriggerLastFrame = false; }
 
+                        AAMHasTarget = false;
+                        AAMLocked = false;
+                        AAMLockTimer = 0;
                         IsFiringGun = false;
                         break;
                     case 5://GEAR
@@ -1111,6 +1130,7 @@ public class EngineController : UdonSharpBehaviour
 
                         AAMHasTarget = false;
                         AAMLocked = false;
+                        AAMLockTimer = 0;
                         IsFiringGun = false;
                         break;
                     case 6://flaps
@@ -1125,6 +1145,7 @@ public class EngineController : UdonSharpBehaviour
 
                         AAMHasTarget = false;
                         AAMLocked = false;
+                        AAMLockTimer = 0;
                         IsFiringGun = false;
                         break;
                     case 7://Display smoke
@@ -1155,10 +1176,6 @@ public class EngineController : UdonSharpBehaviour
                                     SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
                                     SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
                                     SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
-                                    if (SmokeColor.magnitude < .5)
-                                    {
-                                        SmokeColor = SmokeColor.normalized * 0.5f;
-                                    }
                                 }
                             }
 
@@ -1170,6 +1187,7 @@ public class EngineController : UdonSharpBehaviour
 
                         AAMHasTarget = false;
                         AAMLocked = false;
+                        AAMLockTimer = 0;
                         IsFiringGun = false;
                         break;
                     case 8://flares
@@ -1189,6 +1207,7 @@ public class EngineController : UdonSharpBehaviour
 
                         AAMHasTarget = false;
                         AAMLocked = false;
+                        AAMLockTimer = 0;
                         IsFiringGun = false;
                         break;
                 }
@@ -1397,7 +1416,6 @@ public class EngineController : UdonSharpBehaviour
                 {
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
                     //Altitude hold PI Controller
-                    FlightLimitsEnabled = true; //prevent the autopilot from killing you in various ways
 
                     int upsidedown = Vector3.Dot(Vector3.up, VehicleMainObj.transform.up) > 0 ? 1 : -1;
                     float error = CurrentVel.normalized.y - (localAngularVelocity.x * upsidedown * 2.5f);//(Vector3.Dot(VehicleRigidbody.velocity.normalized, Vector3.up));
@@ -1431,6 +1449,11 @@ public class EngineController : UdonSharpBehaviour
                     RollInput = Mathf.Clamp(AltHoldRollProportional * ErrorRoll, -1, 1);
 
                     YawInput = 0;
+
+                    float GLimitStrength = Mathf.Clamp(-(Gs / GLimiter) + 1, 0, 1);
+                    float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimit) + 1, 0, 1);
+                    float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
+                    PitchInput *= Limits;
                 }
                 else
                 {
@@ -1628,6 +1651,15 @@ public class EngineController : UdonSharpBehaviour
                     VehicleRigidbody.angularVelocity = Vector3.zero;
                     break;
                 case 2://launching
+                    if (!SteamOn)
+                    {
+                        if (InEditor)
+                        {
+                            CatapultSteamOn();
+                        }
+                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultSteamOn");
+                        SteamOn = true;
+                    }
                     VehicleMainObj.transform.rotation = CatapultLockRot;
                     VehicleConstantForce.relativeForce = new Vector3(0, 0, CatapultLaunchStrength);
                     //lock all movment except for forward movement
@@ -1638,10 +1670,12 @@ public class EngineController : UdonSharpBehaviour
                     VehicleRigidbody.velocity = temp;
                     VehicleRigidbody.angularVelocity = Vector3.zero;
                     VehicleConstantForce.relativeTorque = Vector3.zero;
-
                     CatapultLaunchTime -= Time.deltaTime;
-
-                    if (CatapultLaunchTime < 0) CatapultStatus = 0;
+                    if (CatapultLaunchTime < 0)
+                    {
+                        CatapultStatus = 0;
+                        SteamOn = false;
+                    }
                     break;
             }
 
@@ -1681,12 +1715,14 @@ public class EngineController : UdonSharpBehaviour
     }
     public override void OnOwnershipTransferred()
     {
-        LastFrameVel = VehicleRigidbody.velocity; //hopefully prevents explosions as soon as you enter the plane
+        VehicleRigidbody.velocity = CurrentVel;
+        LastFrameVel = CurrentVel; //hopefully prevents explosions as soon as you enter the plane
     }
+
     //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
     //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
     //This code adds or removes 100000 based on the situation, + the time it takes for the animation to play.
-    //If the Opening animation is playing when you tell it to close it keeps the time from that animation so that the timing of the sound changing is always correct.
+    //This part is effectively disabled (by not allowing toggling if in transition) because it isn't reliable enough ->>//If the Opening animation is playing when you tell it to close it keeps the time from that animation so that the timing of the sound changing is always correct.
     public void CanopyOpening()
     {
         if (CanopyCloseTimer > 0)
@@ -1703,7 +1739,8 @@ public class EngineController : UdonSharpBehaviour
     }
     public void PlayABOnSound()
     {
-        SoundControl.PlaneABOn.Play();
+        if (!SoundControl.PlaneABOnNull)
+            SoundControl.PlaneABOn.Play();
     }
     public void LaunchAGM()
     {
@@ -1789,18 +1826,23 @@ public class EngineController : UdonSharpBehaviour
     }
     public void Targeted()
     {
-        EngineController target = VehicleMainObj.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
+        EngineController TargetEngine = VehicleMainObj.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
         if (AAMTargets[AAMTarget].transform.parent != null)
-            target = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
-        if (target != null)
+            TargetEngine = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
+        if (TargetEngine != null)
         {
-            if (target.Piloting || target.Passenger)
-                target.SoundControl.TargetedAlarm();
+            if (TargetEngine.Piloting || TargetEngine.Passenger)
+                TargetEngine.SoundControl.RadarLockedAlarm();
         }
+    }
+    public void CatapultSteamOn()
+    {
+        if (EffectsControl.CatapultSteam != null) EffectsControl.CatapultSteam.Play();
     }
     public void CatapultLockSound()
     {
-        SoundControl.CatapultLock.Play();
+        if (!SoundControl.CatapultLockNull)
+            SoundControl.CatapultLock.Play();
     }
     //thx guribo for udon assert
     private void Assert(bool condition, string message)
