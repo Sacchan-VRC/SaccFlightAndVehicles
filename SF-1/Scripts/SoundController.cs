@@ -304,8 +304,8 @@ public class SoundController : UdonSharpBehaviour
             }
             if (EngineControl.MissilesIncoming > 0)
             {
-                if (!MissileIncomingNull && !MissileIncoming.isPlaying) MissileIncoming.gameObject.SetActive(true);
-                if (!RadarLockedNull && RadarLocked.isPlaying) { RadarLocked.Stop(); }
+                if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(true);
+                if (!RadarLockedNull) RadarLocked.Stop();
             }
             else
             {
@@ -465,8 +465,8 @@ public class SoundController : UdonSharpBehaviour
     {
         if (!AAMTargetingNull) AAMTargeting.gameObject.SetActive(false);
         if (!AAMTargetLockNull) AAMTargetLock.gameObject.SetActive(false);
-        if (!RadarLockedNull) RadarLocked.gameObject.SetActive(false);
         if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
+        if (!RadarLockedNull) RadarLocked.Stop();
         if (!PlaneInsideNull)
         {
             PlaneInside.Stop();
@@ -484,9 +484,9 @@ public class SoundController : UdonSharpBehaviour
             PlaneABOn.volume *= 4f;
         }
     }
-    public void TargetedAlarm()
+    public void RadarLockedAlarm()
     {
-        if (RadarLocked != null)
+        if (!RadarLockedNull)
             RadarLocked.Play();
     }
     private void Assert(bool condition, string message)

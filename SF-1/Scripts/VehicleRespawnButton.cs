@@ -19,12 +19,13 @@ public class VehicleRespawnButton : UdonSharpBehaviour
         {
             Networking.SetOwner(EngineControl.localPlayer, VehicleMainObj);
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
+            Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             VehicleMainObj.transform.position = new Vector3(VehicleMainObj.transform.position.x, -10000, VehicleMainObj.transform.position.z);
             EngineControl.EffectsControl.GearUp = false;
             EngineControl.EffectsControl.Flaps = true;
+            EngineControl.EffectsControl.HookDown = false;
             EngineControl.Health = EngineControl.FullHealth;
             EngineControl.Fuel = EngineControl.FullFuel;
-            EngineControl.EffectsControl.HookDown = false;
             EngineControl.NumAAM = EngineControl.FullAAMs;
             EngineControl.NumAGM = EngineControl.FullAGMs;
             EngineControl.NumBomb = EngineControl.FullBombs;

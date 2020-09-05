@@ -21,6 +21,7 @@ public class EffectsController : UdonSharpBehaviour
     public Transform SlatR;
     public Transform FrontWheel;
     public ParticleSystem DisplaySmoke;
+    public ParticleSystem CatapultSteam;
 
 
 
@@ -64,7 +65,6 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 Enginefireerper = new Vector3(1, 0.6f, 1);
     [System.NonSerializedAttribute] [HideInInspector] public float AirbrakeLerper;
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
-    [System.NonSerializedAttribute] [HideInInspector] public ParticleSystem.ColorOverLifetimeModule SmokeModule;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
     private float brake;
@@ -116,7 +116,6 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
         Spawnposition = VehicleMainObj.transform.position;
         Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
-        SmokeModule = DisplaySmoke.colorOverLifetime;
     }
     private void Update()
     {
@@ -303,8 +302,11 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl.SoundControl.playsonicboom && EngineControl.SoundControl.silent)
         {
             int rand = Random.Range(0, EngineControl.SoundControl.SonicBoom.Length);
-            EngineControl.SoundControl.SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
-            EngineControl.SoundControl.SonicBoom[rand].PlayDelayed((EngineControl.SoundControl.SonicBoomDistance - EngineControl.SoundControl.SonicBoomWave) / 343);
+            if (EngineControl.SoundControl.SonicBoom[rand] != null)
+            {
+                EngineControl.SoundControl.SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
+                EngineControl.SoundControl.SonicBoom[rand].PlayDelayed((EngineControl.SoundControl.SonicBoomDistance - EngineControl.SoundControl.SonicBoomWave) / 343);
+            }
         }
         EngineControl.SoundControl.playsonicboom = false;
         EngineControl.SoundControl.silent = false;
@@ -320,7 +322,10 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl.SoundControl != null && !EngineControl.SoundControl.ExplosionNull)
         {
             int rand = Random.Range(0, EngineControl.SoundControl.Explosion.Length);
-            EngineControl.SoundControl.Explosion[rand].Play();//explosion sound has travel time
+            if (EngineControl.SoundControl.Explosion[rand] != null)
+            {
+                EngineControl.SoundControl.Explosion[rand].Play();//explosion sound has travel time
+            }
         }
 
         if ((EngineControl.Piloting || EngineControl.Passenger) && !EngineControl.InEditor)
