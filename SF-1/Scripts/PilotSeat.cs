@@ -70,7 +70,7 @@ public class PilotSeat : UdonSharpBehaviour
             else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
             EngineControl.EjectTimer = 2;
             EngineControl.Hooked = -1;
-            EngineControl.AirBrakeInput = 0;
+            EngineControl.BrakeInput = 0;
             EngineControl.LTriggerTapTime = 1;
             EngineControl.RTriggerTapTime = 1;
             EngineControl.Taxiinglerper = 0;
@@ -79,7 +79,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.RGripLastFrame = false;
             EngineControl.LStickSelection = 0;
             EngineControl.RStickSelection = 0;
-            EngineControl.AirBrakeInput = 0;
+            EngineControl.BrakeInput = 0;
             EngineControl.LTriggerLastFrame = false;
             EngineControl.RTriggerLastFrame = false;
             EngineControl.HUDControl.MenuSoundCheckLast = 0;

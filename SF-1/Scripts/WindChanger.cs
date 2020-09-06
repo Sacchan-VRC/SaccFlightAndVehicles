@@ -88,7 +88,7 @@ public class WindChanger : UdonSharpBehaviour
             }
         }
     }
-    private void OnPickup()
+/*     private void OnPickup()
     {
         WindMenu.SetActive(true);
     }
@@ -96,7 +96,7 @@ public class WindChanger : UdonSharpBehaviour
     private void OnOwnershipTransferred()
     {
         WindMenu.SetActive(false);
-    }
+    } */
     private void Assert(bool condition, string message)
     {
         if (!condition)

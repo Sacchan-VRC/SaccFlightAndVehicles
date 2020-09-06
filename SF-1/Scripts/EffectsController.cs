@@ -245,7 +245,7 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
-        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.AirBrakeInput, 1.3f * Time.deltaTime);
+        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * Time.deltaTime);
 
         PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
@@ -283,7 +283,7 @@ public class EffectsController : UdonSharpBehaviour
         EngineControl.dead = true;
         GearUp = false;
         HookDown = false;
-        EngineControl.AirBrakeInput = 0;
+        EngineControl.BrakeInput = 0;
         EngineControl.FlightLimitsEnabled = true;
         EngineControl.Cruise = false;
         //EngineControl.Trim = Vector2.zero;
