@@ -330,7 +330,7 @@ public class HUDController : UdonSharpBehaviour
                 EngineControl.AGMCam.gameObject.SetActive(true);
                 float newzoom = 0;
                 //if turning camera fast, zoom out
-                if (EngineControl.AGMRotDif < .2f)
+                if (EngineControl.AGMRotDif < .8f)
                 {
                     RaycastHit camhit;
                     Physics.Raycast(EngineControl.AGMCam.transform.position, EngineControl.AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
@@ -345,7 +345,7 @@ public class HUDController : UdonSharpBehaviour
                 else
                 {
                     newzoom = 80;
-                    EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, newzoom, 2f * Time.deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                    EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, newzoom, 3.5f * Time.deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
             }
         }

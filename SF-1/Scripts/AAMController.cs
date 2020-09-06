@@ -105,8 +105,12 @@ public class AAMController : UdonSharpBehaviour
             if (TargetEngineControl != null)
             {
                 //damage particles inherit the velocity of the missile, so this should help them hit the target plane
-                //this is why iskinematic is set 2 frameslater in the explode animation.
+                //this is why kinematic is set 2 frameslater in the explode animation.
                 gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel;
+            }
+            else
+            {
+                gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
             }
 
             //would rather do it like this but udon wont let me

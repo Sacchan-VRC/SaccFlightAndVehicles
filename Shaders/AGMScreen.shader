@@ -35,7 +35,7 @@ Shader "SF-1/AGMScreen"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float col = tex2D(_MainTex, i.uv).r;
+                float col = tex2D(_MainTex, i.uv).b;
                 return col;
             }
             ENDCG
