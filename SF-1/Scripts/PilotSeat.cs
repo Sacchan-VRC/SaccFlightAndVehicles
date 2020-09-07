@@ -25,6 +25,7 @@ public class PilotSeat : UdonSharpBehaviour
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (EngineControl != null)
         {
+            EngineControl.VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
             EngineControl.localPlayer.UseAttachedStation();
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
             EngineControl.Piloting = true;
@@ -87,6 +88,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.AAMHasTarget = false;
             EngineControl.AAMLocked = false;
             EngineControl.MissilesIncoming = 0;
+            EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
             if (EngineControl.CatapultStatus == 2) { }//keep launching if launching
             else EngineControl.CatapultStatus = 0;//else unhook from catapult
         }

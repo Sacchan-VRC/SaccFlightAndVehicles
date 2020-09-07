@@ -461,7 +461,7 @@ public class EngineController : UdonSharpBehaviour
 
             //speed related values
             float SpeedLiftFactor = Mathf.Clamp(AirVel.magnitude * AirVel.magnitude * Lift, 0, MaxLift);
-            rotlift = AirSpeed / RotMultiMaxSpeed;//using a simple linear curve for increasing control as you move faster
+            rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
 
 
@@ -522,21 +522,21 @@ public class EngineController : UdonSharpBehaviour
                     SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((home - end) * Time.deltaTime), 0, 1);
                     SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((pgup - pgdn) * Time.deltaTime), 0, 1);
                 }
-                if (HasCruise && Input.GetKeyDown(KeyCode.F2))
+                if (Input.GetKeyDown(KeyCode.F2) && HasCruise)
                 {
                     SetSpeed = AirSpeed;
                     Cruise = !Cruise;
                 }
-                if (HasLimits && Input.GetKeyDown(KeyCode.F1))
+                if (Input.GetKeyDown(KeyCode.F1) && HasLimits)
                 {
                     FlightLimitsEnabled = !FlightLimitsEnabled;
                 }
-                if (HasCatapult && Input.GetKeyDown(KeyCode.C))
+                if (Input.GetKeyDown(KeyCode.C) && HasCatapult)
                 {
                     if (CatapultStatus == 1)
                         CatapultStatus = 2;
                 }
-                if (HasHook && Input.GetKeyDown(KeyCode.H))
+                if (Input.GetKeyDown(KeyCode.H) && HasHook)
                 {
                     if (HookDetector != null)
                     {
@@ -544,11 +544,11 @@ public class EngineController : UdonSharpBehaviour
                     }
                     Hooked = -1;
                 }
-                if (HasAltHold && Input.GetKeyDown(KeyCode.F3))
+                if (Input.GetKeyDown(KeyCode.F3) && HasAltHold)
                 {
                     AltHold = !AltHold;
                 }
-                if (HasCanopy && Speed < 20 && Input.GetKey(KeyCode.Z))
+                if (Speed < 20 && Input.GetKey(KeyCode.Z) && HasCanopy)
                 {
                     if (CanopyCloseTimer < (-100000 - CanopyCloseTime))
                     {
@@ -563,7 +563,7 @@ public class EngineController : UdonSharpBehaviour
                         else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
                     }
                 }
-                if (HasAfterBurner && Input.GetKeyDown(KeyCode.T))
+                if (Input.GetKeyDown(KeyCode.T) && HasAfterBurner)
                 {
                     EffectsControl.AfterburnerOn = !EffectsControl.AfterburnerOn;
                     if (EffectsControl.AfterburnerOn)
@@ -580,43 +580,43 @@ public class EngineController : UdonSharpBehaviour
                     }
                     else { Afterburner = 1; }
                 }
-                if (HasGun && Input.GetKeyDown(KeyCode.Alpha1))
+                if (Input.GetKeyDown(KeyCode.Alpha1) && HasGun)
                 {
                     RStickSelection = 1;
                 }
-                if (HasAAM && Input.GetKeyDown(KeyCode.Alpha2))
+                if (Input.GetKeyDown(KeyCode.Alpha2) && HasAAM)
                 {
                     RStickSelection = 2;
                 }
-                if (HasAGM && Input.GetKeyDown(KeyCode.Alpha3))
+                if (Input.GetKeyDown(KeyCode.Alpha3) && HasAGM)
                 {
                     RStickSelection = 3;
                 }
-                if (HasBomb && Input.GetKeyDown(KeyCode.Alpha4))
+                if (Input.GetKeyDown(KeyCode.Alpha4) && HasBomb)
                 {
                     RStickSelection = 4;
                 }
-                if (HasGear && Input.GetKeyDown(KeyCode.G))
+                if (Input.GetKeyDown(KeyCode.G) && HasGear)
                 {
                     EffectsControl.GearUp = !EffectsControl.GearUp;
                 }
-                if (HasFlaps && Input.GetKeyDown(KeyCode.F))
+                if (Input.GetKeyDown(KeyCode.F) && HasFlaps)
                 {
                     EffectsControl.Flaps = !EffectsControl.Flaps;
                 }
-                if (HasSmoke && Input.GetKeyDown(KeyCode.Alpha5))
+                if (Input.GetKeyDown(KeyCode.Alpha5) && HasSmoke)
                 {
                     EffectsControl.Smoking = !EffectsControl.Smoking;
                 }
-                if (HasFlare && Input.GetKeyDown(KeyCode.X))
+                if (Input.GetKeyDown(KeyCode.X) && HasFlare)
                 {
-                    if (InEditor) { DropFlares(); }//editor
+                    if (InEditor) { LaunchFlares(); }//editor
                     else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DropFlares"); }//ingame
                 }
                 //brake is done later because it has to be after switches
 
                 //LStick Selection wheel
-                if (LStick.magnitude > .8f)
+                if (LStick.magnitude > .8f && InVR)
                 {
                     float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), LStick);
 
@@ -652,18 +652,18 @@ public class EngineController : UdonSharpBehaviour
                     }
                     else if (stickdir > -135)//right
                     {
-                        if (HasCatapult)
+                        if (HasFlare)
                             LStickSelection = 3;
                     }
                     else//downright
                     {
-                        if (HasHook)
+                        if (HasCatapult)
                             LStickSelection = 4;
                     }
                 }
 
                 //RStick Selection wheel
-                if (RStick.magnitude > .8f)
+                if (RStick.magnitude > .8f && InVR)
                 {
                     float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), RStick);
 
@@ -679,12 +679,12 @@ public class EngineController : UdonSharpBehaviour
                     }
                     else if (stickdir > 45)//left
                     {
-                        if (HasSmoke)
+                        if (HasHook)
                             RStickSelection = 7;
                     }
                     else if (stickdir > 0)//upleft
                     {
-                        if (HasFlare)
+                        if (HasSmoke)
                             RStickSelection = 8;
                     }
                     else if (stickdir > -45)//up
@@ -770,7 +770,24 @@ public class EngineController : UdonSharpBehaviour
                         else { LTriggerLastFrame = false; }
                         BrakeInput = 0;
                         break;
-                    case 3://CATAPULT
+                    case 3://Flare
+                        if (LTrigger > 0.75)
+                        {
+                            if (!LTriggerLastFrame)
+                            {
+                                if (InEditor) { LaunchFlares(); }//editor
+                                else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares"); }//ingame
+                            }
+
+                            AltHold = false;
+                            IsFiringGun = false;
+                            RTriggerLastFrame = true;
+                        }
+                        else { LTriggerLastFrame = false; }
+
+                        BrakeInput = 0;
+                        break;
+                    case 4://Catapult
                         if (LTrigger > 0.75)
                         {
                             if (!LTriggerLastFrame)
@@ -782,23 +799,7 @@ public class EngineController : UdonSharpBehaviour
                             LTriggerLastFrame = true;
                         }
                         else { LTriggerLastFrame = false; }
-                        BrakeInput = 0;
-                        break;
-                    case 4://HOOK
-                        if (LTrigger > 0.75)
-                        {
-                            if (!LTriggerLastFrame)
-                            {
-                                if (HookDetector != null)
-                                {
-                                    EffectsControl.HookDown = !EffectsControl.HookDown;
-                                }
-                                Hooked = -1;
-                            }
 
-                            LTriggerLastFrame = true;
-                        }
-                        else { LTriggerLastFrame = false; }
                         BrakeInput = 0;
                         break;
                     case 5://Brake
@@ -947,7 +948,7 @@ public class EngineController : UdonSharpBehaviour
                         AAMLockTimer = 0;
                         break;
                     case 2://AAM
-                        if (NumAAMTargets != 0 && NumAAM > 0)
+                        if (NumAAMTargets != 0)
                         {
                             AAMCurrentTargetDirection = AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position;
                             float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position));
@@ -958,7 +959,7 @@ public class EngineController : UdonSharpBehaviour
                                 if (AAMCurrentTargetAngle < AAMLockAngle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                                 {
                                     AAMHasTarget = true;
-                                    AAMLockTimer += Time.deltaTime;
+                                    if (NumAAM > 0) AAMLockTimer += Time.deltaTime;//give enemy radar lock even if you're out of missiles
                                     if (AAMCurrentTargetEngineControl != null)
                                     {
                                         //target is a plane
@@ -1033,6 +1034,7 @@ public class EngineController : UdonSharpBehaviour
                                     else
                                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
                                     NumAAM--;
+                                    if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                                 }
                             }
                             RTriggerLastFrame = true;
@@ -1218,7 +1220,28 @@ public class EngineController : UdonSharpBehaviour
                         AAMLockTimer = 0;
                         IsFiringGun = false;
                         break;
-                    case 7://Display smoke
+                    case 7://Hook
+                        if (RTrigger > 0.75)
+                        {
+                            if (!RTriggerLastFrame)
+                            {
+                                if (HookDetector != null)
+                                {
+                                    EffectsControl.HookDown = !EffectsControl.HookDown;
+                                }
+                                Hooked = -1;
+                            }
+
+                            RTriggerLastFrame = true;
+                        }
+                        else { RTriggerLastFrame = false; }
+
+                        AAMHasTarget = false;
+                        AAMLocked = false;
+                        AAMLockTimer = 0;
+                        IsFiringGun = false;
+                        break;
+                    case 8://Smoke
                         if (RTrigger > 0.75)
                         {
                             //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
@@ -1249,27 +1272,6 @@ public class EngineController : UdonSharpBehaviour
                                 }
                             }
 
-
-                            IsFiringGun = false;
-                            RTriggerLastFrame = true;
-                        }
-                        else { RTriggerLastFrame = false; }
-
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        IsFiringGun = false;
-                        break;
-                    case 8://flares
-                        if (RTrigger > 0.75)
-                        {
-                            if (!RTriggerLastFrame)
-                            {
-                                if (InEditor) { DropFlares(); }//editor
-                                else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DropFlares"); }//ingame
-                            }
-
-                            AltHold = false;
                             IsFiringGun = false;
                             RTriggerLastFrame = true;
                         }
@@ -1281,7 +1283,7 @@ public class EngineController : UdonSharpBehaviour
                         IsFiringGun = false;
                         break;
                 }
-                if (Input.GetKey(KeyCode.B))
+                if (Input.GetKey(KeyCode.B) && HasBrake)
                 {
                     BrakeInput = 1;
                 }
@@ -1482,7 +1484,7 @@ public class EngineController : UdonSharpBehaviour
                 if (Fuel < 200) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / 200), 0, 1);
 
                 if (ThrottleInput < .6f) { EffectsControl.AfterburnerOn = false; Afterburner = 1; }
-                if (AltHold && !RGripLastFrame)//level flight enabled, and player not holding joystick
+                if (AltHold && !RGripLastFrame)//alt hold enabled, and player not holding joystick
                 {
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
                     //Altitude hold PI Controller
@@ -1520,15 +1522,21 @@ public class EngineController : UdonSharpBehaviour
 
                     YawInput = 0;
 
+                    //flight limit internally enabled when alt hold is enabled
                     float GLimitStrength = Mathf.Clamp(-(Gs / GLimiter) + 1, 0, 1);
                     float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimit) + 1, 0, 1);
                     float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
                     PitchInput *= Limits;
                 }
-                else
+                else//alt hold disabled, player has control
                 {
+                    if (!InVR)
+                    {
+                        VRPitchRollInput = LStick;
+                        JoystickPosYaw.x = RStick.x;
+                    }
                     //'-input' are used by effectscontroller, and multiplied by 'strength' for final values
-                    if (FlightLimitsEnabled && !Taxiing && AngleOfAttack < AoALimit)
+                    if (FlightLimitsEnabled && !Taxiing && AngleOfAttack < AoALimit)//flight limits are enabled
                     {
                         float GLimitStrength = Mathf.Clamp(-(Gs / GLimiter) + 1, 0, 1);
                         float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimit) + 1, 0, 1);
@@ -1536,11 +1544,12 @@ public class EngineController : UdonSharpBehaviour
                         PitchInput = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRollInput.y + Wf + Sf + downf + upf, -1, 1) * Limits;
                         YawInput = Mathf.Clamp(Qf + Ef + JoystickPosYaw.x, -1, 1) * Limits;
                     }
-                    else
+                    else//player is in full control
                     {
                         PitchInput = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRollInput.y + Wf + Sf + downf + upf, -1, 1);
                         YawInput = Mathf.Clamp(Qf + Ef + JoystickPosYaw.x, -1, 1);
                     }
+                    //roll isn't subject to flight limits
                     RollInput = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRPitchRollInput.x + Af + Df + leftf + rightf) * -1), -1, 1);
                 }
 
@@ -1754,10 +1763,10 @@ public class EngineController : UdonSharpBehaviour
         }
         else//non-owners need to know these values
         {
-            Speed = CurrentVel.magnitude;
+            AirSpeed = CurrentVel.magnitude;
             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
             //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value to stop spazzing
-            VehicleRigidbody.angularDrag = .1f;
+            VehicleRigidbody.angularDrag = .3f;
             //AirVel = VehicleRigidbody.velocity - Wind;
             //AirSpeed = AirVel.magnitude;
         }
@@ -1780,7 +1789,7 @@ public class EngineController : UdonSharpBehaviour
             LastFrameVel = VehicleRigidbody.velocity;
         }
     }
-    public void DropFlares()
+    public void LaunchFlares()
     {
         EffectsControl.PlaneAnimator.SetTrigger("flares");
     }
@@ -1903,7 +1912,7 @@ public class EngineController : UdonSharpBehaviour
         if (TargetEngine != null)
         {
             if (TargetEngine.Piloting || TargetEngine.Passenger)
-                TargetEngine.SoundControl.RadarLockedAlarm();
+                TargetEngine.EffectsControl.PlaneAnimator.SetTrigger("radarlocked");
         }
     }
     public void CatapultSteamOn()

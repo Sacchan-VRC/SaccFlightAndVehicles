@@ -17,8 +17,6 @@ public class EffectsController : UdonSharpBehaviour
     public Transform Enginefire;
     public Transform RudderL;
     public Transform RudderR;
-    public Transform SlatL;
-    public Transform SlatR;
     public Transform FrontWheel;
     public ParticleSystem DisplaySmoke;
     public ParticleSystem CatapultSteam;
@@ -36,8 +34,6 @@ public class EffectsController : UdonSharpBehaviour
     private bool EnginefireNull = true;
     private bool RudderLNull = true;
     private bool RudderRNull = true;
-    private bool SlatLNull = true;
-    private bool SlatRNull = true;
     private bool FrontWheelNull = true;
     private bool DisplaySmokeNull = true;
 
@@ -60,7 +56,6 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 PitchLerper = new Vector3(0, 0, 0);
     private Vector3 AileronLerper = new Vector3(0, 0, 0);
     private Vector3 YawLerper = new Vector3(0, 0, 0);
-    private Vector3 SlatsLerper = new Vector3(0, 35, 0);
     private Vector3 EngineLerper = new Vector3(0, 0, 0);
     private Vector3 Enginefireerper = new Vector3(1, 0.6f, 1);
     [System.NonSerializedAttribute] [HideInInspector] public float AirbrakeLerper;
@@ -83,8 +78,6 @@ public class EffectsController : UdonSharpBehaviour
         Assert(Enginefire != null, "Start: Enginefire != null");
         Assert(RudderL != null, "Start: RudderL != null");
         Assert(RudderR != null, "Start: RudderR != null");
-        Assert(SlatL != null, "Start: SlatsL != null");
-        Assert(SlatR != null, "Start: SlatsR != null");
         Assert(FrontWheel != null, "Start: FrontWheel != null"); */
 
 
@@ -100,8 +93,6 @@ public class EffectsController : UdonSharpBehaviour
         if (Enginefire != null) EnginefireNull = false;
         if (RudderL != null) RudderLNull = false;
         if (RudderR != null) RudderRNull = false;
-        if (SlatL != null) SlatLNull = false;
-        if (SlatR != null) SlatRNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
         if (DisplaySmoke != null) DisplaySmokeNull = false;
 
@@ -158,11 +149,10 @@ public class EffectsController : UdonSharpBehaviour
                 JoyStick.localRotation = Quaternion.Euler(tempjoy);
             }
         }
-        vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
+        vapor = (EngineControl.AirSpeed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
         AileronLerper.y = Mathf.Lerp(AileronLerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
-        SlatsLerper.y = Mathf.Lerp(SlatsLerper.y, Mathf.Max((-EngineControl.Speed * 0.005f) * 35f + 35f, 0f), 4.5f * Time.deltaTime); //higher the speed, closer to 0 rot the slats get.
         YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
         EngineLerper.x = Mathf.Lerp(EngineLerper.x, (-rotationinputs.x * .65f), 4.5f * Time.deltaTime);
         Enginefireerper.y = Mathf.Lerp(Enginefireerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
@@ -220,9 +210,6 @@ public class EffectsController : UdonSharpBehaviour
         if (!RudderLNull) { RudderL.localRotation = Quaternion.Euler(-YawLerper); }
         if (!RudderRNull) { RudderR.localRotation = Quaternion.Euler(YawLerper); }
 
-        if (!SlatLNull) { SlatL.localRotation = Quaternion.Euler(SlatsLerper); }
-        if (!SlatRNull) { SlatR.localRotation = Quaternion.Euler(SlatsLerper); }
-
         if (!EnginesNull) { Engines.localRotation = Quaternion.Euler(EngineLerper); }
 
         //engine thrust animation
@@ -248,15 +235,15 @@ public class EffectsController : UdonSharpBehaviour
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * Time.deltaTime);
 
         PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
+        PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
         PlaneAnimator.SetFloat("brake", AirbrakeLerper);
-        PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
         //PlaneAnimator.SetInteger("rstickselection", EngineControl.RStickSelection);
-        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM / (float)EngineControl.FullAAMs);
-        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM / (float)EngineControl.FullAGMs);
-        PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb / (float)EngineControl.FullBombs);
+        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM / EngineControl.FullAAMs);
+        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM / EngineControl.FullAGMs);
+        PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb / EngineControl.FullBombs);
         DoVapor();
     }
 
@@ -272,7 +259,7 @@ public class EffectsController : UdonSharpBehaviour
         {
             Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * Time.deltaTime);//linger for a bit before cutting off
         }
-        PlaneAnimator.SetFloat("mach10", EngineControl.Speed / 343 / 10);
+        PlaneAnimator.SetFloat("mach10", EngineControl.AirSpeed / 343 / 10);
         PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
         PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
     }
