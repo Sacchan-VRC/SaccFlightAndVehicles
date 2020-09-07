@@ -171,7 +171,7 @@ public class SoundController : UdonSharpBehaviour
         {
             GunSoundInitialVolume = GunSound.volume;
         }
-        dopplecounter = Random.Range(0, 4);
+        dopplecounter = Random.Range(0, 5);
     }
 
     private void Update()
@@ -252,6 +252,7 @@ public class SoundController : UdonSharpBehaviour
         //EngineControl.Piloting = true in editor play
         if ((EngineControl.Piloting || EngineControl.Passenger) && (EngineControl.CanopyCloseTimer < 0 && EngineControl.CanopyCloseTimer > -100000))
         {
+            EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", EngineControl.MissilesIncoming);
             if (Leftplane == false)//change stuff when you get in
             {
                 PlaneThrustPitch = 0.8f;
@@ -301,15 +302,6 @@ public class SoundController : UdonSharpBehaviour
             {
                 AAMTargeting.gameObject.SetActive(false);
                 AAMTargetLock.gameObject.SetActive(false);
-            }
-            if (EngineControl.MissilesIncoming > 0)
-            {
-                if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(true);
-                if (!RadarLockedNull) RadarLocked.Stop();
-            }
-            else
-            {
-                if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
             }
             if (!AirbrakeNull)
             {
@@ -483,11 +475,6 @@ public class SoundController : UdonSharpBehaviour
         {
             PlaneABOn.volume *= 4f;
         }
-    }
-    public void RadarLockedAlarm()
-    {
-        if (!RadarLockedNull)
-            RadarLocked.Play();
     }
     private void Assert(bool condition, string message)
     {

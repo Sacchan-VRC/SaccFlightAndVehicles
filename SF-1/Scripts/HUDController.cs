@@ -37,7 +37,6 @@ public class HUDController : UdonSharpBehaviour
     public GameObject AGMScreen;
     public GameObject LStick_funcon1;
     public GameObject LStick_funcon2;
-    public GameObject LStick_funcon3;
     public GameObject LStick_funcon4;
     public GameObject LStick_funcon6;
     public GameObject LStick_funcon7;
@@ -46,6 +45,7 @@ public class HUDController : UdonSharpBehaviour
     public GameObject RStick_funcon5;
     public GameObject RStick_funcon6;
     public GameObject RStick_funcon7;
+    public GameObject RStick_funcon8;
     private Animator PlaneAnimator;
     private const float distance_from_head = 1.333f;
     private float maxGs = 0f;
@@ -56,9 +56,6 @@ public class HUDController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float MenuSoundCheckLast = 0;
     private Vector3 temprot;
     private int showvel;
-    private bool HasAAM = false;
-    private bool HasAGM = false;
-    private bool HasBombs = false;
     const float InputSquareSize = 0.0284317f;
     private void Start()
     {
@@ -89,7 +86,6 @@ public class HUDController : UdonSharpBehaviour
         Assert(AGMScreen != null, "Start: AGMScreen != null");
         Assert(LStick_funcon1 != null, "Start: LStick_funcon1 != null");
         Assert(LStick_funcon2 != null, "Start: LStick_funcon2 != null");
-        Assert(LStick_funcon3 != null, "Start: LStick_funcon3 != null");
         Assert(LStick_funcon4 != null, "Start: LStick_funcon4 != null");
         Assert(LStick_funcon6 != null, "Start: LStick_funcon6 != null");
         Assert(LStick_funcon7 != null, "Start: LStick_funcon7 != null");
@@ -98,10 +94,7 @@ public class HUDController : UdonSharpBehaviour
         Assert(RStick_funcon5 != null, "Start: LStick_funcon5 != null");
         Assert(RStick_funcon6 != null, "Start: LStick_funcon6 != null");
         Assert(RStick_funcon7 != null, "Start: LStick_funcon7 != null");
-
-        if (EngineControl.NumAAM > 0) HasAAM = true;
-        if (EngineControl.NumAGM > 0) HasAGM = true;
-        if (EngineControl.NumBomb > 0) HasBombs = true;
+        Assert(RStick_funcon8 != null, "Start: LStick_funcon8 != null");
 
         PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
@@ -281,10 +274,7 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.FlightLimitsEnabled) { LStick_funcon2.SetActive(true); }
         else { LStick_funcon2.SetActive(false); }
 
-        if (EngineControl.CatapultStatus == 1) { LStick_funcon3.SetActive(true); }
-        else { LStick_funcon3.SetActive(false); }
-
-        if (EngineControl.EffectsControl.HookDown) { LStick_funcon4.SetActive(true); }
+        if (EngineControl.CatapultStatus == 1) { LStick_funcon4.SetActive(true); }
         else { LStick_funcon4.SetActive(false); }
 
         if (EngineControl.AltHold) { LStick_funcon6.SetActive(true); }
@@ -310,8 +300,11 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.EffectsControl.Flaps) { RStick_funcon6.SetActive(true); }
         else { RStick_funcon6.SetActive(false); }
 
-        if (EngineControl.EffectsControl.Smoking) { RStick_funcon7.SetActive(true); }
+        if (EngineControl.EffectsControl.HookDown) { RStick_funcon7.SetActive(true); }
         else { RStick_funcon7.SetActive(false); }
+
+        if (EngineControl.EffectsControl.Smoking) { RStick_funcon8.SetActive(true); }
+        else { RStick_funcon8.SetActive(false); }
 
         //play menu sound if selection changed since last frame
         float MenuSoundCheck = EngineControl.RStickSelection + EngineControl.LStickSelection;
@@ -391,11 +384,11 @@ public class HUDController : UdonSharpBehaviour
         }
         check += Time.deltaTime;
 
-        if (HasAAM) HUDText_AAM_ammo.text = EngineControl.NumAAM.ToString("F0");
+        if (EngineControl.HasAAM) HUDText_AAM_ammo.text = EngineControl.NumAAM.ToString("F0");
         else HUDText_AAM_ammo.text = string.Empty;
-        if (HasAGM) HUDText_AGM_ammo.text = EngineControl.NumAGM.ToString("F0");
+        if (EngineControl.HasAGM) HUDText_AGM_ammo.text = EngineControl.NumAGM.ToString("F0");
         else HUDText_AGM_ammo.text = string.Empty;
-        if (HasBombs) HUDText_Bomb_ammo.text = EngineControl.NumBomb.ToString("F0");
+        if (EngineControl.HasBomb) HUDText_Bomb_ammo.text = EngineControl.NumBomb.ToString("F0");
         else HUDText_Bomb_ammo.text = string.Empty;
 
         PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
