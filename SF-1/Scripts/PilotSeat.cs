@@ -89,6 +89,8 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.AAMLocked = false;
             EngineControl.MissilesIncoming = 0;
             EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
+            EngineControl.AAMLockTimer = 0;
+            EngineControl.AAMLocked = false;
             if (EngineControl.CatapultStatus == 2) { }//keep launching if launching
             else EngineControl.CatapultStatus = 0;//else unhook from catapult
         }

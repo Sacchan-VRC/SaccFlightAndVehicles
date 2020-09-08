@@ -110,27 +110,6 @@ public class EffectsController : UdonSharpBehaviour
     }
     private void Update()
     {
-        if ((EngineControl.InEditor || EngineControl.IsOwner) && !EngineControl.dead)
-        {
-            if (EngineControl.CenterOfMass.position.y < EngineControl.SeaLevel && !EngineControl.dead)//kill plane if in sea
-            {
-                if (EngineControl.InEditor)//editor
-                    Explode();
-                else//VRC
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-            }
-
-            //G/crash Damage
-            EngineControl.Health += -Mathf.Clamp((EngineControl.Gs - EngineControl.MaxGs) * Time.deltaTime * EngineControl.GDamage, 0f, 99999f); //take damage of GDamage per second per G above MaxGs
-            if (EngineControl.Health <= 0f)//plane is ded
-            {
-                if (EngineControl.InEditor)//editor
-                    Explode();
-                else//VRC
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-            }
-        }
-
         if (DoEffects > 10) { return; }
 
         //if a long way away just skip effects except large vapor effects
@@ -263,67 +242,7 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
         PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
     }
-    public void Explode()//all the things players see happen when the vehicle explodes
-    {
-        DoEffects = 0f; //keep awake
 
-        EngineControl.dead = true;
-        GearUp = false;
-        HookDown = false;
-        EngineControl.BrakeInput = 0;
-        EngineControl.FlightLimitsEnabled = true;
-        EngineControl.Cruise = false;
-        //EngineControl.Trim = Vector2.zero;
-        CanopyOpen = true;
-        EngineControl.CanopyCloseTimer = -100001;
-        EngineControl.Hooked = -1;
-        EngineControl.AAMLaunchOpositeSide = false;
-        EngineControl.AGMLaunchOpositeSide = false;
-        EngineControl.NumAAM = EngineControl.FullAAMs;
-        EngineControl.NumAGM = EngineControl.FullAGMs;
-        EngineControl.NumBomb = EngineControl.FullBombs;
-        EngineControl.GunAmmoInSeconds = EngineControl.FullGunAmmo;
-        EngineControl.Fuel = EngineControl.FullFuel;
-
-        //play sonic boom if it was going to play before it exploded
-        if (EngineControl.SoundControl.playsonicboom && EngineControl.SoundControl.silent)
-        {
-            int rand = Random.Range(0, EngineControl.SoundControl.SonicBoom.Length);
-            if (EngineControl.SoundControl.SonicBoom[rand] != null)
-            {
-                EngineControl.SoundControl.SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
-                EngineControl.SoundControl.SonicBoom[rand].PlayDelayed((EngineControl.SoundControl.SonicBoomDistance - EngineControl.SoundControl.SonicBoomWave) / 343);
-            }
-        }
-        EngineControl.SoundControl.playsonicboom = false;
-        EngineControl.SoundControl.silent = false;
-
-        if (EngineControl.InEditor || EngineControl.IsOwner)
-        {
-            EngineControl.VehicleRigidbody.velocity = Vector3.zero;
-            EngineControl.Health = EngineControl.FullHealth;//turns off low health smoke
-            EngineControl.Fuel = EngineControl.FullFuel;
-        }
-
-        //pilot and passenger are dropped out of the plane
-        if (EngineControl.SoundControl != null && !EngineControl.SoundControl.ExplosionNull)
-        {
-            int rand = Random.Range(0, EngineControl.SoundControl.Explosion.Length);
-            if (EngineControl.SoundControl.Explosion[rand] != null)
-            {
-                EngineControl.SoundControl.Explosion[rand].Play();//explosion sound has travel time
-            }
-        }
-
-        if ((EngineControl.Piloting || EngineControl.Passenger) && !EngineControl.InEditor)
-        {
-            foreach (LeaveVehicleButton seat in EngineControl.LeaveButtons)
-            {
-                seat.ExitStation();
-            }
-        }
-        PlaneAnimator.SetTrigger("explode");
-    }
     private void Assert(bool condition, string message)
     {
         if (!condition)
