@@ -8,11 +8,11 @@ public class AAMController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
     public float ColliderActiveDistance = 30;
-    public float LockAngle;
     public float RotSpeed = 15;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
     private float Lifetime = 0;
+    private float LockAngle = 0;
     private float StartLockAngle = 0;
     private Transform Target;
     private bool ColliderActive = false;
@@ -23,8 +23,9 @@ public class AAMController : UdonSharpBehaviour
     void Start()
     {
         Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
-        AAMCollider = gameObject.GetComponent<CapsuleCollider>();
+        LockAngle = EngineControl.AAMLockAngle;
         StartLockAngle = LockAngle;
+        AAMCollider = gameObject.GetComponent<CapsuleCollider>();
         if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
         {
             TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
@@ -58,7 +59,7 @@ public class AAMController : UdonSharpBehaviour
         }
         if (LockHack)
         {
-            if (Lifetime > 1)
+            if (Lifetime > .6f)
             {
                 LockHack = false;
                 LockAngle = StartLockAngle;
@@ -77,75 +78,78 @@ public class AAMController : UdonSharpBehaviour
         else if (LockedOn)
         {
             if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
+                TargetEngineControl.MissilesIncoming -= 1;
             LockedOn = false;
         }
         Lifetime += Time.deltaTime;
         if (Lifetime > 40)
         {
-            if (LockedOn)
+            if (Exploding)//missile exploded 10 seconds ago
             {
-                if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                    TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
-                LockedOn = false;
+                Destroy(gameObject);
             }
-            Destroy(gameObject);
+            else Explode();//explode and give Lifetime another 10 seconds
         }
     }
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
         {
-            if (LockedOn)
-            {
-                if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                    TargetEngineControl.MissilesIncoming = (int)Mathf.Max((float)TargetEngineControl.MissilesIncoming - 1f, 0);
-                LockedOn = false;
-            }
-            if (TargetEngineControl != null)
-            {
-                //damage particles inherit the velocity of the missile, so this should help them hit the target plane
-                //this is why kinematic is set 2 frameslater in the explode animation.
-                gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel;
-            }
-            else
-            {
-                gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            }
+            Explode();
+        }
+    }
+    private void Explode()
+    {
+        Exploding = true;
+        if (LockedOn)
+        {
+            if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
+                TargetEngineControl.MissilesIncoming -= 1;
+            LockedOn = false;
+        }
+        if (TargetEngineControl != null)
+        {
+            //damage particles inherit the velocity of the missile, so this should help them hit the target plane
+            //this is why kinematic is set 2 frameslater in the explode animation.
+            gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel;
+        }
+        else
+        {
+            gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        }
 
-            //would rather do it like this but udon wont let me
-            /*             if (TargetEngineControl != null)
-                        {
-                            //damage particles take the velocity of the target plane so they can hit it any speed
-                            var vel = DamageParticles.velocityOverLifetime;
-                            vel.enabled = true;
-                            vel.space = ParticleSystemSimulationSpace.World;
+        //would rather do it like this but udon wont let me
+        /*             if (TargetEngineControl != null)
+                    {
+                        //damage particles take the velocity of the target plane so they can hit it any speed
+                        var vel = DamageParticles.velocityOverLifetime;
+                        vel.enabled = true;
+                        vel.space = ParticleSystemSimulationSpace.World;
 
-                            AnimationCurve velcurvex = new AnimationCurve();
-                            AnimationCurve velcurvey = new AnimationCurve();
-                            AnimationCurve velcurvez = new AnimationCurve();
-                            velcurvex.AddKey(0.0f, TargetEngineControl.CurrentVel.x);
-                            velcurvey.AddKey(0.0f, TargetEngineControl.CurrentVel.y);
-                            velcurvez.AddKey(0.0f, TargetEngineControl.CurrentVel.z);
-                            vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvex);
-                            vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvey);
-                            vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvez);
-                        } */
-            AAMCollider.enabled = false;
-            Animator AGMani = gameObject.GetComponent<Animator>();
-            if (EngineControl.InEditor)
+                        AnimationCurve velcurvex = new AnimationCurve();
+                        AnimationCurve velcurvey = new AnimationCurve();
+                        AnimationCurve velcurvez = new AnimationCurve();
+                        velcurvex.AddKey(0.0f, TargetEngineControl.CurrentVel.x);
+                        velcurvey.AddKey(0.0f, TargetEngineControl.CurrentVel.y);
+                        velcurvez.AddKey(0.0f, TargetEngineControl.CurrentVel.z);
+                        vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvex);
+                        vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvey);
+                        vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvez);
+                    } */
+        AAMCollider.enabled = false;
+        Animator AGMani = gameObject.GetComponent<Animator>();
+        if (EngineControl.InEditor)
+        {
+            AGMani.SetTrigger("explodeowner");
+        }
+        else
+        {
+            if (Owner)
             {
                 AGMani.SetTrigger("explodeowner");
             }
-            else
-            {
-                if (Owner)
-                {
-                    AGMani.SetTrigger("explodeowner");
-                }
-                else AGMani.SetTrigger("explode");
-            }
-            Lifetime = 30;//10 seconds to finish exploding
+            else AGMani.SetTrigger("explode");
         }
+        Lifetime = 30;//10 seconds to finish exploding
     }
 }
