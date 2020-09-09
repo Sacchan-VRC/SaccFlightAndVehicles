@@ -288,6 +288,7 @@ public class EngineController : UdonSharpBehaviour
     private EngineController AAMCurrentTargetEngineControl;
     private float LastBombDropTime = 0f;
     private bool SteamOn = false;
+    private bool WeaponSelected = false;
     private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
     //float MouseX;
     //float MouseY;
@@ -772,51 +773,68 @@ public class EngineController : UdonSharpBehaviour
                     float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), RStick);
                     //R stick value is manually synced using events because i don't want to use too many synced variables.
                     //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
+                    //The WeaponSelected variable helps us not send more broadcasts than we need to.
                     if (stickdir > 135)//down
                     {
-                        if (HasGear && RStickSelection != 0)
+                        if (HasGear)
                         {
-                            if (InEditor)
+                            if (WeaponSelected)
                             {
-                                RStick0();
+                                WeaponSelected = false;
+                                if (InEditor)
+                                {
+                                    RStick0();
+                                }
+                                else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                             }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                             RStickSelection = 5;
                         }
                     }
                     else if (stickdir > 90)//downleft
                     {
-                        if (HasFlaps && RStickSelection != 0)
+                        if (HasFlaps)
                         {
-                            if (InEditor)
+                            WeaponSelected = false;
+                            if (WeaponSelected)
                             {
-                                RStick0();
+                                if (InEditor)
+                                {
+                                    RStick0();
+                                }
+                                else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                             }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                             RStickSelection = 6;
                         }
                     }
                     else if (stickdir > 45)//left
                     {
-                        if (HasHook && RStickSelection != 0)
+                        if (HasHook)
                         {
-                            if (InEditor)
+                            WeaponSelected = false;
+                            if (WeaponSelected)
                             {
-                                RStick0();
+                                if (InEditor)
+                                {
+                                    RStick0();
+                                }
+                                else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                             }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                             RStickSelection = 7;
                         }
                     }
                     else if (stickdir > 0)//upleft
                     {
-                        if (HasSmoke && RStickSelection != 0)
+                        if (HasSmoke)
                         {
-                            if (InEditor)
+                            WeaponSelected = false;
+                            if (WeaponSelected)
                             {
-                                RStick0();
+                                if (InEditor)
+                                {
+                                    RStick0();
+                                }
+                                else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                             }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                             RStickSelection = 8;
                         }
                     }
@@ -824,6 +842,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasGun && RStickSelection != 1)
                         {
+                            WeaponSelected = true;
                             if (InEditor)
                             {
                                 RStick1();
@@ -836,6 +855,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasAAM && RStickSelection != 2)
                         {
+                            WeaponSelected = true;
                             if (InEditor)
                             {
                                 RStick2();
@@ -848,6 +868,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasAGM && RStickSelection != 3)
                         {
+                            WeaponSelected = true;
                             if (InEditor)
                             {
                                 RStick3();
@@ -860,6 +881,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasBomb && RStickSelection != 4)
                         {
+                            WeaponSelected = true;
                             if (InEditor)
                             {
                                 RStick4();
@@ -1529,15 +1551,16 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * Time.deltaTime), 0, 1);
-                //if touching ground rotate if trying to turn
+
                 if (Taxiing)
                 {
                     AngleOfAttack = 0; // prevent stall sound and aoavapor when on ground
                     Cruise = false;
                     AltHold = false;
-
+                    //rotate if trying to turn
                     Taxiinglerper = Mathf.Lerp(Taxiinglerper, YawInput * TaxiRotationSpeed * Time.deltaTime, TaxiRotationResponse * Time.deltaTime);
                     VehicleMainObj.transform.Rotate(Vector3.up, Taxiinglerper);
+
                     StillWindMulti = Mathf.Clamp(Speed / 10, 0, 1);
                     ThrustVecGrounded = 0;
 
@@ -2012,8 +2035,16 @@ public class EngineController : UdonSharpBehaviour
     }
     public void PlayABOnSound()
     {
-        if (!SoundControl.PlaneABOnNull)
-            SoundControl.PlaneABOn.Play();
+        if ((Piloting || Passenger) && (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000))
+        {
+            if (!SoundControl.ABOnInsideNull)
+                SoundControl.ABOnInside.Play();
+        }
+        else
+        {
+            if (!SoundControl.ABOnOutsideNull)
+                SoundControl.ABOnOutside.Play();
+        }
     }
     public void LaunchAGM()
     {

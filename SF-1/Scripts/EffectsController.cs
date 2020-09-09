@@ -9,14 +9,12 @@ public class EffectsController : UdonSharpBehaviour
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
     public Transform JoyStick;
-    public Transform AileronL;
-    public Transform AileronR;
+    public Transform[] Ailerons;
+    public Transform[] Elevators;
+    public Transform[] Rudders;
     public Transform Canards;
-    public Transform Elevator;
     public Transform Engines;
-    public Transform Enginefire;
-    public Transform RudderL;
-    public Transform RudderR;
+    public Transform[] Enginefire;
     public Transform FrontWheel;
     public ParticleSystem DisplaySmoke;
     public ParticleSystem CatapultSteam;
@@ -26,14 +24,12 @@ public class EffectsController : UdonSharpBehaviour
     private bool VehicleMainObjNull = true;
     private bool EngineControlNull = true;
     private bool JoyStickNull = true;
-    private bool AileronLNull = true;
-    private bool AileronRNull = true;
+    private bool AileronsNull = true;
     private bool CanardsNull = true;
     private bool ElevatorNull = true;
     private bool EnginesNull = true;
     private bool EnginefireNull = true;
-    private bool RudderLNull = true;
-    private bool RudderRNull = true;
+    private bool RuddersNull = true;
     private bool FrontWheelNull = true;
     private bool DisplaySmokeNull = true;
 
@@ -69,40 +65,28 @@ public class EffectsController : UdonSharpBehaviour
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
         Assert(EngineControl != null, "Start: EngineControl != null");
         //should work withouth these
-        /* Assert(JoyStick != null, "Start: JoyStick != null");
-        Assert(AileronL != null, "Start: AileronL != null");
-        Assert(AileronR != null, "Start: AileronR != null");
-        Assert(Canards != null, "Start: Canards != null");
-        Assert(Elevator != null, "Start: Elevator != null");
-        Assert(Engines != null, "Start: Engines != null");
+        Assert(JoyStick != null, "Start: JoyStick != null");
         Assert(Enginefire != null, "Start: Enginefire != null");
-        Assert(RudderL != null, "Start: RudderL != null");
-        Assert(RudderR != null, "Start: RudderR != null");
-        Assert(FrontWheel != null, "Start: FrontWheel != null"); */
+        Assert(FrontWheel != null, "Start: FrontWheel != null");
+        Assert(Ailerons.Length > 0, "Start: Ailerons.Length > 0");
+        Assert(Elevators.Length > 0, "Start: Elevator.Length > 0");
+        Assert(Rudders.Length > 0, "Start: Rudders.Length > 0");
 
 
 
         if (VehicleMainObj != null) VehicleMainObjNull = false;
         if (EngineControl != null) EngineControlNull = false;
         if (JoyStick != null) JoyStickNull = false;
-        if (AileronL != null) AileronLNull = false;
-        if (AileronR != null) AileronRNull = false;
         if (Canards != null) CanardsNull = false;
-        if (Elevator != null) ElevatorNull = false;
         if (Engines != null) EnginesNull = false;
         if (Enginefire != null) EnginefireNull = false;
-        if (RudderL != null) RudderLNull = false;
-        if (RudderR != null) RudderRNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
         if (DisplaySmoke != null) DisplaySmokeNull = false;
 
 
+        foreach (Transform fire in Enginefire)
+            fire.localScale = new Vector3(fire.localScale.x, 0, fire.localScale.z);
 
-        if (!EnginesNull) EngineLerper = new Vector3(0, Engines.localRotation.eulerAngles.y, Engines.localRotation.eulerAngles.z);
-        if (!EnginefireNull)
-        {
-            Enginefireerper = new Vector3(Enginefire.localScale.x, 0, Enginefire.localScale.z);
-        }
 
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
         Spawnposition = VehicleMainObj.transform.position;
@@ -133,7 +117,6 @@ public class EffectsController : UdonSharpBehaviour
         PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
         AileronLerper.y = Mathf.Lerp(AileronLerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
         YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
-        EngineLerper.x = Mathf.Lerp(EngineLerper.x, (-rotationinputs.x * .65f), 4.5f * Time.deltaTime);
         Enginefireerper.y = Mathf.Lerp(Enginefireerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
 
         if (EngineControl.Occupied == true)
@@ -163,8 +146,18 @@ public class EffectsController : UdonSharpBehaviour
                 }
                 else FrontWheel.localRotation = Quaternion.identity;
             }
+
         }
         else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
+
+        foreach (Transform elevator in Elevators)
+            elevator.localRotation = Quaternion.Euler(-PitchLerper);
+
+        foreach (Transform aileron in Ailerons)
+            aileron.localRotation = Quaternion.Euler(AileronLerper);
+
+        foreach (Transform rudder in Rudders)
+            rudder.localRotation = Quaternion.Euler(YawLerper);
 
         if (Flaps) { PlaneAnimator.SetBool("flaps", true); }
         else { PlaneAnimator.SetBool("flaps", false); }
@@ -175,21 +168,14 @@ public class EffectsController : UdonSharpBehaviour
         if (HookDown) { PlaneAnimator.SetBool("hookdown", true); }
         else { PlaneAnimator.SetBool("hookdown", false); }
 
-
-        /* rotationinputs.x == pitch
-        rotationinputs.y == yaw
-        rotationinputs.z == roll
-        rotating the control surfaces based on inputs */
-        if (!AileronLNull) { AileronL.localRotation = Quaternion.Euler(AileronLerper); }
-        if (!AileronRNull) { AileronR.localRotation = Quaternion.Euler(-AileronLerper); }
-
-        if (!ElevatorNull) { Elevator.localRotation = Quaternion.Euler(-PitchLerper); }
-        if (!CanardsNull) { Canards.localRotation = Quaternion.Euler(PitchLerper * .5f); }
-
-        if (!RudderLNull) { RudderL.localRotation = Quaternion.Euler(-YawLerper); }
-        if (!RudderRNull) { RudderR.localRotation = Quaternion.Euler(YawLerper); }
-
-        if (!EnginesNull) { Engines.localRotation = Quaternion.Euler(EngineLerper); }
+        if (!EnginesNull)
+        {
+            Engines.localRotation = Quaternion.Euler(PitchLerper * -.6f);
+        }
+        if (!CanardsNull)
+        {
+            Canards.localRotation = Quaternion.Euler(PitchLerper * .6f);
+        }
 
         //engine thrust animation
 
@@ -197,17 +183,26 @@ public class EffectsController : UdonSharpBehaviour
         {
             if (AfterburnerOn)
             {
-                Enginefire.gameObject.SetActive(true);
-                Enginefire.localScale = Enginefireerper;
+                foreach (Transform fire in Enginefire)
+                {
+                    fire.gameObject.SetActive(true);
+                    fire.localScale = Enginefireerper;
+                }
             }
             else
             {
-                Enginefire.gameObject.SetActive(true);
-                Enginefire.localScale = new Vector3(1, 0, 1);
+                foreach (Transform fire in Enginefire)
+                {
+                    fire.gameObject.SetActive(true);
+                    fire.localScale = new Vector3(1, 0, 1);
+                }
             }
             if (EngineControl.Throttle <= .03f)
             {
-                Enginefire.gameObject.SetActive(false);
+                foreach (Transform fire in Enginefire)
+                {
+                    fire.gameObject.SetActive(false);
+                }
             }
         }
 

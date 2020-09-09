@@ -62,7 +62,7 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.EffectsControl.GearUp = false;
             EngineControl.EffectsControl.Flaps = true;
         }
-        else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
+        else if (EngineControl.IsOwner)
         {
             EngineControl.Health = EngineControl.FullHealth;
             //this should respawn it in VRC, doesn't work in editor
@@ -89,7 +89,7 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.Health = EngineControl.FullHealth;
             EngineControl.dead = false;
         }
-        else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
+        else if (EngineControl.IsOwner)
         {
             EngineControl.Health = EngineControl.FullHealth;
         }
