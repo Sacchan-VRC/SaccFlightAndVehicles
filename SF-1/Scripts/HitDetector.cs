@@ -26,7 +26,7 @@ public class HitDetector : UdonSharpBehaviour
     public void PlaneHit()
     {
         if (EngineControl.dead) return;
-        if (EngineControl.localPlayer == null || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
+        if (EngineControl.InEditor || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
         {
             EngineControl.Health -= 10;
         }
@@ -40,7 +40,7 @@ public class HitDetector : UdonSharpBehaviour
     }
     public void Respawn()//called by the explode animation on last frame
     {
-        if (EngineControl.localPlayer == null)//editor
+        if (EngineControl.InEditor)//editor
         {
             Respawn_event();
         }
@@ -49,12 +49,20 @@ public class HitDetector : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Respawn_event");//owner broadcasts because it's more reliable than everyone doing it individually
         }
     }
+    public void MoveToSpawn()//called 3 seconds before respawn, to prevent a glitch where the plane will appear where it died for a second for non-owners
+    {
+        if (EngineControl.IsOwner)
+        {
+            EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
+        }
+    }
+
     public void Respawn_event()//called by Respawn()
     {
         //re-enable plane model and effects
         EngineControl.EffectsControl.DoEffects = 6f; //wake up if was asleep
         EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
-        if (EngineControl.localPlayer == null)//editor
+        if (EngineControl.InEditor)
         {
             EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.EffectsControl.Spawnrotation);
             EngineControl.VehicleMainObj.transform.position = EngineControl.EffectsControl.Spawnposition;
@@ -66,14 +74,13 @@ public class HitDetector : UdonSharpBehaviour
         {
             EngineControl.Health = EngineControl.FullHealth;
             //this should respawn it in VRC, doesn't work in editor
-            EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
             EngineControl.EffectsControl.GearUp = false;
             EngineControl.EffectsControl.Flaps = true;
         }
     }
     public void NotDead()//called by 'respawn' animation 5s in
     {
-        if (EngineControl.localPlayer == null)//editor
+        if (EngineControl.InEditor)
         {
             NotDead_event();
         }
@@ -84,7 +91,7 @@ public class HitDetector : UdonSharpBehaviour
     }
     public void NotDead_event()//called by NotDead()
     {
-        if (EngineControl.localPlayer == null)//editor
+        if (EngineControl.InEditor)
         {
             EngineControl.Health = EngineControl.FullHealth;
             EngineControl.dead = false;

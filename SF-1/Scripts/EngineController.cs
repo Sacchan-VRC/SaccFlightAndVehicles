@@ -16,7 +16,6 @@ public class EngineController : UdonSharpBehaviour
     public Transform YawMoment;
     public Transform GroundDetector;
     public Transform HookDetector;
-    public Camera AGMCam;
     public LayerMask ResupplyLayer;
     public LayerMask HookCableLayer;
     public Transform CatapultDetector;
@@ -30,6 +29,7 @@ public class EngineController : UdonSharpBehaviour
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public GameObject AGM;
+    public Camera AtGCam;
     [UdonSynced(UdonSyncMode.None)] public int NumAGM;
     public Transform AGMLaunchPoint;
     public LayerMask AGMTargetsLayer;
@@ -290,6 +290,7 @@ public class EngineController : UdonSharpBehaviour
     private bool SteamOn = false;
     private bool WeaponSelected = false;
     private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
+    [System.NonSerializedAttribute] [HideInInspector] public bool AtGCamNull = true;//used by HudController
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -306,7 +307,7 @@ public class EngineController : UdonSharpBehaviour
         Assert(YawMoment != null, "Start: YawMoment != null");
         Assert(GroundDetector != null, "Start: GroundDetector != null");
         Assert(HookDetector != null, "Start: HookDetector != null");
-        Assert(AGMCam != null, "Start: AGMCam != null");
+        Assert(AtGCam != null, "Start: AGMCam != null");
         Assert(CatapultDetector != null, "Start: CatapultDetector != null");
         Assert(AAM != null, "Start: AAM != null");
         Assert(AAMLaunchPoint != null, "Start: AAMLaunchPoint != null");
@@ -315,6 +316,7 @@ public class EngineController : UdonSharpBehaviour
         Assert(Bomb != null, "Start: Bomb != null");
         Assert(BombLaunchPoints.Length > 0, "Start: BombLaunchPoint.Length > 0");
 
+        if (AtGCam != null) AtGCamNull = false;
 
         FullHealth = Health;
         FullFuel = Fuel;
@@ -700,7 +702,7 @@ public class EngineController : UdonSharpBehaviour
                     }
                 }
 
-                if (Input.GetKeyDown(KeyCode.G) && HasGear)
+                if (Input.GetKeyDown(KeyCode.G) && HasGear && CatapultStatus == 0)
                 {
                     EffectsControl.GearUp = !EffectsControl.GearUp;
                 }
@@ -1260,18 +1262,18 @@ public class EngineController : UdonSharpBehaviour
                                 }
                                 else if (!AGMLocked)
                                 {
-                                    if (AGMCam != null)
+                                    if (AtGCam != null)
                                     {
                                         float targetangle = 999;
                                         RaycastHit lockpoint;
-                                        RaycastHit[] agmtargs = Physics.SphereCastAll(AGMCam.transform.position, 150, AGMCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);
+                                        RaycastHit[] agmtargs = Physics.SphereCastAll(AtGCam.transform.position, 150, AtGCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);
                                         if (agmtargs.Length > 0)
                                         {
                                             //find target with lowest angle from crosshair
                                             foreach (RaycastHit target in agmtargs)
                                             {
-                                                Vector3 targetdirection = target.point - AGMCam.transform.position;
-                                                float angle = Vector3.Angle(AGMCam.transform.forward, targetdirection);
+                                                Vector3 targetdirection = target.point - AtGCam.transform.position;
+                                                float angle = Vector3.Angle(AtGCam.transform.forward, targetdirection);
                                                 if (angle < targetangle)
                                                 {
                                                     targetangle = angle;
@@ -1283,7 +1285,7 @@ public class EngineController : UdonSharpBehaviour
                                         }
                                         else
                                         {
-                                            Physics.Raycast(AGMCam.transform.position, AGMCam.transform.forward, out lockpoint, Mathf.Infinity, 1);
+                                            Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 1);
                                             if (lockpoint.point != null)
                                             {
                                                 if (!SoundControl.AGMUnlockNull)
@@ -1322,14 +1324,14 @@ public class EngineController : UdonSharpBehaviour
                             }
                             AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, temp, 70f * Time.deltaTime);
 
-                            if (AGMCam != null)
+                            if (AtGCam != null)
                             {
-                                AGMRotDif = Vector3.Angle(AGMCam.transform.rotation * Vector3.forward, AGMCamRotSlerper * Vector3.forward);
-                                AGMCam.transform.rotation = AGMCamRotSlerper;
+                                AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotSlerper * Vector3.forward);
+                                AtGCam.transform.rotation = AGMCamRotSlerper;
                                 //dunno if there's a better way to do this
-                                Vector3 temp2 = AGMCam.transform.localRotation.eulerAngles;
+                                Vector3 temp2 = AtGCam.transform.localRotation.eulerAngles;
                                 temp2.z = 0;
-                                AGMCam.transform.localRotation = Quaternion.Euler(temp2);
+                                AtGCam.transform.localRotation = Quaternion.Euler(temp2);
                             }
                         }
 
@@ -1656,8 +1658,8 @@ public class EngineController : UdonSharpBehaviour
                 if (Cruise && !LGripLastFrame && !Shift && !Ctrl)
                 {
                     int equals = Input.GetKey(KeyCode.Equals) ? 1 : 0;
-                    int minus = Input.GetKey(KeyCode.Minus) ? 1 : 0;
-                    SetSpeed += Mathf.Clamp(equals - minus, 0, 2000);
+                    int minus = Input.GetKey(KeyCode.Underscore) ? 1 : 0;
+                    SetSpeed = Mathf.Clamp(SetSpeed + (equals - minus), 0, 2000);
 
                     float error = (SetSpeed - AirSpeed);
 

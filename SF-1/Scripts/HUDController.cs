@@ -317,50 +317,61 @@ public class HUDController : UdonSharpBehaviour
         //AGMScreen
         if (EngineControl.RStickSelection == 3 && !EngineControl.AGMLocked)
         {
-            if (EngineControl.AGMCam != null)
+            if (!EngineControl.AtGCamNull)
             {
                 AGMScreen.SetActive(true);
-                EngineControl.AGMCam.gameObject.SetActive(true);
+                EngineControl.AtGCam.gameObject.SetActive(true);
                 float newzoom = 0;
                 //if turning camera fast, zoom out
                 if (EngineControl.AGMRotDif < .8f)
                 {
                     RaycastHit camhit;
-                    Physics.Raycast(EngineControl.AGMCam.transform.position, EngineControl.AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
+                    Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                     if (camhit.point != null)
                     {
                         //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
-
                         newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                        EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, newzoom, 1.5f * Time.deltaTime), 0.3f, 90);
+                        EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 1.5f * Time.deltaTime), 0.3f, 90);
                     }
                 }
                 else
                 {
                     newzoom = 80;
-                    EngineControl.AGMCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, newzoom, 3.5f * Time.deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                    EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 3.5f * Time.deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
+            }
+        }
+        else if (EngineControl.RStickSelection == 4)
+        {
+            if (!EngineControl.AtGCamNull)
+            {
+                EngineControl.AtGCam.gameObject.SetActive(true);
+                AGMScreen.SetActive(true);
+                EngineControl.AtGCam.fieldOfView = 60;
+                EngineControl.AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
             }
         }
         else if (EngineControl.AGMLocked)
         {
-            if (EngineControl.AGMCam != null) EngineControl.AGMCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
+            if (!EngineControl.AtGCamNull) EngineControl.AtGCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
             RaycastHit camhit;
-            Physics.Raycast(EngineControl.AGMCam.transform.position, EngineControl.AGMCam.transform.forward, out camhit, Mathf.Infinity, 1);
+            Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
             if (camhit.point != null)
             {
                 //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                EngineControl.AGMCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AGMCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f);
+                EngineControl.AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f);
             }
         }
         else
         {
-            if (EngineControl.AGMCam != null)
+            if (!EngineControl.AtGCamNull)
             {
                 AGMScreen.SetActive(false);
-                EngineControl.AGMCam.gameObject.SetActive(false);
+                EngineControl.AtGCam.gameObject.SetActive(false);
             }
         }
+
+
 
         //updating numbers 3~ times a second
         if (check > .3)//update text
