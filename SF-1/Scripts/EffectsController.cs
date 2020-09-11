@@ -16,7 +16,7 @@ public class EffectsController : UdonSharpBehaviour
     public Transform Engines;
     public Transform[] Enginefire;
     public Transform FrontWheel;
-    public ParticleSystem DisplaySmoke;
+    public ParticleSystem[] DisplaySmoke;
     public ParticleSystem CatapultSteam;
 
 
@@ -31,6 +31,7 @@ public class EffectsController : UdonSharpBehaviour
     private bool EnginefireNull = true;
     private bool RuddersNull = true;
     private bool FrontWheelNull = true;
+    private bool CatapultSteamNull = true;
     private bool DisplaySmokeNull = true;
 
 
@@ -81,7 +82,8 @@ public class EffectsController : UdonSharpBehaviour
         if (Engines != null) EnginesNull = false;
         if (Enginefire != null) EnginefireNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
-        if (DisplaySmoke != null) DisplaySmokeNull = false;
+        if (CatapultSteam != null) CatapultSteamNull = false;
+        if (DisplaySmoke.Length > 0) DisplaySmokeNull = false;
 
 
         foreach (Transform fire in Enginefire)
@@ -131,11 +133,14 @@ public class EffectsController : UdonSharpBehaviour
                 PlaneAnimator.SetBool("gunfiring", false);
             }
 
-            if (!DisplaySmokeNull)
+            if (!DisplaySmokeNull && Smoking)
             {
                 SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
-                var main = DisplaySmoke.main;
-                main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
+                foreach (ParticleSystem smoke in DisplaySmoke)
+                {
+                    var main = smoke.main;
+                    main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
+                }
             }
 
             if (!FrontWheelNull)

@@ -547,15 +547,15 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 10
-    functionName: MoveToSpawn
-    data: 
+    functionName: SendCustomEvent
+    data: MoveToSpawn
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 13
-    functionName: Respawn
-    data: 
+    functionName: SendCustomEvent
+    data: Respawn
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
