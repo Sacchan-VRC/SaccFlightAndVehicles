@@ -29,10 +29,10 @@ public class EngineController : UdonSharpBehaviour
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public GameObject AGM;
-    public Camera AtGCam;
     [UdonSynced(UdonSyncMode.None)] public int NumAGM;
     public Transform AGMLaunchPoint;
     public LayerMask AGMTargetsLayer;
+    public Camera AtGCam;
     public GameObject Bomb;
     [UdonSynced(UdonSyncMode.None)] public int NumBomb;
     public float BombHoldDelay = 0.5f;
@@ -287,7 +287,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public int MissilesIncoming = 0;
     private EngineController AAMCurrentTargetEngineControl;
     private float LastBombDropTime = 0f;
-    private bool SteamOn = false;
     private bool WeaponSelected = false;
     private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
     [System.NonSerializedAttribute] [HideInInspector] public bool AtGCamNull = true;//used by HudController
@@ -544,15 +543,15 @@ public class EngineController : UdonSharpBehaviour
                 ///////////////////KEYBOARD CONTROLS////////////////////////////////////////////////////////          
                 if (EffectsControl.Smoking)
                 {
-                    int ins = Input.GetKey(KeyCode.Insert) ? 1 : 0;
-                    int del = Input.GetKey(KeyCode.Delete) ? 1 : 0;
-                    int home = Input.GetKey(KeyCode.Home) ? 1 : 0;
-                    int end = Input.GetKey(KeyCode.End) ? 1 : 0;
-                    int pgup = Input.GetKey(KeyCode.PageUp) ? 1 : 0;
-                    int pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
-                    SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((ins - del) * Time.deltaTime), 0, 1);
-                    SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((home - end) * Time.deltaTime), 0, 1);
-                    SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((pgup - pgdn) * Time.deltaTime), 0, 1);
+                    int keypad7 = Input.GetKey(KeyCode.Keypad7) ? 1 : 0;
+                    int Keypad4 = Input.GetKey(KeyCode.Keypad4) ? 1 : 0;
+                    int Keypad8 = Input.GetKey(KeyCode.Keypad8) ? 1 : 0;
+                    int Keypad5 = Input.GetKey(KeyCode.Keypad5) ? 1 : 0;
+                    int Keypad9 = Input.GetKey(KeyCode.Keypad9) ? 1 : 0;
+                    int Keypad6 = Input.GetKey(KeyCode.Keypad6) ? 1 : 0;
+                    SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * Time.deltaTime), 0, 1);
+                    SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * Time.deltaTime), 0, 1);
+                    SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * Time.deltaTime), 0, 1);
                 }
                 if (Input.GetKeyDown(KeyCode.F2) && HasCruise)
                 {
@@ -566,7 +565,14 @@ public class EngineController : UdonSharpBehaviour
                 if (Input.GetKeyDown(KeyCode.C) && HasCatapult)
                 {
                     if (CatapultStatus == 1)
+                    {
                         CatapultStatus = 2;
+                        if (InEditor)
+                        {
+                            CatapultLaunchEffects();
+                        }
+                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects");
+                    }
                 }
                 if (Input.GetKeyDown(KeyCode.H) && HasHook)
                 {
@@ -933,7 +939,7 @@ public class EngineController : UdonSharpBehaviour
                                     TempSpeed = SetSpeed;
                                 }
                                 float SpeedDifference = (SpeedZeroPoint - handpos) * -600;
-                                SetSpeed = Mathf.Clamp(TempSpeed + SpeedDifference, 0, 2000);
+                                SetSpeed = Mathf.Floor(Mathf.Clamp(TempSpeed + SpeedDifference, 0, 2000));
 
                             }
 
@@ -978,7 +984,14 @@ public class EngineController : UdonSharpBehaviour
                             if (!LTriggerLastFrame)
                             {
                                 if (CatapultStatus == 1)
+                                {
                                     CatapultStatus = 2;
+                                    if (InEditor)
+                                    {
+                                        CatapultLaunchEffects();
+                                    }
+                                    else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects");
+                                }
                             }
 
                             LTriggerLastFrame = true;
@@ -1138,6 +1151,27 @@ public class EngineController : UdonSharpBehaviour
                     case 2://AAM
                         if (NumAAMTargets != 0)
                         {
+                            //firing AAM
+                            if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Space)))
+                            {
+                                if (!RTriggerLastFrame)
+                                {
+                                    if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > 0.5 && !Taxiing)
+                                    {
+                                        AAMLastFiredTime = Time.time;
+                                        if (InEditor)
+                                            LaunchAAM();
+                                        else
+                                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
+                                        NumAAM--;
+                                        if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
+                                    }
+                                }
+                                RTriggerLastFrame = true;
+                            }
+                            else RTriggerLastFrame = false;
+
+                            //targeting
                             AAMCurrentTargetDirection = AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position;
                             float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position));
                             float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
@@ -1208,26 +1242,6 @@ public class EngineController : UdonSharpBehaviour
                             }
                         }
                         else { AAMLocked = false; AAMHasTarget = false; }
-
-                        //firing AAM
-                        if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Space)))
-                        {
-                            if (!RTriggerLastFrame)
-                            {
-                                if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > 0.5 && !Taxiing)
-                                {
-                                    AAMLastFiredTime = Time.time;
-                                    if (InEditor)
-                                        LaunchAAM();
-                                    else
-                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
-                                    NumAAM--;
-                                    if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
-                                }
-                            }
-                            RTriggerLastFrame = true;
-                        }
-                        else RTriggerLastFrame = false;
 
                         IsFiringGun = false;
                         break;
@@ -1590,10 +1604,20 @@ public class EngineController : UdonSharpBehaviour
                         }
                         if (Time.time - LastResupplyTime > 1)
                         {
+                            //only play the sound if we're actually repairing/getting ammo/fuel
+                            if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || GunAmmoInSeconds != FullGunAmmo || Health != FullHealth))
+                                SoundControl.Reloading.Play();
                             LastResupplyTime = Time.time;
                             NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(FullAAMs / 10), 1), FullAAMs);
                             NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
                             NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
+
+                            Debug.Log(string.Concat("fuel", Fuel));
+                            Debug.Log(string.Concat("FullFuel", FullFuel));
+                            Debug.Log(string.Concat("Health", Health));
+                            Debug.Log(string.Concat("FullHealth", FullHealth));
+                            Debug.Log(string.Concat("GunAmmoInSeconds", GunAmmoInSeconds));
+                            Debug.Log(string.Concat("FullGunAmmo", FullGunAmmo));
                             Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
                             GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
                             Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
@@ -1949,15 +1973,7 @@ public class EngineController : UdonSharpBehaviour
                     VehicleRigidbody.angularVelocity = Vector3.zero;
                     break;
                 case 2://launching
-                    if (!SteamOn)
-                    {
-                        if (InEditor)
-                        {
-                            CatapultSteamOn();
-                        }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultSteamOn");
-                        SteamOn = true;
-                    }
+
                     VehicleMainObj.transform.rotation = CatapultLockRot;
                     VehicleConstantForce.relativeForce = new Vector3(0, 0, CatapultLaunchStrength);
                     //lock all movment except for forward movement
@@ -1972,7 +1988,6 @@ public class EngineController : UdonSharpBehaviour
                     if (CatapultLaunchTime < 0)
                     {
                         CatapultStatus = 0;
-                        SteamOn = false;
                     }
                     break;
             }
@@ -2141,9 +2156,23 @@ public class EngineController : UdonSharpBehaviour
                 TargetEngine.EffectsControl.PlaneAnimator.SetTrigger("radarlocked");
         }
     }
-    public void CatapultSteamOn()
+    public void CatapultLaunchEffects()
     {
-        if (EffectsControl.CatapultSteam != null) EffectsControl.CatapultSteam.Play();
+        if (EffectsControl.CatapultSteam != null) { EffectsControl.CatapultSteam.Play(); }
+        if (Piloting || Passenger)
+        {
+            if (!SoundControl.CatapultLaunchNull)
+            {
+                SoundControl.CatapultLaunch.Play();
+            }
+        }
+        else
+        {
+            if (!SoundControl.CatapultLaunchNull)
+            {
+                SoundControl.CatapultLaunch.Play();
+            }
+        }
     }
     public void CatapultLockSound()
     {
@@ -2202,11 +2231,14 @@ public class EngineController : UdonSharpBehaviour
         //play sonic boom if it was going to play before it exploded
         if (SoundControl.playsonicboom && SoundControl.silent)
         {
-            int rand = Random.Range(0, SoundControl.SonicBoom.Length);
-            if (SoundControl.SonicBoom[rand] != null)
+            if (!SoundControl.SonicBoomNull)
             {
-                SoundControl.SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
-                SoundControl.SonicBoom[rand].PlayDelayed((SoundControl.SonicBoomDistance - SoundControl.SonicBoomWave) / 343);
+                int rand = Random.Range(0, SoundControl.SonicBoom.Length);
+                if (SoundControl.SonicBoom[rand] != null)
+                {
+                    SoundControl.SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
+                    SoundControl.SonicBoom[rand].PlayDelayed((SoundControl.SonicBoomDistance - SoundControl.SonicBoomWave) / 343);
+                }
             }
         }
         SoundControl.playsonicboom = false;

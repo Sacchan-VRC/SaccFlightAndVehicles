@@ -53,6 +53,12 @@ public class HitDetector : UdonSharpBehaviour
     {
         if (EngineControl.IsOwner)
         {
+            if (EngineControl.InEditor)
+            {
+                EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.EffectsControl.Spawnrotation);
+                EngineControl.VehicleMainObj.transform.position = EngineControl.EffectsControl.Spawnposition;
+            }
+            //this should respawn it in VRC, doesn't work in editor
             EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
         }
     }
@@ -74,6 +80,7 @@ public class HitDetector : UdonSharpBehaviour
         {
             EngineControl.Health = EngineControl.FullHealth;
             //this should respawn it in VRC, doesn't work in editor
+            EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
             EngineControl.EffectsControl.GearUp = false;
             EngineControl.EffectsControl.Flaps = true;
         }
