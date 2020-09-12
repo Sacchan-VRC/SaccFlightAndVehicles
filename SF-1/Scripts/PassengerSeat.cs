@@ -42,6 +42,7 @@ public class PassengerSeat : UdonSharpBehaviour
         {
             EngineControl.Passenger = false;
             EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+            EngineControl.MissilesIncoming = 0;
         }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }

@@ -7,6 +7,7 @@ using VRC.Udon;
 public class AAMController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
+    public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 30;
     public float RotSpeed = 15;
     private EngineController TargetEngineControl;
@@ -82,7 +83,7 @@ public class AAMController : UdonSharpBehaviour
             LockedOn = false;
         }
         Lifetime += Time.deltaTime;
-        if (Lifetime > 40)
+        if (Lifetime > 30)
         {
             if (Exploding)//missile exploded 10 seconds ago
             {
@@ -101,6 +102,12 @@ public class AAMController : UdonSharpBehaviour
     private void Explode()
     {
         Exploding = true;
+        if (ExplosionSounds.Length > 0)
+        {
+            int rand = Random.Range(0, ExplosionSounds.Length);
+            ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
+            ExplosionSounds[rand].Play();
+        }
         if (LockedOn)
         {
             if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
@@ -150,6 +157,6 @@ public class AAMController : UdonSharpBehaviour
             }
             else AGMani.SetTrigger("explode");
         }
-        Lifetime = 30;//10 seconds to finish exploding
+        Lifetime = 20;//10 seconds to finish exploding
     }
 }

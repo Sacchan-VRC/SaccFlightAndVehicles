@@ -243,7 +243,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float Speed;
     [System.NonSerializedAttribute] [HideInInspector] public float AirSpeed;
     [System.NonSerializedAttribute] [HideInInspector] public bool IsOwner = false;
-    private Vector3 FinalWind;//incl. Gusts
+    private Vector3 FinalWind;//includes Gusts
     [System.NonSerializedAttribute] [HideInInspector] public Vector3 AirVel;
     private float StillWindMulti;
     private int ThrustVecGrounded;
@@ -788,9 +788,9 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (WeaponSelected)
                             {
-                                WeaponSelected = false;
                                 if (InEditor)
                                 {
+                                WeaponSelected = false;
                                     RStick0();
                                 }
                                 else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
@@ -802,9 +802,9 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasFlaps)
                         {
-                            WeaponSelected = false;
                             if (WeaponSelected)
                             {
+                            WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -818,9 +818,9 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasHook)
                         {
-                            WeaponSelected = false;
                             if (WeaponSelected)
                             {
+                            WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -834,9 +834,9 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasSmoke)
                         {
-                            WeaponSelected = false;
                             if (WeaponSelected)
                             {
+                            WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -1682,7 +1682,7 @@ public class EngineController : UdonSharpBehaviour
                 if (Cruise && !LGripLastFrame && !Shift && !Ctrl)
                 {
                     int equals = Input.GetKey(KeyCode.Equals) ? 1 : 0;
-                    int minus = Input.GetKey(KeyCode.Underscore) ? 1 : 0;
+                    int minus = Input.GetKey(KeyCode.Minus) ? 1 : 0;
                     SetSpeed = Mathf.Clamp(SetSpeed + (equals - minus), 0, 2000);
 
                     float error = (SetSpeed - AirSpeed);
@@ -1996,7 +1996,7 @@ public class EngineController : UdonSharpBehaviour
         }
         else//non-owners need to know these values
         {
-            AirSpeed = CurrentVel.magnitude;
+            AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
             //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value to stop spazzing
             VehicleRigidbody.angularDrag = .3f;
@@ -2210,6 +2210,7 @@ public class EngineController : UdonSharpBehaviour
         BrakeInput = 0;
         FlightLimitsEnabled = true;
         Cruise = false;
+        EffectsControl.FrontWheel.localRotation = Quaternion.identity;
         //EngineControl.Trim = Vector2.zero;
         if (HasCanopy)
         {
