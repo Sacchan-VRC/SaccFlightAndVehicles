@@ -7,6 +7,7 @@ using VRC.Udon;
 public class AGMController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
+    public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 30;
     public float LockAngle;
     public float RotSpeed = 15;
@@ -41,30 +42,45 @@ public class AGMController : UdonSharpBehaviour
             gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
         }
         Lifetime += Time.deltaTime;
-        if (Lifetime > 40)
+        if (Lifetime > 30)
         {
-            Destroy(gameObject);
+            if (Exploding)//missile exploded 10 seconds ago
+            {
+                Destroy(gameObject);
+            }
+            else Explode();//explode and give Lifetime another 10 seconds
         }
     }
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
         {
-            AGMCollider.enabled = false;
-            Animator AGMani = gameObject.GetComponent<Animator>();
-            if (EngineControl.InEditor)
+            Explode();
+        }
+    }
+    private void Explode()
+    {
+        Exploding = true;
+        if (ExplosionSounds.Length > 0)
+        {
+            int rand = Random.Range(0, ExplosionSounds.Length);
+            ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
+            ExplosionSounds[rand].Play();
+        }
+        AGMCollider.enabled = false;
+        Animator AGMani = gameObject.GetComponent<Animator>();
+        if (EngineControl.InEditor)
+        {
+            AGMani.SetTrigger("explodeowner");
+        }
+        else
+        {
+            if (EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
             {
                 AGMani.SetTrigger("explodeowner");
             }
-            else
-            {
-                if (EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
-                {
-                    AGMani.SetTrigger("explodeowner");
-                }
-                else AGMani.SetTrigger("explode");
-            }
-            Lifetime = 30;
+            else AGMani.SetTrigger("explode");
         }
+        Lifetime = 20;
     }
 }

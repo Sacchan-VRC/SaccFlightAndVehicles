@@ -279,7 +279,7 @@ public class SoundController : UdonSharpBehaviour
                 if (EngineControl.Taxiing)
                 {
                     if (!RollingNull && !Rolling.isPlaying) Rolling.Play();
-                    Rolling.volume = Mathf.Clamp(EngineControl.Speed * 0.03f, 0, 1);
+                    Rolling.volume = Mathf.Clamp(EngineControl.AirSpeed * 0.03f, 0, 1);
                 }
                 else if (!RollingNull) Rolling.volume = 0;
             }

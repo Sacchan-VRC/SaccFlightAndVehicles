@@ -21,6 +21,7 @@ public class HUDController : UdonSharpBehaviour
     public Text HUDText_Bomb_ammo;
     public GameObject HudCrosshairGun;
     public GameObject HudCrosshair;
+    public GameObject HudHold;
     public GameObject HudLimit;
     public GameObject HudAB;
     public Transform DownIndicator;
@@ -70,6 +71,7 @@ public class HUDController : UdonSharpBehaviour
         Assert(HUDText_angleofattack != null, "Start: HUDText_angleofattack != null");
         Assert(HudCrosshairGun != null, "Start: HudCrosshairGun != null");
         Assert(HudCrosshair != null, "Start: HudCrosshair != null");
+        Assert(HudHold != null, "Start: HudHold != null");
         Assert(HudLimit != null, "Start: HudLimit != null");
         Assert(HudAB != null, "Start: HudAB != null");
         Assert(DownIndicator != null, "Start: DownIndicator != null");
@@ -184,12 +186,19 @@ public class HUDController : UdonSharpBehaviour
         DownIndicator.localRotation = Quaternion.Euler(new Vector3(0, 0, -new_z));
         /////////////////
 
-        //SAFE indicator
+        //LIMITS indicator
         if (EngineControl.FlightLimitsEnabled)
         {
             HudLimit.SetActive(true);
         }
         else { HudLimit.SetActive(false); }
+
+        //Alt. HOLD indicator
+        if (EngineControl.AltHold)
+        {
+            HudHold.SetActive(true);
+        }
+        else { HudHold.SetActive(false); }
 
         //Left Stick Selector
         switch (EngineControl.LStickSelection)

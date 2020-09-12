@@ -1,4 +1,4 @@
-
+//comented stuff can be used to make changes in wind global
 using UdonSharp;
 using UnityEngine.UI;
 using UnityEngine;
