@@ -91,8 +91,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
             EngineControl.AAMLockTimer = 0;
             EngineControl.AAMLocked = false;
-            if (EngineControl.CatapultStatus == 2) { }//keep launching if launching
-            else EngineControl.CatapultStatus = 0;//else unhook from catapult
+            if (EngineControl.CatapultStatus == 1) { EngineControl.CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
         }
         if (LeaveButton != null) { LeaveButton.SetActive(false); }
         if (EngineControl.EffectsControl != null)
@@ -115,8 +114,20 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public void WakeUp()
     {
-        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.DoEffects = 0f; }
-        if (EngineControl.SoundControl != null) { EngineControl.SoundControl.DoSound = 0f; }
+        EngineControl.EffectsControl.DoEffects = 0f;
+        EngineControl.SoundControl.DoSound = 0f;
+        foreach (AudioSource thrust in EngineControl.SoundControl.Thrust)
+        {
+            thrust.gameObject.SetActive(true);
+        }
+        foreach (AudioSource idle in EngineControl.SoundControl.PlaneIdle)
+        {
+            idle.gameObject.SetActive(true);
+        }
+        if (!EngineControl.SoundControl.PlaneDistantNull) EngineControl.SoundControl.PlaneDistant.gameObject.SetActive(true);
+        if (!EngineControl.SoundControl.PlaneWindNull) EngineControl.SoundControl.PlaneWind.gameObject.SetActive(true);
+        if (!EngineControl.SoundControl.PlaneInsideNull) EngineControl.SoundControl.PlaneInside.gameObject.SetActive(true);
+        EngineControl.SoundControl.soundsoff = false;
     }
     private void Assert(bool condition, string message)
     {

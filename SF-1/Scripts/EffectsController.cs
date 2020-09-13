@@ -30,7 +30,7 @@ public class EffectsController : UdonSharpBehaviour
     private bool EnginesNull = true;
     private bool EnginefireNull = true;
     private bool RuddersNull = true;
-    private bool FrontWheelNull = true;
+    public bool FrontWheelNull = true;
     private bool CatapultSteamNull = true;
     private bool DisplaySmokeNull = true;
 

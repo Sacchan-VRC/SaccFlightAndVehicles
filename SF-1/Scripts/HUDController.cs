@@ -277,7 +277,8 @@ public class HUDController : UdonSharpBehaviour
         else { HUDText_knotstarget.text = string.Empty; }
 
         //left stick toggles/functions on?
-        if (EngineControl.Cruise) { LStick_funcon1.SetActive(true); }
+
+        if (EngineControl.EffectsControl.AfterburnerOn) { LStick_funcon1.SetActive(true); }
         else { LStick_funcon1.SetActive(false); }
 
         if (EngineControl.FlightLimitsEnabled) { LStick_funcon2.SetActive(true); }
@@ -295,7 +296,7 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.EffectsControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
         else { LStick_funcon7.SetActive(false); }
 
-        if (EngineControl.EffectsControl.AfterburnerOn) { LStick_funcon8.SetActive(true); }
+        if (EngineControl.Cruise) { LStick_funcon8.SetActive(true); }
         else { LStick_funcon8.SetActive(false); }
 
 
