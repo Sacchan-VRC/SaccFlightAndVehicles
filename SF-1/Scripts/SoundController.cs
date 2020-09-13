@@ -186,6 +186,22 @@ public class SoundController : UdonSharpBehaviour
     {
         if (DoSound > 35f)
         {
+            if (!soundsoff) //disable all the sounds that always play, re-enabled in pilotseat
+            {
+                foreach (AudioSource thrust in Thrust)
+                {
+                    thrust.gameObject.SetActive(false);
+                }
+                foreach (AudioSource idle in PlaneIdle)
+                {
+                    idle.gameObject.SetActive(false);
+                }
+                if (!PlaneDistantNull) PlaneDistant.gameObject.SetActive(false);
+                if (!PlaneWindNull) PlaneWind.gameObject.SetActive(false);
+                if (!PlaneInsideNull) PlaneInside.gameObject.SetActive(false);
+                soundsoff = true;
+            }
+            else { return; }
             return;
         }
 

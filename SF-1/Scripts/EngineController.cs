@@ -21,7 +21,7 @@ public class EngineController : UdonSharpBehaviour
     public Transform CatapultDetector;
     public LayerMask CatapultLayer;
     public GameObject AAM;
-    [UdonSynced(UdonSyncMode.None)] public int NumAAM;
+    [UdonSynced(UdonSyncMode.None)] public int NumAAM = 6;
     public float AAMMaxTargetDistance = 6000;
     public float AAMLockAngle = 15;
     public float AAMLockTime = 1.5f;
@@ -29,15 +29,15 @@ public class EngineController : UdonSharpBehaviour
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public GameObject AGM;
-    [UdonSynced(UdonSyncMode.None)] public int NumAGM;
+    [UdonSynced(UdonSyncMode.None)] public int NumAGM = 4;
     public Transform AGMLaunchPoint;
     public LayerMask AGMTargetsLayer;
     public Camera AtGCam;
     public GameObject Bomb;
-    [UdonSynced(UdonSyncMode.None)] public int NumBomb;
+    [UdonSynced(UdonSyncMode.None)] public int NumBomb = 4;
     public float BombHoldDelay = 0.5f;
     public Transform[] BombLaunchPoints;
-    [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds;
+    [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
     public bool HasCruise = true;
     public bool HasLimits = true;
     public bool HasCatapult = true;
@@ -94,13 +94,14 @@ public class EngineController : UdonSharpBehaviour
     public float SidewaysLift = .17f;
     public float MaxLift = 10f;
     public float VelLift = 1f;
-    public float MaxGs = 25f;
-    public float GDamage = 5f;
+    public float MaxGs = 40f;
+    public float GDamage = 10f;
     public float LandingGearDragMulti = 1.3f;
     public float FlapsDragMulti = 1.4f;
     public float FlapsLiftMulti = 1.35f;
     public float AirbrakeStrength = 4f;
-    public float GroundBrakeStrength = 4f;
+    public float GroundBrakeStrength = 6f;
+    public float GroundBrakeSpeed = 40f;
     public float HookedBrakeStrength = 65f;
     public float CatapultLaunchStrength = 50f;
     public float CatapultLaunchTime = 2f;
@@ -790,7 +791,7 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 if (InEditor)
                                 {
-                                WeaponSelected = false;
+                                    WeaponSelected = false;
                                     RStick0();
                                 }
                                 else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
@@ -804,7 +805,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (WeaponSelected)
                             {
-                            WeaponSelected = false;
+                                WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -820,7 +821,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (WeaponSelected)
                             {
-                            WeaponSelected = false;
+                                WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -836,7 +837,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (WeaponSelected)
                             {
-                            WeaponSelected = false;
+                                WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -912,37 +913,21 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (!LTriggerLastFrame)
                             {
-                                if (!Cruise)
+                                EffectsControl.AfterburnerOn = !EffectsControl.AfterburnerOn;
+                                if (EffectsControl.AfterburnerOn)
                                 {
-                                    SetSpeed = AirSpeed;
-                                    Cruise = true;
+                                    Afterburner = AfterburnerThrustMulti;
+                                    if (ThrottleInput > 0.6)
+                                    {
+                                        if (InEditor)
+                                        {
+                                            PlayABOnSound();
+                                        }
+                                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayABOnSound");
+                                    }
                                 }
-                                if (LTriggerTapTime > .4f)//no double tap
-                                {
-                                    LTriggerTapTime = 0;
-                                }
-                                else//double tap detected, turn off cruise
-                                {
-                                    Cruise = false;
-                                    PlayerThrottle = ThrottleInput;
-                                }
+                                else { Afterburner = 1; }
                             }
-
-                            //VR Set Speed
-                            if (InVR)
-                            {
-
-                                handpos = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position).z;
-                                if (!LTriggerLastFrame)
-                                {
-                                    SpeedZeroPoint = handpos;
-                                    TempSpeed = SetSpeed;
-                                }
-                                float SpeedDifference = (SpeedZeroPoint - handpos) * -600;
-                                SetSpeed = Mathf.Floor(Mathf.Clamp(TempSpeed + SpeedDifference, 0, 2000));
-
-                            }
-
                             LTriggerLastFrame = true;
                         }
                         else { LTriggerLastFrame = false; }
@@ -1107,20 +1092,35 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (!LTriggerLastFrame)
                             {
-                                EffectsControl.AfterburnerOn = !EffectsControl.AfterburnerOn;
-                                if (EffectsControl.AfterburnerOn)
+                                if (!Cruise)
                                 {
-                                    Afterburner = AfterburnerThrustMulti;
-                                    if (ThrottleInput > 0.6)
-                                    {
-                                        if (InEditor)
-                                        {
-                                            PlayABOnSound();
-                                        }
-                                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayABOnSound");
-                                    }
+                                    SetSpeed = AirSpeed;
+                                    Cruise = true;
                                 }
-                                else { Afterburner = 1; }
+                                if (LTriggerTapTime > .4f)//no double tap
+                                {
+                                    LTriggerTapTime = 0;
+                                }
+                                else//double tap detected, turn off cruise
+                                {
+                                    Cruise = false;
+                                    PlayerThrottle = ThrottleInput;
+                                }
+                            }
+
+                            //VR Set Speed
+                            if (InVR)
+                            {
+
+                                handpos = VehicleMainObj.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position).z;
+                                if (!LTriggerLastFrame)
+                                {
+                                    SpeedZeroPoint = handpos;
+                                    TempSpeed = SetSpeed;
+                                }
+                                float SpeedDifference = (SpeedZeroPoint - handpos) * -600;
+                                SetSpeed = Mathf.Floor(Mathf.Clamp(TempSpeed + SpeedDifference, 0, 2000));
+
                             }
                             LTriggerLastFrame = true;
                         }
@@ -1156,7 +1156,7 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 if (!RTriggerLastFrame)
                                 {
-                                    if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > 0.5 && !Taxiing)
+                                    if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > 0.5)
                                     {
                                         AAMLastFiredTime = Time.time;
                                         if (InEditor)
@@ -1176,7 +1176,7 @@ public class EngineController : UdonSharpBehaviour
                             float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position));
                             float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
                             //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
-                            if (AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || !AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead))
+                            if (!Taxiing && AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || !AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead))
                             {
                                 if (AAMCurrentTargetAngle < AAMLockAngle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                                 {
@@ -1582,7 +1582,7 @@ public class EngineController : UdonSharpBehaviour
 
                     PitchStrength = StartPitchStrength + ((TakeoffAssist * Speed) / (TakeoffAssistSpeed));//stronger pitch when moving fast and taxiing to help with taking off
 
-                    if (BrakeInput > 0 && Speed < 40 && Hooked < 0f)
+                    if (BrakeInput > 0 && Speed < GroundBrakeSpeed && Hooked < 0f)
                     {
                         if (Speed > BrakeInput * GroundBrakeStrength * Time.deltaTime)
                         {
@@ -1973,7 +1973,6 @@ public class EngineController : UdonSharpBehaviour
                     VehicleRigidbody.angularVelocity = Vector3.zero;
                     break;
                 case 2://launching
-
                     VehicleMainObj.transform.rotation = CatapultLockRot;
                     VehicleConstantForce.relativeForce = new Vector3(0, 0, CatapultLaunchStrength);
                     //lock all movment except for forward movement
@@ -2210,7 +2209,7 @@ public class EngineController : UdonSharpBehaviour
         BrakeInput = 0;
         FlightLimitsEnabled = true;
         Cruise = false;
-        EffectsControl.FrontWheel.localRotation = Quaternion.identity;
+        if (!EffectsControl.FrontWheelNull) EffectsControl.FrontWheel.localRotation = Quaternion.identity;
         //EngineControl.Trim = Vector2.zero;
         if (HasCanopy)
         {
