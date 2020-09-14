@@ -7,8 +7,7 @@ using VRC.Udon;
 
 public class WindChanger : UdonSharpBehaviour
 {
-    public GameObject WindMenu;
-    public Slider WindSlider;
+    public Slider WindStrengthSlider;
     public Text WindStr_text;
     public Slider WindGustStrengthSlider;
     public Text WindGustStrength_text;
@@ -29,8 +28,7 @@ public class WindChanger : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private void Start()
     {
-        Assert(WindMenu != null, "Start: WindMenu != null");
-        Assert(WindSlider != null, "Start: WindSlider != null");
+        Assert(WindStrengthSlider != null, "Start: WindSlider != null");
         Assert(WindStr_text != null, "Start: WindStr_text != null");
         Assert(WindGustStrengthSlider != null, "Start: WindGustStrengthSlider != null");
         Assert(WindGustStrength_text != null, "Start: WindGustStrength_text != null");
@@ -48,8 +46,8 @@ public class WindChanger : UdonSharpBehaviour
     {
         if (localPlayer.IsOwner(gameObject))
         {
-            WindStrength = WindSlider.value;
-            WindStr_text.text = WindSlider.value.ToString("F1");
+            WindStrength = WindStrengthSlider.value;
+            WindStr_text.text = WindStrengthSlider.value.ToString("F1");
 
             WindGustStrength = WindGustStrengthSlider.value;
             WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
@@ -62,7 +60,7 @@ public class WindChanger : UdonSharpBehaviour
         }
         else
         {
-            WindSlider.value = WindStrength;
+            WindStrengthSlider.value = WindStrength;
             WindGustStrengthSlider.value = WindGustStrength;
             WindGustinessSlider.value = WindGustiness;
             WindTurbulanceScaleSlider.value = WindTurbulanceScale;

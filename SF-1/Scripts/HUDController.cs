@@ -29,13 +29,13 @@ public class HUDController : UdonSharpBehaviour
     public Transform HeadingIndicator;
     public Transform VelocityIndicator;
     public Transform AAMTargetIndicator;
-    public Transform LStickDisplayHighlighter;
-    public Transform RStickDisplayHighlighter;
     public Transform PitchRoll;
     public Transform Yaw;
+    public Transform LStickDisplayHighlighter;
+    public Transform RStickDisplayHighlighter;
     /*     public Transform TrimPitch;
         public Transform TrimYaw; */
-    public GameObject AGMScreen;
+    public GameObject AtGScreen;
     public GameObject LStick_funcon1;
     public GameObject LStick_funcon2;
     public GameObject LStick_funcon4;
@@ -85,7 +85,7 @@ public class HUDController : UdonSharpBehaviour
         Assert(Yaw != null, "Start: Yaw != null");
         /*         Assert(TrimPitch != null, "Start: TrimPitch != null");
                 Assert(TrimYaw != null, "Start: TrimYaw != null"); */
-        Assert(AGMScreen != null, "Start: AGMScreen != null");
+        Assert(AtGScreen != null, "Start: AGMScreen != null");
         Assert(LStick_funcon1 != null, "Start: LStick_funcon1 != null");
         Assert(LStick_funcon2 != null, "Start: LStick_funcon2 != null");
         Assert(LStick_funcon4 != null, "Start: LStick_funcon4 != null");
@@ -329,7 +329,7 @@ public class HUDController : UdonSharpBehaviour
         {
             if (!EngineControl.AtGCamNull)
             {
-                AGMScreen.SetActive(true);
+                AtGScreen.SetActive(true);
                 EngineControl.AtGCam.gameObject.SetActive(true);
                 float newzoom = 0;
                 //if turning camera fast, zoom out
@@ -356,7 +356,7 @@ public class HUDController : UdonSharpBehaviour
             if (!EngineControl.AtGCamNull)
             {
                 EngineControl.AtGCam.gameObject.SetActive(true);
-                AGMScreen.SetActive(true);
+                AtGScreen.SetActive(true);
                 EngineControl.AtGCam.fieldOfView = 60;
                 EngineControl.AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
             }
@@ -376,7 +376,7 @@ public class HUDController : UdonSharpBehaviour
         {
             if (!EngineControl.AtGCamNull)
             {
-                AGMScreen.SetActive(false);
+                AtGScreen.SetActive(false);
                 EngineControl.AtGCam.gameObject.SetActive(false);
             }
         }
