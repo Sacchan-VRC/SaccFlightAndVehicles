@@ -25,7 +25,6 @@ public class EngineController : UdonSharpBehaviour
     public float AAMMaxTargetDistance = 6000;
     public float AAMLockAngle = 15;
     public float AAMLockTime = 1.5f;
-    public float SendRadarLockInterval = 1;
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public GameObject AGM;
@@ -1186,7 +1185,7 @@ public class EngineController : UdonSharpBehaviour
                                     {
                                         //target is a plane
                                         AAMTargetedTimer += Time.deltaTime;
-                                        if (AAMTargetedTimer > SendRadarLockInterval)
+                                        if (AAMTargetedTimer > 1)
                                         {
                                             AAMTargetedTimer = 0;
                                             if (InEditor)

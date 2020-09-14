@@ -5,6 +5,30 @@ https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Major Update 1.3
+•VR Motion Controls for Joystick and Throttle
+•Function Dials with 16 functions for VR control
+•Air-to-air missiles
+•Air-to-ground missiles
+•Bombs
+•Fuel system
+•Ammo/Fuel/resupply system and animations
+•Arresting hook for aircraft carrier landings
+•Arresting cable prefab
+•Catapult launch functionality for carrier takeoffs
+•Catapult prefab
+•Afterburner
+•Air/ground brake
+•Customizable smoke color
+•Flight limits safety mode
+•Cruise mode
+•Altitude hold autopilot
+•Animated canopy with sound changes
+•Customizable wind functionality
+•Takeoff assist options
+•Sound barrier friction options
+•Many new sounds
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Hotfix 1.21
 Fixed plane not exploding in editor test
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -89,12 +113,7 @@ Roll now decays much faster in airplanes
 Added option to disable thrust vectoring
 Implemented (unrealistic) increased lift at higher speeds, you can now fall down faster at low speed
 the two above combined should allow for more boring plane physics
-This package contains the air vehicles and scripts I've been working on. I hope to provide an example of avatar flight and air vehicles people can use as a base to create their own. Feel free to use it however you want.
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-important changes users of the previous version should know about:
-angular drag is now set to 0 on the rigidbody.
-a lot of variable names have changed, or have different effects now, so you'll have to re-calibrate the settings for your vehicles.
 
 Some of the animations use the 'Normalized Time' feature, which makes the animation be controlled by a float parameter (which is controlled by effectscontroller).
 float value 1(or more) = play the last frame of the animation
@@ -112,55 +131,155 @@ I recommend spending as little time as possible with the Inspector in debug mode
 See StationTriggersTutorial.jpg or PhaxeNor's tweet here. Thanks PhaxeNor!
 https://twitter.com/PhaxeNor/status/1262792675767603201
 
-UdonSharp bug warning: If you disable auto-refresh in unity, make sure to refresh before building for VRChat after code changes. If you do not the build will break, and you will need to re-import udonsharp, and place all of your udon's back into your udonbehaviours.
-
 For control inputs to work you must add the VRChat inputs to your unity project. Just filling in the name entry is fine, It needs them to compile. See inputs.png and inputs.txt
 
 Remember you can test fly the vehicles inside unity by adding a camera to them. You can test buttons by clicking Interact in the inspecter with the object selected(PilotSeat etc)
-You can also ofcourse test the animator variables, but some are set every frame so you won't be able to test them without altering or disabling the script.
-To test damage to planes/objects, you must enable the Gun_pilot object, as it's disabled by default (The Interact button on the pilotseat also enables it)
-All planes always react to inputs in the editor play mode.
+You can also ofcourse test the animator variables, but some are set every frame so you won't be able to change them without altering or disabling the script.
+To test the gun damage to planes/objects, you must enable the Gun_pilot object, as it's disabled by default (The Interact button on the pilotseat also enables it)
+All planes will react to inputs in the editor play mode.
 
-It's probably best to break my prefab and remake your own after you've modified the vehicles to your liking and understand how everything works.
-If you've made you own vehicle and it's having trouble taking off, try adjusting the center of mass and pitch moment positions
+It's best to break my prefab in order to make your own planes.
+If you want more than one plane
+If you've made you own vehicle and it's having trouble taking off, try adjusting the center of mass and pitch moment positions, and also the takeoff assist options
 
 HUDController is only enabled when inside the vehicle.
-The leave buttons are children of the HUDController object, just to make the explosion animation simpler. Disabling them in the explosion animation and using write defaults when not exploding means they would need a parent in order to be disabled anyway.
+Objects that are only enabled while inside the plane are children of the HudController.
 
 HUDController's bigstuff object is scaled to 8000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 if you plan on editing HUD elements.
 
-The Gun_pilot is set to not collide with reserved2 layer. The plane is set to reserved2 for the pilot when he enters, so that he can't shoot himself, and reverted back to Walkthrough when he leaves.
+The Gun_pilot is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so you can't shoot himself, and reverted back to Walkthrough when he leaves.
 
-
-There are 20 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
+There are 22 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
 
 SF-1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+AAMController(new in 1.3)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Controls movement of Air-to-air missiles.
+Variables:
+
+Engine Control
+Missile's plane's EngineController, needed to know target.
+
+Explosion Sounds
+Array of sounds one of which will play for the explosion.
+
+Collider Active Distance
+Missile's collider is inactive when it is spawned. After it's this far away from the plane it launched from, it becomes active. This is to prevent it from hitting the plane it launched from. The faster the plane is moving, the higher this number needs to be due to ????Physics.
+
+Rot Speed
+angle per second that the missile can turn while chasing it's target.
+
+
+AGMController(new in 1.3)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Controls movement of Air-to-ground missiles.
+Variables:
+
+Engine Control
+Missile's plane's EngineController, needed to know target.
+
+Explosion Sounds
+Array of sounds one of which will play for the explosion.
+
+Collider Active Distance
+Missile's collider is inactive when it is spawned. After it's this far away from the plane it launched from, it becomes active. This is to prevent it from hitting the plane it launched from. The faster the plane is moving, the higher this number needs to be due to ????Physics.
+
+Lock Angle
+If the missile's target is within this angle, it will follow it.
+
+Rot Speed
+angle per second that the missile can turn while chasing it's target.
+
+
+BombController(new in 1.3)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Controls movement of Bombs.
+Variables:
+
+Engine Control
+Missile's plane's EngineController, needed to know target.
+
+Explosion Sounds
+Array of sounds one of which will play for the explosion.
+
+Collider Active Distance
+Missile's collider is inactive when it is spawned. After it's this far away from the plane it launched from, it becomes active. This is to prevent it from hitting the plane it launched from. The faster the plane is moving, the higher this number needs to be due to ????Physics.
+
+Straighten Factor
+strength of the force making the bomb face towards the direction it's moving.
+
+Air Physics Strength
+Strength of 'air' acting on the bomb's movement
+
+
+EffectsController.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Controls vehicle's control surface movement and vapor effects, also contains synced variables as there's too many for one script.
+If you want an easy way to set up your empties at the the right angles for your plane, try copying and dragging the empties from the SF-1 to yours and adjust them from there.
+Optimizations: The DoEffects variable tracks whether or not a player is inside the vehicle, or if they have left. If they have left more than 10 seconds ago the animations will stop,
+This script also checks if the plane is further away than 2km and if it is, only does vapor effects, because everything else will be so tiny on your screen. If you have a remote camera set up, you probably want to remove this code(line 102).
+Variables:
+
+Vehicle Main Obj
+The script needs access to the Vehicle's main object.
+
+Engine Control
+Engine Controller is needed to know vehicle's control inputs.
+
+Joy Stick
+Joystick mesh object, animates according to rotational inputs.
+
+Ailerons
+Elevators
+Rudders
+Canards
+Engines
+Front Wheel
+Display Smoke
+All of these are transform inputs, most of them are children of an empty that sets orientation, they are animated by rotating on one local axis.
+To adjust rotation axis, rotate the parent empty
+
+Enginefire
+Scaled along once axis according to if Afterburner is on, else it's scale 0, disabled if throttle is 0.
+
+
 EngineController.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 This is the main control script for air vehicles. There are values in here that other scripts use to work, for example the bool Passenger is used in the SoundController script. The owner / pilot does almost everything in this script. 
 Everyone else just uses it to work out if they've just touched down so soundcontroller can play the touchown sound.
 
 Controls Desktop:
-Shift: Thrust Forward
+Shift: Increase Forward
+Ctrl: Decrease Forward
 Q: Yaw Left
 E: Yaw Right
 Arrow Up / W: Pitch Down
 Arrow Down / S: Pitch Up
 Arrow Left / A: Roll Left
 Arrow Right / D: Roll Right
-F: Toggle Flaps
-G: Toggle Landing Gear
+GUN - 1
+AAM - 2
+AGM - 3
+BOMB - 4
+    Weapons: Space to fire
+GEAR - G
+FLAPS - F
+HOOK - H
+SMOKE - 5
+AFTERBURNER - T
+FLT. LIMITS - F1
+FLARE - X
+CATAPULT - C
+BRAKE - B
+ALT. HOLD - F3
+CANOPY - Z
+CRUISE - F2
+Exit - Return
+num7/4 - Smoke R up/down
+num8/5 - Smoke G up/down
+num9/6 - Smoke B up/down
+= - adjust cruise speed
 
 Controls VR:
-Left Stick Left: Yaw Left
-Left Stick Right: Yaw Right
-Right Stick Up: Pitch Down
-Right Stick Down:  Pitch Up
-Right Stick Left: Roll Left
-Right Stick RIght: Roll Right
-Left Trigger: Thrust Up
-Right Trigger: Thrust Forward
+While Gripping Left Grip: Throttle Control
+While Gripping Right Grip: Joystick Control
 A Button: Toggle Flaps
 X Button: Toggle Landing Gear
 
@@ -168,6 +287,9 @@ Variables:
 
 Vehicle Main Obj
 The script needs access to the Vehicle's main object.
+
+Leave Buttons (new in 1.3)
+An array of objects with the LeaveButton script on them, used for exiting each seat of the plane. needed to drop you out of the plane when it explodes
 
 Effects Control
 Effects controller goes in here, used to access variables in effects controller
@@ -178,9 +300,6 @@ Sound controller goes in here, used to access variables in sound controller
 Hud Control
 Hud controller goes in here, used to access variables in hud controller
 
-Ground Detector
-Empty object who's location is used to detect whether or not the vehicle is touching the ground. If gear is down the code traces from it's position, local down 44cm, and if it hits something it enables taxxiing. Including the vehicle itself, so place it between the wheels or something.
-
 Center of Mass (new in 1.1)
 The aircraft's center of mass. Useful to adjust how long it takes to take off.
 
@@ -190,8 +309,102 @@ The point at which force is added to make the vehicle pitch. If not set, script 
 Yaw Moment (new in 1.2)
 The point at which force is added to make the vehicle yaw. If not set, script will fail.
 
-Throttle Strength Forward
+Ground Detector
+Empty object who's location is used to detect whether or not the vehicle is touching the ground. If gear is down the code raycasts from it's position, local down 44cm, and if it hits something it enables taxxiing.
+The resupply check raycast is also checked from this transform.
+
+Hook Detector (new in 1.3)
+Position where the raycast to detect if you've caught a cable with the hook starts.
+
+Resupply Layer (new in 1.3)
+Layer on which raycast looks for triggers to detect if you're in a resupply zone.
+
+Hook Cable Layer (new in 1.3)
+Layer on which raycast looks for triggers to detect if you've caught a cable with your hook.
+
+Catapult Detector (new in 1.3)
+Position where the raycast to detect if you're on a catapult starts (usually at the front wheel).
+
+Catapult Layer (new in 1.3)
+Layer on which the raycast looks for triggers to detect if you're on a catapult.
+
+AAM (new in 1.3)
+Air to air missile object, one of these is spawned when you fire an AAM.
+
+Num AAM (new in 1.3)
+The number of AAMs on the plane.
+
+AAM Max Target Distance (new in 1.3)
+Distance that if a target is within which it is targetable.
+
+AAM Lock Angle (new in 1.3)
+If the missile's target is within this angle, it will follow it.
+
+AAM Lock Time (new in 1.3)
+Time before you can fire an air-to-air missile after acquiring a target.
+
+AAM Launch Point (new in 1.3)
+Point at which air-to-air missiles spawn, alternates left-right each time fired.
+
+AAM Targets Layer (new in 1.3)
+Layer on which AAM target objects are, script searches for triggers on this layer as targets.
+
+AGM (new in 1.3)
+Air to ground missile object, one of these is spawned when you fire an AGM.
+
+Num AGM (new in 1.3)
+The number of AGMs on the plane.
+
+AGM Launch Point (new in 1.3)
+Point at which air-to-ground missiles spawn, alternates left-right each time fired.
+
+AGM Targets Layer (new in 1.3)
+Layer on which AGM target objects are, script searches for triggers on this layer as targets.
+
+At G Cam (new in 1.3)
+Camera object used to view targets with the AGM and Bomb
+
+Bomb (new in 1.3)
+Bomb object, one of these is spawned when you drop a bomb.
+
+Num Bomb (new in 1.3)
+The number of Bombs on the plane.
+
+Bomb Hold Delay (new in 1.3)
+How long between bomb drops if you hold the button.
+
+Bomb Launch Points (new in 1.3)
+Points at which bombs spawn, they spawn at each point in succession.
+
+Gun Ammo In Seconds (new in 1.3)
+How long the gun can be fired before it runs out of ammo.
+
+Has Afterburner
+Has Limits
+Has Catapult
+Has Hook
+Has Flare
+Has Catapult
+Has Brake
+Has Alt Hold
+Has Canopy
+Has Cruise
+Has Gun
+Has AAM
+Has AGM
+Has Bomb
+Has Gear
+Has Flaps
+Has Hook
+Has Smoke
+(new in 1.3)
+These options effectively disable each function of the plane, making them unselectable. Recomend disabling menu objects from the display screens correspondingly.
+
+Throttle Strength
 Value put into the Constant Force's value corresponding to forward.
+
+Afterburner Thrust Multi (new in 1.3)
+Thrust is multiplied by this amount when afterburner is enabled.
 
 Acceleration Response
 How long it takes for the throttle to reach max after you press and hold it (it's lerped).
@@ -205,7 +418,7 @@ Amount per frame the vehicle's velocity is lerped towards MaxSpeed.
 Pitch Strength
 Yaw Strength
 Roll Strength
-Strength of the rotation on the respective axis
+Strength of rotation on the respective axis.
 
 Pitch Thrust Vec Str (new in 1.2)
 Yaw Thrust Vec Str
@@ -235,10 +448,6 @@ Allows you to generate less lift from pulling down. (air hitting the top of your
 
 Rot Multi Max Speed (new in 1.2)
 Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear.
-
-Stick Input Power (new in 1.2)
-Applies a response curve to the rotational inputs. 1 = linear, >1 = flatter then vertical, <1 = more vertical, then gets flatter
-see this to understand and help tweak: https://www.wolframalpha.com/input/?i=x%5E1.7
 
 Vel Straighten Str Pitch
 How much the the vehicle's nose is pulled toward the direction of movement on the pitch axis.
@@ -270,31 +479,67 @@ Taxi Rotation Response
 How smoothed the taxi movement rotation is
 
 Lift
-Adjust how long the lift curve is. Higher = more lift
+Adjust how steep the lift curve is. Higher = more lift
 
 Sideways Lift
-How much angle of attack on yaw affects vehicles velocity vector. Yaw steering strength?
+How much angle of attack on yaw turns vehicles velocity vector. Yaw steering strength?
 
-Max Vel Lift (new in 1.2)
+Max Lift (new in 1.2)
 Maximum value for lift, as it's exponential it's wise to stop it at some point.
 
-Airplane Vel Pull up
-Vehicle will pull up slightly depending on it's speed multiplied by this value. Used to counter the fact that without it, your nose will slowly point down.
+Vel Lift
+Push the vehicle up based on speed. Used to counter the fact that without it, your nose will slowly point down.
 
-Has Flaps (new in 1.1)
-Whether or not the vehicle has flaps and does physics/animations for them.
+Max Gs
+amount of Gs at which you will take damage if you go past. You take damage of 15 per second per G above MaxGs. This is what hurts you when you crash too.
 
-Has Landing Gear (new in 1.1)
-Whether or not the vehicle has landing gear and does physics/animations for them.
-
-Flap Drag Multi (new in 1.1)
-How much extra drag you incur from having flaps deployed.
+GDamage
+Damage taken Per G above maxGs, per second.
+Gs - MaxGs * GDamage = damage/second
 
 Landing Gear Drag Multi (new in 1.1)
 How much extra drag you incur from having landing gear deployed.
 
+Flaps Drag Multi (new in 1.1)
+How much extra drag you incur from having flaps deployed.
+
 Flaps Lift Multi (new in 1.1)
 How much extra lift the flaps give you.
+
+Airbrake Strength (new in 1.3)
+Strength of the airbrake.
+
+Ground Brake Strength (new in 1.3)
+Strength of the breaking in meters per second when on the ground and below the Ground Brake Speed.
+
+Ground Brake Speed (new in 1.3)
+Speed below which the the ground brake takes effect.
+
+Hooked Brake Strength (new in 1.3)
+Strength of the breaking in meters per second when the hook catches an arresting cable.
+
+Catapult Launch Strength (new in 1.3)
+Strength of the force that pushes you forward when launching from the catapult. Same units as Thrust Strength.
+
+Catapult Launch Time (new in 1.3)
+How long the plane takes to launch (reach the end of the catapult).
+
+Catapult Launch Strength and Time must be adjusted together so that the plane finishes launching as it reaches the end of the catapult.
+
+Takeoff Assist (new in 1.3)
+Maximum extra pitch strength given to the plane when it's on the ground, and moving. Strength increases until it reaches Takeoff Assist Speed.
+
+Takeoff Assist Speed (new in 1.3)
+Speed at which Takeoff assist reaches maximum strength
+
+G Limiter (new in 1.3)
+Controls the Flight Limits function. It tries to keep the plane below this number of Gs by reducing input strength linearly as your Gs increase, until this number. Usually needs to be set it a bit above the value you want to limit to.
+
+Ao A Limit (new in 1.3)
+(Angle of Attack Limit) Controls the Flight Limits function. It tries to keep the plane below this angle of attack reducing input strength linearly as your angle of attacked increases, until this number.
+
+Canopy Close Time (new in 1.3)
+Time it takes for the canopy animation to play. Used to switch the sound effects from outside to inside at the right moment.
 
 Health
 Max health of the plane.
@@ -302,57 +547,38 @@ Max health of the plane.
 Sea Level
 Height of the sea in global coordinates, the hud's height is based with this at 0. Plane will instantly explode if below this height.
 
+Wind (new in 1.3)
+Strength of wind on each axis
+
+Wind Gust Strength (new in 1.3)
+Strength of wind gusts, which are added to wind direction, and change direction according to Wind Gustiness.
+
+Wind Gustiness (new in 1.3)
+How often wind gusts change direction.
+
+Wind Turbulance Scale (new in 1.3)
+Scale of the wind gusts, direction of gusts is different according to where you are.
+
+Sound Barrier Strength (new in 1.3)
+Extra drag applied when moving around the speed of sound.
+
+Sound Barrier Width (new in 1.3)
+As you approach the speed of sound, more friction is applied according to 'Sound Barrier Strength'. It increases linearly from 'Sound Barrier Width' distance away from the speed of sound. Also decreases linearly after the speed of sound. (Meters per second)
+
 Atmosphere Thinning Start
 Height(above Sea Level) at which the 'atmosphere' starts getting thinner. Plane starts losing maneuverability and thrust at this height.
 
 Atmosphere Thinning End
 Height at which the 'atmosphere' finishes getting thinner. Plane cannot maneuver or thrust at all beyond this height
 
+Fuel (new in 1.3)
+Amount of fuel the plane has.
 
-EffectsController.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Controls vehicle's control surface movement, vapor effects, and explosions.
-If you want an easy way to set up your empties at the the right angles for your plane, try copying and dragging the empties from the SF-1 to yours and adjust them from there.
-Optimizations: The DoEffects variable tracks whether or not a player is inside the vehicle, or if they have left. If they have left more than 10 seconds ago the animations will stop,
-This script also checks if the plane is further away than 2km and if it is, only does vapor effects, because everything else will be so tiny on your screen. If you have a remote camera set up, you probably want to remove this code.
-Variables:
+Fuel Consumption (new in 1.3)
+Amount of fueld consumed per second by the plane.
 
-Vehicle Main Obj
-The script needs access to the Vehicle's main object.
-
-Engine Control
-Engine Controller is needed to know vehicle's control inputs.
-
-Pilot Seat Station
-Needs the pilot's station to eject the player when exploded.
-
-Passenger Seat Station
-Needs the passenger's station to eject the player when exploded.
-
-Aileron L
-Aileron R
-Canards
-Elevator
-Engine L
-Engine R
-Rudder L
-Rudder R
-All of these are gameobject inputs that contain empties that contain meshes, they are animated based on the SF-1 plane. You will probably have to change the script if you make your own vehicle.
-Most of them are children of an empty that sets orientation, they then animate by rotating on just one local axis.
-
-Slats L
-Slats R
-These rotate to point forward as speed increases.
-
-Enginefire L
-Enginefire R
-Scaled larger on Z with throttle, disappear if too small.
-
-Max Gs
-amount of Gs at which you will take damage if you go past. You take damage of 15 per second per G above MaxGs. This is what hurts you when you crash too.
-
-GDamage
-Damage taken Per G above maxGs, per second.
-Gs - MaxGs = damage/second
+Fuel Consumption AB Multi (new in 1.3)
+Multiplier for how much fuel is consumed when the afterburner is enabled.
 
 
 HitDetector.cs (new in 1.11)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -364,25 +590,33 @@ Variables:
 EngineControl
 Needs this because the Health value is containted in EngineController.
 
-SoundControl
-Needs this to play the sound.
-
 
 HUDController.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Calculates information about the vehicle and sends an output to a Text script.
+Calculates information about the vehicle and applies output to the HUD. Also controls the displays inside the cockpit.
 
 EngineControl
 Required to know information about the vehicle. EngineController goes here.
 
+Smoke Color Indicator
+Material that is used by the display to highlight when smoke is on. It shows the smoke color.
+
 HUD Text_G
 HUD Text_mach
 HUD Text_altitude
+HUD Text_knotstargets
 HUD Text_knots
 HUD Text_angleofattack
+HUD Text_AAM_ammo
+HUD Text_AGM_ammo
+HUD Text_Bomb_ammo
 Output Text scripts, corresponding canvas text objects go here.
 
-Distance from Head
-HUD's distance from the head when scale 1, used to move the velocity vector to the right position
+Hud Crosshair Gun
+Hud Crosshair 
+Hud Hold
+Hud Limit
+Hud AB
+Hud elements that are enabled/disabled by the scrip
 
 Down Indicator
 Hud object that points to the ground
@@ -396,11 +630,32 @@ Hud object that shows yaw angle
 Velocity Indicator
 Hud object that shows what direction vehicle moving
 
+AAM Target Indicator
+Hud object that appears over targets AAMs can shoot at
+
+Pitch Roll
+Hud object that display inputs for pitch and roll
+
+Yaw
+Hud object that display inputs for yaw
+
+L Stick Display Highlighter
+R Stick Display Highlighter
+
+At G Screen
+The screen object that displays assists targeting for AGMs and bombs
+
+L Stick_funcon1-8
+R Stick_funcon3-8
+Function highlight objects that are enabled when the function is on.
+
+
+
 LeaveVehicleButton.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Used to leave pilot seat of vehicles.
 
 Controls Desktop:
-R: Leave vehicle
+Return: Leave vehicle
 
 Controls VR:
 Left Menu Button: Leave Vehicle
@@ -415,62 +670,48 @@ Station we're getting out of.
 
 
 PassengerSeat.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Used to enter as a passenger of vehicles, and to set things back after you leave. Also contains the smoke function control for the passenger.
-Controls Desktop:
-S: Produce Smoke
-
-Controls VR:
-Click Left Thumbstick: Produce Smoke
-
+Used to enter as a passenger of vehicles, and to set things back after you leave.
 Variables:
 
 Engine Control
 Used to tell the vehicle you're a passenger.
 
-Passenger Leave Button
+Leave Button
 Used to enable and disable the leave button. Passenger Leave Button goes here.
 
-Seat Adjuster
-Object containing the Seat Adjuster script. Enabled when enterering, and disabled when leaving(if not already disabled by itself)
-
-Saccflight
-Used to disable and enable Saccflight. Saccflight goes in here.
-
-
-PilotSeat.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Used to enter as pilot of vehicles.
-Variables:
-
-Vehicle Main Obj
-Needed to set player as the owner of the vehicle's main object.
-
-Engine Control
-Player must be the owner of this to operate the vehicle. also sets 'piloting'
-
-Leave Button
-Enable the leave button. PilotLeaveButton goes in here.
-
-Saccflight
-Disables Saccflight when inside. Saccflight goes in here.
-
-Gun_Pilot
-Used to enable the invisible gun that only the pilot fires, (the one that actually does damage)
-
-PlaneMesh
+Plane Mesh
 Put the parent object of the plane's mesh objects here. Sets it and all it's children to 'Playerlocal' layer when you enter, and back to 'Walkthrough' when you leave. This is so that the Gun_Pilot doesn't hit your own plane.
 Do not put any colliders as child of any other object, or the gun might hit them.
 
 Seat Adjuster
 Object containing the Seat Adjuster script. Enabled when enterering, and disabled when leaving(if not already disabled by itself)
 
-Enable Other
-Put any other object you want to be enabled locally whilst you are in the plane here.
+
+PilotSeat.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Used to enter as pilot of vehicles.
+Variables:
+
+Engine Control
+Player must be the owner of this to operate the vehicle. also sets 'piloting'
+
+Leave Button
+Enable the leave button when you get in.
+
+Gun_Pilot
+Used to enable the invisible gun that only the pilot fires, (the one that actually does damage)
+
+Plane Mesh
+Put the parent object of the plane's mesh objects here. Sets it and all it's children to 'Playerlocal' layer when you enter, and back to 'Walkthrough' when you leave. This is so that the Gun_Pilot doesn't hit your own plane.
+Do not put any colliders as child of any other object, or the gun might hit them.
+
+Seat Adjuster
+Object containing the Seat Adjuster script. Enabled when enterering, and disabled when leaving(if not already disabled by itself)
 
 
 SoundController.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Controls sound. By default in unity editor it will test the inside cockpit piloting sounds. Change various "playerlocal == null" to "playerlocal != null" inside if statements to test others.
+Controls sound. By default in unity editor it will test the inside cockpit piloting sounds. To test outside sounds, comment out '&& !EngineControl.Piloting' on line 239 and change -100000 to 100000 on line 277
 See the comments in the script for more details
-Optimizations:The script will do nothing if the vehicle is beyond the range of the the Sonic Boom's max distance (This is assumed to be the loudest/longest range sound).
+Optimizations:The script will do nothing if the vehicle is beyond the range of the the sound (see MaxAudibleDistance in code).
 
 Variables:
 
@@ -486,8 +727,12 @@ Same as Plane Idle but only people inside the plane can hear it.
 Plane Distant
 Engine sound of the plane when it is far away.
 
-Play Afterburner
+Thrust
 Engine sound of the plane when it is close.
+
+AB On Inside
+
+AB On Outside
 
 Touch Down
 Plane touchdown sound. Plays when the wheels touch the ground.
@@ -499,28 +744,99 @@ Sonic Boom
 Sound played when the plane flies past you at over mach 1.
 
 Explosion
-Boom sound
+Boom sound.
+
+Gun Sound
+Plays when firing the gun.
 
 Bullet Hit
 Plays when the plane gets hit by a particle.
 
-Gun Sound
-Plays when firing the gun
+Rolling
+Sound made by the wheels on rolling on the runway.
+
+Reloading
+Sound played every second when reloading/refueling.
+
+Radar Locked
+Sound played when enemy plane is targeting you with AAM.
+
+Missile Incoming
+Sound played when a missile is tracking you.
+
+AAM Targeting
+Sound played when you're targeting something with AAM.
+
+AAM Target Lock
+Sound played when target is locked with AAM.
+
+AGM Lock
+Sound played when you lock a target with AGM.
+
+AGM Unlock
+Sound played when you unlock AGM target.
+
+Airbrake
+Sound made by the airbrake.
+
+Catapult Lock
+Sound made when the plane is locked into place on a catapult.
+
+Catapult Launch
+Sound made when the plane is launched on a catapult.
+
+Menu Select
+Sound made every time menu selection is changed.
 
 Testcamera
 Used only to test inside unity editor. Calculates doppler from this transform. Doesn't do anything in-game.
 
 
 VehicleRespawnButton.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Used to respawn vehicles on button press. Only respawns the vehicle if EngineController.Occupied = false. Sets flaps on and gear down.
+Used to respawn vehicles on button press. Only respawns the vehicle if EngineController.Occupied = false.
 If your vehicle fails to respawn in-game make sure the 'Synchronize Position' tickbox is checked on the vehicle's main object's udonbehaviour.
 Variables:
 
-Vehicle Main Obj
-The script needs access to the vehicle's main object in order to move it. Vehicle's main object goes in here.
-
 Engine Control
 Needed to tell the plane to set certain settings when respawning.
+
+
+WindChanger.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Used to create an object that can change the wind of planes in-game.
+
+Controls:
+Use while holding object to apply wind.
+
+Wind Strength Slider
+Slider object used to set the strength of the wind.
+
+Wind Str_text
+Text object that displays current value of Wind Strength Slider.
+
+Wind Gust Strength Slider
+Slider object used to set the strength of wind gusts.
+
+Wind Gust Strength_text
+Text object that displays current value of Wind Gust Strength Slider.
+
+Wind Gustiness Slider
+Slider object used to set the value of Wind Gustiness.
+
+Wind Gustiness_text
+Text object that displays current value of Wind Gustiness Slider.
+
+Wind Turbulance Scale Slider
+Slider object used to set the value of Turbulance Scale.
+
+Wind Turbulance Scale_text
+Text object that displays current value of Turbulance Scale Slider.
+
+Wind Apply Sound
+AudioSource object containing the sound played when wind is applied.
+
+Vehicle Engines
+EngineController objects the wind will effect.
+
 
 AAGun
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -582,9 +898,6 @@ AA Gun Controller is needed to set manning = true, and loads of other stuff
 HUD Controller
 Needed to activate the HUD and other stuff inside the vehicle when you enter
 
-Saccflight
-Disabled SaccFlight when player enters and re-enable when player leave
-
 Seat Adjuster
 Needed to enable the seat adjuster when you enter
 
@@ -599,10 +912,10 @@ Audio source for being hit by a bullet
 
 
 HUDControllerAAGun.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Calculates information about the vehicle and sends an output to a Text script.
+Calculates information about the AAGun and sends output to the HUD.
 
 AA Gun Control
-Required to know information about the vehicle. AAGunController goes here.
+Required to know information about the AAGun. AAGunController goes here.
 
 Elevation Indicator
 Hud object that shows pitch angle
@@ -615,7 +928,7 @@ LeaveAAGun.cs-------------------------------------------------------------------
 Used on the button to leave the AAGun
 
 Controls Desktop:
-R: Exit AAGun
+Return: Exit AAGun
 
 Controls VR:
 Left menu button: Exit AAGun
@@ -656,34 +969,11 @@ Variables:
 Leave Button
 Enable the leave button. GunnerLeaveButton goes in here.
 
-Saccflight
-Disables Saccflight when you enter, reenables when you exit. Saccflight goes in here.
-
 Gun Object
 Sets the person who enters as the owner of the gun. Gun goes in here.
 
 Gun Controller
 Script makes you the owner of the guncontroller and controls the value 'manning'.
-
-
-GunshipGunController.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Takes head orientation, trigger/mouse0 input and controls the gun's orientation and particle system's emission. Gunship was removed but the code might be useful.
-Controls Desktop:
-Left Click: Fire Gun
-
-Controls VR:
-Right Trigger: Fire Gun
-
-Variables:
-
-EngineController
-Needed to use the VRCPlayerAPI contained within.
-
-Gun
-Used to control orientation of gun model. Gun goes in here.
-
-Gun Particle
-Script emits particles from this particle system. muzzleflash goes in here.
 
 
 SaccFlight.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

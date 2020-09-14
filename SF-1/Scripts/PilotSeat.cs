@@ -26,8 +26,11 @@ public class PilotSeat : UdonSharpBehaviour
         if (EngineControl != null)
         {
             EngineControl.VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
-            EngineControl.localPlayer.UseAttachedStation();
-            Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
+            if (!EngineControl.InEditor)
+            {
+                EngineControl.localPlayer.UseAttachedStation();
+                Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
+            }
             EngineControl.Piloting = true;
             //canopy closed/open sound
             if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;//has to be less than -100000
@@ -36,19 +39,22 @@ public class PilotSeat : UdonSharpBehaviour
         }
         if (EngineControl.EffectsControl != null)
         {
-            Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
+            if (!EngineControl.InEditor)
+                Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.IsFiringGun = false;
             EngineControl.EffectsControl.Smoking = false;
             EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
         }
         if (EngineControl.HUDControl != null)
         {
-            Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject);
+            if (!EngineControl.InEditor)
+                Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject);
             EngineControl.HUDControl.gameObject.SetActive(true);
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        if (EngineControl.EffectsControl != null || EngineControl.SoundControl != null) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "WakeUp"); }
+        if (!EngineControl.InEditor)
+            if (EngineControl.EffectsControl != null || EngineControl.SoundControl != null) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "WakeUp"); }
         if (PlaneMesh != null)
         {
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();

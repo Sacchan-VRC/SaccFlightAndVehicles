@@ -6,21 +6,19 @@ using VRC.Udon;
 
 public class VehicleRespawnButton : UdonSharpBehaviour
 {
-    public GameObject VehicleMainObj;
     public EngineController EngineControl;
     private void Start()
     {
-        Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
         Assert(EngineControl != null, "Start: EngineControl != null");
     }
     private void Interact()
     {
         if (!EngineControl.Occupied && !EngineControl.dead)
         {
-            Networking.SetOwner(EngineControl.localPlayer, VehicleMainObj);
+            Networking.SetOwner(EngineControl.localPlayer, EngineControl.VehicleMainObj);
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
-            VehicleMainObj.transform.position = new Vector3(VehicleMainObj.transform.position.x, -10000, VehicleMainObj.transform.position.z);
+            EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
             EngineControl.EffectsControl.GearUp = false;
             EngineControl.EffectsControl.Flaps = true;
             EngineControl.EffectsControl.HookDown = false;
