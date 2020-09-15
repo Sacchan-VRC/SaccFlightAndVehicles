@@ -37,23 +37,23 @@ public class EngineController : UdonSharpBehaviour
     public float BombHoldDelay = 0.5f;
     public Transform[] BombLaunchPoints;
     [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
-    public bool HasCruise = true;
+    public bool HasAfterburner = true;
     public bool HasLimits = true;
+    public bool HasFlare = true;
     public bool HasCatapult = true;
-    public bool HasHook = true;
     public bool HasBrake = true;
     public bool HasAltHold = true;
     /*     public bool HasTRIM = true; */
     public bool HasCanopy = true;
-    public bool HasAfterBurner = true;
+    public bool HasCruise = true;
     public bool HasGun = true;
     public bool HasAAM = true;
     public bool HasAGM = true;
     public bool HasBomb = true;
     public bool HasGear = true;
     public bool HasFlaps = true;
+    public bool HasHook = true;
     public bool HasSmoke = true;
-    public bool HasFlare = true;
     public float ThrottleStrength = 20f;
     public float AfterburnerThrustMulti = 1.5f;
     public float AccelerationResponse = 4.5f;
@@ -107,7 +107,7 @@ public class EngineController : UdonSharpBehaviour
     public float TakeoffAssist = 5f;
     public float TakeoffAssistSpeed = 50f;
     public float GLimiter = 12f;
-    public float AoALimit = 15f;
+    public float AoALimiter = 15f;
     public float CanopyCloseTime = 1.8f;
     [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
     public float SeaLevel = -10f;
@@ -122,11 +122,11 @@ public class EngineController : UdonSharpBehaviour
     //best to remove synced variables if you aren't using them
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float BrakeInput;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Throttle = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 CurrentVel = new Vector3(0, 0, 0);
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 CurrentVel = Vector3.zero;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Gs = 1f;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 SmokeColor = new Vector3(1, 1, 1);
+    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 SmokeColor = Vector3.one;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
     [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
@@ -602,7 +602,7 @@ public class EngineController : UdonSharpBehaviour
                     }
                 }
 
-                if (Input.GetKeyDown(KeyCode.T) && HasAfterBurner)
+                if (Input.GetKeyDown(KeyCode.T) && HasAfterburner)
                 {
                     EffectsControl.AfterburnerOn = !EffectsControl.AfterburnerOn;
                     if (EffectsControl.AfterburnerOn)
@@ -750,12 +750,12 @@ public class EngineController : UdonSharpBehaviour
                     }
                     else if (stickdir > 0)//upleft
                     {
-                        if (HasAfterBurner)
+                        if (HasCruise)
                             LStickSelection = 8;
                     }
                     else if (stickdir > -45)//up
                     {
-                        if (HasCruise)
+                        if (HasAfterburner)
                             LStickSelection = 1;
                     }
                     else if (stickdir > -90)//upright
@@ -1611,12 +1611,12 @@ public class EngineController : UdonSharpBehaviour
                             NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
                             NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
 
-                            Debug.Log(string.Concat("fuel", Fuel));
-                            Debug.Log(string.Concat("FullFuel", FullFuel));
-                            Debug.Log(string.Concat("Health", Health));
-                            Debug.Log(string.Concat("FullHealth", FullHealth));
-                            Debug.Log(string.Concat("GunAmmoInSeconds", GunAmmoInSeconds));
-                            Debug.Log(string.Concat("FullGunAmmo", FullGunAmmo));
+                            /*                             Debug.Log(string.Concat("fuel ", Fuel));
+                                                        Debug.Log(string.Concat("FullFuel ", FullFuel));
+                                                        Debug.Log(string.Concat("Health ", Health));
+                                                        Debug.Log(string.Concat("FullHealth ", FullHealth));
+                                                        Debug.Log(string.Concat("GunAmmoInSeconds ", GunAmmoInSeconds));
+                                                        Debug.Log(string.Concat("FullGunAmmo ", FullGunAmmo)); */
                             Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
                             GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
                             Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
@@ -1744,7 +1744,7 @@ public class EngineController : UdonSharpBehaviour
 
                     //flight limit internally enabled when alt hold is enabled
                     float GLimitStrength = Mathf.Clamp(-(Gs / GLimiter) + 1, 0, 1);
-                    float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimit) + 1, 0, 1);
+                    float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimiter) + 1, 0, 1);
                     float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
                     PitchInput *= Limits;
                 }
@@ -1770,10 +1770,10 @@ public class EngineController : UdonSharpBehaviour
                         }
                     }
                     //'-input' are used by effectscontroller, and multiplied by 'strength' for final values
-                    if (FlightLimitsEnabled && !Taxiing && AngleOfAttack < AoALimit)//flight limits are enabled
+                    if (FlightLimitsEnabled && !Taxiing && AngleOfAttack < AoALimiter)//flight limits are enabled
                     {
                         float GLimitStrength = Mathf.Clamp(-(Gs / GLimiter) + 1, 0, 1);
-                        float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimit) + 1, 0, 1);
+                        float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimiter) + 1, 0, 1);
                         float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
                         PitchInput = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRollInput.y + Wf + Sf + downf + upf, -1, 1) * Limits;
                         YawInput = Mathf.Clamp(Qf + Ef + JoystickPosYaw.x, -1, 1) * Limits;
@@ -2137,7 +2137,7 @@ public class EngineController : UdonSharpBehaviour
             }
         }
     }
-    public void SetLaunchOpositeSideFalse()//for resupplying
+    public void SetLaunchOpositeSideFalse()//when resupplying
     {
         AAMLaunchOpositeSide = false;
         AGMLaunchOpositeSide = false;
