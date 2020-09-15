@@ -270,7 +270,8 @@ public class SoundController : UdonSharpBehaviour
 
         if (!TouchDownNull)
         {
-            if (Landed == false && EngineControl.Taxiing == true) { TouchDown[Random.Range(0, TouchDown.Length)].Play(); }
+            //play a touchdown sound the frame we start taxiing
+            if (Landed == false && EngineControl.Taxiing == true && EngineControl.AirSpeed > 35) { TouchDown[Random.Range(0, TouchDown.Length)].Play(); }
             if (EngineControl.Taxiing == true) { Landed = true; } else { Landed = false; }
         }
         //EngineControl.Piloting = true in editor play

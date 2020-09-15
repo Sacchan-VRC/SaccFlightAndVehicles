@@ -115,6 +115,10 @@ Implemented (unrealistic) increased lift at higher speeds, you can now fall down
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+On first run there may be a compile problem that causes the plane to not function, try running it a second time before checking anything else.
+
+If the VRChat world upload screen becomes unresponsive, it means you've messed up your Inputs page on your project settings.
+
 Some of the animations use the 'Normalized Time' feature, which makes the animation be controlled by a float parameter (which is controlled by effectscontroller).
 float value 1(or more) = play the last frame of the animation
 float value 0(or less) = play the first frame of the animation
@@ -131,23 +135,111 @@ I recommend spending as little time as possible with the Inspector in debug mode
 See StationTriggersTutorial.jpg or PhaxeNor's tweet here. Thanks PhaxeNor!
 https://twitter.com/PhaxeNor/status/1262792675767603201
 
-For control inputs to work you must add the VRChat inputs to your unity project. Just filling in the name entry is fine, It needs them to compile. See inputs.png and inputs.txt
+For control inputs to work in editor play mode you must add the VRChat inputs to your unity project. Just filling in the name entry is fine, It needs them to compile. See inputs.png and inputs.txt
 
-Remember you can test fly the vehicles inside unity by adding a camera to them. You can test buttons by clicking Interact in the inspecter with the object selected(PilotSeat etc)
-You can also ofcourse test the animator variables, but some are set every frame so you won't be able to change them without altering or disabling the script.
-To test the gun damage to planes/objects, you must enable the Gun_pilot object, as it's disabled by default (The Interact button on the pilotseat also enables it)
+Remember you can test fly the vehicles inside unity by adding a camera to them. Recommend adding camera as child of HudController. Set camera view distance beyond 15,000m~ to see the HUD.
+You can test buttons by clicking Interact in the inspecter with the object selected(PilotSeat etc), some may crash in the editor but not ingame.
+You can also test the animator variables, but some are set every frame so you won't be able to change them without altering or disabling the script.
+To test the gun damage to planes/objects in editor, you must enable the Gun_pilot object, as it's disabled by default (The Interact button on the pilotseat also enables it)
 All planes will react to inputs in the editor play mode.
+SaccFlight will always crash when testing in editor, this doesnt matter.
 
 It's best to break my prefab in order to make your own planes.
-If you want more than one plane
 If you've made you own vehicle and it's having trouble taking off, try adjusting the center of mass and pitch moment positions, and also the takeoff assist options
 
-HUDController is only enabled when inside the vehicle.
-Objects that are only enabled while inside the plane are children of the HudController.
+To see the HUD in-game you must set up a reference camera with a view distance greater than around 15,000 on the VRCworld.
 
-HUDController's bigstuff object is scaled to 8000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 if you plan on editing HUD elements.
+Tips for modifying basic flight characteristics of aircraft:
+The Strength and Friction values for pitch, yaw, and roll are important, and both play off each other. You may need to set them to very high values, especially if you make a large plane.
+Rot Multi Max Speed will need to be adjusted for planes with different speeds. It's the speed at which (in meters per second) the plane reaches maximum responsiveness.
+Vel Straighten Str Pitch/Yaw are Very important to the handling of the plane. They push the nose toward the velocity direction. (they also interact with pitch and yaw strength)
+Lift and Max Lift are also very important, and a bit tricky to tweak. If max lift is too high you can end up with a plane that can fly in circles extremely quickly.
+If you make a heavier plane with a great rigidbody mass value, you will have to tweak the values a lot.
+Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue. (it's 0 when you're owner of the plane, 0.3 when your not)
+
+When making a custom plane, you must also customize a number of the animations, I recommend duplicating the SF-1's animation controller, and replacing the animations that need replacing.
+Likely to need replacing animations:
+AAMs
+AGMs
+AoA (for stall angle)
+Bombs
+Brake
+CanopyOpen
+DropFlares
+Explode
+FlapsOn
+Mach
+GearUp
+TailHook
+TailHookHooked
+ThrottleSlider
 
 The Gun_pilot is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so you can't shoot himself, and reverted back to Walkthrough when he leaves.
+
+Hierarchy:
+PlaneBody--------
+Everything in here is visual, except that it also contains colliders, and wheel colliders. Wheel colliders are a bit dodgy, I don't recommend messing with their settings.
+EngineController--------
+Children of this are transforms used by the enginecontroller, and projectile objects for cloning and launching.
+EffectsController--------
+The children of this are mostly particle systems, visual effects used by EffectsController and the animator.
+SoundController--------
+The children are all the sounds the plane uses. The AttachedSounds empty contains all sounds that are disabled when the plane explodes.
+HudController--------
+The children of this are all things that are disabled when you're not inside the plane. Many different objects are in here including the HUD, visual joystick, leave buttons, MFDs(Multi-Function-Display), the AtG Camera and screen.
+To test the plane in editor mode, add a camera to this object with no change to position or rotation, and increase the view distance of that camera beyond 15,000m~ to see the HUD.
+HUDController is only enabled when inside the vehicle.
+many objects that are only enabled while inside the plane are children of the HudController.
+HUDController's bigstuff child object is scaled to 8000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
+PilotSeat--------
+A custom station with the seat adjuster for entering the plane
+PassengerSeat--------
+A custom station with the seat adjuster for entering the passenger seat of the plane
+AAMs--------
+AGMs--------
+Bombs--------
+These 3 objects just contain meshes to visually represent how many missiles etc you have left. Controlled by the animator.
+
+Custom Layers:
+Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
+As layers can't be imported in a unitypackage you must set them up yourself.
+You must set the trigger objects to their respective layers. Create new layers, and set them in EngineController. By default the layers are as follows, I recommend you set up yours the same:
+23:Hook Cable
+24:Catapult
+25:AAMTargets
+26:AGMTargets
+27:Resupply
+The trigger objects that you made need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of EngineController.
+Note that the AAMTarget object on a plane MUST be the first child of the EngineController object, or the code to play the radar lock warning tone will fail.
+
+Main Prefab:
+SaccFlightAndVehicles
+The main prefab containing the SF-1 plane, the AAGun the WindChanger, SaccFlight, and an instructions board.
+
+This package also contains a few prefabs that can be used with the plane. Explanations follow.
+
+AAMDummyTarget
+Target object that can be placed on anything that you want air-to-air missiles to be able to lock on to. MUST be enabled by default or planes will not detect it during initial target enumeration in Start().
+
+AGMLockTarget
+object that if detected when attempting to target close to it with the AGM targeting system, will cause the targeted spot to snap to this location.
+
+Arresting Cable
+A prefab containing a cable mesh and a trigger designed to be placed on short runways or aircraft carriers to enable short landings.
+The trigger must be on the correct layer, which you have to set up manually, and select in the EngineController.
+
+Catapult
+A prefab containing a catapult mesh and a trigger to enable the plane to launch quickly with no runway
+The trigger must be on the correct layer, which you have to set up manually, and select in the EngineController.
+
+ResupplyZone
+A prefab containing a square outline mesh with a trigger beneath it, used to reload repair and refuel planes.
+The trigger must be on the correct layer, which you have to set up manually, and select in the EngineController.
+
+Target
+A basic example target object with configurable health, that respawns in 10 seconds, replace with your own mesh to create destroyable buildings, etc.
+Target's health is LOCAL. If destroyed locally everyone will see it explode via an event, but you cannot work together to take down it's health to destroy it. That will require a change in code, and cause a laggy experience for non-owners.
+
 
 There are 22 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
 
@@ -244,6 +336,14 @@ Scaled along once axis according to if Afterburner is on, else it's scale 0, dis
 EngineController.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 This is the main control script for air vehicles. There are values in here that other scripts use to work, for example the bool Passenger is used in the SoundController script. The owner / pilot does almost everything in this script. 
 Everyone else just uses it to work out if they've just touched down so soundcontroller can play the touchown sound.
+The pilot has many capabilities and functions and they're all processed here.
+AAM Targeting: If a target is within 15 degrees the plane will target it and begin to lock on. After lock on delay duration, you can fire a missile. two targets are within the 15 degrees, it will target the one with the lower angle.
+The Radarlock event is sent once every second while the plane has a target in it's sights, the radarlock animation lasts 1.1 seconds, this allows for an alarm to play constantly while targeted.
+AGM Targeting: move the camera around with the right hand in VR or head in desktop, to lock a target pull the trigger or click the mouse. the camera will lock onto the position you clicked, or if it detects an AGMTarget nearby it'll lock that.
+Once locked, you can fire an AGM by double tapping the trigger or left click. To unlock from target tap the trigger or click once, and wait 0.4 seconds.
+Smoke: To change smoke color, pull and hold the trigger when you activate it, and move your hand around, XYZ axis movement changes RGB color correspondingly.
+Catapult: The plane will lock onto a catapult if the plane's orientation is within 15 degrees of the catapult's trigger object.
+Cruise: Tries to keep the plane moving at a constant speed. To change the target speed, pull and hold the trigger with Cruise selected and move your right hand back and forth.
 
 Controls Desktop:
 Shift: Increase Forward
@@ -447,7 +547,7 @@ Pitch Down Lift Multi
 Allows you to generate less lift from pulling down. (air hitting the top of your plane)
 
 Rot Multi Max Speed (new in 1.2)
-Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear.
+Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear. (Meters/second)
 
 Vel Straighten Str Pitch
 How much the the vehicle's nose is pulled toward the direction of movement on the pitch axis.
@@ -802,7 +902,7 @@ Needed to tell the plane to set certain settings when respawning.
 
 
 WindChanger.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Used to create an object that can change the wind of planes in-game.
+Used to create an object that can change the wind of planes in-game. Not required for plane functionality. Contains commented code that can be used to make the changes in wind global (doesn't work for late joiners).
 
 Controls:
 Use while holding object to apply wind.

@@ -50,10 +50,10 @@ public class EffectsController : UdonSharpBehaviour
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
-    private Vector3 PitchLerper = new Vector3(0, 0, 0);
-    private Vector3 AileronLerper = new Vector3(0, 0, 0);
-    private Vector3 YawLerper = new Vector3(0, 0, 0);
-    private Vector3 EngineLerper = new Vector3(0, 0, 0);
+    private Vector3 PitchLerper = Vector3.zero;
+    private Vector3 YawLerper = Vector3.zero;
+    private Vector3 RollLerper = Vector3.zero;
+    private Vector3 EngineLerper = Vector3.zero;
     private Vector3 Enginefireerper = new Vector3(1, 0.6f, 1);
     [System.NonSerializedAttribute] [HideInInspector] public float AirbrakeLerper;
     [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
@@ -117,7 +117,7 @@ public class EffectsController : UdonSharpBehaviour
         vapor = (EngineControl.AirSpeed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
-        AileronLerper.y = Mathf.Lerp(AileronLerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
+        RollLerper.y = Mathf.Lerp(RollLerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
         YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
         Enginefireerper.y = Mathf.Lerp(Enginefireerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
 
@@ -147,7 +147,7 @@ public class EffectsController : UdonSharpBehaviour
             {
                 if (EngineControl.Taxiing)
                 {
-                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -YawLerper.y * 3, 0));
+                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -YawLerper.y * 4f * (-Mathf.Min((EngineControl.AirSpeed / 10), 1) + 1), 0));
                 }
                 else FrontWheel.localRotation = Quaternion.identity;
             }
@@ -159,7 +159,7 @@ public class EffectsController : UdonSharpBehaviour
             elevator.localRotation = Quaternion.Euler(-PitchLerper);
 
         foreach (Transform aileron in Ailerons)
-            aileron.localRotation = Quaternion.Euler(AileronLerper);
+            aileron.localRotation = Quaternion.Euler(RollLerper);
 
         foreach (Transform rudder in Rudders)
             rudder.localRotation = Quaternion.Euler(YawLerper);

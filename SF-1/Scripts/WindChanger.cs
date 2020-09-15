@@ -44,27 +44,27 @@ public class WindChanger : UdonSharpBehaviour
     }
     private void Update()
     {
-        if (localPlayer.IsOwner(gameObject))
-        {
-            WindStrength = WindStrengthSlider.value;
-            WindStr_text.text = WindStrengthSlider.value.ToString("F1");
+        /*    if (localPlayer.IsOwner(gameObject))
+           { */
+        WindStrength = WindStrengthSlider.value;
+        WindStr_text.text = WindStrengthSlider.value.ToString("F1");
 
-            WindGustStrength = WindGustStrengthSlider.value;
-            WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
+        WindGustStrength = WindGustStrengthSlider.value;
+        WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
 
-            WindGustiness = WindGustinessSlider.value;
-            WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
+        WindGustiness = WindGustinessSlider.value;
+        WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
 
-            WindTurbulanceScale = WindTurbulanceScaleSlider.value;
-            WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
-        }
-        else
-        {
-            WindStrengthSlider.value = WindStrength;
-            WindGustStrengthSlider.value = WindGustStrength;
-            WindGustinessSlider.value = WindGustiness;
-            WindTurbulanceScaleSlider.value = WindTurbulanceScale;
-        }
+        WindTurbulanceScale = WindTurbulanceScaleSlider.value;
+        WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
+        /*    }
+           else
+           {
+               WindStrengthSlider.value = WindStrength;
+               WindGustStrengthSlider.value = WindGustStrength;
+               WindGustinessSlider.value = WindGustiness;
+               WindTurbulanceScaleSlider.value = WindTurbulanceScale;
+           } */
     }
     private void OnPickupUseDown()
     {
@@ -77,7 +77,7 @@ public class WindChanger : UdonSharpBehaviour
         Vector3 NewWindDir = (gameObject.transform.rotation * Vector3.forward) * WindStrength;
         foreach (EngineController vehicle in VehicleEngines)
         {
-            if (vehicle != null && localPlayer.IsOwner(vehicle.gameObject))
+            if (vehicle != null && (localPlayer == null || localPlayer.IsOwner(vehicle.gameObject)))
             {
                 vehicle.Wind = NewWindDir;
                 vehicle.WindGustStrength = WindGustStrength;
@@ -86,15 +86,15 @@ public class WindChanger : UdonSharpBehaviour
             }
         }
     }
-/*     private void OnPickup()
-    {
-        WindMenu.SetActive(true);
-    }
+    /*     private void OnPickup()
+        {
+            WindMenu.SetActive(true);
+        }
 
-    private void OnOwnershipTransferred()
-    {
-        WindMenu.SetActive(false);
-    } */
+        private void OnOwnershipTransferred()
+        {
+            WindMenu.SetActive(false);
+        } */
     private void Assert(bool condition, string message)
     {
         if (!condition)
