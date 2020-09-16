@@ -4,6 +4,9 @@ https://github.com/Merlin-san/UdonSharp/releases
 https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
+
+Paypal Donate:
+https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=R5ERE8XFFLBXG&currency_code=GBP&source=url
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Major Update 1.3
 •VR Motion Controls for Joystick and Throttle
@@ -157,6 +160,8 @@ Lift and Max Lift are also very important, and a bit tricky to tweak. If max lif
 If you make a heavier plane with a great rigidbody mass value, you will have to tweak the values a lot.
 Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue. (it's 0 when you're owner of the plane, 0.3 when your not)
 
+Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController).
+Doing animations using the animator is most performant, so I've used it where possible. HUD stuff included.
 When making a custom plane, you must also customize a number of the animations, I recommend duplicating the SF-1's animation controller, and replacing the animations that need replacing.
 Likely to need replacing animations:
 AAMs
