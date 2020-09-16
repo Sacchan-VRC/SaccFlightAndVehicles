@@ -280,6 +280,7 @@ public class SoundController : UdonSharpBehaviour
             EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", EngineControl.MissilesIncoming);
             if (Leftplane == false)
             {
+                if (!ABOnOutsideNull) ABOnOutside.Stop();
                 //change stuff when you get in
                 if (!CatapultLaunchNull) CatapultLaunch.volume *= InVehicleThrustVolumeFactor;
                 PlaneThrustPitch = 0.8f;

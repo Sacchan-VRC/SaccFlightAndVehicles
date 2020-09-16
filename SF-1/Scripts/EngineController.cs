@@ -646,6 +646,9 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (RStickSelection == 2)
                     {
+                        AAMHasTarget = false;
+                        AAMLocked = false;
+                        AAMLockTimer = 0;
                         if (InEditor)
                         {
                             RStick0();
