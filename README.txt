@@ -8,6 +8,17 @@ Feel free to give feedback or ask questions
 Paypal Donate:
 https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=R5ERE8XFFLBXG&currency_code=GBP&source=url
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Small Update 1.32
+•Added plane view screen
+•Small changes to EffectsController to support view screen
+•Small fixes to guide images
+•Bomb angle randomization option
+•Fair number of small tweaks
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix Update 1.31
+•Emergency fix to seat exit code to support new VRChat patch
+•Some tweaks
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Major Update 1.3
 •VR Motion Controls for Joystick and Throttle
 •Function Dials with 16 functions for VR control
@@ -240,7 +251,7 @@ A basic example target object with configurable health, that respawns in 10 seco
 Target's health is LOCAL. If destroyed locally everyone will see it explode via an event, but you cannot work together to take down it's health to destroy it. That will require a change in code, and cause a laggy experience for non-owners.
 
 
-There are 22 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
+There are 24 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
 
 SF-1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1061,20 +1072,6 @@ How many HitPoints the target has. It takes 10 damage per bullet that hits it.
 Other
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-GunnerSeat.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Used to enter the gunner seat of the gunship. Gunship was removed but the code might be useful.
-Variables:
-
-Leave Button
-Enable the leave button. GunnerLeaveButton goes in here.
-
-Gun Object
-Sets the person who enters as the owner of the gun. Gun goes in here.
-
-Gun Controller
-Script makes you the owner of the guncontroller and controls the value 'manning'.
-
-
 SaccFlight.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 For flight without a vehicle, only does anything if you're not grounded. So jump first.
 
@@ -1101,7 +1098,7 @@ It is enabled when entering the seat, does its thing, then disables itself.
 When enabled, it resets the seat to its original position before proceeding.
 This script uses broadcasts to sync the position of the seat.
 
-Variables
+Variables:
 
 Seat
 The object that will move (usually the Seat object of a VRCChair)
@@ -1111,6 +1108,41 @@ Empty with transform position at desired head height
 
 Head Test
 You can use this to test the script inside unity. Just put an object as the child of the seat object, position it somewhere bad for piloting, and then when in play mode, enable the SaccSeatAdjuster object, and it should move into position.
+
+ViewScreenButton.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Turns on the view screen or changes channel if it's already on
+
+Variables:
+
+View Screen Control
+ViewScreenController object to effect.
+
+ViewScreenController.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Find all AAMTargets that are planes, makes a list of them and positions a camera behind them. Runs EffectsController's Effects() function for the current plane if it's too far away and has therefore been disabled in EffectsController.
+
+AAM Targets Layer
+Layer to look for planes's AAMTarget on.
+
+Disable Distance
+Distance at which the Plane Camera and View Screen become disabled.
+
+Plane Camera
+Camera object that follows planes.
+
+View Screen
+Screen object.
+
+AAM Target
+Current view target. Used for testing in the editor, the ViewScreenButton increments this. (Be careful not to set it out of range when testing)
+
+
+
+
+
+
+
+
+
 
 
 

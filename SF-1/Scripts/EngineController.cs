@@ -2115,7 +2115,7 @@ public class EngineController : UdonSharpBehaviour
         GameObject NewBomb = VRCInstantiate(Bomb);
         NewBomb.transform.position = BombLaunchPoints[BombPoint].transform.position;
         //give 2 degrees of randomness to bomb's rotation so it looks more interesting
-        NewBomb.transform.rotation = Quaternion.Euler(new Vector3(BombLaunchPoints[BombPoint].transform.rotation.eulerAngles.x + (Random.Range(0, 2)), BombLaunchPoints[BombPoint].transform.rotation.eulerAngles.y + (Random.Range(-2, 2)), BombLaunchPoints[BombPoint].transform.rotation.eulerAngles.z));
+        NewBomb.transform.rotation = VehicleMainObj.transform.rotation;
         NewBomb.SetActive(true);
         NewBomb.GetComponent<Rigidbody>().velocity = CurrentVel;
         BombPoint++;
