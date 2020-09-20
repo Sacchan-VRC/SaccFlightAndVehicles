@@ -132,12 +132,6 @@ This can be used to do other things like F-14 wings moving back at a certain spe
 
 The angle of attack variable is 0 at 0 AoA, and 1 at 180.
 
-The prefab uses station triggers, which currently are currently a bit awkward to use. You must set the inspector to debug mode in order to assign them. Enter the name of a public function that is on the script running on this objects UdonBehaviour.
-This prefab is only using On Local Player Exit Station, and the function names used for it are PilotLeave, PassengerLeave and GunnerLeave.
-I recommend spending as little time as possible with the Inspector in debug mode. I think there may be a bug with it and udon.
-See StationTriggersTutorial.jpg or PhaxeNor's tweet here. Thanks PhaxeNor!
-https://twitter.com/PhaxeNor/status/1262792675767603201
-
 For control inputs to work in editor play mode you must add the VRChat inputs to your unity project. Just filling in the name entry is fine, It needs them to compile. See inputs.png and inputs.txt
 
 Remember you can test fly the vehicles inside unity by adding a camera to them. Recommend adding camera as child of HudController. Set camera view distance beyond 15,000m~ to see the HUD.

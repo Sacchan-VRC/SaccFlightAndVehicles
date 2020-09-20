@@ -386,7 +386,7 @@ public class EngineController : UdonSharpBehaviour
             n++;
         }
         //sort AAMTargets array based on order
-        if (AAMTargets.Length != 0)
+        if (NumAAMTargets > 0)
         {
             SortTargets(AAMTargets, order);
         }
@@ -447,12 +447,13 @@ public class EngineController : UdonSharpBehaviour
                 }
             }
             if (!Piloting) { Occupied = false; } //should make vehicle respawnable if player disconnects while occupying
+            Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
             Speed = CurrentVel.magnitude;
             float gustx = (Time.time * WindGustiness) + (VehicleMainObj.transform.position.x * WindTurbulanceScale);
             float gustz = (Time.time * WindGustiness) + (VehicleMainObj.transform.position.z * WindTurbulanceScale);
             FinalWind = Vector3.Normalize(new Vector3((Mathf.PerlinNoise(gustx + 9000, gustz) - .5f), /* (Mathf.PerlinNoise(gustx - 9000, gustz - 9000) - .5f) */0, (Mathf.PerlinNoise(gustx, gustz + 9999) - .5f))) * WindGustStrength;
-            FinalWind += Wind;
+            FinalWind = (FinalWind + Wind) * Atmosphere;
             AirVel = VehicleRigidbody.velocity - FinalWind;
             AirSpeed = AirVel.magnitude;
             AngleOfAttackPitch = Vector3.SignedAngle(VehicleMainObj.transform.forward, AirVel, VehicleMainObj.transform.right);
@@ -1865,8 +1866,6 @@ public class EngineController : UdonSharpBehaviour
             AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
 
 
-            Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
-
             //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownMulti)
             if (Throttle < ThrottleInput)
             {
@@ -2272,7 +2271,6 @@ public class EngineController : UdonSharpBehaviour
         }
         EffectsControl.PlaneAnimator.SetTrigger("explode");
     }
-    //thx guribo for udon assert
     private void Assert(bool condition, string message)
     {
         if (!condition)
