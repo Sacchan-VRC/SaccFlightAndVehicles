@@ -8,6 +8,7 @@ public class BombController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
     public AudioSource[] ExplosionSounds;
+    public float AngleRandomization = 1;
     public float ColliderActiveDistance = 30;
     public float StraightenFactor = .1f;
     public float AirPhysicsStrength = .1f;
@@ -22,6 +23,7 @@ public class BombController : UdonSharpBehaviour
         BombCollider = gameObject.GetComponent<CapsuleCollider>();
         BombRigid = gameObject.GetComponent<Rigidbody>();
         BombConstant = gameObject.GetComponent<ConstantForce>();
+        gameObject.transform.rotation = Quaternion.Euler(new Vector3(gameObject.transform.rotation.x + (Random.Range(0, AngleRandomization)), gameObject.transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), gameObject.transform.rotation.eulerAngles.z));
     }
 
     void LateUpdate()
