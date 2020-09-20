@@ -99,12 +99,16 @@ public class EffectsController : UdonSharpBehaviour
         if (DoEffects > 10) { return; }
 
         //if a long way away just skip effects except large vapor effects
-        if (EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner) { DoVapor(); return; }//udonsharp doesn't support goto yet, so i'm usnig a function instead
-
+        if (EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner) { LargeEffects(); return; }//udonsharp doesn't support goto yet, so i'm using a function instead
+        Effects();
+        LargeEffects();
+    }
+    public void Effects()
+    {
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
-            rotationinputs.x = Mathf.Clamp(EngineControl.PitchInput/*  + EngineControl.Trim.x */, -1, 1) * 25;
-            rotationinputs.y = Mathf.Clamp(EngineControl.YawInput/*  + EngineControl.Trim.y */, -1, 1) * 20;
+            rotationinputs.x = /* Mathf.Clamp( */EngineControl.PitchInput/*  + EngineControl.Trim.x , -1, 1)*/ * 25;
+            rotationinputs.y = /* Mathf.Clamp( */EngineControl.YawInput/*  + EngineControl.Trim.y , -1, 1)*/ * 20;
             rotationinputs.z = EngineControl.RollInput * 35;
 
             //joystick movement
@@ -124,24 +128,6 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl.Occupied == true)
         {
             DoEffects = 0f;
-            if (EngineControl.IsFiringGun) //send firing to animator
-            {
-                PlaneAnimator.SetBool("gunfiring", true);
-            }
-            else
-            {
-                PlaneAnimator.SetBool("gunfiring", false);
-            }
-
-            if (!DisplaySmokeNull && Smoking)
-            {
-                SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
-                foreach (ParticleSystem smoke in DisplaySmoke)
-                {
-                    var main = smoke.main;
-                    main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
-                }
-            }
 
             if (!FrontWheelNull)
             {
@@ -213,7 +199,6 @@ public class EffectsController : UdonSharpBehaviour
 
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * Time.deltaTime);
 
-        PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
         PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
@@ -223,12 +208,32 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM / EngineControl.FullAAMs);
         PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM / EngineControl.FullAGMs);
         PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb / EngineControl.FullBombs);
-        DoVapor();
     }
 
-
-    private void DoVapor()//large vapor effects visible from a long distance
+    private void LargeEffects()//large effects visible from a long distance
     {
+        if (EngineControl.Occupied == true)
+        {
+            if (EngineControl.IsFiringGun) //send firing to animator
+            {
+                PlaneAnimator.SetBool("gunfiring", true);
+            }
+            else
+            {
+                PlaneAnimator.SetBool("gunfiring", false);
+            }
+
+            if (Smoking && !DisplaySmokeNull)
+            {
+                SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
+                foreach (ParticleSystem smoke in DisplaySmoke)
+                {
+                    var main = smoke.main;
+                    main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
+                }
+            }
+        }
+
         //this is to finetune when wingtrails appear and disappear
         if (EngineControl.Gs >= Gs_trail) //Gs are increasing
         {
@@ -241,6 +246,7 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("mach10", EngineControl.AirSpeed / 343 / 10);
         PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
         PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
+        PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
     }
 
     private void Assert(bool condition, string message)

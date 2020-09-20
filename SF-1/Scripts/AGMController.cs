@@ -33,7 +33,6 @@ public class AGMController : UdonSharpBehaviour
         }
         if (Vector3.Angle(gameObject.transform.forward, (Target - gameObject.transform.position)) < (LockAngle))
         {
-            // homing to target, thx Guribo
             var missileToTargetVector = Target - gameObject.transform.position;
             var missileForward = gameObject.transform.forward;
             var targetDirection = missileToTargetVector.normalized;

@@ -64,11 +64,11 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public float ThisFrameDist = 0;
     private bool Leftplane = false;
     private float PlaneIdlePitch;
-    private float PlaneIdleVolume;
+    [System.NonSerializedAttribute] [HideInInspector] public float PlaneIdleVolume;
     private float PlaneDistantPitch;
-    private float PlaneDistantVolume;
+    [System.NonSerializedAttribute] [HideInInspector] public float PlaneDistantVolume;
     private float PlaneThrustPitch;
-    private float PlaneThrustVolume;
+    [System.NonSerializedAttribute] [HideInInspector] public float PlaneThrustVolume;
     private float LastFramePlaneIdlePitch;
     private float LastFramePlaneThrustPitch;
     private float LastFrameGunPitch;

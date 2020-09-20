@@ -36,23 +36,26 @@ public class PassengerSeat : UdonSharpBehaviour
             }
         }
     }
-    public void PassengerLeave()
+    public override void OnStationExited(VRCPlayerApi player)
     {
-        if (EngineControl != null)
+        if (player.isLocal)
         {
-            EngineControl.Passenger = false;
-            EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
-            EngineControl.MissilesIncoming = 0;
-        }
-        if (LeaveButton != null) { LeaveButton.SetActive(false); }
-        if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
-        if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
-        if (PlaneMesh != null)
-        {
-            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
-            foreach (Transform child in children)
+            if (EngineControl != null)
             {
-                child.gameObject.layer = 17;
+                EngineControl.Passenger = false;
+                EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+                EngineControl.MissilesIncoming = 0;
+            }
+            if (LeaveButton != null) { LeaveButton.SetActive(false); }
+            if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
+            if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
+            if (PlaneMesh != null)
+            {
+                Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+                foreach (Transform child in children)
+                {
+                    child.gameObject.layer = 17;
+                }
             }
         }
     }

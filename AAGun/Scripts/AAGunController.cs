@@ -30,8 +30,12 @@ public class AAGunController : UdonSharpBehaviour
     private Vector3 StartRot;
     private float RstickV;
     private float ZoomLevel;
+    private bool InEditor = true;
     void Start()
     {
+        localPlayer = Networking.LocalPlayer;
+        if (localPlayer != null) { InEditor = false; }
+
         Assert(Rotator != null, "Start: Rotator != null");
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
         Assert(AAGunSeatStation != null, "Start: AAGunSeatStation != null");
@@ -39,17 +43,16 @@ public class AAGunController : UdonSharpBehaviour
 
         if (VehicleMainObj != null) { AAGunAnimator = VehicleMainObj.GetComponent<Animator>(); }
         FullHealth = Health;
-        localPlayer = Networking.LocalPlayer;
         StartRot = Rotator.transform.localRotation.eulerAngles;
         if (StopSpeed > 1) StopSpeed = .999f;
     }
     void Update()
     {
-        if (localPlayer == null || localPlayer.IsOwner(VehicleMainObj))
+        if (InEditor || localPlayer.IsOwner(VehicleMainObj))
         {
             if (Health <= 0)
             {
-                if (localPlayer == null)
+                if (InEditor)
                 {
                     Explode();
                 }
@@ -58,7 +61,7 @@ public class AAGunController : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
                 }
             }
-            if (localPlayer == null || Manning)
+            if (InEditor || Manning)
             {
                 //Camera control
                 if (AACam != null) { ZoomLevel = AACam.fieldOfView / 90; }
@@ -116,6 +119,10 @@ public class AAGunController : UdonSharpBehaviour
                     firing = true;
                 }
                 else { firing = false; }
+            }
+            else
+            {
+                firing = false;
             }
         }
         if (firing)

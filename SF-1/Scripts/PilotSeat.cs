@@ -64,57 +64,60 @@ public class PilotSeat : UdonSharpBehaviour
             }
         }
     }
-    public void PilotLeave()
+    public override void OnStationExited(VRCPlayerApi player)
     {
-        if (EngineControl != null)
+        if (player.isLocal)
         {
-            EngineControl.Piloting = false;
-            if (EngineControl.Ejected)
+            if (EngineControl != null)
             {
-                EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel + EngineControl.VehicleMainObj.transform.up * 25);
-                EngineControl.Ejected = false;
+                EngineControl.Piloting = false;
+                if (EngineControl.Ejected)
+                {
+                    EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel + EngineControl.VehicleMainObj.transform.up * 25);
+                    EngineControl.Ejected = false;
+                }
+                else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+                EngineControl.EjectTimer = 2;
+                EngineControl.Hooked = -1;
+                EngineControl.BrakeInput = 0;
+                EngineControl.LTriggerTapTime = 1;
+                EngineControl.RTriggerTapTime = 1;
+                EngineControl.Taxiinglerper = 0;
+                EngineControl.PlayerThrottle = 0;
+                EngineControl.LGripLastFrame = false;
+                EngineControl.RGripLastFrame = false;
+                EngineControl.LStickSelection = 0;
+                EngineControl.RStickSelection = 0;
+                EngineControl.BrakeInput = 0;
+                EngineControl.LTriggerLastFrame = false;
+                EngineControl.RTriggerLastFrame = false;
+                EngineControl.HUDControl.MenuSoundCheckLast = 0;
+                EngineControl.AGMLocked = false;
+                EngineControl.AAMHasTarget = false;
+                EngineControl.AAMLocked = false;
+                EngineControl.MissilesIncoming = 0;
+                EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
+                EngineControl.AAMLockTimer = 0;
+                EngineControl.AAMLocked = false;
+                if (EngineControl.CatapultStatus == 1) { EngineControl.CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
             }
-            else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
-            EngineControl.EjectTimer = 2;
-            EngineControl.Hooked = -1;
-            EngineControl.BrakeInput = 0;
-            EngineControl.LTriggerTapTime = 1;
-            EngineControl.RTriggerTapTime = 1;
-            EngineControl.Taxiinglerper = 0;
-            EngineControl.PlayerThrottle = 0;
-            EngineControl.LGripLastFrame = false;
-            EngineControl.RGripLastFrame = false;
-            EngineControl.LStickSelection = 0;
-            EngineControl.RStickSelection = 0;
-            EngineControl.BrakeInput = 0;
-            EngineControl.LTriggerLastFrame = false;
-            EngineControl.RTriggerLastFrame = false;
-            EngineControl.HUDControl.MenuSoundCheckLast = 0;
-            EngineControl.AGMLocked = false;
-            EngineControl.AAMHasTarget = false;
-            EngineControl.AAMLocked = false;
-            EngineControl.MissilesIncoming = 0;
-            EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
-            EngineControl.AAMLockTimer = 0;
-            EngineControl.AAMLocked = false;
-            if (EngineControl.CatapultStatus == 1) { EngineControl.CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
-        }
-        if (LeaveButton != null) { LeaveButton.SetActive(false); }
-        if (EngineControl.EffectsControl != null)
-        {
-            EngineControl.IsFiringGun = false;
-            EngineControl.EffectsControl.Smoking = false;
-        }
-        if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
-        if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
-        if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
-        //set plane's layer back
-        if (PlaneMesh != null)
-        {
-            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
-            foreach (Transform child in children)
+            if (LeaveButton != null) { LeaveButton.SetActive(false); }
+            if (EngineControl.EffectsControl != null)
             {
-                child.gameObject.layer = 17;
+                EngineControl.IsFiringGun = false;
+                EngineControl.EffectsControl.Smoking = false;
+            }
+            if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
+            if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
+            if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
+            //set plane's layer back
+            if (PlaneMesh != null)
+            {
+                Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+                foreach (Transform child in children)
+                {
+                    child.gameObject.layer = 17;
+                }
             }
         }
     }
@@ -133,6 +136,12 @@ public class PilotSeat : UdonSharpBehaviour
         if (!EngineControl.SoundControl.PlaneDistantNull) EngineControl.SoundControl.PlaneDistant.gameObject.SetActive(true);
         if (!EngineControl.SoundControl.PlaneWindNull) EngineControl.SoundControl.PlaneWind.gameObject.SetActive(true);
         if (!EngineControl.SoundControl.PlaneInsideNull) EngineControl.SoundControl.PlaneInside.gameObject.SetActive(true);
+        if (EngineControl.SoundControl.soundsoff)
+        {
+            EngineControl.SoundControl.PlaneIdleVolume = 0;
+            EngineControl.SoundControl.PlaneDistantVolume = 0;
+            EngineControl.SoundControl.PlaneThrustVolume = 0;
+        }
         EngineControl.SoundControl.soundsoff = false;
     }
     private void Assert(bool condition, string message)
