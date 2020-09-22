@@ -19,6 +19,7 @@ public class VehicleRespawnButton : UdonSharpBehaviour
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
             Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
+            if (EngineControl.HasCanopy) { EngineControl.EffectsControl.CanopyOpen = true; }
             EngineControl.EffectsControl.GearUp = false;
             EngineControl.EffectsControl.Flaps = true;
             EngineControl.EffectsControl.HookDown = false;
@@ -39,7 +40,7 @@ public class VehicleRespawnButton : UdonSharpBehaviour
     {
         EngineControl.EffectsControl.DoEffects = 6;
         EngineControl.dead = true;//this makes it invincible and unable to be respawned again for 5s
-        EngineControl.EffectsControl.PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead
+        EngineControl.EffectsControl.PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead after 5s
         EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
     }
     private void Assert(bool condition, string message)
