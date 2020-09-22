@@ -155,6 +155,8 @@ SaccFlight will always crash when testing in editor, this doesnt matter.
 It's best to break my prefab in order to make your own planes.
 If you've made you own vehicle and it's having trouble taking off, try adjusting the center of mass and pitch moment positions, and also the takeoff assist options
 
+When using a custom model, remove the Avatar reference from the animator to stop some confusing things from happening with references in animations
+
 To see the HUD in-game you must set up a reference camera with a view distance greater than around 15,000 on the VRCworld.
 
 Tips for modifying basic flight characteristics of aircraft:
@@ -164,6 +166,10 @@ Vel Straighten Str Pitch/Yaw are Very important to the handling of the plane. Th
 Lift and Max Lift are also very important, and a bit tricky to tweak. If max lift is too high you can end up with a plane that can fly in circles extremely quickly.
 If you make a heavier plane with a great rigidbody mass value, you will have to tweak the values a lot.
 Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue. (it's 0 when you're owner of the plane, 0.3 when your not)
+
+The Gun_pilot is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so you can't shoot your own plane, and reverted back to Walkthrough when you leave.
+
+Never leave an entry of an array input empty in EffectsController and SoundController, it'll cause them to crash.
 
 Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController).
 Doing animations using the animator is most performant, so I've used it where possible. HUD stuff included.
@@ -183,8 +189,6 @@ GearUp
 TailHook
 TailHookHooked
 ThrottleSlider
-
-The Gun_pilot is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so you can't shoot himself, and reverted back to Walkthrough when he leaves.
 
 Hierarchy:
 PlaneBody--------
@@ -213,7 +217,8 @@ These 3 objects just contain meshes to visually represent how many missiles etc 
 Custom Layers:
 Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
 As layers can't be imported in a unitypackage you must set them up yourself.
-You must set the trigger objects to their respective layers. Create new layers, and set them in EngineController. By default the layers are as follows, I recommend you set up yours the same:
+You must set the trigger objects to their respective layers. Create new layers, and set them in EngineController. By default the layers are as follows
+I recommend you set up yours the same to save you having to set them on everything:
 23:Hook Cable
 24:Catapult
 25:AAMTargets
@@ -316,6 +321,7 @@ Strength of 'air' acting on the bomb's movement
 EffectsController.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Controls vehicle's control surface movement and vapor effects, also contains synced variables as there's too many for one script.
 If you want an easy way to set up your empties at the the right angles for your plane, try copying and dragging the empties from the SF-1 to yours and adjust them from there.
+You can also set up empties in blender if you don't want to break your model's prefab.
 Optimizations: The DoEffects variable tracks whether or not a player is inside the vehicle, or if they have left. If they have left more than 10 seconds ago the animations will stop,
 This script also checks if the plane is further away than 2km and if it is, only does vapor effects, because everything else will be so tiny on your screen. If you have a remote camera set up, you probably want to remove this code(line 102).
 Variables:
