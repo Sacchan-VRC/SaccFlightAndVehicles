@@ -1154,29 +1154,41 @@ public class EngineController : UdonSharpBehaviour
                     case 2://AAM
                         if (NumAAMTargets != 0)
                         {
-                            //firing AAM
-                            if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Space)))
+                            float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position));
+
+                            //check 1 target per frame to see if it's infront of us and worthy of being our current target
+                            Vector3 AAMNextTargetDirection = (AAMTargets[AAMTargetChecker].transform.position - CenterOfMass.transform.position);
+                            float NextTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, AAMNextTargetDirection);
+                            float NextTargetDistance = Vector3.Distance(CenterOfMass.position, AAMTargets[AAMTargetChecker].transform.position);
+                            EngineController NextTargetEngineControl = VehicleMainObj.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
+                            if (AAMTargets[AAMTargetChecker].transform.parent != null)
+                                NextTargetEngineControl = AAMTargets[AAMTargetChecker].transform.parent.GetComponent<EngineController>();
+                            //if target EngineController is null then it's a dummy target (or isn't set up properly)
+                            if (AAMTargets[AAMTargetChecker].activeInHierarchy && (NextTargetEngineControl == null || !NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead))
                             {
-                                if (!RTriggerLastFrame)
+                                if ((AAMTargets[AAMTargetChecker].activeSelf && NextTargetAngle < AAMLockAngle)
+                                 && NextTargetDistance < AAMMaxTargetDistance && NextTargetAngle < AAMCurrentTargetAngle)
                                 {
-                                    if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > 0.5)
-                                    {
-                                        AAMLastFiredTime = Time.time;
-                                        if (InEditor)
-                                            LaunchAAM();
-                                        else
-                                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
-                                        NumAAM--;
-                                        if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
-                                    }
+                                    //found new target
+                                    AAMCurrentTargetAngle = NextTargetAngle;
+                                    AAMTarget = AAMTargetChecker;
+                                    if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
+                                        AAMCurrentTargetEngineControl = NextTargetEngineControl;
+                                    AAMLockTimer = 0;
+                                    AAMTargetedTimer = .5f;//give the synced variable time to update before sending targeted
                                 }
-                                RTriggerLastFrame = true;
                             }
-                            else RTriggerLastFrame = false;
+                            //increase target checker ready for next frame
+                            AAMTargetChecker++;
+                            if (AAMTargetChecker == AAMTarget)
+                                AAMTargetChecker++;
+                            if (AAMTargetChecker == NumAAMTargets)
+                            {
+                                AAMTargetChecker = 0;
+                            }
 
                             //targeting
                             AAMCurrentTargetDirection = AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position;
-                            float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position));
                             float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
                             //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
                             if (!Taxiing && AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || !AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead))
@@ -1214,38 +1226,27 @@ public class EngineController : UdonSharpBehaviour
                             if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
                             else { AAMLocked = false; }
 
-                            //check 1 target per frame to see if it's infront of us and worthy of being our current target
-                            Vector3 AAMNextTargetDirection = (AAMTargets[AAMTargetChecker].transform.position - CenterOfMass.transform.position);
-                            float nexttargetangle = Vector3.Angle(VehicleMainObj.transform.forward, AAMNextTargetDirection);
-                            float NextTargetDistance = Vector3.Distance(CenterOfMass.position, AAMTargets[AAMTargetChecker].transform.position);
-                            EngineController NextTargetEngineControl = VehicleMainObj.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
-                            if (AAMTargets[AAMTargetChecker].transform.parent != null)
-                                NextTargetEngineControl = AAMTargets[AAMTargetChecker].transform.parent.GetComponent<EngineController>();
-                            //if target EngineController is null then it's a dummy target (or isn't set up properly)
-                            if (AAMTargets[AAMTargetChecker].activeInHierarchy && (NextTargetEngineControl == null || !NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead))
+                            //firing AAM
+                            if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Space)))
                             {
-                                if ((AAMTargets[AAMTargetChecker].activeSelf && nexttargetangle < AAMLockAngle)
-                                 && NextTargetDistance < AAMMaxTargetDistance && nexttargetangle < AAMCurrentTargetAngle)
+                                if (!RTriggerLastFrame)
                                 {
-                                    //found new target
-                                    AAMTarget = AAMTargetChecker;
-                                    if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
-                                        AAMCurrentTargetEngineControl = NextTargetEngineControl;
-                                    AAMLockTimer = 0;
-                                    AAMTargetedTimer = .5f;//give the synced variable time to update before sending targeted
+                                    if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > 0.5)
+                                    {
+                                        AAMLastFiredTime = Time.time;
+                                        if (InEditor)
+                                            LaunchAAM();
+                                        else
+                                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
+                                        NumAAM--;
+                                        if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
+                                    }
                                 }
+                                RTriggerLastFrame = true;
                             }
-                            //increase target checker ready for next frame
-                            AAMTargetChecker++;
-                            if (AAMTargetChecker == AAMTarget)
-                                AAMTargetChecker++;
-                            if (AAMTargetChecker == NumAAMTargets)
-                            {
-                                AAMTargetChecker = 0;
-                            }
+                            else RTriggerLastFrame = false;
                         }
                         else { AAMLocked = false; AAMHasTarget = false; }
-
                         IsFiringGun = false;
                         break;
                     case 3://AGM
@@ -1996,7 +1997,7 @@ public class EngineController : UdonSharpBehaviour
         }
         else//non-owners need to know these values
         {
-            AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
+            Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
             //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value to stop spazzing
             VehicleRigidbody.angularDrag = .3f;
