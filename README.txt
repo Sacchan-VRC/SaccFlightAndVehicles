@@ -8,6 +8,11 @@ Feel free to give feedback or ask questions
 Paypal Donate:
 https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=R5ERE8XFFLBXG&currency_code=GBP&source=url
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix Update 1.33
+•Fixed AoA effects appearing on stationary planes when wind is enabled
+•Tweaked AAM code to prevent possibility of firing at next target without locking if you fire on the frame target changes
+•Fixed Throttle Slider animation
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.32
 •Added plane view screen
 •Small changes to EffectsController to support view screen
@@ -157,7 +162,7 @@ If you've made you own vehicle and it's having trouble taking off, try adjusting
 
 When using a custom model, remove the Avatar reference from the animator to stop some confusing things from happening with references in animations
 
-To see the HUD in-game you must set up a reference camera with a view distance greater than around 15,000 on the VRCworld.
+To see the HUD in-game you must set up a reference camera with a view distance greater than around 12,000 on the VRCworld.
 
 Tips for modifying basic flight characteristics of aircraft:
 The Strength and Friction values for pitch, yaw, and roll are important, and both play off each other. You may need to set them to very high values, especially if you make a large plane.
@@ -189,6 +194,7 @@ GearUp
 TailHook
 TailHookHooked
 ThrottleSlider
+Remember for animations that are controlled by floats (normalized time), set the curves to linear.
 
 Hierarchy:
 PlaneBody--------
@@ -307,6 +313,9 @@ Missile's plane's EngineController, needed to know target.
 
 Explosion Sounds
 Array of sounds one of which will play for the explosion.
+
+Angle Randomization
+Add a random angle to the bombs spawn pitch and yaw to randomize their fall pattern, useful for planes that drop many bombs.
 
 Collider Active Distance
 Missile's collider is inactive when it is spawned. After it's this far away from the plane it launched from, it becomes active. This is to prevent it from hitting the plane it launched from. The faster the plane is moving, the higher this number needs to be due to ????Physics.
@@ -1140,12 +1149,6 @@ Screen object.
 
 AAM Target
 Current view target. Used for testing in the editor, the ViewScreenButton increments this. (Be careful not to set it out of range when testing)
-
-
-
-
-
-
 
 
 

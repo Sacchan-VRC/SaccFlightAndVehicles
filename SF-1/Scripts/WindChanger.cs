@@ -77,7 +77,7 @@ public class WindChanger : UdonSharpBehaviour
         Vector3 NewWindDir = (gameObject.transform.rotation * Vector3.forward) * WindStrength;
         foreach (EngineController vehicle in VehicleEngines)
         {
-            if (vehicle != null && (localPlayer == null || localPlayer.IsOwner(vehicle.gameObject)))
+            if (vehicle != null)
             {
                 vehicle.Wind = NewWindDir;
                 vehicle.WindGustStrength = WindGustStrength;

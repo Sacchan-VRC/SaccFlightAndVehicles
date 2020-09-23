@@ -118,7 +118,7 @@ public class EffectsController : UdonSharpBehaviour
                 JoyStick.localRotation = Quaternion.Euler(tempjoy);
             }
         }
-        vapor = (EngineControl.AirSpeed > 20) ? true : false;// only make vapor when going above "80m/s", prevents vapour appearing when taxiing into a wall or whatever
+        vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
         RollLerper.y = Mathf.Lerp(RollLerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
@@ -133,7 +133,7 @@ public class EffectsController : UdonSharpBehaviour
             {
                 if (EngineControl.Taxiing)
                 {
-                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -YawLerper.y * 4f * (-Mathf.Min((EngineControl.AirSpeed / 10), 1) + 1), 0));
+                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -YawLerper.y * 4f * (-Mathf.Min((EngineControl.Speed / 10), 1) + 1), 0));
                 }
                 else FrontWheel.localRotation = Quaternion.identity;
             }
@@ -243,7 +243,7 @@ public class EffectsController : UdonSharpBehaviour
         {
             Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * Time.deltaTime);//linger for a bit before cutting off
         }
-        PlaneAnimator.SetFloat("mach10", EngineControl.AirSpeed / 343 / 10);
+        PlaneAnimator.SetFloat("mach10", EngineControl.Speed / 343 / 10);//should airspeed but nonlocal players don't have it
         PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
         PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
         PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
