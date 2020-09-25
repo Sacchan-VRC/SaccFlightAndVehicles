@@ -18,7 +18,9 @@ public class ViewScreenButton : UdonSharpBehaviour
         }
         else
         {
-            Networking.SetOwner(ViewScreenControl.localPlayer, ViewScreenControl.gameObject);
+            if (!ViewScreenControl.InEditor)
+                Networking.SetOwner(ViewScreenControl.localPlayer, ViewScreenControl.gameObject);
+
             ViewScreenControl.AAMTarget++;
             if (ViewScreenControl.AAMTarget > ViewScreenControl.NumAAMTargets - 1)
             {

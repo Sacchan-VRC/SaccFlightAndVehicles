@@ -1997,7 +1997,7 @@ public class EngineController : UdonSharpBehaviour
         }
         else//non-owners need to know these values
         {
-            Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
+            Speed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
             //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value to stop spazzing
             VehicleRigidbody.angularDrag = .3f;

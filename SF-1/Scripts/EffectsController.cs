@@ -19,7 +19,11 @@ public class EffectsController : UdonSharpBehaviour
     public ParticleSystem[] DisplaySmoke;
     public ParticleSystem CatapultSteam;
 
-
+/*     public Transform ElevonL;
+    public Transform ElevonR;
+    public Transform RuddervatorL;
+    public Transform RuddervatorR;
+ */
 
     private bool VehicleMainObjNull = true;
     private bool EngineControlNull = true;
@@ -34,6 +38,12 @@ public class EffectsController : UdonSharpBehaviour
     private bool CatapultSteamNull = true;
     private bool DisplaySmokeNull = true;
 
+
+/*     private bool ElevonLNull = true;
+    private bool ElevonRNull = true;
+    private bool RuddervatorLNull = true;
+    private bool RuddervatorRNull = true;
+ */
 
 
     //best to remove synced variables if you aren't using them
@@ -74,6 +84,12 @@ public class EffectsController : UdonSharpBehaviour
         Assert(Rudders.Length > 0, "Start: Rudders.Length > 0");
 
 
+        /*         Assert(ElevonL != null, "Start: ElevonL != null");
+                Assert(ElevonR != null, "Start: ElevonR != null");
+                Assert(RuddervatorL != null, "Start: RuddervatorL != null");
+                Assert(RuddervatorR != null, "Start: RuddervatorR != null");
+         */
+
 
         if (VehicleMainObj != null) VehicleMainObjNull = false;
         if (EngineControl != null) EngineControlNull = false;
@@ -85,6 +101,12 @@ public class EffectsController : UdonSharpBehaviour
         if (CatapultSteam != null) CatapultSteamNull = false;
         if (DisplaySmoke.Length > 0) DisplaySmokeNull = false;
 
+
+        /*         if (ElevonL != null) ElevonLNull = false;
+                if (ElevonR != null) ElevonRNull = false;
+                if (RuddervatorL != null) RuddervatorLNull = false;
+                if (RuddervatorR != null) RuddervatorRNull = false;
+         */
 
         foreach (Transform fire in Enginefire)
             fire.localScale = new Vector3(fire.localScale.x, 0, fire.localScale.z);
@@ -141,6 +163,11 @@ public class EffectsController : UdonSharpBehaviour
         }
         else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
 
+/*         if (!ElevonLNull) ElevonL.localRotation = Quaternion.Euler(0, RollLerper.y + -PitchLerper.x, 0);
+        if (!ElevonRNull) ElevonR.localRotation = Quaternion.Euler(0, RollLerper.y + PitchLerper.x, 0);
+        if (!RuddervatorLNull) RuddervatorL.localRotation = Quaternion.Euler(0, YawLerper.y + -PitchLerper.x, 0);
+        if (!RuddervatorRNull) RuddervatorR.localRotation = Quaternion.Euler(0, YawLerper.y + PitchLerper.x, 0);
+ */
         foreach (Transform elevator in Elevators)
             elevator.localRotation = Quaternion.Euler(-PitchLerper);
 
