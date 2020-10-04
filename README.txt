@@ -4,7 +4,9 @@ https://github.com/Merlin-san/UdonSharp/releases
 https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
-
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix Update 1.35
+•Added missing ViewScreen material
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.34
 •Added commented out elevon and ruddervator code to EffectsController, uncomment it if you need it.

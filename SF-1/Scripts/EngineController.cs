@@ -133,6 +133,7 @@ public class EngineController : UdonSharpBehaviour
 
 
 
+    [System.NonSerializedAttribute] [HideInInspector] public string PlayerName;
     [System.NonSerializedAttribute] [HideInInspector] public bool FlightLimitsEnabled = true;
     [System.NonSerializedAttribute] [HideInInspector] public ConstantForce VehicleConstantForce;
     [System.NonSerializedAttribute] [HideInInspector] public Rigidbody VehicleRigidbody;
@@ -1948,11 +1949,11 @@ public class EngineController : UdonSharpBehaviour
                     //roll + rotational frictions
                     Vector3 FinalInputRot = new Vector3(-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere,// X Pitch
                         -localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere,// Y Yaw
-                            LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere));// Z Roll
+                            (LerpedRoll * Atmosphere) + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere));// Z Roll
 
                     //create values for use in fixedupdate (control input and straightening forces)
-                    Pitching = (((VehicleMainObj.transform.up * LerpedPitch * Atmosphere + (VehicleMainObj.transform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * 90)) * PilotingInt;
-                    Yawing = (((VehicleMainObj.transform.right * LerpedYaw * Atmosphere + (-VehicleMainObj.transform.right * sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * 90)) * PilotingInt;
+                    Pitching = (((VehicleMainObj.transform.up * LerpedPitch * Atmosphere + (VehicleMainObj.transform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift * Atmosphere)) * 90)) * PilotingInt;
+                    Yawing = (((VehicleMainObj.transform.right * LerpedYaw * Atmosphere + (-VehicleMainObj.transform.right * sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift * Atmosphere)) * 90)) * PilotingInt;
 
                     VehicleConstantForce.relativeForce = FinalInputAcc;
                     VehicleConstantForce.relativeTorque = FinalInputRot;
@@ -2159,6 +2160,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void CatapultLaunchEffects()
     {
+        VehicleRigidbody.WakeUp();
         if (EffectsControl.CatapultSteam != null) { EffectsControl.CatapultSteam.Play(); }
         if (Piloting || Passenger)
         {
@@ -2177,6 +2179,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void CatapultLockSound()
     {
+        VehicleRigidbody.Sleep();
         if (!SoundControl.CatapultLockNull)
             SoundControl.CatapultLock.Play();
     }

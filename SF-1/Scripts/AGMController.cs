@@ -7,6 +7,7 @@ using VRC.Udon;
 public class AGMController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
+    public float MaxLifetime = 20;
     public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 30;
     public float LockAngle;
@@ -41,7 +42,7 @@ public class AGMController : UdonSharpBehaviour
             gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
         }
         Lifetime += Time.deltaTime;
-        if (Lifetime > 30)
+        if (Lifetime > MaxLifetime)
         {
             if (Exploding)//missile exploded 10 seconds ago
             {
@@ -80,6 +81,6 @@ public class AGMController : UdonSharpBehaviour
             }
             else AGMani.SetTrigger("explode");
         }
-        Lifetime = 20;
+        Lifetime = MaxLifetime - 10;
     }
 }

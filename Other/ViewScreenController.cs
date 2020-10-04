@@ -94,7 +94,7 @@ public class ViewScreenController : UdonSharpBehaviour
             temp = TargetEngine.VehicleMainObj.transform.TransformDirection(temp);
             PlaneCamera.transform.position = (AAMTargets[AAMTarget].transform.position + temp);
 
-            ChannelNumberText.text = (AAMTarget + 1).ToString();
+            ChannelNumberText.text = string.Concat((AAMTarget + 1).ToString(), "\n", TargetEngine.PlayerName);
         }
     }
 
