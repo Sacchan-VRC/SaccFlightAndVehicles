@@ -93,7 +93,7 @@ public class HitDetector : UdonSharpBehaviour
         }
         else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "NotDead_event");//owner broadcasts because it's more reliable than everyone doing it individually
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "NotDead_event");//owner broadcasts because it seems more reliable than everyone doing it individually
         }
     }
     public void NotDead_event()//called by NotDead()
@@ -101,13 +101,12 @@ public class HitDetector : UdonSharpBehaviour
         if (EngineControl.InEditor)
         {
             EngineControl.Health = EngineControl.FullHealth;
-            EngineControl.dead = false;
         }
         else if (EngineControl.IsOwner)
         {
             EngineControl.Health = EngineControl.FullHealth;
         }
-        EngineControl.dead = false;//because respawning gives us an immense number of Gs because we move so far in one frame, we stop being 'dead' 5 seconds after we respawn. Can't die when already dead. 
+        EngineControl.dead = false;//because respawning gives us an immense number of Gs because we move so far in one frame, we stop being 'dead' 5 seconds after we respawn. Can't explode when 'dead' is set. 
     }
     private void Assert(bool condition, string message)
     {

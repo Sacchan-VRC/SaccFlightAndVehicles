@@ -29,6 +29,8 @@ public class HUDController : UdonSharpBehaviour
     public Transform HeadingIndicator;
     public Transform VelocityIndicator;
     public Transform AAMTargetIndicator;
+    public Transform GUNLeadIndicator;
+    public float BulletSpeed = 1050;
     public Transform PitchRoll;
     public Transform Yaw;
     public Transform LStickDisplayHighlighter;
@@ -58,6 +60,7 @@ public class HUDController : UdonSharpBehaviour
     private Vector3 temprot;
     private int showvel;
     const float InputSquareSize = 0.0284317f;
+    private Vector3 GUN_TargetPosLastFrame;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -79,6 +82,7 @@ public class HUDController : UdonSharpBehaviour
         Assert(HeadingIndicator != null, "Start: HeadingIndicator != null");
         Assert(VelocityIndicator != null, "Start: VelocityIndicator != null");
         Assert(AAMTargetIndicator != null, "Start: AAMTargetIndicator != null");
+        Assert(GUNLeadIndicator != null, "Start: GUNLeadIndicator != null");
         Assert(LStickDisplayHighlighter != null, "Start: LStickDisplayHighlighter != null");
         Assert(RStickDisplayHighlighter != null, "Start: RStickDisplayHighlighter != null");
         Assert(PitchRoll != null, "Start: PitchRoll != null");
@@ -145,7 +149,7 @@ public class HUDController : UdonSharpBehaviour
         }
 
         //AAM Target Indicator
-        if (EngineControl.AAMHasTarget && EngineControl.RStickSelection == 2)
+        if (EngineControl.AAMHasTarget && (EngineControl.RStickSelection == 1 || EngineControl.RStickSelection == 2))//GUN or AAM
         {
             AAMTargetIndicator.localScale = new Vector3(1, 1, 1);
             AAMTargetIndicator.position = transform.position + EngineControl.AAMCurrentTargetDirection;
@@ -160,6 +164,23 @@ public class HUDController : UdonSharpBehaviour
             }
         }
         else AAMTargetIndicator.localScale = Vector3.zero;
+        /////////////////
+
+        //GUN Lead Indicator
+        if (EngineControl.AAMHasTarget && EngineControl.RStickSelection == 1)
+        {
+            GUNLeadIndicator.gameObject.SetActive(true);
+            Vector3 TargetDir = EngineControl.AAMCurrentTargetDirection;
+            Vector3 TargetSpeed = TargetDir - GUN_TargetPosLastFrame;
+            // float BulletHitTime = Vector3.Distance(EngineControl.CenterOfMass.position, EngineControl.AAMCurrentTargetEngineControl.CenterOfMass.position) / (EngineControl.CurrentVel + (EngineControl.VehicleMainObj.transform.forward * BulletSpeed)).magnitude;
+            float BulletHitTime = TargetDir.magnitude / BulletSpeed;
+            Vector3 PredictedPos = TargetDir + ((TargetSpeed / Time.deltaTime) * BulletHitTime);
+            GUNLeadIndicator.position = transform.position + PredictedPos;
+            GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
+
+            GUN_TargetPosLastFrame = TargetDir;
+        }
+        else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
 
         //Smoke Color Indicator

@@ -63,7 +63,7 @@ public class SoundController : UdonSharpBehaviour
     float LastFrameDist;
     [System.NonSerializedAttribute] [HideInInspector] public float ThisFrameDist = 0;
     private bool Leftplane = false;
-    private float PlaneIdlePitch;
+    [System.NonSerializedAttribute] [HideInInspector] public float PlaneIdlePitch;
     [System.NonSerializedAttribute] [HideInInspector] public float PlaneIdleVolume;
     private float PlaneDistantPitch;
     [System.NonSerializedAttribute] [HideInInspector] public float PlaneDistantVolume;

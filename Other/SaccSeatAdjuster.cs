@@ -15,11 +15,11 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
     public Transform PositionTest;
     private Vector3 TargetRelative;
     private Vector3 SeatOriginalPos;
-    private bool Calibrated = true;
     private bool CalibratedY = false;
     private bool CalibratedZ = false;
     private VRCPlayerApi localPlayer;
     private float CalibrateTimer = 0f;
+    private float AwakeTimer = 0f;
     private float scaleratio;
     void Start()
     {
@@ -41,41 +41,35 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResetSeat");
         }
 
-        Calibrated = false;
         CalibratedZ = false;
         CalibratedY = false;
-        CalibrateTimer = 0f;
+        AwakeTimer = CalibrateTimer = 0f;
     }
 
     private void Update()
     {
+        AwakeTimer += Time.deltaTime;
         CalibrateTimer += Time.deltaTime;
-
-        if (Calibrated == false)
+        if (CalibrateTimer > .3f)//do it about 3 times a second so we don't send too many broadcasts
         {
-            if (CalibrateTimer > .3f)//do it about 3 times a second so we don't send too many broadcasts
+            if (localPlayer == null)//find test object relative position for editor testing
             {
-                if (localPlayer == null)//find test object relative position for editor testing
-                {
-                    TargetRelative = TargetHeight.InverseTransformPoint(PositionTest.position);
-                }
-                else//find head relative position ingame
-                {
-                    TargetRelative = TargetHeight.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position);
-                }
-
-                CalibrateY();
-                if (CalibrateFowardBack == true) { CalibrateZ(); }
-                else { CalibratedZ = true; }
-
-                if (CalibratedY && CalibratedZ)
-                {
-                    Calibrated = true;
-                    gameObject.SetActive(false);
-                }
-
-                CalibrateTimer = 0;
+                TargetRelative = TargetHeight.InverseTransformPoint(PositionTest.position);
             }
+            else//find head relative position ingame
+            {
+                TargetRelative = TargetHeight.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position);
+            }
+
+            CalibrateY();
+            if (CalibrateFowardBack == true) { CalibrateZ(); }
+            else { CalibratedZ = true; }
+
+            if (CalibratedY && CalibratedZ)//avatar 3.0 avatars have a weird delay when sitting so just wait a second to make sure we're calibrated
+            {
+                gameObject.SetActive(false);
+            }
+            CalibrateTimer = 0;
         }
     }
 
@@ -254,7 +248,7 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown1cm");
                 }
             }
-            else
+            else if (AwakeTimer > 1)
             {
                 CalibratedY = true;
             }
@@ -434,7 +428,7 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack1cm");
                 }
             }
-            else
+            else if (AwakeTimer > 1)
             {
                 CalibratedZ = true;
             }

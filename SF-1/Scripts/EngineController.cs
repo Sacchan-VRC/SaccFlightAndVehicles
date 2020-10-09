@@ -133,7 +133,8 @@ public class EngineController : UdonSharpBehaviour
 
 
 
-    [System.NonSerializedAttribute] [HideInInspector] public string PlayerName;
+    [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi Pilot;
+    [System.NonSerializedAttribute] [HideInInspector] public string PilotName;
     [System.NonSerializedAttribute] [HideInInspector] public bool FlightLimitsEnabled = true;
     [System.NonSerializedAttribute] [HideInInspector] public ConstantForce VehicleConstantForce;
     [System.NonSerializedAttribute] [HideInInspector] public Rigidbody VehicleRigidbody;
@@ -286,7 +287,7 @@ public class EngineController : UdonSharpBehaviour
     private int PilotingInt;//1 if piloting 0 if not
     /* [System.NonSerializedAttribute] [HideInInspector] */
     [System.NonSerializedAttribute] [HideInInspector] public int MissilesIncoming = 0;
-    private EngineController AAMCurrentTargetEngineControl;
+    [System.NonSerializedAttribute] [HideInInspector] public EngineController AAMCurrentTargetEngineControl;
     private float LastBombDropTime = 0f;
     private bool WeaponSelected = false;
     private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
@@ -419,7 +420,7 @@ public class EngineController : UdonSharpBehaviour
     private void LateUpdate()
     {
         if (!InEditor) IsOwner = localPlayer.IsOwner(VehicleMainObj);
-        if ((!EffectsControl.GearUp) && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 1))
+        if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 1))
         {
             Taxiing = true;
         }
@@ -682,6 +683,8 @@ public class EngineController : UdonSharpBehaviour
                     }
                     else
                     {
+                        AGMUnlocking = 0;
+                        AGMUnlockTimer = 0;
                         if (InEditor)
                         {
                             RStick3();
@@ -734,7 +737,7 @@ public class EngineController : UdonSharpBehaviour
                 //brake is done later because it has to be after switches
 
                 //LStick Selection wheel
-                if (LStick.magnitude > .8f && InVR)
+                if (LStick.magnitude > .7f && InVR)
                 {
                     float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), LStick);
 
@@ -781,9 +784,9 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 //RStick Selection wheel
-                if (RStick.magnitude > .8f && InVR)
+                if (RStick.magnitude > .7f && InVR)
                 {
-                    float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), RStick);
+                    float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), RStick);//that number is 22.5 degrees to the left of straight up
                     //R stick value is manually synced using events because i don't want to use too many synced variables.
                     //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
                     //The WeaponSelected variable helps us not send more broadcasts than we need to.
@@ -881,6 +884,9 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasAGM && RStickSelection != 3)
                         {
+                            AGMUnlocking = 0;
+                            AGMUnlockTimer = 0;
+
                             WeaponSelected = true;
                             if (InEditor)
                             {
@@ -1148,6 +1154,8 @@ public class EngineController : UdonSharpBehaviour
                         }
                         else { IsFiringGun = false; RTriggerLastFrame = false; }
 
+                        AAMTargeting(70);
+
                         AAMHasTarget = false;
                         AAMLocked = false;
                         AAMLockTimer = 0;
@@ -1155,74 +1163,7 @@ public class EngineController : UdonSharpBehaviour
                     case 2://AAM
                         if (NumAAMTargets != 0)
                         {
-                            float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position));
-
-                            //check 1 target per frame to see if it's infront of us and worthy of being our current target
-                            Vector3 AAMNextTargetDirection = (AAMTargets[AAMTargetChecker].transform.position - CenterOfMass.transform.position);
-                            float NextTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, AAMNextTargetDirection);
-                            float NextTargetDistance = Vector3.Distance(CenterOfMass.position, AAMTargets[AAMTargetChecker].transform.position);
-                            EngineController NextTargetEngineControl = VehicleMainObj.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
-                            if (AAMTargets[AAMTargetChecker].transform.parent != null)
-                                NextTargetEngineControl = AAMTargets[AAMTargetChecker].transform.parent.GetComponent<EngineController>();
-                            //if target EngineController is null then it's a dummy target (or isn't set up properly)
-                            if (AAMTargets[AAMTargetChecker].activeInHierarchy && (NextTargetEngineControl == null || !NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead))
-                            {
-                                if ((AAMTargets[AAMTargetChecker].activeSelf && NextTargetAngle < AAMLockAngle)
-                                 && NextTargetDistance < AAMMaxTargetDistance && NextTargetAngle < AAMCurrentTargetAngle)
-                                {
-                                    //found new target
-                                    AAMCurrentTargetAngle = NextTargetAngle;
-                                    AAMTarget = AAMTargetChecker;
-                                    if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
-                                        AAMCurrentTargetEngineControl = NextTargetEngineControl;
-                                    AAMLockTimer = 0;
-                                    AAMTargetedTimer = .5f;//give the synced variable time to update before sending targeted
-                                }
-                            }
-                            //increase target checker ready for next frame
-                            AAMTargetChecker++;
-                            if (AAMTargetChecker == AAMTarget)
-                                AAMTargetChecker++;
-                            if (AAMTargetChecker == NumAAMTargets)
-                            {
-                                AAMTargetChecker = 0;
-                            }
-
-                            //targeting
-                            AAMCurrentTargetDirection = AAMTargets[AAMTarget].transform.position - CenterOfMass.transform.position;
-                            float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
-                            //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
-                            if (!Taxiing && AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || !AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead))
-                            {
-                                if (AAMCurrentTargetAngle < AAMLockAngle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
-                                {
-                                    AAMHasTarget = true;
-                                    if (NumAAM > 0) AAMLockTimer += Time.deltaTime;//give enemy radar lock even if you're out of missiles
-                                    if (AAMCurrentTargetEngineControl != null)
-                                    {
-                                        //target is a plane
-                                        AAMTargetedTimer += Time.deltaTime;
-                                        if (AAMTargetedTimer > 1)
-                                        {
-                                            AAMTargetedTimer = 0;
-                                            if (InEditor)
-                                                Targeted();
-                                            else
-                                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted");
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    AAMTargetedTimer = 2f;//so it plays straight away next time it's targeted
-                                    AAMLockTimer = 0;
-                                    AAMHasTarget = false;
-                                }
-                            }
-                            else
-                            {
-                                AAMHasTarget = false;
-                            }
+                            AAMTargeting(AAMLockAngle);
 
                             if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
                             else { AAMLocked = false; }
@@ -1401,8 +1342,6 @@ public class EngineController : UdonSharpBehaviour
                         if (RTrigger > 0.75)
                         {
                             if (!RTriggerLastFrame && CatapultStatus == 0) { EffectsControl.GearUp = !EffectsControl.GearUp; }
-
-                            IsFiringGun = false;
                             RTriggerLastFrame = true;
                         }
                         else { RTriggerLastFrame = false; }
@@ -1575,6 +1514,7 @@ public class EngineController : UdonSharpBehaviour
 
                 if (Taxiing)
                 {
+                    AAMLockTimer = 0;
                     AngleOfAttack = 0; // prevent stall sound and aoavapor when on ground
                     Cruise = false;
                     AltHold = false;
@@ -2149,7 +2089,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void Targeted()
     {
-        EngineController TargetEngine = VehicleMainObj.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
+        EngineController TargetEngine = null;
         if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
             TargetEngine = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
         if (TargetEngine != null)
@@ -2249,6 +2189,12 @@ public class EngineController : UdonSharpBehaviour
         SoundControl.playsonicboom = false;
         SoundControl.silent = false;
 
+        SoundControl.PlaneIdlePitch = 0;
+        foreach (AudioSource idle in SoundControl.PlaneIdle)
+        {
+            idle.pitch = 0;
+        }
+
         if (InEditor || IsOwner)
         {
             VehicleRigidbody.velocity = Vector3.zero;
@@ -2256,7 +2202,6 @@ public class EngineController : UdonSharpBehaviour
             Fuel = FullFuel;
         }
 
-        //pilot and passenger are dropped out of the plane
         if (SoundControl != null && !SoundControl.ExplosionNull)
         {
             int rand = Random.Range(0, SoundControl.Explosion.Length);
@@ -2266,6 +2211,7 @@ public class EngineController : UdonSharpBehaviour
             }
         }
 
+        //pilot and passenger are dropped out of the plane
         if ((Piloting || Passenger) && !InEditor)
         {
             foreach (LeaveVehicleButton seat in LeaveButtons)
@@ -2275,6 +2221,92 @@ public class EngineController : UdonSharpBehaviour
         }
         EffectsControl.PlaneAnimator.SetTrigger("explode");
     }
+    private void AAMTargeting(float Lock_Angle)
+    {
+        var CurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+        float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (CurrentTargetPosition - CenterOfMass.transform.position));
+
+        //check 1 target per frame to see if it's infront of us and worthy of being our current target
+        var TargetChecker = AAMTargets[AAMTargetChecker];
+        var TargetCheckerTransform = TargetChecker.transform;
+        var TargetCheckerParent = TargetCheckerTransform.parent;
+
+        Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - CenterOfMass.transform.position);
+        float NextTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, AAMNextTargetDirection);
+        float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
+
+        if (TargetChecker.activeInHierarchy)
+        {
+            EngineController NextTargetEngineControl = null;
+
+            if (TargetCheckerParent)
+            {
+                NextTargetEngineControl = TargetCheckerParent.GetComponent<EngineController>();
+            }
+            //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
+            if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead)))
+            {
+                if (NextTargetAngle < Lock_Angle && NextTargetDistance < AAMMaxTargetDistance
+                 && NextTargetAngle < AAMCurrentTargetAngle)
+                {
+                    //found new target
+                    AAMCurrentTargetAngle = NextTargetAngle;
+                    AAMTarget = AAMTargetChecker;
+                    AAMCurrentTargetEngineControl = NextTargetEngineControl;
+                    AAMLockTimer = 0;
+                    AAMTargetedTimer = .5f;//give the synced variable time to update before sending targeted
+                }
+            }
+        }
+        //increase target checker ready for next frame
+        AAMTargetChecker++;
+        if (AAMTargetChecker == AAMTarget && AAMTarget == NumAAMTargets - 1)
+            AAMTargetChecker = 0;
+        else if (AAMTargetChecker == AAMTarget)
+            AAMTargetChecker++;
+        else if (AAMTargetChecker > NumAAMTargets - 1)
+            AAMTargetChecker = 0;
+
+        //if target is currently in front of plane, lock onto it
+        AAMCurrentTargetDirection = CurrentTargetPosition - HUDControl.transform.position;
+        float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
+        //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
+        if (!Taxiing && AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || !AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead))
+        {
+            if (AAMCurrentTargetAngle < Lock_Angle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
+            {
+                AAMHasTarget = true;
+                if (NumAAM > 0) AAMLockTimer += Time.deltaTime;
+                //give enemy radar lock even if you're out of missiles
+                if (AAMCurrentTargetEngineControl != null && RStickSelection == 2)
+                {
+                    //target is a plane
+                    AAMTargetedTimer += Time.deltaTime;
+                    if (AAMTargetedTimer > 1)
+                    {
+                        AAMTargetedTimer = 0;
+                        if (InEditor)
+                            Targeted();
+                        else
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted");
+                    }
+                }
+            }
+            else
+            {
+                AAMTargetedTimer = 2f;//so it plays straight away next time it's targeted
+                AAMLockTimer = 0;
+                AAMHasTarget = false;
+            }
+        }
+        else
+        {
+            AAMTargetedTimer = 2f;
+            AAMLockTimer = 0;
+            AAMHasTarget = false;
+        }
+    }
+
     private void Assert(bool condition, string message)
     {
         if (!condition)

@@ -64,10 +64,11 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
-        EngineControl.PlayerName = player.displayName;
+        EngineControl.PilotName = player.displayName;
+        EngineControl.Pilot = player;
 
         if (!player.isLocal)
-            EngineControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the respawn event
+            EngineControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
 
         //old WakeUp();
         EngineControl.EffectsControl.DoEffects = 0f;
@@ -93,7 +94,9 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
-        EngineControl.PlayerName = string.Empty;
+        EngineControl.PilotName = string.Empty;
+        EngineControl.Pilot = null;
+        
         if (player.isLocal)
         {
             EngineControl.Piloting = false;

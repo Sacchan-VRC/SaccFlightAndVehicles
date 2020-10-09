@@ -23,6 +23,7 @@ public class VehicleRespawnButton : UdonSharpBehaviour
             EngineControl.EffectsControl.GearUp = false;
             EngineControl.EffectsControl.Flaps = true;
             EngineControl.EffectsControl.HookDown = false;
+            EngineControl.FlightLimitsEnabled = true;
             EngineControl.Health = EngineControl.FullHealth;
             EngineControl.Fuel = EngineControl.FullFuel;
             EngineControl.NumAAM = EngineControl.FullAAMs;

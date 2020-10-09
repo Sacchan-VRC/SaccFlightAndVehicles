@@ -10,6 +10,7 @@ public class AAMController : UdonSharpBehaviour
     public float MaxLifetime = 7;
     public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 30;
+    public float MissileDriftCompensation = 30;
     public float RotSpeed = 15;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
@@ -21,9 +22,14 @@ public class AAMController : UdonSharpBehaviour
     private bool Exploding = false;
     private CapsuleCollider AAMCollider;
     private bool Owner = false;
+    private bool TargetIsPlane = false;
     private bool LockedOn = false;
+    private Rigidbody MissileRigid;
+    Vector3 TargetPosLastFrame;
+    //public Transform testobj;
     void Start()
     {
+        MissileRigid = gameObject.GetComponent<Rigidbody>();
         Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
         LockAngle = EngineControl.AAMLockAngle;
         StartLockAngle = LockAngle;
@@ -36,6 +42,7 @@ public class AAMController : UdonSharpBehaviour
                 if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
                     TargetEngineControl.MissilesIncoming++;
                 LockedOn = true;
+                TargetIsPlane = true;
             }
         }
 
@@ -68,9 +75,24 @@ public class AAMController : UdonSharpBehaviour
                 LockAngle = StartLockAngle;
             }
         }
-        if (Vector3.Angle(gameObject.transform.forward, (Target.position - gameObject.transform.position)) < LockAngle)
+
+        Lifetime += Time.deltaTime;
+        if (Lifetime > MaxLifetime)
         {
-            var missileToTargetVector = Target.position - gameObject.transform.position;
+            if (Exploding)//missile exploded 10 seconds ago
+            {
+                Destroy(gameObject);
+            }
+            else Explode();//explode and give Lifetime another 10 seconds
+        }
+    }
+
+    private void FixedUpdate()
+    {
+
+        Vector3 missileToTargetVector = Target.position - gameObject.transform.position;
+        if (Vector3.Angle(gameObject.transform.forward, missileToTargetVector) < LockAngle)
+        {
             var missileForward = gameObject.transform.forward;
             var targetDirection = missileToTargetVector.normalized;
             var rotationAxis = Vector3.Cross(missileForward, targetDirection);
@@ -82,15 +104,6 @@ public class AAMController : UdonSharpBehaviour
             if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
                 TargetEngineControl.MissilesIncoming -= 1;
             LockedOn = false;
-        }
-        Lifetime += Time.deltaTime;
-        if (Lifetime > MaxLifetime)
-        {
-            if (Exploding)//missile exploded 10 seconds ago
-            {
-                Destroy(gameObject);
-            }
-            else Explode();//explode and give Lifetime another 10 seconds
         }
     }
     private void OnCollisionEnter(Collision other)
