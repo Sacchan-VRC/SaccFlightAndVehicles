@@ -8,14 +8,18 @@ public class PassengerSeat : UdonSharpBehaviour
 {
     public EngineController EngineControl;
     public GameObject LeaveButton;
-    public Transform PlaneMesh;
     public GameObject SeatAdjuster;
+    private Transform PlaneMesh;
+    private LayerMask Planelayer;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
         Assert(LeaveButton != null, "Start: LeaveButton != null");
         Assert(PlaneMesh != null, "Start: PlaneMesh != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
+
+        PlaneMesh = EngineControl.PlaneMesh;
+        Planelayer = 1 << PlaneMesh.gameObject.layer;
     }
     private void Interact()
     {
@@ -32,7 +36,7 @@ public class PassengerSeat : UdonSharpBehaviour
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
             foreach (Transform child in children)
             {
-                child.gameObject.layer = 19;
+                child.gameObject.layer = EngineControl.OnboardPlaneLayer;
             }
         }
     }
@@ -54,7 +58,7 @@ public class PassengerSeat : UdonSharpBehaviour
                 Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
                 foreach (Transform child in children)
                 {
-                    child.gameObject.layer = 17;
+                    child.gameObject.layer = Planelayer;
                 }
             }
         }

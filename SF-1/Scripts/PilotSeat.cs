@@ -9,15 +9,27 @@ public class PilotSeat : UdonSharpBehaviour
     public EngineController EngineControl;
     public GameObject LeaveButton;
     public GameObject Gun_pilot;
-    public Transform PlaneMesh;
     public GameObject SeatAdjuster;
+    private Transform PlaneMesh;
+    private LayerMask Planelayer = 0;
+    private ParticleSystem.CollisionModule gunpilotcol;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
         Assert(LeaveButton != null, "Start: LeaveButton != null");
         Assert(Gun_pilot != null, "Start: Gun_pilot != null");
-        Assert(PlaneMesh != null, "Start: PlaneMesh != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
+
+        PlaneMesh = EngineControl.PlaneMesh.transform;
+
+        //make sure gun_pilot will never have collision enabled on the 'OnboardPlaneLayer'
+        var GunPilotCollisionModule = Gun_pilot.GetComponent<ParticleSystem>().collision;
+        int CollideLayers = GunPilotCollisionModule.collidesWith;
+        CollideLayers = CollideLayers & (int.MaxValue ^ (1 << EngineControl.OnboardPlaneLayer));//NOT ~ is not implemented.
+        GunPilotCollisionModule.collidesWith = CollideLayers;
+
+        //get the layer of the plane as set by the world creator
+        Planelayer = PlaneMesh.gameObject.layer;
     }
     private void Interact()//entering the plane
     {
@@ -64,7 +76,7 @@ public class PilotSeat : UdonSharpBehaviour
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
             foreach (Transform child in children)
             {
-                child.gameObject.layer = 19;
+                child.gameObject.layer = EngineControl.OnboardPlaneLayer;
             }
         }
     }
@@ -151,7 +163,7 @@ public class PilotSeat : UdonSharpBehaviour
                 Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
                 foreach (Transform child in children)
                 {
-                    child.gameObject.layer = 17;
+                    child.gameObject.layer = Planelayer;
                 }
 
             }

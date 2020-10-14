@@ -11,6 +11,8 @@ public class EngineController : UdonSharpBehaviour
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
+    public Transform PlaneMesh;
+    public int OnboardPlaneLayer = 19;
     public Transform CenterOfMass;
     public Transform PitchMoment;
     public Transform YawMoment;
@@ -292,6 +294,7 @@ public class EngineController : UdonSharpBehaviour
     private bool WeaponSelected = false;
     private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
     [System.NonSerializedAttribute] [HideInInspector] public bool AtGCamNull = true;//used by HudController
+    private int OutsidePlaneLayer;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -303,6 +306,7 @@ public class EngineController : UdonSharpBehaviour
         Assert(EffectsControl != null, "Start: EffectsControl != null");
         Assert(SoundControl != null, "Start: SoundControl != null");
         Assert(HUDControl != null, "Start: HUDControl != null");
+        Assert(PlaneMesh != null, "Start: PlaneMesh != null");
         Assert(CenterOfMass != null, "Start: CenterOfMass != null");
         Assert(PitchMoment != null, "Start: PitchMoment != null");
         Assert(YawMoment != null, "Start: YawMoment != null");
@@ -316,6 +320,8 @@ public class EngineController : UdonSharpBehaviour
         Assert(AGMLaunchPoint != null, "Start: AGMLaunchPoint != null");
         Assert(Bomb != null, "Start: Bomb != null");
         Assert(BombLaunchPoints.Length > 0, "Start: BombLaunchPoint.Length > 0");
+
+        OutsidePlaneLayer = PlaneMesh.gameObject.layer;
 
         if (AtGCam != null) AtGCamNull = false;
 
@@ -420,7 +426,7 @@ public class EngineController : UdonSharpBehaviour
     private void LateUpdate()
     {
         if (!InEditor) IsOwner = localPlayer.IsOwner(VehicleMainObj);
-        if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 1))
+        if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 2049 /* Default and Environment */))
         {
             Taxiing = true;
         }
@@ -2240,8 +2246,10 @@ public class EngineController : UdonSharpBehaviour
         float NextTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
 
+        RaycastHit hit;
         if (TargetChecker.activeInHierarchy)
         {
+
             EngineController NextTargetEngineControl = null;
 
             if (TargetCheckerParent)
@@ -2251,8 +2259,13 @@ public class EngineController : UdonSharpBehaviour
             //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
             if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead)))
             {
-                if (NextTargetAngle < Lock_Angle && NextTargetDistance < AAMMaxTargetDistance
-                 && NextTargetAngle < AAMCurrentTargetAngle)
+                //raycast to check if it's behind something
+                Physics.Raycast(CenterOfMass.position, AAMNextTargetDirection, out hit, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+
+                if (hit.collider.gameObject.layer == OutsidePlaneLayer
+                    && NextTargetAngle < Lock_Angle
+                        && NextTargetDistance < AAMMaxTargetDistance
+                            && NextTargetAngle < AAMCurrentTargetAngle)
                 {
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;
@@ -2276,9 +2289,12 @@ public class EngineController : UdonSharpBehaviour
         AAMCurrentTargetDirection = CurrentTargetPosition - HUDControl.transform.position;
         float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
         //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
+        //raycast to check if it's behind something
+        Physics.Raycast(CenterOfMass.position, AAMCurrentTargetDirection, out hit, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
         if (!Taxiing && AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
         {
-            if (AAMCurrentTargetAngle < Lock_Angle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
+            if (hit.collider.gameObject.layer == OutsidePlaneLayer &&
+            AAMCurrentTargetAngle < Lock_Angle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
             {
                 AAMHasTarget = true;
                 if (NumAAM > 0) AAMLockTimer += Time.deltaTime;
