@@ -264,7 +264,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [HideInInspector] public int NumAAMTargets = 0;
     private int AAMTargetChecker = 0;
     [System.NonSerializedAttribute] [HideInInspector] public bool AAMHasTarget = false;
-    private float AAMTargetedTimer = 1.1f;
+    private float AAMTargetedTimer = 2f;
     [System.NonSerializedAttribute] [HideInInspector] public bool AAMLocked = false;
     [System.NonSerializedAttribute] [HideInInspector] public float AAMLockTimer = 0;
     private float AAMLastFiredTime;
@@ -871,6 +871,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasAAM && RStickSelection != 2)
                         {
+                            AAMTargetedTimer = 2;
                             WeaponSelected = true;
                             if (InEditor)
                             {
@@ -1156,7 +1157,6 @@ public class EngineController : UdonSharpBehaviour
 
                         AAMTargeting(70);
 
-                        AAMHasTarget = false;
                         AAMLocked = false;
                         AAMLockTimer = 0;
                         break;
@@ -1515,6 +1515,7 @@ public class EngineController : UdonSharpBehaviour
                 if (Taxiing)
                 {
                     AAMLockTimer = 0;
+                    AAMTargetedTimer = 2;
                     AngleOfAttack = 0; // prevent stall sound and aoavapor when on ground
                     Cruise = false;
                     AltHold = false;
@@ -1929,6 +1930,7 @@ public class EngineController : UdonSharpBehaviour
                     CatapultLaunchTime -= Time.deltaTime;
                     if (CatapultLaunchTime < 0)
                     {
+                        dead = false;//just in case
                         CatapultStatus = 0;
                     }
                     break;
@@ -1971,7 +1973,10 @@ public class EngineController : UdonSharpBehaviour
     public override void OnOwnershipTransferred()
     {
         VehicleRigidbody.velocity = CurrentVel;
-        LastFrameVel = CurrentVel; //hopefully prevents explosions as soon as you enter the plane
+
+        //hopefully prevents explosions when you enter the plane
+        Gs = 0;
+        LastFrameVel = CurrentVel;
     }
 
     //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
@@ -2254,7 +2259,7 @@ public class EngineController : UdonSharpBehaviour
                     AAMTarget = AAMTargetChecker;
                     AAMCurrentTargetEngineControl = NextTargetEngineControl;
                     AAMLockTimer = 0;
-                    AAMTargetedTimer = .5f;//give the synced variable time to update before sending targeted
+                    AAMTargetedTimer = .6f;//give the synced variable time to update before sending targeted
                 }
             }
         }
@@ -2271,7 +2276,7 @@ public class EngineController : UdonSharpBehaviour
         AAMCurrentTargetDirection = CurrentTargetPosition - HUDControl.transform.position;
         float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
         //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
-        if (!Taxiing && AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || !AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead))
+        if (!Taxiing && AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
         {
             if (AAMCurrentTargetAngle < Lock_Angle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
             {
@@ -2306,7 +2311,6 @@ public class EngineController : UdonSharpBehaviour
             AAMHasTarget = false;
         }
     }
-
     private void Assert(bool condition, string message)
     {
         if (!condition)

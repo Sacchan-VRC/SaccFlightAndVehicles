@@ -321,7 +321,7 @@ public class SoundController : UdonSharpBehaviour
                 foreach (AudioSource idle in PlaneIdle)
                     idle.Stop();
             }
-            if (EngineControl.AAMHasTarget && !EngineControl.AAMLocked)
+            if (EngineControl.AAMHasTarget && !EngineControl.AAMLocked && EngineControl.RStickSelection == 2)
             {
                 AAMTargeting.gameObject.SetActive(true);
                 AAMTargetLock.gameObject.SetActive(false);

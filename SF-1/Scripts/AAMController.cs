@@ -7,10 +7,10 @@ using VRC.Udon;
 public class AAMController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
-    public float MaxLifetime = 7;
+    public float MaxLifetime = 12;
     public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 30;
-    public float MissileDriftCompensation = 30;
+    public float MissileDriftCompensation = 45f;
     public float RotSpeed = 15;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
@@ -25,6 +25,7 @@ public class AAMController : UdonSharpBehaviour
     private bool TargetIsPlane = false;
     private bool LockedOn = false;
     private Rigidbody MissileRigid;
+    private float TargDistlastframe = 999999999;
     Vector3 TargetPosLastFrame;
     //public Transform testobj;
     void Start()
@@ -61,7 +62,7 @@ public class AAMController : UdonSharpBehaviour
         //Debug.Log(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
         if (!ColliderActive)
         {
-            if (Vector3.Distance(gameObject.transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
+            if (Vector3.Distance(transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
             {
                 AAMCollider.enabled = true;
                 ColliderActive = true;
@@ -89,23 +90,57 @@ public class AAMController : UdonSharpBehaviour
 
     private void FixedUpdate()
     {
+        Vector3 Position = transform.position;
+        Vector3 TargetPos = TargetEngineControl.CenterOfMass.position;
+        float TargetDistance = Vector3.Distance(Position, TargetPos);
+        if (TargetIsPlane)
+        {
 
-        Vector3 missileToTargetVector = Target.position - gameObject.transform.position;
-        if (Vector3.Angle(gameObject.transform.forward, missileToTargetVector) < LockAngle)
-        {
-            var missileForward = gameObject.transform.forward;
-            var targetDirection = missileToTargetVector.normalized;
-            var rotationAxis = Vector3.Cross(missileForward, targetDirection);
-            var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-            gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
+            float timetotarget = TargetDistance / MissileRigid.velocity.magnitude;
+            Vector3 Targetmovedir = TargetPos - TargetPosLastFrame;
+            float DriftAngle = Vector3.Angle(transform.forward, MissileRigid.velocity) / MissileDriftCompensation;
+            Vector3 TargetPredictedPos = TargetEngineControl.CenterOfMass.position + (((Targetmovedir * timetotarget) + (Targetmovedir * DriftAngle)) / Time.fixedDeltaTime);
+
+            TargetPosLastFrame = TargetPos;
+            if (TargetDistance < TargDistlastframe)
+            {
+                Vector3 missileToTargetVector;
+                if (TargetDistance < 700)
+                {
+                    missileToTargetVector = (TargetPredictedPos - Position);
+                }
+                else
+                {
+                    missileToTargetVector = TargetPos - Position;
+                }
+                var missileForward = transform.forward;
+                var targetDirection = missileToTargetVector.normalized;
+                var rotationAxis = Vector3.Cross(missileForward, targetDirection);
+                var deltaAngle = Vector3.Angle(missileForward, targetDirection);
+                transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
+            }
+            else if (LockedOn)
+            {
+                if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
+                    TargetEngineControl.MissilesIncoming -= 1;
+                LockedOn = false;
+            }
         }
-        else if (LockedOn)
+        else
         {
-            if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                TargetEngineControl.MissilesIncoming -= 1;
-            LockedOn = false;
+            if (TargetDistance < TargDistlastframe)
+            {
+                Vector3 missileToTargetVector = TargetPos - Position;
+                var missileForward = transform.forward;
+                var targetDirection = missileToTargetVector.normalized;
+                var rotationAxis = Vector3.Cross(missileForward, targetDirection);
+                var deltaAngle = Vector3.Angle(missileForward, targetDirection);
+                transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
+            }
         }
+        TargDistlastframe = TargetDistance;
     }
+
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)

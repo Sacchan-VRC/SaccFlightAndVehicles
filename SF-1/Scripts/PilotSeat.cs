@@ -21,6 +21,12 @@ public class PilotSeat : UdonSharpBehaviour
     }
     private void Interact()//entering the plane
     {
+        var Target = EngineControl.AAMTargets[EngineControl.AAMTarget];
+        if (Target && Target.transform.parent)
+        {
+            EngineControl.AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
+        }
+
         if (EngineControl.VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.VehicleMainObj); }
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (EngineControl != null)
@@ -96,7 +102,7 @@ public class PilotSeat : UdonSharpBehaviour
     {
         EngineControl.PilotName = string.Empty;
         EngineControl.Pilot = null;
-        
+
         if (player.isLocal)
         {
             EngineControl.Piloting = false;
