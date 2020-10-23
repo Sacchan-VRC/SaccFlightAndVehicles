@@ -12,14 +12,15 @@ public class ViewScreenController : UdonSharpBehaviour
     public Camera PlaneCamera;
     public GameObject ViewScreen;
     public Text ChannelNumberText;
-    [System.NonSerializedAttribute] [HideInInspector] public GameObject[] AAMTargets = new GameObject[80];
+    [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
     [UdonSynced(UdonSyncMode.None)] public int AAMTarget;
-    [System.NonSerializedAttribute] [HideInInspector] public int NumAAMTargets = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
-    [System.NonSerializedAttribute] [HideInInspector] public bool Disabled = true;
-    [System.NonSerializedAttribute] [HideInInspector] public bool InEditor = true;
-    int currenttarget = -1;
-    EngineController TargetEngine;
+    [System.NonSerializedAttribute] public int NumAAMTargets = 0;
+    [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
+    [System.NonSerializedAttribute] public bool Disabled = true;
+    [System.NonSerializedAttribute] public bool InEditor = true;
+    private int currenttarget = -1;
+    private EngineController TargetEngine;
+    private Transform TargetCoM;
     void Start()
     {
         localPlayer = Networking.LocalPlayer;
@@ -32,7 +33,7 @@ public class ViewScreenController : UdonSharpBehaviour
         int n = 0;
         foreach (RaycastHit target in aamtargs)
         {
-            EngineController TargetEngineStart = gameObject.GetComponent<EngineController>();//this returns null but unity complains if it's not 'initialized'
+            EngineController TargetEngineStart = null;
             if (target.collider.transform.parent != null)
                 TargetEngineStart = target.collider.transform.parent.GetComponent<EngineController>();
 
@@ -73,6 +74,7 @@ public class ViewScreenController : UdonSharpBehaviour
                 if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
                 {
                     TargetEngine = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
+                    TargetCoM = TargetEngine.CenterOfMass;
                 }
             }
             currenttarget = AAMTarget;
@@ -86,13 +88,27 @@ public class ViewScreenController : UdonSharpBehaviour
                     Disabled = true;
                 }
             }
-            if (TargetEngine.SoundControl.ThisFrameDist > 2000f && !TargetEngine.IsOwner)
-                TargetEngine.EffectsControl.Effects();//this is skipped in effectscontroller as an optimization if plane is distant, but the camera can see it close up, so do it here.
+            if (TargetEngine.EffectsControl.LargeEffectsOnly)
+            { TargetEngine.EffectsControl.Effects(); }//this is skipped in effectscontroller as an optimization if plane is distant, but the camera can see it close up, so do it here.
 
-            PlaneCamera.transform.rotation = Quaternion.Slerp(PlaneCamera.transform.rotation, AAMTargets[AAMTarget].transform.rotation, 8f * Time.deltaTime);
-            Vector3 temp = new Vector3(0, 14, -50);
-            temp = TargetEngine.VehicleMainObj.transform.TransformDirection(temp);
-            PlaneCamera.transform.position = (AAMTargets[AAMTarget].transform.position + temp);
+            var VehicleTrans = TargetEngine.VehicleMainObj.transform;
+            Quaternion NewRot;
+            Vector3 temp = VehicleTrans.TransformDirection(new Vector3(0, 14, 0));
+            RaycastHit hit;
+            if (Physics.Raycast(TargetCoM.position + temp, -VehicleTrans.forward, out hit, 50, 1))
+            {
+                temp = hit.point + VehicleTrans.forward * .2f;
+                NewRot = TargetEngine.VehicleMainObj.transform.rotation;
+                NewRot = Quaternion.AngleAxis(((-hit.distance + 50) / 50) * 30, VehicleTrans.right) * NewRot;
+            }
+            else
+            {
+                temp = (TargetCoM.position + temp) - (VehicleTrans.forward * 50);
+                NewRot = TargetEngine.VehicleMainObj.transform.rotation;
+            }
+
+            PlaneCamera.transform.position = temp;
+            PlaneCamera.transform.rotation = Quaternion.Slerp(PlaneCamera.transform.rotation, NewRot, 8f * Time.deltaTime);
 
             ChannelNumberText.text = string.Concat((AAMTarget + 1).ToString(), "\n", TargetEngine.PilotName);
         }

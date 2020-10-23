@@ -50,17 +50,24 @@ public class HUDController : UdonSharpBehaviour
     public GameObject RStick_funcon7;
     public GameObject RStick_funcon8;
     private Animator PlaneAnimator;
-    private const float distance_from_head = 1.333f;
+    public float distance_from_head = 1.333f;
     private float maxGs = 0f;
     private Vector3 InputsZeroPos;
     private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
     private float check = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public float MenuSoundCheckLast = 0;
+    [System.NonSerializedAttribute] public float MenuSoundCheckLast = 0;
     private Vector3 temprot;
     private int showvel;
     const float InputSquareSize = 0.0284317f;
-    private Vector3 GUN_TargetPosLastFrame;
+    [System.NonSerializedAttribute] public Vector3 GUN_TargetDirLastFrame;
+    [System.NonSerializedAttribute] public float GUN_TargetSpeedLerper;
+    private Vector3 TargetDir = Vector3.zero;
+    private Vector3 TargetSpeed;
+    private bool HasAAMTargets = false;
+    private float BulletSpeedDivider;
+    private float FullFuelDivider;
+    private float FullGunAmmoDivider;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -104,6 +111,11 @@ public class HUDController : UdonSharpBehaviour
 
         PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
+
+        BulletSpeedDivider = 1f / BulletSpeed;
+
+        FullFuelDivider = 1f / EngineControl.Fuel;
+        FullGunAmmoDivider = 1f / EngineControl.GunAmmoInSeconds;
     }
     private void OnEnable()
     {
@@ -171,14 +183,14 @@ public class HUDController : UdonSharpBehaviour
         {
             GUNLeadIndicator.gameObject.SetActive(true);
             Vector3 TargetDir = EngineControl.AAMCurrentTargetDirection;
-            Vector3 TargetSpeed = TargetDir - GUN_TargetPosLastFrame;
-            // float BulletHitTime = Vector3.Distance(EngineControl.CenterOfMass.position, EngineControl.AAMCurrentTargetEngineControl.CenterOfMass.position) / (EngineControl.CurrentVel + (EngineControl.VehicleMainObj.transform.forward * BulletSpeed)).magnitude;
-            float BulletHitTime = TargetDir.magnitude / BulletSpeed;
-            Vector3 PredictedPos = TargetDir + ((TargetSpeed / Time.deltaTime) * BulletHitTime);
+            Vector3 RelativeTargetSpeed = TargetDir - GUN_TargetDirLastFrame;
+            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, RelativeTargetSpeed.magnitude / Time.deltaTime, 3f * Time.deltaTime);
+            float BulletHitTime = TargetDir.magnitude * BulletSpeedDivider;
+            Vector3 PredictedPos = TargetDir + ((RelativeTargetSpeed.normalized * GUN_TargetSpeedLerper) * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
-            GUN_TargetPosLastFrame = TargetDir;
+            GUN_TargetDirLastFrame = TargetDir;
         }
         else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
@@ -434,8 +446,8 @@ public class HUDController : UdonSharpBehaviour
         else HUDText_Bomb_ammo.text = string.Empty;
 
         PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
-        PlaneAnimator.SetFloat("fuel", EngineControl.Fuel / EngineControl.FullFuel);
-        PlaneAnimator.SetFloat("gunammo", EngineControl.GunAmmoInSeconds / EngineControl.FullGunAmmo);
+        PlaneAnimator.SetFloat("fuel", EngineControl.Fuel * FullFuelDivider);
+        PlaneAnimator.SetFloat("gunammo", EngineControl.GunAmmoInSeconds * FullGunAmmoDivider);
     }
     private void Assert(bool condition, string message)
     {

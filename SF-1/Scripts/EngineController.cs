@@ -18,6 +18,7 @@ public class EngineController : UdonSharpBehaviour
     public Transform YawMoment;
     public Transform GroundDetector;
     public Transform HookDetector;
+    [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
     public LayerMask ResupplyLayer;
     public LayerMask HookCableLayer;
     public Transform CatapultDetector;
@@ -104,6 +105,7 @@ public class EngineController : UdonSharpBehaviour
     public float GroundBrakeStrength = 6f;
     public float GroundBrakeSpeed = 40f;
     public float HookedBrakeStrength = 65f;
+    public float HookedBrakeMaxDistance = 90f;
     public float CatapultLaunchStrength = 50f;
     public float CatapultLaunchTime = 2f;
     public float TakeoffAssist = 5f;
@@ -111,7 +113,6 @@ public class EngineController : UdonSharpBehaviour
     public float GLimiter = 12f;
     public float AoALimiter = 15f;
     public float CanopyCloseTime = 1.8f;
-    [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
     public float SeaLevel = -10f;
     public Vector3 Wind;
     public float WindGustStrength = 15;
@@ -122,34 +123,34 @@ public class EngineController : UdonSharpBehaviour
 
 
     //best to remove synced variables if you aren't using them
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float BrakeInput;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Throttle = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 CurrentVel = Vector3.zero;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float Gs = 1f;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 SmokeColor = Vector3.one;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public float BrakeInput;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public float Throttle = 0f;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 CurrentVel = Vector3.zero;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public float Gs = 1f;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 SmokeColor = Vector3.one;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
 
 
 
-    [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi Pilot;
-    [System.NonSerializedAttribute] [HideInInspector] public string PilotName;
-    [System.NonSerializedAttribute] [HideInInspector] public bool FlightLimitsEnabled = true;
-    [System.NonSerializedAttribute] [HideInInspector] public ConstantForce VehicleConstantForce;
-    [System.NonSerializedAttribute] [HideInInspector] public Rigidbody VehicleRigidbody;
-    [System.NonSerializedAttribute] [HideInInspector] public Color SmokeColor_Color;
+    [System.NonSerializedAttribute] public VRCPlayerApi Pilot;
+    [System.NonSerializedAttribute] public string PilotName;
+    [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
+    [System.NonSerializedAttribute] public ConstantForce VehicleConstantForce;
+    [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
+    [System.NonSerializedAttribute] public Color SmokeColor_Color;
     private float LerpedRoll;
     private float LerpedPitch;
     private float LerpedYaw;
-    [System.NonSerializedAttribute] [HideInInspector] public int RStickSelection = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public int LStickSelection = 0;
+    [System.NonSerializedAttribute] public int RStickSelection = 0;
+    [System.NonSerializedAttribute] public int LStickSelection = 0;
     private Vector2 VRPitchRollInput;
-    [System.NonSerializedAttribute] [HideInInspector] public bool LGripLastFrame = false;
-    [System.NonSerializedAttribute] [HideInInspector] public bool LTriggerLastFrame = false;
-    [System.NonSerializedAttribute] [HideInInspector] public bool RTriggerLastFrame = false;
+    [System.NonSerializedAttribute] public bool LGripLastFrame = false;
+    [System.NonSerializedAttribute] public bool LTriggerLastFrame = false;
+    [System.NonSerializedAttribute] public bool RTriggerLastFrame = false;
     Vector3 JoystickPos;
     Vector3 JoystickPosYaw;
     Quaternion PlaneRotDif;
@@ -157,7 +158,7 @@ public class EngineController : UdonSharpBehaviour
     Quaternion JoystickZeroPoint;
     Quaternion PlaneRotLastFrame;
     private float ThrottleDifference;
-    [System.NonSerializedAttribute] [HideInInspector] public float PlayerThrottle;
+    [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float handpos;
     private float ThrottleZeroPoint;
@@ -165,55 +166,55 @@ public class EngineController : UdonSharpBehaviour
     private float TempZoom;
     private float ZoomZeroPoint;
     private float ZoomDifference;
-    [System.NonSerializedAttribute] [HideInInspector] public float SetSpeed;
+    [System.NonSerializedAttribute] public float SetSpeed;
     private float SpeedZeroPoint;
     private float SmokeHoldTime;
     private bool SetSmokeLastFrame;
     private Vector3 HandPosSmoke;
     private Vector3 SmokeZeroPoint;
     private float EjectZeroPoint;
-    [System.NonSerializedAttribute] [HideInInspector] public float EjectTimer = 1;
-    [System.NonSerializedAttribute] [HideInInspector] public bool Ejected = false;
-    [System.NonSerializedAttribute] [HideInInspector] public float LTriggerTapTime = 1;
-    [System.NonSerializedAttribute] [HideInInspector] public float RTriggerTapTime = 1;
+    [System.NonSerializedAttribute] public float EjectTimer = 1;
+    [System.NonSerializedAttribute] public bool Ejected = false;
+    [System.NonSerializedAttribute] public float LTriggerTapTime = 1;
+    [System.NonSerializedAttribute] public float RTriggerTapTime = 1;
     /*     private bool DoTrim;
         private Vector3 HandPosTrim;
         private Vector3 TrimZeroPoint;
         private Vector2 TempTrim;
         private Vector2 TrimDifference;
-        [System.NonSerializedAttribute] [HideInInspector] public Vector2 Trim; */
-    [System.NonSerializedAttribute] [HideInInspector] public bool RGripLastFrame = false;
+        [System.NonSerializedAttribute] public Vector2 Trim; */
+    [System.NonSerializedAttribute] public bool RGripLastFrame = false;
     private float downspeed;
     private float sidespeed;
-    [System.NonSerializedAttribute] [HideInInspector] public float ThrottleInput = 0f;
+    [System.NonSerializedAttribute] public float ThrottleInput = 0f;
     private float roll = 0f;
     private float pitch = 0f;
     private float yaw = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] public float FullHealth;
-    [System.NonSerializedAttribute] [HideInInspector] public bool Taxiing = false;
-    [System.NonSerializedAttribute] [HideInInspector] public float RollInput = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] public float PitchInput = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] public float YawInput = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] public bool Piloting = false;
-    [System.NonSerializedAttribute] [HideInInspector] public bool InEditor = true;
-    [System.NonSerializedAttribute] [HideInInspector] public bool InVR = false;
-    [System.NonSerializedAttribute] [HideInInspector] public bool Passenger = false;
-    [System.NonSerializedAttribute] [HideInInspector] public Vector3 LastFrameVel = Vector3.zero;
-    [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
-    [System.NonSerializedAttribute] [HideInInspector] public bool dead = false;
-    [System.NonSerializedAttribute] [HideInInspector] public float AtmoshpereFadeDistance;
-    [System.NonSerializedAttribute] [HideInInspector] public float AtmosphereHeightThing;
+    [System.NonSerializedAttribute] public float FullHealth;
+    [System.NonSerializedAttribute] public bool Taxiing = false;
+    [System.NonSerializedAttribute] public float RollInput = 0f;
+    [System.NonSerializedAttribute] public float PitchInput = 0f;
+    [System.NonSerializedAttribute] public float YawInput = 0f;
+    [System.NonSerializedAttribute] public bool Piloting = false;
+    [System.NonSerializedAttribute] public bool InEditor = true;
+    [System.NonSerializedAttribute] public bool InVR = false;
+    [System.NonSerializedAttribute] public bool Passenger = false;
+    [System.NonSerializedAttribute] public Vector3 LastFrameVel = Vector3.zero;
+    [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
+    [System.NonSerializedAttribute] public bool dead = false;
+    [System.NonSerializedAttribute] public float AtmoshpereFadeDistance;
+    [System.NonSerializedAttribute] public float AtmosphereHeightThing;
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     public float AtmosphereThinningEnd = 19812; //65,000 feet
     private float Atmosphere;
-    [System.NonSerializedAttribute] [HideInInspector] public float rotlift;
-    [System.NonSerializedAttribute] [HideInInspector] public float AngleOfAttackPitch;
-    [System.NonSerializedAttribute] [HideInInspector] public float AngleOfAttackYaw;
+    [System.NonSerializedAttribute] public float rotlift;
+    [System.NonSerializedAttribute] public float AngleOfAttackPitch;
+    [System.NonSerializedAttribute] public float AngleOfAttackYaw;
     private float AoALiftYaw;
     private float AoALiftPitch;
     private Vector3 Pitching;
     private Vector3 Yawing;
-    [System.NonSerializedAttribute] [HideInInspector] public float Taxiinglerper;
+    [System.NonSerializedAttribute] public float Taxiinglerper;
     private float GearDrag;
     private float FlapsGearBrakeDrag;
     private float FlapsDrag;
@@ -224,7 +225,7 @@ public class EngineController : UdonSharpBehaviour
     private float ReversingPitchStrengthZero;
     private float ReversingYawStrengthZero;
     private float ReversingRollStrengthZero;
-    [System.NonSerializedAttribute] [HideInInspector] public bool Cruise;
+    [System.NonSerializedAttribute] public bool Cruise;
     private float CruiseProportional = .1f;
     private float CruiseIntegral = .1f;
     private float CruiseIntegrator;
@@ -240,61 +241,65 @@ public class EngineController : UdonSharpBehaviour
     //private float AltHoldPitchDerivator;
     private float AltHoldPitchlastframeerror;
     private float AltHoldRollProportional = -.005f;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AltHold;
-    [System.NonSerializedAttribute] [HideInInspector] public float Hooked = -1f;
+    [System.NonSerializedAttribute] public bool AltHold;
+    [System.NonSerializedAttribute] public bool Hooked = false;
+    [System.NonSerializedAttribute] public float HookedTime = 0f;
     private Vector3 HookedLoc;
     private Vector3 TempSmokeCol = Vector3.zero;
-    [System.NonSerializedAttribute] [HideInInspector] public float Speed;
-    [System.NonSerializedAttribute] [HideInInspector] public float AirSpeed;
-    [System.NonSerializedAttribute] [HideInInspector] public bool IsOwner = false;
+    [System.NonSerializedAttribute] public float Speed;
+    [System.NonSerializedAttribute] public float AirSpeed;
+    [System.NonSerializedAttribute] public bool IsOwner = false;
     private Vector3 FinalWind;//includes Gusts
-    [System.NonSerializedAttribute] [HideInInspector] public Vector3 AirVel;
+    [System.NonSerializedAttribute] public Vector3 AirVel;
     private float StillWindMulti;
     private int ThrustVecGrounded;
     private float SoundBarrier;
-    [System.NonSerializedAttribute] [HideInInspector] private float Afterburner = 1;
-    [System.NonSerializedAttribute] [HideInInspector] public int CatapultStatus = 0;
+    [System.NonSerializedAttribute] private float Afterburner = 1;
+    [System.NonSerializedAttribute] public int CatapultStatus = 0;
     private Vector3 CatapultLockPos;
     private Quaternion CatapultLockRot;
     private float CatapultLaunchTimeStart;
     private float StartPitchStrength;
-    [System.NonSerializedAttribute] [HideInInspector] public float CanopyCloseTimer = -100000;
+    [System.NonSerializedAttribute] public float CanopyCloseTimer = -100000;
     [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     public float FuelConsumption = 2;
     public float FuelConsumptionABMulti = 4.4f;
-    [System.NonSerializedAttribute] [HideInInspector] public GameObject[] AAMTargets = new GameObject[80];
-    [System.NonSerializedAttribute] [HideInInspector] public int NumAAMTargets = 0;
+    [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
+    [System.NonSerializedAttribute] public int NumAAMTargets = 0;
     private int AAMTargetChecker = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AAMHasTarget = false;
+    [System.NonSerializedAttribute] public bool AAMHasTarget = false;
     private float AAMTargetedTimer = 2f;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AAMLocked = false;
-    [System.NonSerializedAttribute] [HideInInspector] public float AAMLockTimer = 0;
+    [System.NonSerializedAttribute] public bool AAMLocked = false;
+    [System.NonSerializedAttribute] public float AAMLockTimer = 0;
     private float AAMLastFiredTime;
-    [System.NonSerializedAttribute] [HideInInspector] public Vector3 AAMCurrentTargetDirection;
-    [System.NonSerializedAttribute] [HideInInspector] public float FullFuel;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AGMLocked;
-    [System.NonSerializedAttribute] [HideInInspector] private int AGMUnlocking = 0;
-    [System.NonSerializedAttribute] [HideInInspector] private float AGMUnlockTimer;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AAMLaunchOpositeSide = false;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AGMLaunchOpositeSide = false;
-    [System.NonSerializedAttribute] [HideInInspector] public int BombPoint = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public float AGMRotDif;
+    [System.NonSerializedAttribute] public Vector3 AAMCurrentTargetDirection;
+    [System.NonSerializedAttribute] public float FullFuel;
+    [System.NonSerializedAttribute] public bool AGMLocked;
+    [System.NonSerializedAttribute] private int AGMUnlocking = 0;
+    [System.NonSerializedAttribute] private float AGMUnlockTimer;
+    [System.NonSerializedAttribute] public bool AAMLaunchOpositeSide = false;
+    [System.NonSerializedAttribute] public bool AGMLaunchOpositeSide = false;
+    [System.NonSerializedAttribute] public int BombPoint = 0;
+    [System.NonSerializedAttribute] public float AGMRotDif;
     private Quaternion AGMCamRotSlerper;
     private bool ResupplyingLastFrame = false;
     private float LastResupplyTime = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public int FullAAMs;
-    [System.NonSerializedAttribute] [HideInInspector] public int FullAGMs;
-    [System.NonSerializedAttribute] [HideInInspector] public int FullBombs;
-    [System.NonSerializedAttribute] [HideInInspector] public float FullGunAmmo;
+    [System.NonSerializedAttribute] public int FullAAMs;
+    [System.NonSerializedAttribute] public int FullAGMs;
+    [System.NonSerializedAttribute] public int FullBombs;
+    [System.NonSerializedAttribute] public float FullGunAmmo;
     private int PilotingInt;//1 if piloting 0 if not
-    /* [System.NonSerializedAttribute] [HideInInspector] */
-    [System.NonSerializedAttribute] [HideInInspector] public int MissilesIncoming = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public EngineController AAMCurrentTargetEngineControl;
+    /* [System.NonSerializedAttribute] */
+    [System.NonSerializedAttribute] public int MissilesIncoming = 0;
+    [System.NonSerializedAttribute] public EngineController AAMCurrentTargetEngineControl;
     private float LastBombDropTime = 0f;
     private bool WeaponSelected = false;
     private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
-    [System.NonSerializedAttribute] [HideInInspector] public bool AtGCamNull = true;//used by HudController
+    [System.NonSerializedAttribute] public bool AtGCamNull = true;//used by HudController
+    [System.NonSerializedAttribute] public Vector3 Spawnposition;
+    [System.NonSerializedAttribute] public Vector3 Spawnrotation;
     private int OutsidePlaneLayer;
+    private float ObscuredDelay;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -324,6 +329,10 @@ public class EngineController : UdonSharpBehaviour
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
 
         if (AtGCam != null) AtGCamNull = false;
+
+        //these two are only used in editor
+        Spawnposition = VehicleMainObj.transform.position;
+        Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
 
         FullHealth = Health;
         FullFuel = Fuel;
@@ -397,6 +406,10 @@ public class EngineController : UdonSharpBehaviour
         if (NumAAMTargets > 0)
         {
             SortTargets(AAMTargets, order);
+        }
+        else
+        {
+            AAMTargets[0] = HUDControl.gameObject;//this should prevent HUDController from crashing with a null reference while causing no ill effects
         }
 
 
@@ -589,7 +602,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         EffectsControl.HookDown = !EffectsControl.HookDown;
                     }
-                    Hooked = -1;
+                    Hooked = false;
                 }
                 if (Input.GetKeyDown(KeyCode.F3) && HasAltHold)
                 {
@@ -1161,7 +1174,7 @@ public class EngineController : UdonSharpBehaviour
                         }
                         else { IsFiringGun = false; RTriggerLastFrame = false; }
 
-                        AAMTargeting(70);
+                        AAMTargeting(70);//gun lead indiactor uses this
 
                         AAMLocked = false;
                         AAMLockTimer = 0;
@@ -1381,7 +1394,7 @@ public class EngineController : UdonSharpBehaviour
                                 {
                                     EffectsControl.HookDown = !EffectsControl.HookDown;
                                 }
-                                Hooked = -1;
+                                Hooked = false;
                             }
 
                             RTriggerLastFrame = true;
@@ -1532,9 +1545,9 @@ public class EngineController : UdonSharpBehaviour
                     StillWindMulti = Mathf.Clamp(Speed / 10, 0, 1);
                     ThrustVecGrounded = 0;
 
-                    PitchStrength = StartPitchStrength + ((TakeoffAssist * Speed) / (TakeoffAssistSpeed));//stronger pitch when moving fast and taxiing to help with taking off
+                    PitchStrength = StartPitchStrength + (TakeoffAssist * Mathf.Min((Speed / TakeoffAssistSpeed), 1));//stronger pitch when moving fast and taxiing to help with taking off
 
-                    if (BrakeInput > 0 && Speed < GroundBrakeSpeed && Hooked < 0f)
+                    if (BrakeInput > 0 && Speed < GroundBrakeSpeed && !Hooked)
                     {
                         if (Speed > BrakeInput * GroundBrakeStrength * Time.deltaTime)
                         {
@@ -1833,25 +1846,27 @@ public class EngineController : UdonSharpBehaviour
             //check for catching a cable with hook
             if (EffectsControl.HookDown)
             {
-                if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookCableLayer) && Hooked < 0)
+                if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookCableLayer) && !Hooked)
                 {
                     HookedLoc = VehicleMainObj.transform.position;
-                    Hooked = 6f;
+                    Hooked = true;
+                    HookedTime = Time.time;
                     EffectsControl.PlaneAnimator.SetTrigger("hooked");
                 }
-                Hooked -= Time.deltaTime;
             }
             //slow down if hooked and on the ground
-            if (Hooked > 0f && Taxiing)
+            if (Hooked && Taxiing)
             {
-                if (Vector3.Distance(VehicleMainObj.transform.position, HookedLoc) > 90)//real planes take around 80-90 meters to stop on a carrier
+                if (Vector3.Distance(VehicleMainObj.transform.position, HookedLoc) > HookedBrakeMaxDistance)//real planes take around 80-90 meters to stop on a carrier
                 {
-                    //if you go further than 90m you snap the cable and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
-                    if (Hooked > 4)
+                    //if you go further than HookedBrakeMaxDistance you snap the cable and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
+                    float HookedDelta = (Time.time - HookedTime);
+                    if (HookedDelta < 2)
                     {
-                        Health -= ((Hooked - 4) / 2) * FullHealth;
+                        Health -= ((-HookedDelta + 2) / 2) * FullHealth;
                     }
-                    Hooked = -1;
+                    Hooked = false;
+                    if (!SoundControl.CableSnapNull) { SoundControl.CableSnap.Play(); }
                     //Debug.Log("snap");
                 }
 
@@ -1975,14 +1990,6 @@ public class EngineController : UdonSharpBehaviour
     public void LaunchFlares()
     {
         EffectsControl.PlaneAnimator.SetTrigger("flares");
-    }
-    public override void OnOwnershipTransferred()
-    {
-        VehicleRigidbody.velocity = CurrentVel;
-
-        //hopefully prevents explosions when you enter the plane
-        Gs = 0;
-        LastFrameVel = CurrentVel;
     }
 
     //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
@@ -2111,7 +2118,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void CatapultLaunchEffects()
     {
-        VehicleRigidbody.WakeUp();
+        VehicleRigidbody.WakeUp(); //i don't think it actually sleeps anyway but this might help other clients sync the launch faster idk
         if (EffectsControl.CatapultSteam != null) { EffectsControl.CatapultSteam.Play(); }
         if (Piloting || Passenger)
         {
@@ -2130,7 +2137,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void CatapultLockSound()
     {
-        VehicleRigidbody.Sleep();
+        VehicleRigidbody.Sleep();//don't think this actually works
         if (!SoundControl.CatapultLockNull)
             SoundControl.CatapultLock.Play();
     }
@@ -2172,7 +2179,7 @@ public class EngineController : UdonSharpBehaviour
             EffectsControl.CanopyOpen = true;
             CanopyCloseTimer = -100001;
         }
-        Hooked = -1;
+        Hooked = false;
         AAMLaunchOpositeSide = false;
         AGMLaunchOpositeSide = false;
         BombPoint = 0;
@@ -2201,9 +2208,21 @@ public class EngineController : UdonSharpBehaviour
         SoundControl.silent = false;
 
         SoundControl.PlaneIdlePitch = 0;
+        SoundControl.PlaneIdleVolume = 0;
+        SoundControl.PlaneThrustVolume = 0;
+        SoundControl.PlaneDistantVolume = 0;
+
+        if (!SoundControl.PlaneDistantNull) { SoundControl.PlaneDistant.volume = 0; }
+
+        foreach (AudioSource thrust in SoundControl.Thrust)
+        {
+            thrust.pitch = 0;
+            thrust.volume = 0;
+        }
         foreach (AudioSource idle in SoundControl.PlaneIdle)
         {
             idle.pitch = 0;
+            idle.volume = 0;
         }
 
         if (InEditor || IsOwner)
@@ -2246,10 +2265,8 @@ public class EngineController : UdonSharpBehaviour
         float NextTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
 
-        RaycastHit hit;
         if (TargetChecker.activeInHierarchy)
         {
-
             EngineController NextTargetEngineControl = null;
 
             if (TargetCheckerParent)
@@ -2259,20 +2276,29 @@ public class EngineController : UdonSharpBehaviour
             //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
             if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead)))
             {
-                //raycast to check if it's behind something
-                Physics.Raycast(CenterOfMass.position, AAMNextTargetDirection, out hit, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
 
-                if (hit.collider.gameObject.layer == OutsidePlaneLayer
-                    && NextTargetAngle < Lock_Angle
-                        && NextTargetDistance < AAMMaxTargetDistance
-                            && NextTargetAngle < AAMCurrentTargetAngle)
+                RaycastHit hitnext;
+                //raycast to check if it's behind something
+                Physics.Raycast(HUDControl.transform.position, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+
+                if (hitnext.point != null
+                    && hitnext.collider.gameObject.layer == OutsidePlaneLayer
+                        && NextTargetAngle < Lock_Angle
+                            && NextTargetDistance < AAMMaxTargetDistance
+                                && NextTargetAngle < AAMCurrentTargetAngle)
                 {
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;
                     AAMTarget = AAMTargetChecker;
+                    CurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                     AAMCurrentTargetEngineControl = NextTargetEngineControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable time to update before sending targeted
+                    if (HUDControl != null)
+                    {
+                        HUDControl.GUN_TargetSpeedLerper = 0f;
+                        HUDControl.GUN_TargetDirLastFrame = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
+                    }
                 }
             }
         }
@@ -2286,15 +2312,28 @@ public class EngineController : UdonSharpBehaviour
             AAMTargetChecker = 0;
 
         //if target is currently in front of plane, lock onto it
-        AAMCurrentTargetDirection = CurrentTargetPosition - HUDControl.transform.position;
+        if (AAMCurrentTargetEngineControl == null)
+        { AAMCurrentTargetDirection = CurrentTargetPosition - HUDControl.transform.position; }
+        else
+        { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HUDControl.transform.position; }
         float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
         //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
         //raycast to check if it's behind something
-        Physics.Raycast(CenterOfMass.position, AAMCurrentTargetDirection, out hit, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
-        if (!Taxiing && AAMTargets[AAMTarget].activeInHierarchy && (AAMCurrentTargetEngineControl == null || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
+        RaycastHit hitcurrent;
+        Physics.Raycast(HUDControl.transform.position, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+        //used to make lock remain for .25 seconds after target is obscured
+        if (hitcurrent.point == null || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
+        { ObscuredDelay += Time.deltaTime; }
+        else
+        { ObscuredDelay = 0; }
+
+        if (!Taxiing
+            && AAMTargets[AAMTarget].activeInHierarchy
+                && (AAMCurrentTargetEngineControl == null || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
         {
-            if (hit.collider.gameObject.layer == OutsidePlaneLayer &&
-            AAMCurrentTargetAngle < Lock_Angle && AAMCurrentTargetDistance < AAMMaxTargetDistance)
+            if ((ObscuredDelay < .25f)
+                    && AAMCurrentTargetAngle < Lock_Angle
+                        && AAMCurrentTargetDistance < AAMMaxTargetDistance)
             {
                 AAMHasTarget = true;
                 if (NumAAM > 0) AAMLockTimer += Time.deltaTime;

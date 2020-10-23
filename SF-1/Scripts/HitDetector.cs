@@ -55,11 +55,13 @@ public class HitDetector : UdonSharpBehaviour
         {
             if (EngineControl.InEditor)
             {
-                EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.EffectsControl.Spawnrotation);
-                EngineControl.VehicleMainObj.transform.position = EngineControl.EffectsControl.Spawnposition;
+                EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.Spawnrotation);
+                EngineControl.VehicleMainObj.transform.position = EngineControl.Spawnposition;
             }
-            //this should respawn it in VRC, doesn't work in editor
-            EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
+            else
+            { //this should respawn it in VRC, doesn't work in editor
+                EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
+            }
         }
     }
 
@@ -70,8 +72,8 @@ public class HitDetector : UdonSharpBehaviour
         EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
         if (EngineControl.InEditor)
         {
-            EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.EffectsControl.Spawnrotation);
-            EngineControl.VehicleMainObj.transform.position = EngineControl.EffectsControl.Spawnposition;
+            EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.Spawnrotation);
+            EngineControl.VehicleMainObj.transform.position = EngineControl.Spawnposition;
             EngineControl.Health = EngineControl.FullHealth;
             EngineControl.EffectsControl.GearUp = false;
             EngineControl.EffectsControl.Flaps = true;

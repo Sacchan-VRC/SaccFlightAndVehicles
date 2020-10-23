@@ -17,16 +17,16 @@ public class AAGunController : UdonSharpBehaviour
     public float ZoomOutFov = 110f;
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
     private Animator AAGunAnimator;
-    [System.NonSerializedAttribute] [HideInInspector] public bool dead;
+    [System.NonSerializedAttribute] public bool dead;
     private float RstickH;
     private float LstickV;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool firing;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool firing;
     private float RTrigger = 0;
-    [System.NonSerializedAttribute] [HideInInspector] public float FullHealth;
-    [System.NonSerializedAttribute] [HideInInspector] public bool Manning;//like Piloting in the plane
-    [System.NonSerializedAttribute] [HideInInspector] public VRCPlayerApi localPlayer;
-    [System.NonSerializedAttribute] [HideInInspector] public float InputXLerper = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] public float InputYLerper = 0f;
+    [System.NonSerializedAttribute] public float FullHealth;
+    [System.NonSerializedAttribute] public bool Manning;//like Piloting in the plane
+    [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
+    [System.NonSerializedAttribute] public float InputXLerper = 0f;
+    [System.NonSerializedAttribute] public float InputYLerper = 0f;
     private Vector3 StartRot;
     private float RstickV;
     private float ZoomLevel;

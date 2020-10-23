@@ -21,24 +21,11 @@ public class PilotSeat : UdonSharpBehaviour
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
         PlaneMesh = EngineControl.PlaneMesh.transform;
-
-        //make sure gun_pilot will never have collision enabled on the 'OnboardPlaneLayer'
-        var GunPilotCollisionModule = Gun_pilot.GetComponent<ParticleSystem>().collision;
-        int CollideLayers = GunPilotCollisionModule.collidesWith;
-        CollideLayers = CollideLayers & (int.MaxValue ^ (1 << EngineControl.OnboardPlaneLayer));//NOT ~ is not implemented.
-        GunPilotCollisionModule.collidesWith = CollideLayers;
-
         //get the layer of the plane as set by the world creator
         Planelayer = PlaneMesh.gameObject.layer;
     }
     private void Interact()//entering the plane
     {
-        var Target = EngineControl.AAMTargets[EngineControl.AAMTarget];
-        if (Target && Target.transform.parent)
-        {
-            EngineControl.AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
-        }
-
         if (EngineControl.VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.VehicleMainObj); }
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (EngineControl != null)
@@ -78,6 +65,17 @@ public class PilotSeat : UdonSharpBehaviour
             {
                 child.gameObject.layer = EngineControl.OnboardPlaneLayer;
             }
+        }
+        //hopefully prevents explosions when you enter the plane
+        EngineControl.VehicleRigidbody.velocity = EngineControl.CurrentVel;
+        EngineControl.Gs = 0;
+        EngineControl.LastFrameVel = EngineControl.CurrentVel;
+
+        //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
+        var Target = EngineControl.AAMTargets[EngineControl.AAMTarget];
+        if (Target && Target.transform.parent)
+        {
+            EngineControl.AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
         }
     }
     public override void OnStationEntered(VRCPlayerApi player)
@@ -125,7 +123,7 @@ public class PilotSeat : UdonSharpBehaviour
             }
             else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
             EngineControl.EjectTimer = 2;
-            EngineControl.Hooked = -1;
+            EngineControl.Hooked = false;
             EngineControl.BrakeInput = 0;
             EngineControl.LTriggerTapTime = 1;
             EngineControl.RTriggerTapTime = 1;

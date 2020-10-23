@@ -6,7 +6,6 @@ using VRC.Udon;
 
 public class SoundController : UdonSharpBehaviour
 {
-
     public EngineController EngineControl;
     public AudioSource[] PlaneIdle;
     public AudioSource PlaneInside;
@@ -31,44 +30,46 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource Airbrake;
     public AudioSource CatapultLock;
     public AudioSource CatapultLaunch;
+    public AudioSource CableSnap;
     public AudioSource MenuSelect;
-    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneIdleNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneInsideNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneDistantNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneThrustNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool ABOnInsideNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool ABOnOutsideNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool TouchDownNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool PlaneWindNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool SonicBoomNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool ExplosionNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool GunSoundNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool BulletHitNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool MissileIncomingNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool RollingNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool ReloadingNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool RadarLockedNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AAMTargetingNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AAMTargetLockNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AGMTargetLockNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AGMUnlockNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool AirbrakeNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool CatapultLockNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool CatapultLaunchNull;
-    [System.NonSerializedAttribute] [HideInInspector] public bool MenuSelectNull;
+    [System.NonSerializedAttribute] public bool PlaneIdleNull;
+    [System.NonSerializedAttribute] public bool PlaneInsideNull;
+    [System.NonSerializedAttribute] public bool PlaneDistantNull;
+    [System.NonSerializedAttribute] public bool PlaneThrustNull;
+    [System.NonSerializedAttribute] public bool ABOnInsideNull;
+    [System.NonSerializedAttribute] public bool ABOnOutsideNull;
+    [System.NonSerializedAttribute] public bool TouchDownNull;
+    [System.NonSerializedAttribute] public bool PlaneWindNull;
+    [System.NonSerializedAttribute] public bool SonicBoomNull;
+    [System.NonSerializedAttribute] public bool ExplosionNull;
+    [System.NonSerializedAttribute] public bool GunSoundNull;
+    [System.NonSerializedAttribute] public bool BulletHitNull;
+    [System.NonSerializedAttribute] public bool MissileIncomingNull;
+    [System.NonSerializedAttribute] public bool RollingNull;
+    [System.NonSerializedAttribute] public bool ReloadingNull;
+    [System.NonSerializedAttribute] public bool RadarLockedNull;
+    [System.NonSerializedAttribute] public bool AAMTargetingNull;
+    [System.NonSerializedAttribute] public bool AAMTargetLockNull;
+    [System.NonSerializedAttribute] public bool AGMTargetLockNull;
+    [System.NonSerializedAttribute] public bool AGMUnlockNull;
+    [System.NonSerializedAttribute] public bool AirbrakeNull;
+    [System.NonSerializedAttribute] public bool CatapultLockNull;
+    [System.NonSerializedAttribute] public bool CatapultLaunchNull;
+    [System.NonSerializedAttribute] public bool CableSnapNull;
+    [System.NonSerializedAttribute] public bool MenuSelectNull;
     public Transform testcamera;
     private bool SuperSonic = false;
     private float IdleDoppleTemp;
-    [System.NonSerializedAttribute] [HideInInspector] public float Doppler = 1;
+    [System.NonSerializedAttribute] public float Doppler = 1;
     float LastFrameDist;
-    [System.NonSerializedAttribute] [HideInInspector] public float ThisFrameDist = 0;
+    [System.NonSerializedAttribute] public float ThisFrameDist = 0;
     private bool Leftplane = false;
-    [System.NonSerializedAttribute] [HideInInspector] public float PlaneIdlePitch;
-    [System.NonSerializedAttribute] [HideInInspector] public float PlaneIdleVolume;
+    [System.NonSerializedAttribute] public float PlaneIdlePitch;
+    [System.NonSerializedAttribute] public float PlaneIdleVolume;
     private float PlaneDistantPitch;
-    [System.NonSerializedAttribute] [HideInInspector] public float PlaneDistantVolume;
+    [System.NonSerializedAttribute] public float PlaneDistantVolume;
     private float PlaneThrustPitch;
-    [System.NonSerializedAttribute] [HideInInspector] public float PlaneThrustVolume;
+    [System.NonSerializedAttribute] public float PlaneThrustVolume;
     private float LastFramePlaneIdlePitch;
     private float LastFramePlaneThrustPitch;
     private float LastFrameGunPitch;
@@ -77,18 +78,18 @@ public class SoundController : UdonSharpBehaviour
     private float PlaneThrustInitialVolume;
     private float PlaneWindInitialVolume;
     private const float InVehicleThrustVolumeFactor = .09f;
-    [System.NonSerializedAttribute] [HideInInspector] public float SonicBoomWave = 0f;
-    [System.NonSerializedAttribute] [HideInInspector] public float SonicBoomDistance = -1f;
+    [System.NonSerializedAttribute] public float SonicBoomWave = 0f;
+    [System.NonSerializedAttribute] public float SonicBoomDistance = -1f;
     bool Landed = false;
     private int dopplecounter;
-    [System.NonSerializedAttribute] [HideInInspector] public float DoSound = 32; //3 seconds before idle so late joiners hear sound
-    [System.NonSerializedAttribute] [HideInInspector] public bool silent;
+    [System.NonSerializedAttribute] public float DoSound = 20; //15 seconds before idle so late joiners have time to sync before going idle
+    [System.NonSerializedAttribute] public bool silent;
     private int silentint = 0;
     private float GunSoundInitialVolume;
-    [System.NonSerializedAttribute] [HideInInspector] public bool soundsoff;
+    [System.NonSerializedAttribute] public bool soundsoff;
     float relativespeed;
     private float SonicBoomPreventer = 5f;//used to prevent sonic booms from occuring too often in case of laggers etc
-    [System.NonSerializedAttribute] [HideInInspector] public bool playsonicboom;
+    [System.NonSerializedAttribute] public bool playsonicboom;
     private float MaxAudibleDistance;
     private void Start()
     {
@@ -107,6 +108,7 @@ public class SoundController : UdonSharpBehaviour
         Assert(Airbrake != null, "Start: Airbrake != null");
         Assert(CatapultLock != null, "Start: CatapultLock != null");
         Assert(CatapultLaunch != null, "Start: CatapultLaunch != null");
+        Assert(CableSnap != null, "Start: CableSnap != null");
         Assert(Rolling != null, "Start: Rolling != null");
         Assert(Reloading != null, "Start: Reloading != null");
         Assert(RadarLocked != null, "Start: RadarLocked != null");
@@ -132,6 +134,7 @@ public class SoundController : UdonSharpBehaviour
         AirbrakeNull = (Airbrake == null) ? true : false;
         CatapultLockNull = (CatapultLock == null) ? true : false;
         CatapultLaunchNull = (CatapultLaunch == null) ? true : false; ;
+        CableSnapNull = (CableSnap == null) ? true : false;
         RollingNull = (Rolling == null) ? true : false;
         ReloadingNull = (Reloading == null) ? true : false;
         RadarLockedNull = (RadarLocked == null) ? true : false;
@@ -497,15 +500,19 @@ public class SoundController : UdonSharpBehaviour
         if (!PlaneInsideNull)
         {
             PlaneInside.Stop();
-            PlaneIdlePitch = PlaneInside.pitch;
         }
         foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
         foreach (AudioSource thrust in Thrust) { thrust.Play(); }
         if (!PlaneDistantNull) PlaneDistant.Play();
         Leftplane = false;
-        PlaneThrustVolume *= 6.666666f;
-        PlaneIdleVolume = PlaneIdleInitialVolume * .4f;
-        PlaneDistantVolume = PlaneThrustVolume;
+        if (!EngineControl.dead)
+        {
+            //these are set differently EngineController.Explode(), so we don't do them if we're dead
+            PlaneIdleVolume = PlaneIdleInitialVolume * .4f;
+            PlaneThrustVolume *= 6.666666f;
+            PlaneDistantVolume = PlaneThrustVolume;
+            if (!PlaneInsideNull) { PlaneIdlePitch = PlaneInside.pitch; }
+        }
     }
     private void Assert(bool condition, string message)
     {

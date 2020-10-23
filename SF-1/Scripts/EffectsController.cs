@@ -19,11 +19,11 @@ public class EffectsController : UdonSharpBehaviour
     public ParticleSystem[] DisplaySmoke;
     public ParticleSystem CatapultSteam;
 
-/*     public Transform ElevonL;
-    public Transform ElevonR;
-    public Transform RuddervatorL;
-    public Transform RuddervatorR;
- */
+    /*     public Transform ElevonL;
+        public Transform ElevonR;
+        public Transform RuddervatorL;
+        public Transform RuddervatorR;
+     */
 
     private bool VehicleMainObjNull = true;
     private bool EngineControlNull = true;
@@ -34,43 +34,46 @@ public class EffectsController : UdonSharpBehaviour
     private bool EnginesNull = true;
     private bool EnginefireNull = true;
     private bool RuddersNull = true;
-    [System.NonSerializedAttribute] [HideInInspector] public bool FrontWheelNull = true;
+    [System.NonSerializedAttribute] public bool FrontWheelNull = true;
     private bool CatapultSteamNull = true;
     private bool DisplaySmokeNull = true;
 
 
-/*     private bool ElevonLNull = true;
-    private bool ElevonRNull = true;
-    private bool RuddervatorLNull = true;
-    private bool RuddervatorRNull = true;
- */
+    /*     private bool ElevonLNull = true;
+        private bool ElevonRNull = true;
+        private bool RuddervatorLNull = true;
+        private bool RuddervatorRNull = true;
+     */
 
 
     //best to remove synced variables if you aren't using them
     //moved some here from enginecontroller because there's a limit per-udonbehaviour
     [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool AfterburnerOn;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool CanopyOpen = true;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool GearUp = false;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Flaps = true;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool HookDown = false;
-    [System.NonSerializedAttribute] [HideInInspector] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool AfterburnerOn;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool CanopyOpen = true;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool GearUp = false;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Flaps = true;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool HookDown = false;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
 
 
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
-    [System.NonSerializedAttribute] [HideInInspector] public Animator PlaneAnimator;
+    [System.NonSerializedAttribute] public Animator PlaneAnimator;
     private Vector3 PitchLerper = Vector3.zero;
     private Vector3 YawLerper = Vector3.zero;
     private Vector3 RollLerper = Vector3.zero;
     private Vector3 EngineLerper = Vector3.zero;
     private Vector3 Enginefireerper = new Vector3(1, 0.6f, 1);
-    [System.NonSerializedAttribute] [HideInInspector] public float AirbrakeLerper;
-    [System.NonSerializedAttribute] [HideInInspector] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
-    [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnposition;
-    [System.NonSerializedAttribute] [HideInInspector] public Vector3 Spawnrotation;
+    [System.NonSerializedAttribute] public float AirbrakeLerper;
+    [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     private float brake;
     private Color SmokeColorLerper = Color.white;
+    public bool LargeEffectsOnly = false;
+    private float FullHealthDivider;
+    private float FullAAMsDivider;
+    private float FullAGMsDivider;
+    private float FullBombsDivider;
     private void Start()
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
@@ -108,20 +111,23 @@ public class EffectsController : UdonSharpBehaviour
                 if (RuddervatorR != null) RuddervatorRNull = false;
          */
 
+        FullHealthDivider = 1f / EngineControl.Health;
+        FullAAMsDivider = 1f / EngineControl.NumAAM;
+        FullAGMsDivider = 1f / EngineControl.NumAGM;
+        FullBombsDivider = 1f / EngineControl.NumBomb;
+
         foreach (Transform fire in Enginefire)
             fire.localScale = new Vector3(fire.localScale.x, 0, fire.localScale.z);
 
 
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
-        Spawnposition = VehicleMainObj.transform.position;
-        Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
     }
     private void Update()
     {
         if (DoEffects > 10) { return; }
 
         //if a long way away just skip effects except large vapor effects
-        if (EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner) { LargeEffects(); return; }//udonsharp doesn't support goto yet, so i'm using a function instead
+        if (LargeEffectsOnly = (EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner)) { LargeEffects(); return; }//udonsharp doesn't support goto yet, so i'm using a function instead
         Effects();
         LargeEffects();
     }
@@ -163,11 +169,11 @@ public class EffectsController : UdonSharpBehaviour
         }
         else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
 
-/*         if (!ElevonLNull) ElevonL.localRotation = Quaternion.Euler(0, RollLerper.y + -PitchLerper.x, 0);
-        if (!ElevonRNull) ElevonR.localRotation = Quaternion.Euler(0, RollLerper.y + PitchLerper.x, 0);
-        if (!RuddervatorLNull) RuddervatorL.localRotation = Quaternion.Euler(0, YawLerper.y + -PitchLerper.x, 0);
-        if (!RuddervatorRNull) RuddervatorR.localRotation = Quaternion.Euler(0, YawLerper.y + PitchLerper.x, 0);
- */
+        /*         if (!ElevonLNull) ElevonL.localRotation = Quaternion.Euler(0, RollLerper.y + -PitchLerper.x, 0);
+                if (!ElevonRNull) ElevonR.localRotation = Quaternion.Euler(0, RollLerper.y + PitchLerper.x, 0);
+                if (!RuddervatorLNull) RuddervatorL.localRotation = Quaternion.Euler(0, YawLerper.y + -PitchLerper.x, 0);
+                if (!RuddervatorRNull) RuddervatorR.localRotation = Quaternion.Euler(0, YawLerper.y + PitchLerper.x, 0);
+         */
         foreach (Transform elevator in Elevators)
             elevator.localRotation = Quaternion.Euler(-PitchLerper);
 
@@ -227,14 +233,12 @@ public class EffectsController : UdonSharpBehaviour
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * Time.deltaTime);
 
         PlaneAnimator.SetBool("canopyopen", CanopyOpen);
-        PlaneAnimator.SetFloat("health", EngineControl.Health / EngineControl.FullHealth);
-        PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack / 180) : 0);
+        PlaneAnimator.SetFloat("health", EngineControl.Health * FullHealthDivider);
+        PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack * 0.00555555556f /* Divide by 180 */ ) : 0);
         PlaneAnimator.SetFloat("brake", AirbrakeLerper);
-        //PlaneAnimator.SetBool("occupied", EngineControl.Occupied);
-        //PlaneAnimator.SetInteger("rstickselection", EngineControl.RStickSelection);
-        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM / EngineControl.FullAAMs);
-        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM / EngineControl.FullAGMs);
-        PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb / EngineControl.FullBombs);
+        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM * FullAAMsDivider);
+        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM * FullAGMsDivider);
+        PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb * FullBombsDivider);
     }
 
     private void LargeEffects()//large effects visible from a long distance
@@ -270,7 +274,7 @@ public class EffectsController : UdonSharpBehaviour
         {
             Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * Time.deltaTime);//linger for a bit before cutting off
         }
-        PlaneAnimator.SetFloat("mach10", EngineControl.Speed / 343 / 10);//should airspeed but nonlocal players don't have it
+        PlaneAnimator.SetFloat("mach10", EngineControl.Speed / 343 / 10);//should be airspeed but nonlocal players don't have it
         PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
         PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
         PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);

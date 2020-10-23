@@ -15,11 +15,10 @@ public class PassengerSeat : UdonSharpBehaviour
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
         Assert(LeaveButton != null, "Start: LeaveButton != null");
-        Assert(PlaneMesh != null, "Start: PlaneMesh != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
-        PlaneMesh = EngineControl.PlaneMesh;
-        Planelayer = 1 << PlaneMesh.gameObject.layer;
+        PlaneMesh = EngineControl.PlaneMesh.transform;
+        Planelayer = PlaneMesh.gameObject.layer;
     }
     private void Interact()
     {
