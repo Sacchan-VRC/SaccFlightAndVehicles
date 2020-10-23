@@ -438,6 +438,7 @@ public class EngineController : UdonSharpBehaviour
 
     private void LateUpdate()
     {
+        float DeltaTime = Time.deltaTime;
         if (!InEditor) IsOwner = localPlayer.IsOwner(VehicleMainObj);
         if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 2049 /* Default and Environment */))
         {
@@ -458,7 +459,7 @@ public class EngineController : UdonSharpBehaviour
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
                 }
                 //G/crash Damage
-                Health += -Mathf.Clamp((Gs - MaxGs) * Time.deltaTime * GDamage, 0f, 99999f); //take damage of GDamage per second per G above MaxGs
+                Health += -Mathf.Clamp((Gs - MaxGs) * DeltaTime * GDamage, 0f, 99999f); //take damage of GDamage per second per G above MaxGs
                 if (Health <= 0f)//plane is ded
                 {
                     if (InEditor)//editor
@@ -571,9 +572,9 @@ public class EngineController : UdonSharpBehaviour
                     int Keypad5 = Input.GetKey(KeyCode.Keypad5) ? 1 : 0;
                     int Keypad9 = Input.GetKey(KeyCode.Keypad9) ? 1 : 0;
                     int Keypad6 = Input.GetKey(KeyCode.Keypad6) ? 1 : 0;
-                    SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * Time.deltaTime), 0, 1);
-                    SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * Time.deltaTime), 0, 1);
-                    SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * Time.deltaTime), 0, 1);
+                    SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * DeltaTime), 0, 1);
+                    SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
+                    SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
                 }
                 if (Input.GetKeyDown(KeyCode.F2) && HasCruise)
                 {
@@ -932,7 +933,7 @@ public class EngineController : UdonSharpBehaviour
                 }
 
 
-                LTriggerTapTime += Time.deltaTime;
+                LTriggerTapTime += DeltaTime;
                 switch (LStickSelection)
                 {
                     case 0://player just got in and hasn't selected anything
@@ -1107,7 +1108,7 @@ public class EngineController : UdonSharpBehaviour
                                 }
                             }
 
-                            EjectTimer += Time.deltaTime;
+                            EjectTimer += DeltaTime;
                             LTriggerLastFrame = true;
                         }
                         else
@@ -1160,7 +1161,7 @@ public class EngineController : UdonSharpBehaviour
                 }
 
 
-                RTriggerTapTime += Time.deltaTime;
+                RTriggerTapTime += DeltaTime;
                 switch (RStickSelection)
                 {
                     case 0://player just got in and hasn't selected anything
@@ -1169,7 +1170,7 @@ public class EngineController : UdonSharpBehaviour
                         if ((RTrigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
                         {
                             IsFiringGun = true;
-                            GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - Time.deltaTime, 0);
+                            GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
                             RTriggerLastFrame = true;
                         }
                         else { IsFiringGun = false; RTriggerLastFrame = false; }
@@ -1211,7 +1212,7 @@ public class EngineController : UdonSharpBehaviour
                         IsFiringGun = false;
                         break;
                     case 3://AGM
-                        AGMUnlockTimer += Time.deltaTime * AGMUnlocking;//AGMUnlocking is 1 if it was locked and just pressed, else 0, (waits for double tap delay to disable)
+                        AGMUnlockTimer += DeltaTime * AGMUnlocking;//AGMUnlocking is 1 if it was locked and just pressed, else 0, (waits for double tap delay to disable)
                         if (AGMUnlockTimer > 0.4f && AGMLocked == true)
                         {
                             AGMLocked = false;
@@ -1301,7 +1302,7 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 temp = VehicleMainObj.transform.rotation;
                             }
-                            AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, temp, 70f * Time.deltaTime);
+                            AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, temp, 70f * DeltaTime);
 
                             if (AtGCam != null)
                             {
@@ -1423,7 +1424,7 @@ public class EngineController : UdonSharpBehaviour
                             }
                             if (InVR)
                             {
-                                SmokeHoldTime += Time.deltaTime;
+                                SmokeHoldTime += DeltaTime;
                                 if (SmokeHoldTime > .4f)
                                 {
 
@@ -1529,7 +1530,7 @@ public class EngineController : UdonSharpBehaviour
                     LGripLastFrame = false;
                 }
 
-                PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * Time.deltaTime), 0, 1);
+                PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * DeltaTime), 0, 1);
 
                 if (Taxiing)
                 {
@@ -1539,7 +1540,7 @@ public class EngineController : UdonSharpBehaviour
                     Cruise = false;
                     AltHold = false;
                     //rotate if trying to turn
-                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, YawInput * TaxiRotationSpeed * Time.deltaTime, TaxiRotationResponse * Time.deltaTime);
+                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, YawInput * TaxiRotationSpeed * DeltaTime, TaxiRotationResponse * DeltaTime);
                     VehicleMainObj.transform.Rotate(Vector3.up, Taxiinglerper);
 
                     StillWindMulti = Mathf.Clamp(Speed / 10, 0, 1);
@@ -1549,9 +1550,9 @@ public class EngineController : UdonSharpBehaviour
 
                     if (BrakeInput > 0 && Speed < GroundBrakeSpeed && !Hooked)
                     {
-                        if (Speed > BrakeInput * GroundBrakeStrength * Time.deltaTime)
+                        if (Speed > BrakeInput * GroundBrakeStrength * DeltaTime)
                         {
-                            VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * Time.deltaTime;
+                            VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
                         }
                         else
                         {
@@ -1652,10 +1653,10 @@ public class EngineController : UdonSharpBehaviour
 
                     float error = (SetSpeed - AirSpeed);
 
-                    CruiseIntegrator += error * Time.deltaTime;
+                    CruiseIntegrator += error * DeltaTime;
                     CruiseIntegrator = Mathf.Clamp(CruiseIntegrator, CruiseIntegratorMin, CruiseIntegratorMax);
 
-                    //float Derivator = Mathf.Clamp(((error - lastframeerror) / Time.deltaTime),DerivMin, DerivMax);
+                    //float Derivator = Mathf.Clamp(((error - lastframeerror) / DeltaTime),DerivMin, DerivMax);
 
                     ThrottleInput = CruiseProportional * error;
                     ThrottleInput += CruiseIntegral * CruiseIntegrator;
@@ -1666,7 +1667,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     ThrottleInput = PlayerThrottle;
                 }
-                Fuel = Mathf.Clamp(Fuel - ((FuelConsumption * Mathf.Max(ThrottleInput, 0.35f)) * Time.deltaTime), 0, FullFuel);
+                Fuel = Mathf.Clamp(Fuel - ((FuelConsumption * Mathf.Max(ThrottleInput, 0.35f)) * DeltaTime), 0, FullFuel);
                 if (Fuel < 200) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / 200), 0, 1);
 
                 if (ThrottleInput < .6f) { EffectsControl.AfterburnerOn = false; Afterburner = 1; }
@@ -1678,9 +1679,9 @@ public class EngineController : UdonSharpBehaviour
                     int upsidedown = Vector3.Dot(Vector3.up, VehicleMainObj.transform.up) > 0 ? 1 : -1;
                     float error = CurrentVel.normalized.y - (localAngularVelocity.x * upsidedown * 2.5f);//(Vector3.Dot(VehicleRigidbody.velocity.normalized, Vector3.up));
 
-                    AltHoldPitchIntegrator += error * Time.deltaTime;
+                    AltHoldPitchIntegrator += error * DeltaTime;
                     //AltHoldPitchIntegrator = Mathf.Clamp(AltHoldPitchIntegrator, AltHoldPitchIntegratorMin, AltHoldPitchIntegratorMax);
-                    //AltHoldPitchDerivator = (error - AltHoldPitchlastframeerror) / Time.deltaTime;
+                    //AltHoldPitchDerivator = (error - AltHoldPitchlastframeerror) / DeltaTime;
                     AltHoldPitchlastframeerror = error;
                     PitchInput = AltHoldPitchProportional * error;
                     PitchInput += AltHoldPitchIntegral * AltHoldPitchIntegrator;
@@ -1798,9 +1799,9 @@ public class EngineController : UdonSharpBehaviour
             {
                 Occupied = false;//make vehicle respawnable if player disconnects while occupying
                 //brake is always on if the plane is on the ground because we can't work out how to use wheel colliders properly
-                if (Speed > GroundBrakeStrength * Time.deltaTime)
+                if (Speed > GroundBrakeStrength * DeltaTime)
                 {
-                    VehicleRigidbody.velocity += -CurrentVel.normalized * GroundBrakeStrength * Time.deltaTime;
+                    VehicleRigidbody.velocity += -CurrentVel.normalized * GroundBrakeStrength * DeltaTime;
                 }
                 else VehicleRigidbody.velocity = Vector3.zero;
                 PilotingInt = 0;
@@ -1831,17 +1832,17 @@ public class EngineController : UdonSharpBehaviour
             //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownMulti)
             if (Throttle < ThrottleInput)
             {
-                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * Time.deltaTime); // ThrottleInput * ThrottleStrengthForward;
+                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * DeltaTime); // ThrottleInput * ThrottleStrengthForward;
             }
             else
             {
-                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * Time.deltaTime); // ThrottleInput * ThrottleStrengthForward;
+                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); // ThrottleInput * ThrottleStrengthForward;
             }
 
             //Lerp the inputs for 'rotation response'
-            LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * Time.deltaTime);
-            LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * Time.deltaTime);
-            LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * Time.deltaTime);
+            LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * DeltaTime);
+            LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
+            LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
 
             //check for catching a cable with hook
             if (EffectsControl.HookDown)
@@ -1870,9 +1871,9 @@ public class EngineController : UdonSharpBehaviour
                     //Debug.Log("snap");
                 }
 
-                if (Speed > HookedBrakeStrength * Time.deltaTime)
+                if (Speed > HookedBrakeStrength * DeltaTime)
                 {
-                    VehicleRigidbody.velocity += -CurrentVel.normalized * HookedBrakeStrength * Time.deltaTime;
+                    VehicleRigidbody.velocity += -CurrentVel.normalized * HookedBrakeStrength * DeltaTime;
                 }
                 else
                 {
@@ -1948,7 +1949,7 @@ public class EngineController : UdonSharpBehaviour
                     VehicleRigidbody.velocity = temp;
                     VehicleRigidbody.angularVelocity = Vector3.zero;
                     VehicleConstantForce.relativeTorque = Vector3.zero;
-                    CatapultLaunchTime -= Time.deltaTime;
+                    CatapultLaunchTime -= DeltaTime;
                     if (CatapultLaunchTime < 0)
                     {
                         dead = false;//just in case
@@ -1969,21 +1970,21 @@ public class EngineController : UdonSharpBehaviour
             //AirSpeed = AirVel.magnitude;
         }
         SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
-        CanopyCloseTimer -= Time.deltaTime;
+        CanopyCloseTimer -= DeltaTime;
     }
     private void FixedUpdate()
     {
         if (InEditor || IsOwner)
         {
             //lerp velocity toward 0 to simulate air friction
-            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, FinalWind * StillWindMulti, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag) * Atmosphere) * 90) * Time.deltaTime);
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, FinalWind * StillWindMulti, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag) * Atmosphere) * 90) * DeltaTime);
             //apply pitching using pitch moment
-            VehicleRigidbody.AddForceAtPosition(Pitching * Time.deltaTime, PitchMoment.position, ForceMode.Force);
+            VehicleRigidbody.AddForceAtPosition(Pitching * DeltaTime, PitchMoment.position, ForceMode.Force);
             //apply yawing using yaw moment
-            VehicleRigidbody.AddForceAtPosition(Yawing * Time.deltaTime, YawMoment.position, ForceMode.Force);
+            VehicleRigidbody.AddForceAtPosition(Yawing * DeltaTime, YawMoment.position, ForceMode.Force);
             //calc Gs
-            LastFrameVel.y += (-9.81f * Time.deltaTime); //add gravity
-            Gs = Vector3.Distance(LastFrameVel, VehicleRigidbody.velocity) / (9.81f * Time.deltaTime);
+            LastFrameVel.y += (-9.81f * DeltaTime); //add gravity
+            Gs = Vector3.Distance(LastFrameVel, VehicleRigidbody.velocity) / (9.81f * DeltaTime);
             LastFrameVel = VehicleRigidbody.velocity;
         }
     }
@@ -2323,7 +2324,7 @@ public class EngineController : UdonSharpBehaviour
         Physics.Raycast(HUDControl.transform.position, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
         //used to make lock remain for .25 seconds after target is obscured
         if (hitcurrent.point == null || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
-        { ObscuredDelay += Time.deltaTime; }
+        { ObscuredDelay += DeltaTime; }
         else
         { ObscuredDelay = 0; }
 
@@ -2336,12 +2337,12 @@ public class EngineController : UdonSharpBehaviour
                         && AAMCurrentTargetDistance < AAMMaxTargetDistance)
             {
                 AAMHasTarget = true;
-                if (NumAAM > 0) AAMLockTimer += Time.deltaTime;
+                if (NumAAM > 0) AAMLockTimer += DeltaTime;
                 //give enemy radar lock even if you're out of missiles
                 if (AAMCurrentTargetEngineControl != null && RStickSelection == 2)
                 {
                     //target is a plane
-                    AAMTargetedTimer += Time.deltaTime;
+                    AAMTargetedTimer += DeltaTime;
                     if (AAMTargetedTimer > 1)
                     {
                         AAMTargetedTimer = 0;

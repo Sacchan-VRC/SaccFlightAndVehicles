@@ -133,6 +133,7 @@ public class EffectsController : UdonSharpBehaviour
     }
     public void Effects()
     {
+        float DeltaTime = Time.deltaTime;
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
             rotationinputs.x = /* Mathf.Clamp( */EngineControl.PitchInput/*  + EngineControl.Trim.x , -1, 1)*/ * 25;
@@ -148,10 +149,10 @@ public class EffectsController : UdonSharpBehaviour
         }
         vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
-        PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * Time.deltaTime);
-        RollLerper.y = Mathf.Lerp(RollLerper.y, rotationinputs.z, 4.5f * Time.deltaTime);
-        YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * Time.deltaTime);
-        Enginefireerper.y = Mathf.Lerp(Enginefireerper.y, EngineControl.Throttle, .9f * Time.deltaTime);
+        PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * DeltaTime);
+        RollLerper.y = Mathf.Lerp(RollLerper.y, rotationinputs.z, 4.5f * DeltaTime);
+        YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * DeltaTime);
+        Enginefireerper.y = Mathf.Lerp(Enginefireerper.y, EngineControl.Throttle, .9f * DeltaTime);
 
         if (EngineControl.Occupied == true)
         {
@@ -167,7 +168,7 @@ public class EffectsController : UdonSharpBehaviour
             }
 
         }
-        else { DoEffects += Time.deltaTime; PlaneAnimator.SetBool("gunfiring", false); }
+        else { DoEffects += DeltaTime; PlaneAnimator.SetBool("gunfiring", false); }
 
         /*         if (!ElevonLNull) ElevonL.localRotation = Quaternion.Euler(0, RollLerper.y + -PitchLerper.x, 0);
                 if (!ElevonRNull) ElevonR.localRotation = Quaternion.Euler(0, RollLerper.y + PitchLerper.x, 0);
@@ -230,7 +231,7 @@ public class EffectsController : UdonSharpBehaviour
             }
         }
 
-        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * Time.deltaTime);
+        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * DeltaTime);
 
         PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         PlaneAnimator.SetFloat("health", EngineControl.Health * FullHealthDivider);
@@ -243,6 +244,7 @@ public class EffectsController : UdonSharpBehaviour
 
     private void LargeEffects()//large effects visible from a long distance
     {
+        float DeltaTime = Time.deltaTime;
         if (EngineControl.Occupied == true)
         {
             if (EngineControl.IsFiringGun) //send firing to animator
@@ -256,7 +258,7 @@ public class EffectsController : UdonSharpBehaviour
 
             if (Smoking && !DisplaySmokeNull)
             {
-                SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * Time.deltaTime);
+                SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * DeltaTime);
                 foreach (ParticleSystem smoke in DisplaySmoke)
                 {
                     var main = smoke.main;
@@ -268,11 +270,11 @@ public class EffectsController : UdonSharpBehaviour
         //this is to finetune when wingtrails appear and disappear
         if (EngineControl.Gs >= Gs_trail) //Gs are increasing
         {
-            Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 30f * Time.deltaTime);//apear fast when pulling Gs
+            Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 30f * DeltaTime);//apear fast when pulling Gs
         }
         else //Gs are decreasing
         {
-            Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * Time.deltaTime);//linger for a bit before cutting off
+            Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * DeltaTime);//linger for a bit before cutting off
         }
         PlaneAnimator.SetFloat("mach10", EngineControl.Speed / 343 / 10);//should be airspeed but nonlocal players don't have it
         PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);

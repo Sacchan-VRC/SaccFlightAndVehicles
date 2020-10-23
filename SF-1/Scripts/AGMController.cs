@@ -24,6 +24,7 @@ public class AGMController : UdonSharpBehaviour
     }
     void LateUpdate()
     {
+        float DeltaTime = Time.deltaTime;
         if (!ColliderActive)
         {
             if (Vector3.Distance(gameObject.transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
@@ -39,9 +40,9 @@ public class AGMController : UdonSharpBehaviour
             var targetDirection = missileToTargetVector.normalized;
             var rotationAxis = Vector3.Cross(missileForward, targetDirection);
             var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-            gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
+            gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
         }
-        Lifetime += Time.deltaTime;
+        Lifetime += DeltaTime;
         if (Lifetime > MaxLifetime)
         {
             if (Exploding)//missile exploded 10 seconds ago

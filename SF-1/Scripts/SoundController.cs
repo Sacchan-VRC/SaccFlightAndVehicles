@@ -187,6 +187,7 @@ public class SoundController : UdonSharpBehaviour
 
     private void Update()
     {
+        float DeltaTime = Time.deltaTime;
         if (DoSound > 35f)
         {
             if (!soundsoff) //disable all the sounds that always play, re-enabled in pilotseat
@@ -228,10 +229,10 @@ public class SoundController : UdonSharpBehaviour
                 ThisFrameDist = Vector3.Distance(testcamera.transform.position, EngineControl.CenterOfMass.position);
             }
             if (EngineControl.Occupied == true) { DoSound = 0f; }
-            else { DoSound += Time.deltaTime; }
+            else { DoSound += DeltaTime; }
 
             relativespeed = (ThisFrameDist - LastFrameDist);
-            float doppletemp = (343 * (Time.deltaTime * 5)) + relativespeed;
+            float doppletemp = (343 * (DeltaTime * 5)) + relativespeed;
 
             //supersonic a bit lower than the speed of sound because dopple is speed towards you, if they're coming in at an angle it won't be as high. stupid hack
             if (doppletemp < .1f)
@@ -250,14 +251,14 @@ public class SoundController : UdonSharpBehaviour
                 }
             }
 
-            Doppler = (343 * (Time.deltaTime * 5)) / doppletemp;
+            Doppler = (343 * (DeltaTime * 5)) / doppletemp;
             LastFrameDist = ThisFrameDist;
             dopplecounter = 0;
         }
         dopplecounter++;
         if (SonicBoomWave < SonicBoomDistance)
         {
-            SonicBoomWave += Mathf.Max(343 * Time.deltaTime, -relativespeed * .2f); //simulate sound wave movement
+            SonicBoomWave += Mathf.Max(343 * DeltaTime, -relativespeed * .2f); //simulate sound wave movement
         }
 
         if (SonicBoomWave <= SonicBoomDistance)
@@ -355,20 +356,20 @@ public class SoundController : UdonSharpBehaviour
             {
                 if (!PlaneInsideNull)
                 {
-                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.Throttle * .4f) + .8f, 2.25f * Time.deltaTime);
-                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, .4f, .72f * Time.deltaTime);
+                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.Throttle * .4f) + .8f, 2.25f * DeltaTime);
+                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, .4f, .72f * DeltaTime);
                 }
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, (EngineControl.Throttle * PlaneThrustInitialVolume) * InVehicleThrustVolumeFactor, 1.08f * Time.deltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, (EngineControl.Throttle * PlaneThrustInitialVolume) * InVehicleThrustVolumeFactor, 1.08f * DeltaTime);
             }
             else/*  if (InEditor) */ //enable here and disable 'Piloting' above for testing //you're a passenger and no one is flying
             {
 
                 if (!PlaneInsideNull)
                 {
-                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * Time.deltaTime);
-                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * Time.deltaTime);
+                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * DeltaTime);
+                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * DeltaTime);
                 }
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * Time.deltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime);
             }
         }
         else if (EngineControl.Occupied && EngineControl.Fuel > 1)//someone else is piloting
@@ -393,27 +394,27 @@ public class SoundController : UdonSharpBehaviour
             {
                 PlaneDistant.Play();
             }
-            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 1, .72f * Time.deltaTime);
+            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 1, .72f * DeltaTime);
             if (Doppler > 50)
             {
-                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, 3 * Time.deltaTime);
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 3 * Time.deltaTime);
+                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, 3 * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 3 * DeltaTime);
             }
             else
             {
-                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, EngineControl.Throttle, .72f * Time.deltaTime);
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, EngineControl.Throttle, 1.08f * Time.deltaTime);
+                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, EngineControl.Throttle, .72f * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, EngineControl.Throttle, 1.08f * DeltaTime);
             }
             PlaneThrustPitch = 1;
-            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (EngineControl.Throttle - 0.3f) + 1.3f, .54f * Time.deltaTime);
+            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (EngineControl.Throttle - 0.3f) + 1.3f, .54f * DeltaTime);
         }
         else //no one is in the plane or its out of fuel
         {
             if (Leftplane == true) { Exitplane(); }//pilot or passenger left or canopy opened
-            PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * Time.deltaTime);
-            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, .09f * Time.deltaTime);
-            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * Time.deltaTime);
-            PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, .72f * Time.deltaTime);
+            PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime);
+            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, .09f * DeltaTime);
+            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * DeltaTime);
+            PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, .72f * DeltaTime);
         }
 
         LastFramePlaneIdlePitch = PlaneIdlePitch;
@@ -428,7 +429,7 @@ public class SoundController : UdonSharpBehaviour
 
         if (SonicBoomPreventer < 5.1f)//count up, limited to 5.1(plane can only cause a sonic boom every 5 seconds max)
         {
-            SonicBoomPreventer += Time.deltaTime;
+            SonicBoomPreventer += DeltaTime;
         }
         //set final volumes and pitches
         //lerp should help smooth out laggers and the dopple only being calculated every 5 frames
@@ -445,19 +446,19 @@ public class SoundController : UdonSharpBehaviour
         }
         foreach (AudioSource idle in PlaneIdle)
         {
-            idle.volume = Mathf.Lerp(idle.volume, PlaneIdleVolume, 30f * Time.deltaTime) * silentint;
-            idle.pitch = Mathf.Lerp(idle.pitch, PlaneIdlePitch, 30f * Time.deltaTime);
+            idle.volume = Mathf.Lerp(idle.volume, PlaneIdleVolume, 30f * DeltaTime) * silentint;
+            idle.pitch = Mathf.Lerp(idle.pitch, PlaneIdlePitch, 30f * DeltaTime);
         }
         if (!PlaneDistantNull)
         {
             PlaneDistantVolume *= silentint;
-            PlaneDistant.volume = Mathf.Lerp(PlaneDistant.volume, PlaneDistantVolume, 30f * Time.deltaTime);
-            PlaneDistant.pitch = Mathf.Lerp(PlaneDistant.pitch, PlaneDistantPitch, 30f * Time.deltaTime);
+            PlaneDistant.volume = Mathf.Lerp(PlaneDistant.volume, PlaneDistantVolume, 30f * DeltaTime);
+            PlaneDistant.pitch = Mathf.Lerp(PlaneDistant.pitch, PlaneDistantPitch, 30f * DeltaTime);
         }
         foreach (AudioSource thrust in Thrust)
         {
             thrust.volume = PlaneThrustVolume * silentint;
-            thrust.pitch = Mathf.Lerp(thrust.pitch, PlaneThrustPitch, 30f * Time.deltaTime);
+            thrust.pitch = Mathf.Lerp(thrust.pitch, PlaneThrustPitch, 30f * DeltaTime);
         }
         if (!PlaneWindNull)
         {
@@ -476,11 +477,11 @@ public class SoundController : UdonSharpBehaviour
                 }
                 if (EngineControl.SoundControl.Doppler > 50f)
                 {
-                    GunSound.volume = Mathf.Lerp(GunSound.volume, 0, 3f * Time.deltaTime);
+                    GunSound.volume = Mathf.Lerp(GunSound.volume, 0, 3f * DeltaTime);
                 }
                 else
                 {
-                    GunSound.volume = Mathf.Lerp(GunSound.volume, GunSoundInitialVolume, 9f * Time.deltaTime);
+                    GunSound.volume = Mathf.Lerp(GunSound.volume, GunSoundInitialVolume, 9f * DeltaTime);
                 }
             }
             else if (!EngineControl.IsFiringGun || EngineControl.SoundControl.silent && GunSound.isPlaying)

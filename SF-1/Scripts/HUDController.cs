@@ -123,6 +123,7 @@ public class HUDController : UdonSharpBehaviour
     }
     private void Update()
     {
+        float DeltaTime = Time.deltaTime;
         //RollPitch Indicator
         PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.RollInput, EngineControl.PitchInput, 0)) * InputSquareSize;
 
@@ -184,7 +185,7 @@ public class HUDController : UdonSharpBehaviour
             GUNLeadIndicator.gameObject.SetActive(true);
             Vector3 TargetDir = EngineControl.AAMCurrentTargetDirection;
             Vector3 RelativeTargetSpeed = TargetDir - GUN_TargetDirLastFrame;
-            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, RelativeTargetSpeed.magnitude / Time.deltaTime, 3f * Time.deltaTime);
+            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, RelativeTargetSpeed.magnitude / DeltaTime, 3f * DeltaTime);
             float BulletHitTime = TargetDir.magnitude * BulletSpeedDivider;
             Vector3 PredictedPos = TargetDir + ((RelativeTargetSpeed.normalized * GUN_TargetSpeedLerper) * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
@@ -374,13 +375,13 @@ public class HUDController : UdonSharpBehaviour
                     {
                         //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
                         newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                        EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 1.5f * Time.deltaTime), 0.3f, 90);
+                        EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 1.5f * DeltaTime), 0.3f, 90);
                     }
                 }
                 else
                 {
                     newzoom = 80;
-                    EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 3.5f * Time.deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                    EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 3.5f * DeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
             }
         }
@@ -402,7 +403,7 @@ public class HUDController : UdonSharpBehaviour
             if (camhit.point != null)
             {
                 //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                EngineControl.AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * Time.deltaTime), 0.3f);
+                EngineControl.AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * DeltaTime), 0.3f);
             }
         }
         else
@@ -436,7 +437,7 @@ public class HUDController : UdonSharpBehaviour
             }
             check = 0;
         }
-        check += Time.deltaTime;
+        check += DeltaTime;
 
         if (EngineControl.HasAAM) HUDText_AAM_ammo.text = EngineControl.NumAAM.ToString("F0");
         else HUDText_AAM_ammo.text = string.Empty;

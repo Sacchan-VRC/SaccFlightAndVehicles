@@ -78,7 +78,6 @@ public class AAMController : UdonSharpBehaviour
             }
         }
 
-        Lifetime += Time.deltaTime;
         if (Lifetime > MaxLifetime)
         {
             if (Exploding)//missile exploded 10 seconds ago
@@ -91,6 +90,7 @@ public class AAMController : UdonSharpBehaviour
 
     private void FixedUpdate()
     {
+        float DeltaTime = Time.deltaTime;
         if (!TargetLost)
         {
             if (!Target.gameObject.activeInHierarchy) { TargetLost = true; }
@@ -102,7 +102,7 @@ public class AAMController : UdonSharpBehaviour
                 Vector3 TargetPos = Target.position;
                 TargetDistance = Vector3.Distance(Position, TargetPos);
                 Vector3 Targetmovedir = TargetPos - TargetPosLastFrame;
-                float timetotarget = TargetDistance / ((TargDistlastframe - TargetDistance) / Time.deltaTime);
+                float timetotarget = TargetDistance / ((TargDistlastframe - TargetDistance) / DeltaTime);
                 Vector3 TargetPredictedPos = TargetPos + ((Targetmovedir * timetotarget) + (Targetmovedir.normalized * (TargetEngineControl.Speed / MissileDriftCompensation) * timetotarget) / Time.fixedDeltaTime);
 
                 TargetPosLastFrame = TargetPos;
@@ -121,7 +121,7 @@ public class AAMController : UdonSharpBehaviour
                     var targetDirection = missileToTargetVector.normalized;
                     var rotationAxis = Vector3.Cross(missileForward, targetDirection);
                     var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
+                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
                 }
                 else if (LockedOn)
                 {
@@ -143,12 +143,13 @@ public class AAMController : UdonSharpBehaviour
                     var targetDirection = missileToTargetVector.normalized;
                     var rotationAxis = Vector3.Cross(missileForward, targetDirection);
                     var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * Time.deltaTime, deltaAngle), Space.World);
+                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
                 }
                 else if (Lifetime > 1) { TargetLost = true; }
             }
             TargDistlastframe = TargetDistance;
         }
+        Lifetime += DeltaTime;
     }
 
     private void OnCollisionEnter(Collision other)
