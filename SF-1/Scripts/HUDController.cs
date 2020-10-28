@@ -184,10 +184,12 @@ public class HUDController : UdonSharpBehaviour
         {
             GUNLeadIndicator.gameObject.SetActive(true);
             Vector3 TargetDir = EngineControl.AAMCurrentTargetDirection;
-            Vector3 RelativeTargetSpeed = TargetDir - GUN_TargetDirLastFrame;
-            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, RelativeTargetSpeed.magnitude / DeltaTime, 3f * DeltaTime);
+            Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirLastFrame;
+            //lerp target speed to smooth out the really unsmooth VRChat rigidbodies
+            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, RelativeTargetVel.magnitude / DeltaTime, .6f * DeltaTime);
             float BulletHitTime = TargetDir.magnitude * BulletSpeedDivider;
-            Vector3 PredictedPos = TargetDir + ((RelativeTargetSpeed.normalized * GUN_TargetSpeedLerper) * BulletHitTime);
+            //normalize relative target velocity vector and multiply by lerped speed so the direction is accurate, but the distance is lerped, so not necesarily precise.
+            Vector3 PredictedPos = TargetDir + ((RelativeTargetVel.normalized * GUN_TargetSpeedLerper) * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
@@ -397,7 +399,11 @@ public class HUDController : UdonSharpBehaviour
         }
         else if (EngineControl.AGMLocked)
         {
-            if (!EngineControl.AtGCamNull) EngineControl.AtGCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
+            if (!EngineControl.AtGCamNull)
+            {
+                EngineControl.AtGCam.gameObject.SetActive(true);
+                EngineControl.AtGCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
+            }
             RaycastHit camhit;
             Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
             if (camhit.point != null)

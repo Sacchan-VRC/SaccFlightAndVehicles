@@ -299,7 +299,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] public Vector3 Spawnrotation;
     private int OutsidePlaneLayer;
-    private float ObscuredDelay;
+    private float AAMTargetObscuredDelay;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -439,15 +439,13 @@ public class EngineController : UdonSharpBehaviour
     private void LateUpdate()
     {
         float DeltaTime = Time.deltaTime;
-        if (!InEditor) IsOwner = localPlayer.IsOwner(VehicleMainObj);
+        if (!InEditor) { IsOwner = localPlayer.IsOwner(VehicleMainObj); }
         if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 2049 /* Default and Environment */))
-        {
-            Taxiing = true;
-        }
+        { Taxiing = true; }
         else { Taxiing = false; }
 
 
-        if (InEditor || IsOwner)//works in editor or ingame
+        if (IsOwner || InEditor)//works in editor or ingame
         {
             if (!dead)
             {
@@ -643,6 +641,7 @@ public class EngineController : UdonSharpBehaviour
                     else { Afterburner = 1; }
                 }
 
+                //with keys 1-4 we select weapons, if they are already selectet, deselect them.
                 if (Input.GetKeyDown(KeyCode.Alpha1) && HasGun)
                 {
                     if (RStickSelection == 1)
@@ -656,6 +655,7 @@ public class EngineController : UdonSharpBehaviour
                     }
                     else
                     {
+                        if (HUDControl != null) { HUDControl.GUN_TargetSpeedLerper = 0; }//reset targeting lerper
                         if (InEditor)
                         {
                             RStick1();
@@ -878,6 +878,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasGun && RStickSelection != 1)
                         {
+                            if (HUDControl != null) { HUDControl.GUN_TargetSpeedLerper = 0; }//reset targeting lerper
                             WeaponSelected = true;
                             if (InEditor)
                             {
@@ -1867,8 +1868,15 @@ public class EngineController : UdonSharpBehaviour
                         Health -= ((-HookedDelta + 2) / 2) * FullHealth;
                     }
                     Hooked = false;
-                    if (!SoundControl.CableSnapNull) { SoundControl.CableSnap.Play(); }
-                    //Debug.Log("snap");
+                    if (InEditor)
+                    {
+                        PlayCableSnap();
+                    }
+                    else
+                    {
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap");
+                    }
+
                 }
 
                 if (Speed > HookedBrakeStrength * DeltaTime)
@@ -1904,7 +1912,7 @@ public class EngineController : UdonSharpBehaviour
                        //do lift
                     Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
                         (downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch * Atmosphere) + (SpeedLiftFactor * AoALiftPitch * VelLift * Atmosphere),// Y Up
-                            Throttle * ThrottleStrength * Atmosphere * Afterburner * Atmosphere);// Z Forward
+                            Throttle * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
 
                     //used to add rotation friction
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
@@ -1954,6 +1962,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         dead = false;//just in case
                         CatapultStatus = 0;
+                        Taxiinglerper = 0;
                     }
                     break;
             }
@@ -1974,8 +1983,9 @@ public class EngineController : UdonSharpBehaviour
     }
     private void FixedUpdate()
     {
-        if (InEditor || IsOwner)
+        if (IsOwner || InEditor)
         {
+            float DeltaTime = Time.deltaTime;
             //lerp velocity toward 0 to simulate air friction
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, FinalWind * StillWindMulti, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag) * Atmosphere) * 90) * DeltaTime);
             //apply pitching using pitch moment
@@ -2191,6 +2201,7 @@ public class EngineController : UdonSharpBehaviour
         Fuel = FullFuel;
         RStickSelection = 0;
         LStickSelection = 0;
+        MissilesIncoming = 0;
 
         //play sonic boom if it was going to play before it exploded
         if (SoundControl.playsonicboom && SoundControl.silent)
@@ -2226,7 +2237,7 @@ public class EngineController : UdonSharpBehaviour
             idle.volume = 0;
         }
 
-        if (InEditor || IsOwner)
+        if (IsOwner || InEditor)
         {
             VehicleRigidbody.velocity = Vector3.zero;
             Health = FullHealth;//turns off low health smoke
@@ -2254,6 +2265,7 @@ public class EngineController : UdonSharpBehaviour
     }
     private void AAMTargeting(float Lock_Angle)
     {
+        float DeltaTime = Time.deltaTime;
         var CurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
         float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (CurrentTargetPosition - CenterOfMass.transform.position));
 
@@ -2277,7 +2289,6 @@ public class EngineController : UdonSharpBehaviour
             //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
             if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead)))
             {
-
                 RaycastHit hitnext;
                 //raycast to check if it's behind something
                 Physics.Raycast(HUDControl.transform.position, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
@@ -2324,15 +2335,15 @@ public class EngineController : UdonSharpBehaviour
         Physics.Raycast(HUDControl.transform.position, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
         //used to make lock remain for .25 seconds after target is obscured
         if (hitcurrent.point == null || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
-        { ObscuredDelay += DeltaTime; }
+        { AAMTargetObscuredDelay += DeltaTime; }
         else
-        { ObscuredDelay = 0; }
+        { AAMTargetObscuredDelay = 0; }
 
         if (!Taxiing
             && AAMTargets[AAMTarget].activeInHierarchy
                 && (AAMCurrentTargetEngineControl == null || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
         {
-            if ((ObscuredDelay < .25f)
+            if ((AAMTargetObscuredDelay < .25f)
                     && AAMCurrentTargetAngle < Lock_Angle
                         && AAMCurrentTargetDistance < AAMMaxTargetDistance)
             {
@@ -2366,6 +2377,10 @@ public class EngineController : UdonSharpBehaviour
             AAMLockTimer = 0;
             AAMHasTarget = false;
         }
+    }
+    public void PlayCableSnap()
+    {
+        if (!SoundControl.CableSnapNull) { SoundControl.CableSnap.Play(); }
     }
     private void Assert(bool condition, string message)
     {

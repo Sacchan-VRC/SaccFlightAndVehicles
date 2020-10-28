@@ -5,6 +5,13 @@ https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Small Update 1.36
+•Many small tweaks and bugfixes
+•Added Gun Lead Indicator
+•Improved missile tracking
+•Cable snap sound
+•Missiles unable to lock on through walls
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Hotfix Update 1.35
 •Added missing ViewScreen material
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -180,6 +187,8 @@ The Gun_pilot is set to not collide with reserved2 layer. The plane is set to re
 
 Never leave an entry of an array input empty in EffectsController and SoundController, it'll cause them to crash.
 
+The hud can be made to appear smaller by moving all elements inside the 'bigstuff' object forward. 'bigstuff' is a child of HudController.
+
 Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController).
 Doing animations using the animator is most performant, so I've used it where possible. HUD stuff included.
 When making a custom plane, you must also customize a number of the animations, I recommend duplicating the SF-1's animation controller, and replacing the animations that need replacing.
@@ -225,6 +234,7 @@ Bombs--------
 These 3 objects just contain meshes to visually represent how many missiles etc you have left. Controlled by the animator.
 
 Custom Layers:
+Plane colliders must be set to Walkthrough layer in order to be targeted by AAMs. (Raycast looks for this layer)
 Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
 As layers can't be imported in a unitypackage you must set them up yourself.
 You must set the trigger objects to their respective layers. Create new layers, and set them in EngineController. By default the layers are as follows
@@ -278,6 +288,9 @@ Variables:
 Engine Control
 Missile's plane's EngineController, needed to know target.
 
+Max Lifetime
+Time until the missile will explode without hitting anything.
+
 Explosion Sounds
 Array of sounds one of which will play for the explosion.
 
@@ -286,6 +299,10 @@ Missile's collider is inactive when it is spawned. After it's this far away from
 
 Rot Speed
 angle per second that the missile can turn while chasing it's target.
+
+Missile Drift Compensation
+Aims the missile further infront of the plane the lower the number is. Used to account for the fact that the missile is a rigidbody and doesn't fly perfectly straight.
+Hard to tweak, recommend not changing unless your missiles are missing easy targets.
 
 
 AGMController(new in 1.3)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -428,6 +445,13 @@ Sound controller goes in here, used to access variables in sound controller
 
 Hud Control
 Hud controller goes in here, used to access variables in hud controller
+
+Plane Mesh
+Put the parent object of the plane's mesh objects here. Sets it and all it's children to the 'OnboardPlaneLayer' layer when you enter, and back to what it was before when you leave. This is so that the Gun_Pilot doesn't hit your own plane.
+Do not put any colliders as child of any other object, or the gun might hit them.
+
+Onboard Plane Layer
+Layer to set the Plane Mesh and all it's children to when you enter the plane.
 
 Center of Mass (new in 1.1)
 The aircraft's center of mass. Useful to adjust how long it takes to take off.
@@ -778,6 +802,8 @@ L Stick_funcon1-8
 R Stick_funcon3-8
 Function highlight objects that are enabled when the function is on.
 
+Distance_from_head
+Distance that some moving hud elements are projected forward to match the position of other objects on the hud. Change this if you move the hud forward (to make it appear smaller)
 
 
 LeaveVehicleButton.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -808,10 +834,6 @@ Used to tell the vehicle you're a passenger.
 Leave Button
 Used to enable and disable the leave button. Passenger Leave Button goes here.
 
-Plane Mesh
-Put the parent object of the plane's mesh objects here. Sets it and all it's children to 'Playerlocal' layer when you enter, and back to 'Walkthrough' when you leave. This is so that the Gun_Pilot doesn't hit your own plane.
-Do not put any colliders as child of any other object, or the gun might hit them.
-
 Seat Adjuster
 Object containing the Seat Adjuster script. Enabled when enterering, and disabled when leaving(if not already disabled by itself)
 
@@ -828,10 +850,6 @@ Enable the leave button when you get in.
 
 Gun_Pilot
 Used to enable the invisible gun that only the pilot fires, (the one that actually does damage)
-
-Plane Mesh
-Put the parent object of the plane's mesh objects here. Sets it and all it's children to 'Playerlocal' layer when you enter, and back to 'Walkthrough' when you leave. This is so that the Gun_Pilot doesn't hit your own plane.
-Do not put any colliders as child of any other object, or the gun might hit them.
 
 Seat Adjuster
 Object containing the Seat Adjuster script. Enabled when enterering, and disabled when leaving(if not already disabled by itself)
@@ -913,6 +931,9 @@ Sound made when the plane is locked into place on a catapult.
 
 Catapult Launch
 Sound made when the plane is launched on a catapult.
+
+Cable Snap
+Sound made when you try to land with the hook too fast, catch the cable, but go too far and the cable snaps.
 
 Menu Select
 Sound made every time menu selection is changed.

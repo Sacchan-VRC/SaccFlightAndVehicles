@@ -38,22 +38,21 @@ public class PilotSeat : UdonSharpBehaviour
             }
             EngineControl.Piloting = true;
             //canopy closed/open sound
-            if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;//has to be less than -100000
+            if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100000 - EngineControl.CanopyCloseTime;
             else EngineControl.CanopyCloseTimer = -1;//less than 0
             if (EngineControl.dead) EngineControl.Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
         }
         if (EngineControl.EffectsControl != null)
         {
             if (!EngineControl.InEditor)
-                Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
+            { Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject); }
             EngineControl.IsFiringGun = false;
             EngineControl.EffectsControl.Smoking = false;
-            EngineControl.LGripLastFrame = false; //prevent instant flares drop on enter
         }
         if (EngineControl.HUDControl != null)
         {
             if (!EngineControl.InEditor)
-                Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject);
+            { Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject); }
             EngineControl.HUDControl.gameObject.SetActive(true);
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
@@ -83,8 +82,7 @@ public class PilotSeat : UdonSharpBehaviour
         EngineControl.PilotName = player.displayName;
         EngineControl.Pilot = player;
 
-        if (!player.isLocal)
-            EngineControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
+        EngineControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
 
         //old WakeUp();
         EngineControl.EffectsControl.DoEffects = 0f;

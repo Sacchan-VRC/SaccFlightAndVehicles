@@ -10,13 +10,11 @@ public class AAMController : UdonSharpBehaviour
     public float MaxLifetime = 12;
     public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 30;
-    public float RotSpeed = 15;
+    public float RotSpeed = 130;
     public float MissileDriftCompensation = 65f;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
     private float Lifetime = 0;
-    private float LockAngle = 0;
-    private float StartLockAngle = 0;
     private Transform Target;
     private bool ColliderActive = false;
     private bool Exploding = false;
@@ -32,17 +30,18 @@ public class AAMController : UdonSharpBehaviour
     void Start()
     {
         MissileRigid = gameObject.GetComponent<Rigidbody>();
-        Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
-        LockAngle = EngineControl.AAMLockAngle;
-        StartLockAngle = LockAngle;
         AAMCollider = gameObject.GetComponent<CapsuleCollider>();
+        Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
+        TargDistlastframe = Vector3.Distance(transform.position, Target.position) + 1;//1 meter further so the number is different and missile knows we're already moving toward target
+        TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
         if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
         {
             TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
             if (TargetEngineControl != null)
             {
                 if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                    TargetEngineControl.MissilesIncoming++;
+                { TargetEngineControl.MissilesIncoming++; }
+
                 LockedOn = true;
                 TargetIsPlane = true;
             }
@@ -51,11 +50,7 @@ public class AAMController : UdonSharpBehaviour
         if (EngineControl.InEditor || EngineControl.IsOwner)
         {
             Owner = true;
-            LockHack = false;//don't do netcode help hack if owner
-        }
-        else
-        {
-            LockAngle = 180;//help missiles fired during a lagged turnfight actually fly towards their targets for the people who didn't fire them (for the first 2 seconds)
+            LockHack = false;
         }
     }
     void LateUpdate()
@@ -74,9 +69,9 @@ public class AAMController : UdonSharpBehaviour
             if (Lifetime > .6f)
             {
                 LockHack = false;
-                LockAngle = StartLockAngle;
             }
         }
+
 
         if (Lifetime > MaxLifetime)
         {
@@ -96,22 +91,22 @@ public class AAMController : UdonSharpBehaviour
             if (!Target.gameObject.activeInHierarchy) { TargetLost = true; }
 
             float TargetDistance;
+            Vector3 Position = transform.position;
+            Vector3 TargetPos = Target.position;
+            TargetDistance = Vector3.Distance(Position, TargetPos);
             if (TargetIsPlane)
             {
-                Vector3 Position = transform.position;
-                Vector3 TargetPos = Target.position;
-                TargetDistance = Vector3.Distance(Position, TargetPos);
-                Vector3 Targetmovedir = TargetPos - TargetPosLastFrame;
-                float timetotarget = TargetDistance / ((TargDistlastframe - TargetDistance) / DeltaTime);
-                Vector3 TargetPredictedPos = TargetPos + ((Targetmovedir * timetotarget) + (Targetmovedir.normalized * (TargetEngineControl.Speed / MissileDriftCompensation) * timetotarget) / Time.fixedDeltaTime);
-
-                TargetPosLastFrame = TargetPos;
-                if (TargetDistance < TargDistlastframe)
+                if (TargetDistance < TargDistlastframe || LockHack)
                 {
+                    //turn towards the target
                     Vector3 missileToTargetVector;
                     if (TargetDistance < 700)
                     {
-                        missileToTargetVector = (TargetPredictedPos - Position);
+                        Vector3 Targetmovedir = TargetPos - TargetPosLastFrame;
+                        float timetotarget = TargetDistance / Mathf.Max(((TargDistlastframe - TargetDistance) / DeltaTime), 0.001f);//ensure no division by 0
+                        Vector3 TargetPredictedPos = TargetPos + ((Targetmovedir * timetotarget) + (Targetmovedir.normalized * (TargetEngineControl.Speed / MissileDriftCompensation) * timetotarget) / DeltaTime);
+                        missileToTargetVector = TargetPredictedPos - Position;
+                        TargetPosLastFrame = TargetPos;
                     }
                     else
                     {
@@ -125,19 +120,18 @@ public class AAMController : UdonSharpBehaviour
                 }
                 else if (LockedOn)
                 {
+                    //just flew past the target, unlock
                     if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
                         TargetEngineControl.MissilesIncoming -= 1;
                     LockedOn = false;
                     if (Lifetime > 1) { TargetLost = true; }
                 }
             }
-            else
+            else //target is not a plane
             {
-                Vector3 Position = transform.position;
-                Vector3 TargetPos = Target.position;
-                TargetDistance = Vector3.Distance(Position, TargetPos);
-                if (TargetDistance < TargDistlastframe)
+                if (TargetDistance < TargDistlastframe || LockHack)
                 {
+                    //turn towards the target
                     Vector3 missileToTargetVector = TargetPos - Position;
                     var missileForward = transform.forward;
                     var targetDirection = missileToTargetVector.normalized;
@@ -145,6 +139,7 @@ public class AAMController : UdonSharpBehaviour
                     var deltaAngle = Vector3.Angle(missileForward, targetDirection);
                     transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
                 }
+                //just flew past the target, unlock
                 else if (Lifetime > 1) { TargetLost = true; }
             }
             TargDistlastframe = TargetDistance;
