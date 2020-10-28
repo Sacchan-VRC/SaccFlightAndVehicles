@@ -70,6 +70,7 @@ public class HitDetector : UdonSharpBehaviour
         //re-enable plane model and effects
         EngineControl.EffectsControl.DoEffects = 6f; //wake up if was asleep
         EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
+        EngineControl.MissilesIncoming = 0;
         if (EngineControl.InEditor)
         {
             EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.Spawnrotation);

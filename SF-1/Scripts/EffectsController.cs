@@ -147,7 +147,6 @@ public class EffectsController : UdonSharpBehaviour
                 JoyStick.localRotation = Quaternion.Euler(tempjoy);
             }
         }
-        vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * DeltaTime);
         RollLerper.y = Mathf.Lerp(RollLerper.y, rotationinputs.z, 4.5f * DeltaTime);
@@ -230,6 +229,7 @@ public class EffectsController : UdonSharpBehaviour
                 }
             }
         }
+        vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * DeltaTime);
 

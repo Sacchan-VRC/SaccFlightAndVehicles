@@ -93,21 +93,21 @@ public class ViewScreenController : UdonSharpBehaviour
 
             var VehicleTrans = TargetEngine.VehicleMainObj.transform;
             Quaternion NewRot;
-            Vector3 temp = VehicleTrans.TransformDirection(new Vector3(0, 14, 0));
+            Vector3 NewPos = VehicleTrans.TransformDirection(new Vector3(0, 14, 0));
             RaycastHit hit;
-            if (Physics.Raycast(TargetCoM.position + temp, -VehicleTrans.forward, out hit, 50, 1))
+            if (Physics.Raycast(TargetCoM.position + NewPos, -VehicleTrans.forward, out hit, 50, 1))
             {
-                temp = hit.point + VehicleTrans.forward * .2f;
-                NewRot = TargetEngine.VehicleMainObj.transform.rotation;
+                NewPos = hit.point + VehicleTrans.forward * .2f;
+                NewRot = VehicleTrans.rotation;
                 NewRot = Quaternion.AngleAxis(((-hit.distance + 50) / 50) * 30, VehicleTrans.right) * NewRot;
             }
             else
             {
-                temp = (TargetCoM.position + temp) - (VehicleTrans.forward * 50);
-                NewRot = TargetEngine.VehicleMainObj.transform.rotation;
+                NewPos = (TargetCoM.position + NewPos) - (VehicleTrans.forward * 50);
+                NewRot = VehicleTrans.rotation;
             }
 
-            PlaneCamera.transform.position = temp;
+            PlaneCamera.transform.position = NewPos;
             PlaneCamera.transform.rotation = Quaternion.Slerp(PlaneCamera.transform.rotation, NewRot, 8f * Time.deltaTime);
 
             ChannelNumberText.text = string.Concat((AAMTarget + 1).ToString(), "\n", TargetEngine.PilotName);
