@@ -30,6 +30,9 @@ public class PilotSeat : UdonSharpBehaviour
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (EngineControl != null)
         {
+            EngineControl.Throttle = 0;
+            EngineControl.ThrottleInput = 0;
+            EngineControl.PlayerThrottle = 0;
             EngineControl.VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
             if (!EngineControl.InEditor)
             {
@@ -39,7 +42,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.Piloting = true;
             //canopy closed/open sound
             if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100000 - EngineControl.CanopyCloseTime;
-            else EngineControl.CanopyCloseTimer = -1;//less than 0
+            else EngineControl.CanopyCloseTimer = -EngineControl.CanopyCloseTime;//less than 0
             if (EngineControl.dead) EngineControl.Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
         }
         if (EngineControl.EffectsControl != null)
@@ -81,6 +84,7 @@ public class PilotSeat : UdonSharpBehaviour
     {
         EngineControl.PilotName = player.displayName;
         EngineControl.Pilot = player;
+        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", true); }
 
         EngineControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
 
@@ -110,6 +114,7 @@ public class PilotSeat : UdonSharpBehaviour
     {
         EngineControl.PilotName = string.Empty;
         EngineControl.Pilot = null;
+        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", false); }
 
         if (player.isLocal)
         {
@@ -126,7 +131,6 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.LTriggerTapTime = 1;
             EngineControl.RTriggerTapTime = 1;
             EngineControl.Taxiinglerper = 0;
-            EngineControl.PlayerThrottle = 0;
             EngineControl.LGripLastFrame = false;
             EngineControl.RGripLastFrame = false;
             EngineControl.LStickSelection = 0;

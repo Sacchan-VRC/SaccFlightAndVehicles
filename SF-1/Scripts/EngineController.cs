@@ -1830,14 +1830,14 @@ public class EngineController : UdonSharpBehaviour
             AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
 
 
-            //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownMulti)
+            //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
             if (Throttle < ThrottleInput)
             {
-                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * DeltaTime); // ThrottleInput * ThrottleStrengthForward;
+                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * DeltaTime); ;
             }
             else
             {
-                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); // ThrottleInput * ThrottleStrengthForward;
+                Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); ;
             }
 
             //Lerp the inputs for 'rotation response'
@@ -2034,31 +2034,9 @@ public class EngineController : UdonSharpBehaviour
                 SoundControl.ABOnOutside.Play();
         }
     }
-    public void LaunchAGM()
-    {
-        GameObject NewAGM = VRCInstantiate(AGM);
-        if (AGMLaunchOpositeSide)
-        {
-            Vector3 temp = AGMLaunchPoint.localPosition;
-            temp.x *= -1;
-            AGMLaunchPoint.localPosition = temp;
-            NewAGM.transform.position = AGMLaunchPoint.transform.position;
-            NewAGM.transform.rotation = AGMLaunchPoint.transform.rotation;
-            temp.x *= -1;
-            AGMLaunchPoint.localPosition = temp;
-            AGMLaunchOpositeSide = !AGMLaunchOpositeSide;
-        }
-        else
-        {
-            NewAGM.transform.position = AGMLaunchPoint.transform.position;
-            NewAGM.transform.rotation = AGMLaunchPoint.transform.rotation;
-            AGMLaunchOpositeSide = !AGMLaunchOpositeSide;
-        }
-        NewAGM.SetActive(true);
-        NewAGM.GetComponent<Rigidbody>().velocity = CurrentVel;
-    }
     public void LaunchAAM()
     {
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetTrigger("aamlaunched"); }
         GameObject NewAAM = VRCInstantiate(AAM);
         if (AAMLaunchOpositeSide)
         {
@@ -2081,8 +2059,33 @@ public class EngineController : UdonSharpBehaviour
         NewAAM.SetActive(true);
         NewAAM.GetComponent<Rigidbody>().velocity = CurrentVel;
     }
+    public void LaunchAGM()
+    {
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetTrigger("agmlaunched"); }
+        GameObject NewAGM = VRCInstantiate(AGM);
+        if (AGMLaunchOpositeSide)
+        {
+            Vector3 temp = AGMLaunchPoint.localPosition;
+            temp.x *= -1;
+            AGMLaunchPoint.localPosition = temp;
+            NewAGM.transform.position = AGMLaunchPoint.transform.position;
+            NewAGM.transform.rotation = AGMLaunchPoint.transform.rotation;
+            temp.x *= -1;
+            AGMLaunchPoint.localPosition = temp;
+            AGMLaunchOpositeSide = !AGMLaunchOpositeSide;
+        }
+        else
+        {
+            NewAGM.transform.position = AGMLaunchPoint.transform.position;
+            NewAGM.transform.rotation = AGMLaunchPoint.transform.rotation;
+            AGMLaunchOpositeSide = !AGMLaunchOpositeSide;
+        }
+        NewAGM.SetActive(true);
+        NewAGM.GetComponent<Rigidbody>().velocity = CurrentVel;
+    }
     public void LaunchBomb()
     {
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetTrigger("bomblaunched"); }
         GameObject NewBomb = VRCInstantiate(Bomb);
         NewBomb.transform.position = BombLaunchPoints[BombPoint].transform.position;
         //give 2 degrees of randomness to bomb's rotation so it looks more interesting
@@ -2175,6 +2178,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool("occupied", false); }
         EffectsControl.DoEffects = 0f; //keep awake
 
         dead = true;

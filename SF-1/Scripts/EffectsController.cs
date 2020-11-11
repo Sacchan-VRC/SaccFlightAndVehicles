@@ -69,7 +69,7 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     private float brake;
     private Color SmokeColorLerper = Color.white;
-    public bool LargeEffectsOnly = false;
+    [System.NonSerializedAttribute] public bool LargeEffectsOnly = false;
     private float FullHealthDivider;
     private float FullAAMsDivider;
     private float FullAGMsDivider;
