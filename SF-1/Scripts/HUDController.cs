@@ -57,10 +57,9 @@ public class HUDController : UdonSharpBehaviour
     private Vector3 startingpos;
     private float check = 0;
     [System.NonSerializedAttribute] public float MenuSoundCheckLast = 0;
-    private Vector3 temprot;
     private int showvel;
     const float InputSquareSize = 0.0284317f;
-    [System.NonSerializedAttribute] public Vector3 GUN_TargetDirLastFrame;
+    [System.NonSerializedAttribute] public Vector3 GUN_TargetDirOld;
     [System.NonSerializedAttribute] public float GUN_TargetSpeedLerper;
     private Vector3 TargetDir = Vector3.zero;
     private Vector3 TargetSpeed;
@@ -68,6 +67,8 @@ public class HUDController : UdonSharpBehaviour
     private float BulletSpeedDivider;
     private float FullFuelDivider;
     private float FullGunAmmoDivider;
+    private Vector3 RelativeTargetVel;
+    private Vector3 AAMCurrentTargetPositionLastFrame;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -121,7 +122,7 @@ public class HUDController : UdonSharpBehaviour
     {
         maxGs = 0f;
     }
-    private void Update()
+    private void LateUpdate()
     {
         float DeltaTime = Time.deltaTime;
         //RollPitch Indicator
@@ -183,17 +184,24 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.AAMHasTarget && EngineControl.RStickSelection == 1)
         {
             GUNLeadIndicator.gameObject.SetActive(true);
-            Vector3 TargetDir = EngineControl.AAMCurrentTargetDirection;
-            Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirLastFrame;
-            //lerp target speed to smooth out the really unsmooth VRChat rigidbodies
-            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, RelativeTargetVel.magnitude / DeltaTime, .6f * DeltaTime);
+
+            Vector3 TargetDir;
+            if (EngineControl.AAMCurrentTargetEngineControl == null)//target is a dummy target
+            { TargetDir = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.position - transform.position; }
+            else
+            { TargetDir = EngineControl.AAMCurrentTargetEngineControl.CenterOfMass.position - transform.position; }
+
+            Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
+            //GUN_TargetDirOld is around 10 frames worth of distance behind a moving target (lerped by .1) in order to smooth out the calculation
+            //multiplying the result by .1(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
+            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .1f) / DeltaTime, .6f * DeltaTime);
             float BulletHitTime = TargetDir.magnitude * BulletSpeedDivider;
-            //normalize relative target velocity vector and multiply by lerped speed so the direction is accurate, but the distance is lerped, so not necesarily precise.
+            //normalize lerped relative target velocity vector and multiply by lerped speed
             Vector3 PredictedPos = TargetDir + ((RelativeTargetVel.normalized * GUN_TargetSpeedLerper) * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
-            GUN_TargetDirLastFrame = TargetDir;
+            GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .1f);
         }
         else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
@@ -202,14 +210,15 @@ public class HUDController : UdonSharpBehaviour
         SmokeColorIndicator.color = EngineControl.SmokeColor_Color;
 
         //Heading indicator
-        temprot = EngineControl.VehicleMainObj.transform.rotation.eulerAngles;
+        Vector3 VehicleEuler = EngineControl.VehicleMainObj.transform.rotation.eulerAngles;
+        Vector3 temprot = VehicleEuler;
         temprot.x = 0;
         temprot.z = 0;
         HeadingIndicator.localRotation = Quaternion.Euler(-temprot);
         /////////////////
 
         //Elevation indicator
-        temprot = EngineControl.VehicleMainObj.transform.rotation.eulerAngles;
+        temprot = VehicleEuler;
         float new_z = temprot.z;
         temprot.y = 0;
         temprot.z = 0;

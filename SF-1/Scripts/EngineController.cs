@@ -300,6 +300,8 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Vector3 Spawnrotation;
     private int OutsidePlaneLayer;
     private float AAMTargetObscuredDelay;
+    [System.NonSerializedAttribute] public bool DoAAMTargeting;
+    private float TargetingAngle;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -818,7 +820,6 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 if (InEditor)
                                 {
-                                    WeaponSelected = false;
                                     RStick0();
                                 }
                                 else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
@@ -832,7 +833,6 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (WeaponSelected)
                             {
-                                WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -848,7 +848,6 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (WeaponSelected)
                             {
-                                WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -864,7 +863,6 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (WeaponSelected)
                             {
-                                WeaponSelected = false;
                                 if (InEditor)
                                 {
                                     RStick0();
@@ -879,7 +877,6 @@ public class EngineController : UdonSharpBehaviour
                         if (HasGun && RStickSelection != 1)
                         {
                             if (HUDControl != null) { HUDControl.GUN_TargetSpeedLerper = 0; }//reset targeting lerper
-                            WeaponSelected = true;
                             if (InEditor)
                             {
                                 RStick1();
@@ -893,7 +890,6 @@ public class EngineController : UdonSharpBehaviour
                         if (HasAAM && RStickSelection != 2)
                         {
                             AAMTargetedTimer = 2;
-                            WeaponSelected = true;
                             if (InEditor)
                             {
                                 RStick2();
@@ -909,7 +905,6 @@ public class EngineController : UdonSharpBehaviour
                             AGMUnlocking = 0;
                             AGMUnlockTimer = 0;
 
-                            WeaponSelected = true;
                             if (InEditor)
                             {
                                 RStick3();
@@ -922,7 +917,6 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasBomb && RStickSelection != 4)
                         {
-                            WeaponSelected = true;
                             if (InEditor)
                             {
                                 RStick4();
@@ -1176,7 +1170,8 @@ public class EngineController : UdonSharpBehaviour
                         }
                         else { IsFiringGun = false; RTriggerLastFrame = false; }
 
-                        AAMTargeting(70);//gun lead indiactor uses this
+                        TargetingAngle = 70;
+                        DoAAMTargeting = true;//gun lead indiactor uses this
 
                         AAMLocked = false;
                         AAMLockTimer = 0;
@@ -1184,7 +1179,8 @@ public class EngineController : UdonSharpBehaviour
                     case 2://AAM
                         if (NumAAMTargets != 0)
                         {
-                            AAMTargeting(AAMLockAngle);
+                            DoAAMTargeting = true;
+                            TargetingAngle = AAMLockAngle;
 
                             if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
                             else { AAMLocked = false; }
@@ -1321,6 +1317,7 @@ public class EngineController : UdonSharpBehaviour
                         AAMLocked = false;
                         AAMLockTimer = 0;
                         IsFiringGun = false;
+                        DoAAMTargeting = false;
                         break;
                     case 4://Bomb
                         if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Space)))
@@ -1358,6 +1355,7 @@ public class EngineController : UdonSharpBehaviour
                         AAMLocked = false;
                         AAMLockTimer = 0;
                         IsFiringGun = false;
+                        DoAAMTargeting = false;
                         break;
                     case 5://GEAR
                         if (RTrigger > 0.75)
@@ -1371,13 +1369,12 @@ public class EngineController : UdonSharpBehaviour
                         AAMLocked = false;
                         AAMLockTimer = 0;
                         IsFiringGun = false;
+                        DoAAMTargeting = false;
                         break;
                     case 6://flaps
                         if (RTrigger > 0.75)
                         {
                             if (!RTriggerLastFrame) EffectsControl.Flaps = !EffectsControl.Flaps;
-
-                            IsFiringGun = false;
                             RTriggerLastFrame = true;
                         }
                         else { RTriggerLastFrame = false; }
@@ -1386,6 +1383,7 @@ public class EngineController : UdonSharpBehaviour
                         AAMLocked = false;
                         AAMLockTimer = 0;
                         IsFiringGun = false;
+                        DoAAMTargeting = false;
                         break;
                     case 7://Hook
                         if (RTrigger > 0.75)
@@ -1407,6 +1405,7 @@ public class EngineController : UdonSharpBehaviour
                         AAMLocked = false;
                         AAMLockTimer = 0;
                         IsFiringGun = false;
+                        DoAAMTargeting = false;
                         break;
                     case 8://Smoke
                         if (RTrigger > 0.75)
@@ -1448,6 +1447,7 @@ public class EngineController : UdonSharpBehaviour
                         AAMLocked = false;
                         AAMLockTimer = 0;
                         IsFiringGun = false;
+                        DoAAMTargeting = false;
                         break;
                 }
                 if (Input.GetKey(KeyCode.B) && HasBrake)
@@ -1573,7 +1573,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             //only play the sound if we're actually repairing/getting ammo/fuel
                             if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || GunAmmoInSeconds != FullGunAmmo || Health != FullHealth))
-                                SoundControl.Reloading.Play();
+                            { SoundControl.Reloading.Play(); }
                             LastResupplyTime = Time.time;
                             NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(FullAAMs / 10), 1), FullAAMs);
                             NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
@@ -1868,15 +1868,19 @@ public class EngineController : UdonSharpBehaviour
                         Health -= ((-HookedDelta + 2) / 2) * FullHealth;
                     }
                     Hooked = false;
-                    if (InEditor)
+                    if (HookedDelta < 5)//if you catch a cable but go airborne before snapping it, keep your hook out and then land somewhere else
+                                        //you would hear the cablesnap sound when you touchdown, so limit it to within 5 seconds of hooking
+                                        //this results in 1 frame's worth of not being able to catch a cable but will rarely happen anyway
                     {
-                        PlayCableSnap();
+                        if (InEditor)
+                        {
+                            PlayCableSnap();
+                        }
+                        else
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap");
+                        }
                     }
-                    else
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap");
-                    }
-
                 }
 
                 if (Speed > HookedBrakeStrength * DeltaTime)
@@ -1985,6 +1989,10 @@ public class EngineController : UdonSharpBehaviour
     {
         if (IsOwner || InEditor)
         {
+            if (DoAAMTargeting)
+            {
+                AAMTargeting(TargetingAngle);
+            }
             float DeltaTime = Time.deltaTime;
             //lerp velocity toward 0 to simulate air friction
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, FinalWind * StillWindMulti, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag) * Atmosphere) * 90) * DeltaTime);
@@ -2036,7 +2044,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void LaunchAAM()
     {
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetTrigger("aamlaunched"); }
+        EffectsControl.PlaneAnimator.SetTrigger("aamlaunched");
         GameObject NewAAM = VRCInstantiate(AAM);
         if (AAMLaunchOpositeSide)
         {
@@ -2061,7 +2069,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void LaunchAGM()
     {
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetTrigger("agmlaunched"); }
+        EffectsControl.PlaneAnimator.SetTrigger("agmlaunched");
         GameObject NewAGM = VRCInstantiate(AGM);
         if (AGMLaunchOpositeSide)
         {
@@ -2085,7 +2093,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void LaunchBomb()
     {
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetTrigger("bomblaunched"); }
+        EffectsControl.PlaneAnimator.SetTrigger("bomblaunched");
         GameObject NewBomb = VRCInstantiate(Bomb);
         NewBomb.transform.position = BombLaunchPoints[BombPoint].transform.position;
         //give 2 degrees of randomness to bomb's rotation so it looks more interesting
@@ -2115,6 +2123,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void SetLaunchOpositeSideFalse()//when resupplying
     {
+        EffectsControl.PlaneAnimator.SetTrigger("startreloading");
         AAMLaunchOpositeSide = false;
         AGMLaunchOpositeSide = false;
         BombPoint = 0;
@@ -2158,29 +2167,35 @@ public class EngineController : UdonSharpBehaviour
     //these are used for syncing weapon selection for bomb bay doors animation etc
     public void RStick0()//Rstick is something other than a weapon
     {
+        WeaponSelected = false;
         EffectsControl.PlaneAnimator.SetInteger("weapon", 0);
     }
     public void RStick1()//GUN
     {
+        WeaponSelected = true;
         EffectsControl.PlaneAnimator.SetInteger("weapon", 1);
     }
     public void RStick2()//AAM
     {
+        WeaponSelected = true;
         EffectsControl.PlaneAnimator.SetInteger("weapon", 2);
     }
     public void RStick3()//AGM
     {
+        WeaponSelected = true;
         EffectsControl.PlaneAnimator.SetInteger("weapon", 3);
     }
     public void RStick4()//Bomb
     {
+        WeaponSelected = true;
         EffectsControl.PlaneAnimator.SetInteger("weapon", 4);
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool("occupied", false); }
+        WeaponSelected = false;
+        EffectsControl.PlaneAnimator.SetInteger("weapon", 0);
+        EffectsControl.PlaneAnimator.SetBool("occupied", false);
         EffectsControl.DoEffects = 0f; //keep awake
-
         dead = true;
         EffectsControl.GearUp = false;
         EffectsControl.HookDown = false;
@@ -2192,7 +2207,7 @@ public class EngineController : UdonSharpBehaviour
         if (HasCanopy)
         {
             EffectsControl.CanopyOpen = true;
-            CanopyCloseTimer = -100001;
+            CanopyCloseTimer = -100000 - CanopyCloseTime;
         }
         Hooked = false;
         AAMLaunchOpositeSide = false;
@@ -2270,8 +2285,8 @@ public class EngineController : UdonSharpBehaviour
     private void AAMTargeting(float Lock_Angle)
     {
         float DeltaTime = Time.deltaTime;
-        var CurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-        float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (CurrentTargetPosition - CenterOfMass.transform.position));
+        var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+        float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMCurrentTargetPosition - CenterOfMass.transform.position));
 
         //check 1 target per frame to see if it's infront of us and worthy of being our current target
         var TargetChecker = AAMTargets[AAMTargetChecker];
@@ -2306,14 +2321,14 @@ public class EngineController : UdonSharpBehaviour
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;
                     AAMTarget = AAMTargetChecker;
-                    CurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+                    AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                     AAMCurrentTargetEngineControl = NextTargetEngineControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable time to update before sending targeted
                     if (HUDControl != null)
                     {
                         HUDControl.GUN_TargetSpeedLerper = 0f;
-                        HUDControl.GUN_TargetDirLastFrame = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
+                        HUDControl.GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
                     }
                 }
             }
@@ -2329,7 +2344,7 @@ public class EngineController : UdonSharpBehaviour
 
         //if target is currently in front of plane, lock onto it
         if (AAMCurrentTargetEngineControl == null)
-        { AAMCurrentTargetDirection = CurrentTargetPosition - HUDControl.transform.position; }
+        { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HUDControl.transform.position; }
         else
         { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HUDControl.transform.position; }
         float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;

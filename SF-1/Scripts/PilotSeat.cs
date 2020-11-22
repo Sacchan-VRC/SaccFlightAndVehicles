@@ -73,6 +73,9 @@ public class PilotSeat : UdonSharpBehaviour
         EngineControl.Gs = 0;
         EngineControl.LastFrameVel = EngineControl.CurrentVel;
 
+
+        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpilot", true); }
+
         //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
         var Target = EngineControl.AAMTargets[EngineControl.AAMTarget];
         if (Target && Target.transform.parent)
@@ -118,6 +121,7 @@ public class PilotSeat : UdonSharpBehaviour
 
         if (player.isLocal)
         {
+            if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpilot", false); }
             EngineControl.Piloting = false;
             if (EngineControl.Ejected)
             {
@@ -141,7 +145,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.HUDControl.MenuSoundCheckLast = 0;
             EngineControl.AGMLocked = false;
             EngineControl.AAMHasTarget = false;
-            EngineControl.AAMLocked = false;
+            EngineControl.DoAAMTargeting = false;
             EngineControl.MissilesIncoming = 0;
             EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
             EngineControl.AAMLockTimer = 0;

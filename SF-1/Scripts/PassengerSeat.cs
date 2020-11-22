@@ -30,6 +30,7 @@ public class PassengerSeat : UdonSharpBehaviour
         if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;
         else EngineControl.CanopyCloseTimer = -1;
         EngineControl.localPlayer.UseAttachedStation();
+        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", true); }
         if (PlaneMesh != null)
         {
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
@@ -43,6 +44,7 @@ public class PassengerSeat : UdonSharpBehaviour
     {
         if (player.isLocal)
         {
+            if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
             if (EngineControl != null)
             {
                 EngineControl.Passenger = false;

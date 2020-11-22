@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c333ccfdd0cbdbc4ca30cef2dd6e6b9b, type: 3}
   m_Name: HUDController
   m_EditorClassIdentifier: 
-  serializedUdonProgramAsset: {fileID: 11400000, guid: d83d541d310ab084b9ded0b3f9afca1a,
+  serializedUdonProgramAsset: {fileID: 11400000, guid: ea9077399c3b7bc4089659ef54e059af,
     type: 2}
   udonAssembly: 
   assemblyError: 
@@ -43,7 +43,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 59
+      Data: 60
     - Name: 
       Entry: 7
       Data: 
@@ -2839,7 +2839,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: temprot
+      Data: showvel
     - Name: $v
       Entry: 7
       Data: 155|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2847,8 +2847,14 @@ MonoBehaviour:
       Entry: 7
       Data: 156|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 140
+      Entry: 7
+      Data: 157|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: System.Int32, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2857,13 +2863,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineVector3
+      Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: temprot
+      Data: showvel
     - Name: symbolUniqueName
       Entry: 1
-      Data: temprot
+      Data: showvel
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2872,7 +2878,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 157|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 158|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -2896,37 +2902,31 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: showvel
+      Data: InputSquareSize
     - Name: $v
       Entry: 7
-      Data: 158|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 159|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 159|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 160|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 160|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: System.Int32, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 78
     - Name: declarationType
       Entry: 3
-      Data: 2
+      Data: 258
     - Name: syncMode
       Entry: 3
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt32
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: showvel
+      Data: InputSquareSize
     - Name: symbolUniqueName
       Entry: 1
-      Data: showvel
+      Data: InputSquareSize
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2959,70 +2959,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: InputSquareSize
+      Data: GUN_TargetDirOld
     - Name: $v
       Entry: 7
       Data: 162|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
       Data: 163|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 78
-    - Name: declarationType
-      Entry: 3
-      Data: 258
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: InputSquareSize
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: InputSquareSize
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 164|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: GUN_TargetDirLastFrame
-    - Name: $v
-      Entry: 7
-      Data: 165|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 166|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 140
@@ -3037,10 +2980,10 @@ MonoBehaviour:
       Data: UnityEngineVector3
     - Name: symbolOriginalName
       Entry: 1
-      Data: GUN_TargetDirLastFrame
+      Data: GUN_TargetDirOld
     - Name: symbolUniqueName
       Entry: 1
-      Data: GUN_TargetDirLastFrame
+      Data: GUN_TargetDirOld
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3049,13 +2992,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 167|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 164|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 168|System.NonSerializedAttribute, mscorlib
+      Data: 165|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -3082,10 +3025,10 @@ MonoBehaviour:
       Data: GUN_TargetSpeedLerper
     - Name: $v
       Entry: 7
-      Data: 169|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 166|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 170|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 167|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 78
@@ -3112,13 +3055,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 171|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 168|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 172|System.NonSerializedAttribute, mscorlib
+      Data: 169|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -3143,6 +3086,63 @@ MonoBehaviour:
     - Name: $k
       Entry: 1
       Data: TargetDir
+    - Name: $v
+      Entry: 7
+      Data: 170|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 171|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 140
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineVector3
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: TargetDir
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: TargetDir
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 172|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: TargetSpeed
     - Name: $v
       Entry: 7
       Data: 173|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3163,10 +3163,10 @@ MonoBehaviour:
       Data: UnityEngineVector3
     - Name: symbolOriginalName
       Entry: 1
-      Data: TargetDir
+      Data: TargetSpeed
     - Name: symbolUniqueName
       Entry: 1
-      Data: TargetDir
+      Data: TargetSpeed
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3199,7 +3199,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: TargetSpeed
+      Data: HasAAMTargets
     - Name: $v
       Entry: 7
       Data: 176|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3207,8 +3207,14 @@ MonoBehaviour:
       Entry: 7
       Data: 177|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 140
+      Entry: 7
+      Data: 178|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: System.Boolean, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3217,13 +3223,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineVector3
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: TargetSpeed
+      Data: HasAAMTargets
     - Name: symbolUniqueName
       Entry: 1
-      Data: TargetSpeed
+      Data: HasAAMTargets
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3232,7 +3238,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 178|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 179|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -3256,22 +3262,16 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HasAAMTargets
+      Data: BulletSpeedDivider
     - Name: $v
       Entry: 7
-      Data: 179|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 180|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 180|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 181|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 181|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: System.Boolean, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 78
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3280,13 +3280,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: HasAAMTargets
+      Data: BulletSpeedDivider
     - Name: symbolUniqueName
       Entry: 1
-      Data: HasAAMTargets
+      Data: BulletSpeedDivider
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3319,7 +3319,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: BulletSpeedDivider
+      Data: FullFuelDivider
     - Name: $v
       Entry: 7
       Data: 183|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3340,10 +3340,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: BulletSpeedDivider
+      Data: FullFuelDivider
     - Name: symbolUniqueName
       Entry: 1
-      Data: BulletSpeedDivider
+      Data: FullFuelDivider
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3376,7 +3376,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FullFuelDivider
+      Data: FullGunAmmoDivider
     - Name: $v
       Entry: 7
       Data: 186|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3397,10 +3397,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: FullFuelDivider
+      Data: FullGunAmmoDivider
     - Name: symbolUniqueName
       Entry: 1
-      Data: FullFuelDivider
+      Data: FullGunAmmoDivider
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3433,7 +3433,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FullGunAmmoDivider
+      Data: RelativeTargetVel
     - Name: $v
       Entry: 7
       Data: 189|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3442,7 +3442,7 @@ MonoBehaviour:
       Data: 190|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 78
+      Data: 140
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3451,13 +3451,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: UnityEngineVector3
     - Name: symbolOriginalName
       Entry: 1
-      Data: FullGunAmmoDivider
+      Data: RelativeTargetVel
     - Name: symbolUniqueName
       Entry: 1
-      Data: FullGunAmmoDivider
+      Data: RelativeTargetVel
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3467,6 +3467,63 @@ MonoBehaviour:
     - Name: fieldAttributes
       Entry: 7
       Data: 191|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: AAMCurrentTargetPositionLastFrame
+    - Name: $v
+      Entry: 7
+      Data: 192|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 193|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 140
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineVector3
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: AAMCurrentTargetPositionLastFrame
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: AAMCurrentTargetPositionLastFrame
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 194|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

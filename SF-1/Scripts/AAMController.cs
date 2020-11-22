@@ -10,8 +10,7 @@ public class AAMController : UdonSharpBehaviour
     public float MaxLifetime = 12;
     public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 30;
-    public float RotSpeed = 130;
-    public float MissileDriftCompensation = 65f;
+    public float RotSpeed = 360;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
     private float Lifetime = 0;
@@ -21,10 +20,11 @@ public class AAMController : UdonSharpBehaviour
     private CapsuleCollider AAMCollider;
     private bool Owner = false;
     private bool TargetIsPlane = false;
-    private bool LockedOn = false;
+    private bool MissileIncoming = false;
     private Rigidbody MissileRigid;
     private float TargDistlastframe = 999999999;
     private bool TargetLost = false;
+    private float UnlockTime;
     Vector3 TargetPosLastFrame;
     //public Transform testobj;
     void Start()
@@ -42,7 +42,7 @@ public class AAMController : UdonSharpBehaviour
                 if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
                 { TargetEngineControl.MissilesIncoming++; }
 
-                LockedOn = true;
+                MissileIncoming = true;
                 TargetIsPlane = true;
             }
         }
@@ -86,64 +86,37 @@ public class AAMController : UdonSharpBehaviour
     private void FixedUpdate()
     {
         float DeltaTime = Time.deltaTime;
+        Vector3 Position = transform.position;
+        Vector3 TargetPos = Target.position;
+        float TargetDistance = Vector3.Distance(Position, TargetPos);
+        if ((TargetDistance < TargDistlastframe || LockHack) && Target.gameObject.activeInHierarchy && UnlockTime < .2f)
+        { TargetLost = false; UnlockTime = 0; }
+        else
+        {
+            UnlockTime += Time.deltaTime;
+            if (UnlockTime >= .2f) //unlock .2s after flying past the target to account for jittery netcode
+            {
+                TargetLost = true;
+                if (MissileIncoming)
+                {
+                    //just flew past the target, stop missile warning sound
+                    if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
+                    { TargetEngineControl.MissilesIncoming -= 1; }
+                    MissileIncoming = false;
+                }
+            }
+        }
         if (!TargetLost)
         {
-            if (!Target.gameObject.activeInHierarchy) { TargetLost = true; }
-
-            float TargetDistance;
-            Vector3 Position = transform.position;
-            Vector3 TargetPos = Target.position;
-            TargetDistance = Vector3.Distance(Position, TargetPos);
-            if (TargetIsPlane)
-            {
-                if (TargetDistance < TargDistlastframe || LockHack)
-                {
-                    //turn towards the target
-                    Vector3 missileToTargetVector;
-                    if (TargetDistance < 700)
-                    {
-                        Vector3 Targetmovedir = TargetPos - TargetPosLastFrame;
-                        float timetotarget = TargetDistance / Mathf.Max(((TargDistlastframe - TargetDistance) / DeltaTime), 0.001f);//ensure no division by 0
-                        Vector3 TargetPredictedPos = TargetPos + ((Targetmovedir * timetotarget) + (Targetmovedir.normalized * (TargetEngineControl.Speed / MissileDriftCompensation) * timetotarget) / DeltaTime);
-                        missileToTargetVector = TargetPredictedPos - Position;
-                        TargetPosLastFrame = TargetPos;
-                    }
-                    else
-                    {
-                        missileToTargetVector = TargetPos - Position;
-                    }
-                    var missileForward = transform.forward;
-                    var targetDirection = missileToTargetVector.normalized;
-                    var rotationAxis = Vector3.Cross(missileForward, targetDirection);
-                    var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
-                }
-                else if (LockedOn)
-                {
-                    //just flew past the target, unlock
-                    if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                        TargetEngineControl.MissilesIncoming -= 1;
-                    LockedOn = false;
-                    if (Lifetime > 1) { TargetLost = true; }
-                }
-            }
-            else //target is not a plane
-            {
-                if (TargetDistance < TargDistlastframe || LockHack)
-                {
-                    //turn towards the target
-                    Vector3 missileToTargetVector = TargetPos - Position;
-                    var missileForward = transform.forward;
-                    var targetDirection = missileToTargetVector.normalized;
-                    var rotationAxis = Vector3.Cross(missileForward, targetDirection);
-                    var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
-                }
-                //just flew past the target, unlock
-                else if (Lifetime > 1) { TargetLost = true; }
-            }
-            TargDistlastframe = TargetDistance;
+            //turn towards the target
+            Vector3 missileToTargetVector = TargetPos - Position;
+            var missileForward = transform.forward;
+            var targetDirection = missileToTargetVector.normalized;
+            var rotationAxis = Vector3.Cross(missileForward, targetDirection);
+            var deltaAngle = Vector3.Angle(missileForward, targetDirection);
+            transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
         }
+        TargDistlastframe = TargetDistance;
         Lifetime += DeltaTime;
     }
 
@@ -163,11 +136,11 @@ public class AAMController : UdonSharpBehaviour
             ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
             ExplosionSounds[rand].Play();
         }
-        if (LockedOn)
+        if (MissileIncoming)
         {
             if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
                 TargetEngineControl.MissilesIncoming -= 1;
-            LockedOn = false;
+            MissileIncoming = false;
         }
         if (TargetEngineControl != null)
         {
