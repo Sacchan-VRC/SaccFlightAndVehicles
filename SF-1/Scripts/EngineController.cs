@@ -86,8 +86,8 @@ public class EngineController : UdonSharpBehaviour
     public float MaxAngleOfAttackPitch = 25f;
     public float MaxAngleOfAttackYaw = 40f;
     public float AoaCurveStrength = 2f;//1 = linear, >1 = convex, <1 = concave
-    public float HighAoaMinControlPitch = 0.2f;
-    public float HighAoaMinControlYaw = 0.2f;
+    public float HighPitchAoaMinControl = 0.2f;
+    public float HighYawAoaMinControl = 0.2f;
     public float HighPitchAoaMinLift = 0.2f;
     public float HighYawAoaMinLift = 0.2f;
     public float TaxiRotationSpeed = 35f;
@@ -489,7 +489,7 @@ public class EngineController : UdonSharpBehaviour
             AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), AoaCurveStrength) + 1;//give it a curve
 
             float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / 90);//linear version to 90 for high aoa
-            AoALiftPitchMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighAoaMinControlPitch, 0, 1);
+            AoALiftPitchMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighPitchAoaMinControl, 0, 1);
             AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
 
             AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
@@ -497,7 +497,7 @@ public class EngineController : UdonSharpBehaviour
             AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
 
             float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
-            AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighAoaMinControlYaw, 0, 1);
+            AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighYawAoaMinControl, 0, 1);
             AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
 
             AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);

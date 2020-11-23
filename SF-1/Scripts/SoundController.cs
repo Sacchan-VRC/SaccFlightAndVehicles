@@ -70,6 +70,7 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PlaneDistantVolume;
     private float PlaneThrustPitch;
     [System.NonSerializedAttribute] public float PlaneThrustVolume;
+    private float PlaneInsideInitialVolume;
     private float LastFramePlaneIdlePitch;
     private float LastFramePlaneThrustPitch;
     private float LastFrameGunPitch;
@@ -146,6 +147,11 @@ public class SoundController : UdonSharpBehaviour
         ExplosionNull = (Explosion.Length < 1) ? true : false;
         BulletHitNull = (BulletHit.Length < 1) ? true : false;
 
+
+        if (!PlaneInsideNull)
+        {
+            PlaneInsideInitialVolume = PlaneInside.volume;
+        }
 
         //used to make it so that changing the volume in unity will do something //set 0 to avoid ear destruction
         if (!PlaneIdleNull)
@@ -357,7 +363,7 @@ public class SoundController : UdonSharpBehaviour
                 if (!PlaneInsideNull)
                 {
                     PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.Throttle * .4f) + .8f, 2.25f * DeltaTime);
-                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, .4f, .72f * DeltaTime);
+                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, PlaneInsideInitialVolume, .72f * DeltaTime);
                 }
                 PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, (EngineControl.Throttle * PlaneThrustInitialVolume) * InVehicleThrustVolumeFactor, 1.08f * DeltaTime);
             }

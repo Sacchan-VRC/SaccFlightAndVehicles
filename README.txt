@@ -6,7 +6,9 @@ https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.37
-•
+•Gun Lead Indicator smoother
+•Missiles reverted to 1.35 because they were much more consistant
+•Animator events for firing weapons
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.36
 •Many small tweaks and bugfixes
@@ -147,6 +149,16 @@ Added option to disable thrust vectoring
 Implemented (unrealistic) increased lift at higher speeds, you can now fall down faster at low speed
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+!!!
+in 1.37 EngineController:
+High Aoa Min Control Pitch
+High Aoa Min Control Yaw
+have been renamed to:
+High Pitch Aoa Min Control
+High Yaw Aoa Min Control
+You must remember and re-enter the values if updating
+!!!
 
 On first run there may be a compile problem that causes the plane to not function, try running it a second time before checking anything else.
 
@@ -594,7 +606,7 @@ How long it takes for the rotational inputs to reach max after you press and hol
 Reversing Pitch Strength Multi (new in 1.2)
 Reversing Yaw Strength Multi
 Reversing Roll Strength Multi
-When moving backwards through the air, your plane's rotational inputs can but multiplied. Does'nt effect axis with thrust vectoring enabled.
+When moving backwards through the air, your plane's rotational input strengths can but multiplied. Doesn't effect any axis with thrust vectoring value above 0.
 
 Pitch Down Str Multi
 Allows you to set a seperate rotation speed for pulling down.
@@ -619,10 +631,11 @@ Aoa Curve Strength (new in 1.2)
 Shape of the angle of attack lift curve.
 See this to understand (the 2 in the input represents this value): https://www.wolframalpha.com/input/?i=-%28%281-x%29%5E2%29%2B1
 
-High Aoa Mine Control Pitch (new in 1.2)
-High Aoa Mine Control Yaw
+High Pitch Aoa Min Control (new in 1.2)
+High Yaw Aoa Min Control
 The angle of attack curve is augmented by being MAX'd(taking the higher value) with a linear curve that is multiplied by this number.
-Use this value to decide how much control the plane has when beyond it's 'max' angle of attack.
+Use this value to decide how much control the plane has when beyond it's 'max' angle of attack. See AoALiftCurve.png
+Pitch AoA and Yaw AoA are calculated seperately, and whichever value is lower is used.
 
 High Pitch Aoa Min Lift (new in 1.2)
 High Yaw Aoa Min Lift
