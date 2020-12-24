@@ -7,7 +7,7 @@ Feel free to give feedback or ask questions
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.37
 •Gun Lead Indicator smoother
-•Missiles reverted to 1.35 because they were much more consistant
+•Missiles reverted to 1.35 because they were much more consistent
 •Animator events for firing weapons
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.36
@@ -149,16 +149,6 @@ Added option to disable thrust vectoring
 Implemented (unrealistic) increased lift at higher speeds, you can now fall down faster at low speed
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-!!!
-in 1.37 EngineController:
-High Aoa Min Control Pitch
-High Aoa Min Control Yaw
-have been renamed to:
-High Pitch Aoa Min Control
-High Yaw Aoa Min Control
-You must remember and re-enter the values if updating
-!!!
 
 On first run there may be a compile problem that causes the plane to not function, try running it a second time before checking anything else.
 

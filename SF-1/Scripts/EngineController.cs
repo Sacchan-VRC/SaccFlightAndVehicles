@@ -65,17 +65,17 @@ public class EngineController : UdonSharpBehaviour
     public float PitchStrength = 5f;
     public float PitchThrustVecMulti = 0f;
     public float PitchFriction = 24f;
-    public float PitchResponse = 12f;
+    public float PitchResponse = 20f;
     public float ReversingPitchStrengthMulti = 2;
     public float YawStrength = 3f;
     public float YawThrustVecMulti = 0f;
     public float YawFriction = 15f;
-    public float YawResponse = 12f;
+    public float YawResponse = 20f;
     public float ReversingYawStrengthMulti = 2.4f;
     public float RollStrength = 450f;
     public float RollThrustVecMulti = 0f;
     public float RollFriction = 90f;
-    public float RollResponse = 12f;
+    public float RollResponse = 20f;
     public float ReversingRollStrengthMulti = 1.6f;//reversing = AoA > 90
     public float PitchDownStrMulti = .8f;
     public float PitchDownLiftMulti = .8f;
@@ -258,6 +258,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int CatapultStatus = 0;
     private Vector3 CatapultLockPos;
     private Quaternion CatapultLockRot;
+    private Transform CatapultTransform;
     private float CatapultLaunchTimeStart;
     private float StartPitchStrength;
     [System.NonSerializedAttribute] public float CanopyCloseTimer = -100000;
@@ -468,7 +469,6 @@ public class EngineController : UdonSharpBehaviour
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
                 }
             }
-            if (!Piloting) { Occupied = false; } //should make vehicle respawnable if player disconnects while occupying
             Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
             CurrentVel = VehicleRigidbody.velocity;//because rigidbody values aren't accessable by non-owner players
             Speed = CurrentVel.magnitude;
@@ -1604,24 +1604,22 @@ public class EngineController : UdonSharpBehaviour
                             if (Vector3.Angle(VehicleMainObj.transform.forward, CatapultTrigger.transform.forward) < 15)
                             {
                                 //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
-                                CatapultLockRot = CatapultTrigger.transform.rotation;//rotation to lock the plane to on the catapult
-                                VehicleMainObj.transform.rotation = CatapultLockRot;//set the plane to the locked rotation so the next step is done at the right angle
-                                Vector3 temp = VehicleMainObj.transform.InverseTransformPoint(CatapultTrigger.transform.position);//relative position of the catapult to our plane
-                                temp.y = 0;//zero out height because we don't want to move up/down
-                                temp = VehicleMainObj.transform.TransformPoint(temp);//convert relative coords back to global
-                                VehicleMainObj.transform.position += VehicleMainObj.transform.position - temp;//move plane to catapult
+                                CatapultTransform = CatapultTrigger.transform;
+                                //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
+                                VehicleMainObj.transform.rotation = Quaternion.Euler(new Vector3(VehicleMainObj.transform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
 
-                                //here we do the same thing as above but with our own catapult detector and the trigger so that the front wheel locks to the correct position on the catapult
-                                //might be a more efficient way to do this
-                                temp = VehicleMainObj.transform.InverseTransformPoint(CatapultDetector.transform.position);
-                                Vector3 temp2 = VehicleMainObj.transform.InverseTransformPoint(CatapultTrigger.transform.position) - temp;
-                                temp2.x = 0; temp2.z = 0;
-                                temp = VehicleMainObj.transform.TransformPoint(temp);
-                                temp2 = VehicleMainObj.transform.TransformPoint(temp2);
-                                VehicleMainObj.transform.position = CatapultTrigger.transform.position + (VehicleMainObj.transform.position - temp) + (VehicleMainObj.transform.position - temp2);
+                                //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
+                                Vector3 PlaneCatapultDistance = CatapultTransform.position - VehicleMainObj.transform.position;
+                                PlaneCatapultDistance = CatapultTransform.transform.InverseTransformDirection(PlaneCatapultDistance);
+                                VehicleMainObj.transform.position = CatapultTransform.position;
+                                VehicleMainObj.transform.position -= CatapultTransform.up * PlaneCatapultDistance.y;
 
+                                //move the plane back so that the catapult is aligned to the catapult detector
+                                float CatapultDetectorDist = Vector3.Distance(VehicleMainObj.transform.position, CatapultDetector.position);
+                                VehicleMainObj.transform.position -= CatapultTrigger.forward * CatapultDetectorDist;
+
+                                CatapultLockRot = VehicleMainObj.transform.rotation;//rotation to lock the plane to on the catapult
                                 CatapultLockPos = VehicleMainObj.transform.position;
-                                VehicleRigidbody.velocity = Vector3.zero;
                                 CatapultStatus = 1;//locked to catapult
 
                                 //use dead to make plane invincible for 1 frame when entering the catapult to prevent damage which will be worse the higher your framerate is
@@ -1798,7 +1796,7 @@ public class EngineController : UdonSharpBehaviour
             }
             else
             {
-                Occupied = false;//make vehicle respawnable if player disconnects while occupying
+                Occupied = false;//make vehicle empty if player disconnects while occupying
                 //brake is always on if the plane is on the ground because we can't work out how to use wheel colliders properly
                 if (Speed > GroundBrakeStrength * DeltaTime)
                 {
@@ -1952,12 +1950,12 @@ public class EngineController : UdonSharpBehaviour
                     break;
                 case 2://launching
                     VehicleMainObj.transform.rotation = CatapultLockRot;
-                    VehicleConstantForce.relativeForce = new Vector3(0, 0, CatapultLaunchStrength);
+                    VehicleConstantForce.relativeForce = VehicleMainObj.transform.InverseTransformDirection(CatapultTransform.forward) * CatapultLaunchStrength;
                     //lock all movment except for forward movement
-                    Vector3 temp = VehicleMainObj.transform.InverseTransformDirection(VehicleRigidbody.velocity);
+                    Vector3 temp = CatapultTransform.transform.InverseTransformDirection(VehicleRigidbody.velocity);
                     temp.x = 0;
                     temp.y = 0;
-                    temp = VehicleMainObj.transform.TransformDirection(temp);
+                    temp = CatapultTransform.transform.TransformDirection(temp);
                     VehicleRigidbody.velocity = temp;
                     VehicleRigidbody.angularVelocity = Vector3.zero;
                     VehicleConstantForce.relativeTorque = Vector3.zero;

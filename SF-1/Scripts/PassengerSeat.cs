@@ -9,6 +9,7 @@ public class PassengerSeat : UdonSharpBehaviour
     public EngineController EngineControl;
     public GameObject LeaveButton;
     public GameObject SeatAdjuster;
+    private LeaveVehicleButton LeaveButtonControl;
     private Transform PlaneMesh;
     private LayerMask Planelayer;
     private void Start()
@@ -16,6 +17,8 @@ public class PassengerSeat : UdonSharpBehaviour
         Assert(EngineControl != null, "Start: EngineControl != null");
         Assert(LeaveButton != null, "Start: LeaveButton != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
+
+        LeaveButtonControl = LeaveButton.GetComponent<LeaveVehicleButton>();
 
         PlaneMesh = EngineControl.PlaneMesh.transform;
         Planelayer = PlaneMesh.gameObject.layer;
@@ -40,10 +43,40 @@ public class PassengerSeat : UdonSharpBehaviour
             }
         }
     }
-    public override void OnStationExited(VRCPlayerApi player)
+    public override void OnStationEntered(VRCPlayerApi player)
     {
+        //voice range change to allow talking inside cockpit (after VRC patch 1008)
+        LeaveButtonControl.SeatedPlayer = player;
         if (player.isLocal)
         {
+            foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+            {
+                if (crew.SeatedPlayer != null)
+                {
+                    SetVoiceInside(crew.SeatedPlayer);
+                }
+            }
+        }
+        else if (EngineControl.Piloting || EngineControl.Passenger)
+        {
+            SetVoiceInside(player);
+        }
+    }
+
+    public override void OnStationExited(VRCPlayerApi player)
+    {
+        LeaveButtonControl.SeatedPlayer = null;
+        SetVoiceOutside(player);
+        if (player.isLocal)
+        {
+            //undo voice distances of all players inside the vehicle
+            foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+            {
+                if (crew.SeatedPlayer != null)
+                {
+                    SetVoiceOutside(crew.SeatedPlayer);
+                }
+            }
             if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
             if (EngineControl != null)
             {
@@ -63,6 +96,19 @@ public class PassengerSeat : UdonSharpBehaviour
                 }
             }
         }
+    }
+
+    private void SetVoiceInside(VRCPlayerApi Player)
+    {
+        Player.SetVoiceDistanceNear(999999);
+        Player.SetVoiceDistanceFar(1000000);
+        Player.SetVoiceGain(.6f);
+    }
+    private void SetVoiceOutside(VRCPlayerApi Player)
+    {
+        Player.SetVoiceDistanceNear(0);
+        Player.SetVoiceDistanceFar(25);
+        Player.SetVoiceGain(15);
     }
     private void Assert(bool condition, string message)
     {

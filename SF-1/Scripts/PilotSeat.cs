@@ -10,15 +10,17 @@ public class PilotSeat : UdonSharpBehaviour
     public GameObject LeaveButton;
     public GameObject Gun_pilot;
     public GameObject SeatAdjuster;
+    private LeaveVehicleButton LeaveButtonControl;
     private Transform PlaneMesh;
     private LayerMask Planelayer = 0;
-    private ParticleSystem.CollisionModule gunpilotcol;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
         Assert(LeaveButton != null, "Start: LeaveButton != null");
         Assert(Gun_pilot != null, "Start: Gun_pilot != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
+
+        LeaveButtonControl = LeaveButton.GetComponent<LeaveVehicleButton>();
 
         PlaneMesh = EngineControl.PlaneMesh.transform;
         //get the layer of the plane as set by the world creator
@@ -33,6 +35,7 @@ public class PilotSeat : UdonSharpBehaviour
             EngineControl.Throttle = 0;
             EngineControl.ThrottleInput = 0;
             EngineControl.PlayerThrottle = 0;
+            EngineControl.IsFiringGun = false;
             EngineControl.VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
             if (!EngineControl.InEditor)
             {
@@ -49,7 +52,6 @@ public class PilotSeat : UdonSharpBehaviour
         {
             if (!EngineControl.InEditor)
             { Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject); }
-            EngineControl.IsFiringGun = false;
             EngineControl.EffectsControl.Smoking = false;
         }
         if (EngineControl.HUDControl != null)
@@ -87,6 +89,24 @@ public class PilotSeat : UdonSharpBehaviour
     {
         EngineControl.PilotName = player.displayName;
         EngineControl.Pilot = player;
+
+        //voice range change to allow talking inside cockpit (after VRC patch 1008)
+        LeaveButtonControl.SeatedPlayer = player;
+        if (player.isLocal)
+        {
+            foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+            {
+                if (crew.SeatedPlayer != null)
+                {
+                    SetVoiceInside(crew.SeatedPlayer);
+                }
+            }
+        }
+        else if (EngineControl.Piloting || EngineControl.Passenger)
+        {
+            SetVoiceInside(player);
+        }
+
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", true); }
 
         EngineControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
@@ -117,10 +137,21 @@ public class PilotSeat : UdonSharpBehaviour
     {
         EngineControl.PilotName = string.Empty;
         EngineControl.Pilot = null;
+        LeaveButtonControl.SeatedPlayer = null;
+        SetVoiceOutside(player);
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", false); }
 
         if (player.isLocal)
         {
+            //undo voice distances of all players inside the vehicle
+            foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+            {
+                if (crew.SeatedPlayer != null)
+                {
+                    SetVoiceOutside(crew.SeatedPlayer);
+                }
+            }
+
             if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpilot", false); }
             EngineControl.Piloting = false;
             if (EngineControl.Ejected)
@@ -172,6 +203,18 @@ public class PilotSeat : UdonSharpBehaviour
 
             }
         }
+    }
+    private void SetVoiceInside(VRCPlayerApi Player)
+    {
+        Player.SetVoiceDistanceNear(999999);
+        Player.SetVoiceDistanceFar(1000000);
+        Player.SetVoiceGain(.6f);
+    }
+    private void SetVoiceOutside(VRCPlayerApi Player)
+    {
+        Player.SetVoiceDistanceNear(0);
+        Player.SetVoiceDistanceFar(25);
+        Player.SetVoiceGain(15);
     }
     private void Assert(bool condition, string message)
     {
