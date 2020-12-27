@@ -71,8 +71,8 @@ public class SoundController : UdonSharpBehaviour
     private float PlaneThrustPitch;
     [System.NonSerializedAttribute] public float PlaneThrustVolume;
     private float PlaneInsideInitialVolume;
-    private float LastFramePlaneIdlePitch;
-    private float LastFramePlaneThrustPitch;
+    public float LastFramePlaneIdlePitch;
+    public float LastFramePlaneThrustPitch;
     private float LastFrameGunPitch;
     private float PlaneIdleInitialVolume;
     private float PlaneDistantInitialVolume;

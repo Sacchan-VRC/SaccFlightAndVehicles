@@ -416,8 +416,7 @@ public class EngineController : UdonSharpBehaviour
         }
 
 
-        float scaleratio = CenterOfMass.transform.lossyScale.magnitude / Vector3.one.magnitude;
-        VehicleRigidbody.centerOfMass = CenterOfMass.localPosition * scaleratio;//correct position if scaled
+        VehicleRigidbody.centerOfMass = VehicleMainObj.transform.InverseTransformDirection(CenterOfMass.position - VehicleMainObj.transform.position);//correct position if scaled
 
         AtmoshpereFadeDistance = (AtmosphereThinningEnd + SeaLevel) - (AtmosphereThinningStart + SeaLevel); //for finding atmosphere thinning gradient
         AtmosphereHeightThing = (AtmosphereThinningStart + SeaLevel) / (AtmoshpereFadeDistance); //used to add back the height to the atmosphere after finding gradient
@@ -671,9 +670,6 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (RStickSelection == 2)
                     {
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
                         if (InEditor)
                         {
                             RStick0();
@@ -1160,6 +1156,11 @@ public class EngineController : UdonSharpBehaviour
                 switch (RStickSelection)
                 {
                     case 0://player just got in and hasn't selected anything
+                        AAMHasTarget = false;
+                        AAMLocked = false;
+                        AAMLockTimer = 0;
+                        IsFiringGun = false;
+                        DoAAMTargeting = false;
                         break;
                     case 1://GUN
                         if ((RTrigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
@@ -2190,9 +2191,10 @@ public class EngineController : UdonSharpBehaviour
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
-        WeaponSelected = false;
+        EffectsControl.PlaneAnimator.SetTrigger("explode");
         EffectsControl.PlaneAnimator.SetInteger("weapon", 0);
         EffectsControl.PlaneAnimator.SetBool("occupied", false);
+        WeaponSelected = false;
         EffectsControl.DoEffects = 0f; //keep awake
         dead = true;
         EffectsControl.GearUp = false;
@@ -2200,6 +2202,8 @@ public class EngineController : UdonSharpBehaviour
         BrakeInput = 0;
         FlightLimitsEnabled = true;
         Cruise = false;
+        CatapultStatus = 0;
+        PlayerThrottle = 0;
         if (!EffectsControl.FrontWheelNull) EffectsControl.FrontWheel.localRotation = Quaternion.identity;
         //EngineControl.Trim = Vector2.zero;
         if (HasCanopy)
@@ -2240,6 +2244,8 @@ public class EngineController : UdonSharpBehaviour
         SoundControl.PlaneIdleVolume = 0;
         SoundControl.PlaneThrustVolume = 0;
         SoundControl.PlaneDistantVolume = 0;
+        SoundControl.LastFramePlaneIdlePitch = 0;
+        SoundControl.LastFramePlaneThrustPitch = 0;
 
         if (!SoundControl.PlaneDistantNull) { SoundControl.PlaneDistant.volume = 0; }
 
@@ -2278,7 +2284,6 @@ public class EngineController : UdonSharpBehaviour
                 seat.ExitStation();
             }
         }
-        EffectsControl.PlaneAnimator.SetTrigger("explode");
     }
     private void AAMTargeting(float Lock_Angle)
     {
