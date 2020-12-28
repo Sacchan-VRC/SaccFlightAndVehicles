@@ -18,8 +18,7 @@ public class AAGunController : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
     private Animator AAGunAnimator;
     [System.NonSerializedAttribute] public bool dead;
-    private float RstickH;
-    private float LstickV;
+
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool firing;
     private float RTrigger = 0;
     [System.NonSerializedAttribute] public float FullHealth;
@@ -63,9 +62,29 @@ public class AAGunController : UdonSharpBehaviour
             }
             if (InEditor || Manning)
             {
+                //get inputs
+                float Wf = Input.GetKey(KeyCode.W) ? -1 : 0; //inputs as floats
+                float Sf = Input.GetKey(KeyCode.S) ? 1 : 0;
+                float Af = Input.GetKey(KeyCode.A) ? -1 : 0;
+                float Df = Input.GetKey(KeyCode.D) ? 1 : 0;
+
+                float RstickH = 0;
+                float LstickV = 0;
+                if (!InEditor)
+                {
+                    RstickH = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                    RstickV = -Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                    LstickV = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                    RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                }
+
+                //lerp to inputs for smooth motion
+                float InputY = Mathf.Clamp((RstickH + Af + Df), -1, 1) * TurnSpeedMulti;
+                float InputX = Mathf.Clamp((RstickV + Wf + Sf), -1, 1) * TurnSpeedMulti;
+
+
                 //Camera control
                 if (AACam != null) { ZoomLevel = AACam.fieldOfView / 90; }
-                LstickV = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                 if (Mathf.Abs(LstickV) > .1)
                 {
                     if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView - 3.2f * LstickV * ZoomLevel, ZoomFov, ZoomOutFov); }
@@ -80,16 +99,7 @@ public class AAGunController : UdonSharpBehaviour
                 }
 
 
-                //get inputs
-                float Wf = Input.GetKey(KeyCode.W) ? -1 : 0; //inputs as floats
-                float Sf = Input.GetKey(KeyCode.S) ? 1 : 0;
-                float Af = Input.GetKey(KeyCode.A) ? -1 : 0;
-                float Df = Input.GetKey(KeyCode.D) ? 1 : 0;
-                RstickH = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                RstickV = -Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                //lerp to inputs for smooth motion
-                float InputY = Mathf.Clamp((RstickH + Af + Df), -1, 1) * TurnSpeedMulti;
-                float InputX = Mathf.Clamp((RstickV + Wf + Sf), -1, 1) * TurnSpeedMulti;
+
                 //only do friction if slowing down or trying to turn in the oposite direction
                 if (InputY > 0 && InputYLerper < 0 || InputY < 0 && InputYLerper > 0 || Mathf.Abs(InputYLerper) > Mathf.Abs(InputY))
                 {
@@ -112,7 +122,6 @@ public class AAGunController : UdonSharpBehaviour
                 temprot = Mathf.Clamp(temprot, -89, 35);
                 Rotator.transform.localRotation = Quaternion.Euler(new Vector3(temprot, Rotator.transform.localRotation.eulerAngles.y + (InputYLerper * ZoomLevel), 0));
 
-                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                 //Firing the gun
                 if (RTrigger >= 0.75 || Input.GetKey(KeyCode.Space))
                 {

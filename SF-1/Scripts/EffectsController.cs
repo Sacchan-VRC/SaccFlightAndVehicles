@@ -46,16 +46,14 @@ public class EffectsController : UdonSharpBehaviour
      */
 
 
-    //best to remove synced variables if you aren't using them
-    //moved some here from enginecontroller because there's a limit per-udonbehaviour
+    //these used to be synced variables, might move them back to EngineController some time
+    [System.NonSerializedAttribute] public bool AfterburnerOn;
+    [System.NonSerializedAttribute] public bool CanopyOpen = true;
+    [System.NonSerializedAttribute] public bool GearUp = false;
+    [System.NonSerializedAttribute] public bool Flaps = true;
+    [System.NonSerializedAttribute] public bool HookDown = false;
+    [System.NonSerializedAttribute] public bool Smoking = false;
     [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool AfterburnerOn;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool CanopyOpen = true;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool GearUp = false;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Flaps = true;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool HookDown = false;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Smoking = false;
-
 
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
@@ -71,9 +69,6 @@ public class EffectsController : UdonSharpBehaviour
     private Color SmokeColorLerper = Color.white;
     [System.NonSerializedAttribute] public bool LargeEffectsOnly = false;
     private float FullHealthDivider;
-    private float FullAAMsDivider;
-    private float FullAGMsDivider;
-    private float FullBombsDivider;
     private void Start()
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
@@ -112,15 +107,17 @@ public class EffectsController : UdonSharpBehaviour
          */
 
         FullHealthDivider = 1f / EngineControl.Health;
-        FullAAMsDivider = 1f / EngineControl.NumAAM;
-        FullAGMsDivider = 1f / EngineControl.NumAGM;
-        FullBombsDivider = 1f / EngineControl.NumBomb;
 
         foreach (Transform fire in Enginefire)
             fire.localScale = new Vector3(fire.localScale.x, 0, fire.localScale.z);
 
-
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
+
+        //set these values at start in case they haven't been set correctly in editor
+        PlaneAnimator.SetBool("gearup", GearUp);
+        PlaneAnimator.SetBool("flaps", Flaps);
+        PlaneAnimator.SetBool("hookdown", HookDown);
+        PlaneAnimator.SetBool("displaysmoke", Smoking);
     }
     private void Update()
     {
@@ -183,15 +180,6 @@ public class EffectsController : UdonSharpBehaviour
         foreach (Transform rudder in Rudders)
             rudder.localRotation = Quaternion.Euler(YawLerper);
 
-        if (Flaps) { PlaneAnimator.SetBool("flaps", true); }
-        else { PlaneAnimator.SetBool("flaps", false); }
-
-        if (GearUp) { PlaneAnimator.SetBool("gearup", true); }
-        else { PlaneAnimator.SetBool("gearup", false); }
-
-        if (HookDown) { PlaneAnimator.SetBool("hookdown", true); }
-        else { PlaneAnimator.SetBool("hookdown", false); }
-
         if (!EnginesNull)
         {
             Engines.localRotation = Quaternion.Euler(PitchLerper * -.6f);
@@ -233,13 +221,9 @@ public class EffectsController : UdonSharpBehaviour
 
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * DeltaTime);
 
-        PlaneAnimator.SetBool("canopyopen", CanopyOpen);
         PlaneAnimator.SetFloat("health", EngineControl.Health * FullHealthDivider);
         PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack * 0.00555555556f /* Divide by 180 */ ) : 0);
         PlaneAnimator.SetFloat("brake", AirbrakeLerper);
-        PlaneAnimator.SetFloat("AAMs", (float)EngineControl.NumAAM * FullAAMsDivider);
-        PlaneAnimator.SetFloat("AGMs", (float)EngineControl.NumAGM * FullAGMsDivider);
-        PlaneAnimator.SetFloat("bombs", (float)EngineControl.NumBomb * FullBombsDivider);
     }
 
     private void LargeEffects()//large effects visible from a long distance
@@ -279,7 +263,34 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("mach10", EngineControl.Speed / 343 / 10);//should be airspeed but nonlocal players don't have it
         PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
         PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
-        PlaneAnimator.SetBool("displaysmoke", (Smoking && EngineControl.Occupied) ? true : false);
+    }
+    public void SetCanopyOpen()
+    {
+        if (EngineControl.InEditor) { CanopyOpening(); }
+        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
+    }
+    public void SetCanopyClosed()
+    {
+        if (EngineControl.InEditor) { CanopyClosing(); }
+        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
+    }
+    public void CanopyOpening()
+    {
+        CanopyOpen = true;
+        if (EngineControl.CanopyCloseTimer > 0)
+        { EngineControl.CanopyCloseTimer -= 100000 + EngineControl.CanopyCloseTime; }
+        else
+        { EngineControl.CanopyCloseTimer = -100000; }
+        PlaneAnimator.SetBool("canopyopen", true);
+    }
+    public void CanopyClosing()
+    {
+        CanopyOpen = false;
+        if (EngineControl.CanopyCloseTimer > (-100000 - EngineControl.CanopyCloseTime) && EngineControl.CanopyCloseTimer < 0)
+        { EngineControl.CanopyCloseTimer += 100000 + ((EngineControl.CanopyCloseTime * 2) + 0.1f); }//the 0.1 is for the delay in the animator that is needed because it's not set to write defaults
+        else
+        { EngineControl.CanopyCloseTimer = EngineControl.CanopyCloseTime; }
+        PlaneAnimator.SetBool("canopyopen", false);
     }
 
     private void Assert(bool condition, string message)

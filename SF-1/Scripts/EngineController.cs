@@ -24,19 +24,19 @@ public class EngineController : UdonSharpBehaviour
     public Transform CatapultDetector;
     public LayerMask CatapultLayer;
     public GameObject AAM;
-    [UdonSynced(UdonSyncMode.None)] public int NumAAM = 6;
+    public int NumAAM = 6;
     public float AAMMaxTargetDistance = 6000;
     public float AAMLockAngle = 15;
     public float AAMLockTime = 1.5f;
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public GameObject AGM;
-    [UdonSynced(UdonSyncMode.None)] public int NumAGM = 4;
+    public int NumAGM = 4;
     public Transform AGMLaunchPoint;
     public LayerMask AGMTargetsLayer;
     public Camera AtGCam;
     public GameObject Bomb;
-    [UdonSynced(UdonSyncMode.None)] public int NumBomb = 4;
+    public int NumBomb = 4;
     public float BombHoldDelay = 0.5f;
     public Transform[] BombLaunchPoints;
     [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
@@ -261,7 +261,7 @@ public class EngineController : UdonSharpBehaviour
     private Transform CatapultTransform;
     private float CatapultLaunchTimeStart;
     private float StartPitchStrength;
-    [System.NonSerializedAttribute] public float CanopyCloseTimer = -100000;
+    [System.NonSerializedAttribute] public float CanopyCloseTimer = -200000;
     [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     public float FuelConsumption = 2;
     public float FuelConsumptionABMulti = 4.4f;
@@ -303,6 +303,11 @@ public class EngineController : UdonSharpBehaviour
     private float AAMTargetObscuredDelay;
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
     private float TargetingAngle;
+
+    private float FullAAMsDivider;
+    private float FullAGMsDivider;
+    private float FullBombsDivider;
+    private bool CanopyOpenCheck = true;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -431,11 +436,11 @@ public class EngineController : UdonSharpBehaviour
         if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
             AAMCurrentTargetEngineControl = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
 
-        if (!HasCanopy)
-        {
-            EffectsControl.CanopyOpen = false;
-            if (InEditor) CanopyClosing();
-        }
+        FullAAMsDivider = 1f / NumAAM;
+        FullAGMsDivider = 1f / NumAGM;
+        FullBombsDivider = 1f / NumBomb;
+
+        if (!HasCanopy) { EffectsControl.CanopyClosing(); }
     }
 
     private void LateUpdate()
@@ -537,28 +542,32 @@ public class EngineController : UdonSharpBehaviour
                 bool Ctrl = Input.GetKey(KeyCode.LeftControl);
                 int Shiftf = Shift ? 1 : 0;
                 int LeftControlf = Ctrl ? 1 : 0;
-                Vector2 LStick;
-                Vector2 RStick;
-                LStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                LStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                RStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                RStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                float LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
-                float RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
-                float LTrigger = LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                float RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                Vector2 LStick = new Vector2(0, 0);
+                Vector2 RStick = new Vector2(0, 0);
+                float LGrip = 0;
+                float RGrip = 0;
+                float LTrigger = 0;
+                float RTrigger = 0;
+                if (!InEditor)
+                {
+                    LStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                    LStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                    RStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                    RStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                    LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
+                    RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
+                    LTrigger = LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                    RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                }
                 //MouseX = Input.GetAxisRaw("Mouse X");
                 //MouseY = Input.GetAxisRaw("Mouse Y");
-
 
                 //close canopy when moving fast, can't fly with it open
                 if (EffectsControl.CanopyOpen && Speed > 20)
                 {
-                    if (CanopyCloseTimer < -100000 + CanopyCloseTime)
+                    if (CanopyCloseTimer < -100000)
                     {
-                        EffectsControl.CanopyOpen = false;
-                        if (InEditor) CanopyClosing();
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
+                        EffectsControl.SetCanopyClosed();
                     }
                 }
 
@@ -582,7 +591,7 @@ public class EngineController : UdonSharpBehaviour
                 }
                 if (Input.GetKeyDown(KeyCode.F1) && HasLimits)
                 {
-                    FlightLimitsEnabled = !FlightLimitsEnabled;
+                    ToggleLimits();
                 }
                 if (Input.GetKeyDown(KeyCode.C) && HasCatapult)
                 {
@@ -600,7 +609,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (HookDetector != null)
                     {
-                        EffectsControl.HookDown = !EffectsControl.HookDown;
+                        ToggleHook();
                     }
                     Hooked = false;
                 }
@@ -608,38 +617,14 @@ public class EngineController : UdonSharpBehaviour
                 {
                     AltHold = !AltHold;
                 }
-                if (Speed < 20 && Input.GetKey(KeyCode.Z) && HasCanopy)
+                if (Input.GetKeyDown(KeyCode.Z) && Speed < 20 && HasCanopy)
                 {
-                    if (CanopyCloseTimer < (-100000 - CanopyCloseTime))
-                    {
-                        EffectsControl.CanopyOpen = false;
-                        if (InEditor) CanopyClosing();
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
-                    }
-                    else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -10000)
-                    {
-                        EffectsControl.CanopyOpen = true;
-                        if (InEditor) CanopyOpening();
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
-                    }
+                    ToggleCanopy();
                 }
 
                 if (Input.GetKeyDown(KeyCode.T) && HasAfterburner)
                 {
-                    EffectsControl.AfterburnerOn = !EffectsControl.AfterburnerOn;
-                    if (EffectsControl.AfterburnerOn)
-                    {
-                        Afterburner = AfterburnerThrustMulti;
-                        if (ThrottleInput > 0.6)
-                        {
-                            if (InEditor)
-                            {
-                                PlayABOnSound();
-                            }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayABOnSound");
-                        }
-                    }
-                    else { Afterburner = 1; }
+                    ToggleAfterburner();
                 }
 
                 //with keys 1-4 we select weapons, if they are already selectet, deselect them.
@@ -736,15 +721,15 @@ public class EngineController : UdonSharpBehaviour
 
                 if (Input.GetKeyDown(KeyCode.G) && HasGear && CatapultStatus == 0)
                 {
-                    EffectsControl.GearUp = !EffectsControl.GearUp;
+                    ToggleGear();
                 }
                 if (Input.GetKeyDown(KeyCode.F) && HasFlaps)
                 {
-                    EffectsControl.Flaps = !EffectsControl.Flaps;
+                    ToggleFlaps();
                 }
                 if (Input.GetKeyDown(KeyCode.Alpha5) && HasSmoke)
                 {
-                    EffectsControl.Smoking = !EffectsControl.Smoking;
+                    ToggleSmoking();
                 }
                 if (Input.GetKeyDown(KeyCode.X) && HasFlare)
                 {
@@ -935,20 +920,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (!LTriggerLastFrame)
                             {
-                                EffectsControl.AfterburnerOn = !EffectsControl.AfterburnerOn;
-                                if (EffectsControl.AfterburnerOn)
-                                {
-                                    Afterburner = AfterburnerThrustMulti;
-                                    if (ThrottleInput > 0.6)
-                                    {
-                                        if (InEditor)
-                                        {
-                                            PlayABOnSound();
-                                        }
-                                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayABOnSound");
-                                    }
-                                }
-                                else { Afterburner = 1; }
+                                ToggleAfterburner();
                             }
                             LTriggerLastFrame = true;
                         }
@@ -960,7 +932,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (!LTriggerLastFrame)
                             {
-                                FlightLimitsEnabled = !FlightLimitsEnabled;
+                                ToggleLimits();
                             }
 
                             LTriggerLastFrame = true;
@@ -1060,18 +1032,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (!LTriggerLastFrame && Speed < 20)
                             {
-                                if (CanopyCloseTimer < (-100000 - CanopyCloseTime))
-                                {
-                                    EffectsControl.CanopyOpen = false;
-                                    if (InEditor) CanopyClosing();
-                                    else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
-                                }
-                                else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -10000)
-                                {
-                                    EffectsControl.CanopyOpen = true;
-                                    if (InEditor) CanopyOpening();
-                                    else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
-                                }
+                                ToggleCanopy();
                             }
 
                             //ejection
@@ -1093,7 +1054,6 @@ public class EngineController : UdonSharpBehaviour
                                     }
                                     if (HasCanopy)
                                     {
-                                        EffectsControl.CanopyOpen = true;
                                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
                                     }
                                 }
@@ -1198,7 +1158,6 @@ public class EngineController : UdonSharpBehaviour
                                             LaunchAAM();
                                         else
                                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
-                                        NumAAM--;
                                         if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                                     }
                                 }
@@ -1233,7 +1192,6 @@ public class EngineController : UdonSharpBehaviour
                                                 LaunchAGM();
                                             else
                                                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAGM");
-                                            NumAGM--;
                                         }
                                         AGMUnlocking = 0;
                                     }
@@ -1332,7 +1290,6 @@ public class EngineController : UdonSharpBehaviour
                                         LaunchBomb();
                                     else
                                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
-                                    NumBomb--;
                                 }
                             }
                             else//launch every BombHoldDelay
@@ -1344,7 +1301,6 @@ public class EngineController : UdonSharpBehaviour
                                         LaunchBomb();
                                     else
                                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
-                                    NumBomb--;
                                 }
                             }
 
@@ -1361,7 +1317,7 @@ public class EngineController : UdonSharpBehaviour
                     case 5://GEAR
                         if (RTrigger > 0.75)
                         {
-                            if (!RTriggerLastFrame && CatapultStatus == 0) { EffectsControl.GearUp = !EffectsControl.GearUp; }
+                            if (!RTriggerLastFrame && CatapultStatus == 0) { ToggleGear(); }
                             RTriggerLastFrame = true;
                         }
                         else { RTriggerLastFrame = false; }
@@ -1375,7 +1331,7 @@ public class EngineController : UdonSharpBehaviour
                     case 6://flaps
                         if (RTrigger > 0.75)
                         {
-                            if (!RTriggerLastFrame) EffectsControl.Flaps = !EffectsControl.Flaps;
+                            if (!RTriggerLastFrame) ToggleFlaps();
                             RTriggerLastFrame = true;
                         }
                         else { RTriggerLastFrame = false; }
@@ -1393,7 +1349,7 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 if (HookDetector != null)
                                 {
-                                    EffectsControl.HookDown = !EffectsControl.HookDown;
+                                    ToggleHook();
                                 }
                                 Hooked = false;
                             }
@@ -1420,7 +1376,7 @@ public class EngineController : UdonSharpBehaviour
                                     SmokeZeroPoint = HandPosSmoke;
                                     TempSmokeCol = SmokeColor;
                                 }
-                                EffectsControl.Smoking = !EffectsControl.Smoking;
+                                ToggleSmoking();
                                 SmokeHoldTime = 0;
                             }
                             if (InVR)
@@ -1572,23 +1528,14 @@ public class EngineController : UdonSharpBehaviour
                         }
                         if (Time.time - LastResupplyTime > 1)
                         {
-                            //only play the sound if we're actually repairing/getting ammo/fuel
-                            if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || GunAmmoInSeconds != FullGunAmmo || Health != FullHealth))
-                            { SoundControl.Reloading.Play(); }
-                            LastResupplyTime = Time.time;
-                            NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(FullAAMs / 10), 1), FullAAMs);
-                            NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
-                            NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
-
-                            /*                             Debug.Log(string.Concat("fuel ", Fuel));
-                                                        Debug.Log(string.Concat("FullFuel ", FullFuel));
-                                                        Debug.Log(string.Concat("Health ", Health));
-                                                        Debug.Log(string.Concat("FullHealth ", FullHealth));
-                                                        Debug.Log(string.Concat("GunAmmoInSeconds ", GunAmmoInSeconds));
-                                                        Debug.Log(string.Concat("FullGunAmmo ", FullGunAmmo)); */
-                            Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
-                            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
-                            Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
+                            if (InEditor)
+                            {
+                                ResupplyPlane();
+                            }
+                            else
+                            {
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResupplyPlane");
+                            }
                         }
                         ResupplyingLastFrame = true;
                     }
@@ -1670,7 +1617,16 @@ public class EngineController : UdonSharpBehaviour
                 Fuel = Mathf.Clamp(Fuel - ((FuelConsumption * Mathf.Max(ThrottleInput, 0.35f)) * DeltaTime), 0, FullFuel);
                 if (Fuel < 200) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / 200), 0, 1);
 
-                if (ThrottleInput < .6f) { EffectsControl.AfterburnerOn = false; Afterburner = 1; }
+                if (ThrottleInput < .6f)
+                {
+                    if (InEditor)
+                    {
+                        SetAfterburnerOff();
+                    }
+                    {
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "AfterburnerDisable");
+                    }
+                }
                 if (AltHold && !RGripLastFrame)//alt hold enabled, and player not holding joystick
                 {
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
@@ -1981,8 +1937,22 @@ public class EngineController : UdonSharpBehaviour
             //AirVel = VehicleRigidbody.velocity - Wind;
             //AirSpeed = AirVel.magnitude;
         }
-        SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
-        CanopyCloseTimer -= DeltaTime;
+        if (Occupied)
+        {
+            CanopyCloseTimer -= DeltaTime;
+            SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
+        }
+    }
+    private void ToggleCanopy()
+    {
+        if (CanopyCloseTimer < (-100000 - CanopyCloseTime))
+        {
+            EffectsControl.SetCanopyClosed();
+        }
+        else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000)
+        {
+            EffectsControl.SetCanopyOpen();
+        }
     }
     private void FixedUpdate()
     {
@@ -2014,35 +1984,9 @@ public class EngineController : UdonSharpBehaviour
     //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
     //This code adds or removes 100000 based on the situation, + the time it takes for the animation to play.
     //This part is effectively disabled (by not allowing toggling if in transition) because it isn't reliable enough ->>//If the Opening animation is playing when you tell it to close it keeps the time from that animation so that the timing of the sound changing is always correct.
-    public void CanopyOpening()
-    {
-        if (CanopyCloseTimer > 0)
-            CanopyCloseTimer -= 100000 + CanopyCloseTime;
-        else
-            CanopyCloseTimer = -100000;
-    }
-    public void CanopyClosing()
-    {
-        if (CanopyCloseTimer > (-100000 - CanopyCloseTime) && CanopyCloseTimer < 0)
-            CanopyCloseTimer += 100000 + ((CanopyCloseTime * 2) + 0.1f);//the 0.1 is for the delay in the animator that is needed because it's not set to write defaults
-        else
-            CanopyCloseTimer = CanopyCloseTime;
-    }
-    public void PlayABOnSound()
-    {
-        if ((Piloting || Passenger) && (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000))
-        {
-            if (!SoundControl.ABOnInsideNull)
-                SoundControl.ABOnInside.Play();
-        }
-        else
-        {
-            if (!SoundControl.ABOnOutsideNull)
-                SoundControl.ABOnOutside.Play();
-        }
-    }
     public void LaunchAAM()
     {
+        NumAAM--;
         EffectsControl.PlaneAnimator.SetTrigger("aamlaunched");
         GameObject NewAAM = VRCInstantiate(AAM);
         if (AAMLaunchOpositeSide)
@@ -2065,9 +2009,12 @@ public class EngineController : UdonSharpBehaviour
         }
         NewAAM.SetActive(true);
         NewAAM.GetComponent<Rigidbody>().velocity = CurrentVel;
+
+        EffectsControl.PlaneAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
     }
     public void LaunchAGM()
     {
+        NumAGM--;
         EffectsControl.PlaneAnimator.SetTrigger("agmlaunched");
         GameObject NewAGM = VRCInstantiate(AGM);
         if (AGMLaunchOpositeSide)
@@ -2089,9 +2036,11 @@ public class EngineController : UdonSharpBehaviour
         }
         NewAGM.SetActive(true);
         NewAGM.GetComponent<Rigidbody>().velocity = CurrentVel;
+        EffectsControl.PlaneAnimator.SetFloat("AGMs", (float)NumAGM * FullAGMsDivider);
     }
     public void LaunchBomb()
     {
+        NumBomb--;
         EffectsControl.PlaneAnimator.SetTrigger("bomblaunched");
         GameObject NewBomb = VRCInstantiate(Bomb);
         NewBomb.transform.position = BombLaunchPoints[BombPoint].transform.position;
@@ -2101,6 +2050,7 @@ public class EngineController : UdonSharpBehaviour
         NewBomb.GetComponent<Rigidbody>().velocity = CurrentVel;
         BombPoint++;
         if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
+        EffectsControl.PlaneAnimator.SetFloat("bombs", (float)NumBomb * FullBombsDivider);
     }
     void SortTargets(GameObject[] Targets, float[] order)
     {
@@ -2191,26 +2141,30 @@ public class EngineController : UdonSharpBehaviour
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
-        EffectsControl.PlaneAnimator.SetTrigger("explode");
-        EffectsControl.PlaneAnimator.SetInteger("weapon", 0);
-        EffectsControl.PlaneAnimator.SetBool("occupied", false);
         WeaponSelected = false;
-        EffectsControl.DoEffects = 0f; //keep awake
         dead = true;
-        EffectsControl.GearUp = false;
-        EffectsControl.HookDown = false;
         BrakeInput = 0;
-        FlightLimitsEnabled = true;
         Cruise = false;
         CatapultStatus = 0;
         PlayerThrottle = 0;
+        MissilesIncoming = 0;
+        EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
+        EffectsControl.PlaneAnimator.SetTrigger("explode");
+        EffectsControl.PlaneAnimator.SetInteger("weapon", 0);
+        EffectsControl.PlaneAnimator.SetBool("occupied", false);
+        EffectsControl.DoEffects = 0f; //keep awake
+        EffectsControl.CanopyOpening();
+        SetLimitsOn();
+        SetHookUp();
+        SetGearDown();
+        SetFlapsOn();
         if (!EffectsControl.FrontWheelNull) EffectsControl.FrontWheel.localRotation = Quaternion.identity;
-        //EngineControl.Trim = Vector2.zero;
         if (HasCanopy)
         {
             EffectsControl.CanopyOpen = true;
             CanopyCloseTimer = -100000 - CanopyCloseTime;
         }
+        //EngineControl.Trim = Vector2.zero;
         Hooked = false;
         AAMLaunchOpositeSide = false;
         AGMLaunchOpositeSide = false;
@@ -2222,58 +2176,14 @@ public class EngineController : UdonSharpBehaviour
         Fuel = FullFuel;
         RStickSelection = 0;
         LStickSelection = 0;
-        MissilesIncoming = 0;
 
-        //play sonic boom if it was going to play before it exploded
-        if (SoundControl.playsonicboom && SoundControl.silent)
-        {
-            if (!SoundControl.SonicBoomNull)
-            {
-                int rand = Random.Range(0, SoundControl.SonicBoom.Length);
-                if (SoundControl.SonicBoom[rand] != null)
-                {
-                    SoundControl.SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
-                    SoundControl.SonicBoom[rand].PlayDelayed((SoundControl.SonicBoomDistance - SoundControl.SonicBoomWave) / 343);
-                }
-            }
-        }
-        SoundControl.playsonicboom = false;
-        SoundControl.silent = false;
-
-        SoundControl.PlaneIdlePitch = 0;
-        SoundControl.PlaneIdleVolume = 0;
-        SoundControl.PlaneThrustVolume = 0;
-        SoundControl.PlaneDistantVolume = 0;
-        SoundControl.LastFramePlaneIdlePitch = 0;
-        SoundControl.LastFramePlaneThrustPitch = 0;
-
-        if (!SoundControl.PlaneDistantNull) { SoundControl.PlaneDistant.volume = 0; }
-
-        foreach (AudioSource thrust in SoundControl.Thrust)
-        {
-            thrust.pitch = 0;
-            thrust.volume = 0;
-        }
-        foreach (AudioSource idle in SoundControl.PlaneIdle)
-        {
-            idle.pitch = 0;
-            idle.volume = 0;
-        }
+        SoundControl.Explode_Sound();
 
         if (IsOwner || InEditor)
         {
             VehicleRigidbody.velocity = Vector3.zero;
             Health = FullHealth;//turns off low health smoke
             Fuel = FullFuel;
-        }
-
-        if (SoundControl != null && !SoundControl.ExplosionNull)
-        {
-            int rand = Random.Range(0, SoundControl.Explosion.Length);
-            if (SoundControl.Explosion[rand] != null)
-            {
-                SoundControl.Explosion[rand].Play();//explosion sound has travel time
-            }
         }
 
         //pilot and passenger are dropped out of the plane
@@ -2403,6 +2313,244 @@ public class EngineController : UdonSharpBehaviour
     public void PlayCableSnap()
     {
         if (!SoundControl.CableSnapNull) { SoundControl.CableSnap.Play(); }
+    }
+    public void SetAfterburnerOn()
+    {
+        EffectsControl.AfterburnerOn = true;
+        if ((Piloting || Passenger) && (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000))
+        {
+            if (!SoundControl.ABOnInsideNull)
+                SoundControl.ABOnInside.Play();
+        }
+        else
+        {
+            if (!SoundControl.ABOnOutsideNull)
+                SoundControl.ABOnOutside.Play();
+        }
+        Afterburner = AfterburnerThrustMulti;
+    }
+    public void SetAfterburnerOff()
+    {
+        EffectsControl.AfterburnerOn = false;
+        Afterburner = 1;
+    }
+    private void ToggleAfterburner()
+    {
+        if (!EffectsControl.AfterburnerOn && ThrottleInput > 0.6)
+        {
+            if (InEditor)
+            {
+                SetAfterburnerOn();
+            }
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
+            }
+        }
+        else if (EffectsControl.AfterburnerOn)
+        {
+            if (InEditor)
+            {
+                SetAfterburnerOff();
+            }
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
+            }
+        }
+    }
+    public void ResupplyPlane()
+    {
+        //only play the sound if we're actually repairing/getting ammo/fuel
+        if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || GunAmmoInSeconds != FullGunAmmo || Health != FullHealth))
+        {
+            SoundControl.Reloading.Play();
+        }
+        LastResupplyTime = Time.time;
+        NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(FullAAMs / 10), 1), FullAAMs);
+        NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
+        NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
+
+        /*                             Debug.Log(string.Concat("fuel ", Fuel));
+                                    Debug.Log(string.Concat("FullFuel ", FullFuel));
+                                    Debug.Log(string.Concat("Health ", Health));
+                                    Debug.Log(string.Concat("FullHealth ", FullHealth));
+                                    Debug.Log(string.Concat("GunAmmoInSeconds ", GunAmmoInSeconds));
+                                    Debug.Log(string.Concat("FullGunAmmo ", FullGunAmmo)); */
+        Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
+        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
+        Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
+    }
+    public void SetGearUP()
+    {
+        EffectsControl.GearUp = true;
+        EffectsControl.PlaneAnimator.SetBool("gearup", true);
+    }
+    public void SetGearDown()
+    {
+        EffectsControl.GearUp = false;
+        EffectsControl.PlaneAnimator.SetBool("gearup", false);
+    }
+    public void ToggleGear()
+    {
+        if (!EffectsControl.GearUp)
+        {
+            if (InEditor)
+            {
+                SetGearUP();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUP");
+            }
+        }
+        else
+        {
+            if (InEditor)
+            {
+                SetGearDown();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearDown");
+            }
+        }
+    }
+    public void SetFlapsOff()
+    {
+        EffectsControl.Flaps = false;
+        EffectsControl.PlaneAnimator.SetBool("flaps", false);
+    }
+    public void SetFlapsOn()
+    {
+        EffectsControl.Flaps = true;
+        EffectsControl.PlaneAnimator.SetBool("flaps", true);
+    }
+    public void ToggleFlaps()
+    {
+        if (!EffectsControl.Flaps)
+        {
+            if (InEditor)
+            {
+                SetFlapsOn();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOn");
+            }
+        }
+        else
+        {
+            if (InEditor)
+            {
+                SetFlapsOff();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
+            }
+        }
+    }
+    public void SetHookDown()
+    {
+        EffectsControl.HookDown = true;
+        EffectsControl.PlaneAnimator.SetBool("hookdown", true);
+    }
+    public void SetHookUp()
+    {
+        EffectsControl.HookDown = false;
+        EffectsControl.PlaneAnimator.SetBool("hookdown", false);
+    }
+    public void ToggleHook()
+    {
+        if (!EffectsControl.HookDown)
+        {
+            if (InEditor)
+            {
+                SetHookDown();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown");
+            }
+        }
+        else
+        {
+            if (InEditor)
+            {
+                SetHookUp();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookUp");
+            }
+        }
+    }
+    public void SetSmokingOn()
+    {
+        EffectsControl.Smoking = true;
+        EffectsControl.PlaneAnimator.SetBool("displaysmoke", true);
+    }
+    public void SetSmokingOff()
+    {
+        EffectsControl.Smoking = false;
+        EffectsControl.PlaneAnimator.SetBool("displaysmoke", false);
+    }
+    public void ToggleSmoking()
+    {
+        if (!EffectsControl.Smoking)
+        {
+            if (InEditor)
+            {
+                SetSmokingOn();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn");
+            }
+        }
+        else
+        {
+            if (InEditor)
+            {
+                SetSmokingOff();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
+            }
+        }
+    }
+    public void SetLimitsOn()
+    {
+        FlightLimitsEnabled = true;
+    }
+    public void SetLimitsOff()
+    {
+        FlightLimitsEnabled = false;
+    }
+    public void ToggleLimits()
+    {
+        if (!FlightLimitsEnabled)
+        {
+            if (InEditor)
+            {
+                SetLimitsOn();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn");
+            }
+        }
+        else
+        {
+            if (InEditor)
+            {
+                SetLimitsOff();
+            }
+            else
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff");
+            }
+        }
     }
     private void Assert(bool condition, string message)
     {

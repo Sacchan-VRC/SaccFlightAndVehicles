@@ -71,8 +71,8 @@ public class SoundController : UdonSharpBehaviour
     private float PlaneThrustPitch;
     [System.NonSerializedAttribute] public float PlaneThrustVolume;
     private float PlaneInsideInitialVolume;
-    public float LastFramePlaneIdlePitch;
-    public float LastFramePlaneThrustPitch;
+    private float LastFramePlaneIdlePitch;
+    private float LastFramePlaneThrustPitch;
     private float LastFrameGunPitch;
     private float PlaneIdleInitialVolume;
     private float PlaneDistantInitialVolume;
@@ -520,6 +520,53 @@ public class SoundController : UdonSharpBehaviour
             PlaneDistantVolume = PlaneThrustVolume;
             if (!PlaneInsideNull) { PlaneIdlePitch = PlaneInside.pitch; }
         }
+    }
+    public void Explode_Sound()
+    {
+        //play sonic boom if it was going to play before it exploded
+        if (playsonicboom && silent)
+        {
+            if (!SonicBoomNull)
+            {
+                int rand = Random.Range(0, SonicBoom.Length);
+                if (SonicBoom[rand] != null)
+                {
+                    SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
+                    SonicBoom[rand].PlayDelayed((SonicBoomDistance - SonicBoomWave) / 343);
+                }
+            }
+        }
+        playsonicboom = false;
+        silent = false;
+        PlaneIdlePitch = 0;
+        PlaneIdleVolume = 0;
+        PlaneThrustVolume = 0;
+        PlaneDistantVolume = 0;
+        LastFramePlaneIdlePitch = 0;
+        LastFramePlaneThrustPitch = 0;
+
+        if (!ExplosionNull)
+        {
+            int rand = Random.Range(0, Explosion.Length);
+            if (Explosion[rand] != null)
+            {
+                Explosion[rand].Play();
+            }
+        }
+
+        if (!PlaneDistantNull) { PlaneDistant.volume = 0; }
+
+        foreach (AudioSource thrust in Thrust)
+        {
+            thrust.pitch = 0;
+            thrust.volume = 0;
+        }
+        foreach (AudioSource idle in PlaneIdle)
+        {
+            idle.pitch = 0;
+            idle.volume = 0;
+        }
+
     }
     private void Assert(bool condition, string message)
     {
