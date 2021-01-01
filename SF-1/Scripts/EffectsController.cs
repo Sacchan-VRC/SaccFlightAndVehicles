@@ -113,7 +113,9 @@ public class EffectsController : UdonSharpBehaviour
 
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
 
+
         //set these values at start in case they haven't been set correctly in editor
+        if (!EngineControl.HasCanopy) { CanopyClosing(); }
         PlaneAnimator.SetBool("gearup", GearUp);
         PlaneAnimator.SetBool("flaps", Flaps);
         PlaneAnimator.SetBool("hookdown", HookDown);

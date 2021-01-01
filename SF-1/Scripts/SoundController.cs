@@ -568,6 +568,30 @@ public class SoundController : UdonSharpBehaviour
         }
 
     }
+    public void Wakeup()
+    {
+        DoSound = 0f;
+        foreach (AudioSource thrust in Thrust)
+        {
+            thrust.gameObject.SetActive(true);
+        }
+        foreach (AudioSource idle in PlaneIdle)
+        {
+            idle.gameObject.SetActive(true);
+        }
+        if (!PlaneDistantNull) PlaneDistant.gameObject.SetActive(true);
+        if (!PlaneWindNull) PlaneWind.gameObject.SetActive(true);
+        if (!PlaneInsideNull) PlaneInside.gameObject.SetActive(true);
+        if (soundsoff)
+        {
+            PlaneIdleVolume = 0;
+            PlaneDistantVolume = 0;
+            PlaneThrustVolume = 0;
+            LastFramePlaneIdlePitch = 0;
+            LastFramePlaneThrustPitch = 0;
+        }
+        soundsoff = false;
+    }
     private void Assert(bool condition, string message)
     {
         if (!condition)

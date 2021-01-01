@@ -47,54 +47,59 @@ public class PassengerSeat : UdonSharpBehaviour
     public override void OnStationEntered(VRCPlayerApi player)
     {
         //voice range change to allow talking inside cockpit (after VRC patch 1008)
-        LeaveButtonControl.SeatedPlayer = player;
-        if (player.isLocal)
+        if (player != null)
         {
-            foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+            LeaveButtonControl.SeatedPlayer = player;
+            if (player.isLocal)
             {
-                if (crew.SeatedPlayer != null)
+                foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
                 {
-                    SetVoiceInside(crew.SeatedPlayer);
+                    if (crew.SeatedPlayer != null)
+                    {
+                        SetVoiceInside(crew.SeatedPlayer);
+                    }
                 }
             }
-        }
-        else if (EngineControl.Piloting || EngineControl.Passenger)
-        {
-            SetVoiceInside(player);
+            else if (EngineControl.Piloting || EngineControl.Passenger)
+            {
+                SetVoiceInside(player);
+            }
         }
     }
-
     public override void OnStationExited(VRCPlayerApi player)
     {
-        LeaveButtonControl.SeatedPlayer = null;
-        SetVoiceOutside(player);
-        if (player.isLocal)
+        if (player != null)
         {
-            //undo voice distances of all players inside the vehicle
-            foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+            LeaveButtonControl.SeatedPlayer = null;
+            SetVoiceOutside(player);
+            if (player.isLocal)
             {
-                if (crew.SeatedPlayer != null)
+                //undo voice distances of all players inside the vehicle
+                foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
                 {
-                    SetVoiceOutside(crew.SeatedPlayer);
+                    if (crew.SeatedPlayer != null)
+                    {
+                        SetVoiceOutside(crew.SeatedPlayer);
+                    }
                 }
-            }
-            if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
-            if (EngineControl != null)
-            {
-                EngineControl.Passenger = false;
-                EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
-                EngineControl.MissilesIncoming = 0;
-                EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
-            }
-            if (LeaveButton != null) { LeaveButton.SetActive(false); }
-            if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
-            if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
-            if (PlaneMesh != null)
-            {
-                Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
-                foreach (Transform child in children)
+                if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
+                if (EngineControl != null)
                 {
-                    child.gameObject.layer = Planelayer;
+                    EngineControl.Passenger = false;
+                    EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+                    EngineControl.MissilesIncoming = 0;
+                    EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
+                }
+                if (LeaveButton != null) { LeaveButton.SetActive(false); }
+                if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
+                if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
+                if (PlaneMesh != null)
+                {
+                    Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+                    foreach (Transform child in children)
+                    {
+                        child.gameObject.layer = Planelayer;
+                    }
                 }
             }
         }

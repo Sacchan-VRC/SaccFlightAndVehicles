@@ -87,120 +87,105 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
-        EngineControl.PilotName = player.displayName;
-        EngineControl.Pilot = player;
-
-        //voice range change to allow talking inside cockpit (after VRC patch 1008)
-        LeaveButtonControl.SeatedPlayer = player;
-        if (player.isLocal)
+        if (player != null)
         {
-            foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+            EngineControl.PilotName = player.displayName;
+            EngineControl.Pilot = player;
+
+            //voice range change to allow talking inside cockpit (after VRC patch 1008)
+            LeaveButtonControl.SeatedPlayer = player;
+            if (player.isLocal)
             {
-                if (crew.SeatedPlayer != null)
+                foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
                 {
-                    SetVoiceInside(crew.SeatedPlayer);
+                    if (crew.SeatedPlayer != null)
+                    {
+                        SetVoiceInside(crew.SeatedPlayer);
+                    }
                 }
             }
+            else if (EngineControl.Piloting || EngineControl.Passenger)
+            {
+                SetVoiceInside(player);
+            }
         }
-        else if (EngineControl.Piloting || EngineControl.Passenger)
-        {
-            SetVoiceInside(player);
-        }
-
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", true); }
-
         EngineControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
-
-        //old WakeUp();
+        //wakeup potentially sleeping controllers
         EngineControl.EffectsControl.DoEffects = 0f;
-        EngineControl.SoundControl.DoSound = 0f;
-        foreach (AudioSource thrust in EngineControl.SoundControl.Thrust)
-        {
-            thrust.gameObject.SetActive(true);
-        }
-        foreach (AudioSource idle in EngineControl.SoundControl.PlaneIdle)
-        {
-            idle.gameObject.SetActive(true);
-        }
-        if (!EngineControl.SoundControl.PlaneDistantNull) EngineControl.SoundControl.PlaneDistant.gameObject.SetActive(true);
-        if (!EngineControl.SoundControl.PlaneWindNull) EngineControl.SoundControl.PlaneWind.gameObject.SetActive(true);
-        if (!EngineControl.SoundControl.PlaneInsideNull) EngineControl.SoundControl.PlaneInside.gameObject.SetActive(true);
-        if (EngineControl.SoundControl.soundsoff)
-        {
-            EngineControl.SoundControl.PlaneIdleVolume = 0;
-            EngineControl.SoundControl.PlaneDistantVolume = 0;
-            EngineControl.SoundControl.PlaneThrustVolume = 0;
-        }
-        EngineControl.SoundControl.soundsoff = false;
+        EngineControl.SoundControl.Wakeup();
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
+        EngineControl.SetSmokingOff();
+        EngineControl.SetAfterburnerOff();
         EngineControl.PilotName = string.Empty;
         EngineControl.Pilot = null;
         LeaveButtonControl.SeatedPlayer = null;
-        SetVoiceOutside(player);
         if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", false); }
-
-        if (player.isLocal)
+        if (player != null)
         {
-            //undo voice distances of all players inside the vehicle
-            foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+            SetVoiceOutside(player);
+            if (player.isLocal)
             {
-                if (crew.SeatedPlayer != null)
+                //undo voice distances of all players inside the vehicle
+                foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
                 {
-                    SetVoiceOutside(crew.SeatedPlayer);
+                    if (crew.SeatedPlayer != null)
+                    {
+                        SetVoiceOutside(crew.SeatedPlayer);
+                    }
                 }
-            }
-
-            if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpilot", false); }
-            EngineControl.Piloting = false;
-            if (EngineControl.Ejected)
-            {
-                EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel + EngineControl.VehicleMainObj.transform.up * 25);
-                EngineControl.Ejected = false;
-            }
-            else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
-            EngineControl.EjectTimer = 2;
-            EngineControl.Hooked = false;
-            EngineControl.BrakeInput = 0;
-            EngineControl.LTriggerTapTime = 1;
-            EngineControl.RTriggerTapTime = 1;
-            EngineControl.Taxiinglerper = 0;
-            EngineControl.LGripLastFrame = false;
-            EngineControl.RGripLastFrame = false;
-            EngineControl.LStickSelection = 0;
-            EngineControl.RStickSelection = 0;
-            EngineControl.BrakeInput = 0;
-            EngineControl.LTriggerLastFrame = false;
-            EngineControl.RTriggerLastFrame = false;
-            EngineControl.HUDControl.MenuSoundCheckLast = 0;
-            EngineControl.AGMLocked = false;
-            EngineControl.AAMHasTarget = false;
-            EngineControl.DoAAMTargeting = false;
-            EngineControl.MissilesIncoming = 0;
-            EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
-            EngineControl.AAMLockTimer = 0;
-            EngineControl.AAMLocked = false;
-            if (EngineControl.CatapultStatus == 1) { EngineControl.CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
-
-            if (LeaveButton != null) { LeaveButton.SetActive(false); }
-            if (EngineControl.EffectsControl != null)
-            {
-                EngineControl.IsFiringGun = false;
-                EngineControl.EffectsControl.Smoking = false;
-            }
-            if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
-            if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
-            if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
-            //set plane's layer back
-            if (PlaneMesh != null)
-            {
-                Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
-                foreach (Transform child in children)
+                if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpilot", false); }
+                EngineControl.Piloting = false;
+                if (EngineControl.Ejected)
                 {
-                    child.gameObject.layer = Planelayer;
+                    EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel + EngineControl.VehicleMainObj.transform.up * 25);
+                    EngineControl.Ejected = false;
                 }
+                else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+                EngineControl.EjectTimer = 2;
+                EngineControl.Hooked = false;
+                EngineControl.BrakeInput = 0;
+                EngineControl.LTriggerTapTime = 1;
+                EngineControl.RTriggerTapTime = 1;
+                EngineControl.Taxiinglerper = 0;
+                EngineControl.LGripLastFrame = false;
+                EngineControl.RGripLastFrame = false;
+                EngineControl.LStickSelection = 0;
+                EngineControl.RStickSelection = 0;
+                EngineControl.BrakeInput = 0;
+                EngineControl.LTriggerLastFrame = false;
+                EngineControl.RTriggerLastFrame = false;
+                EngineControl.HUDControl.MenuSoundCheckLast = 0;
+                EngineControl.AGMLocked = false;
+                EngineControl.AAMHasTarget = false;
+                EngineControl.DoAAMTargeting = false;
+                EngineControl.MissilesIncoming = 0;
+                EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
+                EngineControl.AAMLockTimer = 0;
+                EngineControl.AAMLocked = false;
+                if (EngineControl.CatapultStatus == 1) { EngineControl.CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
 
+                if (LeaveButton != null) { LeaveButton.SetActive(false); }
+                if (EngineControl.EffectsControl != null)
+                {
+                    EngineControl.IsFiringGun = false;
+                    EngineControl.EffectsControl.Smoking = false;
+                }
+                if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
+                if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
+                if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
+                //set plane's layer back
+                if (PlaneMesh != null)
+                {
+                    Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+                    foreach (Transform child in children)
+                    {
+                        child.gameObject.layer = Planelayer;
+                    }
+
+                }
             }
         }
     }
