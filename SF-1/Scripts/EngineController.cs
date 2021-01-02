@@ -307,6 +307,7 @@ public class EngineController : UdonSharpBehaviour
     private float FullAGMsDivider;
     private float FullBombsDivider;
     private bool CanopyOpenCheck = true;
+    private Quaternion AGMCamLastFrame;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -433,9 +434,6 @@ public class EngineController : UdonSharpBehaviour
         ReversingPitchStrengthZero = PitchThrustVecMulti == 0 ? -ReversingPitchStrengthMulti : 1;
         ReversingYawStrengthZero = YawThrustVecMulti == 0 ? -ReversingYawStrengthMulti : 1;
         ReversingRollStrengthZero = RollThrustVecMulti == 0 ? -ReversingRollStrengthMulti : 1;
-
-        if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
-            AAMCurrentTargetEngineControl = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
 
         FullAAMsDivider = 1f / NumAAM;
         FullAGMsDivider = 1f / NumAGM;
@@ -1244,30 +1242,33 @@ public class EngineController : UdonSharpBehaviour
                         //AGM Camera, more in hudcontroller
                         if (!AGMLocked)
                         {
-                            Quaternion temp = Quaternion.identity;
+                            Quaternion newangle;
                             if (InVR)
                             {
-                                temp = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0);
+                                newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0);
                             }
                             else if (!InEditor)//desktop mode
                             {
-                                temp = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
+                                newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
                             }
                             else//editor
                             {
-                                temp = VehicleMainObj.transform.rotation;
+                                newangle = VehicleMainObj.transform.rotation;
                             }
-                            AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, temp, 70f * DeltaTime);
+                            float ZoomLevel = AtGCam.fieldOfView / 90;
+                            AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, ZoomLevel * 70f * DeltaTime);
 
                             if (AtGCam != null)
                             {
-                                AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotSlerper * Vector3.forward);
+                                AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamLastFrame * Vector3.forward);
+                                // AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotSlerper * Vector3.forward);
                                 AtGCam.transform.rotation = AGMCamRotSlerper;
-                                //dunno if there's a better way to do this
+
                                 Vector3 temp2 = AtGCam.transform.localRotation.eulerAngles;
                                 temp2.z = 0;
                                 AtGCam.transform.localRotation = Quaternion.Euler(temp2);
                             }
+                            AGMCamLastFrame = newangle;
                         }
 
 
@@ -1603,7 +1604,19 @@ public class EngineController : UdonSharpBehaviour
                 }
                 else//if cruise control disabled, use inputs
                 {
-                    ThrottleInput = PlayerThrottle;
+                    if (!InVR)
+                    {
+                        if (LTrigger > .07f)
+                            ThrottleInput = LTrigger;
+                        else
+                        {
+                            ThrottleInput = PlayerThrottle;
+                        }
+                    }
+                    else
+                    {
+                        ThrottleInput = PlayerThrottle;
+                    }
                 }
                 Fuel = Mathf.Clamp(Fuel - ((FuelConsumption * Mathf.Max(ThrottleInput, 0.35f)) * DeltaTime), 0, FullFuel);
                 if (Fuel < 200) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / 200), 0, 1);
@@ -1666,6 +1679,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (!InVR)
                     {
+                        //allow stick flight with gamepads
                         VRPitchRollInput = LStick;
                         JoystickPosYaw.x = RStick.x;
                         //make stick input square
@@ -1754,14 +1768,6 @@ public class EngineController : UdonSharpBehaviour
                     }
                     else VehicleRigidbody.velocity = Vector3.zero;
                 }
-                PilotingInt = 0;
-                roll = 0;
-                pitch = 0;
-                yaw = 0;
-                RollInput = 0;
-                PitchInput = 0;
-                YawInput = 0;
-                ThrottleInput = 0;
                 /*                 PitchInput = Trim.x;
                                 YawInput = Trim.y; */
             }
@@ -2207,6 +2213,7 @@ public class EngineController : UdonSharpBehaviour
         Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - CenterOfMass.transform.position);
         float NextTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
+        bool AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
 
         if (TargetChecker.activeInHierarchy)
         {
@@ -2221,13 +2228,14 @@ public class EngineController : UdonSharpBehaviour
             {
                 RaycastHit hitnext;
                 //raycast to check if it's behind something
-                Physics.Raycast(HUDControl.transform.position, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+                bool LineOfSightNext = Physics.Raycast(HUDControl.transform.position, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
 
-                if (hitnext.point != null
+                if ((LineOfSightNext
                     && hitnext.collider.gameObject.layer == OutsidePlaneLayer
                         && NextTargetAngle < Lock_Angle
                             && NextTargetDistance < AAMMaxTargetDistance
                                 && NextTargetAngle < AAMCurrentTargetAngle)
+                                    || (!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                 {
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;
@@ -2236,6 +2244,7 @@ public class EngineController : UdonSharpBehaviour
                     AAMCurrentTargetEngineControl = NextTargetEngineControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable time to update before sending targeted
+                    AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
                     if (HUDControl != null)
                     {
                         HUDControl.GUN_TargetSpeedLerper = 0f;
@@ -2254,7 +2263,7 @@ public class EngineController : UdonSharpBehaviour
             AAMTargetChecker = 0;
 
         //if target is currently in front of plane, lock onto it
-        if (AAMCurrentTargetEngineControl == null)
+        if (AAMCurrentTargetEngineControlNull)
         { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HUDControl.transform.position; }
         else
         { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HUDControl.transform.position; }
@@ -2262,16 +2271,16 @@ public class EngineController : UdonSharpBehaviour
         //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
         //raycast to check if it's behind something
         RaycastHit hitcurrent;
-        Physics.Raycast(HUDControl.transform.position, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+        bool LineOfSightCur = Physics.Raycast(HUDControl.transform.position, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
         //used to make lock remain for .25 seconds after target is obscured
-        if (hitcurrent.point == null || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
+        if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
         { AAMTargetObscuredDelay += DeltaTime; }
         else
         { AAMTargetObscuredDelay = 0; }
 
         if (!Taxiing
             && AAMTargets[AAMTarget].activeInHierarchy
-                && (AAMCurrentTargetEngineControl == null || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
+                && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
         {
             if ((AAMTargetObscuredDelay < .25f)
                     && AAMCurrentTargetAngle < Lock_Angle
@@ -2280,7 +2289,7 @@ public class EngineController : UdonSharpBehaviour
                 AAMHasTarget = true;
                 if (NumAAM > 0) AAMLockTimer += DeltaTime;
                 //give enemy radar lock even if you're out of missiles
-                if (AAMCurrentTargetEngineControl != null && RStickSelection == 2)
+                if (!AAMCurrentTargetEngineControlNull && RStickSelection == 2)
                 {
                     //target is a plane
                     AAMTargetedTimer += DeltaTime;
@@ -2553,6 +2562,17 @@ public class EngineController : UdonSharpBehaviour
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff");
             }
         }
+    }
+    public void ZeroControlValues()
+    {
+        PilotingInt = 0;
+        roll = 0;
+        pitch = 0;
+        yaw = 0;
+        RollInput = 0;
+        PitchInput = 0;
+        YawInput = 0;
+        ThrottleInput = 0;
     }
     private void Assert(bool condition, string message)
     {

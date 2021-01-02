@@ -376,22 +376,21 @@ public class HUDController : UdonSharpBehaviour
             {
                 AtGScreen.SetActive(true);
                 EngineControl.AtGCam.gameObject.SetActive(true);
-                float newzoom = 0;
                 //if turning camera fast, zoom out
-                if (EngineControl.AGMRotDif < .8f)
+                if (EngineControl.AGMRotDif < .13f)
                 {
                     RaycastHit camhit;
                     Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                     if (camhit.point != null)
                     {
                         //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
-                        newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
+                        float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
                         EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 1.5f * DeltaTime), 0.3f, 90);
                     }
                 }
                 else
                 {
-                    newzoom = 80;
+                    float newzoom = 80;
                     EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 3.5f * DeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
             }

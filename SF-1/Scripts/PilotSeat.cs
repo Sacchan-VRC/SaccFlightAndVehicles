@@ -143,7 +143,7 @@ public class PilotSeat : UdonSharpBehaviour
                     EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel + EngineControl.VehicleMainObj.transform.up * 25);
                     EngineControl.Ejected = false;
                 }
-                else EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
+                else { EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel); }
                 EngineControl.EjectTimer = 2;
                 EngineControl.Hooked = false;
                 EngineControl.BrakeInput = 0;
@@ -165,6 +165,7 @@ public class PilotSeat : UdonSharpBehaviour
                 EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
                 EngineControl.AAMLockTimer = 0;
                 EngineControl.AAMLocked = false;
+                EngineControl.ZeroControlValues();
                 if (EngineControl.CatapultStatus == 1) { EngineControl.CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
 
                 if (LeaveButton != null) { LeaveButton.SetActive(false); }

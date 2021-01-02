@@ -55,6 +55,7 @@ public class AAMController : UdonSharpBehaviour
     }
     void LateUpdate()
     {
+        float DeltaTime = Time.deltaTime;
         //Debug.Log(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
         if (!ColliderActive)
         {
@@ -81,11 +82,7 @@ public class AAMController : UdonSharpBehaviour
             }
             else Explode();//explode and give Lifetime another 10 seconds
         }
-    }
 
-    private void FixedUpdate()
-    {
-        float DeltaTime = Time.deltaTime;
         Vector3 Position = transform.position;
         Vector3 TargetPos = Target.position;
         float TargetDistance = Vector3.Distance(Position, TargetPos);
@@ -119,7 +116,6 @@ public class AAMController : UdonSharpBehaviour
         TargDistlastframe = TargetDistance;
         Lifetime += DeltaTime;
     }
-
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
