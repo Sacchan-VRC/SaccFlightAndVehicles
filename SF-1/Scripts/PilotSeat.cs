@@ -30,26 +30,25 @@ public class PilotSeat : UdonSharpBehaviour
     {
         if (EngineControl.VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.VehicleMainObj); }
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
-        if (EngineControl != null)
+
+        EngineControl.Throttle = 0;
+        EngineControl.ThrottleInput = 0;
+        EngineControl.PlayerThrottle = 0;
+        EngineControl.IsFiringGun = false;
+        EngineControl.VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
+        if (!EngineControl.InEditor)
         {
-            EngineControl.Throttle = 0;
-            EngineControl.ThrottleInput = 0;
-            EngineControl.PlayerThrottle = 0;
-            EngineControl.IsFiringGun = false;
-            EngineControl.VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
-            if (!EngineControl.InEditor)
-            {
-                EngineControl.localPlayer.UseAttachedStation();
-                Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
-            }
-            EngineControl.Piloting = true;
-            //canopy closed/open sound
-            if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100000 - EngineControl.CanopyCloseTime;
-            else EngineControl.CanopyCloseTimer = -EngineControl.CanopyCloseTime;//less than 0
-            if (EngineControl.dead) EngineControl.Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
+            EngineControl.localPlayer.UseAttachedStation();
+            Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
         }
+        EngineControl.Piloting = true;
+        //canopy closed/open sound
+        if (EngineControl.dead) EngineControl.Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
+
         if (EngineControl.EffectsControl != null)
         {
+            if (EngineControl.EffectsControl.CanopyOpen) { EngineControl.CanopyCloseTimer = -100000 - EngineControl.CanopyCloseTime; }
+            else EngineControl.CanopyCloseTimer = -EngineControl.CanopyCloseTime;//less than 0
             if (!EngineControl.InEditor)
             { Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject); }
             EngineControl.EffectsControl.Smoking = false;
@@ -90,17 +89,18 @@ public class PilotSeat : UdonSharpBehaviour
         if (player != null)
         {
             EngineControl.PilotName = player.displayName;
-            EngineControl.Pilot = player;
+            EngineControl.PilotID = player.playerId;
 
             //voice range change to allow talking inside cockpit (after VRC patch 1008)
-            LeaveButtonControl.SeatedPlayer = player;
+            LeaveButtonControl.SeatedPlayer = player.playerId;
             if (player.isLocal)
             {
                 foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
-                {
-                    if (crew.SeatedPlayer != null)
+                {//get get a fresh VRCPlayerAPI every time to prevent players who left leaving a broken one behind and causing crashes
+                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew.SeatedPlayer);
+                    if (guy != null)
                     {
-                        SetVoiceInside(crew.SeatedPlayer);
+                        SetVoiceInside(guy);
                     }
                 }
             }
@@ -109,20 +109,27 @@ public class PilotSeat : UdonSharpBehaviour
                 SetVoiceInside(player);
             }
         }
-        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", true); }
+        if (EngineControl.EffectsControl != null)
+        {
+            EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", true);
+            EngineControl.EffectsControl.DoEffects = 0f;
+        }
         EngineControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
-        //wakeup potentially sleeping controllers
-        EngineControl.EffectsControl.DoEffects = 0f;
-        EngineControl.SoundControl.Wakeup();
+                                   //wakeup potentially sleeping controllers
+        if (EngineControl.SoundControl != null) { EngineControl.SoundControl.Wakeup(); }
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
         EngineControl.SetSmokingOff();
         EngineControl.SetAfterburnerOff();
         EngineControl.PilotName = string.Empty;
-        EngineControl.Pilot = null;
-        LeaveButtonControl.SeatedPlayer = null;
-        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("occupied", false); }
+        EngineControl.PilotID = -1;
+        EngineControl.IsFiringGun = false;
+        LeaveButtonControl.SeatedPlayer = -1;
+        if (EngineControl.EffectsControl != null)
+        {
+            EngineControl.EffectsControl.EffectsLeavePlane();
+        }
         if (player != null)
         {
             SetVoiceOutside(player);
@@ -131,12 +138,12 @@ public class PilotSeat : UdonSharpBehaviour
                 //undo voice distances of all players inside the vehicle
                 foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
                 {
-                    if (crew.SeatedPlayer != null)
+                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew.SeatedPlayer);
+                    if (guy != null)
                     {
-                        SetVoiceOutside(crew.SeatedPlayer);
+                        SetVoiceOutside(guy);
                     }
                 }
-                if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpilot", false); }
                 EngineControl.Piloting = false;
                 if (EngineControl.Ejected)
                 {
@@ -162,18 +169,12 @@ public class PilotSeat : UdonSharpBehaviour
                 EngineControl.AAMHasTarget = false;
                 EngineControl.DoAAMTargeting = false;
                 EngineControl.MissilesIncoming = 0;
-                EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
                 EngineControl.AAMLockTimer = 0;
                 EngineControl.AAMLocked = false;
                 EngineControl.ZeroControlValues();
                 if (EngineControl.CatapultStatus == 1) { EngineControl.CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
 
                 if (LeaveButton != null) { LeaveButton.SetActive(false); }
-                if (EngineControl.EffectsControl != null)
-                {
-                    EngineControl.IsFiringGun = false;
-                    EngineControl.EffectsControl.Smoking = false;
-                }
                 if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
                 if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
                 if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
@@ -185,7 +186,6 @@ public class PilotSeat : UdonSharpBehaviour
                     {
                         child.gameObject.layer = Planelayer;
                     }
-
                 }
             }
         }

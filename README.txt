@@ -1,9 +1,24 @@
 Sacchan's Flight and Vehicles Prefab
-FOR VRChat SDK3 WITH UDONSHARP
-https://github.com/Merlin-san/UdonSharp/releases
+FOR VRChat SDK3 WITH UDONSHARP: https://github.com/Merlin-san/UdonSharp/releases
+
 https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 Feel free to give feedback or ask questions
+Support me:
+https://liberapay.com/Sacchan-VRC/
+Bitcoin:bc1q40l0d3582twp3rga4wjrwhepwse4esz4x5y5wa
+ETH:0x975aeF286851BB6E43AaF2299b17045ad1D0eab8
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Small Update 1.38
+•Workaround to allow players to hear each other talking in cockpit again (VRChat patch broke it)
+•Various Functions of the plane are no longer synced using synced variables (Flaps, Gear, Canopy, AB, Hook, Smoking, Missle/Bomb Ammo)
+For late joiners things will sync when toggled or the plane respawns.
+This should allow for more planes as each plane has less network overhead.
+•AGM Cam smoothing
+•Added Russian translation for the guide (Thanks AleksWS)
+•Various events added to the animator
+•Fixed Plane using its ground brake in the air when unoccupied, and other physics while unoccupied
+•No longer required to set up VRChat inputs in Unity, they're only checked in-game now
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.37
 •Gun Lead Indicator smoother
@@ -164,8 +179,6 @@ This can be used to do other things like F-14 wings moving back at a certain spe
 
 The angle of attack variable is 0 at 0 AoA, and 1 at 180.
 
-For control inputs to work in editor play mode you must add the VRChat inputs to your unity project. Just filling in the name entry is fine, It needs them to compile. See inputs.png and inputs.txt
-
 Remember you can test fly the vehicles inside unity by adding a camera to them. Recommend adding camera as child of HudController. Set camera view distance beyond 15,000m~ to see the HUD.
 You can test buttons by clicking Interact in the inspecter with the object selected(PilotSeat etc), some may crash in the editor but not ingame.
 You can also test the animator variables, but some are set every frame so you won't be able to change them without altering or disabling the script.
@@ -192,7 +205,7 @@ The Gun_pilot is set to not collide with reserved2 layer. The plane is set to re
 
 Never leave an entry of an array input empty in EffectsController and SoundController, it'll cause them to crash.
 
-The hud can be made to appear smaller by moving all elements inside the 'bigstuff' object forward. 'bigstuff' is a child of HudController.
+The hud can be made to appear smaller by moving all children of the 'bigstuff' object +Z local. 'bigstuff' is a child of HudController.
 
 Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController).
 Doing animations using the animator is most performant, so I've used it where possible. HUD stuff included.
@@ -228,7 +241,7 @@ The children of this are all things that are disabled when you're not inside the
 To test the plane in editor mode, add a camera to this object with no change to position or rotation, and increase the view distance of that camera beyond 15,000m~ to see the HUD.
 HUDController is only enabled when inside the vehicle.
 many objects that are only enabled while inside the plane are children of the HudController.
-HUDController's bigstuff child object is scaled to 8000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
+HUDController's bigstuff child object is scaled to 1000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
 PilotSeat--------
 A custom station with the seat adjuster for entering the plane
 PassengerSeat--------
@@ -1137,6 +1150,12 @@ Speed of acceleration.
 Back Thrust Strength
 Amount of extra thrust applied when trying to slow down (Thrusting away from velocity vector)
 
+MultiObjectToggle.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+A simple script for enabling different objects one at a time in order when interactacted with.
+
+Variables:
+ToggleObjs
+Array of objects to toggle through.
 
 SaccSeatAdjuster.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 This script adjusts the height of a seat object until your avatar's head bone is within 1cm of the target height object, then disables itself.

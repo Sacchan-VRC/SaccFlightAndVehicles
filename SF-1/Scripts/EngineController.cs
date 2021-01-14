@@ -136,7 +136,7 @@ public class EngineController : UdonSharpBehaviour
 
 
 
-    [System.NonSerializedAttribute] public VRCPlayerApi Pilot;
+    [System.NonSerializedAttribute] public int PilotID;
     [System.NonSerializedAttribute] public string PilotName;
     [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
     [System.NonSerializedAttribute] public ConstantForce VehicleConstantForce;
@@ -288,8 +288,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int FullAGMs;
     [System.NonSerializedAttribute] public int FullBombs;
     [System.NonSerializedAttribute] public float FullGunAmmo;
-    private int PilotingInt;//1 if piloting 0 if not
-    /* [System.NonSerializedAttribute] */
     [System.NonSerializedAttribute] public int MissilesIncoming = 0;
     [System.NonSerializedAttribute] public EngineController AAMCurrentTargetEngineControl;
     private float LastBombDropTime = 0f;
@@ -361,7 +359,8 @@ public class EngineController : UdonSharpBehaviour
         if (localPlayer == null) { InEditor = true; Piloting = true; }
         else
         {
-            InEditor = false; if (localPlayer.IsUserInVR()) { InVR = true; }
+            InEditor = false;
+            if (localPlayer.IsUserInVR()) { InVR = true; }
         }
 
 
@@ -444,12 +443,13 @@ public class EngineController : UdonSharpBehaviour
     {
         float DeltaTime = Time.deltaTime;
         if (!InEditor) { IsOwner = localPlayer.IsOwner(VehicleMainObj); }
+        else { IsOwner = true; }
         if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 2049 /* Default and Environment */))
         { Taxiing = true; }
         else { Taxiing = false; }
 
 
-        if (IsOwner || InEditor)//works in editor or ingame
+        if (IsOwner)//works in editor or ingame
         {
             if (!dead)
             {
@@ -522,7 +522,6 @@ public class EngineController : UdonSharpBehaviour
 
             if (Piloting)
             {
-                PilotingInt = 1;
                 Occupied = true;
                 //collect inputs
                 int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as floats
@@ -553,7 +552,7 @@ public class EngineController : UdonSharpBehaviour
                     RStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                     LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
                     RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
-                    LTrigger = LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                    LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                     RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                 }
                 //MouseX = Input.GetAxisRaw("Mouse X");
@@ -737,7 +736,7 @@ public class EngineController : UdonSharpBehaviour
                 //brake is done later because it has to be after switches
 
                 //LStick Selection wheel
-                if (LStick.magnitude > .7f && InVR)
+                if (InVR && LStick.magnitude > .7f)
                 {
                     float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), LStick);
 
@@ -784,7 +783,7 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 //RStick Selection wheel
-                if (RStick.magnitude > .7f && InVR)
+                if (InVR && RStick.magnitude > .7f)
                 {
                     float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), RStick);//that number is 22.5 degrees to the left of straight up
                     //R stick value is manually synced using events because i don't want to use too many synced variables.
@@ -912,7 +911,7 @@ public class EngineController : UdonSharpBehaviour
                     case 0://player just got in and hasn't selected anything
                         BrakeInput = 0;
                         break;
-                    case 1://Cruise
+                    case 1://Afterburner
                         if (LTrigger > 0.75)
                         {
                             if (!LTriggerLastFrame)
@@ -1066,7 +1065,7 @@ public class EngineController : UdonSharpBehaviour
                         }
                         BrakeInput = 0;
                         break;
-                    case 8://Afterburner
+                    case 8://Cruise
                         if (LTrigger > 0.75)
                         {
                             if (!LTriggerLastFrame)
@@ -1256,7 +1255,7 @@ public class EngineController : UdonSharpBehaviour
                                 newangle = VehicleMainObj.transform.rotation;
                             }
                             float ZoomLevel = AtGCam.fieldOfView / 90;
-                            AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, ZoomLevel * 70f * DeltaTime);
+                            AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, ZoomLevel * 220f * DeltaTime);
 
                             if (AtGCam != null)
                             {
@@ -1606,7 +1605,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (!InVR)
                     {
-                        if (LTrigger > .07f)
+                        if (LTrigger > .05f)//axis throttle input for people who wish to use it //.07 deadzone so it doesn't take effect for keyboard users
                             ThrottleInput = LTrigger;
                         else
                         {
@@ -1679,7 +1678,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (!InVR)
                     {
-                        //allow stick flight with gamepads
+                        //allow stick flight in desktop mode
                         VRPitchRollInput = LStick;
                         JoystickPosYaw.x = RStick.x;
                         //make stick input square
@@ -1735,13 +1734,6 @@ public class EngineController : UdonSharpBehaviour
                     ReversingRollStrength = ReversingRollStrengthZero;
                 }
 
-                //flip ur Vehicle to upright and stop rotating
-                /*if (Input.GetButtonDown("Oculus_CrossPlatform_Button2") || (Input.GetKeyDown(KeyCode.T)))
-                 {
-                     VehicleMainObj.transform.rotation = Quaternion.Euler(VehicleMainObj.transform.rotation.eulerAngles.x, VehicleMainObj.transform.rotation.eulerAngles.y, 0f);
-                     VehicleRigidbody.angularVelocity *= .3f;
-                 }*/
-
                 pitch = Mathf.Clamp(PitchInput/*  + Trim.x */, -1, 1) * PitchStrength * ReversingPitchStrength;
                 yaw = Mathf.Clamp(-YawInput/*  - Trim.y */, -1, 1) * YawStrength * ReversingYawStrength;
                 roll = RollInput * RollStrength * ReversingRollStrength;
@@ -1752,7 +1744,7 @@ public class EngineController : UdonSharpBehaviour
                     pitch *= PitchDownStrMulti;
                 }
 
-                //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it. Heard it doesn't happen so bad if rigidbody weight is realistic.
+                //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it. Heard it doesn't happen so bad if rigidbody weight is much higer.
                 if (Speed < .2 && ThrottleInput > 0)
                     VehicleRigidbody.velocity = VehicleRigidbody.transform.forward * 0.25f;
             }
@@ -1882,8 +1874,8 @@ public class EngineController : UdonSharpBehaviour
                             (LerpedRoll * Atmosphere) + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere));// Z Roll
 
                     //create values for use in fixedupdate (control input and straightening forces)
-                    Pitching = (((VehicleMainObj.transform.up * LerpedPitch * Atmosphere + (VehicleMainObj.transform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift * Atmosphere)) * 90)) * PilotingInt;
-                    Yawing = (((VehicleMainObj.transform.right * LerpedYaw * Atmosphere + (-VehicleMainObj.transform.right * sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift * Atmosphere)) * 90)) * PilotingInt;
+                    Pitching = (((VehicleMainObj.transform.up * LerpedPitch * Atmosphere + (VehicleMainObj.transform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift * Atmosphere)) * 90));
+                    Yawing = (((VehicleMainObj.transform.right * LerpedYaw * Atmosphere + (-VehicleMainObj.transform.right * sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift * Atmosphere)) * 90));
 
                     VehicleConstantForce.relativeForce = FinalInputAcc;
                     VehicleConstantForce.relativeTorque = FinalInputRot;
@@ -1934,7 +1926,7 @@ public class EngineController : UdonSharpBehaviour
         {
             Speed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
-            //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value to stop spazzing
+            //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
             VehicleRigidbody.angularDrag = .3f;
             //AirVel = VehicleRigidbody.velocity - Wind;
             //AirSpeed = AirVel.magnitude;
@@ -1947,7 +1939,7 @@ public class EngineController : UdonSharpBehaviour
     }
     private void FixedUpdate()
     {
-        if (IsOwner || InEditor)
+        if (IsOwner)
         {
             if (DoAAMTargeting)
             {
@@ -1966,13 +1958,9 @@ public class EngineController : UdonSharpBehaviour
             LastFrameVel = VehicleRigidbody.velocity;
         }
     }
-    public override void OnOwnershipTransferred()
-    {
-        SetSmokingOff();
-    }
     private void ToggleCanopy()
     {
-        if (CanopyCloseTimer < (-100000 - CanopyCloseTime))
+        if (CanopyCloseTimer <= -100000)
         {
             EffectsControl.SetCanopyClosed();
         }
@@ -2151,23 +2139,12 @@ public class EngineController : UdonSharpBehaviour
         CatapultStatus = 0;
         PlayerThrottle = 0;
         MissilesIncoming = 0;
-        EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
-        EffectsControl.PlaneAnimator.SetTrigger("explode");
-        EffectsControl.PlaneAnimator.SetInteger("weapon", 0);
-        EffectsControl.PlaneAnimator.SetBool("occupied", false);
-        EffectsControl.DoEffects = 0f; //keep awake
-        EffectsControl.CanopyOpening();
+        SetAfterburnerOff();
         SetSmokingOff();
         SetLimitsOn();
         SetHookUp();
         SetGearDown();
         SetFlapsOn();
-        if (!EffectsControl.FrontWheelNull) EffectsControl.FrontWheel.localRotation = Quaternion.identity;
-        if (HasCanopy)
-        {
-            EffectsControl.CanopyOpen = true;
-            CanopyCloseTimer = -100000 - CanopyCloseTime;
-        }
         //EngineControl.Trim = Vector2.zero;
         Hooked = false;
         AAMLaunchOpositeSide = false;
@@ -2181,9 +2158,11 @@ public class EngineController : UdonSharpBehaviour
         RStickSelection = 0;
         LStickSelection = 0;
 
+        if (HasCanopy) { EffectsControl.CanopyOpening(); }
+        EffectsControl.EffectsExplode();
         SoundControl.Explode_Sound();
 
-        if (IsOwner || InEditor)
+        if (IsOwner)
         {
             VehicleRigidbody.velocity = Vector3.zero;
             Health = FullHealth;//turns off low health smoke
@@ -2204,6 +2183,7 @@ public class EngineController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
         float AAMCurrentTargetAngle = Vector3.Angle(VehicleMainObj.transform.forward, (AAMCurrentTargetPosition - CenterOfMass.transform.position));
+        Vector3 HudControlPosition = HUDControl.transform.position;
 
         //check 1 target per frame to see if it's infront of us and worthy of being our current target
         var TargetChecker = AAMTargets[AAMTargetChecker];
@@ -2228,7 +2208,7 @@ public class EngineController : UdonSharpBehaviour
             {
                 RaycastHit hitnext;
                 //raycast to check if it's behind something
-                bool LineOfSightNext = Physics.Raycast(HUDControl.transform.position, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+                bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
 
                 if ((LineOfSightNext
                     && hitnext.collider.gameObject.layer == OutsidePlaneLayer
@@ -2264,14 +2244,14 @@ public class EngineController : UdonSharpBehaviour
 
         //if target is currently in front of plane, lock onto it
         if (AAMCurrentTargetEngineControlNull)
-        { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HUDControl.transform.position; }
+        { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
         else
-        { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HUDControl.transform.position; }
+        { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HudControlPosition; }
         float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
         //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
         //raycast to check if it's behind something
         RaycastHit hitcurrent;
-        bool LineOfSightCur = Physics.Raycast(HUDControl.transform.position, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+        bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
         //used to make lock remain for .25 seconds after target is obscured
         if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
         { AAMTargetObscuredDelay += DeltaTime; }
@@ -2563,12 +2543,44 @@ public class EngineController : UdonSharpBehaviour
             }
         }
     }
+    public void RespawnStatusLocal()//called when using respawn button
+    {
+        Networking.SetOwner(localPlayer, VehicleMainObj);
+        Networking.SetOwner(localPlayer, gameObject);
+        Networking.SetOwner(localPlayer, EffectsControl.gameObject);
+        VehicleMainObj.transform.position = new Vector3(VehicleMainObj.transform.position.x, -10000, VehicleMainObj.transform.position.z);
+        //synced variables
+        Health = FullHealth;
+        Fuel = FullFuel;
+        GunAmmoInSeconds = FullGunAmmo;
+    }
+    public void ResetStatus()//called when using respawn button
+    {
+        SetFlapsOn();
+        SetGearDown();
+        SetHookUp();
+        SetSmokingOff();
+        SetLimitsOn();
+        if (HasCanopy && !EffectsControl.CanopyOpen) { EffectsControl.SetCanopyOpen(); }
+        NumAAM = FullAAMs;
+        NumAGM = FullAGMs;
+        NumBomb = FullBombs;
+        AAMLaunchOpositeSide = false;
+        AGMLaunchOpositeSide = false;
+        BombPoint = 0;
+        EffectsControl.DoEffects = 6;
+        dead = true;//this makes it invincible and unable to be respawned again for 5s
+        EffectsControl.PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead after 5s
+        EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
+    }
     public void ZeroControlValues()
     {
-        PilotingInt = 0;
         roll = 0;
         pitch = 0;
         yaw = 0;
+        LerpedPitch = 0;
+        LerpedRoll = 0;
+        LerpedYaw = 0;
         RollInput = 0;
         PitchInput = 0;
         YawInput = 0;

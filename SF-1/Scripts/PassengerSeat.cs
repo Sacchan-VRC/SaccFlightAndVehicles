@@ -49,14 +49,15 @@ public class PassengerSeat : UdonSharpBehaviour
         //voice range change to allow talking inside cockpit (after VRC patch 1008)
         if (player != null)
         {
-            LeaveButtonControl.SeatedPlayer = player;
+            LeaveButtonControl.SeatedPlayer = player.playerId;
             if (player.isLocal)
             {
                 foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
                 {
-                    if (crew.SeatedPlayer != null)
+                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew.SeatedPlayer);
+                    if (guy != null)
                     {
-                        SetVoiceInside(crew.SeatedPlayer);
+                        SetVoiceInside(guy);
                     }
                 }
             }
@@ -70,16 +71,17 @@ public class PassengerSeat : UdonSharpBehaviour
     {
         if (player != null)
         {
-            LeaveButtonControl.SeatedPlayer = null;
+            LeaveButtonControl.SeatedPlayer = -1;
             SetVoiceOutside(player);
             if (player.isLocal)
             {
                 //undo voice distances of all players inside the vehicle
                 foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
                 {
-                    if (crew.SeatedPlayer != null)
+                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew.SeatedPlayer);
+                    if (guy != null)
                     {
-                        SetVoiceOutside(crew.SeatedPlayer);
+                        SetVoiceOutside(guy);
                     }
                 }
                 if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }

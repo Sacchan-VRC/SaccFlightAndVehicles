@@ -377,7 +377,7 @@ public class HUDController : UdonSharpBehaviour
                 AtGScreen.SetActive(true);
                 EngineControl.AtGCam.gameObject.SetActive(true);
                 //if turning camera fast, zoom out
-                if (EngineControl.AGMRotDif < .13f)
+                if (EngineControl.AGMRotDif < 2.5f)
                 {
                     RaycastHit camhit;
                     Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);

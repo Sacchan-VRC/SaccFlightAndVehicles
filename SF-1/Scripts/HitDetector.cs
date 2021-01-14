@@ -64,7 +64,6 @@ public class HitDetector : UdonSharpBehaviour
             }
         }
     }
-
     public void Respawn_event()//called by Respawn()
     {
         //re-enable plane model and effects

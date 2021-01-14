@@ -532,7 +532,14 @@ public class SoundController : UdonSharpBehaviour
                 if (SonicBoom[rand] != null)
                 {
                     SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
-                    SonicBoom[rand].PlayDelayed((SonicBoomDistance - SonicBoomWave) / 343);
+                    float delay = (SonicBoomDistance - SonicBoomWave) / 343;
+                    if (delay > 7)
+                    {
+                    }
+                    else
+                    {
+                        SonicBoom[rand].PlayDelayed(delay);
+                    }
                 }
             }
         }
@@ -566,7 +573,6 @@ public class SoundController : UdonSharpBehaviour
             idle.pitch = 0;
             idle.volume = 0;
         }
-
     }
     public void Wakeup()
     {

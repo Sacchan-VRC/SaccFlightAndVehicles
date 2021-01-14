@@ -8,7 +8,7 @@ public class LeaveVehicleButton : UdonSharpBehaviour
 {
     public EngineController EngineControl;
     public VRCStation Seat;
-    public VRCPlayerApi SeatedPlayer;//used for messing with voice volumes
+    [System.NonSerializedAttribute] public int SeatedPlayer;//used for messing with voice volumes
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -36,7 +36,7 @@ public class LeaveVehicleButton : UdonSharpBehaviour
 
     public void ExitStation()
     {
-        if (gameObject.activeSelf)//so we only exit our own seat when all seats are called
+        if (gameObject.activeSelf)//so we only exit our own seat when all seats are called(Explode)
             if (Seat != null) { Seat.ExitStation(EngineControl.localPlayer); }
     }
     private void Assert(bool condition, string message)

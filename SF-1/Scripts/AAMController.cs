@@ -9,8 +9,8 @@ public class AAMController : UdonSharpBehaviour
     public EngineController EngineControl;
     public float MaxLifetime = 12;
     public AudioSource[] ExplosionSounds;
-    public float ColliderActiveDistance = 30;
-    public float RotSpeed = 360;
+    public float ColliderActiveDistance = 45;
+    public float RotSpeed = 400;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
     private float Lifetime = 0;
@@ -53,7 +53,7 @@ public class AAMController : UdonSharpBehaviour
             LockHack = false;
         }
     }
-    void LateUpdate()
+    void FixedUpdate()
     {
         float DeltaTime = Time.deltaTime;
         //Debug.Log(gameObject.GetComponent<Rigidbody>().velocity.magnitude);

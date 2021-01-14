@@ -62,7 +62,7 @@ public class EffectsController : UdonSharpBehaviour
     private Vector3 YawLerper = Vector3.zero;
     private Vector3 RollLerper = Vector3.zero;
     private Vector3 EngineLerper = Vector3.zero;
-    private Vector3 Enginefireerper = new Vector3(1, 0.6f, 1);
+    private Vector3 EnginefireLerper = new Vector3(1, 0.6f, 1);
     [System.NonSerializedAttribute] public float AirbrakeLerper;
     [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     private float brake;
@@ -133,7 +133,7 @@ public class EffectsController : UdonSharpBehaviour
     public void Effects()
     {
         float DeltaTime = Time.deltaTime;
-        if (EngineControl.InEditor || EngineControl.IsOwner)
+        if (EngineControl.IsOwner)
         {
             rotationinputs.x = /* Mathf.Clamp( */EngineControl.PitchInput/*  + EngineControl.Trim.x , -1, 1)*/ * 25;
             rotationinputs.y = /* Mathf.Clamp( */EngineControl.YawInput/*  + EngineControl.Trim.y , -1, 1)*/ * 20;
@@ -150,7 +150,7 @@ public class EffectsController : UdonSharpBehaviour
         PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * DeltaTime);
         RollLerper.y = Mathf.Lerp(RollLerper.y, rotationinputs.z, 4.5f * DeltaTime);
         YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * DeltaTime);
-        Enginefireerper.y = Mathf.Lerp(Enginefireerper.y, EngineControl.Throttle, .9f * DeltaTime);
+        EnginefireLerper.y = Mathf.Lerp(EnginefireLerper.y, EngineControl.Throttle, .9f * DeltaTime);
 
         if (EngineControl.Occupied == true)
         {
@@ -166,7 +166,7 @@ public class EffectsController : UdonSharpBehaviour
             }
 
         }
-        else { DoEffects += DeltaTime; PlaneAnimator.SetBool("gunfiring", false); }
+        else { DoEffects += DeltaTime; }
 
         /*         if (!ElevonLNull) ElevonL.localRotation = Quaternion.Euler(0, RollLerper.y + -PitchLerper.x, 0);
                 if (!ElevonRNull) ElevonR.localRotation = Quaternion.Euler(0, RollLerper.y + PitchLerper.x, 0);
@@ -200,7 +200,7 @@ public class EffectsController : UdonSharpBehaviour
                 foreach (Transform fire in Enginefire)
                 {
                     fire.gameObject.SetActive(true);
-                    fire.localScale = Enginefireerper;
+                    fire.localScale = EnginefireLerper;
                 }
             }
             else
@@ -231,17 +231,9 @@ public class EffectsController : UdonSharpBehaviour
     private void LargeEffects()//large effects visible from a long distance
     {
         float DeltaTime = Time.deltaTime;
-        if (EngineControl.Occupied == true)
+        PlaneAnimator.SetBool("gunfiring", EngineControl.IsFiringGun);
+        if (EngineControl.Occupied)
         {
-            if (EngineControl.IsFiringGun) //send firing to animator
-            {
-                PlaneAnimator.SetBool("gunfiring", true);
-            }
-            else
-            {
-                PlaneAnimator.SetBool("gunfiring", false);
-            }
-
             if (Smoking && !DisplaySmokeNull)
             {
                 SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * DeltaTime);
@@ -294,7 +286,28 @@ public class EffectsController : UdonSharpBehaviour
         { EngineControl.CanopyCloseTimer = EngineControl.CanopyCloseTime; }
         PlaneAnimator.SetBool("canopyopen", false);
     }
-
+    public void EffectsExplode()//called from enginecontroller.explode();
+    {
+        PlaneAnimator.SetInteger("missilesincoming", 0);
+        PlaneAnimator.SetTrigger("explode");
+        PlaneAnimator.SetInteger("weapon", 0);
+        if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
+        DoEffects = 0f; //keep awake
+        PlaneAnimator.SetBool("occupied", false);
+        foreach (Transform fire in Enginefire)//Fixes specific case where distant planes that aren't doing Effects() can respawn with their
+                                              //afterburners appearing to be on when seen through a camera that's looking at another plane.
+        {
+            fire.gameObject.SetActive(false);
+        }
+    }
+    public void EffectsLeavePlane()
+    {
+        Smoking = false;
+        PlaneAnimator.SetBool("gunfiring", false);
+        PlaneAnimator.SetBool("occupied", false);
+        PlaneAnimator.SetInteger("missilesincoming", 0);
+        PlaneAnimator.SetBool("localpilot", false);
+    }
     private void Assert(bool condition, string message)
     {
         if (!condition)

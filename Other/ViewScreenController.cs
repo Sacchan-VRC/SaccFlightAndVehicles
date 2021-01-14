@@ -45,7 +45,7 @@ public class ViewScreenController : UdonSharpBehaviour
             else NumAAMTargets -= 1;
         }
         n = 0;
-        //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure they're the same among clients 
+        //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure it's the same among clients 
         float[] order = new float[NumAAMTargets];
         for (int i = 0; AAMTargets[n] != null; i++)
         {
@@ -75,6 +75,7 @@ public class ViewScreenController : UdonSharpBehaviour
                 {
                     TargetEngine = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
                     TargetCoM = TargetEngine.CenterOfMass;
+                    PlaneCamera.transform.rotation = TargetEngine.VehicleMainObj.transform.rotation;
                 }
             }
             currenttarget = AAMTarget;
