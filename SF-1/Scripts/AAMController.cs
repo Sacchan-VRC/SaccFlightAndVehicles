@@ -86,12 +86,12 @@ public class AAMController : UdonSharpBehaviour
         Vector3 Position = transform.position;
         Vector3 TargetPos = Target.position;
         float TargetDistance = Vector3.Distance(Position, TargetPos);
-        if ((TargetDistance < TargDistlastframe || LockHack) && Target.gameObject.activeInHierarchy && UnlockTime < .2f)
+        if ((TargetDistance < TargDistlastframe || LockHack) && Target.gameObject.activeInHierarchy && UnlockTime < .1f)
         { TargetLost = false; UnlockTime = 0; }
         else
         {
             UnlockTime += Time.deltaTime;
-            if (UnlockTime >= .2f) //unlock .2s after flying past the target to account for jittery netcode
+            if (UnlockTime >= .1f) //unlock .1s after flying past the target to account for jittery netcode
             {
                 TargetLost = true;
                 if (MissileIncoming)

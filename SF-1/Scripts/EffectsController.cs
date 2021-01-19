@@ -109,7 +109,7 @@ public class EffectsController : UdonSharpBehaviour
         FullHealthDivider = 1f / EngineControl.Health;
 
         foreach (Transform fire in Enginefire)
-            fire.localScale = new Vector3(fire.localScale.x, 0, fire.localScale.z);
+        { fire.localScale = new Vector3(fire.localScale.x, 0, fire.localScale.z); }
 
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
 
@@ -270,21 +270,27 @@ public class EffectsController : UdonSharpBehaviour
     }
     public void CanopyOpening()
     {
-        CanopyOpen = true;
-        if (EngineControl.CanopyCloseTimer > 0)
-        { EngineControl.CanopyCloseTimer -= 100000 + EngineControl.CanopyCloseTime; }
-        else
-        { EngineControl.CanopyCloseTimer = -100000; }
-        PlaneAnimator.SetBool("canopyopen", true);
+        if (!CanopyOpen)//this if statement prevents sound issues when this is called by OnPlayerJoined()
+        {
+            CanopyOpen = true;
+            if (EngineControl.CanopyCloseTimer > 0)
+            { EngineControl.CanopyCloseTimer -= 100000 + EngineControl.CanopyCloseTime; }
+            else
+            { EngineControl.CanopyCloseTimer = -100000; }
+            PlaneAnimator.SetBool("canopyopen", true);
+        }
     }
     public void CanopyClosing()
     {
-        CanopyOpen = false;
-        if (EngineControl.CanopyCloseTimer > (-100000 - EngineControl.CanopyCloseTime) && EngineControl.CanopyCloseTimer < 0)
-        { EngineControl.CanopyCloseTimer += 100000 + ((EngineControl.CanopyCloseTime * 2) + 0.1f); }//the 0.1 is for the delay in the animator that is needed because it's not set to write defaults
-        else
-        { EngineControl.CanopyCloseTimer = EngineControl.CanopyCloseTime; }
-        PlaneAnimator.SetBool("canopyopen", false);
+        if (CanopyOpen)//this if statement prevents sound issues when this is called by OnPlayerJoined()
+        {
+            CanopyOpen = false;
+            if (EngineControl.CanopyCloseTimer > (-100000 - EngineControl.CanopyCloseTime) && EngineControl.CanopyCloseTimer < 0)
+            { EngineControl.CanopyCloseTimer += 100000 + ((EngineControl.CanopyCloseTime * 2) + 0.1f); }//the 0.1 is for the delay in the animator that is needed because it's not set to write defaults
+            else
+            { EngineControl.CanopyCloseTimer = EngineControl.CanopyCloseTime; }
+            PlaneAnimator.SetBool("canopyopen", false);
+        }
     }
     public void EffectsExplode()//called from enginecontroller.explode();
     {

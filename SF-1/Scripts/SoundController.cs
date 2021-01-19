@@ -81,7 +81,6 @@ public class SoundController : UdonSharpBehaviour
     private const float InVehicleThrustVolumeFactor = .09f;
     [System.NonSerializedAttribute] public float SonicBoomWave = 0f;
     [System.NonSerializedAttribute] public float SonicBoomDistance = -1f;
-    bool Landed = false;
     private int dopplecounter;
     [System.NonSerializedAttribute] public float DoSound = 20; //15 seconds before idle so late joiners have time to sync before going idle
     [System.NonSerializedAttribute] public bool silent;
@@ -278,12 +277,6 @@ public class SoundController : UdonSharpBehaviour
             silentint = 1;
         }
 
-        if (!TouchDownNull)
-        {
-            //play a touchdown sound the frame we start taxiing
-            if (Landed == false && EngineControl.Taxiing == true && EngineControl.Speed > 35) { TouchDown[Random.Range(0, TouchDown.Length)].Play(); }
-            if (EngineControl.Taxiing == true) { Landed = true; } else { Landed = false; }
-        }
         //EngineControl.Piloting = true in editor play
         if ((EngineControl.Piloting || EngineControl.Passenger) && (EngineControl.CanopyCloseTimer < 0 && EngineControl.CanopyCloseTimer > -100000))
         {
@@ -572,6 +565,13 @@ public class SoundController : UdonSharpBehaviour
         {
             idle.pitch = 0;
             idle.volume = 0;
+        }
+    }
+    public void PlayTouchDownSound()
+    {
+        if (!TouchDownNull)
+        {
+            TouchDown[Random.Range(0, TouchDown.Length)].Play();
         }
     }
     public void Wakeup()

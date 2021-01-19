@@ -105,7 +105,7 @@ public class EngineController : UdonSharpBehaviour
     public float GroundBrakeStrength = 6f;
     public float GroundBrakeSpeed = 40f;
     public float HookedBrakeStrength = 65f;
-    public float HookedBrakeMaxDistance = 90f;
+    public float HookedCableSnapDistance = 120f;
     public float CatapultLaunchStrength = 50f;
     public float CatapultLaunchTime = 2f;
     public float TakeoffAssist = 5f;
@@ -304,8 +304,8 @@ public class EngineController : UdonSharpBehaviour
     private float FullAAMsDivider;
     private float FullAGMsDivider;
     private float FullBombsDivider;
-    private bool CanopyOpenCheck = true;
     private Quaternion AGMCamLastFrame;
+    bool Landed = false;//moved here from soundcontroller
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -367,21 +367,15 @@ public class EngineController : UdonSharpBehaviour
         //get array of AAM Targets
         RaycastHit[] aamtargs = Physics.SphereCastAll(CenterOfMass.transform.position, 1000000, VehicleMainObj.transform.forward, 5, AAMTargetsLayer, QueryTriggerInteraction.Collide);
         int n = 0;
-        if (aamtargs.Length > 0)
-        {
-            NumAAMTargets = Mathf.Clamp(aamtargs.Length - 1, 0, 999);//one less because it found our own plane
-        }
 
-        //work out which index in the aamtargs array is our own plane by finding the closest target object to our plane
-        float dist = 999999;
-        int self = 0;
+        //work out which index in the aamtargs array is our own plane by finding which one has this script as it's parent
+        //allows for each team to have a different layer for AAMTargets
+        int self = -1;
         n = 0;
         foreach (RaycastHit target in aamtargs)
         {
-            float thisdist = Vector3.Distance(CenterOfMass.transform.position, target.collider.transform.position);
-            if (thisdist < dist)
+            if (target.transform.parent != null && target.transform.parent == transform)
             {
-                dist = thisdist;
                 self = n;
             }
             n++;
@@ -398,22 +392,37 @@ public class EngineController : UdonSharpBehaviour
                 n++;
             }
         }
-        n = 0;
-        //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure they're the in the same order on all clients 
-        float[] order = new float[NumAAMTargets];
-        for (int i = 0; AAMTargets[n] != null; i++)
+        if (aamtargs.Length > 0)
         {
-            Transform parent = AAMTargets[n].transform;
-            for (int x = 0; parent != null; x++)
+            if (foundself != 0)
             {
-                order[n] = float.Parse(order[n].ToString() + parent.transform.GetSiblingIndex().ToString());
-                parent = parent.transform.parent;
+                NumAAMTargets = Mathf.Clamp(aamtargs.Length - 1, 0, 999);//one less because it found our own plane
             }
-            n++;
+            else
+            {
+                NumAAMTargets = Mathf.Clamp(aamtargs.Length, 0, 999);
+            }
         }
-        //sort AAMTargets array based on order
+        else { NumAAMTargets = 0; }
+
+
         if (NumAAMTargets > 0)
         {
+            n = 0;
+            //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure they're the in the same order on all clients 
+            float[] order = new float[NumAAMTargets];
+            for (int i = 0; AAMTargets[n] != null; i++)
+            {
+                Transform parent = AAMTargets[n].transform;
+                for (int x = 0; parent != null; x++)
+                {
+                    order[n] = float.Parse(order[n].ToString() + parent.transform.GetSiblingIndex().ToString());
+                    parent = parent.transform.parent;
+                }
+                n++;
+            }
+            //sort AAMTargets array based on order
+
             SortTargets(AAMTargets, order);
         }
         else
@@ -447,7 +456,6 @@ public class EngineController : UdonSharpBehaviour
         if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 2049 /* Default and Environment */))
         { Taxiing = true; }
         else { Taxiing = false; }
-
 
         if (IsOwner)//works in editor or ingame
         {
@@ -509,7 +517,8 @@ public class EngineController : UdonSharpBehaviour
             sidespeed = Vector3.Dot(AirVel, VehicleMainObj.transform.right);
             downspeed = Vector3.Dot(AirVel, VehicleMainObj.transform.up) * -1;
 
-            if (downspeed < 0)//air is hitting plane from above
+            bool PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
+            if (PitchDown)
             {
                 downspeed *= PitchDownLiftMulti;
             }
@@ -1714,6 +1723,54 @@ public class EngineController : UdonSharpBehaviour
                     RollInput = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRPitchRollInput.x + Af + Df + leftf + rightf) * -1), -1, 1);
                 }
 
+                //check for catching a cable with hook
+                if (EffectsControl.HookDown)
+                {
+                    if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookCableLayer) && !Hooked)
+                    {
+                        HookedLoc = VehicleMainObj.transform.position;
+                        Hooked = true;
+                        HookedTime = Time.time;
+                        EffectsControl.PlaneAnimator.SetTrigger("hooked");
+                    }
+                }
+                //slow down if hooked and on the ground
+                if (Hooked && Taxiing)
+                {
+                    if (Vector3.Distance(VehicleMainObj.transform.position, HookedLoc) > HookedCableSnapDistance)//real planes take around 80-90 meters to stop on a carrier
+                    {
+                        //if you go further than HookedBrakeMaxDistance you snap the cable and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
+                        float HookedDelta = (Time.time - HookedTime);
+                        if (HookedDelta < 2)
+                        {
+                            Health -= ((-HookedDelta + 2) / 2) * FullHealth;
+                        }
+                        Hooked = false;
+                        if (HookedDelta < 5)//if you catch a cable but go airborne before snapping it, keep your hook out and then land somewhere else
+                                            //you would hear the cablesnap sound when you touchdown, so limit it to within 5 seconds of hooking
+                                            //this results in 1 frame's worth of not being able to catch a cable but will rarely happen anyway
+                        {
+                            if (InEditor)
+                            {
+                                PlayCableSnap();
+                            }
+                            else
+                            {
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap");
+                            }
+                        }
+                    }
+
+                    if (Speed > HookedBrakeStrength * DeltaTime)
+                    {
+                        VehicleRigidbody.velocity += -CurrentVel.normalized * HookedBrakeStrength * DeltaTime;
+                    }
+                    else
+                    {
+                        VehicleRigidbody.velocity = Vector3.zero;
+                    }
+                    //Debug.Log("hooked");
+                }
 
                 //ability to adjust input to be more precise at low amounts. 'exponant'
                 /* pitchinput = pitchinput > 0 ? Mathf.Pow(pitchinput, StickInputPower) : -Mathf.Pow(Mathf.Abs(pitchinput), StickInputPower);
@@ -1792,65 +1849,22 @@ public class EngineController : UdonSharpBehaviour
             LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
             LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
 
-            //check for catching a cable with hook
-            if (EffectsControl.HookDown)
-            {
-                if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookCableLayer) && !Hooked)
-                {
-                    HookedLoc = VehicleMainObj.transform.position;
-                    Hooked = true;
-                    HookedTime = Time.time;
-                    EffectsControl.PlaneAnimator.SetTrigger("hooked");
-                }
-            }
-            //slow down if hooked and on the ground
-            if (Hooked && Taxiing)
-            {
-                if (Vector3.Distance(VehicleMainObj.transform.position, HookedLoc) > HookedBrakeMaxDistance)//real planes take around 80-90 meters to stop on a carrier
-                {
-                    //if you go further than HookedBrakeMaxDistance you snap the cable and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
-                    float HookedDelta = (Time.time - HookedTime);
-                    if (HookedDelta < 2)
-                    {
-                        Health -= ((-HookedDelta + 2) / 2) * FullHealth;
-                    }
-                    Hooked = false;
-                    if (HookedDelta < 5)//if you catch a cable but go airborne before snapping it, keep your hook out and then land somewhere else
-                                        //you would hear the cablesnap sound when you touchdown, so limit it to within 5 seconds of hooking
-                                        //this results in 1 frame's worth of not being able to catch a cable but will rarely happen anyway
-                    {
-                        if (InEditor)
-                        {
-                            PlayCableSnap();
-                        }
-                        else
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap");
-                        }
-                    }
-                }
-
-                if (Speed > HookedBrakeStrength * DeltaTime)
-                {
-                    VehicleRigidbody.velocity += -CurrentVel.normalized * HookedBrakeStrength * DeltaTime;
-                }
-                else
-                {
-                    VehicleRigidbody.velocity = Vector3.zero;
-                }
-                //Debug.Log("hooked");
-            }
-
+            bool Flaps = EffectsControl.Flaps;
             //flaps drag and lift
-            if (EffectsControl.Flaps)
-            {
-                FlapsDrag = FlapsDragMulti;
-                FlapsLift = FlapsLiftMulti;
-            }
-            else
+            if (!Flaps)//flaps off
             {
                 FlapsDrag = 1;
                 FlapsLift = 1;
+            }
+            else if (PitchDown)//flaps on, but plane is pitching down so they have no helpful effect
+            {
+                FlapsDrag = FlapsDragMulti;
+                FlapsLift = 1;
+            }
+            else//flaps on and pitching up, flaps are useful
+            {
+                FlapsDrag = FlapsDragMulti;
+                FlapsLift = FlapsLiftMulti;
             }
             //gear drag
             if (EffectsControl.GearUp) { GearDrag = 1; }
@@ -1919,15 +1933,35 @@ public class EngineController : UdonSharpBehaviour
                     }
                     break;
             }
-
             SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
+
+            //play a touchdown sound the frame we start taxiing
+            if (Landed == false && Taxiing == true && Speed > 35)
+            {
+                if (SoundControl != null)
+                {
+                    if (InEditor)
+                        SoundControl.PlayTouchDownSound();
+                    else
+                        SoundControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayTouchDownSound");
+                }
+                Landed = true;
+            }
+            else if (Taxiing == true)
+            {
+                Landed = true;
+            }
+            else
+            {
+                Landed = false;
+            }
         }
         else//non-owners need to know these values
         {
             Speed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
             //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
-            VehicleRigidbody.angularDrag = .3f;
+            VehicleRigidbody.angularDrag = .5f;
             //AirVel = VehicleRigidbody.velocity - Wind;
             //AirSpeed = AirVel.magnitude;
         }
@@ -2370,7 +2404,7 @@ public class EngineController : UdonSharpBehaviour
         AGMLaunchOpositeSide = false;
         BombPoint = 0;
     }
-    public void SetGearUP()
+    public void SetGearUp()
     {
         EffectsControl.GearUp = true;
         EffectsControl.PlaneAnimator.SetBool("gearup", true);
@@ -2386,11 +2420,11 @@ public class EngineController : UdonSharpBehaviour
         {
             if (InEditor)
             {
-                SetGearUP();
+                SetGearUp();
             }
             else
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUP");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
             }
         }
         else
@@ -2556,11 +2590,12 @@ public class EngineController : UdonSharpBehaviour
     }
     public void ResetStatus()//called when using respawn button
     {
-        SetFlapsOn();
-        SetGearDown();
-        SetHookUp();
-        SetSmokingOff();
-        SetLimitsOn();
+        if (HasAfterburner) { SetAfterburnerOff(); }
+        if (HasSmoke) { SetSmokingOff(); }
+        if (HasLimits) { SetLimitsOn(); }
+        if (HasHook) { SetHookUp(); }
+        if (HasGear) { SetGearDown(); }
+        if (HasFlaps) { SetFlapsOn(); }
         if (HasCanopy && !EffectsControl.CanopyOpen) { EffectsControl.SetCanopyOpen(); }
         NumAAM = FullAAMs;
         NumAGM = FullAGMs;
@@ -2572,6 +2607,57 @@ public class EngineController : UdonSharpBehaviour
         dead = true;//this makes it invincible and unable to be respawned again for 5s
         EffectsControl.PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead after 5s
         EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
+    }
+    public override void OnPlayerJoined(VRCPlayerApi player)
+    {
+        //Owner sends events to sync the plane so late joiners don't see it flying with it's canopy open and stuff
+        //only change things that aren't in the default state
+        //only change effects which are very visible, this is just so that it looks alright for late joiners, not to sync everything perfectly.
+        //syncing everything perfectly would probably require too many events to be sent.
+        //planes will be fully synced when they explode or are respawned anyway.
+        if (IsOwner)
+        {
+            if (HasCanopy)
+            {
+                if (!EffectsControl.CanopyOpen)
+                {
+                    if (InEditor)//editor
+                    { EffectsControl.SetCanopyClosed(); }
+                    else//VRC
+                    { EffectsControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetCanopyClosed"); }
+                }
+            }
+            if (HasSmoke)
+            {
+                if (EffectsControl.Smoking)
+                {
+                    if (InEditor)//editor
+                    { SetSmokingOn(); }
+                    else//VRC
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn"); }
+                }
+            }
+            if (HasGear)
+            {
+                if (EffectsControl.GearUp)
+                {
+                    if (InEditor)//editor
+                    { SetGearUp(); }
+                    else//VRC
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp"); }
+                }
+            }
+            if (HasFlaps)
+            {
+                if (!EffectsControl.Flaps)
+                {
+                    if (InEditor)//editor
+                    { SetFlapsOff(); }
+                    else//VRC
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff"); }
+                }
+            }
+        }
     }
     public void ZeroControlValues()
     {
