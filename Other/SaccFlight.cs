@@ -11,12 +11,12 @@ public class SaccFlight : UdonSharpBehaviour
     public float BackThrustStrength = .5f;
     private float controllertriggerR;
     private float controllertriggerL;
-    private bool InVR;
+    private bool InVR = false;
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null) { gameObject.SetActive(false); }
-        if (localPlayer.IsUserInVR())
+        else if (localPlayer.IsUserInVR())
         { InVR = true; }
     }
     private void FixedUpdate()

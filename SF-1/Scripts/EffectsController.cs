@@ -126,7 +126,7 @@ public class EffectsController : UdonSharpBehaviour
         if (DoEffects > 10) { return; }
 
         //if a long way away just skip effects except large vapor effects
-        if (LargeEffectsOnly = (EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner)) { LargeEffects(); return; }//udonsharp doesn't support goto yet, so i'm using a function instead
+        if (LargeEffectsOnly = (EngineControl.SoundControl.ThisFrameDist > 2000f && !EngineControl.IsOwner)) { LargeEffects(); return; }
         Effects();
         LargeEffects();
     }
@@ -142,8 +142,7 @@ public class EffectsController : UdonSharpBehaviour
             //joystick movement
             if (!JoyStickNull)
             {
-                Vector3 tempjoy = new Vector3(EngineControl.PitchInput * 35f, EngineControl.YawInput * 35, EngineControl.RollInput * 35f);
-                JoyStick.localRotation = Quaternion.Euler(tempjoy);
+                JoyStick.localRotation = Quaternion.Euler(new Vector3(EngineControl.PitchInput * 35f, EngineControl.YawInput * 35, EngineControl.RollInput * 35f));
             }
         }
 

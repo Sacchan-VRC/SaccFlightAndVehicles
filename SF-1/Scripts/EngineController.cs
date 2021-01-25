@@ -147,17 +147,11 @@ public class EngineController : UdonSharpBehaviour
     private float LerpedYaw;
     [System.NonSerializedAttribute] public int RStickSelection = 0;
     [System.NonSerializedAttribute] public int LStickSelection = 0;
-    private Vector2 VRPitchRollInput;
     [System.NonSerializedAttribute] public bool LGripLastFrame = false;
     [System.NonSerializedAttribute] public bool LTriggerLastFrame = false;
     [System.NonSerializedAttribute] public bool RTriggerLastFrame = false;
-    Vector3 JoystickPos;
-    Vector3 JoystickPosYaw;
-    Quaternion PlaneRotDif;
-    Quaternion JoystickDifference;
     Quaternion JoystickZeroPoint;
     Quaternion PlaneRotLastFrame;
-    private float ThrottleDifference;
     [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float handpos;
@@ -278,8 +272,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] private int AGMUnlocking = 0;
     [System.NonSerializedAttribute] private float AGMUnlockTimer;
-    [System.NonSerializedAttribute] public bool AAMLaunchOpositeSide = false;
-    [System.NonSerializedAttribute] public bool AGMLaunchOpositeSide = false;
     [System.NonSerializedAttribute] public int BombPoint = 0;
     [System.NonSerializedAttribute] public float AGMRotDif;
     private Quaternion AGMCamRotSlerper;
@@ -563,9 +555,16 @@ public class EngineController : UdonSharpBehaviour
                     RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                     LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                     RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+
+                    //localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .1f, Gs, 1);
+                    //localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .1f, Gs, Gs * 2);
                 }
                 //MouseX = Input.GetAxisRaw("Mouse X");
                 //MouseY = Input.GetAxisRaw("Mouse Y");
+                Vector3 JoystickPosYaw;
+                Vector3 JoystickPos;
+                Vector2 VRPitchRollInput;
+
 
                 //close canopy when moving fast, can't fly with it open
                 if (EffectsControl.CanopyOpen && Speed > 20)
@@ -1160,9 +1159,9 @@ public class EngineController : UdonSharpBehaviour
                                     {
                                         AAMLastFiredTime = Time.time;
                                         if (InEditor)
-                                            LaunchAAM();
+                                        { LaunchAAM(); }
                                         else
-                                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
+                                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM"); }
                                         if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                                     }
                                 }
@@ -1422,7 +1421,7 @@ public class EngineController : UdonSharpBehaviour
                 //VR Joystick
                 if (RGrip > 0.75)
                 {
-                    PlaneRotDif = VehicleMainObj.transform.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
+                    Quaternion PlaneRotDif = VehicleMainObj.transform.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
                     JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
                     if (!RGripLastFrame)//first frame you gripped joystick
                     {
@@ -1430,7 +1429,7 @@ public class EngineController : UdonSharpBehaviour
                         JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
                     }
                     //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
-                    JoystickDifference = (Quaternion.Inverse(VehicleMainObj.transform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
+                    Quaternion JoystickDifference = (Quaternion.Inverse(VehicleMainObj.transform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
                     JoystickPosYaw = (JoystickDifference * VehicleMainObj.transform.forward);//angles to vector
                     JoystickPosYaw.y = 0;
                     JoystickPos = (JoystickDifference * VehicleMainObj.transform.up);
@@ -1485,7 +1484,7 @@ public class EngineController : UdonSharpBehaviour
                         ThrottleZeroPoint = handpos;
                         TempThrottle = PlayerThrottle;
                     }
-                    ThrottleDifference = ThrottleZeroPoint - handpos;
+                    float ThrottleDifference = ThrottleZeroPoint - handpos;
                     ThrottleDifference *= -6;
 
                     PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
@@ -1992,6 +1991,11 @@ public class EngineController : UdonSharpBehaviour
             LastFrameVel = VehicleRigidbody.velocity;
         }
     }
+
+    //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
+    //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
+    //This code adds or removes 100000 based on the situation, + the time it takes for the animation to play.
+    //This part is effectively disabled (by not allowing toggling if in transition) because it isn't reliable enough ->>//If the Opening animation is playing when you tell it to close it keeps the time from that animation so that the timing of the sound changing is always correct.
     private void ToggleCanopy()
     {
         if (CanopyCloseTimer <= -100000)
@@ -2008,18 +2012,14 @@ public class EngineController : UdonSharpBehaviour
         EffectsControl.PlaneAnimator.SetTrigger("flares");
     }
 
-    //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
-    //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
-    //This code adds or removes 100000 based on the situation, + the time it takes for the animation to play.
-    //This part is effectively disabled (by not allowing toggling if in transition) because it isn't reliable enough ->>//If the Opening animation is playing when you tell it to close it keeps the time from that animation so that the timing of the sound changing is always correct.
     public void LaunchAAM()
     {
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         EffectsControl.PlaneAnimator.SetTrigger("aamlaunched");
         GameObject NewAAM = VRCInstantiate(AAM);
-        if (AAMLaunchOpositeSide)
+        if (!(NumAAM % 2 == 0))
         {
-            //invert x coordinates of launch point, launch, then revert
+            //invert local x coordinates of launch point, launch, then revert
             Vector3 temp = AAMLaunchPoint.localPosition;
             temp.x *= -1;
             AAMLaunchPoint.localPosition = temp;
@@ -2027,13 +2027,11 @@ public class EngineController : UdonSharpBehaviour
             NewAAM.transform.rotation = AAMLaunchPoint.transform.rotation;
             temp.x *= -1;
             AAMLaunchPoint.localPosition = temp;
-            AAMLaunchOpositeSide = !AAMLaunchOpositeSide;
         }
         else
         {
             NewAAM.transform.position = AAMLaunchPoint.transform.position;
             NewAAM.transform.rotation = AAMLaunchPoint.transform.rotation;
-            AAMLaunchOpositeSide = !AAMLaunchOpositeSide;
         }
         NewAAM.SetActive(true);
         NewAAM.GetComponent<Rigidbody>().velocity = CurrentVel;
@@ -2045,7 +2043,7 @@ public class EngineController : UdonSharpBehaviour
         if (NumAGM > 0) { NumAGM--; }
         EffectsControl.PlaneAnimator.SetTrigger("agmlaunched");
         GameObject NewAGM = VRCInstantiate(AGM);
-        if (AGMLaunchOpositeSide)
+        if (!(NumAGM % 2 == 0))
         {
             Vector3 temp = AGMLaunchPoint.localPosition;
             temp.x *= -1;
@@ -2054,13 +2052,11 @@ public class EngineController : UdonSharpBehaviour
             NewAGM.transform.rotation = AGMLaunchPoint.transform.rotation;
             temp.x *= -1;
             AGMLaunchPoint.localPosition = temp;
-            AGMLaunchOpositeSide = !AGMLaunchOpositeSide;
         }
         else
         {
             NewAGM.transform.position = AGMLaunchPoint.transform.position;
             NewAGM.transform.rotation = AGMLaunchPoint.transform.rotation;
-            AGMLaunchOpositeSide = !AGMLaunchOpositeSide;
         }
         NewAGM.SetActive(true);
         NewAGM.GetComponent<Rigidbody>().velocity = CurrentVel;
@@ -2181,8 +2177,6 @@ public class EngineController : UdonSharpBehaviour
         SetFlapsOn();
         //EngineControl.Trim = Vector2.zero;
         Hooked = false;
-        AAMLaunchOpositeSide = false;
-        AGMLaunchOpositeSide = false;
         BombPoint = 0;
         NumAAM = FullAAMs;
         NumAGM = FullAGMs;
@@ -2303,7 +2297,7 @@ public class EngineController : UdonSharpBehaviour
                 AAMHasTarget = true;
                 if (NumAAM > 0) AAMLockTimer += DeltaTime;
                 //give enemy radar lock even if you're out of missiles
-                if (!AAMCurrentTargetEngineControlNull && RStickSelection == 2)
+                if (!AAMCurrentTargetEngineControlNull && RStickSelection == 2)// Only send Targeted if using AAMs, not gun.
                 {
                     //target is a plane
                     AAMTargetedTimer += DeltaTime;
@@ -2400,8 +2394,6 @@ public class EngineController : UdonSharpBehaviour
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
         Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
         //        EffectsControl.PlaneAnimator.SetTrigger("resupply");
-        AAMLaunchOpositeSide = false;
-        AGMLaunchOpositeSide = false;
         BombPoint = 0;
     }
     public void SetGearUp()
@@ -2600,8 +2592,6 @@ public class EngineController : UdonSharpBehaviour
         NumAAM = FullAAMs;
         NumAGM = FullAGMs;
         NumBomb = FullBombs;
-        AAMLaunchOpositeSide = false;
-        AGMLaunchOpositeSide = false;
         BombPoint = 0;
         EffectsControl.DoEffects = 6;
         dead = true;//this makes it invincible and unable to be respawned again for 5s

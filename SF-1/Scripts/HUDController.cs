@@ -53,7 +53,6 @@ public class HUDController : UdonSharpBehaviour
     public float distance_from_head = 1.333f;
     private float maxGs = 0f;
     private Vector3 InputsZeroPos;
-    private Vector3 tempvel = Vector3.zero;
     private Vector3 startingpos;
     private float check = 0;
     [System.NonSerializedAttribute] public float MenuSoundCheckLast = 0;
@@ -138,6 +137,7 @@ public class HUDController : UdonSharpBehaviour
                 TrimPitch.localPosition = InputsZeroPos + (new Vector3(0, EngineControl.Trim.x, 0)) * InputSquareSize; */
 
         //Velocity indicator
+        Vector3 tempvel;
         if (EngineControl.CurrentVel.magnitude < 2)
         {
             tempvel = -Vector3.up * 2;//straight down instead of spazzing out when moving very slow
@@ -322,7 +322,6 @@ public class HUDController : UdonSharpBehaviour
         else { HUDText_knotstarget.text = string.Empty; }
 
         //left stick toggles/functions on?
-
         if (EngineControl.EffectsControl.AfterburnerOn) { LStick_funcon1.SetActive(true); }
         else { LStick_funcon1.SetActive(false); }
 
@@ -335,7 +334,7 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.AltHold) { LStick_funcon6.SetActive(true); }
         else { LStick_funcon6.SetActive(false); }
 
-        /*         if (EngineControl.Trim.x != 0) { LStick_funcon6.SetActive(true); }
+        /* if (EngineControl.Trim.x != 0) { LStick_funcon6.SetActive(true); }
                 else { LStick_funcon6.SetActive(false); } */
 
         if (EngineControl.EffectsControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
