@@ -355,6 +355,13 @@ public class EngineController : UdonSharpBehaviour
             if (localPlayer.IsUserInVR()) { InVR = true; }
         }
 
+        if (!HasLimits) { FlightLimitsEnabled = false; }
+        if (!HasCanopy) { EffectsControl.CanopyClosing(); }
+        else { EffectsControl.CanopyOpening(); }
+        if (!HasGear) { SetGearUp(); }
+        else { SetGearDown(); }
+        if (!HasFlaps) { SetFlapsOff(); }
+        else { SetFlapsOn(); }
 
         //get array of AAM Targets
         RaycastHit[] aamtargs = Physics.SphereCastAll(CenterOfMass.transform.position, 1000000, VehicleMainObj.transform.forward, 5, AAMTargetsLayer, QueryTriggerInteraction.Collide);
@@ -435,9 +442,9 @@ public class EngineController : UdonSharpBehaviour
         ReversingYawStrengthZero = YawThrustVecMulti == 0 ? -ReversingYawStrengthMulti : 1;
         ReversingRollStrengthZero = RollThrustVecMulti == 0 ? -ReversingRollStrengthMulti : 1;
 
-        FullAAMsDivider = 1f / NumAAM;
-        FullAGMsDivider = 1f / NumAGM;
-        FullBombsDivider = 1f / NumBomb;
+        FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
+        FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
+        FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
     }
 
     private void LateUpdate()
@@ -2239,11 +2246,12 @@ public class EngineController : UdonSharpBehaviour
                 bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
 
                 if ((LineOfSightNext
-                    && hitnext.collider.gameObject.layer == OutsidePlaneLayer
+                    && hitnext.collider.gameObject.layer == OutsidePlaneLayer //did raycast hit an object on the layer planes are on?
                         && NextTargetAngle < Lock_Angle
                             && NextTargetDistance < AAMMaxTargetDistance
                                 && NextTargetAngle < AAMCurrentTargetAngle)
-                                    || (!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                    || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                        || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                 {
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;

@@ -11,16 +11,23 @@ public class AAGunController : UdonSharpBehaviour
     public VRCStation AAGunSeatStation;
     public HUDControllerAAGun HUDControl;
     public Camera AACam;
-    public bool HasZoom = true;
     public bool HasHUD = true;
-    public bool HasMissiles = true;
     public float TurnSpeedMulti = 10;
-    public float TurningResponse = .2f;
-    public float StopSpeed = .95f;
-    public float ZoomFov = .1f;
-    public float ZoomOutFov = 110f;
-    public float MissileReloadTime;
-    [UdonSynced(UdonSyncMode.None)] public float Health = 100f;
+    public float TurnFriction = 0.1f;
+    public float UpAngleMax = 89;
+    public float DownAngleMax = 35;
+    //public float TurningResponse = .35f;
+    public float TurningResponseDesktop = 1.1f;
+    public float MissileReloadTime = 10;
+    public float Health = 100f;
+    public float HPRepairDelay = 5f;
+    public float HPRepairAmount = 5f;
+    public float MGAmmoSeconds = 4;
+    private float MGAmmoRecharge = 0;
+    public float MGReloadDelay = 2;
+    public float MGReloadSpeed = 1;
+    [System.NonSerializedAttribute] public float MGAmmoFull = 4;
+    private float FullMGDivider;
     public GameObject AAM;
     public int NumAAM = 6;
     public float AAMMaxTargetDistance = 6000;
@@ -32,18 +39,16 @@ public class AAGunController : UdonSharpBehaviour
     public AudioSource AAMLocking;
     public AudioSource AAMLockedOn;
     public Transform JoyStick;
-    private Animator AAGunAnimator;
+    [System.NonSerializedAttribute] public Animator AAGunAnimator;
     [System.NonSerializedAttribute] public bool dead;
-
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool firing;
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Manning;//like Piloting in the plane
     [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
-    [System.NonSerializedAttribute] public float InputXLerper = 0f;
-    [System.NonSerializedAttribute] public float InputYLerper = 0f;
+    [System.NonSerializedAttribute] public float RotationSpeedX = 0f;
+    [System.NonSerializedAttribute] public float RotationSpeedY = 0f;
     private Vector3 StartRot;
     private float RstickV;
-    private float ZoomLevel;
     [System.NonSerializedAttribute] public bool InEditor = true;
     [System.NonSerializedAttribute] public bool IsOwner = false;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
@@ -62,13 +67,19 @@ public class AAGunController : UdonSharpBehaviour
     Quaternion AAGunRotLastFrame;
     Quaternion JoystickZeroPoint;
     [System.NonSerializedAttribute] public bool RGripLastFrame = false;
-    Vector2 VRPitchRollInput;
+    Vector2 VRPitchYawInput;
     private float FullAAMsDivider;
+    private float FullHealthDivider;
     private bool LTriggerLastFrame;
-    private bool DoAAMTargeting;
+    [System.NonSerializedAttribute] public bool DoAAMTargeting;
     [System.NonSerializedAttribute] public int FullAAMs;
-    [System.NonSerializedAttribute] public float ReloadTimer;
+    [System.NonSerializedAttribute] public float AAMReloadTimer;
+    [System.NonSerializedAttribute] public float HealthUpTimer;
+    [System.NonSerializedAttribute] public float HPRepairTimer;
     private bool JoyStickNull = true;
+    [System.NonSerializedAttribute] public float InputXKeyb;
+    [System.NonSerializedAttribute] public float InputYKeyb;
+    [System.NonSerializedAttribute] public float LastHealthUpdate = 0;
     void Start()
     {
         localPlayer = Networking.LocalPlayer;
@@ -76,7 +87,10 @@ public class AAGunController : UdonSharpBehaviour
         else
         {
             InEditor = false;
-            if (localPlayer.IsUserInVR()) { InVR = true; }
+            if (localPlayer.IsUserInVR())
+            {
+                InVR = true;
+            }
         }
 
         Assert(Rotator != null, "Start: Rotator != null");
@@ -94,11 +108,14 @@ public class AAGunController : UdonSharpBehaviour
 
         if (VehicleMainObj != null) { AAGunAnimator = VehicleMainObj.GetComponent<Animator>(); }
         FullHealth = Health;
+        FullHealthDivider = 1f / (Health > 0 ? Health : 10000000);
         StartRot = Rotator.transform.localRotation.eulerAngles;
-        if (StopSpeed > 1) StopSpeed = 1;//stops instantly
 
-        FullAAMsDivider = 1f / NumAAM;
         FullAAMs = NumAAM;
+        FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
+        AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+        MGAmmoFull = MGAmmoSeconds;
+        FullMGDivider = 1f / (MGAmmoFull > 0 ? MGAmmoFull : 10000000);
 
         //get array of AAM Targets
         RaycastHit[] aamtargs = Physics.SphereCastAll(VehicleMainObj.transform.position, 1000000, VehicleMainObj.transform.forward, 5, AAMTargetsLayer, QueryTriggerInteraction.Collide);
@@ -203,6 +220,7 @@ public class AAGunController : UdonSharpBehaviour
                     LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                     RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                 }
+                Vector3 JoystickPosYaw;
                 Vector3 JoystickPos;
 
                 //virtual joystick
@@ -219,144 +237,138 @@ public class AAGunController : UdonSharpBehaviour
                         }
                         //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
                         Quaternion JoystickDifference = (Quaternion.Inverse(Rotator.transform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
+                        JoystickPosYaw = (JoystickDifference * Rotator.transform.forward);//angles to vector
+                        JoystickPosYaw.y = 0;
                         JoystickPos = (JoystickDifference * Rotator.transform.up);
-                        VRPitchRollInput = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;
+                        JoystickPos.y = 0;
+                        VRPitchYawInput = new Vector2(JoystickPos.z, JoystickPosYaw.x) * 1.41421f;
 
                         RGripLastFrame = true;
-                        //making a circular joy stick square
-                        //pitch and roll
-                        if (Mathf.Abs(VRPitchRollInput.x) > Mathf.Abs(VRPitchRollInput.y))
-                        {
-                            if (Mathf.Abs(VRPitchRollInput.x) > 0)
-                            {
-                                float temp = VRPitchRollInput.magnitude / Mathf.Abs(VRPitchRollInput.x);
-                                VRPitchRollInput *= temp;
-                            }
-                        }
-                        else if (Mathf.Abs(VRPitchRollInput.y) > 0)
-                        {
-                            float temp = VRPitchRollInput.magnitude / Mathf.Abs(VRPitchRollInput.y);
-                            VRPitchRollInput *= temp;
-                        }
                     }
                     else
                     {
-                        VRPitchRollInput = Vector3.zero;
+                        JoystickPosYaw.x = 0;
+                        VRPitchYawInput = Vector3.zero;
                         RGripLastFrame = false;
                     }
                     AAGunRotLastFrame = Rotator.transform.rotation;
                 }
+                int InX = (Wf + Sf);
+                int InY = (Af + Df);
+                if (InX > 0 && InputXKeyb < 0 || InX < 0 && InputXKeyb > 0) InputXKeyb = 0;
+                if (InY > 0 && InputYKeyb < 0 || InY < 0 && InputYKeyb > 0) InputYKeyb = 0;
+                InputXKeyb = Mathf.Lerp((InputXKeyb), InX, Mathf.Abs(InX) > 0 ? TurningResponseDesktop * DeltaTime : 1);
+                InputYKeyb = Mathf.Lerp((InputYKeyb), InY, Mathf.Abs(InY) > 0 ? TurningResponseDesktop * DeltaTime : 1);
 
-                float InputY = Mathf.Clamp((VRPitchRollInput.x + Af + Df), -1, 1) * TurnSpeedMulti;
-                float InputX = Mathf.Clamp((VRPitchRollInput.y + Wf + Sf), -1, 1) * TurnSpeedMulti;
-
-                if (HasZoom)
+                float InputX = Mathf.Clamp((VRPitchYawInput.x + InputXKeyb), -1, 1);
+                float InputY = Mathf.Clamp((VRPitchYawInput.y + InputYKeyb), -1, 1);
+                //joystick model movement
+                if (!JoyStickNull)
                 {
-                    //Camera control
-                    if (AACam != null) { ZoomLevel = AACam.fieldOfView / 90; }
-                    if (Mathf.Abs(LstickV) > .1)
-                    {
-                        if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView - 3.2f * LstickV * ZoomLevel, ZoomFov, ZoomOutFov); }
-                    }
-                    if (Input.GetKey(KeyCode.LeftShift))
-                    {
-                        if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView - 1.6f * ZoomLevel, ZoomFov, ZoomOutFov); }
-                    }
-                    if (Input.GetKey(KeyCode.LeftControl))
-                    {
-                        if (AACam != null) { AACam.fieldOfView = Mathf.Clamp(AACam.fieldOfView + 1.6f * ZoomLevel, ZoomFov, ZoomOutFov); }
-                    }
+                    JoyStick.localRotation = Quaternion.Euler(new Vector3(InputX * 25f, InputY * 25f, 0));
                 }
+                InputX *= TurnSpeedMulti;
+                InputY *= TurnSpeedMulti;
+
+                RotationSpeedX += -(RotationSpeedX * TurnFriction * DeltaTime) + InputX * DeltaTime;
+                RotationSpeedY += -(RotationSpeedY * TurnFriction * DeltaTime) + InputY * DeltaTime;
+                /*                 //only do friction if slowing down or trying to turn in the oposite direction
+                                if (InputY > 0 && InputYLerper < 0 || InputY < 0 && InputYLerper > 0 || Mathf.Abs(InputYLerper) > Mathf.Abs(InputY))
+                                {
+                                    InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * DeltaTime);
+                                    InputYLerper *= StopSpeed;
+                                }
+                                else { InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * DeltaTime); }
+
+                                if (InputX > 0 && InputXLerper < 0 || InputX < 0 && InputXLerper > 0 || Mathf.Abs(InputXLerper) > Mathf.Abs(InputX))
+                                {
+                                    InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * DeltaTime);
+                                    InputXLerper *= StopSpeed;
+                                }
+                                else { InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * DeltaTime); } */
 
 
-
-                //only do friction if slowing down or trying to turn in the oposite direction
-                if (InputY > 0 && InputYLerper < 0 || InputY < 0 && InputYLerper > 0 || Mathf.Abs(InputYLerper) > Mathf.Abs(InputY))
-                {
-                    InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * DeltaTime);
-                    InputYLerper *= StopSpeed;
-                }
-                else { InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * DeltaTime); }
-
-                if (InputX > 0 && InputXLerper < 0 || InputX < 0 && InputXLerper > 0 || Mathf.Abs(InputXLerper) > Mathf.Abs(InputX))
-                {
-                    InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * DeltaTime);
-                    InputXLerper *= StopSpeed;
-                }
-                else { InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * DeltaTime); }
-
-
+                //rotate turret
                 float temprot = Rotator.transform.localRotation.eulerAngles.x;
-                temprot += InputXLerper * ZoomLevel;
+                temprot += RotationSpeedX;
                 if (temprot > 180) { temprot -= 360; }
-                temprot = Mathf.Clamp(temprot, -89, 35);
-                Rotator.transform.localRotation = Quaternion.Euler(new Vector3(temprot, Rotator.transform.localRotation.eulerAngles.y + (InputYLerper * ZoomLevel), 0));
+                if (temprot > DownAngleMax || temprot < -UpAngleMax) RotationSpeedX = 0;
+                temprot = Mathf.Clamp(temprot, -UpAngleMax, DownAngleMax);//limit angles
+                Rotator.transform.localRotation = Quaternion.Euler(new Vector3(temprot, Rotator.transform.localRotation.eulerAngles.y + (RotationSpeedY), 0));
 
                 //Firing the gun
-                if (RTrigger >= 0.75 || Input.GetKey(KeyCode.Space))
+                if ((RTrigger >= 0.75 || Input.GetKey(KeyCode.Space)) && MGAmmoSeconds > 0)
                 {
                     firing = true;
+                    MGAmmoSeconds -= DeltaTime;
+                    MGAmmoRecharge = MGAmmoSeconds - MGReloadDelay;
                 }
-                else { firing = false; }
+                else//recharge the ammo
+                {
+                    firing = false;
+                    MGAmmoRecharge = Mathf.Min(MGAmmoRecharge + (DeltaTime * MGReloadSpeed), MGAmmoFull);
+                    MGAmmoSeconds = Mathf.Max(MGAmmoRecharge, MGAmmoSeconds);
+                }
 
                 if (HasHUD)
                 {
                     DoAAMTargeting = true;
-
-                    if (HasMissiles)
+                    if (NumAAMTargets != 0)
                     {
-                        if (NumAAMTargets != 0)
+                        if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
+                        else { AAMLocked = false; }
+
+                        //firing AAM
+                        if (LTrigger > 0.75 || (Input.GetKey(KeyCode.C)))
                         {
-
-                            if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
-                            else { AAMLocked = false; }
-
-                            //firing AAM
-                            if (LTrigger > 0.75 || (Input.GetKey(KeyCode.C)))
+                            if (!LTriggerLastFrame)
                             {
-                                if (!LTriggerLastFrame)
+                                if (AAMLocked && Time.time - AAMLastFiredTime > 0.5)
                                 {
-                                    if (AAMLocked && Time.time - AAMLastFiredTime > 0.5)
-                                    {
-                                        AAMLastFiredTime = Time.time;
-                                        if (InEditor)
-                                        { LaunchAAM(); }
-                                        else
-                                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM"); }
-                                        if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
-                                    }
+                                    AAMLastFiredTime = Time.time;
+                                    if (InEditor)
+                                    { LaunchAAM(); }
+                                    else
+                                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM"); }
+                                    if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                                 }
-                                LTriggerLastFrame = true;
                             }
-                            else LTriggerLastFrame = false;
+                            LTriggerLastFrame = true;
                         }
+                        else LTriggerLastFrame = false;
+                    }
+                    else
+                    {
+                        firing = false;
+                    }
+                    //reloading AAMs
+                    if (NumAAM == FullAAMs)
+                    { AAMReloadTimer = 0; }
+                    else
+                    { AAMReloadTimer += DeltaTime; }
+                    if (AAMReloadTimer > MissileReloadTime)
+                    {
+                        if (InEditor)
+                        { ReloadAAM(); }
                         else
-                        {
-                            firing = false;
-                        }
-                        //reloading AAMs
-                        if (NumAAM == FullAAMs)
-                        { ReloadTimer = 0; }
-                        else if (NumAAM < FullAAMs)
-                        { ReloadTimer += DeltaTime; }
-                        if (ReloadTimer > MissileReloadTime)
-                        {
-                            if (InEditor)
-                            { ReloadAAM(); }
-                            else
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ReloadAAM"); }
-                        }
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ReloadAAM"); }
+                    }
+                    //HP Repair
+                    if (Health == FullHealth)
+                    { HPRepairTimer = 0; }
+                    else
+                    { HPRepairTimer += DeltaTime; }
+                    if (HPRepairTimer > HPRepairDelay)
+                    {
+                        if (InEditor)
+                        { HPRepair(); }
+                        else
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "HPRepair"); }
                     }
                 }
                 else
                 {
                     DoAAMTargeting = false;
-                }
-
-                //joystick movement
-                if (!JoyStickNull)
-                {
-                    JoyStick.localRotation = Quaternion.Euler(new Vector3(InputX * 35f, 0, InputY * 35f));
                 }
             }
         }
@@ -368,24 +380,28 @@ public class AAGunController : UdonSharpBehaviour
         {
             AAGunAnimator.SetBool("firing", false);
         }
-        if (!dead)
+        //Sounds
+        if (AAMHasTarget && !AAMLocked && NumAAM > 0)
         {
-            AAGunAnimator.SetFloat("health", Health / FullHealth);
+            AAMLocking.gameObject.SetActive(true);
+            AAMLockedOn.gameObject.SetActive(false);
+        }
+        else if (AAMLocked)
+        {
+            AAMLocking.gameObject.SetActive(false);
+            AAMLockedOn.gameObject.SetActive(true);
         }
         else
         {
-            AAGunAnimator.SetFloat("health", 1);//dead, set animator health to full so that there's no phantom healthsmoke
+            AAMLocking.gameObject.SetActive(false);
+            AAMLockedOn.gameObject.SetActive(false);
         }
-
     }
     private void FixedUpdate()
     {
-        if (IsOwner)
+        if (Manning && DoAAMTargeting)
         {
-            if (DoAAMTargeting)
-            {
-                AAMTargeting(AAMLockAngle);
-            }
+            AAMTargeting(AAMLockAngle);
         }
     }
     public void Explode()//all the things players see happen when the vehicle explodes
@@ -395,12 +411,16 @@ public class AAGunController : UdonSharpBehaviour
             if (AAGunSeatStation != null) { AAGunSeatStation.ExitStation(localPlayer); }
         }
         dead = true;
-        AAGunAnimator.SetTrigger("explode");
         Health = FullHealth;//turns off low health smoke and stops it from calling Explode() every frame
+        AAGunAnimator.SetFloat("health", Health / FullHealth);
+        MGAmmoSeconds = MGAmmoFull;
+        NumAAM = FullAAMs;
         if (IsOwner)
         {
             Rotator.transform.localRotation = Quaternion.Euler(StartRot);
         }
+        AAGunAnimator.SetTrigger("explode");
+        AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
     }
     private void AAMTargeting(float Lock_Angle)
     {
@@ -445,7 +465,7 @@ public class AAGunController : UdonSharpBehaviour
                         && NextTargetAngle < Lock_Angle
                             && NextTargetDistance < AAMMaxTargetDistance
                                 && NextTargetAngle < AAMCurrentTargetAngle)
-                                    || (!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                    || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing) || !AAMTargets[AAMTarget].activeInHierarchy)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                 {
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;
@@ -496,7 +516,7 @@ public class AAGunController : UdonSharpBehaviour
             {
                 AAMHasTarget = true;
                 if (NumAAM > 0) AAMLockTimer += DeltaTime;
-                //give enemy radar lock even if you're out of missiles
+                //dont give enemy radar lock if you're out of missiles (planes can do this though)
                 if (!AAMCurrentTargetEngineControlNull)
                 {
                     //target is a plane
@@ -531,23 +551,6 @@ public class AAGunController : UdonSharpBehaviour
         Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
         Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < Lock_Angle));
         Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance)); */
-
-        //Sounds
-        if (AAMHasTarget && !AAMLocked)
-        {
-            AAMLocking.gameObject.SetActive(true);
-            AAMLockedOn.gameObject.SetActive(false);
-        }
-        else if (AAMLocked)
-        {
-            AAMLocking.gameObject.SetActive(false);
-            AAMLockedOn.gameObject.SetActive(true);
-        }
-        else
-        {
-            AAMLocking.gameObject.SetActive(false);
-            AAMLockedOn.gameObject.SetActive(false);
-        }
     }
     public void Targeted()
     {
@@ -588,10 +591,33 @@ public class AAGunController : UdonSharpBehaviour
     }
     public void ReloadAAM()
     {
-        ReloadTimer = 0;
-        if (NumAAM < FullAAMs)
-        { NumAAM++; }
+        AAMReloadTimer = 0;
+        NumAAM++;
+        if (NumAAM > FullAAMs) { NumAAM = FullAAMs; }
         AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+    }
+    public void HPRepair()
+    {
+        HPRepairTimer = 0;
+        Health += HPRepairAmount;
+        if (Health > FullHealth) { Health = FullHealth; }
+        AAGunAnimator.SetFloat("health", Health / FullHealth);
+    }
+    public void EnterSetStatus()
+    {
+        //Reload based on the amount of time passed while no one was inside
+        float TimeSinceLast = (Time.time - LastHealthUpdate);
+        LastHealthUpdate = Time.time;
+        //This function is called by OnStationEntered(), currently there's a bug where OnStationEntered() is called multiple times, when entering a seat
+        //this check stops it from doing anything more than once
+        if (TimeSinceLast > 1)
+        {
+            NumAAM = Mathf.Min((NumAAM + ((int)(TimeSinceLast / MissileReloadTime))), FullAAMs);
+            AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+            Health = Mathf.Min((Health + (((int)(TimeSinceLast / HPRepairDelay))) * HPRepairAmount), FullHealth);
+            AAGunAnimator.SetFloat("health", Health / FullHealth);
+            MGAmmoRecharge += TimeSinceLast * MGReloadSpeed;
+        }
     }
     void SortTargets(GameObject[] Targets, float[] order)
     {

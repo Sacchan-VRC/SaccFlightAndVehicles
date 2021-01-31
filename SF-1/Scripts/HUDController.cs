@@ -112,10 +112,11 @@ public class HUDController : UdonSharpBehaviour
         PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
 
-        BulletSpeedDivider = 1f / BulletSpeed;
-
-        FullFuelDivider = 1f / EngineControl.Fuel;
-        FullGunAmmoDivider = 1f / EngineControl.GunAmmoInSeconds;
+        BulletSpeedDivider = 1f / (BulletSpeed > 0 ? BulletSpeed : 10000000);
+        float fuel = EngineControl.Fuel;
+        FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
+        float gunammo = EngineControl.GunAmmoInSeconds;
+        FullGunAmmoDivider = 1f / (gunammo > 0 ? gunammo : 10000000);
     }
     private void OnEnable()
     {
@@ -211,24 +212,15 @@ public class HUDController : UdonSharpBehaviour
 
         //Heading indicator
         Vector3 VehicleEuler = EngineControl.VehicleMainObj.transform.rotation.eulerAngles;
-        Vector3 temprot = VehicleEuler;
-        temprot.x = 0;
-        temprot.z = 0;
-        HeadingIndicator.localRotation = Quaternion.Euler(-temprot);
+        HeadingIndicator.localRotation = Quaternion.Euler(new Vector3(0, -VehicleEuler.y, 0));
         /////////////////
 
         //Elevation indicator
-        temprot = VehicleEuler;
-        float new_z = temprot.z;
-        temprot.y = 0;
-        temprot.z = 0;
-        ElevationIndicator.localRotation = Quaternion.Euler(-temprot);
-        ElevationIndicator.RotateAround(ElevationIndicator.position, EngineControl.VehicleMainObj.transform.forward, -new_z);
-        ElevationIndicator.localPosition = Vector3.zero;
+        ElevationIndicator.rotation = Quaternion.Euler(new Vector3(0, VehicleEuler.y, 0));
         /////////////////
 
         //Down indicator
-        DownIndicator.localRotation = Quaternion.Euler(new Vector3(0, 0, -new_z));
+        DownIndicator.localRotation = Quaternion.Euler(new Vector3(0, 0, -VehicleEuler.z));
         /////////////////
 
         //LIMITS indicator

@@ -11,6 +11,7 @@ public class AAMController : UdonSharpBehaviour
     public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 45;
     public float RotSpeed = 400;
+    public float ProximityExplodeDistance = 10;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
     private float Lifetime = 0;
@@ -86,12 +87,33 @@ public class AAMController : UdonSharpBehaviour
         Vector3 Position = transform.position;
         Vector3 TargetPos = Target.position;
         float TargetDistance = Vector3.Distance(Position, TargetPos);
-        if ((TargetDistance < TargDistlastframe || LockHack) && Target.gameObject.activeInHierarchy && UnlockTime < .1f)
-        { TargetLost = false; UnlockTime = 0; }
-        else
+        if (!TargetLost)
         {
-            UnlockTime += Time.deltaTime;
-            if (UnlockTime >= .1f) //unlock .1s after flying past the target to account for jittery netcode
+            if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
+            {
+                if (((TargetDistance < TargDistlastframe || LockHack)))
+                {
+                    UnlockTime = 0;
+                    //turn towards the target
+                    Vector3 missileToTargetVector = TargetPos - Position;
+                    var missileForward = transform.forward;
+                    var targetDirection = missileToTargetVector.normalized;
+                    var rotationAxis = Vector3.Cross(missileForward, targetDirection);
+                    var deltaAngle = Vector3.Angle(missileForward, targetDirection);
+                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
+                }
+                else
+                {
+                    if (TargetDistance < ProximityExplodeDistance)
+                    {
+                        Debug.Log("Proximity!");
+                        Explode();
+                        TargetLost = true;
+                    }
+                    UnlockTime += Time.deltaTime;
+                }
+            }
+            else
             {
                 TargetLost = true;
                 if (MissileIncoming)
@@ -102,16 +124,6 @@ public class AAMController : UdonSharpBehaviour
                     MissileIncoming = false;
                 }
             }
-        }
-        if (!TargetLost)
-        {
-            //turn towards the target
-            Vector3 missileToTargetVector = TargetPos - Position;
-            var missileForward = transform.forward;
-            var targetDirection = missileToTargetVector.normalized;
-            var rotationAxis = Vector3.Cross(missileForward, targetDirection);
-            var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-            transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
         }
         TargDistlastframe = TargetDistance;
         Lifetime += DeltaTime;
@@ -135,7 +147,7 @@ public class AAMController : UdonSharpBehaviour
         if (MissileIncoming)
         {
             if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                TargetEngineControl.MissilesIncoming -= 1;
+            { TargetEngineControl.MissilesIncoming -= 1; }
             MissileIncoming = false;
         }
         if (TargetEngineControl != null)

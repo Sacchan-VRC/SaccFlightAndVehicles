@@ -27,11 +27,10 @@ public class HitDetectorAAGun : UdonSharpBehaviour
     }
     public void AAGunHit()
     {
-        if (AAGunControl.dead) return;
-        if (AAGunControl.localPlayer == null || AAGunControl.localPlayer.IsOwner(AAGunControl.gameObject))
-        {
-            AAGunControl.Health += -10;
-        }
+        if (AAGunControl.dead) { return; }
+        AAGunControl.Health -= 10;
+        AAGunControl.LastHealthUpdate = Time.time;
+        AAGunControl.AAGunAnimator.SetFloat("health", AAGunControl.Health / AAGunControl.FullHealth);
         if (BulletHit != null)
         {
             int rand = Random.Range(0, BulletHit.Length);

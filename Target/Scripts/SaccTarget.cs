@@ -8,13 +8,19 @@ public class SaccTarget : UdonSharpBehaviour
 {
     public float HitPoints = 100f;
     private float FullHealth;
-    private Animator TargetAnimator;
+    public Animator TargetAnimator;
     private VRCPlayerApi localPlayer;
+    void Start()
+    {
+        TargetAnimator = gameObject.GetComponent<Animator>();
+        FullHealth = HitPoints;
+        localPlayer = Networking.LocalPlayer;
+    }
     void OnParticleCollision(GameObject other)//hit by bullet
     {
         if (other == null) return;
-        HitPoints -= 10;
-        if (HitPoints <= 0f)
+
+        if (HitPoints <= 10f)//hit does 10 damage
         {
             if (localPlayer == null)//editor
             {
@@ -24,17 +30,26 @@ public class SaccTarget : UdonSharpBehaviour
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargetExplode");
             }
-            HitPoints = FullHealth;
+        }
+        else
+        {
+            if (localPlayer == null)//editor
+            {
+                TargetTakeDamage();
+            }
+            else//ingame
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargetTakeDamage");
+            }
         }
     }
-    void Start()
+    public void TargetTakeDamage()
     {
-        TargetAnimator = gameObject.GetComponent<Animator>();
-        FullHealth = HitPoints;
-        localPlayer = Networking.LocalPlayer;
+        HitPoints -= 10;
     }
     public void TargetExplode()
     {
         TargetAnimator.SetTrigger("explode");
+        HitPoints = FullHealth;
     }
 }

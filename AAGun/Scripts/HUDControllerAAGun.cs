@@ -12,21 +12,24 @@ public class HUDControllerAAGun : UdonSharpBehaviour
     public Transform HeadingIndicator;
     public Transform AAMTargetIndicator;
     public Transform GUNLeadIndicator;
-    public Transform ReloadBar;
+    public Transform AAMReloadBar;
+    public Transform MGReloadBar;
     public Text HUDText_AAM_ammo;
     public float distance_from_head = 1.333f;
     [System.NonSerializedAttribute] public Vector3 GUN_TargetDirOld;
     [System.NonSerializedAttribute] public float GUN_TargetSpeedLerper;
     public float BulletSpeed = 1050;
     private float BulletSpeedDivider;
-    private float ReloadBarDivider;
+    private float AAMReloadBarDivider;
+    private float MGReloadBarDivider;
     private void Start()
     {
         Assert(AAGunControl != null, "Start: AAGunControl != null");
         Assert(ElevationIndicator != null, "Start: ElevationIndicator != null");
         Assert(HeadingIndicator != null, "Start: HeadingIndicator != null");
         BulletSpeedDivider = 1f / BulletSpeed;
-        ReloadBarDivider = 1f / AAGunControl.MissileReloadTime;
+        AAMReloadBarDivider = 1f / AAGunControl.MissileReloadTime;
+        MGReloadBarDivider = 1f / AAGunControl.MGAmmoFull;
     }
     private void Update()
     {
@@ -54,8 +57,11 @@ public class HUDControllerAAGun : UdonSharpBehaviour
         /////////////////
 
         //AAM Reload bar
-        Vector3 reloadbarscale = new Vector3(AAGunControl.ReloadTimer * ReloadBarDivider, .3f, 0);
-        ReloadBar.localScale = reloadbarscale;
+        AAMReloadBar.localScale = new Vector3(AAGunControl.AAMReloadTimer * AAMReloadBarDivider, .3f, 0);
+        /////////////////
+
+        //MG Reload bar
+        MGReloadBar.localScale = new Vector3(AAGunControl.MGAmmoSeconds * MGReloadBarDivider, .3f, 0);
         /////////////////
 
         //GUN Lead Indicator
@@ -85,17 +91,12 @@ public class HUDControllerAAGun : UdonSharpBehaviour
         /////////////////
 
         //Heading indicator
-        Vector3 temprot = AAGunControl.Rotator.transform.rotation.eulerAngles;
-        temprot.x = 0;
-        temprot.z = 0;
-        HeadingIndicator.localRotation = Quaternion.Euler(-temprot);
+        Vector3 newrot = new Vector3(0, AAGunControl.Rotator.transform.rotation.eulerAngles.y, 0);
+        HeadingIndicator.localRotation = Quaternion.Euler(-newrot);
         /////////////////
 
         //Elevation indicator
-        temprot = AAGunControl.Rotator.transform.localRotation.eulerAngles;
-        temprot.y = 0;
-        temprot.z = 0;
-        ElevationIndicator.localRotation = Quaternion.Euler(-temprot);
+        ElevationIndicator.rotation = Quaternion.Euler(newrot);
         /////////////////
     }
     private void Assert(bool condition, string message)
