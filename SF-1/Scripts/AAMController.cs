@@ -11,7 +11,7 @@ public class AAMController : UdonSharpBehaviour
     public AudioSource[] ExplosionSounds;
     public float ColliderActiveDistance = 45;
     public float RotSpeed = 400;
-    public float ProximityExplodeDistance = 10;
+    public float ProximityExplodeDistance = 20;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
     private float Lifetime = 0;
@@ -104,9 +104,8 @@ public class AAMController : UdonSharpBehaviour
                 }
                 else
                 {
-                    if (TargetDistance < ProximityExplodeDistance)
+                    if (TargetDistance < ProximityExplodeDistance)//missile flew past the target, but is within proximity explode range?
                     {
-                        Debug.Log("Proximity!");
                         Explode();
                         TargetLost = true;
                     }

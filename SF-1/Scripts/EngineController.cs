@@ -356,22 +356,16 @@ public class EngineController : UdonSharpBehaviour
         }
 
         if (!HasLimits) { FlightLimitsEnabled = false; }
-        if (!HasCanopy) { EffectsControl.CanopyClosing(); }
-        else { EffectsControl.CanopyOpening(); }
-        if (!HasGear) { SetGearUp(); }
-        else { SetGearDown(); }
-        if (!HasFlaps) { SetFlapsOff(); }
-        else { SetFlapsOn(); }
 
         //get array of AAM Targets
-        RaycastHit[] aamtargs = Physics.SphereCastAll(CenterOfMass.transform.position, 1000000, VehicleMainObj.transform.forward, 5, AAMTargetsLayer, QueryTriggerInteraction.Collide);
+        Collider[] aamtargs = Physics.OverlapSphere(CenterOfMass.transform.position, 1000000, AAMTargetsLayer, QueryTriggerInteraction.Collide);
         int n = 0;
 
         //work out which index in the aamtargs array is our own plane by finding which one has this script as it's parent
         //allows for each team to have a different layer for AAMTargets
         int self = -1;
         n = 0;
-        foreach (RaycastHit target in aamtargs)
+        foreach (Collider target in aamtargs)
         {
             if (target.transform.parent != null && target.transform.parent == transform)
             {
@@ -382,12 +376,12 @@ public class EngineController : UdonSharpBehaviour
         //populate AAMTargets list excluding our own plane
         n = 0;
         int foundself = 0;
-        foreach (RaycastHit target in aamtargs)
+        foreach (Collider target in aamtargs)
         {
             if (n == self) { foundself = 1; n++; }
             else
             {
-                AAMTargets[n - foundself] = target.collider.gameObject;
+                AAMTargets[n - foundself] = target.gameObject;
                 n++;
             }
         }
@@ -452,7 +446,7 @@ public class EngineController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (!InEditor) { IsOwner = localPlayer.IsOwner(VehicleMainObj); }
         else { IsOwner = true; }
-        if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, GroundDetector.TransformDirection(Vector3.down), .44f, 2049 /* Default and Environment */))
+        if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */))
         { Taxiing = true; }
         else { Taxiing = false; }
 
@@ -613,7 +607,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             CatapultLaunchEffects();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects"); }
                     }
                 }
                 if (Input.GetKeyDown(KeyCode.H) && HasHook)
@@ -638,7 +632,7 @@ public class EngineController : UdonSharpBehaviour
                     ToggleAfterburner();
                 }
 
-                //with keys 1-4 we select weapons, if they are already selectet, deselect them.
+                //with keys 1-4 we select weapons, if they are already selected, deselect them.
                 if (Input.GetKeyDown(KeyCode.Alpha1) && HasGun)
                 {
                     if (RStickSelection == 1)
@@ -647,7 +641,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             RStick0();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
                         RStickSelection = 0;
                     }
                     else
@@ -657,7 +651,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             RStick1();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1"); }
                         RStickSelection = 1;
                     }
                 }
@@ -670,7 +664,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             RStick0();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
                         RStickSelection = 0;
                     }
                     else
@@ -679,7 +673,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             RStick2();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2"); }
                         RStickSelection = 2;
                     }
                 }
@@ -692,7 +686,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             RStick0();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
                         RStickSelection = 0;
                     }
                     else
@@ -703,7 +697,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             RStick3();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3"); }
                         RStickSelection = 3;
                     }
                 }
@@ -716,7 +710,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             RStick0();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
                         RStickSelection = 0;
                     }
                     else
@@ -725,7 +719,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             RStick4();
                         }
-                        else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4");
+                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4"); }
                         RStickSelection = 4;
                     }
                 }
@@ -2248,8 +2242,8 @@ public class EngineController : UdonSharpBehaviour
                 if ((LineOfSightNext
                     && hitnext.collider.gameObject.layer == OutsidePlaneLayer //did raycast hit an object on the layer planes are on?
                         && NextTargetAngle < Lock_Angle
-                            && NextTargetDistance < AAMMaxTargetDistance
-                                && NextTargetAngle < AAMCurrentTargetAngle)
+                            && NextTargetAngle < AAMCurrentTargetAngle)
+                                && NextTargetDistance < AAMMaxTargetDistance
                                     || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                                         || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                 {
@@ -2272,11 +2266,11 @@ public class EngineController : UdonSharpBehaviour
         //increase target checker ready for next frame
         AAMTargetChecker++;
         if (AAMTargetChecker == AAMTarget && AAMTarget == NumAAMTargets - 1)
-            AAMTargetChecker = 0;
+        { AAMTargetChecker = 0; }
         else if (AAMTargetChecker == AAMTarget)
-            AAMTargetChecker++;
+        { AAMTargetChecker++; }
         else if (AAMTargetChecker > NumAAMTargets - 1)
-            AAMTargetChecker = 0;
+        { AAMTargetChecker = 0; }
 
         //if target is currently in front of plane, lock onto it
         if (AAMCurrentTargetEngineControlNull)
@@ -2295,35 +2289,37 @@ public class EngineController : UdonSharpBehaviour
         { AAMTargetObscuredDelay = 0; }
 
         if (!Taxiing
-            && AAMTargets[AAMTarget].activeInHierarchy
-                && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
+            && (AAMTargetObscuredDelay < .25f)
+                && AAMCurrentTargetDistance < AAMMaxTargetDistance
+                    && AAMTargets[AAMTarget].activeInHierarchy
+                        && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
         {
-            if ((AAMTargetObscuredDelay < .25f)
-                    && AAMCurrentTargetAngle < Lock_Angle
-                        && AAMCurrentTargetDistance < AAMMaxTargetDistance)
+            if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
             {
                 AAMHasTarget = true;
-                if (NumAAM > 0) AAMLockTimer += DeltaTime;
-                //give enemy radar lock even if you're out of missiles
-                if (!AAMCurrentTargetEngineControlNull && RStickSelection == 2)// Only send Targeted if using AAMs, not gun.
+                if (AAMCurrentTargetAngle < Lock_Angle && NumAAM > 0)
                 {
-                    //target is a plane
-                    AAMTargetedTimer += DeltaTime;
-                    if (AAMTargetedTimer > 1)
+                    AAMLockTimer += DeltaTime;
+                    //give enemy radar lock even if you're out of missiles
+                    if (!AAMCurrentTargetEngineControlNull && RStickSelection == 2)// Only send Targeted if using AAMs, not gun.
                     {
-                        AAMTargetedTimer = 0;
-                        if (InEditor)
-                            Targeted();
-                        else
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted");
+                        //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
+                        AAMTargetedTimer += DeltaTime;
+                        if (AAMTargetedTimer > 1)
+                        {
+                            AAMTargetedTimer = 0;
+                            if (InEditor)
+                            { Targeted(); }
+                            else
+                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted"); }
+                        }
                     }
                 }
-            }
-            else
-            {
-                AAMTargetedTimer = 2f;//so it plays straight away next time it's targeted
-                AAMLockTimer = 0;
-                AAMHasTarget = false;
+                else
+                {
+                    AAMTargetedTimer = 2f;
+                    AAMLockTimer = 0;
+                }
             }
         }
         else
@@ -2332,6 +2328,18 @@ public class EngineController : UdonSharpBehaviour
             AAMLockTimer = 0;
             AAMHasTarget = false;
         }
+        /*         if (HUDControl.gameObject.activeInHierarchy)
+                {
+                    Debug.Log(string.Concat("AAMTarget ", AAMTarget));
+                    Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
+                    Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
+                    Debug.Log(string.Concat("LoS ", LineOfSightCur));
+                    Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsidePlaneLayer)));
+                    Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
+                    Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
+                    Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < Lock_Angle));
+                    Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance));
+                } */
     }
     public void PlayCableSnap()
     {

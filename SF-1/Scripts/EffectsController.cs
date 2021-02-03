@@ -116,10 +116,10 @@ public class EffectsController : UdonSharpBehaviour
 
         //set these values at start in case they haven't been set correctly in editor
         if (!EngineControl.HasCanopy) { CanopyClosing(); }
-        PlaneAnimator.SetBool("gearup", GearUp);
-        PlaneAnimator.SetBool("flaps", Flaps);
-        PlaneAnimator.SetBool("hookdown", HookDown);
-        PlaneAnimator.SetBool("displaysmoke", Smoking);
+        if (!EngineControl.HasGear) { EngineControl.SetGearUp(); }
+        else { EngineControl.SetGearDown(); }
+        if (!EngineControl.HasFlaps) { EngineControl.SetFlapsOff(); }
+        else { EngineControl.SetFlapsOn(); }
     }
     private void Update()
     {

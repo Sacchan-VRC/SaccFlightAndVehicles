@@ -361,9 +361,9 @@ public class HUDController : UdonSharpBehaviour
         MenuSoundCheckLast = MenuSoundCheck;
 
         //AGMScreen
-        if (EngineControl.RStickSelection == 3 && !EngineControl.AGMLocked)
+        if (EngineControl.RStickSelection == 3)
         {
-            if (!EngineControl.AtGCamNull)
+            if (!EngineControl.AGMLocked)
             {
                 AtGScreen.SetActive(true);
                 EngineControl.AtGCam.gameObject.SetActive(true);
@@ -385,39 +385,32 @@ public class HUDController : UdonSharpBehaviour
                     EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 3.5f * DeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
             }
-        }
-        else if (EngineControl.RStickSelection == 4)
-        {
-            if (!EngineControl.AtGCamNull)
+            else
             {
-                EngineControl.AtGCam.gameObject.SetActive(true);
                 AtGScreen.SetActive(true);
-                EngineControl.AtGCam.fieldOfView = 60;
-                EngineControl.AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
-            }
-        }
-        else if (EngineControl.AGMLocked)
-        {
-            if (!EngineControl.AtGCamNull)
-            {
                 EngineControl.AtGCam.gameObject.SetActive(true);
                 EngineControl.AtGCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
+
+                RaycastHit camhit;
+                Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
+                if (camhit.point != null)
+                {
+                    //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
+                    EngineControl.AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * DeltaTime), 0.3f);
+                }
             }
-            RaycastHit camhit;
-            Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
-            if (camhit.point != null)
-            {
-                //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                EngineControl.AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * DeltaTime), 0.3f);
-            }
+        }
+        else if (EngineControl.RStickSelection == 4)//bomb selected
+        {
+            EngineControl.AtGCam.gameObject.SetActive(true);
+            AtGScreen.SetActive(true);
+            EngineControl.AtGCam.fieldOfView = 60;
+            EngineControl.AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
         }
         else
         {
-            if (!EngineControl.AtGCamNull)
-            {
-                AtGScreen.SetActive(false);
-                EngineControl.AtGCam.gameObject.SetActive(false);
-            }
+            AtGScreen.SetActive(false);
+            EngineControl.AtGCam.gameObject.SetActive(false);
         }
 
 

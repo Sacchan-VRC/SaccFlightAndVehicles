@@ -28,6 +28,12 @@ public class PilotSeat : UdonSharpBehaviour
     }
     private void Interact()//entering the plane
     {
+        //setting this as a workaround because it doesnt work reliably in Enginecontroller's Start()
+        if (EngineControl.localPlayer.IsUserInVR()) { EngineControl.InVR = true; }
+
+        EngineControl.localPlayer.UseAttachedStation();
+        Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
+
         if (EngineControl.VehicleMainObj != null) { Networking.SetOwner(EngineControl.localPlayer, EngineControl.VehicleMainObj); }
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
 
@@ -36,27 +42,21 @@ public class PilotSeat : UdonSharpBehaviour
         EngineControl.PlayerThrottle = 0;
         EngineControl.IsFiringGun = false;
         EngineControl.VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
-        if (!EngineControl.InEditor)
-        {
-            EngineControl.localPlayer.UseAttachedStation();
-            Networking.SetOwner(EngineControl.localPlayer, EngineControl.gameObject);
-        }
+
         EngineControl.Piloting = true;
-        //canopy closed/open sound
         if (EngineControl.dead) EngineControl.Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
         if (EngineControl.EffectsControl != null)
         {
+            //canopy closed/open sound
             if (EngineControl.EffectsControl.CanopyOpen) { EngineControl.CanopyCloseTimer = -100000 - EngineControl.CanopyCloseTime; }
             else EngineControl.CanopyCloseTimer = -EngineControl.CanopyCloseTime;//less than 0
-            if (!EngineControl.InEditor)
-            { Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject); }
+            Networking.SetOwner(EngineControl.localPlayer, EngineControl.EffectsControl.gameObject);
             EngineControl.EffectsControl.Smoking = false;
         }
         if (EngineControl.HUDControl != null)
         {
-            if (!EngineControl.InEditor)
-            { Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject); }
+            Networking.SetOwner(EngineControl.localPlayer, EngineControl.HUDControl.gameObject);
             EngineControl.HUDControl.gameObject.SetActive(true);
         }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }

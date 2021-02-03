@@ -30,6 +30,8 @@ public class AAGunSeat : UdonSharpBehaviour
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
         if (AAGunControl.localPlayer != null) { AAGunControl.localPlayer.UseAttachedStation(); }
         if (AAGunControl.HUDControl != null) { AAGunControl.HUDControl.GUN_TargetSpeedLerper = 0; }
+
+        if (AAGunControl.NumAAMTargets != 0) { AAGunControl.DoAAMTargeting = true; }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {

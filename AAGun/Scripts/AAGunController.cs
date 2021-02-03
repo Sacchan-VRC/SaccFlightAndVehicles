@@ -11,7 +11,6 @@ public class AAGunController : UdonSharpBehaviour
     public VRCStation AAGunSeatStation;
     public HUDControllerAAGun HUDControl;
     public Camera AACam;
-    public bool HasHUD = true;
     public float TurnSpeedMulti = 10;
     public float TurnFriction = 0.1f;
     public float UpAngleMax = 89;
@@ -48,7 +47,6 @@ public class AAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float RotationSpeedX = 0f;
     [System.NonSerializedAttribute] public float RotationSpeedY = 0f;
     private Vector3 StartRot;
-    private float RstickV;
     [System.NonSerializedAttribute] public bool InEditor = true;
     [System.NonSerializedAttribute] public bool IsOwner = false;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
@@ -103,6 +101,7 @@ public class AAGunController : UdonSharpBehaviour
         Assert(JoyStick != null, "Start: JoyStick != null");
 
 
+        if (InEditor) { DoAAMTargeting = true; }
 
         if (JoyStick != null) { JoyStickNull = false; }
 
@@ -118,14 +117,14 @@ public class AAGunController : UdonSharpBehaviour
         FullMGDivider = 1f / (MGAmmoFull > 0 ? MGAmmoFull : 10000000);
 
         //get array of AAM Targets
-        RaycastHit[] aamtargs = Physics.SphereCastAll(VehicleMainObj.transform.position, 1000000, VehicleMainObj.transform.forward, 5, AAMTargetsLayer, QueryTriggerInteraction.Collide);
+        Collider[] aamtargs = Physics.OverlapSphere(VehicleMainObj.transform.position, 1000000, AAMTargetsLayer, QueryTriggerInteraction.Collide);
         int n = 0;
 
         //work out which index in the aamtargs array is our own plane by finding which one has this script as it's parent
         //allows for each team to have a different layer for AAMTargets
         int self = -1;
         n = 0;
-        foreach (RaycastHit target in aamtargs)
+        foreach (Collider target in aamtargs)
         {
             if (target.transform.parent != null && target.transform.parent == transform)
             {
@@ -136,12 +135,12 @@ public class AAGunController : UdonSharpBehaviour
         //populate AAMTargets list excluding our own plane
         n = 0;
         int foundself = 0;
-        foreach (RaycastHit target in aamtargs)
+        foreach (Collider target in aamtargs)
         {
             if (n == self) { foundself = 1; n++; }
             else
             {
-                AAMTargets[n - foundself] = target.collider.gameObject;
+                AAMTargets[n - foundself] = target.gameObject;
                 n++;
             }
         }
@@ -208,14 +207,11 @@ public class AAGunController : UdonSharpBehaviour
                 int Af = Input.GetKey(KeyCode.A) ? -1 : 0;
                 int Df = Input.GetKey(KeyCode.D) ? 1 : 0;
 
-                float LstickV = 0;
                 float RGrip = 0;
                 float RTrigger = 0;
                 float LTrigger = 0;
                 if (!InEditor)
                 {
-                    RstickV = -Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                    LstickV = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                     RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                     LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                     RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
@@ -310,65 +306,53 @@ public class AAGunController : UdonSharpBehaviour
                     MGAmmoSeconds = Mathf.Max(MGAmmoRecharge, MGAmmoSeconds);
                 }
 
-                if (HasHUD)
+                if (DoAAMTargeting)
                 {
-                    DoAAMTargeting = true;
-                    if (NumAAMTargets != 0)
+                    if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
+                    else { AAMLocked = false; }
+                    //firing AAM
+                    if (LTrigger > 0.75 || (Input.GetKey(KeyCode.C)))
                     {
-                        if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
-                        else { AAMLocked = false; }
-
-                        //firing AAM
-                        if (LTrigger > 0.75 || (Input.GetKey(KeyCode.C)))
+                        if (!LTriggerLastFrame)
                         {
-                            if (!LTriggerLastFrame)
+                            if (AAMLocked && Time.time - AAMLastFiredTime > 0.5)
                             {
-                                if (AAMLocked && Time.time - AAMLastFiredTime > 0.5)
-                                {
-                                    AAMLastFiredTime = Time.time;
-                                    if (InEditor)
-                                    { LaunchAAM(); }
-                                    else
-                                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM"); }
-                                    if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
-                                }
+                                AAMLastFiredTime = Time.time;
+                                if (InEditor)
+                                { LaunchAAM(); }
+                                else
+                                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM"); }
+                                if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                             }
-                            LTriggerLastFrame = true;
                         }
-                        else LTriggerLastFrame = false;
+                        LTriggerLastFrame = true;
                     }
-                    else
-                    {
-                        firing = false;
-                    }
-                    //reloading AAMs
-                    if (NumAAM == FullAAMs)
-                    { AAMReloadTimer = 0; }
-                    else
-                    { AAMReloadTimer += DeltaTime; }
-                    if (AAMReloadTimer > MissileReloadTime)
-                    {
-                        if (InEditor)
-                        { ReloadAAM(); }
-                        else
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ReloadAAM"); }
-                    }
-                    //HP Repair
-                    if (Health == FullHealth)
-                    { HPRepairTimer = 0; }
-                    else
-                    { HPRepairTimer += DeltaTime; }
-                    if (HPRepairTimer > HPRepairDelay)
-                    {
-                        if (InEditor)
-                        { HPRepair(); }
-                        else
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "HPRepair"); }
-                    }
+                    else LTriggerLastFrame = false;
                 }
+
+                //reloading AAMs
+                if (NumAAM == FullAAMs)
+                { AAMReloadTimer = 0; }
                 else
+                { AAMReloadTimer += DeltaTime; }
+                if (AAMReloadTimer > MissileReloadTime)
                 {
-                    DoAAMTargeting = false;
+                    if (InEditor)
+                    { ReloadAAM(); }
+                    else
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ReloadAAM"); }
+                }
+                //HP Repair
+                if (Health == FullHealth)
+                { HPRepairTimer = 0; }
+                else
+                { HPRepairTimer += DeltaTime; }
+                if (HPRepairTimer > HPRepairDelay)
+                {
+                    if (InEditor)
+                    { HPRepair(); }
+                    else
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "HPRepair"); }
                 }
             }
         }
@@ -381,7 +365,7 @@ public class AAGunController : UdonSharpBehaviour
             AAGunAnimator.SetBool("firing", false);
         }
         //Sounds
-        if (AAMHasTarget && !AAMLocked && NumAAM > 0)
+        if (AAMLockTimer > 0 && !AAMLocked && NumAAM > 0)
         {
             AAMLocking.gameObject.SetActive(true);
             AAMLockedOn.gameObject.SetActive(false);
@@ -486,11 +470,11 @@ public class AAGunController : UdonSharpBehaviour
         //increase target checker ready for next frame
         AAMTargetChecker++;
         if (AAMTargetChecker == AAMTarget && AAMTarget == NumAAMTargets - 1)
-            AAMTargetChecker = 0;
+        { AAMTargetChecker = 0; }
         else if (AAMTargetChecker == AAMTarget)
-            AAMTargetChecker++;
+        { AAMTargetChecker++; }
         else if (AAMTargetChecker > NumAAMTargets - 1)
-            AAMTargetChecker = 0;
+        { AAMTargetChecker = 0; }
 
         //if target is currently in front of plane, lock onto it
         if (AAMCurrentTargetEngineControlNull)
@@ -511,24 +495,31 @@ public class AAGunController : UdonSharpBehaviour
                 && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
         {
             if ((AAMTargetObscuredDelay < .25f)
-                    && AAMCurrentTargetAngle < Lock_Angle
                         && AAMCurrentTargetDistance < AAMMaxTargetDistance)
             {
                 AAMHasTarget = true;
-                if (NumAAM > 0) AAMLockTimer += DeltaTime;
-                //dont give enemy radar lock if you're out of missiles (planes can do this though)
-                if (!AAMCurrentTargetEngineControlNull)
+                if (AAMCurrentTargetAngle < Lock_Angle && NumAAM > 0)
                 {
-                    //target is a plane
-                    AAMTargetedTimer += DeltaTime;
-                    if (AAMTargetedTimer > 1)
+                    AAMLockTimer += DeltaTime;
+                    //dont give enemy radar lock if you're out of missiles (planes can do this though)
+                    if (!AAMCurrentTargetEngineControlNull)
                     {
-                        AAMTargetedTimer = 0;
-                        if (InEditor)
-                            Targeted();
-                        else
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted");
+                        //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
+                        AAMTargetedTimer += DeltaTime;
+                        if (AAMTargetedTimer > 1)
+                        {
+                            AAMTargetedTimer = 0;
+                            if (InEditor)
+                            { Targeted(); }
+                            else
+                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted"); }
+                        }
                     }
+                }
+                else
+                {
+                    AAMTargetedTimer = 2f;
+                    AAMLockTimer = 0;
                 }
             }
             else
@@ -546,7 +537,7 @@ public class AAGunController : UdonSharpBehaviour
         }
         /*Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
         Debug.Log(string.Concat("LoS ", LineOfSightCur));
-        Debug.Log(string.Concat("RayCastCorrectLayer ", !(hitcurrent.collider.gameObject.layer != PlaneHitBoxLayer)));
+        Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == PlaneHitBoxLayer)));
         Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
         Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
         Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < Lock_Angle));
