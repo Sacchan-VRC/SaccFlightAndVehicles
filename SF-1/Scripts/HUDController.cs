@@ -57,17 +57,18 @@ public class HUDController : UdonSharpBehaviour
     private float check = 0;
     [System.NonSerializedAttribute] public float MenuSoundCheckLast = 0;
     private int showvel;
-    const float InputSquareSize = 0.0284317f;
+    const float InputSquareSize = 0.0284317f;//size of the square on the HUD that shows inputs
     [System.NonSerializedAttribute] public Vector3 GUN_TargetDirOld;
     [System.NonSerializedAttribute] public float GUN_TargetSpeedLerper;
+    [System.NonSerializedAttribute] public Vector3 RelativeTargetVelLastFrame;
     private Vector3 TargetDir = Vector3.zero;
     private Vector3 TargetSpeed;
     private bool HasAAMTargets = false;
-    private float BulletSpeedDivider;
     private float FullFuelDivider;
     private float FullGunAmmoDivider;
     private Vector3 RelativeTargetVel;
     private Vector3 AAMCurrentTargetPositionLastFrame;
+    private Transform VehicleTransform;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -111,8 +112,8 @@ public class HUDController : UdonSharpBehaviour
 
         PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
+        VehicleTransform = EngineControl.VehicleMainObj.transform;
 
-        BulletSpeedDivider = 1f / (BulletSpeed > 0 ? BulletSpeed : 10000000);
         float fuel = EngineControl.Fuel;
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
         float gunammo = EngineControl.GunAmmoInSeconds;
@@ -185,7 +186,6 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.AAMHasTarget && EngineControl.RStickSelection == 1)
         {
             GUNLeadIndicator.gameObject.SetActive(true);
-
             Vector3 TargetDir;
             if (EngineControl.AAMCurrentTargetEngineControl == null)//target is a dummy target
             { TargetDir = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.position - transform.position; }
@@ -193,15 +193,20 @@ public class HUDController : UdonSharpBehaviour
             { TargetDir = EngineControl.AAMCurrentTargetEngineControl.CenterOfMass.position - transform.position; }
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-            //GUN_TargetDirOld is around 10 frames worth of distance behind a moving target (lerped by .1) in order to smooth out the calculation
+            float BulletPlusPlaneSpeed = (EngineControl.CurrentVel + (VehicleTransform.forward * BulletSpeed) + (RelativeTargetVel * .1f)).magnitude;
+            Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
+            //GUN_TargetDirOld is around 10 frames worth of distance behind a moving target (lerped by .1) in order to smooth out the calculation for unsmooth netcode
             //multiplying the result by .1(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
             GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .1f) / DeltaTime, .6f * DeltaTime);
-            float BulletHitTime = TargetDir.magnitude * BulletSpeedDivider;
+            float BulletHitTime = TargetDir.magnitude / BulletPlusPlaneSpeed;
             //normalize lerped relative target velocity vector and multiply by lerped speed
-            Vector3 PredictedPos = TargetDir + ((RelativeTargetVel.normalized * GUN_TargetSpeedLerper) * BulletHitTime);
+            Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
+            //the .05 in the next line is combined .1 for undoing the lerp, and .5 for the acceleration formula
+            Vector3 PredictedPos = (TargetDir /* Linear */+ ((RelTargVelNormalized * GUN_TargetSpeedLerper)/* /Linear */ /* Acceleration */+ (TargetAccel * .05f * BulletHitTime)  /* /Acceleration */ /* Bulletdrop */+ new Vector3(0, 9.81f * .5f * BulletHitTime, 0))/* /Bulletdrop */ * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
+            RelativeTargetVelLastFrame = RelativeTargetVel;
             GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .1f);
         }
         else GUNLeadIndicator.gameObject.SetActive(false);

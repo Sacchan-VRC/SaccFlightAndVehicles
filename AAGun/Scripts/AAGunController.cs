@@ -461,6 +461,7 @@ public class AAGunController : UdonSharpBehaviour
                     AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
                     if (HUDControl != null)
                     {
+                        HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
                         HUDControl.GUN_TargetSpeedLerper = 0f;
                         HUDControl.GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
                     }

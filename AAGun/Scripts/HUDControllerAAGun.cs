@@ -18,10 +18,13 @@ public class HUDControllerAAGun : UdonSharpBehaviour
     public float distance_from_head = 1.333f;
     [System.NonSerializedAttribute] public Vector3 GUN_TargetDirOld;
     [System.NonSerializedAttribute] public float GUN_TargetSpeedLerper;
+    [System.NonSerializedAttribute] public Vector3 RelativeTargetVel;
+    [System.NonSerializedAttribute] public Vector3 RelativeTargetVelLastFrame;
     public float BulletSpeed = 1050;
     private float BulletSpeedDivider;
     private float AAMReloadBarDivider;
     private float MGReloadBarDivider;
+    private Transform Rotator;
     private void Start()
     {
         Assert(AAGunControl != null, "Start: AAGunControl != null");
@@ -30,6 +33,8 @@ public class HUDControllerAAGun : UdonSharpBehaviour
         BulletSpeedDivider = 1f / BulletSpeed;
         AAMReloadBarDivider = 1f / AAGunControl.MissileReloadTime;
         MGReloadBarDivider = 1f / AAGunControl.MGAmmoFull;
+
+        Rotator = AAGunControl.Rotator.transform;
     }
     private void Update()
     {
@@ -68,7 +73,6 @@ public class HUDControllerAAGun : UdonSharpBehaviour
         if (AAGunControl.AAMHasTarget)
         {
             GUNLeadIndicator.gameObject.SetActive(true);
-
             Vector3 TargetDir;
             if (AAGunControl.AAMCurrentTargetEngineControl == null)//target is a dummy target
             { TargetDir = AAGunControl.AAMTargets[AAGunControl.AAMTarget].transform.position - transform.position; }
@@ -76,22 +80,25 @@ public class HUDControllerAAGun : UdonSharpBehaviour
             { TargetDir = AAGunControl.AAMCurrentTargetEngineControl.CenterOfMass.position - transform.position; }
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-            //GUN_TargetDirOld is around 10 frames worth of distance behind a moving target (lerped by .1) in order to smooth out the calculation
+            Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
+            //GUN_TargetDirOld is around 10 frames worth of distance behind a moving target (lerped by .1) in order to smooth out the calculation for unsmooth netcode
             //multiplying the result by .1(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
             GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .1f) / DeltaTime, .6f * DeltaTime);
-            float BulletHitTime = TargetDir.magnitude * BulletSpeedDivider;
+            float BulletHitTime = TargetDir.magnitude / BulletSpeed;
             //normalize lerped relative target velocity vector and multiply by lerped speed
-            Vector3 PredictedPos = TargetDir + ((RelativeTargetVel.normalized * GUN_TargetSpeedLerper) * BulletHitTime);
+            Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
+            Vector3 PredictedPos = TargetDir /* Linear */+ (((RelTargVelNormalized * GUN_TargetSpeedLerper)/* /Linear */  /* Acceleration */+ (TargetAccel * .05f * BulletHitTime) /* /Acceleration */ /* Bulletdrop */+ new Vector3(0, 9.81f * .5f * BulletHitTime, 0))/* /Bulletdrop */ * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
+            RelativeTargetVelLastFrame = RelativeTargetVel;
             GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .1f);
         }
         else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
 
         //Heading indicator
-        Vector3 newrot = new Vector3(0, AAGunControl.Rotator.transform.rotation.eulerAngles.y, 0);
+        Vector3 newrot = new Vector3(0, Rotator.rotation.eulerAngles.y, 0);
         HeadingIndicator.localRotation = Quaternion.Euler(-newrot);
         /////////////////
 
