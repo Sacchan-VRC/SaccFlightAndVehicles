@@ -26,7 +26,7 @@ public class WindChangerRespawner : UdonSharpBehaviour
     {
         if (!condition)
         {
-            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

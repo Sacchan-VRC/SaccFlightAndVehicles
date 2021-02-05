@@ -28,7 +28,7 @@ public class LeaveVehicleButton : UdonSharpBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Return) || (Input.GetButtonDown("Oculus_CrossPlatform_Button4")))
+        if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
         {
             ExitStation();
         }
@@ -43,7 +43,7 @@ public class LeaveVehicleButton : UdonSharpBehaviour
     {
         if (!condition)
         {
-            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

@@ -50,7 +50,7 @@ public class HitDetectorAAGun : UdonSharpBehaviour
     {
         if (!condition)
         {
-            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

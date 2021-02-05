@@ -32,6 +32,13 @@ public class AAGunSeat : UdonSharpBehaviour
         if (AAGunControl.HUDControl != null) { AAGunControl.HUDControl.GUN_TargetSpeedLerper = 0; }
 
         if (AAGunControl.NumAAMTargets != 0) { AAGunControl.DoAAMTargeting = true; }
+
+        //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
+        var Target = AAGunControl.AAMTargets[AAGunControl.AAMTarget];
+        if (Target && Target.transform.parent)
+        {
+            AAGunControl.AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
+        }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
@@ -61,7 +68,7 @@ public class AAGunSeat : UdonSharpBehaviour
     {
         if (!condition)
         {
-            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

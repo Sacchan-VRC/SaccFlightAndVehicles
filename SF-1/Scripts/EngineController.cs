@@ -1995,11 +1995,9 @@ public class EngineController : UdonSharpBehaviour
 
     //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
     //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
-    //This code adds or removes 100000 based on the situation, + the time it takes for the animation to play.
-    //This part is effectively disabled (by not allowing toggling if in transition) because it isn't reliable enough ->>//If the Opening animation is playing when you tell it to close it keeps the time from that animation so that the timing of the sound changing is always correct.
     private void ToggleCanopy()
     {
-        if (CanopyCloseTimer <= -100000)
+        if (CanopyCloseTimer <= -100000 - CanopyCloseTime)
         {
             EffectsControl.SetCanopyClosed();
         }
@@ -2683,7 +2681,7 @@ public class EngineController : UdonSharpBehaviour
     {
         if (!condition)
         {
-            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

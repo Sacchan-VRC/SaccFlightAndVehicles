@@ -87,7 +87,11 @@ public class HUDControllerAAGun : UdonSharpBehaviour
             float BulletHitTime = TargetDir.magnitude / BulletSpeed;
             //normalize lerped relative target velocity vector and multiply by lerped speed
             Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
-            Vector3 PredictedPos = TargetDir /* Linear */+ (((RelTargVelNormalized * GUN_TargetSpeedLerper)/* /Linear */  /* Acceleration */+ (TargetAccel * .05f * BulletHitTime) /* /Acceleration */ /* Bulletdrop */+ new Vector3(0, 9.81f * .5f * BulletHitTime, 0))/* /Bulletdrop */ * BulletHitTime);
+            Vector3 PredictedPos = TargetDir
+                + (((RelTargVelNormalized * GUN_TargetSpeedLerper)//Linear
+                    + (TargetAccel * .05f * BulletHitTime)//Acceleration
+                        + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
+                            * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
@@ -110,7 +114,7 @@ public class HUDControllerAAGun : UdonSharpBehaviour
     {
         if (!condition)
         {
-            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

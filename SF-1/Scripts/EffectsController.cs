@@ -115,11 +115,13 @@ public class EffectsController : UdonSharpBehaviour
 
 
         //set these values at start in case they haven't been set correctly in editor
-        if (!EngineControl.HasCanopy) { CanopyClosing(); }
+        if (!EngineControl.HasCanopy) { CanopyOpen = true; CanopyClosing(); }
+        else { CanopyOpen = false; CanopyOpening(); }
         if (!EngineControl.HasGear) { EngineControl.SetGearUp(); }
         else { EngineControl.SetGearDown(); }
         if (!EngineControl.HasFlaps) { EngineControl.SetFlapsOff(); }
         else { EngineControl.SetFlapsOn(); }
+        EngineControl.SetHookUp();
     }
     private void Update()
     {
@@ -317,7 +319,7 @@ public class EffectsController : UdonSharpBehaviour
     {
         if (!condition)
         {
-            Debug.LogError("Assertion failed : '" + GetType() + " : " + message + "'", this);
+            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }
