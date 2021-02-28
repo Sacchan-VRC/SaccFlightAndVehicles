@@ -6,38 +6,36 @@ using VRC.Udon;
 
 public class AAGunController : UdonSharpBehaviour
 {
-    public GameObject Rotator;
     public GameObject VehicleMainObj;
-    public VRCStation AAGunSeatStation;
+    public GameObject Rotator;
     public HUDControllerAAGun HUDControl;
-    public Camera AACam;
-    public float TurnSpeedMulti = 10;
-    public float TurnFriction = 0.1f;
+    public VRCStation AAGunSeat;
+    public GameObject AAM;
+    public AudioSource AAMLocking;
+    public AudioSource AAMLockedOn;
+    public Transform JoyStick;
+    public float Health = 100f;
+    public float TurnSpeedMulti = 5;
+    public float TurnFriction = 4;
     public float UpAngleMax = 89;
     public float DownAngleMax = 35;
-    //public float TurningResponse = .35f;
-    public float TurningResponseDesktop = 1.1f;
-    public float MissileReloadTime = 10;
-    public float Health = 100f;
+    public float TurningResponseDesktop = 3f;
     public float HPRepairDelay = 5f;
     public float HPRepairAmount = 5f;
+    public float MissileReloadTime = 10;
     public float MGAmmoSeconds = 4;
-    private float MGAmmoRecharge = 0;
-    public float MGReloadDelay = 2;
     public float MGReloadSpeed = 1;
+    public float MGReloadDelay = 2;
+    private float MGAmmoRecharge = 0;
     [System.NonSerializedAttribute] public float MGAmmoFull = 4;
     private float FullMGDivider;
-    public GameObject AAM;
-    public int NumAAM = 6;
+    public int NumAAM = 4;
     public float AAMMaxTargetDistance = 6000;
-    public float AAMLockAngle = 15;
+    public float AAMLockAngle = 20;
     public float AAMLockTime = 1.5f;
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public float PlaneHitBoxLayer = 17;//walkthrough
-    public AudioSource AAMLocking;
-    public AudioSource AAMLockedOn;
-    public Transform JoyStick;
     [System.NonSerializedAttribute] public Animator AAGunAnimator;
     [System.NonSerializedAttribute] public bool dead;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool firing;
@@ -93,8 +91,7 @@ public class AAGunController : UdonSharpBehaviour
 
         Assert(Rotator != null, "Start: Rotator != null");
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
-        Assert(AAGunSeatStation != null, "Start: AAGunSeatStation != null");
-        Assert(AACam != null, "Start: AACam != null");
+        Assert(AAGunSeat != null, "Start: AAGunSeatStation != null");
         Assert(AAM != null, "Start: AAM != null");
         Assert(AAMLocking != null, "Start: AAMLocking != null");
         Assert(AAMLockedOn != null, "Start: AAMLockedOn != null");
@@ -178,6 +175,7 @@ public class AAGunController : UdonSharpBehaviour
         }
         else
         {
+            Debug.LogWarning(string.Concat(VehicleMainObj.name, ": NO AAM TARGETS FOUND"));
             AAMTargets[0] = gameObject;//this should prevent HUDController from crashing with a null reference while causing no ill effects
         }
     }
@@ -224,11 +222,11 @@ public class AAGunController : UdonSharpBehaviour
                 {
                     if (RGrip > 0.75)
                     {
-                        Quaternion PlaneRotDif = Rotator.transform.rotation * Quaternion.Inverse(AAGunRotLastFrame);//difference in plane's rotation since last frame
-                        JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
+                        Quaternion RotDif = Rotator.transform.rotation * Quaternion.Inverse(AAGunRotLastFrame);//difference in vehicle's rotation since last frame
+                        JoystickZeroPoint = RotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
                         if (!RGripLastFrame)//first frame you gripped joystick
                         {
-                            PlaneRotDif = Quaternion.identity;
+                            RotDif = Quaternion.identity;
                             JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
                         }
                         //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
@@ -392,7 +390,7 @@ public class AAGunController : UdonSharpBehaviour
     {
         if (Manning)
         {
-            if (AAGunSeatStation != null) { AAGunSeatStation.ExitStation(localPlayer); }
+            if (AAGunSeat != null) { AAGunSeat.ExitStation(localPlayer); }
         }
         dead = true;
         Health = FullHealth;//turns off low health smoke and stops it from calling Explode() every frame
@@ -457,7 +455,7 @@ public class AAGunController : UdonSharpBehaviour
                     AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                     AAMCurrentTargetEngineControl = NextTargetEngineControl;
                     AAMLockTimer = 0;
-                    AAMTargetedTimer = .6f;//give the synced variable time to update before sending targeted
+                    AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
                     AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
                     if (HUDControl != null)
                     {
@@ -562,7 +560,7 @@ public class AAGunController : UdonSharpBehaviour
         GameObject NewAAM = VRCInstantiate(AAM);
         if (!(NumAAM % 2 == 0))
         {
-            //invert local x coordinates of launch point, launch, then revert
+            //invert local x coordinates of launch point, launch, then revert, for odd numbered shots
             Vector3 temp = AAMLaunchPoint.localPosition;
             temp.x *= -1;
             AAMLaunchPoint.localPosition = temp;

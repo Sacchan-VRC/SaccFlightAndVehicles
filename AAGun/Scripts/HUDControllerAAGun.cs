@@ -32,7 +32,7 @@ public class HUDControllerAAGun : UdonSharpBehaviour
         Assert(HeadingIndicator != null, "Start: HeadingIndicator != null");
         BulletSpeedDivider = 1f / BulletSpeed;
         AAMReloadBarDivider = 1f / AAGunControl.MissileReloadTime;
-        MGReloadBarDivider = 1f / AAGunControl.MGAmmoFull;
+        MGReloadBarDivider = 1f / AAGunControl.MGAmmoSeconds;
 
         Rotator = AAGunControl.Rotator.transform;
     }
@@ -42,7 +42,7 @@ public class HUDControllerAAGun : UdonSharpBehaviour
         //AAM Target Indicator
         if (AAGunControl.AAMHasTarget)
         {
-            AAMTargetIndicator.localScale = new Vector3(1, 1, 1);
+            AAMTargetIndicator.gameObject.SetActive(true);
             AAMTargetIndicator.position = transform.position + AAGunControl.AAMCurrentTargetDirection;
             AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
             if (AAGunControl.AAMLocked)
@@ -51,7 +51,7 @@ public class HUDControllerAAGun : UdonSharpBehaviour
             }
             else
             {
-                AAMTargetIndicator.localRotation = Quaternion.identity;
+                AAMTargetIndicator.gameObject.SetActive(false);
             }
         }
         else AAMTargetIndicator.localScale = Vector3.zero;

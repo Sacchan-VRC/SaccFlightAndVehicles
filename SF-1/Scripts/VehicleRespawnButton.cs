@@ -16,12 +16,8 @@ public class VehicleRespawnButton : UdonSharpBehaviour
         if (!EngineControl.Occupied && !EngineControl.dead)
         {
             EngineControl.RespawnStatusLocal();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ButtonRespawn");
+            EngineControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResetStatus");
         }
-    }
-    public void ButtonRespawn()
-    {
-        EngineControl.ResetStatus();
     }
     private void Assert(bool condition, string message)
     {

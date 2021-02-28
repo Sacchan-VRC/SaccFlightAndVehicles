@@ -7,6 +7,8 @@ using VRC.Udon;
 public class HitDetector : UdonSharpBehaviour
 {
     public EngineController EngineControl;
+    public EngineController LastAttacker;
+    public float LastHitTime = -100;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -14,7 +16,7 @@ public class HitDetector : UdonSharpBehaviour
     void OnParticleCollision(GameObject other)
     {
         if (other == null || EngineControl.dead) return;//avatars can't shoot you, and you can't get hurt when you're dead
-        if (EngineControl.localPlayer == null)
+        if (EngineControl.InEditor)//editor
         {
             PlaneHit();
         }
@@ -22,10 +24,27 @@ public class HitDetector : UdonSharpBehaviour
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlaneHit");
         }
+        GameObject EnemyObjs = other;
+        HitDetector EnemyHitDetector = null;
+        AAMController EnemyAAMController = null;
+        while (EnemyAAMController == null && EnemyHitDetector == null && EnemyObjs.transform.parent != null)
+        {
+            EnemyObjs = EnemyObjs.transform.parent.gameObject;
+            EnemyHitDetector = EnemyObjs.GetComponent<HitDetector>();
+            EnemyAAMController = EnemyObjs.GetComponent<AAMController>();
+        }
+        if (EnemyHitDetector != null)
+        {
+            LastAttacker = EnemyHitDetector.EngineControl;
+        }
+        if (EnemyAAMController != null)
+        {
+            LastAttacker = EnemyAAMController.EngineControl;
+        }
+        LastHitTime = Time.time;
     }
     public void PlaneHit()
     {
-        if (EngineControl.dead) return;
         if (EngineControl.InEditor || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
         {
             EngineControl.Health -= 10;

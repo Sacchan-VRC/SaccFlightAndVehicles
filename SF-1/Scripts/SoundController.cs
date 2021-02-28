@@ -91,6 +91,7 @@ public class SoundController : UdonSharpBehaviour
     private float SonicBoomPreventer = 5f;//used to prevent sonic booms from occuring too often in case of laggers etc
     [System.NonSerializedAttribute] public bool playsonicboom;
     private float MaxAudibleDistance;
+    private bool TooFarToHear = false;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -195,7 +196,7 @@ public class SoundController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (DoSound > 35f)
         {
-            if (!soundsoff) //disable all the sounds that always play, re-enabled in pilotseat
+            if (!soundsoff)//disable all the sounds that always play, re-enabled in pilotseat
             {
                 foreach (AudioSource thrust in Thrust)
                 {
@@ -208,36 +209,45 @@ public class SoundController : UdonSharpBehaviour
                 if (!PlaneDistantNull) PlaneDistant.gameObject.SetActive(false);
                 if (!PlaneWindNull) PlaneWind.gameObject.SetActive(false);
                 if (!PlaneInsideNull) PlaneInside.gameObject.SetActive(false);
+                if (!AirbrakeNull) Airbrake.gameObject.SetActive(false);
                 soundsoff = true;
             }
             else { return; }
             return;
         }
-
+        if (EngineControl.Occupied) { DoSound = 0f; }
+        else { DoSound += DeltaTime; }
 
         //undo doppler
         PlaneIdlePitch = LastFramePlaneIdlePitch;
         PlaneThrustPitch = LastFramePlaneThrustPitch;
 
-        //the doppler code is done in a really scuffed hacky way to avoid having to do it in fixedupdate and have worse performance.
+        //the doppler code is done in a really hacky way to avoid having to do it in fixedupdate and have worse performance.
+        //and because even if you do it in fixedupate, it only works properly in VRChat if you have max framerate. (objects owned by other players positions are only updated in Update())
         //only calculate doppler every 5 frames to smooth out laggers and frame drops
         if (dopplecounter > 4)
         {
+            float SmoothDeltaTime = Time.smoothDeltaTime;
             //find distance to player or testcamera
             if (!EngineControl.InEditor) //ingame
             {
                 ThisFrameDist = Vector3.Distance(EngineControl.localPlayer.GetPosition(), EngineControl.CenterOfMass.position);
-                if (ThisFrameDist > MaxAudibleDistance) { LastFrameDist = ThisFrameDist; return; } // too far away to hear, so just stop
+                if (ThisFrameDist > MaxAudibleDistance)
+                {
+                    LastFrameDist = ThisFrameDist; TooFarToHear = true;
+                }
+                else
+                {
+                    TooFarToHear = false;
+                } // too far away to hear, so just stop
             }
             else if ((testcamera != null))//editor and testcamera is set
             {
                 ThisFrameDist = Vector3.Distance(testcamera.transform.position, EngineControl.CenterOfMass.position);
             }
-            if (EngineControl.Occupied == true) { DoSound = 0f; }
-            else { DoSound += DeltaTime; }
 
             relativespeed = (ThisFrameDist - LastFrameDist);
-            float doppletemp = (343 * (DeltaTime * 5)) + relativespeed;
+            float doppletemp = (343 * (SmoothDeltaTime * 5)) + relativespeed;
 
             //supersonic a bit lower than the speed of sound because dopple is speed towards you, if they're coming in at an angle it won't be as high. stupid hack
             if (doppletemp < .1f)
@@ -256,18 +266,16 @@ public class SoundController : UdonSharpBehaviour
                 }
             }
 
-            Doppler = (343 * (DeltaTime * 5)) / doppletemp;
+            Doppler = (343 * (SmoothDeltaTime * 5)) / doppletemp;
             LastFrameDist = ThisFrameDist;
             dopplecounter = 0;
         }
         dopplecounter++;
+        if (TooFarToHear) { return; }
+
         if (SonicBoomWave < SonicBoomDistance)
         {
             SonicBoomWave += Mathf.Max(343 * DeltaTime, -relativespeed * .2f); //simulate sound wave movement
-        }
-
-        if (SonicBoomWave <= SonicBoomDistance)
-        {
             silent = true;
             silentint = 0;//for multiplying sound volumes
         }
@@ -277,15 +285,15 @@ public class SoundController : UdonSharpBehaviour
             silentint = 1;
         }
 
-        //EngineControl.Piloting = true in editor play
+        //EngineControl.Piloting = true in editor play mode
         if ((EngineControl.Piloting || EngineControl.Passenger) && (EngineControl.CanopyCloseTimer < 0 && EngineControl.CanopyCloseTimer > -100000))
         {
             EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", EngineControl.MissilesIncoming);
             if (Leftplane == false)
             {
-                if (!ABOnOutsideNull) ABOnOutside.Stop();
+                if (!ABOnOutsideNull) { ABOnOutside.Stop(); }
                 //change stuff when you get in
-                if (!CatapultLaunchNull) CatapultLaunch.volume *= InVehicleThrustVolumeFactor;
+                if (!CatapultLaunchNull) { CatapultLaunch.volume *= InVehicleThrustVolumeFactor; }
                 PlaneThrustPitch = 0.8f;
                 if (!PlaneInsideNull && !PlaneIdleNull)
                 {
@@ -299,7 +307,7 @@ public class SoundController : UdonSharpBehaviour
             {
                 if (EngineControl.Taxiing)
                 {
-                    if (!RollingNull && !Rolling.isPlaying) Rolling.Play();
+                    if (!RollingNull && !Rolling.isPlaying) { Rolling.Play(); }
                     Rolling.volume = Mathf.Clamp(EngineControl.Speed * 0.03f, 0, 1);
                 }
                 else if (!RollingNull) Rolling.volume = 0;
@@ -342,14 +350,9 @@ public class SoundController : UdonSharpBehaviour
             if (!AirbrakeNull)
             {
                 if (!Airbrake.isPlaying)
-                    Airbrake.Play();
+                { Airbrake.Play(); }
                 Airbrake.pitch = EngineControl.BrakeInput * .2f + .9f;
                 Airbrake.volume = EngineControl.EffectsControl.AirbrakeLerper * EngineControl.rotlift;
-            }
-            else
-            {
-                if (!AirbrakeNull)
-                    Airbrake.Stop();
             }
             if ((EngineControl.Piloting || (EngineControl.Passenger && EngineControl.Occupied)) && EngineControl.Fuel > 1) //you're piloting or someone is piloting and you're a passenger
             {
@@ -426,10 +429,7 @@ public class SoundController : UdonSharpBehaviour
         }
 
 
-        if (SonicBoomPreventer < 5.1f)//count up, limited to 5.1(plane can only cause a sonic boom every 5 seconds max)
-        {
-            SonicBoomPreventer += DeltaTime;
-        }
+        SonicBoomPreventer += DeltaTime;
         //set final volumes and pitches
         //lerp should help smooth out laggers and the dopple only being calculated every 5 frames
         if (!SonicBoomNull && !silent && playsonicboom)
@@ -489,18 +489,15 @@ public class SoundController : UdonSharpBehaviour
             }
         }
     }
-    private void Exitplane()//sets sound values to give illusion of continuity of engine sound when exiting the plane
+    private void Exitplane()//sets sound values to give continuity of engine sound when exiting the plane
     {
         if (!AAMTargetingNull) AAMTargeting.gameObject.SetActive(false);
         if (!AAMTargetLockNull) AAMTargetLock.gameObject.SetActive(false);
         if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
-        if (!RadarLockedNull) RadarLocked.Stop();
+        if (!RadarLockedNull) { RadarLocked.Stop(); }
         if (!CatapultLaunchNull) CatapultLaunch.volume /= InVehicleThrustVolumeFactor;
-        if (!RollingNull) Rolling.Stop();
-        if (!PlaneInsideNull)
-        {
-            PlaneInside.Stop();
-        }
+        if (!RollingNull) { Rolling.Stop(); }
+        if (!PlaneInsideNull) { PlaneInside.Stop(); }
         foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
         foreach (AudioSource thrust in Thrust) { thrust.Play(); }
         if (!PlaneDistantNull) PlaneDistant.Play();
@@ -588,6 +585,7 @@ public class SoundController : UdonSharpBehaviour
         if (!PlaneDistantNull) PlaneDistant.gameObject.SetActive(true);
         if (!PlaneWindNull) PlaneWind.gameObject.SetActive(true);
         if (!PlaneInsideNull) PlaneInside.gameObject.SetActive(true);
+        if (!AirbrakeNull) Airbrake.gameObject.SetActive(true);
         if (soundsoff)
         {
             PlaneIdleVolume = 0;

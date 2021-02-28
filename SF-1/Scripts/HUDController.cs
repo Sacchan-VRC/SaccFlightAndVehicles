@@ -167,7 +167,7 @@ public class HUDController : UdonSharpBehaviour
         //AAM Target Indicator
         if (EngineControl.AAMHasTarget && (EngineControl.RStickSelection == 1 || EngineControl.RStickSelection == 2))//GUN or AAM
         {
-            AAMTargetIndicator.localScale = new Vector3(1, 1, 1);
+            AAMTargetIndicator.gameObject.SetActive(true);
             AAMTargetIndicator.position = transform.position + EngineControl.AAMCurrentTargetDirection;
             AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
             if (EngineControl.AAMLocked)
@@ -179,7 +179,7 @@ public class HUDController : UdonSharpBehaviour
                 AAMTargetIndicator.localRotation = Quaternion.identity;
             }
         }
-        else AAMTargetIndicator.localScale = Vector3.zero;
+        else AAMTargetIndicator.gameObject.SetActive(false);
         /////////////////
 
         //GUN Lead Indicator

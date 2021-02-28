@@ -107,7 +107,6 @@ public class AAMController : UdonSharpBehaviour
                     if (TargetDistance < ProximityExplodeDistance)//missile flew past the target, but is within proximity explode range?
                     {
                         Explode();
-                        TargetLost = true;
                     }
                     UnlockTime += Time.deltaTime;
                 }
@@ -137,6 +136,7 @@ public class AAMController : UdonSharpBehaviour
     private void Explode()
     {
         Exploding = true;
+        TargetLost = true;
         if (ExplosionSounds.Length > 0)
         {
             int rand = Random.Range(0, ExplosionSounds.Length);

@@ -40,6 +40,7 @@ public class EngineController : UdonSharpBehaviour
     public float BombHoldDelay = 0.5f;
     public Transform[] BombLaunchPoints;
     [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
+    public Scoreboard_Kills KillsBoard;
     public bool HasAfterburner = true;
     public bool HasLimits = true;
     public bool HasFlare = true;
@@ -108,8 +109,11 @@ public class EngineController : UdonSharpBehaviour
     public float HookedCableSnapDistance = 120f;
     public float CatapultLaunchStrength = 50f;
     public float CatapultLaunchTime = 2f;
-    public float TakeoffAssist = 5f;
-    public float TakeoffAssistSpeed = 50f;
+    /*     public float TakeoffAssist = 5f;
+        public float TakeoffAssistSpeed = 50f; */
+    public float GroundEffectMaxDistance;
+    public float GroundEffectStrength;
+    public float MaxGroundEffectLift;
     public float GLimiter = 12f;
     public float AoALimiter = 15f;
     public float CanopyCloseTime = 1.8f;
@@ -135,7 +139,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
 
 
-
+    private Animator PlaneAnimator;
     [System.NonSerializedAttribute] public int PilotID;
     [System.NonSerializedAttribute] public string PilotName;
     [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
@@ -178,8 +182,6 @@ public class EngineController : UdonSharpBehaviour
         private Vector2 TrimDifference;
         [System.NonSerializedAttribute] public Vector2 Trim; */
     [System.NonSerializedAttribute] public bool RGripLastFrame = false;
-    private float downspeed;
-    private float sidespeed;
     [System.NonSerializedAttribute] public float ThrottleInput = 0f;
     private float roll = 0f;
     private float pitch = 0f;
@@ -200,7 +202,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AtmosphereHeightThing;
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     public float AtmosphereThinningEnd = 19812; //65,000 feet
-    private float Atmosphere;
+    public float Atmosphere = 1;
     [System.NonSerializedAttribute] public float rotlift;
     [System.NonSerializedAttribute] public float AngleOfAttackPitch;
     [System.NonSerializedAttribute] public float AngleOfAttackYaw;
@@ -245,7 +247,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool IsOwner = false;
     private Vector3 FinalWind;//includes Gusts
     [System.NonSerializedAttribute] public Vector3 AirVel;
-    private float StillWindMulti;
+    private float StillWindMulti;//multiplies the speed of the wind by the speed of the plane when taxiing to prevent still planes flying away
     private int ThrustVecGrounded;
     private float SoundBarrier;
     [System.NonSerializedAttribute] private float Afterburner = 1;
@@ -254,7 +256,6 @@ public class EngineController : UdonSharpBehaviour
     private Quaternion CatapultLockRot;
     private Transform CatapultTransform;
     private float CatapultLaunchTimeStart;
-    private float StartPitchStrength;
     [System.NonSerializedAttribute] public float CanopyCloseTimer = -200000;
     [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     public float FuelConsumption = 2;
@@ -275,7 +276,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int BombPoint = 0;
     [System.NonSerializedAttribute] public float AGMRotDif;
     private Quaternion AGMCamRotSlerper;
-    private float LastResupplyTime = 5;//can't resupply for the first 10 seconds after joining, fixes potential null ref if sending something to effectscontrol.planeanimator on first frame
+    private float LastResupplyTime = 5;//can't resupply for the first 10 seconds after joining, fixes potential null ref if sending something to PlaneAnimator on first frame
     [System.NonSerializedAttribute] public int FullAAMs;
     [System.NonSerializedAttribute] public int FullAGMs;
     [System.NonSerializedAttribute] public int FullBombs;
@@ -298,6 +299,10 @@ public class EngineController : UdonSharpBehaviour
     private float FullBombsDivider;
     private Quaternion AGMCamLastFrame;
     bool Landed = false;//moved here from soundcontroller
+    private float StartVelLift;
+    private HitDetector PlaneHitDetector;
+    [System.NonSerializedAttribute] public float PilotExitTime;
+    private int Planelayer = 0;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -324,7 +329,17 @@ public class EngineController : UdonSharpBehaviour
         Assert(Bomb != null, "Start: Bomb != null");
         Assert(BombLaunchPoints.Length > 0, "Start: BombLaunchPoint.Length > 0");
 
+        Planelayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
+        PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
+        //set these values at start in case they haven't been set correctly in editor
+        if (!HasCanopy) { EffectsControl.CanopyOpen = true; CanopyClosing(); }
+        else { EffectsControl.CanopyOpen = false; CanopyOpening(); }
+        if (!HasGear) { SetGearUp(); }
+        else { SetGearDown(); }
+        if (!HasFlaps) { SetFlapsOff(); }
+        else { SetFlapsOn(); }
+        SetHookUp();
 
         if (AtGCam != null) AtGCamNull = false;
 
@@ -339,12 +354,10 @@ public class EngineController : UdonSharpBehaviour
         FullAGMs = NumAGM;
         FullBombs = NumBomb;
 
-        LastResupplyTime = Time.time + 10;//fixes potential null ref if sending something to effectscontrol.planeanimator on first frame
-
+        StartVelLift = VelLift;
         CatapultLaunchTimeStart = CatapultLaunchTime;
 
-        StartPitchStrength = PitchStrength;//used for takeoff assist
-        if (AtmosphereThinningStart > AtmosphereThinningEnd) { AtmosphereThinningEnd = AtmosphereThinningStart; }
+        PlaneHitDetector = VehicleMainObj.GetComponent<HitDetector>();
         VehicleRigidbody = VehicleMainObj.GetComponent<Rigidbody>();
         VehicleConstantForce = VehicleMainObj.GetComponent<ConstantForce>();
         localPlayer = Networking.LocalPlayer;
@@ -357,75 +370,11 @@ public class EngineController : UdonSharpBehaviour
 
         if (!HasLimits) { FlightLimitsEnabled = false; }
 
-        //get array of AAM Targets
-        Collider[] aamtargs = Physics.OverlapSphere(CenterOfMass.transform.position, 1000000, AAMTargetsLayer, QueryTriggerInteraction.Collide);
-        int n = 0;
-
-        //work out which index in the aamtargs array is our own plane by finding which one has this script as it's parent
-        //allows for each team to have a different layer for AAMTargets
-        int self = -1;
-        n = 0;
-        foreach (Collider target in aamtargs)
-        {
-            if (target.transform.parent != null && target.transform.parent == transform)
-            {
-                self = n;
-            }
-            n++;
-        }
-        //populate AAMTargets list excluding our own plane
-        n = 0;
-        int foundself = 0;
-        foreach (Collider target in aamtargs)
-        {
-            if (n == self) { foundself = 1; n++; }
-            else
-            {
-                AAMTargets[n - foundself] = target.gameObject;
-                n++;
-            }
-        }
-        if (aamtargs.Length > 0)
-        {
-            if (foundself != 0)
-            {
-                NumAAMTargets = Mathf.Clamp(aamtargs.Length - 1, 0, 999);//one less because it found our own plane
-            }
-            else
-            {
-                NumAAMTargets = Mathf.Clamp(aamtargs.Length, 0, 999);
-            }
-        }
-        else { NumAAMTargets = 0; }
-
-
-        if (NumAAMTargets > 0)
-        {
-            n = 0;
-            //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure they're the in the same order on all clients 
-            float[] order = new float[NumAAMTargets];
-            for (int i = 0; AAMTargets[n] != null; i++)
-            {
-                Transform parent = AAMTargets[n].transform;
-                for (int x = 0; parent != null; x++)
-                {
-                    order[n] = float.Parse(order[n].ToString() + parent.transform.GetSiblingIndex().ToString());
-                    parent = parent.transform.parent;
-                }
-                n++;
-            }
-            //sort AAMTargets array based on order
-
-            SortTargets(AAMTargets, order);
-        }
-        else
-        {
-            AAMTargets[0] = HUDControl.gameObject;//this should prevent HUDController from crashing with a null reference while causing no ill effects
-        }
-
+        FindAAMTargets();
 
         VehicleRigidbody.centerOfMass = VehicleMainObj.transform.InverseTransformDirection(CenterOfMass.position - VehicleMainObj.transform.position);//correct position if scaled
 
+        if (AtmosphereThinningStart > AtmosphereThinningEnd) { AtmosphereThinningEnd = (AtmosphereThinningStart + 1); }
         AtmoshpereFadeDistance = (AtmosphereThinningEnd + SeaLevel) - (AtmosphereThinningStart + SeaLevel); //for finding atmosphere thinning gradient
         AtmosphereHeightThing = (AtmosphereThinningStart + SeaLevel) / (AtmoshpereFadeDistance); //used to add back the height to the atmosphere after finding gradient
 
@@ -472,6 +421,46 @@ public class EngineController : UdonSharpBehaviour
                 }
             }
 
+            //synced variables because rigidbody values aren't accessable by non-owner players
+            CurrentVel = VehicleRigidbody.velocity;
+            Speed = CurrentVel.magnitude;
+            bool PlaneMoving = false;
+            if (Speed > 0.3f)//don't bother doing all this for planes that arent moving and it therefore wont even effect
+            {
+                PlaneMoving = true;//check this bool later for more optimizations
+                Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
+                float TimeGustiness = Time.time * WindGustiness;
+                float gustx = TimeGustiness + (VehicleMainObj.transform.position.x * WindTurbulanceScale);
+                float gustz = TimeGustiness + (VehicleMainObj.transform.position.z * WindTurbulanceScale);
+                FinalWind = Vector3.Normalize(new Vector3((Mathf.PerlinNoise(gustx + 9000, gustz) - .5f), /* (Mathf.PerlinNoise(gustx - 9000, gustz - 9000) - .5f) */0, (Mathf.PerlinNoise(gustx, gustz + 9999) - .5f))) * WindGustStrength;
+                FinalWind = (FinalWind + Wind) * Atmosphere;
+                AirVel = VehicleRigidbody.velocity - (FinalWind * StillWindMulti);
+                AirSpeed = AirVel.magnitude;
+                Vector3 VecForward = VehicleMainObj.transform.forward;
+                AngleOfAttackPitch = Vector3.SignedAngle(VecForward, AirVel, VehicleMainObj.transform.right);
+                AngleOfAttackYaw = Vector3.SignedAngle(VecForward, AirVel, VehicleMainObj.transform.up);
+
+                //angle of attack stuff, pitch and yaw are calculated seperately
+                //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
+                //the linear version is used for high aoa, and is 0 when at 90 degrees, and 1(multiplied by HighAoaMinControl) at 0. When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
+                AoALiftPitch = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / MaxAngleOfAttackPitch, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / MaxAngleOfAttackPitch);//angle of attack as 0-1 float, for backwards and forwards
+                AoALiftPitch = -AoALiftPitch + 1;
+                AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), AoaCurveStrength) + 1;//give it a curve
+
+                float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / 90);//linear version to 90 for high aoa
+                AoALiftPitchMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighPitchAoaMinControl, 0, 1);
+                AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
+
+                AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
+                AoALiftYaw = -AoALiftYaw + 1;
+                AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
+
+                float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
+                AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighYawAoaMinControl, 0, 1);
+                AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
+
+                AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
+            }
 
             if (Piloting)
             {
@@ -523,7 +512,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (CanopyCloseTimer < -100000)
                     {
-                        EffectsControl.SetCanopyClosed();
+                        SetCanopyClosed();
                     }
                 }
 
@@ -1177,7 +1166,7 @@ public class EngineController : UdonSharpBehaviour
                                         }
                                         else
                                         {
-                                            Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 1);
+                                            Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
                                             if (lockpoint.point != null)
                                             {
                                                 if (!SoundControl.AGMUnlockNull)
@@ -1353,8 +1342,6 @@ public class EngineController : UdonSharpBehaviour
                                     SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
                                 }
                             }
-
-                            IsFiringGun = false;
                             RTriggerLastFrame = true;
                         }
                         else { RTriggerLastFrame = false; }
@@ -1453,17 +1440,15 @@ public class EngineController : UdonSharpBehaviour
                 {
                     AAMLockTimer = 0;
                     AAMTargetedTimer = 2;
-                    AngleOfAttack = 0; //prevent stall sound and aoavapor when on ground
+                    AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                     Cruise = false;
                     AltHold = false;
                     //rotate if trying to yaw
-                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, YawInput * TaxiRotationSpeed * DeltaTime, TaxiRotationResponse * DeltaTime);
+                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, YawInput * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
                     VehicleMainObj.transform.Rotate(Vector3.up, Taxiinglerper);
 
-                    StillWindMulti = Mathf.Clamp(Speed / 10, 0, 1);
+                    StillWindMulti = Mathf.Min(Speed / 10, 1);
                     ThrustVecGrounded = 0;
-
-                    PitchStrength = StartPitchStrength + (TakeoffAssist * Mathf.Min((Speed / TakeoffAssistSpeed), 1));//stronger pitch when moving fast and taxiing to help with taking off
 
                     if (BrakeInput > 0 && Speed < GroundBrakeSpeed && !Hooked)
                     {
@@ -1537,7 +1522,6 @@ public class EngineController : UdonSharpBehaviour
                 }
                 else
                 {
-                    PitchStrength = StartPitchStrength;
                     StillWindMulti = 1;
                     ThrustVecGrounded = 1;
                     Taxiinglerper = 0;
@@ -1682,7 +1666,7 @@ public class EngineController : UdonSharpBehaviour
                         HookedLoc = VehicleMainObj.transform.position;
                         Hooked = true;
                         HookedTime = Time.time;
-                        EffectsControl.PlaneAnimator.SetTrigger("hooked");
+                        PlaneAnimator.SetTrigger("hooked");
                     }
                 }
                 //slow down if hooked and on the ground
@@ -1752,91 +1736,27 @@ public class EngineController : UdonSharpBehaviour
                     pitch *= PitchDownStrMulti;
                 }
 
-                //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it. Heard it doesn't happen so bad if rigidbody weight is much higer.
+                //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it. Heard it doesn't happen so bad if rigidbody weight is much higher.
                 if (Speed < .2 && ThrottleInput > 0)
-                    VehicleRigidbody.velocity = VehicleRigidbody.transform.forward * 0.25f;
+                { VehicleRigidbody.velocity = VehicleRigidbody.transform.forward * 0.25f; }
             }
             else
             {
-                Occupied = false;//make vehicle empty if player disconnects while occupying
-                                 //brake is always on if the plane is on the ground because we can't work out how to use wheel colliders properly
+                Occupied = false;
+                //brake is always on if the plane is on the ground
                 if (Taxiing)
                 {
+                    StillWindMulti = Mathf.Min(Speed / 10, 1);
                     if (Speed > GroundBrakeStrength * DeltaTime)
                     {
                         VehicleRigidbody.velocity += -CurrentVel.normalized * GroundBrakeStrength * DeltaTime;
                     }
                     else VehicleRigidbody.velocity = Vector3.zero;
                 }
+                else { StillWindMulti = 1; }
                 /*                 PitchInput = Trim.x;
                                 YawInput = Trim.y; */
             }
-
-            //because rigidbody values aren't accessable by non-owner players
-            CurrentVel = VehicleRigidbody.velocity;
-            Speed = CurrentVel.magnitude;
-
-            Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
-            float gustx = (Time.time * WindGustiness) + (VehicleMainObj.transform.position.x * WindTurbulanceScale);
-            float gustz = (Time.time * WindGustiness) + (VehicleMainObj.transform.position.z * WindTurbulanceScale);
-            FinalWind = Vector3.Normalize(new Vector3((Mathf.PerlinNoise(gustx + 9000, gustz) - .5f), /* (Mathf.PerlinNoise(gustx - 9000, gustz - 9000) - .5f) */0, (Mathf.PerlinNoise(gustx, gustz + 9999) - .5f))) * WindGustStrength;
-            FinalWind = (FinalWind + Wind) * Atmosphere;
-            AirVel = VehicleRigidbody.velocity - FinalWind;
-            AirSpeed = AirVel.magnitude;
-            Vector3 VechForward = VehicleMainObj.transform.forward;
-            AngleOfAttackPitch = Vector3.SignedAngle(VechForward, AirVel, VehicleMainObj.transform.right);
-            AngleOfAttackYaw = Vector3.SignedAngle(VechForward, AirVel, VehicleMainObj.transform.up);
-
-            //angle of attack stuff, pitch and yaw are calculated seperately
-            //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
-            //the linear version is used for high aoa, and is 0 when at 90 degrees, 1 at 0(multiplied by HighAoaMinControlx). When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
-            AoALiftPitch = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / MaxAngleOfAttackPitch, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / MaxAngleOfAttackPitch);//angle of attack as 0-1 float, for backwards and forwards
-            AoALiftPitch = -AoALiftPitch + 1;
-            AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), AoaCurveStrength) + 1;//give it a curve
-
-            float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / 90);//linear version to 90 for high aoa
-            AoALiftPitchMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighPitchAoaMinControl, 0, 1);
-            AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
-
-            AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
-            AoALiftYaw = -AoALiftYaw + 1;
-            AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
-
-            float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
-            AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighYawAoaMinControl, 0, 1);
-            AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
-
-            AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
-
-            //used to create air resistance for updown and sideways if your movement direction is in those directions
-            //to add physics to plane's yaw and pitch, accel angvel towards velocity, and add force to the plane
-            //and add wind
-            sidespeed = Vector3.Dot(AirVel, VehicleMainObj.transform.right);
-            downspeed = -Vector3.Dot(AirVel, VehicleMainObj.transform.up);
-
-            bool PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
-            if (PitchDown)
-            {
-                downspeed *= PitchDownLiftMulti;
-            }
-
-            //speed related values
-            float SpeedLiftFactor = Mathf.Clamp(AirSpeed * AirSpeed * Lift, 0, MaxLift);
-            rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
-
-
-            //thrust vecotring airplanes have a minimum rotation speed
-            float minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
-            pitch *= Mathf.Max(PitchThrustVecMulti * ThrustVecGrounded, minlifttemp);
-            yaw *= Mathf.Max(YawThrustVecMulti * ThrustVecGrounded, minlifttemp);
-            roll *= Mathf.Max(RollThrustVecMulti * ThrustVecGrounded, minlifttemp);
-
-
-
-            //rotation inputs are done, now we can set the minimum lift/drag when at high aoa, this should be high than 0 because if it's 0 you will have 0 drag when at 90 degree AoA.
-            AoALiftPitch = Mathf.Clamp(AoALiftPitch, HighPitchAoaMinLift, 1);
-            AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
-
 
             //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
             if (Throttle < ThrottleInput)
@@ -1848,33 +1768,80 @@ public class EngineController : UdonSharpBehaviour
                 Throttle = Mathf.Lerp(Throttle, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); ;
             }
 
-            //Lerp the inputs for 'rotation response'
-            LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * DeltaTime);
-            LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
-            LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
+            float sidespeed = 0;
+            float downspeed = 0;
+            float SpeedLiftFactor = 0;
 
-            bool Flaps = EffectsControl.Flaps;
-            //flaps drag and lift
-            if (!Flaps)//flaps off
+            if (PlaneMoving)//optimization
             {
-                FlapsDrag = 1;
-                FlapsLift = 1;
-            }
-            else if (PitchDown)//flaps on, but plane is pitching down so they have no helpful effect
-            {
-                FlapsDrag = FlapsDragMulti;
-                FlapsLift = 1;
-            }
-            else//flaps on and pitching up, flaps are useful
-            {
-                FlapsDrag = FlapsDragMulti;
-                FlapsLift = FlapsLiftMulti;
-            }
-            //gear drag
-            if (EffectsControl.GearUp) { GearDrag = 1; }
-            else { GearDrag = LandingGearDragMulti; }
-            FlapsGearBrakeDrag = (GearDrag + FlapsDrag + (BrakeInput * AirbrakeStrength)) - 1;//combine these so we don't have to do as much in fixedupdate
+                //used to create air resistance for updown and sideways if your movement direction is in those directions
+                //to add physics to plane's yaw and pitch, accel angvel towards velocity, and add force to the plane
+                //and add wind
+                sidespeed = Vector3.Dot(AirVel, VehicleMainObj.transform.right);
+                downspeed = -Vector3.Dot(AirVel, VehicleMainObj.transform.up);
 
+                bool PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
+                if (PitchDown)
+                {
+                    downspeed *= PitchDownLiftMulti;
+                }
+
+                //speed related values
+                SpeedLiftFactor = Mathf.Clamp(AirSpeed * AirSpeed * Lift, 0, MaxLift);
+                rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
+
+                //thrust vectoring airplanes have a minimum rotation control
+                float minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
+                pitch *= Mathf.Max(PitchThrustVecMulti * ThrustVecGrounded, minlifttemp);
+                yaw *= Mathf.Max(YawThrustVecMulti * ThrustVecGrounded, minlifttemp);
+                roll *= Mathf.Max(RollThrustVecMulti * ThrustVecGrounded, minlifttemp);
+
+                //rotation inputs are done, now we can set the minimum lift/drag when at high aoa, this should be higher than 0 because if it's 0 you will have 0 drag when at 90 degree AoA.
+                AoALiftPitch = Mathf.Clamp(AoALiftPitch, HighPitchAoaMinLift, 1);
+                AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
+
+                //Lerp the inputs for 'rotation response'
+                LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * DeltaTime);
+                LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
+                LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
+
+                bool Flaps = EffectsControl.Flaps;
+                //Ground effect, extra lift caused by air pressure when close to the ground
+                RaycastHit GF;
+                if (Physics.Raycast(PitchMoment.position, -VehicleMainObj.transform.up, out GF, GroundEffectMaxDistance, 2049 /* Default and Environment */, QueryTriggerInteraction.Collide))
+                {
+                    float GroundEffect = (-GF.distance + GroundEffectMaxDistance) * GroundEffectStrength * SpeedLiftFactor;
+                    if (Flaps) { GroundEffect *= FlapsLiftMulti; }
+                    VelLift = Mathf.Min(StartVelLift + GroundEffect, MaxGroundEffectLift);
+                }
+                else
+                {
+                    VelLift = StartVelLift;
+                }
+
+                //flaps drag and lift
+                if (Flaps)
+                {
+                    if (PitchDown)//flaps on, but plane's angle of attack is negative so they have no helpful effect
+                    {
+                        FlapsDrag = FlapsDragMulti;
+                        FlapsLift = 1;
+                    }
+                    else//flaps on positive angle of attack, flaps are useful
+                    {
+                        FlapsDrag = FlapsDragMulti;
+                        FlapsLift = FlapsLiftMulti;
+                    }
+                }
+                //gear drag
+                if (EffectsControl.GearUp) { GearDrag = 1; }
+                else { GearDrag = LandingGearDragMulti; }
+                FlapsGearBrakeDrag = (GearDrag + FlapsDrag + (BrakeInput * AirbrakeStrength)) - 1;//combine these so we don't have to do as much in fixedupdate
+            }
+            else
+            {
+                VelLift = pitch = yaw = roll = 0;
+            }
             switch (CatapultStatus)
             {
                 case 0://normal
@@ -1963,6 +1930,7 @@ public class EngineController : UdonSharpBehaviour
         else//non-owners need to know these values
         {
             Speed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
+            rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
             //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
             VehicleRigidbody.angularDrag = .5f;
@@ -1997,6 +1965,16 @@ public class EngineController : UdonSharpBehaviour
             LastFrameVel = VehicleVel;
         }
     }
+    public override void OnOwnershipTransferred()
+    {
+        IsFiringGun = false;
+        EffectsControl.DoEffects = 0;
+        if (IsOwner && !Piloting) { SetSmokingOff(); }//for when people quit the game while smoking in the plane
+        if (localPlayer.IsOwner(gameObject) && !Piloting)
+        {
+            Occupied = false;
+        }
+    }
 
     //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
     //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
@@ -2004,22 +1982,22 @@ public class EngineController : UdonSharpBehaviour
     {
         if (CanopyCloseTimer <= -100000 - CanopyCloseTime)
         {
-            EffectsControl.SetCanopyClosed();
+            SetCanopyClosed();
         }
         else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000)
         {
-            EffectsControl.SetCanopyOpen();
+            SetCanopyOpen();
         }
     }
     public void LaunchFlares()
     {
-        EffectsControl.PlaneAnimator.SetTrigger("flares");
+        PlaneAnimator.SetTrigger("flares");
     }
 
     public void LaunchAAM()
     {
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
-        EffectsControl.PlaneAnimator.SetTrigger("aamlaunched");
+        PlaneAnimator.SetTrigger("aamlaunched");
         GameObject NewAAM = VRCInstantiate(AAM);
         if (!(NumAAM % 2 == 0))
         {
@@ -2040,12 +2018,12 @@ public class EngineController : UdonSharpBehaviour
         NewAAM.SetActive(true);
         NewAAM.GetComponent<Rigidbody>().velocity = CurrentVel;
 
-        EffectsControl.PlaneAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+        PlaneAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
     }
     public void LaunchAGM()
     {
         if (NumAGM > 0) { NumAGM--; }
-        EffectsControl.PlaneAnimator.SetTrigger("agmlaunched");
+        PlaneAnimator.SetTrigger("agmlaunched");
         GameObject NewAGM = VRCInstantiate(AGM);
         if (!(NumAGM % 2 == 0))
         {
@@ -2064,12 +2042,12 @@ public class EngineController : UdonSharpBehaviour
         }
         NewAGM.SetActive(true);
         NewAGM.GetComponent<Rigidbody>().velocity = CurrentVel;
-        EffectsControl.PlaneAnimator.SetFloat("AGMs", (float)NumAGM * FullAGMsDivider);
+        PlaneAnimator.SetFloat("AGMs", (float)NumAGM * FullAGMsDivider);
     }
     public void LaunchBomb()
     {
         if (NumBomb > 0) { NumBomb--; }
-        EffectsControl.PlaneAnimator.SetTrigger("bomblaunched");
+        PlaneAnimator.SetTrigger("bomblaunched");
         GameObject NewBomb = VRCInstantiate(Bomb);
         NewBomb.transform.position = BombLaunchPoints[BombPoint].transform.position;
         //give 2 degrees of randomness to bomb's rotation so it looks more interesting
@@ -2078,7 +2056,7 @@ public class EngineController : UdonSharpBehaviour
         NewBomb.GetComponent<Rigidbody>().velocity = CurrentVel;
         BombPoint++;
         if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
-        EffectsControl.PlaneAnimator.SetFloat("bombs", (float)NumBomb * FullBombsDivider);
+        PlaneAnimator.SetFloat("bombs", (float)NumBomb * FullBombsDivider);
     }
     void SortTargets(GameObject[] Targets, float[] order)
     {
@@ -2106,7 +2084,7 @@ public class EngineController : UdonSharpBehaviour
         if (TargetEngine != null)
         {
             if (TargetEngine.Piloting || TargetEngine.Passenger)
-                TargetEngine.EffectsControl.PlaneAnimator.SetTrigger("radarlocked");
+            { TargetEngine.EffectsControl.PlaneAnimator.SetTrigger("radarlocked"); }
         }
     }
     public void CatapultLaunchEffects()
@@ -2130,39 +2108,39 @@ public class EngineController : UdonSharpBehaviour
     }
     public void CatapultLockIn()
     {
-        EffectsControl.PlaneAnimator.SetBool("oncatapult", true);
+        PlaneAnimator.SetBool("oncatapult", true);
         VehicleRigidbody.Sleep();//don't think this actually helps
         if (!SoundControl.CatapultLockNull) { SoundControl.CatapultLock.Play(); }
     }
     public void CatapultLockOff()
     {
-        EffectsControl.PlaneAnimator.SetBool("oncatapult", false);
+        PlaneAnimator.SetBool("oncatapult", false);
     }
     //these are used for syncing weapon selection for bomb bay doors animation etc
     public void RStick0()//Rstick is something other than a weapon
     {
         WeaponSelected = false;
-        EffectsControl.PlaneAnimator.SetInteger("weapon", 0);
+        PlaneAnimator.SetInteger("weapon", 0);
     }
     public void RStick1()//GUN
     {
         WeaponSelected = true;
-        EffectsControl.PlaneAnimator.SetInteger("weapon", 1);
+        PlaneAnimator.SetInteger("weapon", 1);
     }
     public void RStick2()//AAM
     {
         WeaponSelected = true;
-        EffectsControl.PlaneAnimator.SetInteger("weapon", 2);
+        PlaneAnimator.SetInteger("weapon", 2);
     }
     public void RStick3()//AGM
     {
         WeaponSelected = true;
-        EffectsControl.PlaneAnimator.SetInteger("weapon", 3);
+        PlaneAnimator.SetInteger("weapon", 3);
     }
     public void RStick4()//Bomb
     {
         WeaponSelected = true;
-        EffectsControl.PlaneAnimator.SetInteger("weapon", 4);
+        PlaneAnimator.SetInteger("weapon", 4);
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
@@ -2173,12 +2151,12 @@ public class EngineController : UdonSharpBehaviour
         CatapultStatus = 0;
         PlayerThrottle = 0;
         MissilesIncoming = 0;
-        SetAfterburnerOff();
-        SetSmokingOff();
-        SetLimitsOn();
-        SetHookUp();
-        SetGearDown();
-        SetFlapsOn();
+        if (HasAfterburner) { SetAfterburnerOff(); }
+        if (HasSmoke) { SetSmokingOff(); }
+        if (HasLimits) { SetLimitsOn(); }
+        if (HasHook) { SetHookUp(); }
+        if (HasGear) { SetGearDown(); }
+        if (HasFlaps) { SetFlapsOn(); }
         //EngineControl.Trim = Vector2.zero;
         Hooked = false;
         BombPoint = 0;
@@ -2189,8 +2167,9 @@ public class EngineController : UdonSharpBehaviour
         Fuel = FullFuel;
         RStickSelection = 0;
         LStickSelection = 0;
+        Atmosphere = 1;//planemoving optimization requires this to be here
 
-        if (HasCanopy) { EffectsControl.CanopyOpening(); }
+        if (HasCanopy) { CanopyOpening(); }
         EffectsControl.EffectsExplode();
         SoundControl.Explode_Sound();
 
@@ -2199,14 +2178,62 @@ public class EngineController : UdonSharpBehaviour
             VehicleRigidbody.velocity = Vector3.zero;
             Health = FullHealth;//turns off low health smoke
             Fuel = FullFuel;
+            AoALiftPitch = 0;
+            AoALiftYaw = 0;
+            AngleOfAttack = 0;
+            VelLift = StartVelLift;
         }
 
-        //pilot and passenger are dropped out of the plane
+        //our killer increases their kills
+        float time = Time.time;
+        if (PlaneHitDetector.LastAttacker != null && (time - PlaneHitDetector.LastHitTime) < 5 && !Taxiing && ((time - PilotExitTime) < 5 || Occupied))
+        {
+            if (InEditor)
+            {
+                PlaneHitDetector.LastAttacker.IncreaseKills();
+            }
+            else
+            {
+                PlaneHitDetector.LastAttacker.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "IncreaseKills");
+            }
+        }
+        //Update Kills board (person with most kills will probably show as having one less kill than they really have until they die, because synced variables will update after this)
+        //waiting for VRC networking patch to fix
+        if (KillsBoard != null)
+        {
+            KillsBoard.UpdateScores();
+        }
+        //pilot and passengers are dropped out of the plane
         if ((Piloting || Passenger) && !InEditor)
         {
             foreach (LeaveVehicleButton seat in LeaveButtons)
             {
                 seat.ExitStation();
+            }
+        }
+    }
+    public void IncreaseKills()
+    {
+        if (KillsBoard != null && Piloting)
+        {
+            KillsBoard.MyKills++;
+            if (KillsBoard.MyKills > KillsBoard.MyBestKills)
+            {
+                KillsBoard.MyBestKills = KillsBoard.MyKills;
+            }
+            if (KillsBoard.MyKills > KillsBoard.TopKills)
+            {
+                if (InEditor)
+                {
+                    KillsBoard.TopKiller = "Player";
+                    KillsBoard.TopKills = KillsBoard.MyKills;
+                }
+                else
+                {
+                    Networking.SetOwner(localPlayer, KillsBoard.gameObject);
+                    KillsBoard.TopKiller = localPlayer.displayName;
+                    KillsBoard.TopKills = KillsBoard.MyKills;
+                }
             }
         }
     }
@@ -2256,7 +2283,7 @@ public class EngineController : UdonSharpBehaviour
                     AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                     AAMCurrentTargetEngineControl = NextTargetEngineControl;
                     AAMLockTimer = 0;
-                    AAMTargetedTimer = .6f;//give the synced variable time to update before sending targeted
+                    AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
                     AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
                     if (HUDControl != null)
                     {
@@ -2404,6 +2431,10 @@ public class EngineController : UdonSharpBehaviour
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
 
+        PlaneAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+        PlaneAnimator.SetFloat("AGMs", (float)NumAGM * FullAGMsDivider);
+        PlaneAnimator.SetFloat("bombs", (float)NumBomb * FullBombsDivider);
+
         /*Debug.Log(string.Concat("fuel ", Fuel));
           Debug.Log(string.Concat("FullFuel ", FullFuel));
           Debug.Log(string.Concat("Health ", Health));
@@ -2413,18 +2444,52 @@ public class EngineController : UdonSharpBehaviour
         Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
         Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
-        //EffectsControl.PlaneAnimator.SetTrigger("resupply");
+        PlaneAnimator.SetTrigger("resupply");
         BombPoint = 0;
+    }
+    public void SetCanopyOpen()
+    {
+        if (InEditor) { CanopyOpening(); }
+        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
+    }
+    public void SetCanopyClosed()
+    {
+        if (InEditor) { CanopyClosing(); }
+        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
+    }
+    public void CanopyOpening()
+    {
+        if (!EffectsControl.CanopyOpen)//this if statement prevents sound issues when this is called by OnPlayerJoined()
+        {
+            EffectsControl.CanopyOpen = true;
+            if (CanopyCloseTimer > 0)
+            { CanopyCloseTimer -= 100000 + CanopyCloseTime; }
+            else
+            { CanopyCloseTimer = -100000; }
+            PlaneAnimator.SetBool("canopyopen", true);
+        }
+    }
+    public void CanopyClosing()
+    {
+        if (EffectsControl.CanopyOpen)//this if statement prevents sound issues when this is called by OnPlayerJoined()
+        {
+            EffectsControl.CanopyOpen = false;
+            if (CanopyCloseTimer > (-100000 - CanopyCloseTime) && CanopyCloseTimer < 0)
+            { CanopyCloseTimer += 100000 + ((CanopyCloseTime * 2) + 0.1f); }//the 0.1 is for the delay in the animator that is needed because it's not set to write defaults
+            else
+            { CanopyCloseTimer = CanopyCloseTime; }
+            PlaneAnimator.SetBool("canopyopen", false);
+        }
     }
     public void SetGearUp()
     {
         EffectsControl.GearUp = true;
-        EffectsControl.PlaneAnimator.SetBool("gearup", true);
+        PlaneAnimator.SetBool("gearup", true);
     }
     public void SetGearDown()
     {
         EffectsControl.GearUp = false;
-        EffectsControl.PlaneAnimator.SetBool("gearup", false);
+        PlaneAnimator.SetBool("gearup", false);
     }
     public void ToggleGear()
     {
@@ -2454,12 +2519,14 @@ public class EngineController : UdonSharpBehaviour
     public void SetFlapsOff()
     {
         EffectsControl.Flaps = false;
-        EffectsControl.PlaneAnimator.SetBool("flaps", false);
+        PlaneAnimator.SetBool("flaps", false);
+        FlapsDrag = 1;
+        FlapsLift = 1;
     }
     public void SetFlapsOn()
     {
         EffectsControl.Flaps = true;
-        EffectsControl.PlaneAnimator.SetBool("flaps", true);
+        PlaneAnimator.SetBool("flaps", true);
     }
     public void ToggleFlaps()
     {
@@ -2489,12 +2556,12 @@ public class EngineController : UdonSharpBehaviour
     public void SetHookDown()
     {
         EffectsControl.HookDown = true;
-        EffectsControl.PlaneAnimator.SetBool("hookdown", true);
+        PlaneAnimator.SetBool("hookdown", true);
     }
     public void SetHookUp()
     {
         EffectsControl.HookDown = false;
-        EffectsControl.PlaneAnimator.SetBool("hookdown", false);
+        PlaneAnimator.SetBool("hookdown", false);
     }
     public void ToggleHook()
     {
@@ -2524,12 +2591,12 @@ public class EngineController : UdonSharpBehaviour
     public void SetSmokingOn()
     {
         EffectsControl.Smoking = true;
-        EffectsControl.PlaneAnimator.SetBool("displaysmoke", true);
+        PlaneAnimator.SetBool("displaysmoke", true);
     }
     public void SetSmokingOff()
     {
         EffectsControl.Smoking = false;
-        EffectsControl.PlaneAnimator.SetBool("displaysmoke", false);
+        PlaneAnimator.SetBool("displaysmoke", false);
     }
     public void ToggleSmoking()
     {
@@ -2599,8 +2666,9 @@ public class EngineController : UdonSharpBehaviour
         Health = FullHealth;
         Fuel = FullFuel;
         GunAmmoInSeconds = FullGunAmmo;
+        Atmosphere = 1;//planemoving optimization requires this to be here
     }
-    public void ResetStatus()//called when using respawn button
+    public void ResetStatus()//called globally when using respawn button
     {
         if (HasAfterburner) { SetAfterburnerOff(); }
         if (HasSmoke) { SetSmokingOff(); }
@@ -2608,15 +2676,18 @@ public class EngineController : UdonSharpBehaviour
         if (HasHook) { SetHookUp(); }
         if (HasGear) { SetGearDown(); }
         if (HasFlaps) { SetFlapsOn(); }
-        if (HasCanopy && !EffectsControl.CanopyOpen) { EffectsControl.SetCanopyOpen(); }
+        if (HasCanopy && !EffectsControl.CanopyOpen) { SetCanopyOpen(); }
+        WeaponSelected = false;
         NumAAM = FullAAMs;
         NumAGM = FullAGMs;
         NumBomb = FullBombs;
+        PlaneAnimator.SetFloat("AAMs", 1);
+        PlaneAnimator.SetFloat("AGMs", 1);
+        PlaneAnimator.SetFloat("bombs", 1);
         BombPoint = 0;
-        EffectsControl.DoEffects = 6;
-        dead = true;//this makes it invincible and unable to be respawned again for 5s
-        EffectsControl.PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead after 5s
-        EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
+        //these two make it invincible and unable to be respawned again for 5s
+        dead = true;
+        PlaneAnimator.SetTrigger("Respawn");
     }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
@@ -2632,7 +2703,7 @@ public class EngineController : UdonSharpBehaviour
                 if (!EffectsControl.CanopyOpen)
                 {
                     if (InEditor)//editor
-                    { EffectsControl.SetCanopyClosed(); }
+                    { SetCanopyClosed(); }
                     else//VRC
                     { EffectsControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetCanopyClosed"); }
                 }
@@ -2669,18 +2740,247 @@ public class EngineController : UdonSharpBehaviour
             }
         }
     }
-    public void ZeroControlValues()
+    public void PasengerEnterPlaneLocal()
     {
-        roll = 0;
-        pitch = 0;
-        yaw = 0;
-        LerpedPitch = 0;
-        LerpedRoll = 0;
-        LerpedYaw = 0;
-        RollInput = 0;
-        PitchInput = 0;
-        YawInput = 0;
+        Passenger = true;
+        if (HUDControl != null) { HUDControl.gameObject.SetActive(true); }
+        if (EffectsControl.CanopyOpen) CanopyCloseTimer = -100001;
+        else CanopyCloseTimer = -1;
+
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool("localpassenger", true); }
+        if (PlaneMesh != null)
+        {
+            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+            foreach (Transform child in children)
+            {
+                child.gameObject.layer = OnboardPlaneLayer;
+            }
+        }
+    }
+    public void PilotEnterPlaneLocal()//called from PilotSeat
+    {
+        //setting this as a workaround because it doesnt work reliably in Enginecontroller's Start()
+        if (localPlayer.IsUserInVR()) { InVR = true; }
+
+        Networking.SetOwner(localPlayer, gameObject);
+
+        if (VehicleMainObj != null) { Networking.SetOwner(localPlayer, VehicleMainObj); }
+
+        Throttle = 0;
         ThrottleInput = 0;
+        PlayerThrottle = 0;
+        IsFiringGun = false;
+        VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
+
+        Piloting = true;
+        if (dead) Health = 100;//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
+
+        if (EffectsControl != null)
+        {
+            //canopy closed/open sound
+            if (EffectsControl.CanopyOpen) { CanopyCloseTimer = -100000 - CanopyCloseTime; }
+            else CanopyCloseTimer = -CanopyCloseTime;//less than 0
+            Networking.SetOwner(localPlayer, EffectsControl.gameObject);
+            SetSmokingOff();
+        }
+        if (HUDControl != null)
+        {
+            Networking.SetOwner(localPlayer, HUDControl.gameObject);
+            HUDControl.gameObject.SetActive(true);
+        }
+
+        //hopefully prevents explosions when you enter the plane
+        VehicleRigidbody.velocity = CurrentVel;
+        Gs = 0;
+        LastFrameVel = CurrentVel;
+
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool("localpilot", true); }
+
+        if (PlaneMesh != null)
+        {
+            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+            foreach (Transform child in children)
+            {
+                child.gameObject.layer = OnboardPlaneLayer;
+            }
+        }
+
+        //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
+        var Target = AAMTargets[AAMTarget];
+        if (Target && Target.transform.parent)
+        {
+            AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
+        }
+
+        if (KillsBoard != null)
+        {
+            KillsBoard.MyKills = 0;
+        }
+    }
+    public void PilotEnterPlaneGlobal(VRCPlayerApi player)
+    {
+        PilotName = player.displayName;
+        PilotID = player.playerId;
+
+        if (EffectsControl != null)
+        {
+            PlaneAnimator.SetBool("occupied", true);
+            EffectsControl.DoEffects = 0f;
+        }
+        dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
+                     //wakeup potentially sleeping controllers
+        if (SoundControl != null) { SoundControl.Wakeup(); }
+    }
+    public void PilotExitPlane(VRCPlayerApi player)
+    {
+        PilotExitTime = Time.time;
+        PilotName = string.Empty;
+        PilotID = -1;
+        IsFiringGun = false;
+        SetSmokingOff();
+        SetAfterburnerOff();
+        if (EffectsControl != null)
+        {
+            EffectsControl.EffectsLeavePlane();
+        }
+        if (player.isLocal)
+        {
+            //zero control values
+            roll = 0;
+            pitch = 0;
+            yaw = 0;
+            LerpedPitch = 0;
+            LerpedRoll = 0;
+            LerpedYaw = 0;
+            RollInput = 0;
+            PitchInput = 0;
+            YawInput = 0;
+            ThrottleInput = 0;
+            //reset everything
+            Piloting = false;
+            EjectTimer = 2;
+            Hooked = false;
+            BrakeInput = 0;
+            LTriggerTapTime = 1;
+            RTriggerTapTime = 1;
+            Taxiinglerper = 0;
+            LGripLastFrame = false;
+            RGripLastFrame = false;
+            LStickSelection = 0;
+            RStickSelection = 0;
+            BrakeInput = 0;
+            LTriggerLastFrame = false;
+            RTriggerLastFrame = false;
+            AGMLocked = false;
+            AAMHasTarget = false;
+            DoAAMTargeting = false;
+            MissilesIncoming = 0;
+            AAMLockTimer = 0;
+            AAMLocked = false;
+            HUDControl.MenuSoundCheckLast = 0;
+            if (Ejected)
+            {
+                localPlayer.SetVelocity(CurrentVel + VehicleMainObj.transform.up * 25);
+                Ejected = false;
+            }
+            else { localPlayer.SetVelocity(CurrentVel); }
+            if (CatapultStatus == 1) { CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
+
+            if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
+            //set plane's layer back
+            if (PlaneMesh != null)
+            {
+                Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+                foreach (Transform child in children)
+                {
+                    child.gameObject.layer = Planelayer;
+                }
+            }
+        }
+        if (KillsBoard != null)
+        {
+            Scoreboard_Kills killsboard = KillsBoard;
+            if (killsboard.MyKills == killsboard.TopKills)
+            {
+                if (InEditor)
+                {
+                    killsboard.UpdateScores();
+                }
+                else
+                {
+                    killsboard.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "UpdateScores");
+                }
+            }
+        }
+    }
+    private void FindAAMTargets()
+    {
+        //get array of AAM Targets
+        Collider[] aamtargs = Physics.OverlapSphere(CenterOfMass.transform.position, 1000000, AAMTargetsLayer, QueryTriggerInteraction.Collide);
+        int n = 0;
+
+        //work out which index in the aamtargs array is our own plane by finding which one has this script as it's parent
+        //allows for each team to have a different layer for AAMTargets
+        int self = -1;
+        n = 0;
+        foreach (Collider target in aamtargs)
+        {
+            if (target.transform.parent != null && target.transform.parent == transform)
+            {
+                self = n;
+            }
+            n++;
+        }
+        //populate AAMTargets list excluding our own plane
+        n = 0;
+        int foundself = 0;
+        foreach (Collider target in aamtargs)
+        {
+            if (n == self) { foundself = 1; n++; }
+            else
+            {
+                AAMTargets[n - foundself] = target.gameObject;
+                n++;
+            }
+        }
+        if (aamtargs.Length > 0)
+        {
+            if (foundself != 0)
+            {
+                NumAAMTargets = Mathf.Clamp(aamtargs.Length - 1, 0, 999);//one less because it found our own plane
+            }
+            else
+            {
+                NumAAMTargets = Mathf.Clamp(aamtargs.Length, 0, 999);
+            }
+        }
+        else { NumAAMTargets = 0; }
+
+
+        if (NumAAMTargets > 0)
+        {
+            n = 0;
+            //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure they're the in the same order on all clients 
+            float[] order = new float[NumAAMTargets];
+            for (int i = 0; AAMTargets[n] != null; i++)
+            {
+                Transform parent = AAMTargets[n].transform;
+                for (int x = 0; parent != null; x++)
+                {
+                    order[n] = float.Parse(order[n].ToString() + parent.transform.GetSiblingIndex().ToString());
+                    parent = parent.transform.parent;
+                }
+                n++;
+            }
+            //sort AAMTargets array based on order
+
+            SortTargets(AAMTargets, order);
+        }
+        else
+        {
+            Debug.LogWarning(string.Concat(VehicleMainObj.name, ": NO AAM TARGETS FOUND"));
+            AAMTargets[0] = HUDControl.gameObject;//this should prevent HUDController from crashing with a null reference while causing no ill effects
+        }
     }
     private void Assert(bool condition, string message)
     {

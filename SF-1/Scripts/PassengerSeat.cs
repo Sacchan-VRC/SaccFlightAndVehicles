@@ -25,24 +25,10 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     private void Interact()
     {
-        EngineControl.Passenger = true;
-        Networking.SetOwner(EngineControl.localPlayer, gameObject);
+        EngineControl.PasengerEnterPlaneLocal();
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(true); }
-        if (EngineControl.EffectsControl.CanopyOpen) EngineControl.CanopyCloseTimer = -100001;
-        else EngineControl.CanopyCloseTimer = -1;
-
         EngineControl.localPlayer.UseAttachedStation();
-        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", true); }
-        if (PlaneMesh != null)
-        {
-            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
-            foreach (Transform child in children)
-            {
-                child.gameObject.layer = EngineControl.OnboardPlaneLayer;
-            }
-        }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
@@ -69,9 +55,9 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
+        LeaveButtonControl.SeatedPlayer = -1;
         if (player != null)
         {
-            LeaveButtonControl.SeatedPlayer = -1;
             SetVoiceOutside(player);
             if (player.isLocal)
             {
@@ -84,9 +70,9 @@ public class PassengerSeat : UdonSharpBehaviour
                         SetVoiceOutside(guy);
                     }
                 }
-                if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
                 if (EngineControl != null)
                 {
+                    if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
                     EngineControl.Passenger = false;
                     EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
                     EngineControl.MissilesIncoming = 0;

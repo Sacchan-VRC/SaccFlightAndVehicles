@@ -112,16 +112,6 @@ public class EffectsController : UdonSharpBehaviour
         { fire.localScale = new Vector3(fire.localScale.x, 0, fire.localScale.z); }
 
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
-
-
-        //set these values at start in case they haven't been set correctly in editor
-        if (!EngineControl.HasCanopy) { CanopyOpen = true; CanopyClosing(); }
-        else { CanopyOpen = false; CanopyOpening(); }
-        if (!EngineControl.HasGear) { EngineControl.SetGearUp(); }
-        else { EngineControl.SetGearDown(); }
-        if (!EngineControl.HasFlaps) { EngineControl.SetFlapsOff(); }
-        else { EngineControl.SetFlapsOn(); }
-        EngineControl.SetHookUp();
     }
     private void Update()
     {
@@ -255,48 +245,31 @@ public class EffectsController : UdonSharpBehaviour
         {
             Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * DeltaTime);//linger for a bit before cutting off
         }
-        PlaneAnimator.SetFloat("mach10", EngineControl.Speed / 343 / 10);//should be airspeed but nonlocal players don't have it
-        PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs / 50 : 0);
-        PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail / 50 : 0);
+        //("mach10", EngineControl.Speed / 343 / 10)
+        PlaneAnimator.SetFloat("mach10", EngineControl.Speed * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
+        //("Gs", vapor ? EngineControl.Gs / 50 : 0)
+        PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs * 0.02f : 0);
+        //("Gs_trail", vapor ? Gs_trail / 50 : 0);
+        PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail * 0.02f : 0);
     }
-    public void SetCanopyOpen()
+    public void EffectsResetStatus()//called from enginecontroller.explode();
     {
-        if (EngineControl.InEditor) { CanopyOpening(); }
-        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
-    }
-    public void SetCanopyClosed()
-    {
-        if (EngineControl.InEditor) { CanopyClosing(); }
-        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
-    }
-    public void CanopyOpening()
-    {
-        if (!CanopyOpen)//this if statement prevents sound issues when this is called by OnPlayerJoined()
-        {
-            CanopyOpen = true;
-            if (EngineControl.CanopyCloseTimer > 0)
-            { EngineControl.CanopyCloseTimer -= 100000 + EngineControl.CanopyCloseTime; }
-            else
-            { EngineControl.CanopyCloseTimer = -100000; }
-            PlaneAnimator.SetBool("canopyopen", true);
-        }
-    }
-    public void CanopyClosing()
-    {
-        if (CanopyOpen)//this if statement prevents sound issues when this is called by OnPlayerJoined()
-        {
-            CanopyOpen = false;
-            if (EngineControl.CanopyCloseTimer > (-100000 - EngineControl.CanopyCloseTime) && EngineControl.CanopyCloseTimer < 0)
-            { EngineControl.CanopyCloseTimer += 100000 + ((EngineControl.CanopyCloseTime * 2) + 0.1f); }//the 0.1 is for the delay in the animator that is needed because it's not set to write defaults
-            else
-            { EngineControl.CanopyCloseTimer = EngineControl.CanopyCloseTime; }
-            PlaneAnimator.SetBool("canopyopen", false);
-        }
+        DoEffects = 6;
+        PlaneAnimator.SetInteger("weapon", 4);
+        PlaneAnimator.SetFloat("bombs", 1);
+        PlaneAnimator.SetFloat("AAMs", 1);
+        PlaneAnimator.SetFloat("AGMs", 1);
+        PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead after 5s
+        PlaneAnimator.SetTrigger("instantgeardown");
+        if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
     public void EffectsExplode()//called from enginecontroller.explode();
     {
-        PlaneAnimator.SetInteger("missilesincoming", 0);
         PlaneAnimator.SetTrigger("explode");
+        PlaneAnimator.SetFloat("bombs", 1);
+        PlaneAnimator.SetFloat("AAMs", 1);
+        PlaneAnimator.SetFloat("AGMs", 1);
+        PlaneAnimator.SetInteger("missilesincoming", 0);
         PlaneAnimator.SetInteger("weapon", 0);
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
         DoEffects = 0f; //keep awake
