@@ -7,8 +7,8 @@ using VRC.Udon;
 public class HitDetector : UdonSharpBehaviour
 {
     public EngineController EngineControl;
-    public EngineController LastAttacker;
-    public float LastHitTime = -100;
+    [System.NonSerializedAttribute] public float LastHitTime = -100;
+    [System.NonSerializedAttribute] public EngineController LastAttacker;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");

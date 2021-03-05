@@ -127,10 +127,10 @@ public class HUDController : UdonSharpBehaviour
     {
         float DeltaTime = Time.deltaTime;
         //RollPitch Indicator
-        PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.RollInput, EngineControl.PitchInput, 0)) * InputSquareSize;
+        PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.RotationInputs.z, EngineControl.RotationInputs.x, 0)) * InputSquareSize;
 
         //Yaw Indicator
-        Yaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.YawInput, 0, 0)) * InputSquareSize;
+        Yaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.RotationInputs.y, 0, 0)) * InputSquareSize;
 
         /*         //Yaw Trim Indicator
                 TrimYaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.Trim.y, 0, 0)) * InputSquareSize;
@@ -193,25 +193,25 @@ public class HUDController : UdonSharpBehaviour
             { TargetDir = EngineControl.AAMCurrentTargetEngineControl.CenterOfMass.position - transform.position; }
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-            float BulletPlusPlaneSpeed = (EngineControl.CurrentVel + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .1f)).magnitude;
+            float BulletPlusPlaneSpeed = (EngineControl.CurrentVel + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel /* * .1f */)).magnitude;
             Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
             //GUN_TargetDirOld is around 10 frames worth of distance behind a moving target (lerped by .1) in order to smooth out the calculation for unsmooth netcode
             //multiplying the result by .1(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
-            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .1f) / DeltaTime, .6f * DeltaTime);
+            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude/*  * .1f */) / DeltaTime, .6f * DeltaTime);
             float BulletHitTime = TargetDir.magnitude / BulletPlusPlaneSpeed;
             //normalize lerped relative target velocity vector and multiply by lerped speed
             Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
             //the .05 in the next line is combined .1 for undoing the lerp, and .5 for the acceleration formula
             Vector3 PredictedPos = (TargetDir
                 + ((RelTargVelNormalized * GUN_TargetSpeedLerper)//Linear
-                    + (TargetAccel * .05f * BulletHitTime)//Acceleration
+                    + (TargetAccel * .5f * BulletHitTime)//Acceleration
                         + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
                             * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
             RelativeTargetVelLastFrame = RelativeTargetVel;
-            GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .1f);
+            GUN_TargetDirOld = TargetDir;//Vector3.Lerp(GUN_TargetDirOld, TargetDir, .1f);
         }
         else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
@@ -453,7 +453,6 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.HasBomb) HUDText_Bomb_ammo.text = EngineControl.NumBomb.ToString("F0");
         else HUDText_Bomb_ammo.text = string.Empty;
 
-        PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
         PlaneAnimator.SetFloat("fuel", EngineControl.Fuel * FullFuelDivider);
         PlaneAnimator.SetFloat("gunammo", EngineControl.GunAmmoInSeconds * FullGunAmmoDivider);
     }

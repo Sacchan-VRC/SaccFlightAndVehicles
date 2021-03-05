@@ -9,41 +9,16 @@ public class EffectsController : UdonSharpBehaviour
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
     public Transform JoyStick;
-    public Transform[] Ailerons;
-    public Transform[] Elevators;
-    public Transform[] Rudders;
-    public Transform Canards;
-    public Transform Engines;
-    public Transform[] Enginefire;
     public Transform FrontWheel;
     public ParticleSystem[] DisplaySmoke;
     public ParticleSystem CatapultSteam;
-
-    /*     public Transform ElevonL;
-        public Transform ElevonR;
-        public Transform RuddervatorL;
-        public Transform RuddervatorR;
-     */
-
     private bool VehicleMainObjNull = true;
     private bool EngineControlNull = true;
     private bool JoyStickNull = true;
-    private bool AileronsNull = true;
-    private bool CanardsNull = true;
-    private bool ElevatorNull = true;
-    private bool EnginesNull = true;
-    private bool EnginefireNull = true;
-    private bool RuddersNull = true;
     [System.NonSerializedAttribute] public bool FrontWheelNull = true;
     private bool CatapultSteamNull = true;
     private bool DisplaySmokeNull = true;
 
-
-    /*     private bool ElevonLNull = true;
-        private bool ElevonRNull = true;
-        private bool RuddervatorLNull = true;
-        private bool RuddervatorRNull = true;
-     */
 
 
     //these used to be synced variables, might move them back to EngineController some time
@@ -53,33 +28,25 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool Flaps = true;
     [System.NonSerializedAttribute] public bool HookDown = false;
     [System.NonSerializedAttribute] public bool Smoking = false;
-    [UdonSynced(UdonSyncMode.None)] private Vector3 rotationinputs;
+    [UdonSynced(UdonSyncMode.Linear)] private Vector3 rotationinputs;
 
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] public Animator PlaneAnimator;
-    private Vector3 PitchLerper = Vector3.zero;
-    private Vector3 YawLerper = Vector3.zero;
-    private Vector3 RollLerper = Vector3.zero;
-    private Vector3 EngineLerper = Vector3.zero;
-    private Vector3 EnginefireLerper = new Vector3(1, 0.6f, 1);
     [System.NonSerializedAttribute] public float AirbrakeLerper;
     [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     private float brake;
     private Color SmokeColorLerper = Color.white;
     [System.NonSerializedAttribute] public bool LargeEffectsOnly = false;
     private float FullHealthDivider;
+    private Vector3 OwnerRotationInputs;
     private void Start()
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
         Assert(EngineControl != null, "Start: EngineControl != null");
         //should work withouth these
         Assert(JoyStick != null, "Start: JoyStick != null");
-        Assert(Enginefire != null, "Start: Enginefire != null");
         Assert(FrontWheel != null, "Start: FrontWheel != null");
-        Assert(Ailerons.Length > 0, "Start: Ailerons.Length > 0");
-        Assert(Elevators.Length > 0, "Start: Elevator.Length > 0");
-        Assert(Rudders.Length > 0, "Start: Rudders.Length > 0");
 
 
         /*         Assert(ElevonL != null, "Start: ElevonL != null");
@@ -92,9 +59,6 @@ public class EffectsController : UdonSharpBehaviour
         if (VehicleMainObj != null) VehicleMainObjNull = false;
         if (EngineControl != null) EngineControlNull = false;
         if (JoyStick != null) JoyStickNull = false;
-        if (Canards != null) CanardsNull = false;
-        if (Engines != null) EnginesNull = false;
-        if (Enginefire != null) EnginefireNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
         if (CatapultSteam != null) CatapultSteamNull = false;
         if (DisplaySmoke.Length > 0) DisplaySmokeNull = false;
@@ -107,9 +71,6 @@ public class EffectsController : UdonSharpBehaviour
          */
 
         FullHealthDivider = 1f / EngineControl.Health;
-
-        foreach (Transform fire in Enginefire)
-        { fire.localScale = new Vector3(fire.localScale.x, 0, fire.localScale.z); }
 
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
     }
@@ -124,25 +85,26 @@ public class EffectsController : UdonSharpBehaviour
     }
     public void Effects()
     {
+        Vector3 RotInputs = EngineControl.RotationInputs;
         float DeltaTime = Time.deltaTime;
         if (EngineControl.IsOwner)
         {
-            rotationinputs.x = /* Mathf.Clamp( */EngineControl.PitchInput/*  + EngineControl.Trim.x , -1, 1)*/ * 25;
-            rotationinputs.y = /* Mathf.Clamp( */EngineControl.YawInput/*  + EngineControl.Trim.y , -1, 1)*/ * 20;
-            rotationinputs.z = EngineControl.RollInput * 35;
-
-            //joystick movement
-            if (!JoyStickNull)
-            {
-                JoyStick.localRotation = Quaternion.Euler(new Vector3(EngineControl.PitchInput * 35f, EngineControl.YawInput * 35, EngineControl.RollInput * 35f));
-            }
+            OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, EngineControl.RotationInputs, 7 * DeltaTime);
+            PlaneAnimator.SetFloat("pitchinput", (OwnerRotationInputs.x * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat("yawinput", (OwnerRotationInputs.y * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat("rollinput", (OwnerRotationInputs.z * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
+            PlaneAnimator.SetFloat("engineoutput", EngineControl.EngineOutput);
         }
-
-        PitchLerper.x = Mathf.Lerp(PitchLerper.x, rotationinputs.x, 4.5f * DeltaTime);
-        RollLerper.y = Mathf.Lerp(RollLerper.y, rotationinputs.z, 4.5f * DeltaTime);
-        YawLerper.y = Mathf.Lerp(YawLerper.y, rotationinputs.y, 4.5f * DeltaTime);
-        EnginefireLerper.y = Mathf.Lerp(EnginefireLerper.y, EngineControl.Throttle, .9f * DeltaTime);
-
+        else
+        {
+            float EngineOutput = EngineControl.EngineOutput;
+            PlaneAnimator.SetFloat("pitchinput", (RotInputs.x * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat("yawinput", (RotInputs.y * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat("rollinput", (RotInputs.z * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat("throttle", EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
+            PlaneAnimator.SetFloat("engineoutput", EngineOutput);
+        }
         if (EngineControl.Occupied == true)
         {
             DoEffects = 0f;
@@ -151,65 +113,16 @@ public class EffectsController : UdonSharpBehaviour
             {
                 if (EngineControl.Taxiing)
                 {
-                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -YawLerper.y * 4f * (-Mathf.Min((EngineControl.Speed / 10), 1) + 1), 0));
+                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -EngineControl.RotationInputs.y * 4f * (-Mathf.Min((EngineControl.Speed / 10), 1) + 1), 0));
                 }
                 else FrontWheel.localRotation = Quaternion.identity;
             }
-
         }
         else { DoEffects += DeltaTime; }
 
-        /*         if (!ElevonLNull) ElevonL.localRotation = Quaternion.Euler(0, RollLerper.y + -PitchLerper.x, 0);
-                if (!ElevonRNull) ElevonR.localRotation = Quaternion.Euler(0, RollLerper.y + PitchLerper.x, 0);
-                if (!RuddervatorLNull) RuddervatorL.localRotation = Quaternion.Euler(0, YawLerper.y + -PitchLerper.x, 0);
-                if (!RuddervatorRNull) RuddervatorR.localRotation = Quaternion.Euler(0, YawLerper.y + PitchLerper.x, 0);
-         */
-        foreach (Transform elevator in Elevators)
-            elevator.localRotation = Quaternion.Euler(-PitchLerper);
 
-        foreach (Transform aileron in Ailerons)
-            aileron.localRotation = Quaternion.Euler(RollLerper);
+        PlaneAnimator.SetFloat("engineoutput", EngineControl.EngineOutput);
 
-        foreach (Transform rudder in Rudders)
-            rudder.localRotation = Quaternion.Euler(YawLerper);
-
-        if (!EnginesNull)
-        {
-            Engines.localRotation = Quaternion.Euler(PitchLerper * -.6f);
-        }
-        if (!CanardsNull)
-        {
-            Canards.localRotation = Quaternion.Euler(PitchLerper * .6f);
-        }
-
-        //engine thrust animation
-
-        if (!EnginefireNull)
-        {
-            if (AfterburnerOn)
-            {
-                foreach (Transform fire in Enginefire)
-                {
-                    fire.gameObject.SetActive(true);
-                    fire.localScale = EnginefireLerper;
-                }
-            }
-            else
-            {
-                foreach (Transform fire in Enginefire)
-                {
-                    fire.gameObject.SetActive(true);
-                    fire.localScale = new Vector3(1, 0, 1);
-                }
-            }
-            if (EngineControl.Throttle <= .03f)
-            {
-                foreach (Transform fire in Enginefire)
-                {
-                    fire.gameObject.SetActive(false);
-                }
-            }
-        }
         vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * DeltaTime);
@@ -272,13 +185,8 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetInteger("missilesincoming", 0);
         PlaneAnimator.SetInteger("weapon", 0);
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
-        DoEffects = 0f; //keep awake
+        DoEffects = 0f;//keep awake
         PlaneAnimator.SetBool("occupied", false);
-        foreach (Transform fire in Enginefire)//Fixes specific case where distant planes that aren't doing Effects() can respawn with their
-                                              //afterburners appearing to be on when seen through a camera that's looking at another plane.
-        {
-            fire.gameObject.SetActive(false);
-        }
     }
     public void EffectsLeavePlane()
     {

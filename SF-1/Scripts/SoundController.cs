@@ -358,10 +358,10 @@ public class SoundController : UdonSharpBehaviour
             {
                 if (!PlaneInsideNull)
                 {
-                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.Throttle * .4f) + .8f, 2.25f * DeltaTime);
+                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (EngineControl.EngineOutput * .4f) + .8f, 2.25f * DeltaTime);
                     PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, PlaneInsideInitialVolume, .72f * DeltaTime);
                 }
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, (EngineControl.Throttle * PlaneThrustInitialVolume) * InVehicleThrustVolumeFactor, 1.08f * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, (EngineControl.EngineOutput * PlaneThrustInitialVolume) * InVehicleThrustVolumeFactor, 1.08f * DeltaTime);
             }
             else/*  if (InEditor) */ //enable here and disable 'Piloting' above for testing //you're a passenger and no one is flying
             {
@@ -404,11 +404,11 @@ public class SoundController : UdonSharpBehaviour
             }
             else
             {
-                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, EngineControl.Throttle, .72f * DeltaTime);
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, EngineControl.Throttle, 1.08f * DeltaTime);
+                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, EngineControl.EngineOutput, .72f * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, EngineControl.EngineOutput, 1.08f * DeltaTime);
             }
             PlaneThrustPitch = 1;
-            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (EngineControl.Throttle - 0.3f) + 1.3f, .54f * DeltaTime);
+            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (EngineControl.EngineOutput - 0.3f) + 1.3f, .54f * DeltaTime);
         }
         else //no one is in the plane or its out of fuel
         {
