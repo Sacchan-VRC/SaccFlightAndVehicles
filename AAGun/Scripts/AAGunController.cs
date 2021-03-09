@@ -266,21 +266,6 @@ public class AAGunController : UdonSharpBehaviour
 
                 RotationSpeedX += -(RotationSpeedX * TurnFriction * DeltaTime) + InputX * DeltaTime;
                 RotationSpeedY += -(RotationSpeedY * TurnFriction * DeltaTime) + InputY * DeltaTime;
-                /*                 //only do friction if slowing down or trying to turn in the oposite direction
-                                if (InputY > 0 && InputYLerper < 0 || InputY < 0 && InputYLerper > 0 || Mathf.Abs(InputYLerper) > Mathf.Abs(InputY))
-                                {
-                                    InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * DeltaTime);
-                                    InputYLerper *= StopSpeed;
-                                }
-                                else { InputYLerper = Mathf.Lerp(InputYLerper, InputY, TurningResponse * DeltaTime); }
-
-                                if (InputX > 0 && InputXLerper < 0 || InputX < 0 && InputXLerper > 0 || Mathf.Abs(InputXLerper) > Mathf.Abs(InputX))
-                                {
-                                    InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * DeltaTime);
-                                    InputXLerper *= StopSpeed;
-                                }
-                                else { InputXLerper = Mathf.Lerp(InputXLerper, InputX, TurningResponse * DeltaTime); } */
-
 
                 //rotate turret
                 float temprot = Rotator.transform.localRotation.eulerAngles.x;
@@ -388,21 +373,31 @@ public class AAGunController : UdonSharpBehaviour
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
-        if (Manning)
+        if (Manning && !InEditor)
         {
             if (AAGunSeat != null) { AAGunSeat.ExitStation(localPlayer); }
         }
         dead = true;
-        Health = FullHealth;//turns off low health smoke and stops it from calling Explode() every frame
-        AAGunAnimator.SetFloat("health", Health / FullHealth);
+        firing = false;
         MGAmmoSeconds = MGAmmoFull;
+        Health = FullHealth;//turns off low health smoke and stops it from calling Explode() every frame
         NumAAM = FullAAMs;
+        AAGunAnimator.SetBool("firing", false);
+        AAGunAnimator.SetFloat("AAMs", 1);
+        AAGunAnimator.SetFloat("health", 1);
         if (IsOwner)
         {
             Rotator.transform.localRotation = Quaternion.Euler(StartRot);
         }
         AAGunAnimator.SetTrigger("explode");
-        AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+    }
+    public void RespawnStuff()//called by hitdetector on respawn
+    {
+        dead = false;
+        if (localPlayer == null || IsOwner)
+        {
+            Health = FullHealth;
+        }
     }
     private void AAMTargeting(float Lock_Angle)
     {

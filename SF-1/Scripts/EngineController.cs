@@ -97,6 +97,7 @@ public class EngineController : UdonSharpBehaviour
     public float SidewaysLift = .17f;
     public float MaxLift = 10f;
     public float VelLift = 1f;
+    public float VelLiftMax = 10f;
     public float MaxGs = 40f;
     public float GDamage = 10f;
     public float LandingGearDragMulti = 1.3f;
@@ -105,15 +106,13 @@ public class EngineController : UdonSharpBehaviour
     public float AirbrakeStrength = 4f;
     public float GroundBrakeStrength = 6f;
     public float GroundBrakeSpeed = 40f;
-    public float HookedBrakeStrength = 65f;
+    public float HookedBrakeStrength = 55f;
     public float HookedCableSnapDistance = 120f;
     public float CatapultLaunchStrength = 50f;
     public float CatapultLaunchTime = 2f;
-    /*     public float TakeoffAssist = 5f;
-        public float TakeoffAssistSpeed = 50f; */
-    public float GroundEffectMaxDistance;
-    public float GroundEffectStrength;
-    public float MaxGroundEffectLift;
+    public float GroundEffectMaxDistance = 7;
+    public float GroundEffectStrength = 4;
+    public float GroundEffectLiftMax = 999999;
     public float GLimiter = 12f;
     public float AoALimiter = 15f;
     public float CanopyCloseTime = 1.8f;
@@ -133,7 +132,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float Gs = 1f;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 SmokeColor = Vector3.one;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 SmokeColor = Vector3.one;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
@@ -297,10 +296,11 @@ public class EngineController : UdonSharpBehaviour
     private float FullBombsDivider;
     private Quaternion AGMCamLastFrame;
     bool Landed = false;//moved here from soundcontroller
-    private float StartVelLift;
+    private float VelLiftStart;
     private HitDetector PlaneHitDetector;
     [System.NonSerializedAttribute] public float PilotExitTime;
-    private int Planelayer = 0;
+    private int Planelayer;
+    private float VelLiftMaxStart;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -333,8 +333,7 @@ public class EngineController : UdonSharpBehaviour
         //set these values at start in case they haven't been set correctly in editor
         if (!HasCanopy) { EffectsControl.CanopyOpen = true; CanopyClosing(); }
         else { EffectsControl.CanopyOpen = false; CanopyOpening(); }
-        if (!HasGear) { SetGearUp(); }
-        else { SetGearDown(); }
+        SetGearDown();
         if (!HasFlaps) { SetFlapsOff(); }
         else { SetFlapsOn(); }
         SetHookUp();
@@ -352,7 +351,8 @@ public class EngineController : UdonSharpBehaviour
         FullAGMs = NumAGM;
         FullBombs = NumBomb;
 
-        StartVelLift = VelLift;
+        VelLiftMaxStart = VelLiftMax;
+        VelLiftStart = VelLift;
         CatapultLaunchTimeStart = CatapultLaunchTime;
 
         PlaneHitDetector = VehicleMainObj.GetComponent<HitDetector>();
@@ -1769,6 +1769,7 @@ public class EngineController : UdonSharpBehaviour
             float sidespeed = 0;
             float downspeed = 0;
             float SpeedLiftFactor = 0;
+            float VelLiftFinal = 0;
 
             if (PlaneMoving)//optimization
             {
@@ -1785,7 +1786,7 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 //speed related values
-                SpeedLiftFactor = Mathf.Clamp(AirSpeed * AirSpeed * Lift, 0, MaxLift);
+                SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift);
                 rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
                 //thrust vectoring airplanes have a minimum rotation control
@@ -1805,17 +1806,20 @@ public class EngineController : UdonSharpBehaviour
 
                 bool Flaps = EffectsControl.Flaps;
                 //Ground effect, extra lift caused by air pressure when close to the ground
-                RaycastHit GF;
-                if (Physics.Raycast(PitchMoment.position, -VehicleMainObj.transform.up, out GF, GroundEffectMaxDistance, 2049 /* Default and Environment */, QueryTriggerInteraction.Collide))
+                RaycastHit GE;
+                if (Physics.Raycast(PitchMoment.position, -VehicleMainObj.transform.up, out GE, GroundEffectMaxDistance, 2049 /* Default and Environment */, QueryTriggerInteraction.Collide))
                 {
-                    float GroundEffect = (-GF.distance + GroundEffectMaxDistance) * GroundEffectStrength * SpeedLiftFactor;
+                    float GroundEffect = ((-GE.distance + GroundEffectMaxDistance) / GroundEffectMaxDistance) * GroundEffectStrength;
                     if (Flaps) { GroundEffect *= FlapsLiftMulti; }
-                    VelLift = Mathf.Min(StartVelLift + GroundEffect, MaxGroundEffectLift);
+                    VelLift = VelLiftStart + GroundEffect;
+                    VelLiftMax = Mathf.Max(VelLiftMaxStart, GroundEffectLiftMax);
                 }
-                else
+                else//set non-groundeffect'd vel lift values
                 {
-                    VelLift = StartVelLift;
+                    VelLift = VelLiftStart;
+                    VelLiftMax = VelLiftMaxStart;
                 }
+                VelLiftFinal = Mathf.Min(SpeedLiftFactor * AoALiftPitch * VelLift, VelLiftMax);
 
                 //flaps drag and lift
                 if (Flaps)
@@ -1843,9 +1847,9 @@ public class EngineController : UdonSharpBehaviour
             switch (CatapultStatus)
             {
                 case 0://normal
-                       //do lift
+                       //do lift and thrust
                     Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                        ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + (SpeedLiftFactor * AoALiftPitch * VelLift)) * Atmosphere,// Y Up
+                        ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + VelLiftFinal) * Atmosphere,// Y Up
                             EngineOutput * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
 
                     //used to add rotation friction
@@ -1927,12 +1931,12 @@ public class EngineController : UdonSharpBehaviour
         }
         else//non-owners need to know these values
         {
-            Speed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
-            rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
+            Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
+            rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//so passengers can hear the airbrake
             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
             //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
             VehicleRigidbody.angularDrag = .5f;
-            //AirVel = VehicleRigidbody.velocity - Wind;
+            //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
             //AirSpeed = AirVel.magnitude;
         }
         if (Occupied)
@@ -2169,7 +2173,7 @@ public class EngineController : UdonSharpBehaviour
             AoALiftPitch = 0;
             AoALiftYaw = 0;
             AngleOfAttack = 0;
-            VelLift = StartVelLift;
+            VelLift = VelLiftStart;
         }
 
         //our killer increases their kills
@@ -2678,6 +2682,48 @@ public class EngineController : UdonSharpBehaviour
         //these two make it invincible and unable to be respawned again for 5s
         dead = true;
         PlaneAnimator.SetTrigger("Respawn");
+    }
+    public void PlaneHit()
+    {
+        if (InEditor || IsOwner)
+        {
+            Health -= 10;
+        }
+        if (EffectsControl != null)
+        {
+            EffectsControl.DoEffects = 0f;
+            EffectsControl.PlaneAnimator.SetTrigger("bullethit");
+        }
+
+        if (SoundControl != null && !SoundControl.BulletHitNull)
+        {
+            int rand = Random.Range(0, SoundControl.BulletHit.Length);
+            SoundControl.BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
+            SoundControl.BulletHit[rand].Play();
+        }
+    }
+    public void Respawn_event()//called by Respawn()
+    {
+        //re-enable plane model and effects
+        EffectsControl.DoEffects = 6f; //wake up if was asleep
+        EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
+        MissilesIncoming = 0;
+        if (InEditor)
+        {
+            VehicleMainObj.transform.rotation = Quaternion.Euler(Spawnrotation);
+            VehicleMainObj.transform.position = Spawnposition;
+            Health = FullHealth;
+            EffectsControl.GearUp = false;
+            EffectsControl.Flaps = true;
+        }
+        else if (IsOwner)
+        {
+            Health = FullHealth;
+            //this should respawn it in VRC, doesn't work in editor
+            VehicleMainObj.transform.position = new Vector3(VehicleMainObj.transform.position.x, -10000, VehicleMainObj.transform.position.z);
+            EffectsControl.GearUp = false;
+            EffectsControl.Flaps = true;
+        }
     }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {

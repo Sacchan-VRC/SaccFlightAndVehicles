@@ -20,7 +20,6 @@ public class AAMControllerAAGun : UdonSharpBehaviour
     private bool Exploding = false;
     private CapsuleCollider AAMCollider;
     private bool Owner = false;
-    private bool TargetIsPlane = false;
     private bool MissileIncoming = false;
     private Rigidbody MissileRigid;
     private float TargDistlastframe = 999999999;
@@ -44,7 +43,6 @@ public class AAMControllerAAGun : UdonSharpBehaviour
                 { TargetEngineControl.MissilesIncoming++; }
 
                 MissileIncoming = true;
-                TargetIsPlane = true;
             }
         }
 

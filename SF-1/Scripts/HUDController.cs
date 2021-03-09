@@ -125,7 +125,7 @@ public class HUDController : UdonSharpBehaviour
     }
     private void LateUpdate()
     {
-        float DeltaTime = Time.deltaTime;
+        float SmoothDeltaTime = Time.smoothDeltaTime;
         //RollPitch Indicator
         PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.RotationInputs.z, EngineControl.RotationInputs.x, 0)) * InputSquareSize;
 
@@ -193,25 +193,25 @@ public class HUDController : UdonSharpBehaviour
             { TargetDir = EngineControl.AAMCurrentTargetEngineControl.CenterOfMass.position - transform.position; }
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-            float BulletPlusPlaneSpeed = (EngineControl.CurrentVel + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel /* * .1f */)).magnitude;
+            float BulletPlusPlaneSpeed = (EngineControl.CurrentVel + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .2f)).magnitude;
             Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
             //GUN_TargetDirOld is around 10 frames worth of distance behind a moving target (lerped by .1) in order to smooth out the calculation for unsmooth netcode
             //multiplying the result by .1(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
-            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude/*  * .1f */) / DeltaTime, .6f * DeltaTime);
+            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .2f) / SmoothDeltaTime, 15 * SmoothDeltaTime);
             float BulletHitTime = TargetDir.magnitude / BulletPlusPlaneSpeed;
             //normalize lerped relative target velocity vector and multiply by lerped speed
             Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
-            //the .05 in the next line is combined .1 for undoing the lerp, and .5 for the acceleration formula
             Vector3 PredictedPos = (TargetDir
-                + ((RelTargVelNormalized * GUN_TargetSpeedLerper)//Linear
-                    + (TargetAccel * .5f * BulletHitTime)//Acceleration
+                + ((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
+                    //the .1 in the next line is combined .2 for undoing the lerp, and .5 for the acceleration formula
+                    + (TargetAccel * .1f * BulletHitTime)//Acceleration disabled as it just makes things more inaccurate with the lerp
                         + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
                             * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
             RelativeTargetVelLastFrame = RelativeTargetVel;
-            GUN_TargetDirOld = TargetDir;//Vector3.Lerp(GUN_TargetDirOld, TargetDir, .1f);
+            GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
         }
         else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
@@ -385,13 +385,13 @@ public class HUDController : UdonSharpBehaviour
                     {
                         //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
                         float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                        EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 1.5f * DeltaTime), 0.3f, 90);
+                        EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
                     }
                 }
                 else
                 {
                     float newzoom = 80;
-                    EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 3.5f * DeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                    EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 3.5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
             }
             else
@@ -405,7 +405,7 @@ public class HUDController : UdonSharpBehaviour
                 if (camhit.point != null)
                 {
                     //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                    EngineControl.AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * DeltaTime), 0.3f);
+                    EngineControl.AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * SmoothDeltaTime), 0.3f);
                 }
             }
         }
@@ -432,7 +432,7 @@ public class HUDController : UdonSharpBehaviour
             HUDText_mach.text = ((EngineControl.Speed) / 343f).ToString("F2");
             HUDText_altitude.text = string.Concat((EngineControl.CurrentVel.y * 60 * 3.28084f).ToString("F0"), "\n", ((EngineControl.CenterOfMass.position.y + -EngineControl.SeaLevel) * 3.28084f).ToString("F0"));
             HUDText_knots.text = ((EngineControl.Speed) * 1.9438445f).ToString("F0");
-            HUDText_knotsairspeed.text = ((EngineControl.AirVel.magnitude) * 1.9438445f).ToString("F0");
+            HUDText_knotsairspeed.text = ((EngineControl.AirSpeed) * 1.9438445f).ToString("F0");
 
             if (EngineControl.Speed < 2)
             {
@@ -444,7 +444,7 @@ public class HUDController : UdonSharpBehaviour
             }
             check = 0;
         }
-        check += DeltaTime;
+        check += SmoothDeltaTime;
 
         if (EngineControl.HasAAM) HUDText_AAM_ammo.text = EngineControl.NumAAM.ToString("F0");
         else HUDText_AAM_ammo.text = string.Empty;

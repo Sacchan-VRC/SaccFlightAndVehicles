@@ -8,7 +8,6 @@ public class EffectsController : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
-    public Transform JoyStick;
     public Transform FrontWheel;
     public ParticleSystem[] DisplaySmoke;
     public ParticleSystem CatapultSteam;
@@ -28,7 +27,6 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool Flaps = true;
     [System.NonSerializedAttribute] public bool HookDown = false;
     [System.NonSerializedAttribute] public bool Smoking = false;
-    [UdonSynced(UdonSyncMode.Linear)] private Vector3 rotationinputs;
 
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
@@ -36,7 +34,6 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AirbrakeLerper;
     [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     private float brake;
-    private Color SmokeColorLerper = Color.white;
     [System.NonSerializedAttribute] public bool LargeEffectsOnly = false;
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
@@ -44,31 +41,12 @@ public class EffectsController : UdonSharpBehaviour
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
         Assert(EngineControl != null, "Start: EngineControl != null");
-        //should work withouth these
-        Assert(JoyStick != null, "Start: JoyStick != null");
-        Assert(FrontWheel != null, "Start: FrontWheel != null");
-
-
-        /*         Assert(ElevonL != null, "Start: ElevonL != null");
-                Assert(ElevonR != null, "Start: ElevonR != null");
-                Assert(RuddervatorL != null, "Start: RuddervatorL != null");
-                Assert(RuddervatorR != null, "Start: RuddervatorR != null");
-         */
-
 
         if (VehicleMainObj != null) VehicleMainObjNull = false;
         if (EngineControl != null) EngineControlNull = false;
-        if (JoyStick != null) JoyStickNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
         if (CatapultSteam != null) CatapultSteamNull = false;
         if (DisplaySmoke.Length > 0) DisplaySmokeNull = false;
-
-
-        /*         if (ElevonL != null) ElevonLNull = false;
-                if (ElevonR != null) ElevonRNull = false;
-                if (RuddervatorL != null) RuddervatorLNull = false;
-                if (RuddervatorR != null) RuddervatorRNull = false;
-         */
 
         FullHealthDivider = 1f / EngineControl.Health;
 
@@ -89,7 +67,10 @@ public class EffectsController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (EngineControl.IsOwner)
         {
-            OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, EngineControl.RotationInputs, 7 * DeltaTime);
+            if (EngineControl.InVR)
+            { OwnerRotationInputs = EngineControl.RotationInputs; }
+            else
+            { OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, EngineControl.RotationInputs, 7 * DeltaTime); }
             PlaneAnimator.SetFloat("pitchinput", (OwnerRotationInputs.x * 0.5f) + 0.5f);
             PlaneAnimator.SetFloat("yawinput", (OwnerRotationInputs.y * 0.5f) + 0.5f);
             PlaneAnimator.SetFloat("rollinput", (OwnerRotationInputs.z * 0.5f) + 0.5f);
@@ -123,7 +104,7 @@ public class EffectsController : UdonSharpBehaviour
 
         PlaneAnimator.SetFloat("engineoutput", EngineControl.EngineOutput);
 
-        vapor = (EngineControl.Speed > 20) ? true : false;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
+        vapor = EngineControl.Speed > 20;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * DeltaTime);
 
@@ -140,11 +121,11 @@ public class EffectsController : UdonSharpBehaviour
         {
             if (Smoking && !DisplaySmokeNull)
             {
-                SmokeColorLerper = Color.Lerp(SmokeColorLerper, EngineControl.SmokeColor_Color, 5 * DeltaTime);
+                Color SmokeCol = EngineControl.SmokeColor_Color;
                 foreach (ParticleSystem smoke in DisplaySmoke)
                 {
                     var main = smoke.main;
-                    main.startColor = new ParticleSystem.MinMaxGradient(SmokeColorLerper, SmokeColorLerper * .8f);
+                    main.startColor = new ParticleSystem.MinMaxGradient(SmokeCol, SmokeCol * .8f);
                 }
             }
         }
@@ -184,9 +165,14 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("AGMs", 1);
         PlaneAnimator.SetInteger("missilesincoming", 0);
         PlaneAnimator.SetInteger("weapon", 0);
-        if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
-        DoEffects = 0f;//keep awake
+        PlaneAnimator.SetFloat("pitchinput", .5f);
+        PlaneAnimator.SetFloat("yawinput", .5f);
+        PlaneAnimator.SetFloat("rollinput", .5f);
+        PlaneAnimator.SetFloat("throttle", 0);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
+        PlaneAnimator.SetFloat("engineoutput", 0);
         PlaneAnimator.SetBool("occupied", false);
+        DoEffects = 0f;//keep awake
+        if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
     public void EffectsLeavePlane()
     {

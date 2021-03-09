@@ -25,6 +25,8 @@ public class HUDControllerAAGun : UdonSharpBehaviour
     private float AAMReloadBarDivider;
     private float MGReloadBarDivider;
     private Transform Rotator;
+    private Quaternion backfacing = Quaternion.Euler(new Vector3(0, 180, 0));
+    private Quaternion frontfacing = Quaternion.identity;
     private void Start()
     {
         Assert(AAGunControl != null, "Start: AAGunControl != null");
@@ -45,16 +47,16 @@ public class HUDControllerAAGun : UdonSharpBehaviour
             AAMTargetIndicator.gameObject.SetActive(true);
             AAMTargetIndicator.position = transform.position + AAGunControl.AAMCurrentTargetDirection;
             AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
+            AAMTargetIndicator.localRotation = frontfacing;
             if (AAGunControl.AAMLocked)
             {
-                AAMTargetIndicator.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));//back of mesh is locked version
-            }
-            else
-            {
-                AAMTargetIndicator.gameObject.SetActive(false);
+                AAMTargetIndicator.localRotation = backfacing;//back of mesh is locked version
             }
         }
-        else AAMTargetIndicator.localScale = Vector3.zero;
+        else
+        {
+            AAMTargetIndicator.gameObject.SetActive(false);
+        }
         /////////////////
 
         //AAMs

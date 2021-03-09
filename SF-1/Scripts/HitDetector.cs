@@ -45,17 +45,7 @@ public class HitDetector : UdonSharpBehaviour
     }
     public void PlaneHit()
     {
-        if (EngineControl.InEditor || EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
-        {
-            EngineControl.Health -= 10;
-        }
-        if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.DoEffects = 0f; }
-        if (EngineControl.SoundControl != null && !EngineControl.SoundControl.BulletHitNull)
-        {
-            int rand = Random.Range(0, EngineControl.SoundControl.BulletHit.Length);
-            EngineControl.SoundControl.BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
-            EngineControl.SoundControl.BulletHit[rand].Play();
-        }
+        EngineControl.PlaneHit();
     }
     public void Respawn()//called by the explode animation on last frame
     {
@@ -63,7 +53,7 @@ public class HitDetector : UdonSharpBehaviour
         {
             Respawn_event();
         }
-        else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
+        else if (EngineControl.IsOwner)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Respawn_event");//owner broadcasts because it's more reliable than everyone doing it individually
         }
@@ -85,26 +75,7 @@ public class HitDetector : UdonSharpBehaviour
     }
     public void Respawn_event()//called by Respawn()
     {
-        //re-enable plane model and effects
-        EngineControl.EffectsControl.DoEffects = 6f; //wake up if was asleep
-        EngineControl.EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
-        EngineControl.MissilesIncoming = 0;
-        if (EngineControl.InEditor)
-        {
-            EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.Spawnrotation);
-            EngineControl.VehicleMainObj.transform.position = EngineControl.Spawnposition;
-            EngineControl.Health = EngineControl.FullHealth;
-            EngineControl.EffectsControl.GearUp = false;
-            EngineControl.EffectsControl.Flaps = true;
-        }
-        else if (EngineControl.IsOwner)
-        {
-            EngineControl.Health = EngineControl.FullHealth;
-            //this should respawn it in VRC, doesn't work in editor
-            EngineControl.VehicleMainObj.transform.position = new Vector3(EngineControl.VehicleMainObj.transform.position.x, -10000, EngineControl.VehicleMainObj.transform.position.z);
-            EngineControl.EffectsControl.GearUp = false;
-            EngineControl.EffectsControl.Flaps = true;
-        }
+        EngineControl.Respawn_event();
     }
     public void NotDead()//called by 'respawn' animation 5s in
     {
