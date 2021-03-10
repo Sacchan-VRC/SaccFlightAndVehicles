@@ -73,6 +73,7 @@ public class SoundController : UdonSharpBehaviour
     private float PlaneInsideInitialVolume;
     private float LastFramePlaneIdlePitch;
     private float LastFramePlaneThrustPitch;
+    private float LastFramePlaneDistantPitch;
     private float LastFrameGunPitch;
     private float PlaneIdleInitialVolume;
     private float PlaneDistantInitialVolume;
@@ -166,22 +167,35 @@ public class SoundController : UdonSharpBehaviour
         if (!PlaneThrustNull)
         {
             PlaneThrustInitialVolume = Thrust[0].volume;
+            LastFramePlaneThrustPitch = Thrust[0].pitch;
             foreach (AudioSource thrust in Thrust)
             {
                 thrust.volume = 0;
             }
         }
-
         if (!PlaneDistantNull)
         {
             PlaneDistantInitialVolume = PlaneDistant.volume;
+            LastFramePlaneDistantPitch = PlaneDistant.pitch;
             PlaneDistant.volume = 0f;
         }
 
+        //get a Maximum audible distance of plane based on its assumed furthest reaching audio sources (for optimization)
         if (!SonicBoomNull) MaxAudibleDistance = SonicBoom[0].maxDistance;
-        else if (!ExplosionNull) MaxAudibleDistance = Explosion[0].maxDistance;
-        else if (!PlaneDistantNull) MaxAudibleDistance = PlaneDistant.maxDistance + 50;
-        else MaxAudibleDistance = 4000;
+        if (!ExplosionNull)
+        {
+            if (MaxAudibleDistance < Explosion[0].maxDistance)
+            { MaxAudibleDistance = Explosion[0].maxDistance; }
+        }
+        if (!PlaneDistantNull)
+        {
+            if (MaxAudibleDistance < PlaneDistant.maxDistance)
+            { MaxAudibleDistance = PlaneDistant.maxDistance + 50; }
+        }
+        if (MaxAudibleDistance < 100)
+        {
+            Debug.LogWarning("MaxAudibleDistance is set extrmely low");
+        }
 
         if (!PlaneWindNull) { PlaneWindInitialVolume = PlaneWind.volume; PlaneWind.volume = 0f; }
         if (!GunSoundNull)
@@ -221,6 +235,7 @@ public class SoundController : UdonSharpBehaviour
         //undo doppler
         PlaneIdlePitch = LastFramePlaneIdlePitch;
         PlaneThrustPitch = LastFramePlaneThrustPitch;
+        PlaneDistantPitch = LastFramePlaneDistantPitch;
 
         //the doppler code is done in a really hacky way to avoid having to do it in fixedupdate and have worse performance.
         //and because even if you do it in fixedupate, it only works properly in VRChat if you have max framerate. (objects owned by other players positions are only updated in Update())
@@ -420,12 +435,15 @@ public class SoundController : UdonSharpBehaviour
         }
 
         LastFramePlaneIdlePitch = PlaneIdlePitch;
+        LastFramePlaneThrustPitch = PlaneThrustPitch;
+        LastFramePlaneDistantPitch = PlaneDistantPitch;
 
         if (!EngineControl.Piloting && !EngineControl.Passenger) //apply dopper if you're not in the vehicle
         {
             PlaneIdlePitch *= Doppler;
-            PlaneDistantPitch = Mathf.Clamp(((Doppler - 1) * .4f) + 1, 0, 1.25f);//40% effect + clamp to prevent sounding too stupid while plane is flying towards you
-            PlaneThrustPitch = Mathf.Clamp(Doppler, 0, 2.5f);
+            float clampdop = Mathf.Clamp(Doppler, 0, 2.25f);
+            PlaneDistantPitch *= clampdop;//clamp to prevent sounding too stupid while plane is flying towards you
+            PlaneThrustPitch *= clampdop;
         }
 
 

@@ -7,7 +7,8 @@ using VRC.Udon;
 public class EngineController : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
-    public LeaveVehicleButton[] LeaveButtons;
+    public bool RepeatingWorld = false;
+    public float RepeatingWorldDistance = 25000;
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
@@ -138,6 +139,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
 
 
+    [System.NonSerializedAttribute] public LeaveVehicleButton[] LeaveButtons;
     private Animator PlaneAnimator;
     [System.NonSerializedAttribute] public int PilotID;
     [System.NonSerializedAttribute] public string PilotName;
@@ -308,7 +310,6 @@ public class EngineController : UdonSharpBehaviour
     private void Start()
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
-        Assert(LeaveButtons.Length > 0, "Start: Leavebutton Set");
         Assert(EffectsControl != null, "Start: EffectsControl != null");
         Assert(SoundControl != null, "Start: SoundControl != null");
         Assert(HUDControl != null, "Start: HUDControl != null");
@@ -327,6 +328,9 @@ public class EngineController : UdonSharpBehaviour
         Assert(Bomb != null, "Start: Bomb != null");
         Assert(BombLaunchPoints.Length > 0, "Start: BombLaunchPoint.Length > 0");
 
+        LeaveButtons = HUDControl.gameObject.GetComponentsInChildren<LeaveVehicleButton>(true);//get componants even in disabled children
+        Assert(LeaveButtons.Length > 0, "Start: Leavebuttons Set");
+
         Planelayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
@@ -339,6 +343,7 @@ public class EngineController : UdonSharpBehaviour
         SetHookUp();
 
         if (AtGCam != null) AtGCamNull = false;
+
 
         //these two are only used in editor
         Spawnposition = VehicleMainObj.transform.position;
@@ -462,6 +467,34 @@ public class EngineController : UdonSharpBehaviour
 
             if (Piloting)
             {
+                if (RepeatingWorld)
+                {
+                    if (CenterOfMass.position.z > RepeatingWorldDistance)
+                    {
+                        Vector3 vehpos = VehicleMainObj.transform.position;
+                        vehpos.z -= RepeatingWorldDistance * 2;
+                        VehicleMainObj.transform.position = vehpos;
+                    }
+                    else if (CenterOfMass.position.z < -RepeatingWorldDistance)
+                    {
+                        Vector3 vehpos = VehicleMainObj.transform.position;
+                        vehpos.z += RepeatingWorldDistance * 2;
+                        VehicleMainObj.transform.position = vehpos;
+                    }
+                    else if (CenterOfMass.position.x > RepeatingWorldDistance)
+                    {
+                        Vector3 vehpos = VehicleMainObj.transform.position;
+                        vehpos.x -= RepeatingWorldDistance * 2;
+                        VehicleMainObj.transform.position = vehpos;
+                    }
+                    else if (CenterOfMass.position.x < -RepeatingWorldDistance)
+                    {
+                        Vector3 vehpos = VehicleMainObj.transform.position;
+                        vehpos.x += RepeatingWorldDistance * 2;
+                        VehicleMainObj.transform.position = vehpos;
+                    }
+                }
+
                 Occupied = true;
                 //collect inputs
                 int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as floats
@@ -1168,7 +1201,7 @@ public class EngineController : UdonSharpBehaviour
                                             if (lockpoint.point != null)
                                             {
                                                 if (!SoundControl.AGMUnlockNull)
-                                                    SoundControl.AGMLock.Play();
+                                                { SoundControl.AGMLock.Play(); }
                                                 AGMTarget = lockpoint.point;
                                                 AGMLocked = true;
                                                 AGMUnlocking = 0;
@@ -1529,7 +1562,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     int equals = Input.GetKey(KeyCode.Equals) ? 1 : 0;
                     int minus = Input.GetKey(KeyCode.Minus) ? 1 : 0;
-                    SetSpeed = Mathf.Clamp(SetSpeed + (equals - minus), 0, 2000);
+                    SetSpeed = Mathf.Max(SetSpeed + (equals - minus), 0);
 
                     float error = (SetSpeed - AirSpeed);
 
