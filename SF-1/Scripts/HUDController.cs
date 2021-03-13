@@ -69,6 +69,8 @@ public class HUDController : UdonSharpBehaviour
     private Vector3 RelativeTargetVel;
     private Vector3 AAMCurrentTargetPositionLastFrame;
     private Transform VehicleTransform;
+    private EffectsController EffectsControl;
+    private Camera AtGCam;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -113,6 +115,8 @@ public class HUDController : UdonSharpBehaviour
         PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
         VehicleTransform = EngineControl.VehicleMainObj.transform;
+        EffectsControl = EngineControl.EffectsControl;
+        AtGCam = EngineControl.AtGCam;
 
         float fuel = EngineControl.Fuel;
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
@@ -204,7 +208,7 @@ public class HUDController : UdonSharpBehaviour
             Vector3 PredictedPos = (TargetDir
                 + ((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
                     //the .1 in the next line is combined .2 for undoing the lerp, and .5 for the acceleration formula
-                    + (TargetAccel * .1f * BulletHitTime)//Acceleration disabled as it just makes things more inaccurate with the lerp
+                    + (-TargetAccel * .1f * BulletHitTime)
                         + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
                             * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
@@ -312,7 +316,7 @@ public class HUDController : UdonSharpBehaviour
 
 
         //AB
-        if (EngineControl.EffectsControl.AfterburnerOn) { HudAB.SetActive(true); }
+        if (EffectsControl.AfterburnerOn) { HudAB.SetActive(true); }
         else { HudAB.SetActive(false); }
 
         //Cruise Control target knots
@@ -323,7 +327,7 @@ public class HUDController : UdonSharpBehaviour
         else { HUDText_knotstarget.text = string.Empty; }
 
         //left stick toggles/functions on?
-        if (EngineControl.EffectsControl.AfterburnerOn) { LStick_funcon1.SetActive(true); }
+        if (EffectsControl.AfterburnerOn) { LStick_funcon1.SetActive(true); }
         else { LStick_funcon1.SetActive(false); }
 
         if (EngineControl.FlightLimitsEnabled) { LStick_funcon2.SetActive(true); }
@@ -338,7 +342,7 @@ public class HUDController : UdonSharpBehaviour
         /* if (EngineControl.Trim.x != 0) { LStick_funcon6.SetActive(true); }
                 else { LStick_funcon6.SetActive(false); } */
 
-        if (EngineControl.EffectsControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
+        if (EffectsControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
         else { LStick_funcon7.SetActive(false); }
 
         if (EngineControl.Cruise) { LStick_funcon8.SetActive(true); }
@@ -349,16 +353,16 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.AGMLocked) { RStick_funcon3.SetActive(true); }
         else { RStick_funcon3.SetActive(false); }
 
-        if (!EngineControl.EffectsControl.GearUp) { RStick_funcon5.SetActive(true); }
+        if (!EffectsControl.GearUp) { RStick_funcon5.SetActive(true); }
         else { RStick_funcon5.SetActive(false); }
 
-        if (EngineControl.EffectsControl.Flaps) { RStick_funcon6.SetActive(true); }
+        if (EffectsControl.Flaps) { RStick_funcon6.SetActive(true); }
         else { RStick_funcon6.SetActive(false); }
 
-        if (EngineControl.EffectsControl.HookDown) { RStick_funcon7.SetActive(true); }
+        if (EffectsControl.HookDown) { RStick_funcon7.SetActive(true); }
         else { RStick_funcon7.SetActive(false); }
 
-        if (EngineControl.EffectsControl.Smoking) { RStick_funcon8.SetActive(true); }
+        if (EffectsControl.Smoking) { RStick_funcon8.SetActive(true); }
         else { RStick_funcon8.SetActive(false); }
 
         //play menu sound if selection changed since last frame
@@ -375,51 +379,51 @@ public class HUDController : UdonSharpBehaviour
             if (!EngineControl.AGMLocked)
             {
                 AtGScreen.SetActive(true);
-                EngineControl.AtGCam.gameObject.SetActive(true);
+                AtGCam.gameObject.SetActive(true);
                 //if turning camera fast, zoom out
                 if (EngineControl.AGMRotDif < 2.5f)
                 {
                     RaycastHit camhit;
-                    Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
+                    Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                     if (camhit.point != null)
                     {
                         //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
                         float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                        EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
+                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
                     }
                 }
                 else
                 {
                     float newzoom = 80;
-                    EngineControl.AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, newzoom, 3.5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 3.5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
             }
             else
             {
                 AtGScreen.SetActive(true);
-                EngineControl.AtGCam.gameObject.SetActive(true);
-                EngineControl.AtGCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
+                AtGCam.gameObject.SetActive(true);
+                AtGCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
 
                 RaycastHit camhit;
-                Physics.Raycast(EngineControl.AtGCam.transform.position, EngineControl.AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
+                Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                 if (camhit.point != null)
                 {
                     //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                    EngineControl.AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(EngineControl.AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * SmoothDeltaTime), 0.3f);
+                    AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * SmoothDeltaTime), 0.3f);
                 }
             }
         }
         else if (EngineControl.RStickSelection == 4)//bomb selected
         {
-            EngineControl.AtGCam.gameObject.SetActive(true);
             AtGScreen.SetActive(true);
-            EngineControl.AtGCam.fieldOfView = 60;
-            EngineControl.AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
+            AtGCam.gameObject.SetActive(true);
+            AtGCam.fieldOfView = 60;
+            AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
         }
         else
         {
             AtGScreen.SetActive(false);
-            EngineControl.AtGCam.gameObject.SetActive(false);
+            AtGCam.gameObject.SetActive(false);
         }
 
 

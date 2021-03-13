@@ -9,6 +9,18 @@ https://liberapay.com/Sacchan-VRC/
 Bitcoin:bc1q40l0d3582twp3rga4wjrwhepwse4esz4x5y5wa
 ETH:0x975aeF286851BB6E43AaF2299b17045ad1D0eab8
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Large Update 1.39
+•Added racing objects and scripts
+•Added simple scoreboard that shows who has the highest kill streak in an instance
+•Ground Effect added, for much smoother takeoffs, removed Takeoff-assist variables
+•Replaced hardcoded control surface movement & engine effects with normalized-time animations
+•Hud almost perfectly synchronized for passengers (airspeed value is not correct if wind is enabled)
+•Added Bullet drop and corresponding hud prediction
+•Fixed VelLift variable to function how it was originally intended, so that it works with slower planes
+•Fixed bug that made the turn rate weaker the higher the refresh rate (removed double-deltatime)
+•Missiles now have a proximity explode radius option
+•AAGun updated with missiles and targeting
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.38
 •Workaround to allow players to hear each other talking in cockpit again (VRChat patch broke it)
 •Various Functions of the plane are no longer synced using synced variables (Flaps, Gear, Canopy, AB, Hook, Smoking, Missle/Bomb Ammo)
@@ -165,51 +177,66 @@ Implemented (unrealistic) increased lift at higher speeds, you can now fall down
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-On first run there may be a compile problem that causes the plane to not function, try running it a second time before checking anything else.
+Changes for people wishing to update from recent versions:
+EffectsController no longer controls movement of control surfaces, or the enginefire. Instead floats are sent to the animator called pitchinput, yawinput, rollinput, engineoutput, and afterburneron. Please look at the SF-1's animations and create your own accordingly.
+Set the Gravity Modifier on your bullet particles to 1 (Don't forget the _pilot variants!), or just copy over the entirety of the new particle system's settings
+Missile explode animation changed to allow more easily customizing missile model without changing the animation.
+The 'bigstuff' object inside HUDController has been reduced in scale from 8000 to 740, to keep the HUD within the default camera range (and allow WMR users to see the HUD, as there is a view range bug for WMR users in VRChat)
 
-If the VRChat world upload screen becomes unresponsive, it means you've messed up your Inputs page on your project settings.
+Race set up:
+There's an object called RacingTrigger inside the PilotLeaveButton object (because it's the only object that is only enabled for just the pilot) you can remove this if you don't intend to use it. It should be disabled by default, it's enabled when a race is selected with the racebutton.
+The RaceToggleButton has a list of RaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tell the racingtriggers to switch to the selected race.
+You must place a reference to every Race, and RacingTrigger(for each plane) inside the RaceToggleButton.
+Each race has its own script called RaceCourseAndScoreBoard. This contains references for its race's checkpoints, and has text objects for displaying the times.
+The Racingtrigger detects checkpoints, tracks your time, and sends your time to the RaceCourseAndScoreBoard script for the selected race when you finish.
+To test a race inside unity editor, you must enable the plane's HUDController, PilotLeaveButton, and RacingTrigger (which are all disabled by default), then click play. Once in play mode you must select the RaceToggleButton and click 'Trigger Interact' until your race is selected.
+
+Killsboard set up:
+Place the killboard anywhere in the world, and drag it into each plane's EngineController's Kills Board slot
 
 Some of the animations use the 'Normalized Time' feature, which makes the animation be controlled by a float parameter (which is controlled by effectscontroller).
 float value 1(or more) = play the last frame of the animation
 float value 0(or less) = play the first frame of the animation
 and everything in between accordingly.
 
-The MachVapor for example uses the mach10 variable. This variable = 1 at mach10, and 0 when not moving. The animation is 1000 frames long, and the MachVapor is enabled on frame 97 and disabled on frame 102, which corresponds to mach1.
-This can be used to do other things like F-14 wings moving back at a certain speed.
+The MachVapor for example uses the mach10 variable. This variable = 1 at mach10, and 0 when not moving. The animation is 1000 frames long, and the MachVapor is enabled on frame 97 and disabled on frame 102, which corresponds to transitioning mach1.
+This variable can be used to do other things like F-14 wings moving back at a certain speed.
 
 The angle of attack variable is 0 at 0 AoA, and 1 at 180.
 
-Remember you can test fly the vehicles inside unity by adding a camera to them. Recommend adding camera as child of HudController. Set camera view distance beyond 15,000m~ to see the HUD.
-You can test buttons by clicking Interact in the inspecter with the object selected(PilotSeat etc), some may crash in the editor but not ingame.
+Remember you can test fly the vehicles inside unity by adding a camera to them. Recommend adding camera as child of HudController.
+You can test buttons by clicking Interact in the inspecter with the object selected(PilotSeat etc), some may crash when tested in the editor.
 You can also test the animator variables, but some are set every frame so you won't be able to change them without altering or disabling the script.
 To test the gun damage to planes/objects in editor, you must enable the Gun_pilot object, as it's disabled by default (The Interact button on the pilotseat also enables it)
-All planes will react to inputs in the editor play mode.
-SaccFlight will always crash when testing in editor, this doesnt matter.
+All planes will react to inputs in the editor play mode. I recommend disabling planes that you aren't testing.
+The 'SaccFlight' script will always crash when testing in editor, because it's looking for the VRChat player. This doesnt matter.
 
 It's best to break my prefab in order to make your own planes.
-If you've made you own vehicle and it's having trouble taking off, try adjusting the center of mass and pitch moment positions, and also the takeoff assist options
 
-When using a custom model, remove the Avatar reference from the animator to stop some confusing things from happening with references in animations
-
-To see the HUD in-game you must set up a reference camera with a view distance greater than around 12,000 on the VRCworld.
+When using a custom model, remove the Avatar reference from the animator to stop some confusing things from happening with object references in animations.
 
 Tips for modifying basic flight characteristics of aircraft:
+If it's having trouble taking off, try adjusting the center of mass and pitch moment positions, as well as the ground effect settings.
 The Strength and Friction values for pitch, yaw, and roll are important, and both play off each other. You may need to set them to very high values, especially if you make a large plane.
 Rot Multi Max Speed will need to be adjusted for planes with different speeds. It's the speed at which (in meters per second) the plane reaches maximum responsiveness.
 Vel Straighten Str Pitch/Yaw are Very important to the handling of the plane. They push the nose toward the velocity direction. (they also interact with pitch and yaw strength)
 Lift and Max Lift are also very important, and a bit tricky to tweak. If max lift is too high you can end up with a plane that can fly in circles extremely quickly.
-If you make a heavier plane with a great rigidbody mass value, you will have to tweak the values a lot.
+The Vel Lift/Max values are used to prevent the plane's nose from dropping constantly. Find a Vel Lift Max value that keeps the nose steady (for planes with a rigidbody weight of 1, the default value is correct)
+Vel Lift value is used to decide how quickly the plane reaches Vel Lift Max.
+If you make a heavier plane with a greater rigidbody mass value, you will have to tweak all of the values a lot.
 Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue. (it's 0 when you're owner of the plane, 0.3 when your not)
 
-The Gun_pilot is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so you can't shoot your own plane, and reverted back to Walkthrough when you leave.
+The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
 
 Never leave an entry of an array input empty in EffectsController and SoundController, it'll cause them to crash.
 
 The hud can be made to appear smaller by moving all children of the 'bigstuff' object +Z local. 'bigstuff' is a child of HudController.
 
+When testing a world offline SaccFlight does not detect whether the user is in vr (and hand direction wont be used), this is because of a bug with udon (InVR check fails in Start()). It will work if you upload the world and load it from the menu.
+
 Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController).
-Doing animations using the animator is most performant, so I've used it where possible. HUD stuff included.
-When making a custom plane, you must also customize a number of the animations, I recommend duplicating the SF-1's animation controller, and replacing the animations that need replacing.
+Doing animations using the animator is most performant, so I've used it where possible. Some HUD stuff included.
+When making a custom plane, you must customize a number of the animations, I recommend duplicating the SF-1's animation controller, and replacing the animations that need replacing.
 Likely to need replacing animations:
 AAMs
 AGMs
@@ -225,27 +252,31 @@ GearUp
 TailHook
 TailHookHooked
 ThrottleSlider
+EngineOutput
+EngineOutputAB
+Pitch
+Yaw
+Roll
 Remember for animations that are controlled by floats (normalized time), set the curves to linear.
+Joystick animation is now done in the Pitch Yaw and Roll animations. Each one rotates a seperate empty of which the joystick is the last child of.
 
 Hierarchy:
 PlaneBody--------
-Everything in here is visual, except that it also contains colliders, and wheel colliders. Wheel colliders are a bit dodgy, I don't recommend messing with their settings.
+Everything in here is visual, except that it also contains colliders, and wheel colliders.
 EngineController--------
-Children of this are transforms used by the enginecontroller, and projectile objects for cloning and launching.
+Children of this are transforms used by the enginecontroller, and weapon objects for cloning and launching.
 EffectsController--------
 The children of this are mostly particle systems, visual effects used by EffectsController and the animator.
 SoundController--------
-The children are all the sounds the plane uses. The AttachedSounds empty contains all sounds that are disabled when the plane explodes.
+The children are all the sounds the plane uses. The AttachedSounds object contains all sounds that are disabled when the plane explodes.
 HudController--------
-The children of this are all things that are disabled when you're not inside the plane. Many different objects are in here including the HUD, visual joystick, leave buttons, MFDs(Multi-Function-Display), the AtG Camera and screen.
-To test the plane in editor mode, add a camera to this object with no change to position or rotation, and increase the view distance of that camera beyond 15,000m~ to see the HUD.
+The children of this are all things that are disabled when you're not inside the plane. Many different objects are in here including the HUD, joystick, leave buttons, MFDs(Multi-Function-Display), the AtG Camera and screen.
 HUDController is only enabled when inside the vehicle.
-many objects that are only enabled while inside the plane are children of the HudController.
 HUDController's bigstuff child object is scaled to 1000 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
 PilotSeat--------
 A custom station with the seat adjuster for entering the plane
 PassengerSeat--------
-A custom station with the seat adjuster for entering the passenger seat of the plane
+A custom station with the seat adjuster for entering a passenger seat of the plane
 AAMs--------
 AGMs--------
 Bombs--------
@@ -256,18 +287,20 @@ Plane colliders must be set to Walkthrough layer in order to be targeted by AAMs
 Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
 As layers can't be imported in a unitypackage you must set them up yourself.
 You must set the trigger objects to their respective layers. Create new layers, and set them in EngineController. By default the layers are as follows
-I recommend you set up yours the same to save you having to set them on everything:
+I recommend you name your layers the same as mine to save you having to set them on everything manually:
 23:Hook Cable
 24:Catapult
 25:AAMTargets
 26:AGMTargets
 27:Resupply
+28:Racing
 The trigger objects that you made need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of EngineController.
 Note that the AAMTarget object on a plane MUST be the first child of the EngineController object, or the code to play the radar lock warning tone will fail.
 
 Main Prefab:
 SaccFlightAndVehicles
-The main prefab containing the SF-1 plane, the AAGun the WindChanger, SaccFlight, and an instructions board.
+The main prefab containing the SF-1 plane, the AAGun the WindChanger, SaccFlight, Race objects, Scoreboards and an instructions board.
+The SaccFlight object, (the red ball), is the object with the script that allows you to fly with just your avatar.
 
 This package also contains a few prefabs that can be used with the plane. Explanations follow.
 
@@ -275,29 +308,28 @@ AAMDummyTarget
 Target object that can be placed on anything that you want air-to-air missiles to be able to lock on to. MUST be enabled by default or planes will not detect it during initial target enumeration in Start().
 
 AGMLockTarget
-object that if detected when attempting to target close to it with the AGM targeting system, will cause the targeted spot to snap to this location.
+object that if detected when attempting to lock target close to it with the AGM targeting system, will cause the targeted spot to snap to this location.
 
 Arresting Cable
 A prefab containing a cable mesh and a trigger designed to be placed on short runways or aircraft carriers to enable short landings.
-The trigger must be on the correct layer, which you have to set up manually, and select in the EngineController.
+The trigger must be on the correct layer, which you may have to set up manually, and select in the EngineController.
 
 Catapult
 A prefab containing a catapult mesh and a trigger to enable the plane to launch quickly with no runway
-The trigger must be on the correct layer, which you have to set up manually, and select in the EngineController.
+The trigger must be on the correct layer, which you may have to set up manually, and select in the EngineController.
 
 ResupplyZone
-A prefab containing a square outline mesh with a trigger beneath it, used to reload repair and refuel planes.
-The trigger must be on the correct layer, which you have to set up manually, and select in the EngineController.
+A prefab containing a square outline mesh with a trigger beneath it, used to reload, repair and refuel planes.
+The trigger must be on the correct layer, which you may have to set up manually, and select in the EngineController.
 
 Target
 A basic example target object with configurable health, that respawns in 10 seconds, replace with your own mesh to create destroyable buildings, etc.
-Target's health is LOCAL. If destroyed locally everyone will see it explode via an event, but you cannot work together to take down it's health to destroy it. That will require a change in code, and cause a laggy experience for non-owners.
 
 
-There are 24 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
+There are 30 udon scripts in this package, I will now explain what each one does, and what each of the variables of each one does. Ctrl-F as needed.
 
-SF-1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SF-1
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AAMController(new in 1.3)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Controls movement of Air-to-air missiles.
@@ -318,9 +350,8 @@ Missile's collider is inactive when it is spawned. After it's this far away from
 Rot Speed
 angle per second that the missile can turn while chasing it's target.
 
-Missile Drift Compensation
-Aims the missile further infront of the plane the lower the number is. Used to account for the fact that the missile is a rigidbody and doesn't fly perfectly straight.
-Hard to tweak, recommend not changing unless your missiles are missing easy targets.
+Proximity Explode Distance
+Distance to the target within which the missile will explode if it starts moving away from its target
 
 
 AGMController(new in 1.3)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -340,7 +371,7 @@ Lock Angle
 If the missile's target is within this angle, it will follow it.
 
 Rot Speed
-angle per second that the missile can turn while chasing it's target.
+Angle per second that the missile can turn while chasing it's target.
 
 
 BombController(new in 1.3)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -380,21 +411,14 @@ The script needs access to the Vehicle's main object.
 Engine Control
 Engine Controller is needed to know vehicle's control inputs.
 
-Joy Stick
-Joystick mesh object, animates according to rotational inputs.
-
-Ailerons
-Elevators
-Rudders
-Canards
-Engines
 Front Wheel
-Display Smoke
-All of these are transform inputs, most of them are children of an empty that sets orientation, they are animated by rotating on one local axis.
-To adjust rotation axis, rotate the parent empty
+This object is rotated based on the steering input whilst on the ground. You must orient the object correctly or it will move on the wrong axis.
 
-Enginefire
-Scaled along once axis according to if Afterburner is on, else it's scale 0, disabled if throttle is 0.
+Display Smoke
+List of particle system you would like to enable when the plane turns on it's smoke.
+
+Catapult Steam
+Particle system that is enabled when the plane is launching from a catapult.
 
 
 EngineController.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -451,9 +475,6 @@ Variables:
 
 Vehicle Main Obj
 The script needs access to the Vehicle's main object.
-
-Leave Buttons (new in 1.3)
-An array of objects with the LeaveButton script on them, used for exiting each seat of the plane. needed to drop you out of the plane when it explodes
 
 Effects Control
 Effects controller goes in here, used to access variables in effects controller
@@ -514,6 +535,9 @@ If the missile's target is within this angle, it will follow it.
 AAM Lock Time (new in 1.3)
 Time before you can fire an air-to-air missile after acquiring a target.
 
+AAM Launch Delay (new in 1.39)
+Time after last missile launch that a new missile is allowed to be launched in seconds.
+
 AAM Launch Point (new in 1.3)
 Point at which air-to-air missiles spawn, alternates left-right each time fired.
 
@@ -549,6 +573,15 @@ Points at which bombs spawn, they spawn at each point in succession.
 
 Gun Ammo In Seconds (new in 1.3)
 How long the gun can be fired before it runs out of ammo.
+
+Kills Board
+Scoreboard object that tracks kill streaks (optional)
+
+Repeating World
+If this is enabled the plane will teleport to the oposite side of the world when going too far in one direction
+
+Repeating World Distance
+Coordinate from the center of the world on the X and Z axis at which the plane will be teleported to the opposite side.
 
 Has Afterburner
 Has Limits
@@ -657,13 +690,16 @@ Sideways Lift
 How much angle of attack on yaw turns vehicles velocity vector. Yaw steering strength?
 
 Max Lift (new in 1.2)
-Maximum value for lift, as it's exponential it's wise to stop it at some point.
+Maximum value for lift, as it's exponential it's wise to stop it at some point?
 
 Vel Lift
-Push the vehicle up based on speed. Used to counter the fact that without it, your nose will slowly point down.
+Push the vehicle up based on speed. Used to counter the fact that without it, the plane's nose will droop down due to gravity. Slower planes need a high value.
+
+Vel Lift Max
+Maximum Vel Lift, to stop the nose being pushed up. Heavier planes need a higher value.
 
 Max Gs
-amount of Gs at which you will take damage if you go past. You take damage of 15 per second per G above MaxGs. This is what hurts you when you crash too.
+Amount of Gs at which you will take damage if you go past. You take damage of 15 per second per G above MaxGs. This is what hurts you when you crash too.
 
 GDamage
 Damage taken Per G above maxGs, per second.
@@ -690,19 +726,24 @@ Speed below which the the ground brake takes effect.
 Hooked Brake Strength (new in 1.3)
 Strength of the breaking in meters per second when the hook catches an arresting cable.
 
+Hooked CableSnap Distance (new in 1.3?)
+Distance from the point of snagging that if you exceed the cable will snap, and will no longer effect the plane.
+
 Catapult Launch Strength (new in 1.3)
 Strength of the force that pushes you forward when launching from the catapult. Same units as Thrust Strength.
 
 Catapult Launch Time (new in 1.3)
 How long the plane takes to launch (reach the end of the catapult).
-
 Catapult Launch Strength and Time must be adjusted together so that the plane finishes launching as it reaches the end of the catapult.
 
-Takeoff Assist (new in 1.3)
-Maximum extra pitch strength given to the plane when it's on the ground, and moving. Strength increases until it reaches Takeoff Assist Speed.
+Ground Effect Max Distance
+Proximity to the ground at which ground effect starts. When distance is equal to this distance ground effect is 0. It increases linearly until the distance is 0. Ground effect is measured from the Pitch Moment's transform
 
-Takeoff Assist Speed (new in 1.3)
-Speed at which Takeoff assist reaches maximum strength
+Ground Effect Strength
+Multiplier for strength of ground effect force
+
+Ground Effect Max Lift
+Max for possible to be given by ground effect
 
 G Limiter (new in 1.3)
 Controls the Flight Limits function. It tries to keep the plane below this number of Gs by reducing input strength linearly as your Gs increase, until this number. Usually needs to be set it a bit above the value you want to limit to.
@@ -738,10 +779,10 @@ Sound Barrier Width (new in 1.3)
 As you approach the speed of sound, more friction is applied according to 'Sound Barrier Strength'. It increases linearly from 'Sound Barrier Width' distance away from the speed of sound. Also decreases linearly after the speed of sound. (Meters per second)
 
 Atmosphere Thinning Start
-Height(above Sea Level) at which the 'atmosphere' starts getting thinner. Plane starts losing maneuverability and thrust at this height.
+Height(above Sea Level in meters) at which the 'atmosphere' starts getting thinner. Plane starts losing maneuverability and thrust at this height.
 
 Atmosphere Thinning End
-Height at which the 'atmosphere' finishes getting thinner. Plane cannot maneuver or thrust at all beyond this height
+Height(above Sea Level in meters) at which the 'atmosphere' finishes getting thinner. Plane cannot maneuver or thrust at all beyond this height
 
 Fuel (new in 1.3)
 Amount of fuel the plane has.
@@ -788,7 +829,7 @@ Hud Crosshair
 Hud Hold
 Hud Limit
 Hud AB
-Hud elements that are enabled/disabled by the scrip
+Hud elements that are enabled/disabled by the script
 
 Down Indicator
 Hud object that points to the ground
@@ -803,7 +844,13 @@ Velocity Indicator
 Hud object that shows what direction vehicle moving
 
 AAM Target Indicator
-Hud object that appears over targets AAMs can shoot at
+Hud object that appears over targets
+
+GUN Lead Indicator
+Object that represents a position prediction of where to fire the gun in order to hit the currently targeted enemy.
+
+Bullet Speed
+Input the speed of the bullets your plane fires, from the particle system(s), this value is used to predict how far ahead of the target the Gun Lead Indicator should appear to be accurate.
 
 Pitch Roll
 Hud object that display inputs for pitch and roll
@@ -813,6 +860,7 @@ Hud object that display inputs for yaw
 
 L Stick Display Highlighter
 R Stick Display Highlighter
+The objects that highlight which function is currently selected
 
 At G Screen
 The screen object that displays assists targeting for AGMs and bombs
@@ -822,11 +870,11 @@ R Stick_funcon3-8
 Function highlight objects that are enabled when the function is on.
 
 Distance_from_head
-Distance that some moving hud elements are projected forward to match the position of other objects on the hud. Change this if you move the hud forward (to make it appear smaller)
+Distance that some moving hud elements are projected forward to match the position of other objects on the hud. Change this if you move the hud objects forward (to make it appear smaller)
 
 
 LeaveVehicleButton.cs (new in 1.1)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Used to leave pilot seat of vehicles.
+Used to leave pilot seat of vehicles. Also contains reference to the player in the seat for changing voice volumes and distances, so players inside the plane can hear each other.
 
 Controls Desktop:
 Return: Leave vehicle
@@ -967,7 +1015,7 @@ If your vehicle fails to respawn in-game make sure the 'Synchronize Position' ti
 Variables:
 
 Engine Control
-Needed to tell the plane to set certain settings when respawning.
+Needed to tell which plane to respawn.
 
 
 WindChanger.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1007,9 +1055,33 @@ Vehicle Engines
 EngineController objects the wind will effect.
 
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AAGun
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+AAMControllerAAGunGun.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+AAMController(new in 1.3)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Controls movement of Air-to-air missiles.
+Variables:
+
+AA Gun Control 
+Missile's AAGun's AAGunController, needed to know target.
+
+Max Lifetime
+Time until the missile will explode without hitting anything.
+
+Explosion Sounds
+Array of sounds one of which will play for the explosion.
+
+Collider Active Distance
+Missile's collider is inactive when it is spawned. After it's this far away from the AAGun it launched from, it becomes active. This is to prevent it from hitting the AAGun it launched from.
+
+Rot Speed
+Angle per second that the missile can turn while chasing it's target.
+
+Proximity Explode Distance
+Distance to the target within which the missile will explode if it starts moving away from its target
+
+
 AAGunController.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Main Control script for the AAGun
 Controls Desktop
@@ -1077,7 +1149,7 @@ AA Gun Control
 AAGunController is needed to reduce health on hit
 
 Bullet Hit
-Audio source for being hit by a bullet
+Audio source played when hit by a bullet.
 
 
 HUDControllerAAGun.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1092,9 +1164,30 @@ Hud object that shows pitch angle
 Heading Indicator
 Hud object that shows yaw angle
 
+AAM Target Indicator
+Hud object that appears over targets
+
+GUN Lead Indicator
+Hud object showing an estimation of where to fire the gun in order to hit the target
+
+AAM Reload Bar
+Bar that increases in size until full, at which point you gain an AAM
+
+MG Reload Bar
+Bar represinting how much machine gun ammo is left
+
+HUD Text_AAM_ammo
+Text object that is used to display amount of AAMs remaining
+
+Distance_from_head
+Distance that some moving hud elements are projected forward to match the position of other objects on the hud. Change this if you move the hud objects forward (to make it appear smaller)
+
+Bullet Speed
+Speed of the bullet particle system, used to calculate targeting estimation
+
 
 LeaveAAGun.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Used on the button to leave the AAGun
+Used on to leave the AAGun
 
 Controls Desktop:
 Return: Exit AAGun
@@ -1106,18 +1199,59 @@ AA Gun Control
 Used for the localplayer reference
 
 Seat
-Used to leave the seat
+Which seat to leave
 
 
-SwivelScreenToggle.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Used to control the screen position toggler
-
-Screen
-The object with the swivel animator on it.
-
-
-SaccTarget
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Racing(new in 1.39)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+RaceCourseAndScoreboard.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Has a list of checkpoints for a race, and contains the scoreboard for the race.
+
+Race Checkpoints
+A list of checkpoints used in the race, in order, the first slot is the beginning and the last slow is the end.
+
+Race Objects
+The game object that is enabled when the race is selected, children of this object include all race checkpoints, and the scoreboard for this race.
+
+Time Text
+Text object used to display race times.
+
+
+RacingTrigger.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Times races, and sends times to RaceCourseAndScoreboard objects.
+
+Plane Name
+Name of the plane displayed when a record is achieved in this plane.
+
+Button
+RaceToggleButton object that is used to switch through races.
+
+Disabled Races
+Races that are never enabled for this plane, useful if you have a 2 races designed for a very small plane and a very large plane, and the large plane is unable to fit through the checkpoints of the smaller plane's race.
+
+Instance Record Disallowed Races
+Races that if completed by this plane, it doesn't get recorded as the instance record
+
+Time Text_Cockpit
+Text object in the cockpit that is used to display the race time to the pilot
+
+
+RacingToggleButton.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Has a list of races in the world and switches between them and tells the RacingTriggers to switch to them too.
+
+Racing Triggers
+List of RacingTrigger objects to enable/set race on when switching races. You should put every plane's RacingTrigger in this list. If you do not, the plane will not be able to race.
+
+Races
+List of RaceCourseAndScoreboard objects to toggle through when interacting with the button
+
+Current Course Selection
+This just displays the currently selected course. -1 means no course is selected. This value is incremented when interacting with the object. Changing this value in the editor won't work.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SaccTarget
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 SaccTarget.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 This is used in combination with an animator to create an object that can be destroyed by shooting it.
@@ -1127,16 +1261,18 @@ Variables:
 HitPoints
 How many HitPoints the target has. It takes 10 damage per bullet that hits it.
 
+Explode Other Targets
+Any other object in this list that can will also explode whenever this target explodes, (Useful for tanks on bridges, buildings near oil drums, AAGuns on oil rigs)
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Other
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 SaccFlight.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-For flight without a vehicle, only does anything if you're not grounded. So jump first.
+For flight without a vehicle, only does anything if you're not grounded, so jump first.
 
 Controls Desktop:
 Space: Fly Straight Up
-F: Fly towards Head bone's 'forward' direction (doesn't work right with every avatar)
+F: Fly towards direction head is facing
 
 Controls VR:
 Left Trigger: Fly Straight Up
@@ -1174,6 +1310,13 @@ Empty with transform position at desired head height
 Head Test
 You can use this to test the script inside unity. Just put an object as the child of the seat object, position it somewhere bad for piloting, and then when in play mode, enable the SaccSeatAdjuster object, and it should move into position.
 
+
+Scoreboard_Kills.cs(new in 1.39)--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Keeps track of the best kill streak in the instance for all to see, and your personal best kill streak locally
+Scores
+Text object used to display scores in the world.
+
+
 ViewScreenButton.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Turns on the view screen or changes channel if it's already on
 
@@ -1183,7 +1326,7 @@ View Screen Control
 ViewScreenController object to effect.
 
 ViewScreenController.cs--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Find all AAMTargets that are planes, makes a list of them and positions a camera behind them. Runs EffectsController's Effects() function for the current plane if it's too far away and has therefore been disabled in EffectsController.
+Find all AAMTargets that are planes, makes a list of them and positions a camera behind them if selected to watch. Runs EffectsController's Effects() function for the current plane if it's too far away and has therefore been disabled in EffectsController.
 
 AAM Targets Layer
 Layer to look for planes's AAMTarget on.
@@ -1199,8 +1342,6 @@ Screen object.
 
 AAM Target
 Current view target. Used for testing in the editor, the ViewScreenButton increments this. (Be careful not to set it out of range when testing)
-
-
 
 
 

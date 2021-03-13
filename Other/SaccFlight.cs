@@ -15,7 +15,7 @@ public class SaccFlight : UdonSharpBehaviour
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
-        if (localPlayer == null) { gameObject.SetActive(false); }
+        if (localPlayer == null) { gameObject.SetActive(false); }//fixedupdate runs before this happens and causes a crashin the editor until vrc fix it
         else if (localPlayer.IsUserInVR())
         { InVR = true; }
     }

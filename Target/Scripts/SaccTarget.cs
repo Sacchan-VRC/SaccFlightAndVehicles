@@ -7,8 +7,9 @@ using VRC.Udon;
 public class SaccTarget : UdonSharpBehaviour
 {
     public float HitPoints = 100f;
+    public GameObject[] ExplodeOther;
+    private Animator TargetAnimator;
     private float FullHealth;
-    public Animator TargetAnimator;
     private VRCPlayerApi localPlayer;
     void Start()
     {
@@ -20,15 +21,15 @@ public class SaccTarget : UdonSharpBehaviour
     {
         if (other == null) return;
 
-        if (HitPoints <= 10f)//hit does 10 damage
+        if (HitPoints <= 10f)//hit does 10 damage, so we're dead
         {
             if (localPlayer == null)//editor
             {
-                TargetExplode();
+                Explode();
             }
             else//ingame
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargetExplode");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
             }
         }
         else
@@ -47,9 +48,17 @@ public class SaccTarget : UdonSharpBehaviour
     {
         HitPoints -= 10;
     }
-    public void TargetExplode()
+    public void Explode()
     {
         TargetAnimator.SetTrigger("explode");
         HitPoints = FullHealth;
+        foreach (GameObject Exploder in ExplodeOther)
+        {
+            UdonBehaviour ExploderUdon = (UdonBehaviour)Exploder.GetComponent(typeof(UdonBehaviour));
+            if (ExploderUdon != null)
+            {
+                ExploderUdon.SendCustomEvent("Explode");
+            }
+        }
     }
 }

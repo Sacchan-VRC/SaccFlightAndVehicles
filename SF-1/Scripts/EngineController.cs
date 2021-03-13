@@ -7,8 +7,6 @@ using VRC.Udon;
 public class EngineController : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
-    public bool RepeatingWorld = false;
-    public float RepeatingWorldDistance = 25000;
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
@@ -29,6 +27,7 @@ public class EngineController : UdonSharpBehaviour
     public float AAMMaxTargetDistance = 6000;
     public float AAMLockAngle = 15;
     public float AAMLockTime = 1.5f;
+    public float AAMLaunchDelay = 0.5f;
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public GameObject AGM;
@@ -42,6 +41,8 @@ public class EngineController : UdonSharpBehaviour
     public Transform[] BombLaunchPoints;
     [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
     public Scoreboard_Kills KillsBoard;
+    public bool RepeatingWorld = false;
+    public float RepeatingWorldDistance = 25000;
     public bool HasAfterburner = true;
     public bool HasLimits = true;
     public bool HasFlare = true;
@@ -109,11 +110,11 @@ public class EngineController : UdonSharpBehaviour
     public float GroundBrakeSpeed = 40f;
     public float HookedBrakeStrength = 55f;
     public float HookedCableSnapDistance = 120f;
-    public float CatapultLaunchStrength = 50f;
-    public float CatapultLaunchTime = 2f;
     public float GroundEffectMaxDistance = 7;
     public float GroundEffectStrength = 4;
     public float GroundEffectLiftMax = 999999;
+    public float CatapultLaunchStrength = 50f;
+    public float CatapultLaunchTime = 2f;
     public float GLimiter = 12f;
     public float AoALimiter = 15f;
     public float CanopyCloseTime = 1.8f;
@@ -285,14 +286,12 @@ public class EngineController : UdonSharpBehaviour
     private float LastBombDropTime = 0f;
     private bool WeaponSelected = false;
     private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
-    [System.NonSerializedAttribute] public bool AtGCamNull = true;//used by HudController
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] public Vector3 Spawnrotation;
     private int OutsidePlaneLayer;
     private float AAMTargetObscuredDelay;
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
     private float TargetingAngle;
-
     private float FullAAMsDivider;
     private float FullAGMsDivider;
     private float FullBombsDivider;
@@ -303,6 +302,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PilotExitTime;
     private int Planelayer;
     private float VelLiftMaxStart;
+    private bool HasAirBrake;//set to false if air brake strength is 0
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -342,9 +342,6 @@ public class EngineController : UdonSharpBehaviour
         else { SetFlapsOn(); }
         SetHookUp();
 
-        if (AtGCam != null) AtGCamNull = false;
-
-
         //these two are only used in editor
         Spawnposition = VehicleMainObj.transform.position;
         Spawnrotation = VehicleMainObj.transform.rotation.eulerAngles;
@@ -359,6 +356,7 @@ public class EngineController : UdonSharpBehaviour
         VelLiftMaxStart = VelLiftMax;
         VelLiftStart = VelLift;
         CatapultLaunchTimeStart = CatapultLaunchTime;
+        HasAirBrake = AirbrakeStrength != 0;
 
         PlaneHitDetector = VehicleMainObj.GetComponent<HitDetector>();
         VehicleRigidbody = VehicleMainObj.GetComponent<Rigidbody>();
@@ -383,7 +381,6 @@ public class EngineController : UdonSharpBehaviour
 
         //used to set each rotation axis' reversing behaviour to inverted if 0 thrust vectoring, and not inverted if thrust vectoring is non-zero.
         //the variables are called 'Zero' because they ask if thrustvec is set to 0.
-
         ReversingPitchStrengthZero = PitchThrustVecMulti == 0 ? -ReversingPitchStrengthMulti : 1;
         ReversingYawStrengthZero = YawThrustVecMulti == 0 ? -ReversingYawStrengthMulti : 1;
         ReversingRollStrengthZero = RollThrustVecMulti == 0 ? -ReversingRollStrengthMulti : 1;
@@ -398,7 +395,7 @@ public class EngineController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (!InEditor) { IsOwner = localPlayer.IsOwner(VehicleMainObj); }
         else { IsOwner = true; }
-        if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */))
+        if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore))
         { Taxiing = true; }
         else { Taxiing = false; }
 
@@ -956,7 +953,12 @@ public class EngineController : UdonSharpBehaviour
                         BrakeInput = 0;
                         break;
                     case 5://Brake
-                        BrakeInput = LTrigger;
+                        if (!Taxiing)
+                        {
+                            if (HasAirBrake) { BrakeInput = LTrigger; }
+                            else { BrakeInput = 0; }
+                        }
+                        else { BrakeInput = LTrigger; }
 
                         if (LTrigger > 0.75) { LTriggerLastFrame = true; }
                         else { LTriggerLastFrame = false; }
@@ -1127,7 +1129,7 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 if (!RTriggerLastFrame)
                                 {
-                                    if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > 0.5)
+                                    if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                                     {
                                         AAMLastFiredTime = Time.time;
                                         if (InEditor)
@@ -1386,7 +1388,12 @@ public class EngineController : UdonSharpBehaviour
                 }
                 if (Input.GetKey(KeyCode.B) && HasBrake)
                 {
-                    BrakeInput = 1;
+                    if (!Taxiing)
+                    {
+                        if (HasAirBrake) { BrakeInput = 1; }
+                        else { BrakeInput = 0; }
+                    }
+                    else { BrakeInput = 1; }
                 }
                 //VR Joystick
                 if (RGrip > 0.75)
@@ -1989,14 +1996,15 @@ public class EngineController : UdonSharpBehaviour
             float DeltaTime = Time.fixedDeltaTime;
             //lerp velocity toward 0 to simulate air friction
             Vector3 VehicleVel = VehicleRigidbody.velocity;
-            VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag) * Atmosphere) * 90) * DeltaTime);
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag)) * 90) * DeltaTime);
             //apply pitching using pitch moment
             VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);//deltatime is built into ForceMode.Force
             //apply yawing using yaw moment
             VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
             //calc Gs
-            LastFrameVel.y += (-9.81f * DeltaTime); //add gravity
-            Gs = Vector3.Distance(LastFrameVel, VehicleVel) / (9.81f * DeltaTime);
+            float gravity = 9.81f * DeltaTime;
+            LastFrameVel.y -= gravity; //add gravity
+            Gs = Vector3.Distance(LastFrameVel, VehicleVel) / gravity;
             LastFrameVel = VehicleVel;
         }
     }
@@ -2175,6 +2183,7 @@ public class EngineController : UdonSharpBehaviour
         Cruise = false;
         CatapultStatus = 0;
         PlayerThrottle = 0;
+        EngineOutput = 0;
         MissilesIncoming = 0;
         if (HasAfterburner) { SetAfterburnerOff(); }
         if (HasSmoke) { SetSmokingOff(); }
@@ -2737,7 +2746,8 @@ public class EngineController : UdonSharpBehaviour
     }
     public void Respawn_event()//called by Respawn()
     {
-        //re-enable plane model and effects
+        PlayerThrottle = 0;//for editor test mode
+        EngineOutput = 0;//^
         EffectsControl.DoEffects = 6f; //wake up if was asleep
         EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
         MissilesIncoming = 0;

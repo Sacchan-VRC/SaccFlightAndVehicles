@@ -66,17 +66,14 @@ public class SoundController : UdonSharpBehaviour
     private bool Leftplane = false;
     [System.NonSerializedAttribute] public float PlaneIdlePitch;
     [System.NonSerializedAttribute] public float PlaneIdleVolume;
-    private float PlaneDistantPitch;
     [System.NonSerializedAttribute] public float PlaneDistantVolume;
     private float PlaneThrustPitch;
     [System.NonSerializedAttribute] public float PlaneThrustVolume;
     private float PlaneInsideInitialVolume;
     private float LastFramePlaneIdlePitch;
     private float LastFramePlaneThrustPitch;
-    private float LastFramePlaneDistantPitch;
     private float LastFrameGunPitch;
     private float PlaneIdleInitialVolume;
-    private float PlaneDistantInitialVolume;
     private float PlaneThrustInitialVolume;
     private float PlaneWindInitialVolume;
     private const float InVehicleThrustVolumeFactor = .09f;
@@ -173,10 +170,9 @@ public class SoundController : UdonSharpBehaviour
                 thrust.volume = 0;
             }
         }
+
         if (!PlaneDistantNull)
         {
-            PlaneDistantInitialVolume = PlaneDistant.volume;
-            LastFramePlaneDistantPitch = PlaneDistant.pitch;
             PlaneDistant.volume = 0f;
         }
 
@@ -207,7 +203,7 @@ public class SoundController : UdonSharpBehaviour
 
     private void Update()
     {
-        float DeltaTime = Time.deltaTime;
+        float DeltaTime = Time.smoothDeltaTime;
         if (DoSound > 35f)
         {
             if (!soundsoff)//disable all the sounds that always play, re-enabled in pilotseat
@@ -235,7 +231,6 @@ public class SoundController : UdonSharpBehaviour
         //undo doppler
         PlaneIdlePitch = LastFramePlaneIdlePitch;
         PlaneThrustPitch = LastFramePlaneThrustPitch;
-        PlaneDistantPitch = LastFramePlaneDistantPitch;
 
         //the doppler code is done in a really hacky way to avoid having to do it in fixedupdate and have worse performance.
         //and because even if you do it in fixedupate, it only works properly in VRChat if you have max framerate. (objects owned by other players positions are only updated in Update())
@@ -323,7 +318,7 @@ public class SoundController : UdonSharpBehaviour
                 if (EngineControl.Taxiing)
                 {
                     if (!RollingNull && !Rolling.isPlaying) { Rolling.Play(); }
-                    Rolling.volume = Mathf.Clamp(EngineControl.Speed * 0.03f, 0, 1);
+                    Rolling.volume = Mathf.Min(EngineControl.Speed * 0.03f, 1);
                 }
                 else if (!RollingNull) Rolling.volume = 0;
             }
@@ -436,14 +431,12 @@ public class SoundController : UdonSharpBehaviour
 
         LastFramePlaneIdlePitch = PlaneIdlePitch;
         LastFramePlaneThrustPitch = PlaneThrustPitch;
-        LastFramePlaneDistantPitch = PlaneDistantPitch;
 
         if (!EngineControl.Piloting && !EngineControl.Passenger) //apply dopper if you're not in the vehicle
         {
-            PlaneIdlePitch *= Doppler;
-            float clampdop = Mathf.Clamp(Doppler, 0, 2.25f);
-            PlaneDistantPitch *= clampdop;//clamp to prevent sounding too stupid while plane is flying towards you
-            PlaneThrustPitch *= clampdop;
+            float dopplemin = Mathf.Min(Doppler, 2.25f);
+            PlaneIdlePitch *= dopplemin;
+            PlaneThrustPitch *= dopplemin;
         }
 
 
@@ -470,7 +463,7 @@ public class SoundController : UdonSharpBehaviour
         {
             PlaneDistantVolume *= silentint;
             PlaneDistant.volume = Mathf.Lerp(PlaneDistant.volume, PlaneDistantVolume, 30f * DeltaTime);
-            PlaneDistant.pitch = Mathf.Lerp(PlaneDistant.pitch, PlaneDistantPitch, 30f * DeltaTime);
+            PlaneDistant.pitch = Mathf.Lerp(PlaneDistant.pitch, Mathf.Min(Doppler, 2.25f), 30f * DeltaTime);
         }
         foreach (AudioSource thrust in Thrust)
         {
@@ -480,19 +473,19 @@ public class SoundController : UdonSharpBehaviour
         if (!PlaneWindNull)
         {
             PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
-            PlaneWind.volume = (Mathf.Clamp(((EngineControl.CurrentVel.magnitude / 20) * PlaneWindInitialVolume), 0, 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) / 8, 0, 1) * .2f)) * silentint;
+            PlaneWind.volume = (Mathf.Min(((EngineControl.Speed / 20) * PlaneWindInitialVolume), 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) * .125f, 0, 1) * .2f)) * silentint;
         }
 
         if (!GunSoundNull)
         {
-            if (EngineControl.IsFiringGun && !EngineControl.SoundControl.silent)
+            if (EngineControl.IsFiringGun && !silent)
             {
-                GunSound.pitch = Mathf.Clamp(((EngineControl.SoundControl.Doppler - 1) * .3f) + 1, 0, 1.2f);
+                GunSound.pitch = Mathf.Min(Doppler, 2f);
                 if (!GunSound.isPlaying)
                 {
                     GunSound.Play();
                 }
-                if (EngineControl.SoundControl.Doppler > 50f)
+                if (Doppler > 50f)
                 {
                     GunSound.volume = Mathf.Lerp(GunSound.volume, 0, 3f * DeltaTime);
                 }
@@ -501,7 +494,7 @@ public class SoundController : UdonSharpBehaviour
                     GunSound.volume = Mathf.Lerp(GunSound.volume, GunSoundInitialVolume, 9f * DeltaTime);
                 }
             }
-            else if (!EngineControl.IsFiringGun || EngineControl.SoundControl.silent && GunSound.isPlaying)
+            else if (!EngineControl.IsFiringGun || silent && GunSound.isPlaying)
             {
                 GunSound.Stop();
             }

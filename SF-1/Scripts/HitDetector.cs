@@ -98,7 +98,7 @@ public class HitDetector : UdonSharpBehaviour
         {
             EngineControl.Health = EngineControl.FullHealth;
         }
-        EngineControl.dead = false;//because respawning gives us an immense number of Gs because we move so far in one frame, we stop being 'dead' 5 seconds after we respawn. Can't explode when 'dead' is set. 
+        EngineControl.dead = false;
     }
     private void Assert(bool condition, string message)
     {
