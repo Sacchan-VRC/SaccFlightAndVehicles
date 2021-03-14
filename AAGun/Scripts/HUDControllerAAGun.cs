@@ -40,7 +40,7 @@ public class HUDControllerAAGun : UdonSharpBehaviour
     }
     private void Update()
     {
-        float DeltaTime = Time.deltaTime;
+        float SmoothDeltaTime = Time.smoothDeltaTime;
         //AAM Target Indicator
         if (AAGunControl.AAMHasTarget)
         {
@@ -80,26 +80,26 @@ public class HUDControllerAAGun : UdonSharpBehaviour
             { TargetDir = AAGunControl.AAMTargets[AAGunControl.AAMTarget].transform.position - transform.position; }
             else
             { TargetDir = AAGunControl.AAMCurrentTargetEngineControl.CenterOfMass.position - transform.position; }
+            GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
             Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
             //GUN_TargetDirOld is around 5 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
             //multiplying the result by .2(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
-            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .2f) / DeltaTime, .6f * DeltaTime);
+            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .25f) / SmoothDeltaTime, 15 * SmoothDeltaTime);
             float BulletHitTime = TargetDir.magnitude / BulletSpeed;
             //normalize lerped relative target velocity vector and multiply by lerped speed
             Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
             Vector3 PredictedPos = TargetDir
                 + (((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
                     //the .1 in the next line is combined .2 for undoing the lerp, and .5 for the acceleration formula
-                    + (TargetAccel * .1f * BulletHitTime)//Acceleration
+                    + (-TargetAccel * .125f * BulletHitTime)//Acceleration
                         + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
                             * BulletHitTime);
             GUNLeadIndicator.position = transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
             RelativeTargetVelLastFrame = RelativeTargetVel;
-            GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
         }
         else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
