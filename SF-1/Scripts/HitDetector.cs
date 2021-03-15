@@ -51,11 +51,11 @@ public class HitDetector : UdonSharpBehaviour
     {
         if (EngineControl.InEditor)//editor
         {
-            Respawn_event();
+            EngineControl.Respawn_event();
         }
         else if (EngineControl.IsOwner)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Respawn_event");//owner broadcasts because it's more reliable than everyone doing it individually
+            EngineControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Respawn_event");//owner broadcasts because it's more reliable than everyone doing it individually
         }
     }
     public void MoveToSpawn()//called 3 seconds before respawn, to prevent a glitch where the plane will appear where it died for a second for non-owners
@@ -73,22 +73,7 @@ public class HitDetector : UdonSharpBehaviour
             }
         }
     }
-    public void Respawn_event()//called by Respawn()
-    {
-        EngineControl.Respawn_event();
-    }
-    public void NotDead()//called by 'respawn' animation 5s in
-    {
-        if (EngineControl.InEditor)
-        {
-            NotDead_event();
-        }
-        else if (EngineControl.localPlayer.IsOwner(EngineControl.VehicleMainObj))
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "NotDead_event");//owner broadcasts because it seems more reliable than everyone doing it individually
-        }
-    }
-    public void NotDead_event()//called by NotDead()
+    public void NotDead()//called by 'respawn' animation twice because calling on the last frame of animation is unreliable for some reason
     {
         if (EngineControl.InEditor)
         {

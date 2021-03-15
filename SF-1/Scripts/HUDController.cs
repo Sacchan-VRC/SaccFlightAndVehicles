@@ -202,8 +202,8 @@ public class HUDController : UdonSharpBehaviour
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
             float BulletPlusPlaneSpeed = (EngineControl.CurrentVel + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .25f)).magnitude;
             Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
-            //GUN_TargetDirOld is around 5 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
-            //multiplying the result by .2(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
+            //GUN_TargetDirOld is around 4 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
+            //multiplying the result by .25(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
             GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .25f) / SmoothDeltaTime, 15 * SmoothDeltaTime);
             float BulletHitTime = TargetDir.magnitude / BulletPlusPlaneSpeed;
             //normalize lerped relative target velocity vector and multiply by lerped speed
