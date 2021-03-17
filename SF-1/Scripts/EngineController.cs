@@ -2723,7 +2723,7 @@ public class EngineController : UdonSharpBehaviour
         BombPoint = 0;
         //these two make it invincible and unable to be respawned again for 5s
         dead = true;
-        PlaneAnimator.SetTrigger("Respawn");
+        PlaneAnimator.SetTrigger("respawn");
     }
     public void PlaneHit()
     {

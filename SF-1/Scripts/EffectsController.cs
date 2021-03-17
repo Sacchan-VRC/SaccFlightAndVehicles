@@ -94,7 +94,7 @@ public class EffectsController : UdonSharpBehaviour
             {
                 if (EngineControl.Taxiing)
                 {
-                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -EngineControl.RotationInputs.y * 4f * (-Mathf.Min((EngineControl.Speed / 10), 1) + 1), 0));
+                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -OwnerRotationInputs.y * 80 * (-Mathf.Min((EngineControl.Speed / 10), 1) + 1), 0));
                 }
                 else FrontWheel.localRotation = Quaternion.identity;
             }
@@ -146,14 +146,14 @@ public class EffectsController : UdonSharpBehaviour
         //("Gs_trail", vapor ? Gs_trail / 50 : 0);
         PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail * 0.02f : 0);
     }
-    public void EffectsResetStatus()//called from enginecontroller.explode();
+    public void EffectsResetStatus()//called from enginecontroller.Explode();
     {
         DoEffects = 6;
         PlaneAnimator.SetInteger("weapon", 4);
         PlaneAnimator.SetFloat("bombs", 1);
         PlaneAnimator.SetFloat("AAMs", 1);
         PlaneAnimator.SetFloat("AGMs", 1);
-        PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead after 5s
+        PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead after 2.5s
         PlaneAnimator.SetTrigger("instantgeardown");
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
