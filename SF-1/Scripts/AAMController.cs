@@ -30,8 +30,8 @@ public class AAMController : UdonSharpBehaviour
     //public Transform testobj;
     void Start()
     {
-        MissileRigid = gameObject.GetComponent<Rigidbody>();
-        AAMCollider = gameObject.GetComponent<CapsuleCollider>();
+        MissileRigid = GetComponent<Rigidbody>();
+        AAMCollider = GetComponent<CapsuleCollider>();
         Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
         TargDistlastframe = Vector3.Distance(transform.position, Target.position) + 1;//1 meter further so the number is different and missile knows we're already moving toward target
         TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
@@ -56,8 +56,8 @@ public class AAMController : UdonSharpBehaviour
     }
     void FixedUpdate()
     {
-        float DeltaTime = Time.deltaTime;
-        //Debug.Log(gameObject.GetComponent<Rigidbody>().velocity.magnitude);
+        float DeltaTime = Time.fixedDeltaTime;
+        //Debug.Log(GetComponent<Rigidbody>().velocity.magnitude);
         if (!ColliderActive)
         {
             if (Vector3.Distance(transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
@@ -153,11 +153,11 @@ public class AAMController : UdonSharpBehaviour
         {
             //damage particles inherit the velocity of the missile, so this should help them hit the target plane
             //this is why kinematic is set 2 frames later in the explode animation.
-            gameObject.GetComponent<Rigidbody>().velocity = TargetEngineControl.CurrentVel;
+            MissileRigid.velocity = TargetEngineControl.CurrentVel;
         }
         else
         {
-            gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            MissileRigid.velocity = Vector3.zero;
         }
 
         //would rather do it like this but udon wont let me
@@ -179,7 +179,7 @@ public class AAMController : UdonSharpBehaviour
                         vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvez);
                     } */
         AAMCollider.enabled = false;
-        Animator AGMani = gameObject.GetComponent<Animator>();
+        Animator AGMani = GetComponent<Animator>();
         if (EngineControl.InEditor)
         {
             AGMani.SetTrigger("explodeowner");

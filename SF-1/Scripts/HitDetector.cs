@@ -16,7 +16,7 @@ public class HitDetector : UdonSharpBehaviour
     void OnParticleCollision(GameObject other)
     {
         if (other == null || EngineControl.dead) return;//avatars can't shoot you, and you can't get hurt when you're dead
-        if (EngineControl.InEditor)//editor
+        if (EngineControl.InEditor)
         {
             PlaneHit();
         }
@@ -64,8 +64,7 @@ public class HitDetector : UdonSharpBehaviour
         {
             if (EngineControl.InEditor)
             {
-                EngineControl.VehicleMainObj.transform.rotation = Quaternion.Euler(EngineControl.Spawnrotation);
-                EngineControl.VehicleMainObj.transform.position = EngineControl.Spawnposition;
+                EngineControl.VehicleTransform.SetPositionAndRotation(EngineControl.Spawnposition, Quaternion.Euler(EngineControl.Spawnrotation));
             }
             else
             { //this should respawn it in VRC, doesn't work in editor

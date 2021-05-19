@@ -33,6 +33,7 @@ public class AAGunController : UdonSharpBehaviour
     public float AAMMaxTargetDistance = 6000;
     public float AAMLockAngle = 20;
     public float AAMLockTime = 1.5f;
+    public float AAMLaunchDelay = .5f;
     public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public float PlaneHitBoxLayer = 17;//walkthrough
@@ -298,7 +299,7 @@ public class AAGunController : UdonSharpBehaviour
                     {
                         if (!LTriggerLastFrame)
                         {
-                            if (AAMLocked && Time.time - AAMLastFiredTime > 0.5)
+                            if (AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                             {
                                 AAMLastFiredTime = Time.time;
                                 if (InEditor)

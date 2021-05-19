@@ -21,21 +21,21 @@ public class BombController : UdonSharpBehaviour
     private CapsuleCollider BombCollider;
     private void Start()
     {
-        BombCollider = gameObject.GetComponent<CapsuleCollider>();
-        BombRigid = gameObject.GetComponent<Rigidbody>();
-        BombConstant = gameObject.GetComponent<ConstantForce>();
-        gameObject.transform.rotation = Quaternion.Euler(new Vector3(gameObject.transform.rotation.x + (Random.Range(0, AngleRandomization)), gameObject.transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), gameObject.transform.rotation.eulerAngles.z));
+        BombCollider = GetComponent<CapsuleCollider>();
+        BombRigid = GetComponent<Rigidbody>();
+        BombConstant = GetComponent<ConstantForce>();
+        transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
     }
 
     void LateUpdate()
     {
-        float sidespeed = Vector3.Dot(BombRigid.velocity, gameObject.transform.right);
-        float downspeed = Vector3.Dot(BombRigid.velocity, gameObject.transform.up);
+        float sidespeed = Vector3.Dot(BombRigid.velocity, transform.right);
+        float downspeed = Vector3.Dot(BombRigid.velocity, transform.up);
         BombConstant.relativeTorque = new Vector3(-downspeed, sidespeed, 0) * StraightenFactor;
         BombConstant.relativeForce = new Vector3(-sidespeed, -downspeed, 0);
         if (!ColliderActive)
         {
-            if (Vector3.Distance(gameObject.transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
+            if (Vector3.Distance(transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
             {
                 BombCollider.enabled = true;
                 ColliderActive = true;
@@ -68,7 +68,7 @@ public class BombController : UdonSharpBehaviour
             ExplosionSounds[rand].Play();
         }
         BombCollider.enabled = false;
-        Animator Bombani = gameObject.GetComponent<Animator>();
+        Animator Bombani = GetComponent<Animator>();
         if (EngineControl.InEditor)
         {
             Bombani.SetTrigger("explodeowner");

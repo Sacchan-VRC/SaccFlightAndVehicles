@@ -210,7 +210,7 @@ public class HUDController : UdonSharpBehaviour
             Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
             Vector3 PredictedPos = (TargetDir
                 + ((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
-                    //the .1 in the next line is combined .2 for undoing the lerp, and .5 for the acceleration formula
+                    //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
                     + (TargetAccel * .125f * BulletHitTime)
                         + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
                             * BulletHitTime);

@@ -55,6 +55,17 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
+        PlayerExitPlane(player);
+    }
+    public override void OnPlayerLeft(VRCPlayerApi player)
+    {
+        if (player.playerId == LeaveButtonControl.SeatedPlayer)
+        {
+            PlayerExitPlane(player);
+        }
+    }
+    public void PlayerExitPlane(VRCPlayerApi player)
+    {
         LeaveButtonControl.SeatedPlayer = -1;
         if (player != null)
         {

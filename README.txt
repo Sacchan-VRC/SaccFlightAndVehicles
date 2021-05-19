@@ -1,5 +1,6 @@
 Sacchan's Flight and Vehicles Prefab
 FOR VRChat SDK3 WITH UDONSHARP: https://github.com/Merlin-san/UdonSharp/releases
+Usage instructions below changelog
 
 https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC

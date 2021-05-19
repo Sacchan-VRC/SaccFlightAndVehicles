@@ -27,20 +27,20 @@ public class AGMController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (!ColliderActive)
         {
-            if (Vector3.Distance(gameObject.transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
+            if (Vector3.Distance(transform.position, EngineControl.CenterOfMass.position) > ColliderActiveDistance)
             {
                 AGMCollider.enabled = true;
                 ColliderActive = true;
             }
         }
-        if (Vector3.Angle(gameObject.transform.forward, (Target - gameObject.transform.position)) < (LockAngle))
+        if (Vector3.Angle(transform.forward, (Target - transform.position)) < (LockAngle))
         {
-            var missileToTargetVector = Target - gameObject.transform.position;
-            var missileForward = gameObject.transform.forward;
+            var missileToTargetVector = Target - transform.position;
+            var missileForward = transform.forward;
             var targetDirection = missileToTargetVector.normalized;
             var rotationAxis = Vector3.Cross(missileForward, targetDirection);
             var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-            gameObject.transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
+            transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
         }
         Lifetime += DeltaTime;
         if (Lifetime > MaxLifetime)

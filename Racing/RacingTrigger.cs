@@ -117,7 +117,7 @@ public class RacingTrigger : UdonSharpBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        if (CurrentCourseSelection != -1 && other.gameObject == CurrentCourse.RaceCheckpoints[NextCheckpoint])
+        if (CurrentCourseSelection != -1 && (other != null && other.gameObject == CurrentCourse.RaceCheckpoints[NextCheckpoint]))
         {
             if (NextCheckpoint == FinalCheckpoint)//end of the race
             {

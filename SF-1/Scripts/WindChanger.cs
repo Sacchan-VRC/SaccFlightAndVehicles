@@ -7,6 +7,7 @@ using VRC.Udon;
 
 public class WindChanger : UdonSharpBehaviour
 {
+    public GameObject WindMenu;
     public Slider WindStrengthSlider;
     public Text WindStr_text;
     public Slider WindGustStrengthSlider;
@@ -26,6 +27,7 @@ public class WindChanger : UdonSharpBehaviour
     /* [UdonSynced(UdonSyncMode.None)] */
     private float WindTurbulanceScale;
     private VRCPlayerApi localPlayer;
+    private bool menuactive;
     private void Start()
     {
         Assert(WindStrengthSlider != null, "Start: WindSlider != null");
@@ -46,17 +48,26 @@ public class WindChanger : UdonSharpBehaviour
     {
         /*    if (localPlayer.IsOwner(gameObject))
            { */
-        WindStrength = WindStrengthSlider.value;
-        WindStr_text.text = WindStrengthSlider.value.ToString("F1");
+        if (menuactive)
+        {
+            WindStrength = WindStrengthSlider.value;
+            WindStr_text.text = WindStrengthSlider.value.ToString("F1");
 
-        WindGustStrength = WindGustStrengthSlider.value;
-        WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
+            WindGustStrength = WindGustStrengthSlider.value;
+            WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
 
-        WindGustiness = WindGustinessSlider.value;
-        WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
+            WindGustiness = WindGustinessSlider.value;
+            WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
 
-        WindTurbulanceScale = WindTurbulanceScaleSlider.value;
-        WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
+            WindTurbulanceScale = WindTurbulanceScaleSlider.value;
+            WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
+
+            if (Vector3.Distance(transform.position, localPlayer.GetPosition()) > 3)
+            {
+                WindMenu.SetActive(false);
+                menuactive = false;
+            }
+        }
         /*    }
            else
            {
@@ -65,6 +76,11 @@ public class WindChanger : UdonSharpBehaviour
                WindGustinessSlider.value = WindGustiness;
                WindTurbulanceScaleSlider.value = WindTurbulanceScale;
            } */
+    }
+    private void OnPickup()
+    {
+        WindMenu.SetActive(true);
+        menuactive = true;
     }
     private void OnPickupUseDown()
     {
