@@ -65,7 +65,7 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
             if (CalibrateFowardBack == true) { CalibrateZ(); }
             else { CalibratedZ = true; }
 
-            if (CalibratedY && CalibratedZ)//avatar 3.0 avatars have a weird delay when sitting so just wait a second to make sure we're calibrated
+            if (CalibratedY && CalibratedZ)
             {
                 gameObject.SetActive(false);
             }
@@ -248,7 +248,7 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown1cm");
                 }
             }
-            else if (AwakeTimer > 1)
+            else if (AwakeTimer > 1)//avatar 3.0 avatars have a weird delay when sitting so just wait a second to make sure we're calibrated
             {
                 CalibratedY = true;
             }
@@ -428,7 +428,7 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack1cm");
                 }
             }
-            else if (AwakeTimer > 1)
+            else if (AwakeTimer > 1)//avatar 3.0 avatars have a weird delay when sitting so just wait a second to make sure we're calibrated
             {
                 CalibratedZ = true;
             }

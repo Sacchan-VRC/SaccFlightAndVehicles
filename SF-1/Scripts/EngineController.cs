@@ -82,10 +82,10 @@ public class EngineController : UdonSharpBehaviour
     public float RollFriction = 90f;
     public float RollResponse = 20f;
     public float ReversingRollStrengthMulti = 1.6f;//reversing = AoA > 90
-    public float InertiaTensorRotationMulti = 1;
-    public bool InvertAdverseYaw = false;
     public float PitchDownStrMulti = .8f;
     public float PitchDownLiftMulti = .8f;
+    public float InertiaTensorRotationMulti = 1;
+    public bool InvertAdverseYaw = false;
     public float RotMultiMaxSpeed = 220f;
     //public float StickInputPower = 1.7f;
     public float VelStraightenStrPitch = 0.035f;
@@ -426,7 +426,7 @@ public class EngineController : UdonSharpBehaviour
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
                 }
                 //G/crash Damage
-                Health += -Mathf.Clamp((Gs - MaxGs) * DeltaTime * GDamage, 0f, 99999f); //take damage of GDamage per second per G above MaxGs
+                Health -= Mathf.Max((Gs - MaxGs) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
                 if (Health <= 0f)//plane is ded
                 {
                     if (InEditor)//editor

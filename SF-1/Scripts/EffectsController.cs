@@ -68,9 +68,9 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl.IsOwner)
         {
             if (EngineControl.InVR)
-            { OwnerRotationInputs = EngineControl.RotationInputs; }
+            { OwnerRotationInputs = RotInputs; }//vr users use raw input
             else
-            { OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, EngineControl.RotationInputs, 7 * DeltaTime); }
+            { OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, RotInputs, 7 * DeltaTime); }//desktop users use value movetowards'd
             PlaneAnimator.SetFloat("pitchinput", (OwnerRotationInputs.x * 0.5f) + 0.5f);
             PlaneAnimator.SetFloat("yawinput", (OwnerRotationInputs.y * 0.5f) + 0.5f);
             PlaneAnimator.SetFloat("rollinput", (OwnerRotationInputs.z * 0.5f) + 0.5f);
@@ -89,12 +89,11 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl.Occupied == true)
         {
             DoEffects = 0f;
-
             if (!FrontWheelNull)
             {
                 if (EngineControl.Taxiing)
                 {
-                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -OwnerRotationInputs.y * 80 * (-Mathf.Min((EngineControl.Speed / 10), 1) + 1), 0));
+                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -RotInputs.y * 80 * (-Mathf.Min((EngineControl.Speed / 10), 1) + 1), 0));
                 }
                 else FrontWheel.localRotation = Quaternion.identity;
             }

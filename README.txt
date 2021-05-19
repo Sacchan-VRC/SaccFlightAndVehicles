@@ -10,12 +10,20 @@ https://liberapay.com/Sacchan-VRC/
 Bitcoin:bc1q40l0d3582twp3rga4wjrwhepwse4esz4x5y5wa
 ETH:0x975aeF286851BB6E43AaF2299b17045ad1D0eab8
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Hotfix Update 1.392--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Small Update 1.393
+•Compatability for VRChat Networking Update
+•Throttle Now Unaffected by Object Scale
+•Throttle Sensitivity Option
+•Inertia Tensor Rotation adjustment Option
+•Minumum Bomb Drop Delay Option
+•Some Optimization
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix Update 1.392
 •Fixed vehicle respawner not setting the 'respawn' animation
 •Fixed Frontwheel movement
 •Set AtG render texture to something compatible with quest
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Hotfix Update 1.391--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix Update 1.391
 •Hud lead indicator is now accurate
 •Made the NotDead event local only
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -578,6 +586,9 @@ The number of Bombs on the plane.
 Bomb Hold Delay (new in 1.3)
 How long between bomb drops if you hold the button.
 
+Bomb Delay (new in 1.393)
+Minimum delay between bomb drops
+
 Bomb Launch Points (new in 1.3)
 Points at which bombs spawn, they spawn at each point in succession.
 
@@ -659,6 +670,12 @@ Allows you to set a seperate rotation speed for pulling down.
 
 Pitch Down Lift Multi
 Allows you to generate less lift from pulling down. (air hitting the top of your plane)
+
+Inertia Tensor Rotation Multi (New in 1.393)
+Multiplier for the Inertia Tensor Rotation, Lower values will make the plane feel more stable
+
+Invert Adverse Yaw (New in 1.393)
+Inverts one axis of the Inertia Tensor Rotation, causing the direction of the yawing experienced after rolling to invert
 
 Rot Multi Max Speed (new in 1.2)
 Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear. (Meters/second)
