@@ -316,11 +316,6 @@ public class HUDController : UdonSharpBehaviour
                 break;
         }
 
-
-        //AB
-        if (EffectsControl.AfterburnerOn) { HudAB.SetActive(true); }
-        else { HudAB.SetActive(false); }
-
         //Cruise Control target knots
         if (EngineControl.Cruise)
         {

@@ -45,6 +45,7 @@ public class EngineController : UdonSharpBehaviour
     public bool RepeatingWorld = false;
     public float RepeatingWorldDistance = 20000;
     public bool HasAfterburner = true;
+    public bool HasVTOL = true;
     public bool HasLimits = true;
     public bool HasFlare = true;
     public bool HasCatapult = true;
@@ -62,6 +63,7 @@ public class EngineController : UdonSharpBehaviour
     public bool HasHook = true;
     public bool HasSmoke = true;
     public float ThrottleStrength = 20f;
+    public float ThrottleStrengthVTOLMulti = 10;
     public float ThrottleSensitivity = 6f;
     public float AfterburnerThrustMulti = 1.5f;
     public float AccelerationResponse = 4.5f;
@@ -166,10 +168,10 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float ThrottleZeroPoint;
-    private float TempSpeed;
-    private float TempZoom;
-    private float ZoomZeroPoint;
-    private float ZoomDifference;
+    private float CruiseTemp;
+    private float VTOLTemp;
+    private float VTOLZeroPoint;
+    private float VTOLAngle;
     [System.NonSerializedAttribute] public float SetSpeed;
     private float SpeedZeroPoint;
     private float SmokeHoldTime;
@@ -307,6 +309,9 @@ public class EngineController : UdonSharpBehaviour
     Transform[] PlaneMeshParts;
     private float VelLiftMaxStart;
     private bool HasAirBrake;//set to false if air brake strength is 0
+    private float HandDistanceZLastFrame;
+
+    private float EngineAngle;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -607,11 +612,6 @@ public class EngineController : UdonSharpBehaviour
                     ToggleCanopy();
                 }
 
-                if (Input.GetKeyDown(KeyCode.T) && HasAfterburner)
-                {
-                    ToggleAfterburner();
-                }
-
                 //with keys 1-4 we select weapons, if they are already selected, deselect them.
                 if (Input.GetKeyDown(KeyCode.Alpha1) && HasGun)
                 {
@@ -721,8 +721,17 @@ public class EngineController : UdonSharpBehaviour
                     if (InEditor) { LaunchFlares(); }//editor
                     else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares"); }//ingame
                 }
+                if (Input.GetKeyDown(KeyCode.C))
+                {
+                    if (VTOLAngle == 1)
+                    {
+                        VTOLAngle = 0;
+                    }
+                    else
+                        VTOLAngle = 1;
+                }
                 //////////////////END OF KEYBOARD CONTROLS////////////////////////////////////////////////////////
-                //brake is done later because it has to be after switches
+                //brake, throttle, and afterburner are done later because they have to be to work
 
                 //LStick Selection wheel
                 if (InVR && LStick.magnitude > .7f)
@@ -900,13 +909,20 @@ public class EngineController : UdonSharpBehaviour
                     case 0://player just got in and hasn't selected anything
                         BrakeInput = 0;
                         break;
-                    case 1://Afterburner
+                    case 1://VTOL
                         if (LTrigger > 0.75)
                         {
+                            Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                            handpos = VehicleTransform.InverseTransformDirection(handpos);
+
                             if (!LTriggerLastFrame)
                             {
-                                ToggleAfterburner();
+                                VTOLZeroPoint = handpos.z;
+                                VTOLTemp = VTOLAngle;
                             }
+                            float VTOLAngleDifference = (VTOLZeroPoint - handpos.z) * ThrottleSensitivity;
+                            VTOLAngle = Mathf.Clamp(VTOLTemp + VTOLAngleDifference, 0, 1);
+
                             LTriggerLastFrame = true;
                         }
                         else { LTriggerLastFrame = false; }
@@ -1062,6 +1078,11 @@ public class EngineController : UdonSharpBehaviour
                     case 8://Cruise
                         if (LTrigger > 0.75)
                         {
+                            //for setting speed in VR
+                            Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                            handpos = VehicleTransform.InverseTransformDirection(handpos);
+
+                            //enable and disable
                             if (!LTriggerLastFrame)
                             {
                                 if (!Cruise)
@@ -1078,23 +1099,15 @@ public class EngineController : UdonSharpBehaviour
                                     Cruise = false;
                                     PlayerThrottle = ThrottleInput;
                                 }
+                                //end of enable disable
+
+                                //more set speed stuff
+                                SpeedZeroPoint = handpos.z;
+                                CruiseTemp = SetSpeed;
                             }
+                            float SpeedDifference = (SpeedZeroPoint - handpos.z) * 250;
+                            SetSpeed = Mathf.Floor(Mathf.Clamp(CruiseTemp + SpeedDifference, 0, 2000));
 
-                            //VR Set Speed
-                            if (InVR)
-                            {
-                                Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                                handpos = VehicleTransform.InverseTransformDirection(handpos);
-
-                                if (!LTriggerLastFrame)
-                                {
-                                    SpeedZeroPoint = handpos.z;
-                                    TempSpeed = SetSpeed;
-                                }
-                                float SpeedDifference = (SpeedZeroPoint - handpos.z) * 250;
-                                SetSpeed = Mathf.Floor(Mathf.Clamp(TempSpeed + SpeedDifference, 0, 2000));
-
-                            }
                             LTriggerLastFrame = true;
                         }
                         else { LTriggerLastFrame = false; }
@@ -1393,6 +1406,7 @@ public class EngineController : UdonSharpBehaviour
                         DoAAMTargeting = false;
                         break;
                 }
+                //keyboard control for brake
                 if (Input.GetKey(KeyCode.B) && HasBrake)
                 {
                     if (!Taxiing)
@@ -1459,6 +1473,18 @@ public class EngineController : UdonSharpBehaviour
                 }
                 PlaneRotLastFrame = VehicleTransform.rotation;
 
+                bool AfterburnerOn = EffectsControl.AfterburnerOn;
+                //kerboard throttle controls and afterburner strength
+                if (AfterburnerOn)
+                {
+                    PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * DeltaTime), 0, 1);
+                    Afterburner = ((ThrottleInput - 0.8f) * 5) * AfterburnerThrustMulti;//scale afterburner strength with amount above 0.8 throttle (it's turned on at 0.8)
+                }
+                else
+                {
+                    PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * DeltaTime), 0, 0.8f);
+                }
+
                 //VR Throttle
                 if (LGrip > 0.75)
                 {
@@ -1469,19 +1495,27 @@ public class EngineController : UdonSharpBehaviour
                     {
                         ThrottleZeroPoint = handdistance.z;
                         TempThrottle = PlayerThrottle;
+                        HandDistanceZLastFrame = 0;
                     }
                     float ThrottleDifference = ThrottleZeroPoint - handdistance.z;
                     ThrottleDifference *= ThrottleSensitivity;
 
-                    PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
+                    //Detent function to prevent you going into afterburner to easily
+                    if ((HandDistanceZLastFrame - handdistance.z) * ThrottleSensitivity > .05f || PlayerThrottle > 0.8f)
+                    {
+                        PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
+                    }
+                    else
+                    {
+                        PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, .8f);
+                    }
+                    HandDistanceZLastFrame = handdistance.z;
                     LGripLastFrame = true;
                 }
                 else
                 {
                     LGripLastFrame = false;
                 }
-
-                PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * DeltaTime), 0, 1);
 
                 if (Taxiing)
                 {
@@ -1574,6 +1608,24 @@ public class EngineController : UdonSharpBehaviour
                     ThrustVecGrounded = 1;
                     Taxiinglerper = 0;
                 }
+                //keyboard control for afterburner
+                if (Input.GetKeyDown(KeyCode.T) && HasAfterburner)
+                {
+                    if (HasAfterburner)
+                    {
+                        if (AfterburnerOn)
+                            PlayerThrottle = 0.8f;
+                        else
+                            PlayerThrottle = 1;
+                    }
+                    else
+                    {
+                        if (PlayerThrottle == 1)
+                            PlayerThrottle = 0;
+                        else
+                            PlayerThrottle = 1;
+                    }
+                }
                 //Cruise PI Controller
                 if (Cruise && !LGripLastFrame && !Shift && !Ctrl)
                 {
@@ -1609,15 +1661,16 @@ public class EngineController : UdonSharpBehaviour
                         ThrottleInput = PlayerThrottle;
                     }
                 }
-                Fuel = Mathf.Clamp(Fuel - ((FuelConsumption * Mathf.Max(ThrottleInput, 0.35f)) * DeltaTime), 0, FullFuel);
-                if (Fuel < 200) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / 200), 0, 1);
+                Fuel = Mathf.Max(Fuel - ((FuelConsumption * Mathf.Max(ThrottleInput, 0.35f)) * DeltaTime), 0);
+                if (Fuel < 200) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / 200), 0, 1);//decrease max throttle as fuel runs out
 
-                if (ThrottleInput < .6f && EffectsControl.AfterburnerOn)
+                if (HasAfterburner)
                 {
-                    if (InEditor)
+                    if (ThrottleInput > 0.8f && !AfterburnerOn)
                     {
-                        SetAfterburnerOff();
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
                     }
+                    else if (ThrottleInput <= .8f && AfterburnerOn)
                     {
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
                     }
@@ -1808,13 +1861,9 @@ public class EngineController : UdonSharpBehaviour
 
             //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
             if (EngineOutput < ThrottleInput)
-            {
-                EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * DeltaTime); ;
-            }
+            { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * DeltaTime); }
             else
-            {
-                EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); ;
-            }
+            { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); }
 
             float sidespeed = 0;
             float downspeed = 0;
@@ -1901,10 +1950,20 @@ public class EngineController : UdonSharpBehaviour
             switch (CatapultStatus)
             {
                 case 0://normal
-                       //do lift and thrust
+                       //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
+                    float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
+                    float downthrust = thrust * ThrottleStrengthVTOLMulti;
+
+                    Vector3 dangle = Vector3.MoveTowards(Vector3.forward, Vector3.up, VTOLAngle).normalized * Mathf.Lerp(thrust, downthrust, VTOLAngle);
+
+
+                    //do lift and thrust
                     Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
                         ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + VelLiftFinal) * Atmosphere,// Y Up
-                            EngineOutput * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
+                            0);
+
+                    FinalInputAcc += dangle;
+                    //(HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
 
                     //used to add rotation friction
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
@@ -2451,7 +2510,8 @@ public class EngineController : UdonSharpBehaviour
     }
     private void ToggleAfterburner()
     {
-        if (!EffectsControl.AfterburnerOn && ThrottleInput > 0.6)
+        bool AfterburnerOn = EffectsControl.AfterburnerOn;
+        if (!AfterburnerOn && ThrottleInput > 0.8)
         {
             if (InEditor)
             {
@@ -2461,7 +2521,7 @@ public class EngineController : UdonSharpBehaviour
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
             }
         }
-        else if (EffectsControl.AfterburnerOn)
+        else if (AfterburnerOn)
         {
             if (InEditor)
             {

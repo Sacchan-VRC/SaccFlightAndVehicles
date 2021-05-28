@@ -20,17 +20,17 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: {x: 0.002710387, y: 0.047365665, z: 0.0238657}
+        value: {x: 0.0003361106, y: 0.03883505, z: -0.0058465004}
         inSlope: {x: 0, y: 0, z: 0}
-        outSlope: {x: -0.0000010387041, y: -0.008706567, z: 0.000003430061}
+        outSlope: {x: -0.0000036110578, y: -0.008273505, z: 0.0000046500472}
         tangentMode: 0
         weightedMode: 0
         inWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
         outWeight: {x: 0.33333334, y: 0.33333334, z: 0.33333334}
       - serializedVersion: 3
         time: 10
-        value: {x: 0.0027, y: -0.0397, z: 0.0239}
-        inSlope: {x: -0.0000010387041, y: -0.008706567, z: 0.000003430061}
+        value: {x: 0.0003, y: -0.0439, z: -0.0058}
+        inSlope: {x: -0.0000036110578, y: -0.008273505, z: 0.0000046500472}
         outSlope: {x: 0, y: 0, z: 0}
         tangentMode: 0
         weightedMode: 0
@@ -66,8 +66,45 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     path: HUDController/bigstuff/hud_throttlebar
-  m_FloatCurves: []
-  m_PPtrCurves: []
+  m_FloatCurves:
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 8.016666
+        value: 1
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_IsActive
+    path: HUDController/bigstuff/hud_ab
+    classID: 1
+    script: {fileID: 0}
+  m_PPtrCurves:
+  - curve:
+    - time: 0
+      value: {fileID: 2100000, guid: a18cdf3a6a3017543af0d876d0755d80, type: 2}
+    - time: 8.016666
+      value: {fileID: 2100000, guid: c3d066a228c2d6d43b0c652eb7072427, type: 2}
+    attribute: m_Materials.Array.data[0]
+    path: HUDController/bigstuff/hud_throttlebar
+    classID: 23
+    script: {fileID: 0}
   m_SampleRate: 60
   m_WrapMode: 0
   m_Bounds:
@@ -89,7 +126,23 @@ AnimationClip:
       typeID: 4
       customType: 0
       isPPtrCurve: 0
-    pptrCurveMapping: []
+    - serializedVersion: 2
+      path: 3669605750
+      attribute: 2086281974
+      script: {fileID: 0}
+      typeID: 1
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 1611041427
+      attribute: 0
+      script: {fileID: 0}
+      typeID: 23
+      customType: 21
+      isPPtrCurve: 1
+    pptrCurveMapping:
+    - {fileID: 2100000, guid: a18cdf3a6a3017543af0d876d0755d80, type: 2}
+    - {fileID: 2100000, guid: c3d066a228c2d6d43b0c652eb7072427, type: 2}
   m_AnimationClipSettings:
     serializedVersion: 2
     m_AdditiveReferencePoseClip: {fileID: 0}
@@ -200,17 +253,17 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.002710387
+        value: 0.0003361106
         inSlope: 0
-        outSlope: -0.0000010387041
+        outSlope: -0.0000036110578
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 10
-        value: 0.0027
-        inSlope: -0.0000010387041
+        value: 0.0003
+        inSlope: -0.0000036110578
         outSlope: 0
         tangentMode: 69
         weightedMode: 0
@@ -228,17 +281,17 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.047365665
+        value: 0.03883505
         inSlope: 0
-        outSlope: -0.008706567
+        outSlope: -0.008273505
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 10
-        value: -0.0397
-        inSlope: -0.008706567
+        value: -0.0439
+        inSlope: -0.008273505
         outSlope: 0
         tangentMode: 69
         weightedMode: 0
@@ -256,17 +309,17 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0.0238657
+        value: -0.0058465004
         inSlope: 0
-        outSlope: 0.000003430061
+        outSlope: 0.0000046500472
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 10
-        value: 0.0239
-        inSlope: 0.000003430061
+        value: -0.0058
+        inSlope: 0.0000046500472
         outSlope: 0
         tangentMode: 69
         weightedMode: 0
@@ -278,6 +331,34 @@ AnimationClip:
     attribute: m_LocalPosition.z
     path: HUDController/ThrottleSlider/ThrottleSlider
     classID: 4
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 8.016666
+        value: 1
+        inSlope: Infinity
+        outSlope: Infinity
+        tangentMode: 103
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_IsActive
+    path: HUDController/bigstuff/hud_ab
+    classID: 1
     script: {fileID: 0}
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0

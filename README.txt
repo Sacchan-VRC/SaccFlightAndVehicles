@@ -11,11 +11,11 @@ Bitcoin:bc1q40l0d3582twp3rga4wjrwhepwse4esz4x5y5wa
 ETH:0x975aeF286851BB6E43AaF2299b17045ad1D0eab8
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.393
-•Compatability for VRChat Networking Update
+•Compatibility for VRChat Networking Update
 •Throttle Now Unaffected by Object Scale
 •Throttle Sensitivity Option
 •Inertia Tensor Rotation adjustment Option
-•Minumum Bomb Drop Delay Option
+•Minimum Bomb Drop Delay Option
 •Some Optimization
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Hotfix Update 1.392
