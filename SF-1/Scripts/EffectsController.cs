@@ -70,7 +70,7 @@ public class EffectsController : UdonSharpBehaviour
             if (EngineControl.InVR)
             { OwnerRotationInputs = RotInputs; }//vr users use raw input
             else
-            { OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, RotInputs, 7 * DeltaTime); }//desktop users use value movetowards'd
+            { OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, RotInputs, 7 * DeltaTime); }//desktop users use value movetowards'd to prevent instant movement
             PlaneAnimator.SetFloat("pitchinput", (OwnerRotationInputs.x * 0.5f) + 0.5f);
             PlaneAnimator.SetFloat("yawinput", (OwnerRotationInputs.y * 0.5f) + 0.5f);
             PlaneAnimator.SetFloat("rollinput", (OwnerRotationInputs.z * 0.5f) + 0.5f);
@@ -101,7 +101,7 @@ public class EffectsController : UdonSharpBehaviour
         else { DoEffects += DeltaTime; }
 
 
-        PlaneAnimator.SetFloat("engineoutput", EngineControl.EngineOutput);
+        PlaneAnimator.SetFloat("vtolangle", EngineControl.VTOLAngle);
 
         vapor = EngineControl.Speed > 20;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 

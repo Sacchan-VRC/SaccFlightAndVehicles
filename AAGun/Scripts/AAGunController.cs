@@ -384,7 +384,7 @@ public class AAGunController : UdonSharpBehaviour
         Health = FullHealth;//turns off low health smoke and stops it from calling Explode() every frame
         NumAAM = FullAAMs;
         AAGunAnimator.SetBool("firing", false);
-        AAGunAnimator.SetFloat("AAMs", 1);
+        AAGunAnimator.SetFloat("AAMs", (float)FullAAMs * FullAAMsDivider);
         AAGunAnimator.SetFloat("health", 1);
         if (IsOwner)
         {
