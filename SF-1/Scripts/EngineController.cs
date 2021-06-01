@@ -67,9 +67,11 @@ public class EngineController : UdonSharpBehaviour
     public float ThrottleStrength = 20f;
     public bool VerticalThrottle = false;
     public float VTOLAngleTurnRate = 90f;
+    public float VTOLDefaultAmount = 0;
     public float VTOLAdverseYaw = 0;
     public bool VTOLAllowAfterburner = false;
     public float VTOLThrottleStrengthMulti = .7f;
+    public float VTOLMinAngle = 0;
     public float VTOLMaxAngle = 90;
     public float VTOLPitchThrustVecMulti = .3f;
     public float VTOLYawThrustVecMulti = .3f;
@@ -335,6 +337,7 @@ public class EngineController : UdonSharpBehaviour
     private float VTOLMaxAngleDivider;
     private float InverseThrottleABPointDivider;
     private float EngineOutputLastFrame;
+    float VTOLAngle90;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -443,6 +446,8 @@ public class EngineController : UdonSharpBehaviour
         throttleABPointDivider = 1 / ThrottleAfterBurnerPoint;
         VTOLMaxAngleDivider = 1 / VTOLMaxAngle;
         InverseThrottleABPointDivider = 1 / (1 - ThrottleAfterBurnerPoint);
+
+        VTOLAngle = VTOLDefaultAmount;
     }
 
     private void LateUpdate()
@@ -764,7 +769,7 @@ public class EngineController : UdonSharpBehaviour
                     float pgdn = Input.GetKey(KeyCode.PageDown) ? DeltaTime * VTOLAngleTurnRate / VTOLMaxAngle : 0;
                     VTOLAngleInput = Mathf.Clamp(VTOLAngleInput + (pgdn - pgup), 0, 1);
 
-                    if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0))//only SetVTOLValues if it'll do anything
+                    if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
                     { SetVTOLValues(); }
                 }
                 //LStick Selection wheel
@@ -1522,7 +1527,6 @@ public class EngineController : UdonSharpBehaviour
                 {
                     PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * DeltaTime), 0, ThrottleAfterBurnerPoint);
                 }
-
                 //VR Throttle
                 if (LGrip > 0.75)
                 {
@@ -1546,9 +1550,10 @@ public class EngineController : UdonSharpBehaviour
                     }
                     float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
                     ThrottleDifference *= ThrottleSensitivity;
+                    bool VTOLandAB_Disallowed = (!VTOLAllowAfterburner && VTOLAngle != 0);/*don't allow VTOL AB disabled planes, false if attemping to*/
 
-                    //Detent function to prevent you going into afterburner to easily
-                    if ((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f || (PlayerThrottle > ThrottleAfterBurnerPoint || !HasAfterburner))
+                    //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
+                    if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !VTOLandAB_Disallowed || ((PlayerThrottle > ThrottleAfterBurnerPoint/*already in afterburner*/&& !VTOLandAB_Disallowed) || !HasAfterburner))
                     {
                         PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
                     }
@@ -1998,10 +2003,22 @@ public class EngineController : UdonSharpBehaviour
                     if (VTOLenabled)
                     {
                         float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
-                        float downthrust = thrust * VTOLThrottleStrengthMulti;
-                        Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that it rotates on the correct axis
+
+                        Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
                         //rotate and scale Vector for VTOL thrust
-                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLMaxAngle * VTOLAngle, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle);
+                        if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
+                        {
+                            float vtolangledif = VTOLMaxAngle - VTOLMinAngle;
+                            float VTOLAngle2 = VTOLMinAngle + vtolangledif * VTOLAngle;
+
+                            FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
+                            Debug.Log(VTOLAngle2);
+                        }
+                        else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
+                        {
+                            float downthrust = thrust * VTOLThrottleStrengthMulti;
+                            FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLMaxAngle * VTOLAngle, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
+                        }
                         //add lift and thrust
                         FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
                             ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + VelLiftFinal) * Atmosphere,// Y Up
@@ -3189,10 +3206,10 @@ public class EngineController : UdonSharpBehaviour
     {
         VTOLAngle = Mathf.MoveTowards(VTOLAngle, VTOLAngleInput, VTOLMaxAngleDivider * VTOLAngleTurnRate * Time.smoothDeltaTime);
         float SpeedForVTOL = (Mathf.Min(Speed / VTOLLoseControlSpeed, 1));
-        if (VTOLAngle > 0 && SpeedForVTOL != 1)
+        if (VTOLAngle > 0 && SpeedForVTOL != 1 || VTOLOnly)
         {
-            float VTOL90 = Mathf.Min(VTOLAngle / VTOL90Degrees, 1);
-            float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOL90;
+            VTOLAngle90 = VTOLOnly ? 1 : Mathf.Min(VTOLAngle / VTOL90Degrees, 1);
+            float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngle90;
 
             PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
             YawThrustVecMulti = Mathf.Lerp(YawThrustVecMultiStart, VTOLYawThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
