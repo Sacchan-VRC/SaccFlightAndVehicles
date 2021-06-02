@@ -47,7 +47,7 @@ public class EngineController : UdonSharpBehaviour
     public bool HasAfterburner = true;
     public float ThrottleAfterBurnerPoint = 0.8f;
     public bool VTOLOnly = false;
-    public bool HasVTOL = true;
+    public bool HasVTOLAngle = false;
     public bool HasLimits = true;
     public bool HasFlare = true;
     public bool HasCatapult = true;
@@ -67,7 +67,7 @@ public class EngineController : UdonSharpBehaviour
     public float ThrottleStrength = 20f;
     public bool VerticalThrottle = false;
     public float VTOLAngleTurnRate = 90f;
-    public float VTOLDefaultAmount = 0;
+    public float VTOLDefaultValue = 0;
     public float VTOLAdverseYaw = 0;
     public bool VTOLAllowAfterburner = false;
     public float VTOLThrottleStrengthMulti = .7f;
@@ -77,6 +77,7 @@ public class EngineController : UdonSharpBehaviour
     public float VTOLYawThrustVecMulti = .3f;
     public float VTOLRollThrustVecMulti = .07f;
     public float VTOLLoseControlSpeed = 120;
+    public float GunRecoil = 1;
     public float ThrottleSensitivity = 6f;
     public float AfterburnerThrustMulti = 1.5f;
     public float AccelerationResponse = 4.5f;
@@ -439,15 +440,14 @@ public class EngineController : UdonSharpBehaviour
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
         FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
 
-        if (VTOLOnly) { HasVTOL = false; }
-        if (VTOLOnly || HasVTOL) { VTOLenabled = true; }
+        if (VTOLOnly || HasVTOLAngle) { VTOLenabled = true; }
         VTOL90Degrees = Mathf.Min(90 / VTOLMaxAngle, 1);
 
         throttleABPointDivider = 1 / ThrottleAfterBurnerPoint;
         VTOLMaxAngleDivider = 1 / VTOLMaxAngle;
         InverseThrottleABPointDivider = 1 / (1 - ThrottleAfterBurnerPoint);
 
-        VTOLAngle = VTOLDefaultAmount;
+        VTOLAngle = VTOLDefaultValue;
     }
 
     private void LateUpdate()
@@ -765,10 +765,12 @@ public class EngineController : UdonSharpBehaviour
                 //brake, throttle, and afterburner are done later because they have to be to work
                 if (VTOLenabled)
                 {
-                    float pgup = Input.GetKey(KeyCode.PageUp) ? DeltaTime * VTOLAngleTurnRate / VTOLMaxAngle : 0;
-                    float pgdn = Input.GetKey(KeyCode.PageDown) ? DeltaTime * VTOLAngleTurnRate / VTOLMaxAngle : 0;
-                    VTOLAngleInput = Mathf.Clamp(VTOLAngleInput + (pgdn - pgup), 0, 1);
-
+                    if (HasVTOLAngle)
+                    {
+                        float pgup = Input.GetKey(KeyCode.PageUp) ? DeltaTime * VTOLAngleTurnRate / VTOLMaxAngle : 0;
+                        float pgdn = Input.GetKey(KeyCode.PageDown) ? DeltaTime * VTOLAngleTurnRate / VTOLMaxAngle : 0;
+                        VTOLAngleInput = Mathf.Clamp(VTOLAngleInput + (pgdn - pgup), 0, 1);
+                    }
                     if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
                     { SetVTOLValues(); }
                 }
@@ -799,7 +801,7 @@ public class EngineController : UdonSharpBehaviour
                     }
                     else if (stickdir > -45)//up
                     {
-                        if (HasVTOL)
+                        if (HasVTOLAngle)
                             LStickSelection = 1;
                     }
                     else if (stickdir > -90)//upright
@@ -1170,13 +1172,13 @@ public class EngineController : UdonSharpBehaviour
                         {
                             IsFiringGun = true;
                             GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
+                            VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * DeltaTime);
                             RTriggerLastFrame = true;
                         }
                         else { IsFiringGun = false; RTriggerLastFrame = false; }
 
                         TargetingAngle = 70;
                         DoAAMTargeting = true;//gun lead indiactor uses this
-
                         AAMLocked = false;
                         AAMLockTimer = 0;
                         break;
@@ -2330,6 +2332,8 @@ public class EngineController : UdonSharpBehaviour
         ThrottleInput = 0;
         EngineOutput = 0;
         MissilesIncoming = 0;
+        VTOLAngle = VTOLDefaultValue;
+        VTOLAngleInput = VTOLDefaultValue;
         if (HasAfterburner) { SetAfterburnerOff(); }
         if (HasSmoke) { SetSmokingOff(); }
         if (HasLimits) { SetLimitsOn(); }
@@ -2844,11 +2848,13 @@ public class EngineController : UdonSharpBehaviour
         Networking.SetOwner(localPlayer, gameObject);
         Networking.SetOwner(localPlayer, EffectsControl.gameObject);
         VehicleTransform.position = new Vector3(VehicleTransform.position.x, -10000, VehicleTransform.position.z);
+        Atmosphere = 1;//planemoving optimization requires this to be here
         //synced variables
         Health = FullHealth;
         Fuel = FullFuel;
         GunAmmoInSeconds = FullGunAmmo;
-        Atmosphere = 1;//planemoving optimization requires this to be here
+        VTOLAngle = VTOLDefaultValue;
+        VTOLAngleInput = VTOLDefaultValue;
     }
     public void ResetStatus()//called globally when using respawn button
     {

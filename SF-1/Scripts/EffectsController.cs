@@ -37,6 +37,15 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool LargeEffectsOnly = false;
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
+    private int PITCHINPUT_STRING = Animator.StringToHash("pitchinput");
+    private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
+    private int ROLLINPUT_STRING = Animator.StringToHash("rollinput");
+    private int THROTTLE_STRING = Animator.StringToHash("throttle");
+    private int ENGINEOUTPUT_STRING = Animator.StringToHash("engineoutput");
+    private int VTOLANGLE_STRING = Animator.StringToHash("vtolangle");
+    private int HEALTH_STRING = Animator.StringToHash("health");
+    private int AOA_STRING = Animator.StringToHash("AoA");
+    private int BRAKE_STRING = Animator.StringToHash("brake");
     private void Start()
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
@@ -71,20 +80,20 @@ public class EffectsController : UdonSharpBehaviour
             { OwnerRotationInputs = RotInputs; }//vr users use raw input
             else
             { OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, RotInputs, 7 * DeltaTime); }//desktop users use value movetowards'd to prevent instant movement
-            PlaneAnimator.SetFloat("pitchinput", (OwnerRotationInputs.x * 0.5f) + 0.5f);
-            PlaneAnimator.SetFloat("yawinput", (OwnerRotationInputs.y * 0.5f) + 0.5f);
-            PlaneAnimator.SetFloat("rollinput", (OwnerRotationInputs.z * 0.5f) + 0.5f);
-            PlaneAnimator.SetFloat("throttle", EngineControl.ThrottleInput);
-            PlaneAnimator.SetFloat("engineoutput", EngineControl.EngineOutput);
+            PlaneAnimator.SetFloat(PITCHINPUT_STRING, (OwnerRotationInputs.x * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat(YAWINPUT_STRING, (OwnerRotationInputs.y * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat(ROLLINPUT_STRING, (OwnerRotationInputs.z * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat(THROTTLE_STRING, EngineControl.ThrottleInput);
+            PlaneAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineControl.EngineOutput);
         }
         else
         {
             float EngineOutput = EngineControl.EngineOutput;
-            PlaneAnimator.SetFloat("pitchinput", (RotInputs.x * 0.5f) + 0.5f);
-            PlaneAnimator.SetFloat("yawinput", (RotInputs.y * 0.5f) + 0.5f);
-            PlaneAnimator.SetFloat("rollinput", (RotInputs.z * 0.5f) + 0.5f);
-            PlaneAnimator.SetFloat("throttle", EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
-            PlaneAnimator.SetFloat("engineoutput", EngineOutput);
+            PlaneAnimator.SetFloat(PITCHINPUT_STRING, (RotInputs.x * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat(YAWINPUT_STRING, (RotInputs.y * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat(ROLLINPUT_STRING, (RotInputs.z * 0.5f) + 0.5f);
+            PlaneAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
+            PlaneAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
         }
         if (EngineControl.Occupied == true)
         {
@@ -101,15 +110,15 @@ public class EffectsController : UdonSharpBehaviour
         else { DoEffects += DeltaTime; }
 
 
-        PlaneAnimator.SetFloat("vtolangle", EngineControl.VTOLAngle);
+        PlaneAnimator.SetFloat(VTOLANGLE_STRING, EngineControl.VTOLAngle);
 
         vapor = EngineControl.Speed > 20;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * DeltaTime);
 
-        PlaneAnimator.SetFloat("health", EngineControl.Health * FullHealthDivider);
-        PlaneAnimator.SetFloat("AoA", vapor ? Mathf.Abs(EngineControl.AngleOfAttack * 0.00555555556f /* Divide by 180 */ ) : 0);
-        PlaneAnimator.SetFloat("brake", AirbrakeLerper);
+        PlaneAnimator.SetFloat(HEALTH_STRING, EngineControl.Health * FullHealthDivider);
+        PlaneAnimator.SetFloat(AOA_STRING, vapor ? Mathf.Abs(EngineControl.AngleOfAttack * 0.00555555556f /* Divide by 180 */ ) : 0);
+        PlaneAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper);
     }
 
     private void LargeEffects()//large effects visible from a long distance

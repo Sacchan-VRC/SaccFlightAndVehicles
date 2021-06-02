@@ -406,7 +406,7 @@ public class SoundController : UdonSharpBehaviour
             {
                 PlaneDistant.Play();
             }
-            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 1, .72f * DeltaTime);
+            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleInitialVolume, .72f * DeltaTime);
             if (Doppler > 50)
             {
                 PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, 3 * DeltaTime);
