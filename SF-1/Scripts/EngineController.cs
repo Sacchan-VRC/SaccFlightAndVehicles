@@ -13,6 +13,7 @@ public class EngineController : UdonSharpBehaviour
     public Transform PlaneMesh;
     public int OnboardPlaneLayer = 19;
     public Transform CenterOfMass;
+    public Transform GroundEffectEmpty;
     public Transform PitchMoment;
     public Transform YawMoment;
     public Transform GroundDetector;
@@ -90,16 +91,19 @@ public class EngineController : UdonSharpBehaviour
     public float PitchStrength = 5f;
     public float PitchThrustVecMulti = 0f;
     public float PitchFriction = 24f;
+    public float PitchConstantFriction = 0f;
     public float PitchResponse = 20f;
     public float ReversingPitchStrengthMulti = 2;
     public float YawStrength = 3f;
     public float YawThrustVecMulti = 0f;
     public float YawFriction = 15f;
+    public float YawConstantFriction = 0f;
     public float YawResponse = 20f;
     public float ReversingYawStrengthMulti = 2.4f;
     public float RollStrength = 450f;
     public float RollThrustVecMulti = 0f;
     public float RollFriction = 90f;
+    public float RollConstantFriction = 0f;
     public float RollResponse = 20f;
     public float ReversingRollStrengthMulti = 1.6f;//reversing = AoA > 90
     public float PitchDownStrMulti = .8f;
@@ -135,6 +139,7 @@ public class EngineController : UdonSharpBehaviour
     public float HookedBrakeStrength = 55f;
     public float HookedCableSnapDistance = 120f;
     public float GroundEffectMaxDistance = 7;
+    public float VTOLGroundEffectStrength = 4;
     public float GroundEffectStrength = 4;
     public float GroundEffectLiftMax = 999999;
     public float CatapultLaunchStrength = 50f;
@@ -345,6 +350,7 @@ public class EngineController : UdonSharpBehaviour
     private float EngineOutputLastFrame;
     float VTOLAngle90;
     bool PlaneMoving = false;
+    bool HasWheelColliders = false;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -472,9 +478,17 @@ public class EngineController : UdonSharpBehaviour
         VTOLMaxAngleDivider = 1 / VTOLMaxAngle;
         InverseThrottleABPointDivider = 1 / (1 - ThrottleAfterBurnerPoint);
 
-        VTOLAngle = VTOLDefaultValue;
+        VTOLAngle = VTOLAngleInput = VTOLDefaultValue;
 
         if (NoCanopy) { HasCanopy = false; }
+
+        WheelCollider[] wc = PlaneMesh.GetComponentsInChildren<WheelCollider>(true);
+        if (wc.Length != 0) HasWheelColliders = true;
+        if (GroundEffectEmpty == null)
+        {
+            Debug.LogWarning("GroundEffectEmpty not found, using PitchMoment instead");
+            GroundEffectEmpty = PitchMoment;
+        }
     }
 
     private void LateUpdate()
@@ -511,7 +525,6 @@ public class EngineController : UdonSharpBehaviour
             //synced variables because rigidbody values aren't accessable by non-owner players
             CurrentVel = VehicleRigidbody.velocity;
             Speed = CurrentVel.magnitude;
-            Debug.Log(Speed);
             if (Speed > .1f)//don't bother doing all this for planes that arent moving and it therefore wont even effect
             {
                 WindAndAoA();//Planemoving is set true or false here
@@ -1880,7 +1893,7 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it. Heard it doesn't happen so bad if rigidbody weight is much higher.
-                if (Speed < .2 && ThrottleInput > 0)
+                if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
                 {
                     if (VTOLAngle > VTOL90Degrees)
                     { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
@@ -1915,7 +1928,7 @@ public class EngineController : UdonSharpBehaviour
             float sidespeed = 0;
             float downspeed = 0;
             float SpeedLiftFactor = 0;
-            float VelLiftFinal = 0;
+            bool Flaps = false;
 
             if (PlaneMoving)//optimization
             {
@@ -1954,22 +1967,7 @@ public class EngineController : UdonSharpBehaviour
                 LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
                 LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
 
-                bool Flaps = EffectsControl.Flaps;
-                //Ground effect, extra lift caused by air pressure when close to the ground
-                RaycastHit GE;
-                if (Physics.Raycast(PitchMoment.position, -VehicleTransform.up, out GE, GroundEffectMaxDistance, 2049 /* Default and Environment */, QueryTriggerInteraction.Collide))
-                {
-                    float GroundEffect = ((-GE.distance + GroundEffectMaxDistance) / GroundEffectMaxDistance) * GroundEffectStrength;
-                    if (Flaps) { GroundEffect *= FlapsLiftMulti; }
-                    VelLift = VelLiftStart + GroundEffect;
-                    VelLiftMax = Mathf.Max(VelLiftMaxStart, GroundEffectLiftMax);
-                }
-                else//set non-groundeffect'd vel lift values
-                {
-                    VelLift = VelLiftStart;
-                    VelLiftMax = VelLiftMaxStart;
-                }
-                VelLiftFinal = Mathf.Min(SpeedLiftFactor * AoALiftPitch * VelLift, VelLiftMax);
+                Flaps = EffectsControl.Flaps;
 
                 //flaps drag and lift
                 if (Flaps)
@@ -1997,20 +1995,20 @@ public class EngineController : UdonSharpBehaviour
             switch (CatapultStatus)
             {
                 case 0://normal
-                       //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
-                       //engine output is multiplied by so that max throttle without afterburner is max strength (unrelated to vtol)
+                    //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
+                    //engine output is multiplied by so that max throttle without afterburner is max strength (unrelated to vtol)
                     Vector3 FinalInputAcc;
+                    float GroundEffectAndVelLift = 0;
                     if (VTOLenabled)
                     {
                         float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
 
                         Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
+                        float vtolangledif = VTOLMaxAngle - VTOLMinAngle;
+                        float VTOLAngle2 = VTOLMinAngle + vtolangledif * VTOLAngle;//vtol angle in degrees
                         //rotate and scale Vector for VTOL thrust
                         if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
                         {
-                            float vtolangledif = VTOLMaxAngle - VTOLMinAngle;
-                            float VTOLAngle2 = VTOLMinAngle + vtolangledif * VTOLAngle;
-
                             FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
                         }
                         else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
@@ -2018,15 +2016,22 @@ public class EngineController : UdonSharpBehaviour
                             float downthrust = thrust * VTOLThrottleStrengthMulti;
                             FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLMaxAngle * VTOLAngle, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
                         }
+                        //add ground effect to the VTOL thrust
+                        GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, false, 1);
+                        FinalInputAcc *= GroundEffectAndVelLift;
+
+                        //Add Airplane Ground Effect
+                        GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
                         //add lift and thrust
                         FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                            ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + VelLiftFinal) * Atmosphere,// Y Up
+                            ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
                                 0);//(HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
                     }
                     else//Simpler version for non-VTOL craft
                     {
+                        GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
                         FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                            ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + VelLiftFinal) * Atmosphere,// Y Up
+                            ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
                                 (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
                     }
 
@@ -2037,10 +2042,11 @@ public class EngineController : UdonSharpBehaviour
                     //used to add rotation friction
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
+
                     //roll + rotational frictions
-                    Vector3 FinalInputRot = new Vector3(-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere,// X Pitch
-                        (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere,// Y Yaw
-                            (LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere);// Z Roll
+                    Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere) - (localAngularVelocity.x * PitchConstantFriction),// X Pitch
+                        (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere - (localAngularVelocity.y * YawConstantFriction),// Y Yaw
+                            ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere) - (localAngularVelocity.z * RollConstantFriction));// Z Roll
 
                     //create values for use in fixedupdate (control input and straightening forces)
                     Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
@@ -3242,6 +3248,26 @@ public class EngineController : UdonSharpBehaviour
         AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
 
         AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
+    }
+    private float GroundEffect(bool VTOL, Vector3 Position, Vector3 Direction, float GEStrength, bool Flaps, float speedliftfac)
+    {
+        //Ground effect, extra lift caused by air pressure when close to the ground
+        RaycastHit GE;
+        if (Physics.Raycast(Position, Direction, out GE, GroundEffectMaxDistance, 2049 /* Default and Environment */, QueryTriggerInteraction.Collide))
+        {
+            float GroundEffect = ((-GE.distance + GroundEffectMaxDistance) / GroundEffectMaxDistance) * GEStrength;
+            if (VTOL) { return 1 + GroundEffect; }
+            if (Flaps) { GroundEffect *= FlapsLiftMulti; }
+            VelLift = VelLiftStart + GroundEffect;
+            VelLiftMax = Mathf.Max(VelLiftMaxStart, VTOL ? 99999f : GroundEffectLiftMax);
+        }
+        else//set non-groundeffect'd vel lift values
+        {
+            if (VTOL) { return 1; }
+            VelLift = VelLiftStart;
+            VelLiftMax = VelLiftMaxStart;
+        }
+        return Mathf.Min(speedliftfac * AoALiftPitch * VelLift, VelLiftMax);
     }
     private void SetVTOLValues()
     {

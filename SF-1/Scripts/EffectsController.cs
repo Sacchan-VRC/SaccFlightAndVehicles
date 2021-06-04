@@ -37,6 +37,7 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool LargeEffectsOnly = false;
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
+    private bool InEditor;
     private int PITCHINPUT_STRING = Animator.StringToHash("pitchinput");
     private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
     private int ROLLINPUT_STRING = Animator.StringToHash("rollinput");
@@ -60,6 +61,11 @@ public class EffectsController : UdonSharpBehaviour
         FullHealthDivider = 1f / EngineControl.Health;
 
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
+        if (Networking.LocalPlayer == null)
+        {
+            InEditor = true;
+            PlaneAnimator.SetBool("occupied", true);
+        }
     }
     private void Update()
     {
@@ -178,7 +184,7 @@ public class EffectsController : UdonSharpBehaviour
         PlaneAnimator.SetFloat("rollinput", .5f);
         PlaneAnimator.SetFloat("throttle", 0);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
         PlaneAnimator.SetFloat("engineoutput", 0);
-        PlaneAnimator.SetBool("occupied", false);
+        if (!InEditor) { PlaneAnimator.SetBool("occupied", false); }
         DoEffects = 0f;//keep awake
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
