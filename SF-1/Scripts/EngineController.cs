@@ -47,6 +47,8 @@ public class EngineController : UdonSharpBehaviour
     public bool HasAfterburner = true;
     public float ThrottleAfterBurnerPoint = 0.8f;
     public bool VTOLOnly = false;
+    public bool NoCanopy = false;
+    [Header("Dial Functions Usable?")]
     public bool HasVTOLAngle = false;
     public bool HasLimits = true;
     public bool HasFlare = true;
@@ -64,11 +66,13 @@ public class EngineController : UdonSharpBehaviour
     public bool HasFlaps = true;
     public bool HasHook = true;
     public bool HasSmoke = true;
+    [Header("Response:")]
     public float ThrottleStrength = 20f;
     public bool VerticalThrottle = false;
     public float VTOLAngleTurnRate = 90f;
     public float VTOLDefaultValue = 0;
-    public float VTOLAdverseYaw = 0;
+    public float AdverseYaw = 0;
+    public float AdverseRoll = 0;
     public bool VTOLAllowAfterburner = false;
     public float VTOLThrottleStrengthMulti = .7f;
     public float VTOLMinAngle = 0;
@@ -137,6 +141,7 @@ public class EngineController : UdonSharpBehaviour
     public float CatapultLaunchTime = 2f;
     public float GLimiter = 12f;
     public float AoALimiter = 15f;
+    [Header("Other:")]
     public float CanopyCloseTime = 1.8f;
     public float SeaLevel = -10f;
     public Vector3 Wind;
@@ -339,6 +344,7 @@ public class EngineController : UdonSharpBehaviour
     private float InverseThrottleABPointDivider;
     private float EngineOutputLastFrame;
     float VTOLAngle90;
+    bool PlaneMoving = false;
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -371,8 +377,18 @@ public class EngineController : UdonSharpBehaviour
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
         //set these values at start in case they haven't been set correctly in editor
-        if (!HasCanopy) { EffectsControl.CanopyOpen = true; CanopyClosing(); }
-        else { EffectsControl.CanopyOpen = false; CanopyOpening(); }
+        if (!HasCanopy)
+        {
+            if (NoCanopy)
+            {
+                EffectsControl.CanopyOpen = false; CanopyOpening();
+            }
+            else
+            {
+                EffectsControl.CanopyOpen = true; CanopyClosing();
+            }
+        }
+        else { EffectsControl.CanopyOpen = false; CanopyOpening(); }//always spawn with canopy open if has one
         SetGearDown();
         if (!HasFlaps) { SetFlapsOff(); }
         else { SetFlapsOn(); }
@@ -432,9 +448,18 @@ public class EngineController : UdonSharpBehaviour
 
         //used to set each rotation axis' reversing behaviour to inverted if 0 thrust vectoring, and not inverted if thrust vectoring is non-zero.
         //the variables are called 'Zero' because they ask if thrustvec is set to 0.
-        ReversingPitchStrengthZeroStart = ReversingPitchStrengthZero = PitchThrustVecMulti == 0 ? -ReversingPitchStrengthMulti : 1;
-        ReversingYawStrengthZeroStart = ReversingYawStrengthZero = YawThrustVecMulti == 0 ? -ReversingYawStrengthMulti : 1;
-        ReversingRollStrengthZeroStart = ReversingRollStrengthZero = RollThrustVecMulti == 0 ? -ReversingRollStrengthMulti : 1;
+        if (VTOLOnly)//Never do this for heli-like vehicles
+        {
+            ReversingPitchStrengthZero = 1;
+            ReversingYawStrengthZero = 1;
+            ReversingRollStrengthZero = 1;
+        }
+        else
+        {
+            ReversingPitchStrengthZeroStart = ReversingPitchStrengthZero = PitchThrustVecMulti == 0 ? -ReversingPitchStrengthMulti : 1;
+            ReversingYawStrengthZeroStart = ReversingYawStrengthZero = YawThrustVecMulti == 0 ? -ReversingYawStrengthMulti : 1;
+            ReversingRollStrengthZeroStart = ReversingRollStrengthZero = RollThrustVecMulti == 0 ? -ReversingRollStrengthMulti : 1;
+        }
 
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
@@ -448,6 +473,8 @@ public class EngineController : UdonSharpBehaviour
         InverseThrottleABPointDivider = 1 / (1 - ThrottleAfterBurnerPoint);
 
         VTOLAngle = VTOLDefaultValue;
+
+        if (NoCanopy) { HasCanopy = false; }
     }
 
     private void LateUpdate()
@@ -484,46 +511,17 @@ public class EngineController : UdonSharpBehaviour
             //synced variables because rigidbody values aren't accessable by non-owner players
             CurrentVel = VehicleRigidbody.velocity;
             Speed = CurrentVel.magnitude;
-            bool PlaneMoving = false;
-            if (Speed > 0.3f)//don't bother doing all this for planes that arent moving and it therefore wont even effect
+            Debug.Log(Speed);
+            if (Speed > .1f)//don't bother doing all this for planes that arent moving and it therefore wont even effect
             {
-                PlaneMoving = true;//check this bool later for more optimizations
-                Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
-                float TimeGustiness = Time.time * WindGustiness;
-                float gustx = TimeGustiness + (VehicleTransform.position.x * WindTurbulanceScale);
-                float gustz = TimeGustiness + (VehicleTransform.position.z * WindTurbulanceScale);
-                FinalWind = Vector3.Normalize(new Vector3((Mathf.PerlinNoise(gustx + 9000, gustz) - .5f), /* (Mathf.PerlinNoise(gustx - 9000, gustz - 9000) - .5f) */0, (Mathf.PerlinNoise(gustx, gustz + 9999) - .5f))) * WindGustStrength;
-                FinalWind = (FinalWind + Wind) * Atmosphere;
-                AirVel = VehicleRigidbody.velocity - (FinalWind * StillWindMulti);
-                AirSpeed = AirVel.magnitude;
-                Vector3 VecForward = VehicleTransform.forward;
-                AngleOfAttackPitch = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.right);
-                AngleOfAttackYaw = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.up);
-
-                //angle of attack stuff, pitch and yaw are calculated seperately
-                //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
-                //the linear version is used for high aoa, and is 0 when at 90 degrees, and 1(multiplied by HighAoaMinControl) at 0. When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
-                AoALiftPitch = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / MaxAngleOfAttackPitch, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / MaxAngleOfAttackPitch);//angle of attack as 0-1 float, for backwards and forwards
-                AoALiftPitch = -AoALiftPitch + 1;
-                AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), AoaCurveStrength) + 1;//give it a curve
-
-                float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / 90);//linear version to 90 for high aoa
-                AoALiftPitchMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighPitchAoaMinControl, 0, 1);
-                AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
-
-                AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
-                AoALiftYaw = -AoALiftYaw + 1;
-                AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
-
-                float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
-                AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighYawAoaMinControl, 0, 1);
-                AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
-
-                AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
+                WindAndAoA();//Planemoving is set true or false here
             }
 
             if (Piloting)
             {
+                //gotta do these this if we're piloting but they didn't get done(specifically, hovering extremely slowly in a VTOL craft will cause control issues we don't)
+                if (!PlaneMoving)
+                { WindAndAoA(); }
                 if (RepeatingWorld)
                 {
                     if (CenterOfMass.position.z > RepeatingWorldDistance)
@@ -593,7 +591,7 @@ public class EngineController : UdonSharpBehaviour
 
 
                 //close canopy when moving fast, can't fly with it open
-                if (EffectsControl.CanopyOpen && Speed > 20)
+                if (Speed > 20 && EffectsControl.CanopyOpen && HasCanopy)
                 {
                     if (CanopyCloseTimer < -100000)
                     {
@@ -767,9 +765,9 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (HasVTOLAngle)
                     {
-                        float pgup = Input.GetKey(KeyCode.PageUp) ? DeltaTime * VTOLAngleTurnRate / VTOLMaxAngle : 0;
-                        float pgdn = Input.GetKey(KeyCode.PageDown) ? DeltaTime * VTOLAngleTurnRate / VTOLMaxAngle : 0;
-                        VTOLAngleInput = Mathf.Clamp(VTOLAngleInput + (pgdn - pgup), 0, 1);
+                        float pgup = Input.GetKey(KeyCode.PageUp) ? 1 : 0;
+                        float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
+                        VTOLAngleInput = Mathf.Clamp(VTOLAngleInput + ((pgdn - pgup) * DeltaTime * VTOLAngleTurnRate) / VTOLMaxAngle, 0, 1);
                     }
                     if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
                     { SetVTOLValues(); }
@@ -2014,7 +2012,6 @@ public class EngineController : UdonSharpBehaviour
                             float VTOLAngle2 = VTOLMinAngle + vtolangledif * VTOLAngle;
 
                             FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
-                            Debug.Log(VTOLAngle2);
                         }
                         else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
                         {
@@ -2033,16 +2030,17 @@ public class EngineController : UdonSharpBehaviour
                                 (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
                     }
 
-
-                    float Adverseyaw = (EngineOutput - EngineOutputLastFrame) * VTOLAdverseYaw;
+                    float outputdif = (EngineOutput - EngineOutputLastFrame);
+                    float ADVYaw = outputdif * AdverseYaw;
+                    float ADVRoll = outputdif * AdverseRoll;
                     EngineOutputLastFrame = EngineOutput;
                     //used to add rotation friction
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
                     //roll + rotational frictions
                     Vector3 FinalInputRot = new Vector3(-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere,// X Pitch
-                        (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + Adverseyaw * Atmosphere,// Y Yaw
-                            (LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) * Atmosphere);// Z Roll
+                        (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere,// Y Yaw
+                            (LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere);// Z Roll
 
                     //create values for use in fixedupdate (control input and straightening forces)
                     Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
@@ -3001,6 +2999,7 @@ public class EngineController : UdonSharpBehaviour
         PlayerThrottle = 0;
         IsFiringGun = false;
         VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
+        VTOLAngleInput = VTOLAngle;
 
         Piloting = true;
         if (dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
@@ -3208,22 +3207,69 @@ public class EngineController : UdonSharpBehaviour
             AAMTargets[0] = HUDControl.gameObject;//this should prevent HUDController from crashing with a null reference while causing no ill effects
         }
     }
+    private void WindAndAoA()
+    {
+        PlaneMoving = true;//check this bool later for more optimizations
+        Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
+        float TimeGustiness = Time.time * WindGustiness;
+        float gustx = TimeGustiness + (VehicleTransform.position.x * WindTurbulanceScale);
+        float gustz = TimeGustiness + (VehicleTransform.position.z * WindTurbulanceScale);
+        FinalWind = Vector3.Normalize(new Vector3((Mathf.PerlinNoise(gustx + 9000, gustz) - .5f), /* (Mathf.PerlinNoise(gustx - 9000, gustz - 9000) - .5f) */0, (Mathf.PerlinNoise(gustx, gustz + 9999) - .5f))) * WindGustStrength;
+        FinalWind = (FinalWind + Wind) * Atmosphere;
+        AirVel = VehicleRigidbody.velocity - (FinalWind * StillWindMulti);
+        AirSpeed = AirVel.magnitude;
+        Vector3 VecForward = VehicleTransform.forward;
+        AngleOfAttackPitch = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.right);
+        AngleOfAttackYaw = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.up);
+
+        //angle of attack stuff, pitch and yaw are calculated seperately
+        //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
+        //the linear version is used for high aoa, and is 0 when at 90 degrees, and 1(multiplied by HighAoaMinControl) at 0. When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
+        AoALiftPitch = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / MaxAngleOfAttackPitch, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / MaxAngleOfAttackPitch);//angle of attack as 0-1 float, for backwards and forwards
+        AoALiftPitch = -AoALiftPitch + 1;
+        AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), AoaCurveStrength) + 1;//give it a curve
+
+        float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / 90);//linear version to 90 for high aoa
+        AoALiftPitchMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighPitchAoaMinControl, 0, 1);
+        AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
+
+        AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
+        AoALiftYaw = -AoALiftYaw + 1;
+        AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
+
+        float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
+        AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighYawAoaMinControl, 0, 1);
+        AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
+
+        AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
+    }
     private void SetVTOLValues()
     {
         VTOLAngle = Mathf.MoveTowards(VTOLAngle, VTOLAngleInput, VTOLMaxAngleDivider * VTOLAngleTurnRate * Time.smoothDeltaTime);
         float SpeedForVTOL = (Mathf.Min(Speed / VTOLLoseControlSpeed, 1));
         if (VTOLAngle > 0 && SpeedForVTOL != 1 || VTOLOnly)
         {
-            VTOLAngle90 = VTOLOnly ? 1 : Mathf.Min(VTOLAngle / VTOL90Degrees, 1);
-            float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngle90;
+            if (VTOLOnly)
+            {
+                VTOLAngle90 = 1;
+                PitchThrustVecMulti = 1;
+                YawThrustVecMulti = 1;
+                RollThrustVecMulti = 1;
+            }
+            else
+            {
+                VTOLAngle90 = Mathf.Min(VTOLAngle / VTOL90Degrees, 1);
+                float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngle90;
 
-            PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
-            YawThrustVecMulti = Mathf.Lerp(YawThrustVecMultiStart, VTOLYawThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
-            RollThrustVecMulti = Mathf.Lerp(RollThrustVecMultiStart, VTOLRollThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
+                PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
+                YawThrustVecMulti = Mathf.Lerp(YawThrustVecMultiStart, VTOLYawThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
+                RollThrustVecMulti = Mathf.Lerp(RollThrustVecMultiStart, VTOLRollThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
 
-            ReversingPitchStrengthZero = 1;
-            ReversingYawStrengthZero = 1;
-            ReversingRollStrengthZero = 1;
+                ReversingPitchStrengthZero = 1;
+                ReversingYawStrengthZero = 1;
+                ReversingRollStrengthZero = 1;
+            }
+
 
             if (!VTOLAllowAfterburner)
             {
