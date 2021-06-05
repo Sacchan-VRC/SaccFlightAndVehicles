@@ -73,6 +73,7 @@ public class HUDController : UdonSharpBehaviour
     private Camera AtGCam;
     float debuglerper;
     float debugcurrentframe;
+    private float VTOLDefaultValue;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -124,6 +125,8 @@ public class HUDController : UdonSharpBehaviour
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
         float gunammo = EngineControl.GunAmmoInSeconds;
         FullGunAmmoDivider = 1f / (gunammo > 0 ? gunammo : 10000000);
+
+        VTOLDefaultValue = EngineControl.VTOLDefaultValue;
     }
     private void OnEnable()
     {
@@ -324,7 +327,7 @@ public class HUDController : UdonSharpBehaviour
         else { HUDText_knotstarget.text = string.Empty; }
 
         //left stick toggles/functions on?
-        if (EngineControl.VTOLAngle > 0) { LStick_funcon1.SetActive(true); }
+        if (EngineControl.VTOLAngle != VTOLDefaultValue) { LStick_funcon1.SetActive(true); }
         else { LStick_funcon1.SetActive(false); }
 
         if (EngineControl.FlightLimitsEnabled) { LStick_funcon2.SetActive(true); }

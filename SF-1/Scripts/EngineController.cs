@@ -43,7 +43,7 @@ public class EngineController : UdonSharpBehaviour
     public Transform[] BombLaunchPoints;
     [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
     public Scoreboard_Kills KillsBoard;
-    public bool RepeatingWorld = false;
+    public bool RepeatingWorld = true;
     public float RepeatingWorldDistance = 20000;
     public bool HasAfterburner = true;
     public float ThrottleAfterBurnerPoint = 0.8f;
@@ -82,7 +82,7 @@ public class EngineController : UdonSharpBehaviour
     public float VTOLYawThrustVecMulti = .3f;
     public float VTOLRollThrustVecMulti = .07f;
     public float VTOLLoseControlSpeed = 120;
-    public float GunRecoil = 1;
+    public float GunRecoil = 300;
     public float ThrottleSensitivity = 6f;
     public float AfterburnerThrustMulti = 1.5f;
     public float AccelerationResponse = 4.5f;
@@ -109,7 +109,7 @@ public class EngineController : UdonSharpBehaviour
     public float PitchDownStrMulti = .8f;
     public float PitchDownLiftMulti = .8f;
     public float InertiaTensorRotationMulti = 1;
-    public bool InvertAdverseYaw = false;
+    public bool InvertAdverseInertiaTensorRotationYaw = false;
     public float RotMultiMaxSpeed = 220f;
     //public float StickInputPower = 1.7f;
     public float VelStraightenStrPitch = 0.035f;
@@ -155,6 +155,10 @@ public class EngineController : UdonSharpBehaviour
     public float WindTurbulanceScale = 0.0001f;
     public float SoundBarrierStrength = 0.0003f;
     public float SoundBarrierWidth = 20f;
+    public float TouchDownSoundSpeed = 35;
+    [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
+    public float FuelConsumption = 2;
+    public float FuelConsumptionABMulti = 4.4f;
 
 
     //best to remove synced variables if you aren't using them
@@ -289,9 +293,6 @@ public class EngineController : UdonSharpBehaviour
     private Transform CatapultTransform;
     private float CatapultLaunchTimeStart;
     [System.NonSerializedAttribute] public float CanopyCloseTimer = -200000;
-    [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
-    public float FuelConsumption = 2;
-    public float FuelConsumptionABMulti = 4.4f;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
     [System.NonSerializedAttribute] public int NumAAMTargets = 0;
     private int AAMTargetChecker = 0;
@@ -440,11 +441,11 @@ public class EngineController : UdonSharpBehaviour
 
         VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
         VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
-        if (InvertAdverseYaw)
+        if (InvertAdverseInertiaTensorRotationYaw)
         {
-            Vector3 IRT = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
-            IRT.x *= -1;
-            VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(IRT);
+            Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
+            ITR.x *= -1;
+            VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
         }
         if (BombHoldDelay < BombDelay) { BombHoldDelay = BombDelay; }
 
@@ -2096,7 +2097,7 @@ public class EngineController : UdonSharpBehaviour
             SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
 
             //play a touchdown sound the frame we start taxiing
-            if (Landed == false && Taxiing == true && Speed > 35)
+            if (Landed == false && Taxiing == true && Speed > TouchDownSoundSpeed)
             {
                 if (SoundControl != null)
                 {
