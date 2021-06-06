@@ -41,7 +41,9 @@ public class EngineController : UdonSharpBehaviour
     public float BombHoldDelay = 0.5f;
     public float BombDelay = 0f;
     public Transform[] BombLaunchPoints;
+    public Transform GunRecoilEmpty;
     [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
+    public float GunRecoil = 150;
     public Scoreboard_Kills KillsBoard;
     public bool RepeatingWorld = true;
     public float RepeatingWorldDistance = 20000;
@@ -70,19 +72,6 @@ public class EngineController : UdonSharpBehaviour
     [Header("Response:")]
     public float ThrottleStrength = 20f;
     public bool VerticalThrottle = false;
-    public float VTOLAngleTurnRate = 90f;
-    public float VTOLDefaultValue = 0;
-    public float AdverseYaw = 0;
-    public float AdverseRoll = 0;
-    public bool VTOLAllowAfterburner = false;
-    public float VTOLThrottleStrengthMulti = .7f;
-    public float VTOLMinAngle = 0;
-    public float VTOLMaxAngle = 90;
-    public float VTOLPitchThrustVecMulti = .3f;
-    public float VTOLYawThrustVecMulti = .3f;
-    public float VTOLRollThrustVecMulti = .07f;
-    public float VTOLLoseControlSpeed = 120;
-    public float GunRecoil = 300;
     public float ThrottleSensitivity = 6f;
     public float AfterburnerThrustMulti = 1.5f;
     public float AccelerationResponse = 4.5f;
@@ -109,7 +98,9 @@ public class EngineController : UdonSharpBehaviour
     public float PitchDownStrMulti = .8f;
     public float PitchDownLiftMulti = .8f;
     public float InertiaTensorRotationMulti = 1;
-    public bool InvertAdverseInertiaTensorRotationYaw = false;
+    public bool InvertITRYaw = false;
+    public float AdverseYaw = 0;
+    public float AdverseRoll = 0;
     public float RotMultiMaxSpeed = 220f;
     //public float StickInputPower = 1.7f;
     public float VelStraightenStrPitch = 0.035f;
@@ -139,13 +130,24 @@ public class EngineController : UdonSharpBehaviour
     public float HookedBrakeStrength = 55f;
     public float HookedCableSnapDistance = 120f;
     public float GroundEffectMaxDistance = 7;
-    public float VTOLGroundEffectStrength = 4;
     public float GroundEffectStrength = 4;
     public float GroundEffectLiftMax = 999999;
     public float CatapultLaunchStrength = 50f;
     public float CatapultLaunchTime = 2f;
     public float GLimiter = 12f;
     public float AoALimiter = 15f;
+    [Header("Response VTOL:")]
+    public float VTOLAngleTurnRate = 90f;
+    public float VTOLDefaultValue = 0;
+    public bool VTOLAllowAfterburner = false;
+    public float VTOLThrottleStrengthMulti = .7f;
+    public float VTOLMinAngle = 0;
+    public float VTOLMaxAngle = 90;
+    public float VTOLPitchThrustVecMulti = .3f;
+    public float VTOLYawThrustVecMulti = .3f;
+    public float VTOLRollThrustVecMulti = .07f;
+    public float VTOLLoseControlSpeed = 120;
+    public float VTOLGroundEffectStrength = 4;
     [Header("Other:")]
     public float CanopyCloseTime = 1.8f;
     public float SeaLevel = -10f;
@@ -166,7 +168,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 CurrentVel = Vector3.zero;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float Gs = 1f;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 SmokeColor = Vector3.one;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
@@ -184,6 +186,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
     [System.NonSerializedAttribute] public Transform VehicleTransform;
     [System.NonSerializedAttribute] public Color SmokeColor_Color;
+    private VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
     private float LerpedRoll;
     private float LerpedPitch;
     private float LerpedYaw;
@@ -352,6 +355,32 @@ public class EngineController : UdonSharpBehaviour
     float VTOLAngle90;
     bool PlaneMoving = false;
     bool HasWheelColliders = false;
+    private bool GunRecoilEmptyNULL = true;
+    private int HOOKED_STRING = Animator.StringToHash("hooked");
+    private int FLARES_STRING = Animator.StringToHash("flares");
+    private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
+    private int AAMS_STRING = Animator.StringToHash("AAMs");
+    private int AGMLAUNCHED_STRING = Animator.StringToHash("agmlaunched");
+    private int AGMS_STRING = Animator.StringToHash("AGMs");
+    private int BOMBLAUNCHED_STRING = Animator.StringToHash("bomblaunched");
+    private int BOMBS_STRING = Animator.StringToHash("bombs");
+    private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
+    private int ONCATAPULT_STRING = Animator.StringToHash("oncatapult");
+    private int WEAPON_STRING = Animator.StringToHash("weapon");
+    private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
+    private int RESUPPLY_STRING = Animator.StringToHash("resupply");
+    private int CANOPYOPEN_STRING = Animator.StringToHash("canopyopen");
+    private int GEARUP_STRING = Animator.StringToHash("gearup");
+    private int FLAPS_STRING = Animator.StringToHash("flaps");
+    private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
+    private int DISPLAYSMOKE_STRING = Animator.StringToHash("displaysmoke");
+    private int BULLETHIT_STRING = Animator.StringToHash("bullethit");
+    private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
+    private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
+    private int LOCALPASSENGER_STRING = Animator.StringToHash("localpassenger");
+    private int OCCUPIED_STRING = Animator.StringToHash("occupied");
+    private int RESPAWN_STRING = Animator.StringToHash("respawn");
+
     //float MouseX;
     //float MouseY;
     //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
@@ -376,6 +405,9 @@ public class EngineController : UdonSharpBehaviour
         Assert(AGMLaunchPoint != null, "Start: AGMLaunchPoint != null");
         Assert(Bomb != null, "Start: Bomb != null");
         Assert(BombLaunchPoints.Length > 0, "Start: BombLaunchPoint.Length > 0");
+        Assert(GroundEffectEmpty != null, "Start: GroundEffectEmpty != null");
+        Assert(GunRecoilEmpty != null, "Start: GunRecoilEmpty != null");
+        Assert(KillsBoard != null, "Start: KillsBoard != null");
 
         LeaveButtons = HUDControl.gameObject.GetComponentsInChildren<LeaveVehicleButton>(true);//get componants even in disabled children
         Assert(LeaveButtons.Length > 0, "Start: Leavebuttons Set");
@@ -441,7 +473,7 @@ public class EngineController : UdonSharpBehaviour
 
         VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
         VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
-        if (InvertAdverseInertiaTensorRotationYaw)
+        if (InvertITRYaw)
         {
             Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
             ITR.x *= -1;
@@ -490,6 +522,13 @@ public class EngineController : UdonSharpBehaviour
             Debug.LogWarning("GroundEffectEmpty not found, using PitchMoment instead");
             GroundEffectEmpty = PitchMoment;
         }
+
+        VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)VehicleMainObj.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
+
+        if (GunRecoilEmpty != null)
+        {
+            GunRecoilEmptyNULL = false;
+        }
     }
 
     private void LateUpdate()
@@ -507,19 +546,13 @@ public class EngineController : UdonSharpBehaviour
             {
                 if (CenterOfMass.position.y < SeaLevel)//kill plane if in sea
                 {
-                    if (InEditor)//editor
-                        Explode();
-                    else//VRC
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
                 }
                 //G/crash Damage
                 Health -= Mathf.Max((Gs - MaxGs) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
                 if (Health <= 0f)//plane is ded
                 {
-                    if (InEditor)//editor
-                        Explode();
-                    else//VRC
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
                 }
             }
 
@@ -528,6 +561,7 @@ public class EngineController : UdonSharpBehaviour
             Speed = CurrentVel.magnitude;
             if (Speed > .1f)//don't bother doing all this for planes that arent moving and it therefore wont even effect
             {
+                PlaneMoving = true;//check this bool later for more optimizations
                 WindAndAoA();//Planemoving is set true or false here
             }
 
@@ -640,11 +674,7 @@ public class EngineController : UdonSharpBehaviour
                     if (CatapultStatus == 1)
                     {
                         CatapultStatus = 2;
-                        if (InEditor)
-                        {
-                            CatapultLaunchEffects();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects");
                     }
                 }
                 if (Input.GetKeyDown(KeyCode.H) && HasHook)
@@ -669,21 +699,13 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (RStickSelection == 1)
                     {
-                        if (InEditor)
-                        {
-                            RStick0();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                         RStickSelection = 0;
                     }
                     else
                     {
                         if (HUDControl != null) { HUDControl.GUN_TargetSpeedLerper = 0; }//reset targeting lerper
-                        if (InEditor)
-                        {
-                            RStick1();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1");
                         RStickSelection = 1;
                     }
                 }
@@ -692,20 +714,13 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (RStickSelection == 2)
                     {
-                        if (InEditor)
-                        {
-                            RStick0();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                         RStickSelection = 0;
                     }
                     else
                     {
-                        if (InEditor)
-                        {
-                            RStick2();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2"); }
+
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2");
                         RStickSelection = 2;
                     }
                 }
@@ -714,22 +729,14 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (RStickSelection == 3)
                     {
-                        if (InEditor)
-                        {
-                            RStick0();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                         RStickSelection = 0;
                     }
                     else
                     {
                         AGMUnlocking = 0;
                         AGMUnlockTimer = 0;
-                        if (InEditor)
-                        {
-                            RStick3();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3");
                         RStickSelection = 3;
                     }
                 }
@@ -738,20 +745,12 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (RStickSelection == 4)
                     {
-                        if (InEditor)
-                        {
-                            RStick0();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
                         RStickSelection = 0;
                     }
                     else
                     {
-                        if (InEditor)
-                        {
-                            RStick4();
-                        }
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4");
                         RStickSelection = 4;
                     }
                 }
@@ -770,8 +769,7 @@ public class EngineController : UdonSharpBehaviour
                 }
                 if (Input.GetKeyDown(KeyCode.X) && HasFlare)
                 {
-                    if (InEditor) { LaunchFlares(); }//editor
-                    else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares"); }//ingame
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares");
                 }
                 //////////////////END OF KEYBOARD CONTROLS////////////////////////////////////////////////////////
                 //brake, throttle, and afterburner are done later because they have to be to work
@@ -845,13 +843,7 @@ public class EngineController : UdonSharpBehaviour
                         if (HasGear)
                         {
                             if (WeaponSelected)
-                            {
-                                if (InEditor)
-                                {
-                                    RStick0();
-                                }
-                                else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
-                            }
+                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
                             RStickSelection = 5;
                         }
                     }
@@ -860,13 +852,7 @@ public class EngineController : UdonSharpBehaviour
                         if (HasFlaps)
                         {
                             if (WeaponSelected)
-                            {
-                                if (InEditor)
-                                {
-                                    RStick0();
-                                }
-                                else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
-                            }
+                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
                             RStickSelection = 6;
                         }
                     }
@@ -875,13 +861,7 @@ public class EngineController : UdonSharpBehaviour
                         if (HasHook)
                         {
                             if (WeaponSelected)
-                            {
-                                if (InEditor)
-                                {
-                                    RStick0();
-                                }
-                                else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
-                            }
+                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
                             RStickSelection = 7;
                         }
                     }
@@ -890,13 +870,7 @@ public class EngineController : UdonSharpBehaviour
                         if (HasSmoke)
                         {
                             if (WeaponSelected)
-                            {
-                                if (InEditor)
-                                {
-                                    RStick0();
-                                }
-                                else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
-                            }
+                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
                             RStickSelection = 8;
                         }
                     }
@@ -905,11 +879,7 @@ public class EngineController : UdonSharpBehaviour
                         if (HasGun && RStickSelection != 1)
                         {
                             if (HUDControl != null) { HUDControl.GUN_TargetSpeedLerper = 0; }//reset targeting lerper
-                            if (InEditor)
-                            {
-                                RStick1();
-                            }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1");
                             RStickSelection = 1;
                         }
                     }
@@ -918,11 +888,7 @@ public class EngineController : UdonSharpBehaviour
                         if (HasAAM && RStickSelection != 2)
                         {
                             AAMTargetedTimer = 2;
-                            if (InEditor)
-                            {
-                                RStick2();
-                            }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2");
                             RStickSelection = 2;
                         }
                     }
@@ -933,11 +899,7 @@ public class EngineController : UdonSharpBehaviour
                             AGMUnlocking = 0;
                             AGMUnlockTimer = 0;
 
-                            if (InEditor)
-                            {
-                                RStick3();
-                            }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3");
                             RStickSelection = 3;
                         }
                     }
@@ -945,11 +907,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (HasBomb && RStickSelection != 4)
                         {
-                            if (InEditor)
-                            {
-                                RStick4();
-                            }
-                            else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4");
                             RStickSelection = 4;
                         }
                     }
@@ -999,8 +957,7 @@ public class EngineController : UdonSharpBehaviour
                         {
                             if (!LTriggerLastFrame)
                             {
-                                if (InEditor) { LaunchFlares(); }//editor
-                                else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares"); }//ingame
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares");
                             }
 
                             AltHold = false;
@@ -1019,11 +976,7 @@ public class EngineController : UdonSharpBehaviour
                                 if (CatapultStatus == 1)
                                 {
                                     CatapultStatus = 2;
-                                    if (InEditor)
-                                    {
-                                        CatapultLaunchEffects();
-                                    }
-                                    else SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects");
+                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects");
                                 }
                             }
 
@@ -1184,7 +1137,15 @@ public class EngineController : UdonSharpBehaviour
                         {
                             IsFiringGun = true;
                             GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
-                            VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * DeltaTime);
+                            if (GunRecoilEmptyNULL)
+                            {
+                                VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime);
+                            }
+                            else
+                            {
+                                Debug.Log("RECOILINGINGING");
+                                VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in the same range as above*/, GunRecoilEmpty.position, ForceMode.Force);
+                            }
                             RTriggerLastFrame = true;
                         }
                         else { IsFiringGun = false; RTriggerLastFrame = false; }
@@ -1211,10 +1172,7 @@ public class EngineController : UdonSharpBehaviour
                                     if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                                     {
                                         AAMLastFiredTime = Time.time;
-                                        if (InEditor)
-                                        { LaunchAAM(); }
-                                        else
-                                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM"); }
+                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
                                         if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                                     }
                                 }
@@ -1245,10 +1203,7 @@ public class EngineController : UdonSharpBehaviour
                                         //double tap detected
                                         if (NumAGM > 0 && !Taxiing)
                                         {
-                                            if (InEditor)
-                                                LaunchAGM();
-                                            else
-                                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAGM");
+                                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAGM");
                                         }
                                         AGMUnlocking = 0;
                                     }
@@ -1346,10 +1301,7 @@ public class EngineController : UdonSharpBehaviour
                                 if (NumBomb > 0 && !Taxiing && ((Time.time - LastBombDropTime) > BombDelay))
                                 {
                                     LastBombDropTime = Time.time;
-                                    if (InEditor)
-                                        LaunchBomb();
-                                    else
-                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
+                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
                                 }
                             }
                             else//launch every BombHoldDelay
@@ -1357,10 +1309,7 @@ public class EngineController : UdonSharpBehaviour
                             {
                                 {
                                     LastBombDropTime = Time.time;
-                                    if (InEditor)
-                                        LaunchBomb();
-                                    else
-                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
+                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
                                 }
                             }
 
@@ -1613,14 +1562,7 @@ public class EngineController : UdonSharpBehaviour
                     {
                         if (Time.time - LastResupplyTime > 1)
                         {
-                            if (InEditor)
-                            {
-                                ResupplyPlane();
-                            }
-                            else
-                            {
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResupplyPlane");
-                            }
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResupplyPlane");
                         }
                     }
                     //check for catapult below us and attach if there is one    
@@ -1658,8 +1600,7 @@ public class EngineController : UdonSharpBehaviour
                                 dead = true;
                                 CatapultDeadTimer = 2;//to make
 
-                                if (InEditor) CatapultLockIn();
-                                else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockIn"); }
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockIn");
                                 /*  if (!SoundControl.CatapultLockNull)
                                  {
                                      //SoundControl.CatapultLock.play();
@@ -1823,7 +1764,7 @@ public class EngineController : UdonSharpBehaviour
                         HookedLoc = VehicleTransform.position;
                         Hooked = true;
                         HookedTime = Time.time;
-                        PlaneAnimator.SetTrigger("hooked");
+                        PlaneAnimator.SetTrigger(HOOKED_STRING);
                     }
                 }
                 //slow down if hooked and on the ground
@@ -1838,19 +1779,12 @@ public class EngineController : UdonSharpBehaviour
                             Health -= ((-HookedDelta + 2) / 2) * FullHealth;
                         }
                         Hooked = false;
-                        if (HookedDelta < 5)//if you catch a cable but go airborne before snapping it, keep your hook out and then land somewhere else
-                                            //you would hear the cablesnap sound when you touchdown, so limit it to within 5 seconds of hooking
-                                            //this results in 1 frame's worth of not being able to catch a cable but will rarely happen anyway
-                        {
-                            if (InEditor)
-                            {
-                                PlayCableSnap();
-                            }
-                            else
-                            {
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap");
-                            }
-                        }
+                        //if you catch a cable but go airborne before snapping it, keep your hook out and then land somewhere else
+                        //you would hear the cablesnap sound when you touchdown, so limit it to within 5 seconds of hooking
+                        //this results in 1 frame's worth of not being able to catch a cable if hook stays down after being 'hooked', not snapping and then trying to hook again
+                        //but that should be a very rare and unnoitcable(if it happens) occurance
+                        if (HookedDelta < 5)
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap"); }
                     }
 
                     if (Speed > HookedBrakeStrength * DeltaTime)
@@ -1996,65 +1930,73 @@ public class EngineController : UdonSharpBehaviour
             switch (CatapultStatus)
             {
                 case 0://normal
-                    //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
-                    //engine output is multiplied by so that max throttle without afterburner is max strength (unrelated to vtol)
-                    Vector3 FinalInputAcc;
-                    float GroundEffectAndVelLift = 0;
-                    if (VTOLenabled)
+                    if (PlaneMoving || Piloting)
                     {
-                        float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
-
-                        Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
-                        float vtolangledif = VTOLMaxAngle - VTOLMinAngle;
-                        float VTOLAngle2 = VTOLMinAngle + vtolangledif * VTOLAngle;//vtol angle in degrees
-                        //rotate and scale Vector for VTOL thrust
-                        if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
+                        //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
+                        //engine output is multiplied by so that max throttle without afterburner is max strength (unrelated to vtol)
+                        Vector3 FinalInputAcc;
+                        float GroundEffectAndVelLift = 0;
+                        if (VTOLenabled)
                         {
-                            FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
-                        }
-                        else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
-                        {
-                            float downthrust = thrust * VTOLThrottleStrengthMulti;
-                            FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLMaxAngle * VTOLAngle, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
-                        }
-                        //add ground effect to the VTOL thrust
-                        GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, false, 1);
-                        FinalInputAcc *= GroundEffectAndVelLift;
+                            float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
 
-                        //Add Airplane Ground Effect
-                        GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
-                        //add lift and thrust
-                        FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                            ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
-                                0);//(HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
+                            Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
+                            float vtolangledif = VTOLMaxAngle - VTOLMinAngle;
+                            float VTOLAngle2 = VTOLMinAngle + vtolangledif * VTOLAngle;//vtol angle in degrees
+                                                                                       //rotate and scale Vector for VTOL thrust
+                            if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
+                            {
+                                FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
+                            }
+                            else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
+                            {
+                                float downthrust = thrust * VTOLThrottleStrengthMulti;
+                                FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLMaxAngle * VTOLAngle, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
+                            }
+                            //add ground effect to the VTOL thrust
+                            GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, false, 1);
+                            FinalInputAcc *= GroundEffectAndVelLift;
+
+                            //Add Airplane Ground Effect
+                            GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
+                            //add lift and thrust
+                            FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
+                                ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
+                                    0);//(HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
+                        }
+                        else//Simpler version for non-VTOL craft
+                        {
+                            GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
+                            FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
+                                ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
+                                    (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
+                        }
+
+                        float outputdif = (EngineOutput - EngineOutputLastFrame);
+                        float ADVYaw = outputdif * AdverseYaw;
+                        float ADVRoll = outputdif * AdverseRoll;
+                        EngineOutputLastFrame = EngineOutput;
+                        //used to add rotation friction
+                        Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
+
+
+                        //roll + rotational frictions
+                        Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere) - (localAngularVelocity.x * PitchConstantFriction),// X Pitch
+                            (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere - (localAngularVelocity.y * YawConstantFriction),// Y Yaw
+                                ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere) - (localAngularVelocity.z * RollConstantFriction));// Z Roll
+
+                        //create values for use in fixedupdate (control input and straightening forces)
+                        Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
+                        Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
+
+                        VehicleConstantForce.relativeForce = FinalInputAcc;
+                        VehicleConstantForce.relativeTorque = FinalInputRot;
                     }
-                    else//Simpler version for non-VTOL craft
+                    else
                     {
-                        GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
-                        FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                            ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
-                                (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
+                        VehicleConstantForce.relativeForce = Vector3.zero;
+                        VehicleConstantForce.relativeTorque = Vector3.zero;
                     }
-
-                    float outputdif = (EngineOutput - EngineOutputLastFrame);
-                    float ADVYaw = outputdif * AdverseYaw;
-                    float ADVRoll = outputdif * AdverseRoll;
-                    EngineOutputLastFrame = EngineOutput;
-                    //used to add rotation friction
-                    Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
-
-
-                    //roll + rotational frictions
-                    Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere) - (localAngularVelocity.x * PitchConstantFriction),// X Pitch
-                        (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere - (localAngularVelocity.y * YawConstantFriction),// Y Yaw
-                            ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere) - (localAngularVelocity.z * RollConstantFriction));// Z Roll
-
-                    //create values for use in fixedupdate (control input and straightening forces)
-                    Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
-                    Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
-
-                    VehicleConstantForce.relativeForce = FinalInputAcc;
-                    VehicleConstantForce.relativeTorque = FinalInputRot;
                     break;
                 case 1://locked on catapult
                        //dead == invincible, turn off once a frame has passed since attaching
@@ -2086,8 +2028,7 @@ public class EngineController : UdonSharpBehaviour
                     CatapultLaunchTime -= DeltaTime;
                     if (CatapultLaunchTime < 0)
                     {
-                        if (InEditor) CatapultLockOff();
-                        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff"); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff");
                         dead = false;//just in case
                         CatapultStatus = 0;
                         Taxiinglerper = 0;
@@ -2101,10 +2042,7 @@ public class EngineController : UdonSharpBehaviour
             {
                 if (SoundControl != null)
                 {
-                    if (InEditor)
-                        SoundControl.PlayTouchDownSound();
-                    else
-                        SoundControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayTouchDownSound");
+                    SoundControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayTouchDownSound");
                 }
                 Landed = true;
             }
@@ -2172,13 +2110,13 @@ public class EngineController : UdonSharpBehaviour
     }
     public void LaunchFlares()
     {
-        PlaneAnimator.SetTrigger("flares");
+        PlaneAnimator.SetTrigger(FLARES_STRING);
     }
 
     public void LaunchAAM()
     {
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
-        PlaneAnimator.SetTrigger("aamlaunched");
+        PlaneAnimator.SetTrigger(AAMLAUNCHED_STRING);
         if (AAM != null)
         {
             GameObject NewAAM = VRCInstantiate(AAM);
@@ -2199,12 +2137,12 @@ public class EngineController : UdonSharpBehaviour
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = CurrentVel;
         }
-        PlaneAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
+        PlaneAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
     }
     public void LaunchAGM()
     {
         if (NumAGM > 0) { NumAGM--; }
-        PlaneAnimator.SetTrigger("agmlaunched");
+        PlaneAnimator.SetTrigger(AGMLAUNCHED_STRING);
         if (AGM != null)
         {
             GameObject NewAGM = VRCInstantiate(AGM);
@@ -2224,12 +2162,12 @@ public class EngineController : UdonSharpBehaviour
             NewAGM.SetActive(true);
             NewAGM.GetComponent<Rigidbody>().velocity = CurrentVel;
         }
-        PlaneAnimator.SetFloat("AGMs", (float)NumAGM * FullAGMsDivider);
+        PlaneAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
     }
     public void LaunchBomb()
     {
         if (NumBomb > 0) { NumBomb--; }
-        PlaneAnimator.SetTrigger("bomblaunched");
+        PlaneAnimator.SetTrigger(BOMBLAUNCHED_STRING);
         if (Bomb != null)
         {
             GameObject NewBomb = VRCInstantiate(Bomb);
@@ -2240,7 +2178,7 @@ public class EngineController : UdonSharpBehaviour
             BombPoint++;
             if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
         }
-        PlaneAnimator.SetFloat("bombs", (float)NumBomb * FullBombsDivider);
+        PlaneAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
     }
     void SortTargets(GameObject[] Targets, float[] order)
     {
@@ -2268,7 +2206,7 @@ public class EngineController : UdonSharpBehaviour
         if (TargetEngine != null)
         {
             if (TargetEngine.Piloting || TargetEngine.Passenger)
-            { TargetEngine.EffectsControl.PlaneAnimator.SetTrigger("radarlocked"); }
+            { TargetEngine.EffectsControl.PlaneAnimator.SetTrigger(RADARLOCKED_STRING); }
         }
     }
     public void CatapultLaunchEffects()
@@ -2292,39 +2230,39 @@ public class EngineController : UdonSharpBehaviour
     }
     public void CatapultLockIn()
     {
-        PlaneAnimator.SetBool("oncatapult", true);
+        PlaneAnimator.SetBool(ONCATAPULT_STRING, true);
         VehicleRigidbody.Sleep();//don't think this actually helps
         if (!SoundControl.CatapultLockNull) { SoundControl.CatapultLock.Play(); }
     }
     public void CatapultLockOff()
     {
-        PlaneAnimator.SetBool("oncatapult", false);
+        PlaneAnimator.SetBool(ONCATAPULT_STRING, false);
     }
     //these are used for syncing weapon selection for bomb bay doors animation etc
     public void RStick0()//Rstick is something other than a weapon
     {
         WeaponSelected = false;
-        PlaneAnimator.SetInteger("weapon", 0);
+        PlaneAnimator.SetInteger(WEAPON_STRING, 0);
     }
     public void RStick1()//GUN
     {
         WeaponSelected = true;
-        PlaneAnimator.SetInteger("weapon", 1);
+        PlaneAnimator.SetInteger(WEAPON_STRING, 1);
     }
     public void RStick2()//AAM
     {
         WeaponSelected = true;
-        PlaneAnimator.SetInteger("weapon", 2);
+        PlaneAnimator.SetInteger(WEAPON_STRING, 2);
     }
     public void RStick3()//AGM
     {
         WeaponSelected = true;
-        PlaneAnimator.SetInteger("weapon", 3);
+        PlaneAnimator.SetInteger(WEAPON_STRING, 3);
     }
     public void RStick4()//Bomb
     {
         WeaponSelected = true;
-        PlaneAnimator.SetInteger("weapon", 4);
+        PlaneAnimator.SetInteger(WEAPON_STRING, 4);
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
@@ -2376,14 +2314,7 @@ public class EngineController : UdonSharpBehaviour
         float time = Time.time;
         if (PlaneHitDetector.LastAttacker != null && (time - PlaneHitDetector.LastHitTime) < 5 && !Taxiing && ((time - PilotExitTime) < 5 || Occupied))
         {
-            if (InEditor)
-            {
-                PlaneHitDetector.LastAttacker.IncreaseKills();
-            }
-            else
-            {
-                PlaneHitDetector.LastAttacker.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "IncreaseKills");
-            }
+            PlaneHitDetector.LastAttacker.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "IncreaseKills");
         }
         //Update Kills board (person with most kills will probably show as having one less kill than they really have until they die, because synced variables will update after this)
         //waiting for VRC networking patch to fix
@@ -2527,10 +2458,7 @@ public class EngineController : UdonSharpBehaviour
                         if (AAMTargetedTimer > 1)
                         {
                             AAMTargetedTimer = 0;
-                            if (InEditor)
-                            { Targeted(); }
-                            else
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted"); }
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted");
                         }
                     }
                 }
@@ -2567,7 +2495,7 @@ public class EngineController : UdonSharpBehaviour
     public void SetAfterburnerOn()
     {
         EffectsControl.AfterburnerOn = true;
-        PlaneAnimator.SetBool("afterburneron", true);
+        PlaneAnimator.SetBool(AFTERBURNERON_STRING, true);
         if ((Piloting || Passenger) && (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000))
         {
             if (!SoundControl.ABOnInsideNull)
@@ -2584,30 +2512,18 @@ public class EngineController : UdonSharpBehaviour
     {
         EffectsControl.AfterburnerOn = false;
         Afterburner = 1;
-        PlaneAnimator.SetBool("afterburneron", false);
+        PlaneAnimator.SetBool(AFTERBURNERON_STRING, false);
     }
     private void ToggleAfterburner()
     {
         bool AfterburnerOn = EffectsControl.AfterburnerOn;
         if (!AfterburnerOn && ThrottleInput > 0.8)
         {
-            if (InEditor)
-            {
-                SetAfterburnerOn();
-            }
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
         }
         else if (AfterburnerOn)
         {
-            if (InEditor)
-            {
-                SetAfterburnerOff();
-            }
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
         }
     }
     public void ResupplyPlane()
@@ -2622,9 +2538,9 @@ public class EngineController : UdonSharpBehaviour
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
 
-        PlaneAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
-        PlaneAnimator.SetFloat("AGMs", (float)NumAGM * FullAGMsDivider);
-        PlaneAnimator.SetFloat("bombs", (float)NumBomb * FullBombsDivider);
+        PlaneAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
+        PlaneAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
+        PlaneAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
 
         /*Debug.Log(string.Concat("fuel ", Fuel));
           Debug.Log(string.Concat("FullFuel ", FullFuel));
@@ -2635,18 +2551,16 @@ public class EngineController : UdonSharpBehaviour
         Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
         Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
-        PlaneAnimator.SetTrigger("resupply");
+        PlaneAnimator.SetTrigger(RESUPPLY_STRING);
         BombPoint = 0;
     }
     public void SetCanopyOpen()
     {
-        if (InEditor) { CanopyOpening(); }
-        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
     }
     public void SetCanopyClosed()
     {
-        if (InEditor) { CanopyClosing(); }
-        else { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
     }
     public void CanopyOpening()
     {
@@ -2657,7 +2571,7 @@ public class EngineController : UdonSharpBehaviour
             { CanopyCloseTimer -= 100000 + CanopyCloseTime; }
             else
             { CanopyCloseTimer = -100000; }
-            PlaneAnimator.SetBool("canopyopen", true);
+            PlaneAnimator.SetBool(CANOPYOPEN_STRING, true);
         }
     }
     public void CanopyClosing()
@@ -2669,149 +2583,93 @@ public class EngineController : UdonSharpBehaviour
             { CanopyCloseTimer += 100000 + ((CanopyCloseTime * 2) + 0.1f); }//the 0.1 is for the delay in the animator that is needed because it's not set to write defaults
             else
             { CanopyCloseTimer = CanopyCloseTime; }
-            PlaneAnimator.SetBool("canopyopen", false);
+            PlaneAnimator.SetBool(CANOPYOPEN_STRING, false);
         }
     }
     public void SetGearUp()
     {
         EffectsControl.GearUp = true;
-        PlaneAnimator.SetBool("gearup", true);
+        PlaneAnimator.SetBool(GEARUP_STRING, true);
     }
     public void SetGearDown()
     {
         EffectsControl.GearUp = false;
-        PlaneAnimator.SetBool("gearup", false);
+        PlaneAnimator.SetBool(GEARUP_STRING, false);
     }
     public void ToggleGear()
     {
         if (!EffectsControl.GearUp)
         {
-            if (InEditor)
-            {
-                SetGearUp();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
         }
         else
         {
-            if (InEditor)
-            {
-                SetGearDown();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearDown");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearDown");
         }
     }
     public void SetFlapsOff()
     {
         EffectsControl.Flaps = false;
-        PlaneAnimator.SetBool("flaps", false);
+        PlaneAnimator.SetBool(FLAPS_STRING, false);
         FlapsDrag = 1;
         FlapsLift = 1;
     }
     public void SetFlapsOn()
     {
         EffectsControl.Flaps = true;
-        PlaneAnimator.SetBool("flaps", true);
+        PlaneAnimator.SetBool(FLAPS_STRING, true);
     }
     public void ToggleFlaps()
     {
         if (!EffectsControl.Flaps)
         {
-            if (InEditor)
-            {
-                SetFlapsOn();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOn");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOn");
         }
         else
         {
-            if (InEditor)
-            {
-                SetFlapsOff();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
         }
     }
     public void SetHookDown()
     {
         EffectsControl.HookDown = true;
-        PlaneAnimator.SetBool("hookdown", true);
+        PlaneAnimator.SetBool(HOOKDOWN_STRING, true);
     }
     public void SetHookUp()
     {
         EffectsControl.HookDown = false;
-        PlaneAnimator.SetBool("hookdown", false);
+        PlaneAnimator.SetBool(HOOKDOWN_STRING, false);
     }
     public void ToggleHook()
     {
         if (!EffectsControl.HookDown)
         {
-            if (InEditor)
-            {
-                SetHookDown();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown");
         }
         else
         {
-            if (InEditor)
-            {
-                SetHookUp();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookUp");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookUp");
         }
     }
     public void SetSmokingOn()
     {
         EffectsControl.Smoking = true;
-        PlaneAnimator.SetBool("displaysmoke", true);
+        PlaneAnimator.SetBool(DISPLAYSMOKE_STRING, true);
     }
     public void SetSmokingOff()
     {
         EffectsControl.Smoking = false;
-        PlaneAnimator.SetBool("displaysmoke", false);
+        PlaneAnimator.SetBool(DISPLAYSMOKE_STRING, false);
     }
     public void ToggleSmoking()
     {
         if (!EffectsControl.Smoking)
         {
-            if (InEditor)
-            {
-                SetSmokingOn();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn");
         }
         else
         {
-            if (InEditor)
-            {
-                SetSmokingOff();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
         }
     }
     public void SetLimitsOn()
@@ -2826,25 +2684,11 @@ public class EngineController : UdonSharpBehaviour
     {
         if (!FlightLimitsEnabled)
         {
-            if (InEditor)
-            {
-                SetLimitsOn();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn");
         }
         else
         {
-            if (InEditor)
-            {
-                SetLimitsOff();
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff");
         }
     }
     public void RespawnStatusLocal()//called when using respawn button
@@ -2852,7 +2696,7 @@ public class EngineController : UdonSharpBehaviour
         Networking.SetOwner(localPlayer, VehicleMainObj);
         Networking.SetOwner(localPlayer, gameObject);
         Networking.SetOwner(localPlayer, EffectsControl.gameObject);
-        VehicleTransform.position = new Vector3(VehicleTransform.position.x, -10000, VehicleTransform.position.z);
+        //VehicleTransform.position = new Vector3(VehicleTransform.position.x, -10000, VehicleTransform.position.z);
         Atmosphere = 1;//planemoving optimization requires this to be here
         //synced variables
         Health = FullHealth;
@@ -2860,6 +2704,7 @@ public class EngineController : UdonSharpBehaviour
         GunAmmoInSeconds = FullGunAmmo;
         VTOLAngle = VTOLDefaultValue;
         VTOLAngleInput = VTOLDefaultValue;
+        VehicleObjectSync.Respawn();//this works if done just locally
     }
     public void ResetStatus()//called globally when using respawn button
     {
@@ -2875,13 +2720,13 @@ public class EngineController : UdonSharpBehaviour
         NumAAM = FullAAMs;
         NumAGM = FullAGMs;
         NumBomb = FullBombs;
-        PlaneAnimator.SetFloat("AAMs", 1);
-        PlaneAnimator.SetFloat("AGMs", 1);
-        PlaneAnimator.SetFloat("bombs", 1);
+        PlaneAnimator.SetFloat(AAMS_STRING, 1);
+        PlaneAnimator.SetFloat(AGMS_STRING, 1);
+        PlaneAnimator.SetFloat(BOMBS_STRING, 1);
         BombPoint = 0;
         //these two make it invincible and unable to be respawned again for 5s
         dead = true;
-        PlaneAnimator.SetTrigger("respawn");
+        PlaneAnimator.SetTrigger(RESPAWN_STRING);
     }
     public void PlaneHit()
     {
@@ -2892,7 +2737,7 @@ public class EngineController : UdonSharpBehaviour
         if (EffectsControl != null)
         {
             EffectsControl.DoEffects = 0f;
-            PlaneAnimator.SetTrigger("bullethit");
+            PlaneAnimator.SetTrigger(BULLETHIT_STRING);
         }
 
         if (SoundControl != null && !SoundControl.BulletHitNull)
@@ -2907,7 +2752,7 @@ public class EngineController : UdonSharpBehaviour
         PlayerThrottle = 0;//for editor test mode
         EngineOutput = 0;//^
         EffectsControl.DoEffects = 6f; //wake up if was asleep
-        EffectsControl.PlaneAnimator.SetTrigger("instantgeardown");
+        EffectsControl.PlaneAnimator.SetTrigger(INSTANTGEARDOWN_STRING);
         MissilesIncoming = 0;
         if (InEditor)
         {
@@ -2938,59 +2783,52 @@ public class EngineController : UdonSharpBehaviour
             {
                 if (!EffectsControl.CanopyOpen)
                 {
-                    if (InEditor)//editor
-                    { SetCanopyClosed(); }
-                    else//VRC
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetCanopyClosed"); }
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetCanopyClosed");
                 }
             }
             if (HasSmoke)
             {
                 if (EffectsControl.Smoking)
                 {
-                    if (InEditor)//editor
-                    { SetSmokingOn(); }
-                    else//VRC
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn"); }
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn");
                 }
             }
             if (HasGear)
             {
                 if (EffectsControl.GearUp)
                 {
-                    if (InEditor)//editor
-                    { SetGearUp(); }
-                    else//VRC
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp"); }
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
                 }
             }
             if (HasFlaps)
             {
                 if (!EffectsControl.Flaps)
                 {
-                    if (InEditor)//editor
-                    { SetFlapsOff(); }
-                    else//VRC
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff"); }
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
                 }
             }
         }
     }
-    public void PasengerEnterPlaneLocal()
+    public void PassengerEnterPlaneLocal()
     {
         Passenger = true;
         if (HUDControl != null) { HUDControl.gameObject.SetActive(true); }
         if (EffectsControl.CanopyOpen) CanopyCloseTimer = -100001;
         else CanopyCloseTimer = -1;
 
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool("localpassenger", true); }
-        if (PlaneMesh != null)
-        {
-            foreach (Transform child in PlaneMeshParts)
-            {
-                child.gameObject.layer = OnboardPlaneLayer;
-            }
-        }
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool(LOCALPASSENGER_STRING, true); }
+        SetPlaneLayerInside();
+    }
+    public void PassengerExitPlaneLocal()
+    {
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
+        Passenger = false;
+        localPlayer.SetVelocity(CurrentVel);
+        MissilesIncoming = 0;
+        EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
+
+        if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
+        SetPlaneLayerOutside();
     }
     public void PilotEnterPlaneLocal()//called from PilotSeat
     {
@@ -3030,16 +2868,9 @@ public class EngineController : UdonSharpBehaviour
         Gs = 0;
         LastFrameVel = CurrentVel;
 
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool("localpilot", true); }
+        SetPlaneLayerInside();
 
-        if (PlaneMesh != null)
-        {
-            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
-            foreach (Transform child in children)
-            {
-                child.gameObject.layer = OnboardPlaneLayer;
-            }
-        }
+        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool(LOCALPILOT_STRING, true); }
 
         //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
         var Target = AAMTargets[AAMTarget];
@@ -3060,7 +2891,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (EffectsControl != null)
         {
-            PlaneAnimator.SetBool("occupied", true);
+            PlaneAnimator.SetBool(OCCUPIED_STRING, true);
             EffectsControl.DoEffects = 0f;
         }
         dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
@@ -3121,27 +2952,36 @@ public class EngineController : UdonSharpBehaviour
 
             if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
             //set plane's layer back
-            if (PlaneMesh != null)
-            {
-                foreach (Transform child in PlaneMeshParts)
-                {
-                    child.gameObject.layer = Planelayer;
-                }
-            }
+            SetPlaneLayerOutside();
         }
         if (KillsBoard != null)
         {
             Scoreboard_Kills killsboard = KillsBoard;
             if (killsboard.MyKills == killsboard.TopKills)
             {
-                if (InEditor)
-                {
-                    killsboard.UpdateScores();
-                }
-                else
-                {
-                    killsboard.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "UpdateScores");
-                }
+                killsboard.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "UpdateScores");
+            }
+        }
+    }
+    public void SetPlaneLayerInside()
+    {
+        if (PlaneMesh != null)
+        {
+            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+            foreach (Transform child in children)
+            {
+                child.gameObject.layer = OnboardPlaneLayer;
+            }
+        }
+    }
+    public void SetPlaneLayerOutside()
+    {
+        if (PlaneMesh != null)
+        {
+            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+            foreach (Transform child in children)
+            {
+                child.gameObject.layer = Planelayer;
             }
         }
     }
@@ -3216,7 +3056,6 @@ public class EngineController : UdonSharpBehaviour
     }
     private void WindAndAoA()
     {
-        PlaneMoving = true;//check this bool later for more optimizations
         Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
         float TimeGustiness = Time.time * WindGustiness;
         float gustx = TimeGustiness + (VehicleTransform.position.x * WindTurbulanceScale);
@@ -3248,7 +3087,7 @@ public class EngineController : UdonSharpBehaviour
         AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighYawAoaMinControl, 0, 1);
         AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
 
-        AngleOfAttack = Mathf.Max(AngleOfAttackPitch, AngleOfAttackYaw);
+        AngleOfAttack = Mathf.Max(Mathf.Abs(AngleOfAttackPitch), Mathf.Abs(AngleOfAttackYaw));
     }
     private float GroundEffect(bool VTOL, Vector3 Position, Vector3 Direction, float GEStrength, bool Flaps, float speedliftfac)
     {

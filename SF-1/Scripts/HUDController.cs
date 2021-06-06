@@ -74,6 +74,8 @@ public class HUDController : UdonSharpBehaviour
     float debuglerper;
     float debugcurrentframe;
     private float VTOLDefaultValue;
+    private int FUEL_STRING = Animator.StringToHash("fuel");
+    private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -457,8 +459,8 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.HasBomb) HUDText_Bomb_ammo.text = EngineControl.NumBomb.ToString("F0");
         else HUDText_Bomb_ammo.text = string.Empty;
 
-        PlaneAnimator.SetFloat("fuel", EngineControl.Fuel * FullFuelDivider);
-        PlaneAnimator.SetFloat("gunammo", EngineControl.GunAmmoInSeconds * FullGunAmmoDivider);
+        PlaneAnimator.SetFloat(FUEL_STRING, EngineControl.Fuel * FullFuelDivider);
+        PlaneAnimator.SetFloat(GUNAMMO_STRING, EngineControl.GunAmmoInSeconds * FullGunAmmoDivider);
     }
     private void Assert(bool condition, string message)
     {

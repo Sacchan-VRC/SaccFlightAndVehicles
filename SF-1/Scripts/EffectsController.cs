@@ -38,6 +38,8 @@ public class EffectsController : UdonSharpBehaviour
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
     private bool InEditor;
+    private int GUNFIRING_STRING = Animator.StringToHash("gunfiring");
+    private int OCCUPIED_STRING = Animator.StringToHash("occupied");
     private int PITCHINPUT_STRING = Animator.StringToHash("pitchinput");
     private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
     private int ROLLINPUT_STRING = Animator.StringToHash("rollinput");
@@ -47,6 +49,20 @@ public class EffectsController : UdonSharpBehaviour
     private int HEALTH_STRING = Animator.StringToHash("health");
     private int AOA_STRING = Animator.StringToHash("AoA");
     private int BRAKE_STRING = Animator.StringToHash("brake");
+    private int MACH10_STRING = Animator.StringToHash("mach10");
+    private int GS_STRING = Animator.StringToHash("Gs");
+    private int GS_TRAIL_STRING = Animator.StringToHash("Gs_trail");
+    private int WEAPON_STRING = Animator.StringToHash("weapon");
+    private int BOMB_STRING = Animator.StringToHash("bombs");
+    private int AAMS_STRING = Animator.StringToHash("AAMs");
+    private int AGMS_STRING = Animator.StringToHash("AGMs");
+    private int RESPAWN_STRING = Animator.StringToHash("respawn");
+    private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
+    private int EXPLODE_STRING = Animator.StringToHash("explode");
+    private int MISSILESINCOMING_STRING = Animator.StringToHash("missilesincoming");
+    private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
+
+
     private void Start()
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
@@ -64,7 +80,7 @@ public class EffectsController : UdonSharpBehaviour
         if (Networking.LocalPlayer == null)
         {
             InEditor = true;
-            PlaneAnimator.SetBool("occupied", true);
+            PlaneAnimator.SetBool(OCCUPIED_STRING, true);
         }
     }
     private void Update()
@@ -130,7 +146,7 @@ public class EffectsController : UdonSharpBehaviour
     private void LargeEffects()//large effects visible from a long distance
     {
         float DeltaTime = Time.deltaTime;
-        PlaneAnimator.SetBool("gunfiring", EngineControl.IsFiringGun);
+        PlaneAnimator.SetBool(GUNFIRING_STRING, EngineControl.IsFiringGun);
         if (EngineControl.Occupied)
         {
             if (Smoking && !DisplaySmokeNull)
@@ -154,47 +170,47 @@ public class EffectsController : UdonSharpBehaviour
             Gs_trail = Mathf.Lerp(Gs_trail, EngineControl.Gs, 2.7f * DeltaTime);//linger for a bit before cutting off
         }
         //("mach10", EngineControl.Speed / 343 / 10)
-        PlaneAnimator.SetFloat("mach10", EngineControl.Speed * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
+        PlaneAnimator.SetFloat(MACH10_STRING, EngineControl.Speed * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
         //("Gs", vapor ? EngineControl.Gs / 50 : 0)
-        PlaneAnimator.SetFloat("Gs", vapor ? EngineControl.Gs * 0.02f : 0);
+        PlaneAnimator.SetFloat(GS_STRING, vapor ? EngineControl.Gs * 0.02f : 0);
         //("Gs_trail", vapor ? Gs_trail / 50 : 0);
-        PlaneAnimator.SetFloat("Gs_trail", vapor ? Gs_trail * 0.02f : 0);
+        PlaneAnimator.SetFloat(GS_TRAIL_STRING, vapor ? Gs_trail * 0.02f : 0);
     }
     public void EffectsResetStatus()//called from enginecontroller.Explode();
     {
         DoEffects = 6;
-        PlaneAnimator.SetInteger("weapon", 4);
-        PlaneAnimator.SetFloat("bombs", 1);
-        PlaneAnimator.SetFloat("AAMs", 1);
-        PlaneAnimator.SetFloat("AGMs", 1);
-        PlaneAnimator.SetTrigger("respawn");//this animation disables EngineControl.dead after 2.5s
-        PlaneAnimator.SetTrigger("instantgeardown");
+        PlaneAnimator.SetInteger(WEAPON_STRING, 4);
+        PlaneAnimator.SetFloat(BOMB_STRING, 1);
+        PlaneAnimator.SetFloat(AAMS_STRING, 1);
+        PlaneAnimator.SetFloat(AGMS_STRING, 1);
+        PlaneAnimator.SetTrigger(RESPAWN_STRING);//this animation disables EngineControl.dead after 2.5s
+        PlaneAnimator.SetTrigger(INSTANTGEARDOWN_STRING);
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
     public void EffectsExplode()//called from enginecontroller.explode();
     {
-        PlaneAnimator.SetTrigger("explode");
-        PlaneAnimator.SetFloat("bombs", 1);
-        PlaneAnimator.SetFloat("AAMs", 1);
-        PlaneAnimator.SetFloat("AGMs", 1);
-        PlaneAnimator.SetInteger("missilesincoming", 0);
-        PlaneAnimator.SetInteger("weapon", 0);
-        PlaneAnimator.SetFloat("pitchinput", .5f);
-        PlaneAnimator.SetFloat("yawinput", .5f);
-        PlaneAnimator.SetFloat("rollinput", .5f);
-        PlaneAnimator.SetFloat("throttle", 0);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
-        PlaneAnimator.SetFloat("engineoutput", 0);
-        if (!InEditor) { PlaneAnimator.SetBool("occupied", false); }
+        PlaneAnimator.SetTrigger(EXPLODE_STRING);
+        PlaneAnimator.SetFloat(BOMB_STRING, 1);
+        PlaneAnimator.SetFloat(AAMS_STRING, 1);
+        PlaneAnimator.SetFloat(AGMS_STRING, 1);
+        PlaneAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
+        PlaneAnimator.SetInteger(WEAPON_STRING, 0);
+        PlaneAnimator.SetFloat(PITCHINPUT_STRING, .5f);
+        PlaneAnimator.SetFloat(YAWINPUT_STRING, .5f);
+        PlaneAnimator.SetFloat(ROLLINPUT_STRING, .5f);
+        PlaneAnimator.SetFloat(THROTTLE_STRING, 0);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
+        PlaneAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);
+        if (!InEditor) { PlaneAnimator.SetBool(OCCUPIED_STRING, false); }
         DoEffects = 0f;//keep awake
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
     public void EffectsLeavePlane()
     {
         Smoking = false;
-        PlaneAnimator.SetBool("gunfiring", false);
-        PlaneAnimator.SetBool("occupied", false);
-        PlaneAnimator.SetInteger("missilesincoming", 0);
-        PlaneAnimator.SetBool("localpilot", false);
+        PlaneAnimator.SetBool(GUNFIRING_STRING, false);
+        PlaneAnimator.SetBool(OCCUPIED_STRING, false);
+        PlaneAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
+        PlaneAnimator.SetBool(LOCALPILOT_STRING, false);
     }
     private void Assert(bool condition, string message)
     {

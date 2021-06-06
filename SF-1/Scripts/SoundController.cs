@@ -90,6 +90,8 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool playsonicboom;
     private float MaxAudibleDistance;
     private bool TooFarToHear = false;
+    private bool InEditor = true;
+    private Transform CenterOfMass;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -145,6 +147,9 @@ public class SoundController : UdonSharpBehaviour
         ExplosionNull = (Explosion.Length < 1) ? true : false;
         BulletHitNull = (BulletHit.Length < 1) ? true : false;
 
+        if (Networking.LocalPlayer != null)
+        { InEditor = false; }
+        CenterOfMass = EngineControl.CenterOfMass;
 
         if (!PlaneInsideNull)
         {
@@ -239,9 +244,9 @@ public class SoundController : UdonSharpBehaviour
         {
             float SmoothDeltaTime = Time.smoothDeltaTime;
             //find distance to player or testcamera
-            if (!EngineControl.InEditor) //ingame
+            if (!InEditor)
             {
-                ThisFrameDist = Vector3.Distance(EngineControl.localPlayer.GetPosition(), EngineControl.CenterOfMass.position);
+                ThisFrameDist = Vector3.Distance(EngineControl.localPlayer.GetPosition(), CenterOfMass.position);
                 if (ThisFrameDist > MaxAudibleDistance)
                 {
                     LastFrameDist = ThisFrameDist; TooFarToHear = true;
@@ -249,11 +254,11 @@ public class SoundController : UdonSharpBehaviour
                 else
                 {
                     TooFarToHear = false;
-                } // too far away to hear, so just stop
+                }
             }
             else if ((testcamera != null))//editor and testcamera is set
             {
-                ThisFrameDist = Vector3.Distance(testcamera.transform.position, EngineControl.CenterOfMass.position);
+                ThisFrameDist = Vector3.Distance(testcamera.transform.position, CenterOfMass.position);
             }
 
             relativespeed = (ThisFrameDist - LastFrameDist);

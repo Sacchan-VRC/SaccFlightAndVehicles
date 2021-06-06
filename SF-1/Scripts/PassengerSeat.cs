@@ -25,7 +25,7 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     private void Interact()
     {
-        EngineControl.PasengerEnterPlaneLocal();
+        EngineControl.PassengerEnterPlaneLocal();
         if (LeaveButton != null) { LeaveButton.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
         EngineControl.localPlayer.UseAttachedStation();
@@ -72,6 +72,7 @@ public class PassengerSeat : UdonSharpBehaviour
             SetVoiceOutside(player);
             if (player.isLocal)
             {
+                EngineControl.PassengerExitPlaneLocal();
                 //undo voice distances of all players inside the vehicle
                 foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
                 {
@@ -81,25 +82,8 @@ public class PassengerSeat : UdonSharpBehaviour
                         SetVoiceOutside(guy);
                     }
                 }
-                if (EngineControl != null)
-                {
-                    if (EngineControl.EffectsControl != null) { EngineControl.EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
-                    EngineControl.Passenger = false;
-                    EngineControl.localPlayer.SetVelocity(EngineControl.CurrentVel);
-                    EngineControl.MissilesIncoming = 0;
-                    EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
-                }
                 if (LeaveButton != null) { LeaveButton.SetActive(false); }
                 if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
-                if (EngineControl.HUDControl != null) { EngineControl.HUDControl.gameObject.SetActive(false); }
-                if (PlaneMesh != null)
-                {
-                    Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
-                    foreach (Transform child in children)
-                    {
-                        child.gameObject.layer = Planelayer;
-                    }
-                }
             }
         }
     }
