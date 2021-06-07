@@ -10,6 +10,7 @@ public class AAGunSeat : UdonSharpBehaviour
     public GameObject HUDControl;
     public GameObject SeatAdjuster;
     private Animator AAGunAnimator;
+    private VRCPlayerApi localPlayer;
     void Start()
     {
         Assert(AAGunControl != null, "Start: AAGunControl != null");
@@ -17,6 +18,8 @@ public class AAGunSeat : UdonSharpBehaviour
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
         if (AAGunControl.VehicleMainObj != null) { AAGunAnimator = AAGunControl.VehicleMainObj.GetComponent<Animator>(); }
+
+        localPlayer = Networking.LocalPlayer;
     }
     private void Interact()
     {
@@ -38,6 +41,10 @@ public class AAGunSeat : UdonSharpBehaviour
         if (Target && Target.transform.parent)
         {
             AAGunControl.AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
+        }
+        if (localPlayer != null && localPlayer.IsUserInVR())
+        {
+            AAGunControl.InVR = true;//has to be set on enter otherwise Built And Test thinks you're in desktop
         }
     }
     public override void OnStationEntered(VRCPlayerApi player)

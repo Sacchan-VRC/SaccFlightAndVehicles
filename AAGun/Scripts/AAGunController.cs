@@ -60,7 +60,7 @@ public class AAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Vector3 AAMCurrentTargetDirection;
     [System.NonSerializedAttribute] public EngineController AAMCurrentTargetEngineControl;
     private float AAMTargetObscuredDelay;
-    private bool InVR;
+    [System.NonSerializedAttribute] public bool InVR;
     Quaternion AAGunRotLastFrame;
     Quaternion JoystickZeroPoint;
     [System.NonSerializedAttribute] public bool RGripLastFrame = false;

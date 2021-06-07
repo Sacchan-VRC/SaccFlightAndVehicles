@@ -10,6 +10,18 @@ https://liberapay.com/Sacchan-VRC/
 Bitcoin:bc1q40l0d3582twp3rga4wjrwhepwse4esz4x5y5wa
 ETH:0x975aeF286851BB6E43AaF2299b17045ad1D0eab8
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Large Update 1.4
+•Added VTOL functionality and variables
+•Replaced Afterburner dial function with VTOL Angle
+•Afterburner now activated by pushing the throttle to max
+•Added SH-1 helicopter example vehicle
+•Added SF-1VTOL example vehicle
+•Textures for SF-1
+•Adverse Yaw and Roll options
+•Gun recoil option
+•Option to totally disable canopy for open cockpit vehicles
+•Various small optimizations
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.393
 •Compatibility for VRChat Networking Update
 •Throttle Now Unaffected by Object Scale
@@ -195,11 +207,8 @@ Implemented (unrealistic) increased lift at higher speeds, you can now fall down
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Changes for people wishing to update from recent versions:
-EffectsController no longer controls movement of control surfaces, or the enginefire. Instead floats are sent to the animator called pitchinput, yawinput, rollinput, engineoutput, and afterburneron. Please look at the SF-1's animations and create your own accordingly.
-Set the Gravity Modifier on your bullet particles to 1 (Don't forget the _pilot variants!), or just copy over the entirety of the new particle system's settings
-Missile explode animation changed to allow more easily customizing missile model without changing the animation.
-The 'bigstuff' object inside HUDController has been reduced in scale from 8000 to 740, to keep the HUD within the default camera range (and allow WMR users to see the HUD, as there is a view range bug for WMR users in VRChat)
+Place the SaccFlightAndVehicles object into a scene, and it should work right away. If you only want one vehicle, it's okay to just drag it out of the prefab. You can also duplicate it as many times as you wish.
+If you duplicate a vehicle, it will not work with the windchanger, or race system until you add its enginecontroller to the windchanger, or the racetrigger to the RaceToggleButton.
 
 Race set up:
 There's an object called RacingTrigger inside the PilotLeaveButton object (because it's the only object that is only enabled for just the pilot) you can remove this if you don't intend to use it. It should be disabled by default, it's enabled when a race is selected with the racebutton.
@@ -244,6 +253,14 @@ Vel Lift value is used to decide how quickly the plane reaches Vel Lift Max.
 If you make a heavier plane with a greater rigidbody mass value, you will have to tweak all of the values a lot.
 Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue. (it's 0 when you're owner of the plane, 0.3 when your not)
 
+Tips for VTOL Only aircraft:
+For helicopters, keep the VTOL Thrust Vec values at 1, and adjust Pitch Yaw and Roll Strength
+Pitch Down Lift Strength has a pretty big effect on how fast the vehicle can move forwards
+The constant friction values are intended for helicopters (gyroscopic forces stop rotation)
+You can make the tilt angle larger than implied in order to make the vehicle faster
+Reducing adverse yaw will make the vehicle much easier to control
+the Vel Straighten values are just as important for the handling of helicopters as planes
+
 The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
 
 Never leave an entry of an array input empty in EffectsController and SoundController, it'll cause them to crash.
@@ -275,7 +292,7 @@ EngineOutputAB
 Pitch
 Yaw
 Roll
-Remember for animations that are controlled by floats (normalized time), set the curves to linear.
+Remember for animations that are controlled by floats that use normalized time, set the transition curves to linear.
 Joystick animation is now done in the Pitch Yaw and Roll animations. Each one rotates a seperate empty of which the joystick is the last child of.
 
 Hierarchy:
@@ -513,6 +530,9 @@ Layer to set the Plane Mesh and all it's children to when you enter the plane.
 Center of Mass (new in 1.1)
 The aircraft's center of mass. Useful to adjust how long it takes to take off.
 
+Ground Effect Empty (new in 1.4)
+Position from which to raycast from to check distance from ground for groundeffect calculation.
+
 Pitch Moment (new in 1.04)
 The point at which force is added to make the vehicle pitch. If not set, script will fail.
 
@@ -525,6 +545,9 @@ The resupply check raycast is also checked from this transform.
 
 Hook Detector (new in 1.3)
 Position where the raycast to detect if you've caught a cable with the hook starts.
+
+Health
+Max health of the plane. Plane takes 10 damage per bullet hit.
 
 Resupply Layer (new in 1.3)
 Layer on which raycast looks for triggers to detect if you're in a resupply zone.
@@ -592,10 +615,16 @@ Minimum delay between bomb drops
 Bomb Launch Points (new in 1.3)
 Points at which bombs spawn, they spawn at each point in succession.
 
+Gun Recoil Empty (new in 1.4)
+Position at which the gun recoil force is applied. Adjust position to make the vehicle rotate by different amounts or in different directions. Not requied. If not present the vehicle will be pushed straight back.
+
 Gun Ammo In Seconds (new in 1.3)
 How long the gun can be fired before it runs out of ammo.
 
-Kills Board
+Gun Recoil (new in 1.4)
+How much force pushes the plane back when you're firing the gun.
+
+Kills Board (new in 1.39)
 Scoreboard object that tracks kill streaks (optional)
 
 Repeating World
@@ -604,7 +633,19 @@ If this is enabled the plane will teleport to the oposite side of the world when
 Repeating World Distance
 Coordinate from the center of the world on the X and Z axis at which the plane will be teleported to the opposite side.
 
-Has Afterburner
+Has Afterburner (new in 1.4)
+Enable this if the vehicle has an afterburner
+
+Throttle Afterburner Point (new in 1.4)
+Point at which you have to put the throttle past for the afterburner to turn on, afterburner scales up after this point. Throttle is max at this point.
+
+VTOL Only new in 1.4)
+Is the vehicle incapable of fast forward lift based flight?
+
+No Canopy (new in 1.4)
+If this is ticked, vehicle's sound will never switch to being 'inside' when you're inside it
+
+Has VTOL Angle
 Has Limits
 Has Catapult
 Has Hook
@@ -627,6 +668,12 @@ These options effectively disable each function of the plane, making them unsele
 
 Throttle Strength
 Value put into the Constant Force's value corresponding to forward.
+
+Vertical Throttle
+If ticked, in VR the throttle will be controlled by moving your left hand up and down instead of forward and back.
+
+Throttle Sensitivity
+Scaling of hand movement into throttle adjustment
 
 Afterburner Thrust Multi (new in 1.3)
 Thrust is multiplied by this amount when afterburner is enabled.
@@ -653,7 +700,12 @@ Minimum rotational strength for each axis. If non-zero then the plane will not i
 Pitch Friction (new in 1.2)
 Yaw Friction
 Roll Friction
-How much friction is applied to stop you from moving on each axis.
+How much friction is applied to stop you from moving on each axis. Increases in strength the faster you go.
+
+Pitch Constant Friction
+Yaw Constant Friction
+Roll Constant Friction
+How much friction is applied to stop you from moving on each axis. Always by the same amount. Intended for use with helicopters (Gyroscopic forces stop rotation)
 
 Pitch Response (new in 1.2)
 Yaw Response
@@ -672,10 +724,16 @@ Pitch Down Lift Multi
 Allows you to generate less lift from pulling down. (air hitting the top of your plane)
 
 Inertia Tensor Rotation Multi (New in 1.393)
-Multiplier for the Inertia Tensor Rotation, Lower values will make the plane feel more stable
+Adjust the rotation of Unity's inbuilt Inertia Tensor Rotation, which is a function of rigidbodies. If set to 0, the plane will be very stable and feel boring to fly.
 
-Invert Adverse Yaw (New in 1.393)
-Inverts one axis of the Inertia Tensor Rotation, causing the direction of the yawing experienced after rolling to invert
+Invert ITR Yaw
+Inverts Z axis of the Inertia Tensor Rotation, causing the direction of the yawing experienced after rolling to invert
+
+Adverse Yaw
+Yawing added to the vehicle with changes in throttle
+
+Adverse Roll
+Rolling added to the vehicle with changes in throttle
 
 Rot Multi Max Speed (new in 1.2)
 Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear. (Meters/second)
@@ -775,14 +833,40 @@ Max for possible to be given by ground effect
 G Limiter (new in 1.3)
 Controls the Flight Limits function. It tries to keep the plane below this number of Gs by reducing input strength linearly as your Gs increase, until this number. Usually needs to be set it a bit above the value you want to limit to.
 
-Ao A Limit (new in 1.3)
-(Angle of Attack Limit) Controls the Flight Limits function. It tries to keep the plane below this angle of attack reducing input strength linearly as your angle of attacked increases, until this number.
+Ao A Limiter (new in 1.3)
+(Angle of Attack Limiter) Controls the Flight Limits function. It tries to keep the plane below this angle of attack reducing input strength linearly as your angle of attacked increases, until this number.
+
+VTOL Angle Turn Rate (new in 1.4)
+Degrees per second which the angle of the thrusters on the vehicle rotate toward a new angle
+
+VTOL Default Angle (new in 1.4)
+Position between VTOL Min Angle and VTOL Max Angle that the plane is at by default. 0 = min, 1 = max.
+
+VTOL Allow Afterburner (new in 1.4)
+Allow after burner whilst VTOL is engaged, (VTOL angle is not 0), VTOL Min Angle must be 0 for afterburner to work if this is unticked.
+
+VTOL Throttle Strength Multi (new in 1.4)
+Multiply throttle strength by this value whilst vehicle is in VTOL mode, at VTOL angle of 90 degrees, this value is used, between 0 and 90 degrees the value is linearly transitioned towards this value, above 90 degrees it remains at this value.
+
+VTOL Min Angle (new in 1.4)
+Minimum angle of thrust direction, 0 = straight backwards, 90 = straight down, 180 = straight forwards
+
+VTOL Max Angle (new in 1.4)
+Maximum angle of thrust direction, 0 = straight backwards, 90 = straight down, 180 = straight forwards
+
+VTOL Pitch Thrust Vec Multi (new in 1.4)
+VTOL Yaw Thrust Vec Multi
+VTOL Roll Thrust Vec Multi
+Amount of Thrust Vectoring the plane has whilst in VTOL mode. (Remember thrust vectoring is as a multiple of the normal rotation values, so best to keep below 1, usually below .4)
+
+VTOL Lose Control Speed (new in 1.4)
+Speed at which the VTOL Thrust Vec Multi values will stop taking affect, scaled linearly up to this speed. Doesn't have any effect if vehicle is VTOLOnly.
+
+VTOL Ground Effect Strength (new in 1.4)
+Strength of ground effect that doesn't depend on speed, and points in the direction of the thrust. Uses GroundEffectEmpty and GroundEffectMaxDistance. Only enabled if the vehicle has VTOL
 
 Canopy Close Time (new in 1.3)
-Time it takes for the canopy animation to play. Used to switch the sound effects from outside to inside at the right moment.
-
-Health
-Max health of the plane.
+Time it takes for the canopy animation to play. Used to switch the sound effects from outside to inside at the right moment. Put the length of the Canopy closing animation in seconds in here.
 
 Sea Level
 Height of the sea in global coordinates, the hud's height is based with this at 0. Plane will instantly explode if below this height.
