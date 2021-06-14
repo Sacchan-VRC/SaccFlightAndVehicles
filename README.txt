@@ -749,7 +749,7 @@ Max Angle Of Attack Yaw
 Angle of attack above which the plane will lose control.
 
 Aoa Curve Strength (new in 1.2)
-Shape of the angle of attack lift curve.
+Shape of the angle of attack lift curve. 1= linear, high number = curve more vertical at the beginning
 See this to understand (the 2 in the input represents this value): https://www.wolframalpha.com/input/?i=-%28%281-x%29%5E2%29%2B1
 
 High Pitch Aoa Min Control (new in 1.2)

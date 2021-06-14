@@ -461,7 +461,7 @@ public class EngineController : UdonSharpBehaviour
         else
         {
             InEditor = false;
-            if (localPlayer.IsUserInVR()) { InVR = true; }
+            InVR = localPlayer.IsUserInVR();
         }
 
         if (!HasLimits) { FlightLimitsEnabled = false; }
@@ -2856,6 +2856,7 @@ public class EngineController : UdonSharpBehaviour
             else CanopyCloseTimer = -CanopyCloseTime;//less than 0
             Networking.SetOwner(localPlayer, EffectsControl.gameObject);
             SetSmokingOff();
+            EffectsControl.PlaneAnimator.SetBool(LOCALPILOT_STRING, true);
         }
         if (HUDControl != null)
         {
@@ -2869,8 +2870,6 @@ public class EngineController : UdonSharpBehaviour
         LastFrameVel = CurrentVel;
 
         SetPlaneLayerInside();
-
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool(LOCALPILOT_STRING, true); }
 
         //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
         var Target = AAMTargets[AAMTarget];

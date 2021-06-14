@@ -44,7 +44,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 50
+      Data: 51
     - Name: 
       Entry: 7
       Data: 
@@ -1652,7 +1652,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: InEditor
+      Data: InVR
     - Name: $v
       Entry: 7
       Data: 100|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1673,10 +1673,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: InEditor
+      Data: InVR
     - Name: symbolUniqueName
       Entry: 1
-      Data: InEditor
+      Data: InVR
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1709,7 +1709,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: GUNFIRING_STRING
+      Data: InEditor
     - Name: $v
       Entry: 7
       Data: 103|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1717,14 +1717,8 @@ MonoBehaviour:
       Entry: 7
       Data: 104|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 105|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: System.Int32, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 24
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1733,13 +1727,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt32
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: GUNFIRING_STRING
+      Data: InEditor
     - Name: symbolUniqueName
       Entry: 1
-      Data: GUNFIRING_STRING
+      Data: InEditor
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1748,7 +1742,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 106|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 105|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1772,16 +1766,22 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: OCCUPIED_STRING
+      Data: GUNFIRING_STRING
     - Name: $v
       Entry: 7
-      Data: 107|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 106|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 108|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 107|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 105
+      Entry: 7
+      Data: 108|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: System.Int32, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1793,10 +1793,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: OCCUPIED_STRING
+      Data: GUNFIRING_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: OCCUPIED_STRING
+      Data: GUNFIRING_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1829,7 +1829,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PITCHINPUT_STRING
+      Data: OCCUPIED_STRING
     - Name: $v
       Entry: 7
       Data: 110|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1838,7 +1838,7 @@ MonoBehaviour:
       Data: 111|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1850,10 +1850,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: PITCHINPUT_STRING
+      Data: OCCUPIED_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: PITCHINPUT_STRING
+      Data: OCCUPIED_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1886,7 +1886,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: YAWINPUT_STRING
+      Data: PITCHINPUT_STRING
     - Name: $v
       Entry: 7
       Data: 113|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1895,7 +1895,7 @@ MonoBehaviour:
       Data: 114|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1907,10 +1907,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: YAWINPUT_STRING
+      Data: PITCHINPUT_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: YAWINPUT_STRING
+      Data: PITCHINPUT_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1943,7 +1943,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ROLLINPUT_STRING
+      Data: YAWINPUT_STRING
     - Name: $v
       Entry: 7
       Data: 116|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1952,7 +1952,7 @@ MonoBehaviour:
       Data: 117|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1964,10 +1964,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: ROLLINPUT_STRING
+      Data: YAWINPUT_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: ROLLINPUT_STRING
+      Data: YAWINPUT_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2000,7 +2000,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: THROTTLE_STRING
+      Data: ROLLINPUT_STRING
     - Name: $v
       Entry: 7
       Data: 119|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2009,7 +2009,7 @@ MonoBehaviour:
       Data: 120|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2021,10 +2021,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: THROTTLE_STRING
+      Data: ROLLINPUT_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: THROTTLE_STRING
+      Data: ROLLINPUT_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2057,7 +2057,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ENGINEOUTPUT_STRING
+      Data: THROTTLE_STRING
     - Name: $v
       Entry: 7
       Data: 122|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2066,7 +2066,7 @@ MonoBehaviour:
       Data: 123|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2078,10 +2078,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: ENGINEOUTPUT_STRING
+      Data: THROTTLE_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: ENGINEOUTPUT_STRING
+      Data: THROTTLE_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2114,7 +2114,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: VTOLANGLE_STRING
+      Data: ENGINEOUTPUT_STRING
     - Name: $v
       Entry: 7
       Data: 125|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2123,7 +2123,7 @@ MonoBehaviour:
       Data: 126|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2135,10 +2135,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: VTOLANGLE_STRING
+      Data: ENGINEOUTPUT_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: VTOLANGLE_STRING
+      Data: ENGINEOUTPUT_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2171,7 +2171,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HEALTH_STRING
+      Data: VTOLANGLE_STRING
     - Name: $v
       Entry: 7
       Data: 128|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2180,7 +2180,7 @@ MonoBehaviour:
       Data: 129|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2192,10 +2192,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: HEALTH_STRING
+      Data: VTOLANGLE_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: HEALTH_STRING
+      Data: VTOLANGLE_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2228,7 +2228,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AOA_STRING
+      Data: HEALTH_STRING
     - Name: $v
       Entry: 7
       Data: 131|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2237,7 +2237,7 @@ MonoBehaviour:
       Data: 132|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2249,10 +2249,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: AOA_STRING
+      Data: HEALTH_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: AOA_STRING
+      Data: HEALTH_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2285,7 +2285,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: BRAKE_STRING
+      Data: AOA_STRING
     - Name: $v
       Entry: 7
       Data: 134|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2294,7 +2294,7 @@ MonoBehaviour:
       Data: 135|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2306,10 +2306,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: BRAKE_STRING
+      Data: AOA_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: BRAKE_STRING
+      Data: AOA_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2342,7 +2342,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: MACH10_STRING
+      Data: BRAKE_STRING
     - Name: $v
       Entry: 7
       Data: 137|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2351,7 +2351,7 @@ MonoBehaviour:
       Data: 138|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2363,10 +2363,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: MACH10_STRING
+      Data: BRAKE_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: MACH10_STRING
+      Data: BRAKE_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2399,7 +2399,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: GS_STRING
+      Data: MACH10_STRING
     - Name: $v
       Entry: 7
       Data: 140|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2408,7 +2408,7 @@ MonoBehaviour:
       Data: 141|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2420,10 +2420,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: GS_STRING
+      Data: MACH10_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: GS_STRING
+      Data: MACH10_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2456,7 +2456,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: GS_TRAIL_STRING
+      Data: GS_STRING
     - Name: $v
       Entry: 7
       Data: 143|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2465,7 +2465,7 @@ MonoBehaviour:
       Data: 144|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2477,10 +2477,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: GS_TRAIL_STRING
+      Data: GS_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: GS_TRAIL_STRING
+      Data: GS_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2513,7 +2513,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: WEAPON_STRING
+      Data: GS_TRAIL_STRING
     - Name: $v
       Entry: 7
       Data: 146|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2522,7 +2522,7 @@ MonoBehaviour:
       Data: 147|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2534,10 +2534,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: WEAPON_STRING
+      Data: GS_TRAIL_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: WEAPON_STRING
+      Data: GS_TRAIL_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2570,7 +2570,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: BOMB_STRING
+      Data: WEAPON_STRING
     - Name: $v
       Entry: 7
       Data: 149|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2579,7 +2579,7 @@ MonoBehaviour:
       Data: 150|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2591,10 +2591,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: BOMB_STRING
+      Data: WEAPON_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: BOMB_STRING
+      Data: WEAPON_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2627,7 +2627,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AAMS_STRING
+      Data: BOMB_STRING
     - Name: $v
       Entry: 7
       Data: 152|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2636,7 +2636,7 @@ MonoBehaviour:
       Data: 153|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2648,10 +2648,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: AAMS_STRING
+      Data: BOMB_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: AAMS_STRING
+      Data: BOMB_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2684,7 +2684,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AGMS_STRING
+      Data: AAMS_STRING
     - Name: $v
       Entry: 7
       Data: 155|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2693,7 +2693,7 @@ MonoBehaviour:
       Data: 156|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2705,10 +2705,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: AGMS_STRING
+      Data: AAMS_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: AGMS_STRING
+      Data: AAMS_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2741,7 +2741,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RESPAWN_STRING
+      Data: AGMS_STRING
     - Name: $v
       Entry: 7
       Data: 158|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2750,7 +2750,7 @@ MonoBehaviour:
       Data: 159|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2762,10 +2762,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: RESPAWN_STRING
+      Data: AGMS_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: RESPAWN_STRING
+      Data: AGMS_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2798,7 +2798,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: INSTANTGEARDOWN_STRING
+      Data: RESPAWN_STRING
     - Name: $v
       Entry: 7
       Data: 161|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2807,7 +2807,7 @@ MonoBehaviour:
       Data: 162|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2819,10 +2819,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: INSTANTGEARDOWN_STRING
+      Data: RESPAWN_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: INSTANTGEARDOWN_STRING
+      Data: RESPAWN_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2855,7 +2855,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: EXPLODE_STRING
+      Data: INSTANTGEARDOWN_STRING
     - Name: $v
       Entry: 7
       Data: 164|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2864,7 +2864,7 @@ MonoBehaviour:
       Data: 165|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2876,10 +2876,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: EXPLODE_STRING
+      Data: INSTANTGEARDOWN_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: EXPLODE_STRING
+      Data: INSTANTGEARDOWN_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2912,7 +2912,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: MISSILESINCOMING_STRING
+      Data: EXPLODE_STRING
     - Name: $v
       Entry: 7
       Data: 167|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2921,7 +2921,7 @@ MonoBehaviour:
       Data: 168|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2933,10 +2933,10 @@ MonoBehaviour:
       Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: MISSILESINCOMING_STRING
+      Data: EXPLODE_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: MISSILESINCOMING_STRING
+      Data: EXPLODE_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2969,7 +2969,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LOCALPILOT_STRING
+      Data: MISSILESINCOMING_STRING
     - Name: $v
       Entry: 7
       Data: 170|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2978,7 +2978,64 @@ MonoBehaviour:
       Data: 171|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 105
+      Data: 108
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemInt32
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: MISSILESINCOMING_STRING
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: MISSILESINCOMING_STRING
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 172|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: LOCALPILOT_STRING
+    - Name: $v
+      Entry: 7
+      Data: 173|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 174|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 108
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3002,7 +3059,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 172|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 175|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
