@@ -176,8 +176,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VTOLAngle;
 
-
-    [System.NonSerializedAttribute] public LeaveVehicleButton[] LeaveButtons;
     private Animator PlaneAnimator;
     [System.NonSerializedAttribute] public int PilotID;
     [System.NonSerializedAttribute] public string PilotName;
@@ -409,9 +407,6 @@ public class EngineController : UdonSharpBehaviour
         Assert(GroundEffectEmpty != null, "Start: GroundEffectEmpty != null");
         Assert(GunRecoilEmpty != null, "Start: GunRecoilEmpty != null");
         Assert(KillsBoard != null, "Start: KillsBoard != null");
-
-        LeaveButtons = HUDControl.gameObject.GetComponentsInChildren<LeaveVehicleButton>(true);//get componants even in disabled children
-        Assert(LeaveButtons.Length > 0, "Start: Leavebuttons Set");
 
         Planelayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
@@ -1065,10 +1060,7 @@ public class EngineController : UdonSharpBehaviour
                                 if (EjectZeroPoint - handposL.y > .5f && EjectTimer < 1)
                                 {
                                     Ejected = true;
-                                    foreach (LeaveVehicleButton seat in LeaveButtons)
-                                    {
-                                        if (seat != null) seat.ExitStation();
-                                    }
+                                    HUDControl.ExitStation();
                                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
                                 }
                             }
@@ -2325,10 +2317,7 @@ public class EngineController : UdonSharpBehaviour
         //pilot and passengers are dropped out of the plane
         if ((Piloting || Passenger) && !InEditor)
         {
-            foreach (LeaveVehicleButton seat in LeaveButtons)
-            {
-                seat.ExitStation();
-            }
+            HUDControl.ExitStation();
         }
     }
     public void IncreaseKills()
@@ -2855,7 +2844,7 @@ public class EngineController : UdonSharpBehaviour
             if (EffectsControl.CanopyOpen) { CanopyCloseTimer = -100000 - CanopyCloseTime; }
             else CanopyCloseTimer = -CanopyCloseTime;//less than 0
             Networking.SetOwner(localPlayer, EffectsControl.gameObject);
-            SetSmokingOff();
+            //SetSmokingOff();
             EffectsControl.PlaneAnimator.SetBool(LOCALPILOT_STRING, true);
         }
         if (HUDControl != null)

@@ -7,39 +7,62 @@ using VRC.Udon;
 public class PilotSeat : UdonSharpBehaviour
 {
     public EngineController EngineControl;
-    public GameObject LeaveButton;
+    public GameObject EnableOther;
     public GameObject Gun_pilot;
     public GameObject SeatAdjuster;
-    private LeaveVehicleButton LeaveButtonControl;
+    private HUDController HUDControl;
+    private int ThisStationID;
+    private bool firsttime = true;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(LeaveButton != null, "Start: LeaveButton != null");
+        Assert(EnableOther != null, "Start: LeaveButton != null");
         Assert(Gun_pilot != null, "Start: Gun_pilot != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
-        LeaveButtonControl = LeaveButton.GetComponent<LeaveVehicleButton>();
+        HUDControl = EngineControl.HUDControl;
     }
     private void Interact()//entering the plane
     {
+        if (firsttime)//can't do this in start because hudcontrol might not have initialized
+        {
+            HUDControl.FindSeats();
+            int x = 0;
+            foreach (VRCStation station in HUDControl.VehicleStations)
+            {
+                if (station.gameObject == gameObject)
+                {
+                    ThisStationID = x;
+                    HUDControl.PilotSeat = x;
+                }
+                x++;
+            }
+            firsttime = false;
+        }
         EngineControl.PilotEnterPlaneLocal();
         EngineControl.localPlayer.UseAttachedStation();
-        if (LeaveButton != null) { LeaveButton.SetActive(true); }
+        HUDControl.MySeat = ThisStationID;
+        if (EnableOther != null) { EnableOther.SetActive(true); }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
+        if (firsttime)
+        {
+            HUDControl.FindSeats();
+            firsttime = false;
+        }
         if (player != null)
         {
             EngineControl.PilotEnterPlaneGlobal(player);
             //voice range change to allow talking inside cockpit (after VRC patch 1008)
-            LeaveButtonControl.SeatedPlayer = player.playerId;
+            HUDControl.SeatedPlayers[ThisStationID] = player.playerId;
             if (player.isLocal)
             {
-                foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+                foreach (int crew in HUDControl.SeatedPlayers)
                 {//get get a fresh VRCPlayerAPI every time to prevent players who left leaving a broken one behind and causing crashes
-                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew.SeatedPlayer);
+                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
                     if (guy != null)
                     {
                         SetVoiceInside(guy);
@@ -58,27 +81,31 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
-        if (player.playerId == LeaveButtonControl.SeatedPlayer)
+        if (player.playerId == HUDControl.SeatedPlayers[ThisStationID])
         {
             PlayerExitPlane(player);
         }
     }
     public void PlayerExitPlane(VRCPlayerApi player)
     {
-        LeaveButtonControl.SeatedPlayer = -1;
+        HUDControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)
         {
             EngineControl.PilotExitPlane(player);
             SetVoiceOutside(player);
-            if (LeaveButton != null) { LeaveButton.SetActive(false); }
+            if (EnableOther != null) { EnableOther.SetActive(false); }
             if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
             if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
             if (player.isLocal)
             {
+                HUDControl.MySeat = -1;
+            }
+            if (player.isLocal)
+            {
                 //undo voice distances of all players inside the vehicle
-                foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+                foreach (int crew in HUDControl.SeatedPlayers)
                 {
-                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew.SeatedPlayer);
+                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
                     if (guy != null)
                     {
                         SetVoiceOutside(guy);
