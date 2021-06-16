@@ -162,6 +162,17 @@ public class EngineController : UdonSharpBehaviour
     public float FuelConsumption = 2;
     public float FuelConsumptionABMulti = 4.4f;
 
+    [SerializeField] private float Compressing;
+    [SerializeField] private float Rebound;
+    [SerializeField] private float FloatForce;
+    [SerializeField] private Transform[] FloatPoints;
+    private float[] SuspensionCompression;
+    private float[] SuspensionCompressionLastFrame;
+    [SerializeField] private bool SeaPlane;
+    [SerializeField] private float SuspMaxDist = .5f;
+    [SerializeField] private float WaterSidewaysDrag = .1f;
+    [SerializeField] private float WaterForwardDrag = .1f;
+
 
     //best to remove synced variables if you aren't using them
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public float BrakeInput;
@@ -355,6 +366,7 @@ public class EngineController : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float vtolangledif;
     private bool GunRecoilEmptyNULL = true;
+
     private int HOOKED_STRING = Animator.StringToHash("hooked");
     private int FLARES_STRING = Animator.StringToHash("flares");
     private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
@@ -526,6 +538,9 @@ public class EngineController : UdonSharpBehaviour
         {
             GunRecoilEmptyNULL = false;
         }
+
+        SuspensionCompression = new float[FloatPoints.Length];
+        SuspensionCompressionLastFrame = new float[FloatPoints.Length];
     }
 
     private void LateUpdate()
@@ -1855,6 +1870,7 @@ public class EngineController : UdonSharpBehaviour
 
             float sidespeed = 0;
             float downspeed = 0;
+            float forwardspeed = 0;
             float SpeedLiftFactor = 0;
             bool Flaps = false;
 
@@ -1865,6 +1881,7 @@ public class EngineController : UdonSharpBehaviour
                 //and add wind
                 sidespeed = Vector3.Dot(AirVel, VehicleTransform.right);
                 downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
+                forwardspeed = Vector3.Dot(AirVel, VehicleTransform.forward);
 
                 bool PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
                 if (PitchDown)
@@ -1934,8 +1951,8 @@ public class EngineController : UdonSharpBehaviour
                             float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
 
                             Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
-                            float VTOLAngle2 = VTOLMinAngle + vtolangledif * VTOLAngle;//vtol angle in degrees
-                                                                                       //rotate and scale Vector for VTOL thrust
+                            float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
+                                                                                         //rotate and scale Vector for VTOL thrust
                             if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
                             {
                                 FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
@@ -1943,7 +1960,7 @@ public class EngineController : UdonSharpBehaviour
                             else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
                             {
                                 float downthrust = thrust * VTOLThrottleStrengthMulti;
-                                FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLMaxAngle * VTOLAngle, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
+                                FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
                             }
                             //add ground effect to the VTOL thrust
                             GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, false, 1);
@@ -1962,6 +1979,13 @@ public class EngineController : UdonSharpBehaviour
                             FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
                                 ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
                                     (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
+                        }
+                        if (SeaPlane)
+                        {
+                            float depth = Floating();
+
+                            FinalInputAcc.x += -sidespeed * WaterSidewaysDrag * depth;
+                            FinalInputAcc.z += -forwardspeed * WaterForwardDrag * depth;
                         }
 
                         float outputdif = (EngineOutput - EngineOutputLastFrame);
@@ -3096,6 +3120,35 @@ public class EngineController : UdonSharpBehaviour
             VelLiftMax = VelLiftMaxStart;
         }
         return Mathf.Min(speedliftfac * AoALiftPitch * VelLift, VelLiftMax);
+    }
+    private float Floating()
+    {
+        int i = 0;
+        float x = 0;
+        foreach (Transform FLOAT in FloatPoints)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(FLOAT.position, -Vector3.up, out hit, SuspMaxDist, 1, QueryTriggerInteraction.Collide))
+            {
+                if (hit.collider.isTrigger)
+                {
+                    SuspensionCompression[i] = Mathf.Clamp(((hit.distance / SuspMaxDist) * -1) + 1, 0, 1);
+                    float CompressionDifference = (SuspensionCompression[i] - SuspensionCompressionLastFrame[i]);
+                    x += SuspensionCompression[i];
+                    if (CompressionDifference > 0)
+                    { CompressionDifference *= Compressing; }
+                    else
+                    { CompressionDifference *= Rebound; }
+
+                    SuspensionCompressionLastFrame[i] = SuspensionCompression[i];
+
+                    VehicleRigidbody.AddForceAtPosition((VehicleTransform.up * (((SuspensionCompression[i] * FloatForce) + CompressionDifference))), FloatPoints[i].position, ForceMode.Force);
+                }
+            }
+            i++;
+        }
+        x /= i;
+        return x;
     }
     private void SetVTOLValues()
     {
