@@ -7,8 +7,8 @@ using VRC.Udon;
 public class PassengerSeat : UdonSharpBehaviour
 {
     public EngineController EngineControl;
-    public GameObject LeaveButton;
     public GameObject SeatAdjuster;
+    public GameObject PassengerOnly;
     private Transform PlaneMesh;
     private LayerMask Planelayer;
     private HUDController HUDControl;
@@ -17,7 +17,7 @@ public class PassengerSeat : UdonSharpBehaviour
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(LeaveButton != null, "Start: LeaveButton != null");
+        Assert(PassengerOnly != null, "Start: LeaveButton != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
         HUDControl = EngineControl.HUDControl;
@@ -43,7 +43,7 @@ public class PassengerSeat : UdonSharpBehaviour
 
         EngineControl.PassengerEnterPlaneLocal();
         HUDControl.MySeat = ThisStationID;
-        if (LeaveButton != null) { LeaveButton.SetActive(true); }
+        if (PassengerOnly != null) { PassengerOnly.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
         EngineControl.localPlayer.UseAttachedStation();
     }
@@ -91,15 +91,15 @@ public class PassengerSeat : UdonSharpBehaviour
             {
                 EngineControl.PassengerExitPlaneLocal();
                 //undo voice distances of all players inside the vehicle
-                foreach (LeaveVehicleButton crew in EngineControl.LeaveButtons)
+                foreach (int crew in HUDControl.SeatedPlayers)
                 {
-                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew.SeatedPlayer);
+                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
                     if (guy != null)
                     {
                         SetVoiceOutside(guy);
                     }
                 }
-                if (LeaveButton != null) { LeaveButton.SetActive(false); }
+                if (PassengerOnly != null) { PassengerOnly.SetActive(false); }
                 if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
             }
         }

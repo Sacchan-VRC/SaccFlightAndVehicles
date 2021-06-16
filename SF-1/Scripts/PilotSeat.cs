@@ -7,16 +7,16 @@ using VRC.Udon;
 public class PilotSeat : UdonSharpBehaviour
 {
     public EngineController EngineControl;
-    public GameObject EnableOther;
     public GameObject Gun_pilot;
     public GameObject SeatAdjuster;
+    public GameObject PilotOnly;
     private HUDController HUDControl;
     private int ThisStationID;
     private bool firsttime = true;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(EnableOther != null, "Start: LeaveButton != null");
+        Assert(PilotOnly != null, "Start: LeaveButton != null");
         Assert(Gun_pilot != null, "Start: Gun_pilot != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
@@ -42,7 +42,7 @@ public class PilotSeat : UdonSharpBehaviour
         EngineControl.PilotEnterPlaneLocal();
         EngineControl.localPlayer.UseAttachedStation();
         HUDControl.MySeat = ThisStationID;
-        if (EnableOther != null) { EnableOther.SetActive(true); }
+        if (PilotOnly != null) { PilotOnly.SetActive(true); }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
     }
@@ -93,7 +93,7 @@ public class PilotSeat : UdonSharpBehaviour
         {
             EngineControl.PilotExitPlane(player);
             SetVoiceOutside(player);
-            if (EnableOther != null) { EnableOther.SetActive(false); }
+            if (PilotOnly != null) { PilotOnly.SetActive(false); }
             if (Gun_pilot != null) { Gun_pilot.SetActive(false); }
             if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
             if (player.isLocal)

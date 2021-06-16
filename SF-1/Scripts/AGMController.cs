@@ -6,12 +6,12 @@ using VRC.Udon;
 
 public class AGMController : UdonSharpBehaviour
 {
-    public EngineController EngineControl;
-    public float MaxLifetime = 20;
-    public AudioSource[] ExplosionSounds;
-    public float ColliderActiveDistance = 30;
-    public float LockAngle;
-    public float RotSpeed = 15;
+    [SerializeField] private EngineController EngineControl;
+    [SerializeField] private float MaxLifetime = 20;
+    [SerializeField] private AudioSource[] ExplosionSounds;
+    [SerializeField] private float ColliderActiveDistance = 30;
+    [SerializeField] private float LockAngle;
+    [SerializeField] private float RotSpeed = 15;
     private Vector3 Target;
     private float Lifetime = 0;
     private bool ColliderActive = false;

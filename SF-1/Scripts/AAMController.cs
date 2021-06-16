@@ -7,11 +7,11 @@ using VRC.Udon;
 public class AAMController : UdonSharpBehaviour
 {
     public EngineController EngineControl;
-    public float MaxLifetime = 12;
-    public AudioSource[] ExplosionSounds;
-    public float ColliderActiveDistance = 45;
-    public float RotSpeed = 400;
-    public float ProximityExplodeDistance = 20;
+    [SerializeField] private float MaxLifetime = 12;
+    [SerializeField] private AudioSource[] ExplosionSounds;
+    [SerializeField] private float ColliderActiveDistance = 45;
+    [SerializeField] private float RotSpeed = 400;
+    [SerializeField] private float ProximityExplodeDistance = 20;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
     private float Lifetime = 0;
