@@ -162,17 +162,6 @@ public class EngineController : UdonSharpBehaviour
     public float FuelConsumption = 2;
     public float FuelConsumptionABMulti = 4.4f;
 
-    [SerializeField] private float Compressing;
-    [SerializeField] private float Rebound;
-    [SerializeField] private float FloatForce;
-    [SerializeField] private Transform[] FloatPoints;
-    private float[] SuspensionCompression;
-    private float[] SuspensionCompressionLastFrame;
-    [SerializeField] private bool SeaPlane;
-    [SerializeField] private float SuspMaxDist = .5f;
-    [SerializeField] private float WaterSidewaysDrag = .1f;
-    [SerializeField] private float WaterForwardDrag = .1f;
-
 
     //best to remove synced variables if you aren't using them
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public float BrakeInput;
@@ -538,9 +527,6 @@ public class EngineController : UdonSharpBehaviour
         {
             GunRecoilEmptyNULL = false;
         }
-
-        SuspensionCompression = new float[FloatPoints.Length];
-        SuspensionCompressionLastFrame = new float[FloatPoints.Length];
     }
 
     private void LateUpdate()
@@ -1980,13 +1966,6 @@ public class EngineController : UdonSharpBehaviour
                                 ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
                                     (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
                         }
-                        if (SeaPlane)
-                        {
-                            float depth = Floating();
-
-                            FinalInputAcc.x += -sidespeed * WaterSidewaysDrag * depth;
-                            FinalInputAcc.z += -forwardspeed * WaterForwardDrag * depth;
-                        }
 
                         float outputdif = (EngineOutput - EngineOutputLastFrame);
                         float ADVYaw = outputdif * AdverseYaw;
@@ -2777,8 +2756,6 @@ public class EngineController : UdonSharpBehaviour
         else if (IsOwner)
         {
             Health = FullHealth;
-            //this should respawn it in VRC, doesn't work in editor
-            VehicleTransform.position = new Vector3(VehicleTransform.position.x, -10000, VehicleTransform.position.z);
             EffectsControl.GearUp = false;
             EffectsControl.Flaps = true;
         }
@@ -3120,35 +3097,6 @@ public class EngineController : UdonSharpBehaviour
             VelLiftMax = VelLiftMaxStart;
         }
         return Mathf.Min(speedliftfac * AoALiftPitch * VelLift, VelLiftMax);
-    }
-    private float Floating()
-    {
-        int i = 0;
-        float x = 0;
-        foreach (Transform FLOAT in FloatPoints)
-        {
-            RaycastHit hit;
-            if (Physics.Raycast(FLOAT.position, -Vector3.up, out hit, SuspMaxDist, 1, QueryTriggerInteraction.Collide))
-            {
-                if (hit.collider.isTrigger)
-                {
-                    SuspensionCompression[i] = Mathf.Clamp(((hit.distance / SuspMaxDist) * -1) + 1, 0, 1);
-                    float CompressionDifference = (SuspensionCompression[i] - SuspensionCompressionLastFrame[i]);
-                    x += SuspensionCompression[i];
-                    if (CompressionDifference > 0)
-                    { CompressionDifference *= Compressing; }
-                    else
-                    { CompressionDifference *= Rebound; }
-
-                    SuspensionCompressionLastFrame[i] = SuspensionCompression[i];
-
-                    VehicleRigidbody.AddForceAtPosition((VehicleTransform.up * (((SuspensionCompression[i] * FloatForce) + CompressionDifference))), FloatPoints[i].position, ForceMode.Force);
-                }
-            }
-            i++;
-        }
-        x /= i;
-        return x;
     }
     private void SetVTOLValues()
     {

@@ -13,6 +13,8 @@ public class PilotSeat : UdonSharpBehaviour
     private HUDController HUDControl;
     private int ThisStationID;
     private bool firsttime = true;
+    private Transform Seat;
+    private Quaternion SeatStartRot;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -21,38 +23,29 @@ public class PilotSeat : UdonSharpBehaviour
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
         HUDControl = EngineControl.HUDControl;
+
+        Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
+        SeatStartRot = Seat.localRotation;
     }
     private void Interact()//entering the plane
     {
-        if (firsttime)//can't do this in start because hudcontrol might not have initialized
-        {
-            HUDControl.FindSeats();
-            int x = 0;
-            foreach (VRCStation station in HUDControl.VehicleStations)
-            {
-                if (station.gameObject == gameObject)
-                {
-                    ThisStationID = x;
-                    HUDControl.PilotSeat = x;
-                }
-                x++;
-            }
-            firsttime = false;
-        }
         EngineControl.PilotEnterPlaneLocal();
+
+        Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
         EngineControl.localPlayer.UseAttachedStation();
+        Seat.localRotation = SeatStartRot;
+
         HUDControl.MySeat = ThisStationID;
         if (PilotOnly != null) { PilotOnly.SetActive(true); }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
+
+
+
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
-        if (firsttime)
-        {
-            HUDControl.FindSeats();
-            firsttime = false;
-        }
+        if (firsttime) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
         if (player != null)
         {
             EngineControl.PilotEnterPlaneGlobal(player);
@@ -88,6 +81,7 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public void PlayerExitPlane(VRCPlayerApi player)
     {
+        if (firsttime) { InitializeSeat(); }
         HUDControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)
         {
@@ -125,6 +119,21 @@ public class PilotSeat : UdonSharpBehaviour
         Player.SetVoiceDistanceNear(0);
         Player.SetVoiceDistanceFar(25);
         Player.SetVoiceGain(15);
+    }
+    private void InitializeSeat()
+    {
+        HUDControl.FindSeats();
+        int x = 0;
+        foreach (VRCStation station in HUDControl.VehicleStations)
+        {
+            if (station.gameObject == gameObject)
+            {
+                ThisStationID = x;
+                HUDControl.PilotSeat = x;
+            }
+            x++;
+        }
+        firsttime = false;
     }
     private void Assert(bool condition, string message)
     {

@@ -14,6 +14,8 @@ public class PassengerSeat : UdonSharpBehaviour
     private HUDController HUDControl;
     private int ThisStationID;
     private bool firsttime = true;
+    private Transform Seat;
+    private Quaternion SeatStartRot;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -23,32 +25,26 @@ public class PassengerSeat : UdonSharpBehaviour
         HUDControl = EngineControl.HUDControl;
         PlaneMesh = EngineControl.PlaneMesh.transform;
         Planelayer = PlaneMesh.gameObject.layer;
+
+        Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
+        SeatStartRot = Seat.localRotation;
     }
     private void Interact()
     {
-        if (firsttime)//can't do this in start because hducontrol might not have initialized
-        {
-            HUDControl.FindSeats();
-            int x = 0;
-            foreach (VRCStation station in HUDControl.VehicleStations)
-            {
-                if (station.gameObject == gameObject)
-                {
-                    ThisStationID = x;
-                }
-                x++;
-            }
-            firsttime = false;
-        }
-
         EngineControl.PassengerEnterPlaneLocal();
+
+        Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
+        EngineControl.localPlayer.UseAttachedStation();
+        Seat.localRotation = SeatStartRot;
+
         HUDControl.MySeat = ThisStationID;
         if (PassengerOnly != null) { PassengerOnly.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        EngineControl.localPlayer.UseAttachedStation();
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
+        if (firsttime) { initializeseat(); }//can't do this in start because hudcontrol might not have initialized
+
         //voice range change to allow talking inside cockpit (after VRC patch 1008)
         if (player != null)
         {
@@ -83,6 +79,8 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     public void PlayerExitPlane(VRCPlayerApi player)
     {
+        if (firsttime) { initializeseat(); }
+
         HUDControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)
         {
@@ -116,6 +114,20 @@ public class PassengerSeat : UdonSharpBehaviour
         Player.SetVoiceDistanceNear(0);
         Player.SetVoiceDistanceFar(25);
         Player.SetVoiceGain(15);
+    }
+    private void initializeseat()
+    {
+        HUDControl.FindSeats();
+        int x = 0;
+        foreach (VRCStation station in HUDControl.VehicleStations)
+        {
+            if (station.gameObject == gameObject)
+            {
+                ThisStationID = x;
+            }
+            x++;
+        }
+        firsttime = false;
     }
     private void Assert(bool condition, string message)
     {

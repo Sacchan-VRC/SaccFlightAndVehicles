@@ -32,26 +32,35 @@ public class AAMController : UdonSharpBehaviour
     {
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
-        Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform;
-        TargDistlastframe = Vector3.Distance(transform.position, Target.position) + 1;//1 meter further so the number is different and missile knows we're already moving toward target
-        TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
-        if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
+        if (EngineControl.AAMTargets[EngineControl.AAMTarget] != null)
+        { Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform; }
+        if (Target == null)
         {
-            TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
-            if (TargetEngineControl != null)
-            {
-                if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                { TargetEngineControl.MissilesIncoming++; }
-
-                MissileIncoming = true;
-                TargetIsPlane = true;
-            }
+            TargetLost = true;
+            Debug.LogWarning("AAM spawned without target");
         }
-
-        if (EngineControl.InEditor || EngineControl.IsOwner)
+        else
         {
-            Owner = true;
-            LockHack = false;
+            TargDistlastframe = Vector3.Distance(transform.position, Target.position) + 1;//1 meter further so the number is different and missile knows we're already moving toward target
+            TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
+            if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
+            {
+                TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
+                if (TargetEngineControl != null)
+                {
+                    if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
+                    { TargetEngineControl.MissilesIncoming++; }
+
+                    MissileIncoming = true;
+                    TargetIsPlane = true;
+                }
+            }
+
+            if (EngineControl.InEditor || EngineControl.IsOwner)
+            {
+                Owner = true;
+                LockHack = false;
+            }
         }
     }
     void FixedUpdate()
@@ -84,11 +93,11 @@ public class AAMController : UdonSharpBehaviour
             else Explode();//explode and give Lifetime another 10 seconds
         }
 
-        Vector3 Position = transform.position;
-        Vector3 TargetPos = Target.position;
-        float TargetDistance = Vector3.Distance(Position, TargetPos);
         if (!TargetLost)
         {
+            Vector3 Position = transform.position;
+            Vector3 TargetPos = Target.position;
+            float TargetDistance = Vector3.Distance(Position, TargetPos);
             if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
             {
                 if (((TargetDistance < TargDistlastframe || LockHack)))
@@ -122,8 +131,8 @@ public class AAMController : UdonSharpBehaviour
                     MissileIncoming = false;
                 }
             }
+            TargDistlastframe = TargetDistance;
         }
-        TargDistlastframe = TargetDistance;
         Lifetime += DeltaTime;
     }
     private void OnCollisionEnter(Collision other)
