@@ -10,6 +10,7 @@ public class PilotSeat : UdonSharpBehaviour
     public GameObject Gun_pilot;
     public GameObject SeatAdjuster;
     public GameObject PilotOnly;
+    [SerializeField] private GameObject[] SetOwnerObjects;
     private HUDController HUDControl;
     private int ThisStationID;
     private bool firsttime = true;
@@ -29,19 +30,21 @@ public class PilotSeat : UdonSharpBehaviour
     }
     private void Interact()//entering the plane
     {
+        if (firsttime) { InitializeSeat(); }
+        HUDControl.MySeat = ThisStationID;
+
         EngineControl.PilotEnterPlaneLocal();
 
         Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
         EngineControl.localPlayer.UseAttachedStation();
         Seat.localRotation = SeatStartRot;
 
-        HUDControl.MySeat = ThisStationID;
         if (PilotOnly != null) { PilotOnly.SetActive(true); }
         if (Gun_pilot != null) { Gun_pilot.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
 
-
-
+        foreach (GameObject obj in SetOwnerObjects)
+        { Networking.SetOwner(EngineControl.localPlayer, obj); }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
@@ -74,6 +77,7 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
+        if (firsttime) { InitializeSeat(); }
         if (player.playerId == HUDControl.SeatedPlayers[ThisStationID])
         {
             PlayerExitPlane(player);

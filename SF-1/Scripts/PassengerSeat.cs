@@ -16,6 +16,7 @@ public class PassengerSeat : UdonSharpBehaviour
     private bool firsttime = true;
     private Transform Seat;
     private Quaternion SeatStartRot;
+    [SerializeField] private GameObject[] SetOwnerObjects;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -40,6 +41,9 @@ public class PassengerSeat : UdonSharpBehaviour
         HUDControl.MySeat = ThisStationID;
         if (PassengerOnly != null) { PassengerOnly.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
+
+        foreach (GameObject obj in SetOwnerObjects)
+        { Networking.SetOwner(EngineControl.localPlayer, obj); }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
@@ -68,10 +72,12 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
+        if (firsttime) { initializeseat(); }
         PlayerExitPlane(player);
     }
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
+        if (firsttime) { initializeseat(); }
         if (player.playerId == HUDControl.SeatedPlayers[ThisStationID])
         {
             PlayerExitPlane(player);

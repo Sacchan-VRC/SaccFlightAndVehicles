@@ -6,11 +6,13 @@ using VRC.Udon;
 
 public class AAGunSeat : UdonSharpBehaviour
 {
-    public AAGunController AAGunControl;
-    public GameObject HUDControl;
-    public GameObject SeatAdjuster;
+    [SerializeField] private AAGunController AAGunControl;
+    private HUDControllerAAGun HUDControl;
+    [SerializeField] private GameObject SeatAdjuster;
     private Animator AAGunAnimator;
     private VRCPlayerApi localPlayer;
+    private int ThisStationID;
+    private bool firsttime = true;
     void Start()
     {
         Assert(AAGunControl != null, "Start: AAGunControl != null");
@@ -18,6 +20,7 @@ public class AAGunSeat : UdonSharpBehaviour
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
         if (AAGunControl.VehicleMainObj != null) { AAGunAnimator = AAGunControl.VehicleMainObj.GetComponent<Animator>(); }
+        HUDControl = AAGunControl.HUDControl;
 
         localPlayer = Networking.LocalPlayer;
     }
@@ -49,10 +52,12 @@ public class AAGunSeat : UdonSharpBehaviour
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
+        if (firsttime) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
         AAGunControl.EnterSetStatus();
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
+        if (firsttime) { InitializeSeat(); }
         AAGunControl.LastHealthUpdate = Time.time;
         if (player.isLocal)
         {
@@ -63,13 +68,26 @@ public class AAGunSeat : UdonSharpBehaviour
             AAGunControl.DoAAMTargeting = false;
             AAGunAnimator.SetBool("inside", false);
             if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
-            //set X rotation 0 so people don't get the seat orientation bug when they enter again
-            AAGunControl.Rotator.transform.localRotation = Quaternion.Euler(new Vector3(0, AAGunControl.Rotator.transform.localRotation.eulerAngles.y, 0));
         }
     }
     private void OnOwnershipTransferred()
     {
         AAGunControl.firing = false;
+    }
+    private void InitializeSeat()
+    {
+        HUDControl.FindSeats();
+        int x = 0;
+        foreach (VRCStation station in HUDControl.VehicleStations)
+        {
+            if (station.gameObject == gameObject)
+            {
+                ThisStationID = x;
+                HUDControl.PilotSeat = x;
+            }
+            x++;
+        }
+        firsttime = false;
     }
     private void Assert(bool condition, string message)
     {

@@ -565,7 +565,7 @@ public class EngineController : UdonSharpBehaviour
 
             if (Piloting)
             {
-                //gotta do these this if we're piloting but they didn't get done(specifically, hovering extremely slowly in a VTOL craft will cause control issues we don't)
+                //gotta do these this if we're piloting but it didn't get done(specifically, hovering extremely slowly in a VTOL craft will cause control issues we don't)
                 if (!PlaneMoving)
                 { WindAndAoA(); }
                 if (RepeatingWorld)

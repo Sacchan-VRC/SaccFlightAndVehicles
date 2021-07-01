@@ -7,17 +7,17 @@ using VRC.Udon;
 
 public class WindChanger : UdonSharpBehaviour
 {
-    public GameObject WindMenu;
-    public Slider WindStrengthSlider;
-    public Text WindStr_text;
-    public Slider WindGustStrengthSlider;
-    public Text WindGustStrength_text;
-    public Slider WindGustinessSlider;
-    public Text WindGustiness_text;
-    public Slider WindTurbulanceScaleSlider;
-    public Text WindTurbulanceScale_text;
-    public AudioSource WindApplySound;
-    public EngineController[] VehicleEngines;
+    [SerializeField] private GameObject WindMenu;
+    [SerializeField] private Slider WindStrengthSlider;
+    [SerializeField] private Text WindStr_text;
+    [SerializeField] private Slider WindGustStrengthSlider;
+    [SerializeField] private Text WindGustStrength_text;
+    [SerializeField] private Slider WindGustinessSlider;
+    [SerializeField] private Text WindGustiness_text;
+    [SerializeField] private Slider WindTurbulanceScaleSlider;
+    [SerializeField] private Text WindTurbulanceScale_text;
+    [SerializeField] private AudioSource WindApplySound;
+    [SerializeField] private EngineController[] VehicleEngines;
     /* [UdonSynced(UdonSyncMode.None)] */
     private float WindStrength;
     /* [UdonSynced(UdonSyncMode.None)] */

@@ -462,28 +462,20 @@ public class HUDController : UdonSharpBehaviour
 
         PlaneAnimator.SetFloat(FUEL_STRING, EngineControl.Fuel * FullFuelDivider);
         PlaneAnimator.SetFloat(GUNAMMO_STRING, EngineControl.GunAmmoInSeconds * FullGunAmmoDivider);
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
-    }
-    //Replacement for leavebuttons
-    [System.NonSerializedAttribute] public int PilotSeat;
-    [System.NonSerializedAttribute] public int MySeat;
-    [System.NonSerializedAttribute] public int[] SeatedPlayers;
-    [System.NonSerializedAttribute] public VRCStation[] VehicleStations;
-    [System.NonSerializedAttribute] public int[] InsidePlayers;
 
-    public void Update()
-    {
+
+        //Replacement for leavebuttons below this point
         if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
         {
             ExitStation();
         }
     }
+
+    [System.NonSerializedAttribute] public int PilotSeat;
+    [System.NonSerializedAttribute] public int MySeat;
+    [System.NonSerializedAttribute] public int[] SeatedPlayers;
+    [System.NonSerializedAttribute] public VRCStation[] VehicleStations;
+    [System.NonSerializedAttribute] public int[] InsidePlayers;
     public void ExitStation()
     {
         VehicleStations[MySeat].ExitStation(EngineControl.localPlayer);
@@ -493,5 +485,14 @@ public class HUDController : UdonSharpBehaviour
         VehicleStations = (VRC.SDK3.Components.VRCStation[])EngineControl.VehicleMainObj.GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
         SeatedPlayers = new int[VehicleStations.Length];
         foreach (int i in SeatedPlayers) SeatedPlayers[i] = -1;
+    }
+
+
+    private void Assert(bool condition, string message)
+    {
+        if (!condition)
+        {
+            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
+        }
     }
 }
