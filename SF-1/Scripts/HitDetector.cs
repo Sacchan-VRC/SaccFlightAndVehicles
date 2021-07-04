@@ -11,6 +11,8 @@ public class HitDetector : UdonSharpBehaviour
     [System.NonSerializedAttribute] public EngineController LastAttacker;
     private bool InEditor = true;
     VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
+    private GameObject[] ExtensionUdonBehaviours;
+    private Rigidbody VehicleRigid;
 
     private void Start()
     {
@@ -19,6 +21,8 @@ public class HitDetector : UdonSharpBehaviour
         { InEditor = false; }
 
         VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
+        ExtensionUdonBehaviours = EngineControl.ExtensionUdonBehaviours;
+        VehicleRigid = GetComponent<Rigidbody>();
     }
     void OnParticleCollision(GameObject other)
     {
@@ -71,6 +75,21 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.Health = EngineControl.FullHealth;
         }
         EngineControl.dead = false;
+    }
+    public void ReAppear()//called by 'respawn' animation first frame
+    {
+        if (EngineControl.IsOwner)
+        {
+            VehicleRigid.velocity = Vector3.zero;//there's a weird jump it does on respawn otherwise
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("ReAppear");
+                }
+            }
+        }
     }
     private void Assert(bool condition, string message)
     {

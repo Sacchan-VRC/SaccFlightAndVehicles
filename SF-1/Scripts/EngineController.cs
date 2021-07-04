@@ -10,6 +10,7 @@ public class EngineController : UdonSharpBehaviour
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
+    public GameObject[] ExtensionUdonBehaviours;//replace my code if fixed: https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/589-udonbehaviour-array-type-is-not-defined
     public Transform PlaneMesh;
     public int OnboardPlaneLayer = 19;
     public Transform CenterOfMass;
@@ -51,6 +52,7 @@ public class EngineController : UdonSharpBehaviour
     public float ThrottleAfterburnerPoint = 0.8f;
     public bool VTOLOnly = false;
     public bool NoCanopy = false;
+    public bool DefaultFlapsOff = false;
     [Header("Dial Functions Usable?")]
     public bool HasVTOLAngle = false;
     public bool HasLimits = true;
@@ -58,7 +60,6 @@ public class EngineController : UdonSharpBehaviour
     public bool HasCatapult = true;
     public bool HasBrake = true;
     public bool HasAltHold = true;
-    /*     public bool HasTRIM = true; */
     public bool HasCanopy = true;
     public bool HasCruise = true;
     public bool HasGun = true;
@@ -124,6 +125,7 @@ public class EngineController : UdonSharpBehaviour
     public float LandingGearDragMulti = 1.3f;
     public float FlapsDragMulti = 1.4f;
     public float FlapsLiftMulti = 1.35f;
+    public float FlapsMaxLiftMulti = 1;
     public float AirbrakeStrength = 4f;
     public float GroundBrakeStrength = 6f;
     public float GroundBrakeSpeed = 40f;
@@ -211,12 +213,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool Ejected = false;
     [System.NonSerializedAttribute] public float LTriggerTapTime = 1;
     [System.NonSerializedAttribute] public float RTriggerTapTime = 1;
-    /*     private bool DoTrim;
-        private Vector3 HandPosTrim;
-        private Vector3 TrimZeroPoint;
-        private Vector2 TempTrim;
-        private Vector2 TrimDifference;
-        [System.NonSerializedAttribute] public Vector2 Trim; */
     [System.NonSerializedAttribute] public bool RGripLastFrame = false;
     [System.NonSerializedAttribute] public float ThrottleInput = 0f;
     private float roll = 0f;
@@ -304,6 +300,7 @@ public class EngineController : UdonSharpBehaviour
     private float AAMLastFiredTime;
     [System.NonSerializedAttribute] public Vector3 AAMCurrentTargetDirection;
     [System.NonSerializedAttribute] public float FullFuel;
+    private float LowFuel;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] private int AGMUnlocking = 0;
     [System.NonSerializedAttribute] private float AGMUnlockTimer;
@@ -330,7 +327,7 @@ public class EngineController : UdonSharpBehaviour
     private float FullAGMsDivider;
     private float FullBombsDivider;
     private Quaternion AGMCamLastFrame;
-    bool Landed = false;//moved here from soundcontroller
+    bool Landed = false;
     private float VelLiftStart;
     private HitDetector PlaneHitDetector;
     [System.NonSerializedAttribute] public float PilotExitTime;
@@ -355,6 +352,7 @@ public class EngineController : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float vtolangledif;
     private bool GunRecoilEmptyNULL = true;
+    private float StartMaxLift;
 
     private int HOOKED_STRING = Animator.StringToHash("hooked");
     private int FLARES_STRING = Animator.StringToHash("flares");
@@ -412,6 +410,7 @@ public class EngineController : UdonSharpBehaviour
         Planelayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
         PlaneAnimator = VehicleMainObj.GetComponent<Animator>();
+        StartMaxLift = MaxLift;
         //set these values at start in case they haven't been set correctly in editor
         if (!HasCanopy)
         {
@@ -425,8 +424,9 @@ public class EngineController : UdonSharpBehaviour
             }
         }
         else { EffectsControl.CanopyOpen = false; CanopyOpening(); }//always spawn with canopy open if has one
-        SetGearDown();
-        if (!HasFlaps) { SetFlapsOff(); }
+        if (HasGear) { SetGearDown(); }
+        else { SetGearUp(); }
+        if (!HasFlaps || DefaultFlapsOff) { SetFlapsOff(); }
         else { SetFlapsOn(); }
         SetHookUp();
 
@@ -527,6 +527,7 @@ public class EngineController : UdonSharpBehaviour
         {
             GunRecoilEmptyNULL = false;
         }
+        LowFuel = FullFuel * .14f;
     }
 
     private void LateUpdate()
@@ -542,10 +543,6 @@ public class EngineController : UdonSharpBehaviour
         {
             if (!dead)
             {
-                if (CenterOfMass.position.y < SeaLevel)//kill plane if in sea
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-                }
                 //G/crash Damage
                 Health -= Mathf.Max((Gs - MaxGs) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
                 if (Health <= 0f)//plane is ded
@@ -641,7 +638,7 @@ public class EngineController : UdonSharpBehaviour
                 {
                     if (CanopyCloseTimer < -100000)
                     {
-                        SetCanopyClosed();
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
                     }
                 }
 
@@ -1002,39 +999,6 @@ public class EngineController : UdonSharpBehaviour
                             LTriggerLastFrame = true;
                         }
                         else { LTriggerLastFrame = false; }
-                        //this used to be TRIM
-                        /*                             if (LTrigger > 0.75 || (Input.GetKey(KeyCode.Alpha4)))
-                           {
-                               if (!LTriggerLastFrame)
-                               {
-                                   if (InVR)
-                                   {
-                                       HandPosTrim = VehicleTransform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position);
-                                       TrimZeroPoint = HandPosTrim;
-                                       TempTrim = new Vector2(Trim.y, Trim.x);//it's inverted because i want X to be pitch and y to be yaw
-                                   }
-                                   if (LTriggerTapTime > .4f)//no double tap
-                                   {
-                                       LTriggerTapTime = 0;
-                                       DoTrim = true;
-                                   }
-                                   else//double tap detected, reset trim
-                                   {
-                                       DoTrim = false;
-                                       Trim = new Vector2(0, 0);
-                                   }
-                               }
-                               if (InVR && DoTrim)
-                               {
-                                   //VR Set Trim
-                                   HandPosTrim = VehicleTransform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position);
-                                   TrimDifference = (TrimZeroPoint - HandPosTrim) * 2f;
-                                   Trim.x = Mathf.Clamp(TempTrim.y + TrimDifference.y, -1, 1);
-                                   Trim.y = Mathf.Clamp(TempTrim.x + -TrimDifference.x, -1, 1);
-                               }
-                               LTriggerLastFrame = true;
-                           }
-                           else { LTriggerLastFrame = false; } */
                         BrakeInput = 0;
                         break;
                     case 7://Canopy
@@ -1551,14 +1515,6 @@ public class EngineController : UdonSharpBehaviour
                             VehicleRigidbody.velocity = Vector3.zero;
                         }
                     }
-
-                    if (Physics.Raycast(GroundDetector.position, VehicleTransform.TransformDirection(Vector3.down), 1f, ResupplyLayer))
-                    {
-                        if (Time.time - LastResupplyTime > 1)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResupplyPlane");
-                        }
-                    }
                     //check for catapult below us and attach if there is one    
                     if (HasCatapult && CatapultStatus == 0)
                     {
@@ -1595,10 +1551,6 @@ public class EngineController : UdonSharpBehaviour
                                 CatapultDeadTimer = 2;//to make
 
                                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockIn");
-                                /*  if (!SoundControl.CatapultLockNull)
-                                 {
-                                     //SoundControl.CatapultLock.play();
-                                 } */
                             }
                         }
                     }
@@ -1652,8 +1604,9 @@ public class EngineController : UdonSharpBehaviour
                         ThrottleInput = PlayerThrottle;
                     }
                 }
-                Fuel = Mathf.Max(Fuel - ((FuelConsumption * Mathf.Max(ThrottleInput, 0.35f)) * DeltaTime), 0);
-                if (Fuel < 200) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / 200), 0, 1);//decrease max throttle as fuel runs out
+
+                Fuel = Mathf.Max(Fuel - ((FuelConsumption * (AfterburnerOn ? Mathf.Max(ThrottleInput, 0.35f) * FuelConsumptionABMulti : Mathf.Max(ThrottleInput, 0.35f))) * DeltaTime), 0);
+                if (Fuel < LowFuel) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / LowFuel), 0, 1);//decrease max throttle as fuel runs out
 
                 if (HasAfterburner)
                 {
@@ -1811,8 +1764,8 @@ public class EngineController : UdonSharpBehaviour
                     ReversingRollStrength = ReversingRollStrengthZero;
                 }
 
-                pitch = Mathf.Clamp(RotationInputs.x/*  + Trim.x */, -1, 1) * PitchStrength * ReversingPitchStrength;
-                yaw = Mathf.Clamp(-RotationInputs.y/*  - Trim.y */, -1, 1) * YawStrength * ReversingYawStrength;
+                pitch = Mathf.Clamp(RotationInputs.x, -1, 1) * PitchStrength * ReversingPitchStrength;
+                yaw = Mathf.Clamp(-RotationInputs.y, -1, 1) * YawStrength * ReversingYawStrength;
                 roll = RotationInputs.z * RollStrength * ReversingRollStrength;
 
 
@@ -1844,8 +1797,6 @@ public class EngineController : UdonSharpBehaviour
                     else VehicleRigidbody.velocity = Vector3.zero;
                 }
                 else { StillWindMulti = 1; }
-                /*                 RotationInputs.x = Trim.x;
-                                RotationInputs.y = Trim.y; */
             }
 
             //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
@@ -1856,7 +1807,6 @@ public class EngineController : UdonSharpBehaviour
 
             float sidespeed = 0;
             float downspeed = 0;
-            float forwardspeed = 0;
             float SpeedLiftFactor = 0;
             bool Flaps = false;
 
@@ -1867,15 +1817,12 @@ public class EngineController : UdonSharpBehaviour
                 //and add wind
                 sidespeed = Vector3.Dot(AirVel, VehicleTransform.right);
                 downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
-                forwardspeed = Vector3.Dot(AirVel, VehicleTransform.forward);
 
                 bool PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
                 if (PitchDown)
                 {
                     downspeed *= PitchDownLiftMulti;
-
-                    //speed related values
-                    SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift * PitchDownLiftMulti);//max lift is lower when pitching down
+                    SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift * PitchDownLiftMulti);
                 }
                 else
                 {
@@ -2033,22 +1980,34 @@ public class EngineController : UdonSharpBehaviour
             SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
 
             //play a touchdown sound the frame we start taxiing
-            if (Landed == false && Taxiing == true && Speed > TouchDownSoundSpeed)
+            if (Landed == false && Taxiing == true)
             {
-                if (SoundControl != null)
+                if (Speed > TouchDownSoundSpeed)
                 {
-                    SoundControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayTouchDownSound");
+                    if (SoundControl != null)
+                    {
+                        SoundControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayTouchDownSound");
+                    }
                 }
                 Landed = true;
             }
             else if (Taxiing == true)
-            {
-                Landed = true;
-            }
-            else
+            { Landed = true; }
+            else if (Landed == true && Taxiing == false)
             {
                 Landed = false;
+
+                foreach (GameObject obj in ExtensionUdonBehaviours)
+                {
+                    if (obj != null)
+                    {
+                        UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                        ud.SendCustomEvent("TakeOff");
+                    }
+                }
             }
+            else
+            { Landed = false; }
         }
         else//non-owners need to know these values
         {
@@ -2092,17 +2051,6 @@ public class EngineController : UdonSharpBehaviour
 
     //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
     //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
-    private void ToggleCanopy()
-    {
-        if (CanopyCloseTimer <= -100000 - CanopyCloseTime)
-        {
-            SetCanopyClosed();
-        }
-        else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000)
-        {
-            SetCanopyOpen();
-        }
-    }
     public void LaunchFlares()
     {
         PlaneAnimator.SetTrigger(FLARES_STRING);
@@ -2277,8 +2225,13 @@ public class EngineController : UdonSharpBehaviour
         if (HasLimits) { SetLimitsOn(); }
         if (HasHook) { SetHookUp(); }
         if (HasGear) { SetGearDown(); }
-        if (HasFlaps) { SetFlapsOn(); }
-        //EngineControl.Trim = Vector2.zero;
+        if (HasFlaps)
+        {
+            if (DefaultFlapsOff)
+            { SetFlapsOff(); }
+            else
+            { SetFlapsOn(); }
+        }
         Hooked = false;
         BombPoint = 0;
         NumAAM = FullAAMs;
@@ -2303,6 +2256,15 @@ public class EngineController : UdonSharpBehaviour
             AoALiftYaw = 0;
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
+
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("Explode");
+                }
+            }
         }
 
         //our killer increases their kills
@@ -2499,12 +2461,36 @@ public class EngineController : UdonSharpBehaviour
                 SoundControl.ABOnOutside.Play();
         }
         Afterburner = AfterburnerThrustMulti;
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("AfterburnerOn");
+                }
+            }
+        }
     }
     public void SetAfterburnerOff()
     {
         EffectsControl.AfterburnerOn = false;
         Afterburner = 1;
         PlaneAnimator.SetBool(AFTERBURNERON_STRING, false);
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("AfterburnerOff");
+                }
+            }
+        }
     }
     private void ToggleAfterburner()
     {
@@ -2545,14 +2531,46 @@ public class EngineController : UdonSharpBehaviour
         Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
         PlaneAnimator.SetTrigger(RESUPPLY_STRING);
         BombPoint = 0;
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("ReSupply");
+                }
+            }
+        }
     }
-    public void SetCanopyOpen()
+    public void ResupplyPlane_FuelOnly()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
-    }
-    public void SetCanopyClosed()
-    {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
+        //only play the sound if we're actually repairing/getting ammo/fuel
+        if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || GunAmmoInSeconds != FullGunAmmo || Health != FullHealth))
+        {
+            SoundControl.Reloading.Play();
+        }
+        LastResupplyTime = Time.time;
+        NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(FullAAMs / 10), 1), FullAAMs);
+        NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
+        NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
+
+        PlaneAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
+        PlaneAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
+        PlaneAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
+
+        /*Debug.Log(string.Concat("fuel ", Fuel));
+          Debug.Log(string.Concat("FullFuel ", FullFuel));
+          Debug.Log(string.Concat("Health ", Health));
+          Debug.Log(string.Concat("FullHealth ", FullHealth));
+          Debug.Log(string.Concat("GunAmmoInSeconds ", GunAmmoInSeconds));
+          Debug.Log(string.Concat("FullGunAmmo ", FullGunAmmo)); */
+        Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
+        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
+        Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
+        PlaneAnimator.SetTrigger(RESUPPLY_STRING);
+        BombPoint = 0;
     }
     public void CanopyOpening()
     {
@@ -2564,6 +2582,18 @@ public class EngineController : UdonSharpBehaviour
             else
             { CanopyCloseTimer = -100000; }
             PlaneAnimator.SetBool(CANOPYOPEN_STRING, true);
+        }
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("CanopyOpened");
+                }
+            }
         }
     }
     public void CanopyClosing()
@@ -2577,16 +2607,62 @@ public class EngineController : UdonSharpBehaviour
             { CanopyCloseTimer = CanopyCloseTime; }
             PlaneAnimator.SetBool(CANOPYOPEN_STRING, false);
         }
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("CanopyClosed");
+                }
+            }
+        }
+    }
+    private void ToggleCanopy()
+    {
+        if (CanopyCloseTimer <= -100000 - CanopyCloseTime)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
+        }
+        else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
+        }
     }
     public void SetGearUp()
     {
         EffectsControl.GearUp = true;
         PlaneAnimator.SetBool(GEARUP_STRING, true);
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("GearUp");
+                }
+            }
+        }
     }
     public void SetGearDown()
     {
         EffectsControl.GearUp = false;
         PlaneAnimator.SetBool(GEARUP_STRING, false);
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("GearDown");
+                }
+            }
+        }
     }
     public void ToggleGear()
     {
@@ -2602,14 +2678,40 @@ public class EngineController : UdonSharpBehaviour
     public void SetFlapsOff()
     {
         EffectsControl.Flaps = false;
+        MaxLift = StartMaxLift;
         PlaneAnimator.SetBool(FLAPS_STRING, false);
         FlapsDrag = 1;
         FlapsLift = 1;
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("FlapsOff");
+                }
+            }
+        }
     }
     public void SetFlapsOn()
     {
         EffectsControl.Flaps = true;
+        MaxLift *= FlapsMaxLiftMulti;
         PlaneAnimator.SetBool(FLAPS_STRING, true);
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("FlapsOn");
+                }
+            }
+        }
     }
     public void ToggleFlaps()
     {
@@ -2626,11 +2728,35 @@ public class EngineController : UdonSharpBehaviour
     {
         EffectsControl.HookDown = true;
         PlaneAnimator.SetBool(HOOKDOWN_STRING, true);
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("HookDown");
+                }
+            }
+        }
     }
     public void SetHookUp()
     {
         EffectsControl.HookDown = false;
         PlaneAnimator.SetBool(HOOKDOWN_STRING, false);
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("HookUp");
+                }
+            }
+        }
     }
     public void ToggleHook()
     {
@@ -2647,11 +2773,35 @@ public class EngineController : UdonSharpBehaviour
     {
         EffectsControl.Smoking = true;
         PlaneAnimator.SetBool(DISPLAYSMOKE_STRING, true);
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("SmokeOn");
+                }
+            }
+        }
     }
     public void SetSmokingOff()
     {
         EffectsControl.Smoking = false;
         PlaneAnimator.SetBool(DISPLAYSMOKE_STRING, false);
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("SmokeOff");
+                }
+            }
+        }
     }
     public void ToggleSmoking()
     {
@@ -2667,10 +2817,34 @@ public class EngineController : UdonSharpBehaviour
     public void SetLimitsOn()
     {
         FlightLimitsEnabled = true;
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("LimitsOn");
+                }
+            }
+        }
     }
     public void SetLimitsOff()
     {
         FlightLimitsEnabled = false;
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("LimitsOff");
+                }
+            }
+        }
     }
     public void ToggleLimits()
     {
@@ -2697,6 +2871,20 @@ public class EngineController : UdonSharpBehaviour
         VTOLAngle = VTOLDefaultValue;
         VTOLAngleInput = VTOLDefaultValue;
         VehicleObjectSync.Respawn();//this works if done just locally
+
+
+        foreach (GameObject obj in ExtensionUdonBehaviours)
+        {
+            if (obj != null)
+            {
+                if (!localPlayer.IsOwner(obj.gameObject))
+                {
+                    Networking.SetOwner(localPlayer, obj.gameObject);
+                }
+                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                ud.SendCustomEvent("Respawn");
+            }
+        }
     }
     public void ResetStatus()//called globally when using respawn button
     {
@@ -2706,8 +2894,15 @@ public class EngineController : UdonSharpBehaviour
         if (HasLimits) { SetLimitsOn(); }
         if (HasHook) { SetHookUp(); }
         if (HasGear) { SetGearDown(); }
-        if (HasFlaps) { SetFlapsOn(); }
-        if (HasCanopy && !EffectsControl.CanopyOpen) { SetCanopyOpen(); }
+        if (HasFlaps)
+        {
+            if (DefaultFlapsOff)
+            { SetFlapsOff(); }
+            else
+            { SetFlapsOn(); }
+        }
+        if (HasCanopy && !EffectsControl.CanopyOpen)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
         WeaponSelected = false;
         NumAAM = FullAAMs;
         NumAGM = FullAGMs;
@@ -2737,6 +2932,18 @@ public class EngineController : UdonSharpBehaviour
             int rand = Random.Range(0, SoundControl.BulletHit.Length);
             SoundControl.BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
             SoundControl.BulletHit[rand].Play();
+        }
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("PlaneHit");
+                }
+            }
         }
     }
     public void Respawn_event()//called by Respawn()
@@ -2808,6 +3015,18 @@ public class EngineController : UdonSharpBehaviour
 
         if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool(LOCALPASSENGER_STRING, true); }
         SetPlaneLayerInside();
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("PassengerEnter");
+                }
+            }
+        }
     }
     public void PassengerExitPlaneLocal()
     {
@@ -2819,15 +3038,44 @@ public class EngineController : UdonSharpBehaviour
 
         if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
         SetPlaneLayerOutside();
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("PassengerExit");
+                }
+            }
+        }
+    }
+    public override void OnOwnershipTransferred(VRCPlayerApi player)
+    {
+        if (player.isLocal)
+        { SetOwnerships(); }
+    }
+    public void SetOwnerships()
+    {
+        if (!localPlayer.IsOwner(gameObject)) { Networking.SetOwner(localPlayer, gameObject); }
+        if (!localPlayer.IsOwner(VehicleMainObj)) { Networking.SetOwner(localPlayer, VehicleMainObj); }
+        if (!localPlayer.IsOwner(EffectsControl.gameObject)) { Networking.SetOwner(localPlayer, EffectsControl.gameObject); }
+        if (!localPlayer.IsOwner(HUDControl.gameObject)) { Networking.SetOwner(localPlayer, HUDControl.gameObject); }
+        SetOwnerships();
+        foreach (GameObject obj in ExtensionUdonBehaviours)
+        {
+            if (obj != null && !localPlayer.IsOwner(obj.gameObject)) { Networking.SetOwner(localPlayer, obj.gameObject); }
+        }
     }
     public void PilotEnterPlaneLocal()//called from PilotSeat
     {
-        //setting this as a workaround because it doesnt work reliably in Enginecontroller's Start()
+        //setting this as a workaround because it doesnt work reliably in Start()
         if (localPlayer.IsUserInVR()) { InVR = true; }
 
         Networking.SetOwner(localPlayer, gameObject);
+        SetOwnerships();
 
-        if (VehicleMainObj != null) { Networking.SetOwner(localPlayer, VehicleMainObj); }
 
         EngineOutput = 0;
         ThrottleInput = 0;
@@ -2844,13 +3092,11 @@ public class EngineController : UdonSharpBehaviour
             //canopy closed/open sound
             if (EffectsControl.CanopyOpen) { CanopyCloseTimer = -100000 - CanopyCloseTime; }
             else CanopyCloseTimer = -CanopyCloseTime;//less than 0
-            Networking.SetOwner(localPlayer, EffectsControl.gameObject);
             //SetSmokingOff();
             EffectsControl.PlaneAnimator.SetBool(LOCALPILOT_STRING, true);
         }
         if (HUDControl != null)
         {
-            Networking.SetOwner(localPlayer, HUDControl.gameObject);
             HUDControl.gameObject.SetActive(true);
         }
 
@@ -2871,6 +3117,18 @@ public class EngineController : UdonSharpBehaviour
         if (KillsBoard != null)
         {
             KillsBoard.MyKills = 0;
+        }
+
+        if (IsOwner)
+        {
+            foreach (GameObject obj in ExtensionUdonBehaviours)
+            {
+                if (obj != null)
+                {
+                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                    ud.SendCustomEvent("PilotEnter");
+                }
+            }
         }
     }
     public void PilotEnterPlaneGlobal(VRCPlayerApi player)
@@ -2942,6 +3200,18 @@ public class EngineController : UdonSharpBehaviour
             if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
             //set plane's layer back
             SetPlaneLayerOutside();
+
+            if (IsOwner)
+            {
+                foreach (GameObject obj in ExtensionUdonBehaviours)
+                {
+                    if (obj != null)
+                    {
+                        UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                        ud.SendCustomEvent("PilotExit");
+                    }
+                }
+            }
         }
         if (KillsBoard != null)
         {
@@ -3082,7 +3352,7 @@ public class EngineController : UdonSharpBehaviour
     {
         //Ground effect, extra lift caused by air pressure when close to the ground
         RaycastHit GE;
-        if (Physics.Raycast(Position, Direction, out GE, GroundEffectMaxDistance, 2049 /* Default and Environment */, QueryTriggerInteraction.Collide))
+        if (Physics.Raycast(Position, Direction, out GE, GroundEffectMaxDistance, 2065 /* Default, Water and Environment */, QueryTriggerInteraction.Collide))
         {
             float GroundEffect = ((-GE.distance + GroundEffectMaxDistance) / GroundEffectMaxDistance) * GEStrength;
             if (VTOL) { return 1 + GroundEffect; }
@@ -3114,6 +3384,7 @@ public class EngineController : UdonSharpBehaviour
             else
             {
                 VTOLAngle90 = Mathf.Min(VTOLAngle / VTOL90Degrees, 1);
+                //used to lerp values as vtol angle goes towards 90 degrees instead of max vtol angle which can be above 90
                 float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngle90;
 
                 PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);

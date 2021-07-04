@@ -36,8 +36,6 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Transform Yaw;
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
-    /*     [SerializeField] private Transform TrimPitch;
-        [SerializeField] private Transform TrimYaw; */
     [SerializeField] private GameObject AtGScreen;
     [SerializeField] private GameObject LStick_funcon1;
     [SerializeField] private GameObject LStick_funcon2;
@@ -77,6 +75,8 @@ public class HUDController : UdonSharpBehaviour
     private float VTOLDefaultValue;
     private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
+    private GameObject[] ExtensionUdonBehaviours;
+    VRCPlayerApi localPlayer;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -103,8 +103,6 @@ public class HUDController : UdonSharpBehaviour
         Assert(RStickDisplayHighlighter != null, "Start: RStickDisplayHighlighter != null");
         Assert(PitchRoll != null, "Start: PitchRoll != null");
         Assert(Yaw != null, "Start: Yaw != null");
-        /*         Assert(TrimPitch != null, "Start: TrimPitch != null");
-                Assert(TrimYaw != null, "Start: TrimYaw != null"); */
         Assert(AtGScreen != null, "Start: AGMScreen != null");
         Assert(LStick_funcon1 != null, "Start: LStick_funcon1 != null");
         Assert(LStick_funcon2 != null, "Start: LStick_funcon2 != null");
@@ -130,6 +128,9 @@ public class HUDController : UdonSharpBehaviour
         FullGunAmmoDivider = 1f / (gunammo > 0 ? gunammo : 10000000);
 
         VTOLDefaultValue = EngineControl.VTOLDefaultValue;
+
+        ExtensionUdonBehaviours = EngineControl.ExtensionUdonBehaviours;
+        localPlayer = Networking.LocalPlayer;
     }
     private void OnEnable()
     {
@@ -143,12 +144,6 @@ public class HUDController : UdonSharpBehaviour
 
         //Yaw Indicator
         Yaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.RotationInputs.y, 0, 0)) * InputSquareSize;
-
-        /*         //Yaw Trim Indicator
-                TrimYaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.Trim.y, 0, 0)) * InputSquareSize;
-
-                //Pitch Trim Indicator
-                TrimPitch.localPosition = InputsZeroPos + (new Vector3(0, EngineControl.Trim.x, 0)) * InputSquareSize; */
 
         //Velocity indicator
         Vector3 tempvel;
@@ -342,9 +337,6 @@ public class HUDController : UdonSharpBehaviour
         if (EngineControl.AltHold) { LStick_funcon6.SetActive(true); }
         else { LStick_funcon6.SetActive(false); }
 
-        /* if (EngineControl.Trim.x != 0) { LStick_funcon6.SetActive(true); }
-                else { LStick_funcon6.SetActive(false); } */
-
         if (EffectsControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
         else { LStick_funcon7.SetActive(false); }
 
@@ -471,13 +463,28 @@ public class HUDController : UdonSharpBehaviour
         }
     }
 
-    [System.NonSerializedAttribute] public int PilotSeat;
-    [System.NonSerializedAttribute] public int MySeat;
+    [System.NonSerializedAttribute] public int PilotSeat = -1;
+    [System.NonSerializedAttribute] public int MySeat = -1;
     [System.NonSerializedAttribute] public int[] SeatedPlayers;
     [System.NonSerializedAttribute] public VRCStation[] VehicleStations;
     [System.NonSerializedAttribute] public int[] InsidePlayers;
     public void ExitStation()
     {
+        foreach (GameObject obj in ExtensionUdonBehaviours)
+        {
+            if (obj != null)
+            {
+                if (!localPlayer.IsOwner(obj.gameObject))
+                {
+                    Networking.SetOwner(localPlayer, obj.gameObject);
+                }
+                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                if (MySeat == PilotSeat)
+                { ud.SendCustomEvent("PilotExit"); }
+                else
+                { ud.SendCustomEvent("PassengerExit"); }
+            }
+        }
         VehicleStations[MySeat].ExitStation(EngineControl.localPlayer);
     }
     public void FindSeats()

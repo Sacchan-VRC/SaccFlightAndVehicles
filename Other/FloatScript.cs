@@ -7,12 +7,12 @@ using VRC.Udon;
 public class FloatScript : UdonSharpBehaviour
 {
     [SerializeField] private Rigidbody VehicleRigidbody;
-    private Transform VehicleTransform;
-    [SerializeField] private float Compressing;
-    [SerializeField] private float Rebound;
-    [SerializeField] private float FloatForce;
-    [SerializeField] private bool DoOnLand;
     [SerializeField] private Transform[] FloatPoints;
+    [SerializeField] private LayerMask FloatLayers = 16;
+    private Transform VehicleTransform;
+    [SerializeField] private float FloatForce;
+    [SerializeField] private float Compressing;
+    [SerializeField] private bool DoOnLand;
     [SerializeField] private float SuspMaxDist = .5f;
     [SerializeField] private float WaterSidewaysDrag = .1f;
     [SerializeField] private float WaterForwardDrag = .1f;
@@ -35,7 +35,7 @@ public class FloatScript : UdonSharpBehaviour
     private float LastRayHitHeight = float.MinValue;
     private Vector3[] FloatPointForce;
     private int currentfloatpoint;
-    private float depth;
+    [System.NonSerializedAttribute] public float depth;
     float SuspDispToMeters;
     private VRCPlayerApi localPlayer;
     private bool InEditor = false;
@@ -60,27 +60,30 @@ public class FloatScript : UdonSharpBehaviour
         {
             FloatLocalPos[i] = FloatPoints[i].localPosition;
         }
-
     }
     private void OnEnable()
     {
         LastRayHitHeight = float.MinValue;
     }
-    void FixedUpdate()
+    public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
-        if (InEditor || localPlayer.IsOwner(gameObject))
+        if (player.isLocal)
         {
-            Floating();
+            gameObject.SetActive(true);
+        }
+        else
+        {
+            gameObject.SetActive(false);
         }
     }
-    private void Floating()
+    private void FixedUpdate()
     {
         //fire test ray to check if it's worth firing another ray, and to check the height of the water/ground surface and if it's water or land
         if (LastRayHitHeight < transform.position.y)
         {
             RaycastHit hit;
-            //15 meters should be far enough for this to work with any size of plane, needs to be increase if you're trying to make something gigantic fly
-            if (Physics.Raycast(transform.position, -Vector3.up, out hit, 15, 1, QueryTriggerInteraction.Collide))
+            //15 meters should be far enough for this to work with any size of plane, needs to be increased if you're trying to make something gigantic float
+            if (Physics.Raycast(transform.position, -Vector3.up, out hit, 15, FloatLayers, QueryTriggerInteraction.Collide))
             {
                 if (hit.collider.isTrigger)//trigger = water
                 {
@@ -111,8 +114,6 @@ public class FloatScript : UdonSharpBehaviour
             float CompressionDifference = FloatPoints[currentfloatpoint].position.y - FloatPointHeightLastFrame[currentfloatpoint];
             if (CompressionDifference < 0)
             { CompressionDifference *= -Compressing; }
-            else
-            { CompressionDifference *= -Rebound; }
             FloatPointForce[currentfloatpoint] = Vector3.up * (FloatForce + (CompressionDifference * SuspDispToMeters));
             FloatPointHeightLastFrame[currentfloatpoint] = FloatPoints[currentfloatpoint].position.y;
         }
@@ -130,7 +131,7 @@ public class FloatScript : UdonSharpBehaviour
                 FloatPoints[currentfloatpoint].localPosition = FloatLocalPos[currentfloatpoint];
             }
             RaycastHit hit;
-            if (Physics.Raycast(FloatPoints[currentfloatpoint].position, -Vector3.up, out hit, SuspMaxDist, 1, QueryTriggerInteraction.Collide))
+            if (Physics.Raycast(FloatPoints[currentfloatpoint].position, -Vector3.up, out hit, SuspMaxDist, FloatLayers, QueryTriggerInteraction.Collide))
             {
                 if (DoOnLand || hit.collider.isTrigger)
                 {
@@ -138,8 +139,6 @@ public class FloatScript : UdonSharpBehaviour
                     float CompressionDifference = (SuspensionCompression[currentfloatpoint] - SuspensionCompressionLastFrame[currentfloatpoint]);
                     if (CompressionDifference > 0)
                     { CompressionDifference *= Compressing; }
-                    else
-                    { CompressionDifference *= Rebound; }
 
                     SuspensionCompressionLastFrame[currentfloatpoint] = SuspensionCompression[currentfloatpoint];
                     FloatPointForce[currentfloatpoint] = Vector3.up * (((SuspensionCompression[currentfloatpoint] * FloatForce) + CompressionDifference));
@@ -190,7 +189,6 @@ public class FloatScript : UdonSharpBehaviour
                 right = Vector3.zero;
             }
             float BackThrustAmount = -((Vector3.Dot(Vel, forward)) * BackThrustStrength);
-            Debug.Log(BackThrustAmount);
             if (BackThrustAmount > 0)
             { VehicleRigidbody.AddForce(forward * BackThrustAmount * depth * EngineControl.ThrottleInput); }
             VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * depth, ForceMode.Force);

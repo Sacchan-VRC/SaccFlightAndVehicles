@@ -17,12 +17,14 @@ public class PassengerSeat : UdonSharpBehaviour
     private Transform Seat;
     private Quaternion SeatStartRot;
     [SerializeField] private GameObject[] SetOwnerObjects;
+    private VRCPlayerApi localPlayer;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
         Assert(PassengerOnly != null, "Start: LeaveButton != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
+        localPlayer = Networking.LocalPlayer;
         HUDControl = EngineControl.HUDControl;
         PlaneMesh = EngineControl.PlaneMesh.transform;
         Planelayer = PlaneMesh.gameObject.layer;
@@ -35,7 +37,7 @@ public class PassengerSeat : UdonSharpBehaviour
         EngineControl.PassengerEnterPlaneLocal();
 
         Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
-        EngineControl.localPlayer.UseAttachedStation();
+        localPlayer.UseAttachedStation();
         Seat.localRotation = SeatStartRot;
 
         HUDControl.MySeat = ThisStationID;
@@ -43,11 +45,14 @@ public class PassengerSeat : UdonSharpBehaviour
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
 
         foreach (GameObject obj in SetOwnerObjects)
-        { Networking.SetOwner(EngineControl.localPlayer, obj); }
+        {
+            if (!localPlayer.IsOwner(obj.gameObject))
+            { Networking.SetOwner(localPlayer, obj); }
+        }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
-        if (firsttime) { initializeseat(); }//can't do this in start because hudcontrol might not have initialized
+        if (firsttime) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
 
         //voice range change to allow talking inside cockpit (after VRC patch 1008)
         if (player != null)
@@ -72,12 +77,12 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
-        if (firsttime) { initializeseat(); }
+        if (firsttime) { InitializeSeat(); }
         PlayerExitPlane(player);
     }
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
-        if (firsttime) { initializeseat(); }
+        if (firsttime) { InitializeSeat(); }
         if (player.playerId == HUDControl.SeatedPlayers[ThisStationID])
         {
             PlayerExitPlane(player);
@@ -85,9 +90,10 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     public void PlayerExitPlane(VRCPlayerApi player)
     {
-        if (firsttime) { initializeseat(); }
+        if (firsttime) { InitializeSeat(); }
 
         HUDControl.SeatedPlayers[ThisStationID] = -1;
+        HUDControl.MySeat = -1;
         if (player != null)
         {
             SetVoiceOutside(player);
@@ -121,7 +127,7 @@ public class PassengerSeat : UdonSharpBehaviour
         Player.SetVoiceDistanceFar(25);
         Player.SetVoiceGain(15);
     }
-    private void initializeseat()
+    private void InitializeSeat()
     {
         HUDControl.FindSeats();
         int x = 0;
