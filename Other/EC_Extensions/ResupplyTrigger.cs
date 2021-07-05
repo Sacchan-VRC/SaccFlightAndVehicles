@@ -13,15 +13,11 @@ public class ResupplyTrigger : UdonSharpBehaviour
     private int NumTriggers = 0;
     private bool InResupplyZone;
     private Collider ThisCollider;
-    private VRCPlayerApi localPlayer;
     private bool Initialized = false;
     private void Initialize()
     {
         ResupplyLayer = LayerMaskToLayer(EngineControl.ResupplyLayer);
         ThisCollider = gameObject.GetComponent<Collider>();
-        localPlayer = Networking.LocalPlayer;
-        if (localPlayer != null)
-        { gameObject.SetActive(false); }
     }
     private void Update()
     {
@@ -78,11 +74,8 @@ public class ResupplyTrigger : UdonSharpBehaviour
     {
         gameObject.SetActive(true);
     }
-    public override void OnOwnershipTransferred(VRCPlayerApi player)
+    public void PilotExit()
     {
-        if (player.isLocal)
-        { gameObject.SetActive(true); }
-        else
-        { gameObject.SetActive(false); }
+        gameObject.SetActive(false);
     }
 }

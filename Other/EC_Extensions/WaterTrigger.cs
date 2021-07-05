@@ -64,11 +64,12 @@ public class WaterTrigger : UdonSharpBehaviour
         InWater = false;
         NumTriggers = 0;
     }
-    public override void OnOwnershipTransferred(VRCPlayerApi player)
+    public void TakeOwnership()
     {
-        if (player.isLocal)
         { gameObject.SetActive(true); }
-        else
+    }
+    public void LoseOwnership()
+    {
         { gameObject.SetActive(false); }
     }
 }

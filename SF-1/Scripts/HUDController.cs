@@ -470,21 +470,6 @@ public class HUDController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int[] InsidePlayers;
     public void ExitStation()
     {
-        foreach (GameObject obj in ExtensionUdonBehaviours)
-        {
-            if (obj != null)
-            {
-                if (!localPlayer.IsOwner(obj.gameObject))
-                {
-                    Networking.SetOwner(localPlayer, obj.gameObject);
-                }
-                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                if (MySeat == PilotSeat)
-                { ud.SendCustomEvent("PilotExit"); }
-                else
-                { ud.SendCustomEvent("PassengerExit"); }
-            }
-        }
         VehicleStations[MySeat].ExitStation(EngineControl.localPlayer);
     }
     public void FindSeats()

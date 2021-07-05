@@ -24,7 +24,7 @@ public class FloatScript : UdonSharpBehaviour
 
     [Header("HoverBike Only")]
     [SerializeField] private EngineController EngineControl;
-    [SerializeField] private bool HoverBikeTurning = false;
+    [SerializeField] private bool HoverBike = false;
     [SerializeField] private float HoverBikeTurningStrength = 1;
     [SerializeField] private float BackThrustStrength = 5;
     private float[] SuspensionCompression;
@@ -60,21 +60,30 @@ public class FloatScript : UdonSharpBehaviour
         {
             FloatLocalPos[i] = FloatPoints[i].localPosition;
         }
+        if (HoverBike || (!InEditor && !localPlayer.isMaster))
+        {
+            gameObject.SetActive(false);
+        }
     }
     private void OnEnable()
     {
         LastRayHitHeight = float.MinValue;
     }
-    public override void OnOwnershipTransferred(VRCPlayerApi player)
+    public void TakeOwnership()
     {
-        if (player.isLocal)
-        {
-            gameObject.SetActive(true);
-        }
-        else
-        {
-            gameObject.SetActive(false);
-        }
+        if (!HoverBike) { gameObject.SetActive(true); }
+    }
+    public void LoseOwnership()
+    {
+        if (!HoverBike) { gameObject.SetActive(false); }
+    }
+    public void PilotExit()
+    {
+        if (HoverBike) { gameObject.SetActive(false); }
+    }
+    public void PilotEnter()
+    {
+        if (HoverBike) { gameObject.SetActive(true); }
     }
     private void FixedUpdate()
     {
@@ -176,7 +185,7 @@ public class FloatScript : UdonSharpBehaviour
         float sidespeed = Vector3.Dot(Vel, right);
         float forwardspeed = Vector3.Dot(Vel, forward);
 
-        if (HoverBikeTurning)
+        if (HoverBike)
         {
             float RightY = Mathf.Abs(right.y);
             right.y = 0;

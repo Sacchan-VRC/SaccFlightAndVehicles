@@ -527,7 +527,7 @@ public class EngineController : UdonSharpBehaviour
         {
             GunRecoilEmptyNULL = false;
         }
-        LowFuel = FullFuel * .14f;
+        LowFuel = FullFuel * .13888888f;//to match the old default settings
     }
 
     private void LateUpdate()
@@ -1996,15 +1996,7 @@ public class EngineController : UdonSharpBehaviour
             else if (Landed == true && Taxiing == false)
             {
                 Landed = false;
-
-                foreach (GameObject obj in ExtensionUdonBehaviours)
-                {
-                    if (obj != null)
-                    {
-                        UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                        ud.SendCustomEvent("TakeOff");
-                    }
-                }
+                SendEventToExtensions("TakeOff", false);
             }
             else
             { Landed = false; }
@@ -2257,14 +2249,7 @@ public class EngineController : UdonSharpBehaviour
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
 
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("Explode");
-                }
-            }
+            SendEventToExtensions("Explode", false);
         }
 
         //our killer increases their kills
@@ -2464,14 +2449,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("AfterburnerOn");
-                }
-            }
+            SendEventToExtensions("AfterburnerOn", false);
         }
     }
     public void SetAfterburnerOff()
@@ -2482,14 +2460,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("AfterburnerOff");
-                }
-            }
+            SendEventToExtensions("AfterburnerOff", false);
         }
     }
     private void ToggleAfterburner()
@@ -2534,14 +2505,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("ReSupply");
-                }
-            }
+            SendEventToExtensions("ReSupply", false);
         }
     }
     public void ResupplyPlane_FuelOnly()
@@ -2586,14 +2550,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("CanopyOpened");
-                }
-            }
+            SendEventToExtensions("CanopyOpened", false);
         }
     }
     public void CanopyClosing()
@@ -2609,14 +2566,7 @@ public class EngineController : UdonSharpBehaviour
         }
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("CanopyClosed");
-                }
-            }
+            SendEventToExtensions("CanopyClosed", false);
         }
     }
     private void ToggleCanopy()
@@ -2637,14 +2587,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("GearUp");
-                }
-            }
+            SendEventToExtensions("GearUp", false);
         }
     }
     public void SetGearDown()
@@ -2654,14 +2597,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("GearDown");
-                }
-            }
+            SendEventToExtensions("GearDown", false);
         }
     }
     public void ToggleGear()
@@ -2685,14 +2621,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("FlapsOff");
-                }
-            }
+            SendEventToExtensions("FlapsOff", false);
         }
     }
     public void SetFlapsOn()
@@ -2703,14 +2632,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("FlapsOn");
-                }
-            }
+            SendEventToExtensions("FlapsOn", false);
         }
     }
     public void ToggleFlaps()
@@ -2731,14 +2653,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("HookDown");
-                }
-            }
+            SendEventToExtensions("HookDown", false);
         }
     }
     public void SetHookUp()
@@ -2748,14 +2663,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("HookUp");
-                }
-            }
+            SendEventToExtensions("HookUp", false);
         }
     }
     public void ToggleHook()
@@ -2776,14 +2684,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("SmokeOn");
-                }
-            }
+            SendEventToExtensions("SmokeOn", false);
         }
     }
     public void SetSmokingOff()
@@ -2793,14 +2694,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("SmokeOff");
-                }
-            }
+            SendEventToExtensions("SmokeOff", false);
         }
     }
     public void ToggleSmoking()
@@ -2820,14 +2714,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("LimitsOn");
-                }
-            }
+            SendEventToExtensions("LimitsOn", false);
         }
     }
     public void SetLimitsOff()
@@ -2836,14 +2723,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("LimitsOff");
-                }
-            }
+            SendEventToExtensions("LimitsOff", false);
         }
     }
     public void ToggleLimits()
@@ -2873,18 +2753,7 @@ public class EngineController : UdonSharpBehaviour
         VehicleObjectSync.Respawn();//this works if done just locally
 
 
-        foreach (GameObject obj in ExtensionUdonBehaviours)
-        {
-            if (obj != null)
-            {
-                if (!localPlayer.IsOwner(obj.gameObject))
-                {
-                    Networking.SetOwner(localPlayer, obj.gameObject);
-                }
-                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                ud.SendCustomEvent("Respawn");
-            }
-        }
+        SendEventToExtensions("Respawn", true);
     }
     public void ResetStatus()//called globally when using respawn button
     {
@@ -2936,14 +2805,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("PlaneHit");
-                }
-            }
+            SendEventToExtensions("PlaneHit", false);
         }
     }
     public void Respawn_event()//called by Respawn()
@@ -3016,45 +2878,36 @@ public class EngineController : UdonSharpBehaviour
         if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool(LOCALPASSENGER_STRING, true); }
         SetPlaneLayerInside();
 
-        if (IsOwner)
-        {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("PassengerEnter");
-                }
-            }
-        }
+        SendEventToExtensions("PassengerEnter", false);
     }
     public void PassengerExitPlaneLocal()
     {
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool("localpassenger", false); }
+        if (EffectsControl != null) { PlaneAnimator.SetBool("localpassenger", false); }
         Passenger = false;
         localPlayer.SetVelocity(CurrentVel);
         MissilesIncoming = 0;
-        EffectsControl.PlaneAnimator.SetInteger("missilesincoming", 0);
+        PlaneAnimator.SetInteger("missilesincoming", 0);
 
         if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
         SetPlaneLayerOutside();
 
-        if (IsOwner)
-        {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("PassengerExit");
-                }
-            }
-        }
+        SendEventToExtensions("PassengerExit", false);
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
         if (player.isLocal)
-        { SetOwnerships(); }
+        {
+            SetOwnerships();
+
+            SendEventToExtensions("TakeOwnership", false);
+        }
+        else
+        {
+            if (IsOwner)
+            {
+                SendEventToExtensions("LoseOwnership", false);
+            }
+        }
     }
     public void SetOwnerships()
     {
@@ -3062,11 +2915,11 @@ public class EngineController : UdonSharpBehaviour
         if (!localPlayer.IsOwner(VehicleMainObj)) { Networking.SetOwner(localPlayer, VehicleMainObj); }
         if (!localPlayer.IsOwner(EffectsControl.gameObject)) { Networking.SetOwner(localPlayer, EffectsControl.gameObject); }
         if (!localPlayer.IsOwner(HUDControl.gameObject)) { Networking.SetOwner(localPlayer, HUDControl.gameObject); }
-        SetOwnerships();
         foreach (GameObject obj in ExtensionUdonBehaviours)
         {
             if (obj != null && !localPlayer.IsOwner(obj.gameObject)) { Networking.SetOwner(localPlayer, obj.gameObject); }
         }
+        IsOwner = true;
     }
     public void PilotEnterPlaneLocal()//called from PilotSeat
     {
@@ -3121,14 +2974,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
-            {
-                if (obj != null)
-                {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("PilotEnter");
-                }
-            }
+            SendEventToExtensions("PilotEnter", false);
         }
     }
     public void PilotEnterPlaneGlobal(VRCPlayerApi player)
@@ -3201,17 +3047,7 @@ public class EngineController : UdonSharpBehaviour
             //set plane's layer back
             SetPlaneLayerOutside();
 
-            if (IsOwner)
-            {
-                foreach (GameObject obj in ExtensionUdonBehaviours)
-                {
-                    if (obj != null)
-                    {
-                        UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                        ud.SendCustomEvent("PilotExit");
-                    }
-                }
-            }
+            SendEventToExtensions("PilotExit", false);
         }
         if (KillsBoard != null)
         {
@@ -3418,6 +3254,20 @@ public class EngineController : UdonSharpBehaviour
             ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
         }
     }
+    private void SendEventToExtensions(string eventname, bool takeownership)
+    {
+        foreach (GameObject obj in ExtensionUdonBehaviours)
+        {
+            if (obj != null)
+            {
+                if (takeownership)
+                { }
+
+                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                ud.SendCustomEvent(eventname);
+            }
+        }
+    }
     private void Assert(bool condition, string message)
     {
         if (!condition)
@@ -3425,4 +3275,5 @@ public class EngineController : UdonSharpBehaviour
             Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
+
 }
