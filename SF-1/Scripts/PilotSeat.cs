@@ -12,7 +12,7 @@ public class PilotSeat : UdonSharpBehaviour
     public GameObject PilotOnly;
     private HUDController HUDControl;
     private int ThisStationID;
-    private bool firsttime = true;
+    private bool SeatInitialized = false;
     private Transform Seat;
     private Quaternion SeatStartRot;
     private Transform[] PilotOnlyScripts;
@@ -53,7 +53,7 @@ public class PilotSeat : UdonSharpBehaviour
     }
     private void Interact()//entering the plane
     {
-        if (firsttime) { InitializeSeat(); }
+        if (!SeatInitialized) { InitializeSeat(); }
         HUDControl.MySeat = ThisStationID;
 
         EngineControl.PilotEnterPlaneLocal();
@@ -68,7 +68,7 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
-        if (firsttime) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
+        if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
         if (player != null)
         {
             EngineControl.PilotEnterPlaneGlobal(player);
@@ -97,7 +97,7 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
-        if (firsttime) { InitializeSeat(); }
+        if (!SeatInitialized) { InitializeSeat(); }
         if (player.playerId == HUDControl.SeatedPlayers[ThisStationID])
         {
             PlayerExitPlane(player);
@@ -105,7 +105,7 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public void PlayerExitPlane(VRCPlayerApi player)
     {
-        if (firsttime) { InitializeSeat(); }
+        if (!SeatInitialized) { InitializeSeat(); }
         HUDControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)
         {
@@ -157,7 +157,7 @@ public class PilotSeat : UdonSharpBehaviour
             }
             x++;
         }
-        firsttime = false;
+        SeatInitialized = true;
     }
     private void Assert(bool condition, string message)
     {

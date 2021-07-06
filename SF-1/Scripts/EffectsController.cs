@@ -38,7 +38,6 @@ public class EffectsController : UdonSharpBehaviour
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
     private bool InEditor;
-    private int GUNFIRING_STRING = Animator.StringToHash("gunfiring");
     private int OCCUPIED_STRING = Animator.StringToHash("occupied");
     private int PITCHINPUT_STRING = Animator.StringToHash("pitchinput");
     private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
@@ -146,7 +145,6 @@ public class EffectsController : UdonSharpBehaviour
     private void LargeEffects()//large effects visible from a long distance
     {
         float DeltaTime = Time.deltaTime;
-        PlaneAnimator.SetBool(GUNFIRING_STRING, EngineControl.IsFiringGun);
         if (EngineControl.Occupied)
         {
             if (Smoking && !DisplaySmokeNull)
@@ -207,7 +205,6 @@ public class EffectsController : UdonSharpBehaviour
     public void EffectsLeavePlane()
     {
         Smoking = false;
-        PlaneAnimator.SetBool(GUNFIRING_STRING, false);
         PlaneAnimator.SetBool(OCCUPIED_STRING, false);
         PlaneAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
         PlaneAnimator.SetBool(LOCALPILOT_STRING, false);

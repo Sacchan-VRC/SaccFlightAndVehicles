@@ -10,7 +10,11 @@ public class EngineController : UdonSharpBehaviour
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
-    public GameObject[] ExtensionUdonBehaviours;//replace my code if fixed: https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/589-udonbehaviour-array-type-is-not-defined
+    public GameObject[] ExtensionUdonBehaviours;
+    public GameObject[] Dial_Functions_L;
+    private UdonBehaviour CurrentSelectedFunctionL;
+    private UdonBehaviour CurrentSelectedFunctionR;
+    public GameObject[] Dial_Functions_R;
     public Transform PlaneMesh;
     public int OnboardPlaneLayer = 19;
     public Transform CenterOfMass;
@@ -43,7 +47,6 @@ public class EngineController : UdonSharpBehaviour
     public float BombDelay = 0f;
     public Transform[] BombLaunchPoints;
     public Transform GunRecoilEmpty;
-    [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
     public float GunRecoil = 150;
     public Scoreboard_Kills KillsBoard;
     public bool RepeatingWorld = true;
@@ -173,7 +176,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 SmokeColor = Vector3.one;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool IsFiringGun = false;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VTOLAngle;
@@ -190,8 +192,10 @@ public class EngineController : UdonSharpBehaviour
     private float LerpedRoll;
     private float LerpedPitch;
     private float LerpedYaw;
-    [System.NonSerializedAttribute] public int RStickSelection = 0;
-    [System.NonSerializedAttribute] public int LStickSelection = 0;
+    [System.NonSerializedAttribute] public int RStickSelection = -1;
+    [System.NonSerializedAttribute] public int LStickSelection = -1;
+    [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
+    [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
     [System.NonSerializedAttribute] public bool LGripLastFrame = false;
     [System.NonSerializedAttribute] public bool LTriggerLastFrame = false;
     [System.NonSerializedAttribute] public bool RTriggerLastFrame = false;
@@ -433,7 +437,6 @@ public class EngineController : UdonSharpBehaviour
 
         FullHealth = Health;
         FullFuel = Fuel;
-        FullGunAmmo = GunAmmoInSeconds;
         FullAAMs = NumAAM;
         FullAGMs = NumAGM;
         FullBombs = NumBomb;
@@ -535,7 +538,7 @@ public class EngineController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (!InEditor) { IsOwner = localPlayer.IsOwner(VehicleMainObj); }
         else { IsOwner = true; }
-        if (!EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore))
+        if (HasGear && !EffectsControl.GearUp && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore))
         { Taxiing = true; }
         else { Taxiing = false; }
 
@@ -632,6 +635,17 @@ public class EngineController : UdonSharpBehaviour
                 Vector3 JoystickPos;
                 Vector2 VRPitchRoll;
 
+                if (Input.GetKeyDown(KeyCode.Alpha1))
+                {
+                    LStickSelection += 1;
+                    if (LStickSelection == Dial_Functions_L.Length) { LStickSelection = 0; }
+                }
+                if (Input.GetKeyDown(KeyCode.Alpha2))
+                {
+                    RStickSelection += 1;
+                    if (RStickSelection == Dial_Functions_R.Length) { RStickSelection = 0; }
+                }
+
 
                 //close canopy when moving fast, can't fly with it open
                 if (Speed > 20 && EffectsControl.CanopyOpen && HasCanopy)
@@ -642,132 +656,6 @@ public class EngineController : UdonSharpBehaviour
                     }
                 }
 
-                ///////////////////KEYBOARD CONTROLS////////////////////////////////////////////////////////          
-                if (EffectsControl.Smoking)
-                {
-                    int keypad7 = Input.GetKey(KeyCode.Keypad7) ? 1 : 0;
-                    int Keypad4 = Input.GetKey(KeyCode.Keypad4) ? 1 : 0;
-                    int Keypad8 = Input.GetKey(KeyCode.Keypad8) ? 1 : 0;
-                    int Keypad5 = Input.GetKey(KeyCode.Keypad5) ? 1 : 0;
-                    int Keypad9 = Input.GetKey(KeyCode.Keypad9) ? 1 : 0;
-                    int Keypad6 = Input.GetKey(KeyCode.Keypad6) ? 1 : 0;
-                    SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * DeltaTime), 0, 1);
-                    SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
-                    SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
-                }
-                if (Input.GetKeyDown(KeyCode.F2) && HasCruise)
-                {
-                    SetSpeed = AirSpeed;
-                    Cruise = !Cruise;
-                }
-                if (Input.GetKeyDown(KeyCode.F1) && HasLimits)
-                {
-                    ToggleLimits();
-                }
-                if (Input.GetKeyDown(KeyCode.C) && HasCatapult)
-                {
-                    if (CatapultStatus == 1)
-                    {
-                        CatapultStatus = 2;
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects");
-                    }
-                }
-                if (Input.GetKeyDown(KeyCode.H) && HasHook)
-                {
-                    if (HookDetector != null)
-                    {
-                        ToggleHook();
-                    }
-                    Hooked = false;
-                }
-                if (Input.GetKeyDown(KeyCode.F3) && HasAltHold)
-                {
-                    AltHold = !AltHold;
-                }
-                if (Input.GetKeyDown(KeyCode.Z) && Speed < 20 && HasCanopy)
-                {
-                    ToggleCanopy();
-                }
-
-                //with keys 1-4 we select weapons, if they are already selected, deselect them.
-                if (Input.GetKeyDown(KeyCode.Alpha1) && HasGun)
-                {
-                    if (RStickSelection == 1)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
-                        RStickSelection = 0;
-                    }
-                    else
-                    {
-                        if (HUDControl != null) { HUDControl.GUN_TargetSpeedLerper = 0; }//reset targeting lerper
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1");
-                        RStickSelection = 1;
-                    }
-                }
-
-                if (Input.GetKeyDown(KeyCode.Alpha2) && HasAAM)
-                {
-                    if (RStickSelection == 2)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
-                        RStickSelection = 0;
-                    }
-                    else
-                    {
-
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2");
-                        RStickSelection = 2;
-                    }
-                }
-
-                if (Input.GetKeyDown(KeyCode.Alpha3) && HasAGM)
-                {
-                    if (RStickSelection == 3)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
-                        RStickSelection = 0;
-                    }
-                    else
-                    {
-                        AGMUnlocking = 0;
-                        AGMUnlockTimer = 0;
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3");
-                        RStickSelection = 3;
-                    }
-                }
-
-                if (Input.GetKeyDown(KeyCode.Alpha4) && HasBomb)
-                {
-                    if (RStickSelection == 4)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0");
-                        RStickSelection = 0;
-                    }
-                    else
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4");
-                        RStickSelection = 4;
-                    }
-                }
-
-                if (Input.GetKeyDown(KeyCode.G) && HasGear && CatapultStatus == 0)
-                {
-                    ToggleGear();
-                }
-                if (Input.GetKeyDown(KeyCode.F) && HasFlaps)
-                {
-                    ToggleFlaps();
-                }
-                if (Input.GetKeyDown(KeyCode.Alpha5) && HasSmoke)
-                {
-                    ToggleSmoking();
-                }
-                if (Input.GetKeyDown(KeyCode.X) && HasFlare)
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares");
-                }
-                //////////////////END OF KEYBOARD CONTROLS////////////////////////////////////////////////////////
-                //brake, throttle, and afterburner are done later because they have to be to work
                 if (VTOLenabled)
                 {
                     if (HasVTOLAngle)
@@ -786,43 +674,35 @@ public class EngineController : UdonSharpBehaviour
 
                     if (stickdir > 135)//down
                     {
-                        if (HasBrake)
-                            LStickSelection = 5;
+                        LStickSelection = 4;
                     }
                     else if (stickdir > 90)//downleft
                     {
-                        if (HasAltHold)
-                            LStickSelection = 6;
+                        LStickSelection = 5;
                     }
                     else if (stickdir > 45)//left
                     {
-                        if (HasCanopy)
-                            LStickSelection = 7;
+                        LStickSelection = 6;
                     }
                     else if (stickdir > 0)//upleft
                     {
-                        if (HasCruise)
-                            LStickSelection = 8;
+                        LStickSelection = 7;
                     }
                     else if (stickdir > -45)//up
                     {
-                        if (HasVTOLAngle)
-                            LStickSelection = 1;
+                        LStickSelection = 0;
                     }
                     else if (stickdir > -90)//upright
                     {
-                        if (HasLimits)
-                            LStickSelection = 2;
+                        LStickSelection = 1;
                     }
                     else if (stickdir > -135)//right
                     {
-                        if (HasFlare)
-                            LStickSelection = 3;
+                        LStickSelection = 2;
                     }
                     else//downright
                     {
-                        if (HasCatapult)
-                            LStickSelection = 4;
+                        LStickSelection = 3;
                     }
                 }
 
@@ -835,547 +715,70 @@ public class EngineController : UdonSharpBehaviour
                     //The WeaponSelected variable helps us not send more broadcasts than we need to.
                     if (stickdir > 135)//down
                     {
-                        if (HasGear)
-                        {
-                            if (WeaponSelected)
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
-                            RStickSelection = 5;
-                        }
+                        RStickSelection = 4;
                     }
                     else if (stickdir > 90)//downleft
                     {
-                        if (HasFlaps)
-                        {
-                            if (WeaponSelected)
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
-                            RStickSelection = 6;
-                        }
+                        RStickSelection = 5;
                     }
                     else if (stickdir > 45)//left
                     {
-                        if (HasHook)
-                        {
-                            if (WeaponSelected)
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
-                            RStickSelection = 7;
-                        }
+                        RStickSelection = 6;
                     }
                     else if (stickdir > 0)//upleft
                     {
-                        if (HasSmoke)
-                        {
-                            if (WeaponSelected)
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); }
-                            RStickSelection = 8;
-                        }
+                        RStickSelection = 7;
                     }
                     else if (stickdir > -45)//up
                     {
-                        if (HasGun && RStickSelection != 1)
-                        {
-                            if (HUDControl != null) { HUDControl.GUN_TargetSpeedLerper = 0; }//reset targeting lerper
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1");
-                            RStickSelection = 1;
-                        }
+                        RStickSelection = 0;
                     }
                     else if (stickdir > -90)//upright
                     {
-                        if (HasAAM && RStickSelection != 2)
-                        {
-                            AAMTargetedTimer = 2;
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2");
-                            RStickSelection = 2;
-                        }
+                        RStickSelection = 1;
                     }
                     else if (stickdir > -135)//right
                     {
-                        if (HasAGM && RStickSelection != 3)
-                        {
-                            AGMUnlocking = 0;
-                            AGMUnlockTimer = 0;
-
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3");
-                            RStickSelection = 3;
-                        }
+                        RStickSelection = 2;
                     }
                     else//downright
                     {
-                        if (HasBomb && RStickSelection != 4)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4");
-                            RStickSelection = 4;
-                        }
+                        RStickSelection = 3;
                     }
                 }
 
 
-                LTriggerTapTime += DeltaTime;
-                switch (LStickSelection)
+                if (LStickSelection != LStickSelectionLastFrame)
                 {
-                    case 0://player just got in and hasn't selected anything
-                        BrakeInput = 0;
-                        break;
-                    case 1://VTOL ANGLE
-                        if (LTrigger > 0.75)
-                        {
-                            Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                            handpos = VehicleTransform.InverseTransformDirection(handpos);
-
-                            if (!LTriggerLastFrame)
-                            {
-                                VTOLZeroPoint = handpos.z;
-                                VTOLTemp = VTOLAngle;
-                            }
-                            float VTOLAngleDifference = (VTOLZeroPoint - handpos.z) * -ThrottleSensitivity;
-                            VTOLAngleInput = Mathf.Clamp(VTOLTemp + VTOLAngleDifference, 0, 1);
-
-                            LTriggerLastFrame = true;
-                        }
-                        else { LTriggerLastFrame = false; }
-                        BrakeInput = 0;
-                        break;
-                    case 2://LIMIT
-                        if (LTrigger > 0.75)
-                        {
-                            if (!LTriggerLastFrame)
-                            {
-                                ToggleLimits();
-                            }
-
-                            LTriggerLastFrame = true;
-                        }
-                        else { LTriggerLastFrame = false; }
-                        BrakeInput = 0;
-                        break;
-                    case 3://Flare
-                        if (LTrigger > 0.75)
-                        {
-                            if (!LTriggerLastFrame)
-                            {
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares");
-                            }
-
-                            AltHold = false;
-                            IsFiringGun = false;
-                            RTriggerLastFrame = true;
-                        }
-                        else { LTriggerLastFrame = false; }
-
-                        BrakeInput = 0;
-                        break;
-                    case 4://Catapult
-                        if (LTrigger > 0.75)
-                        {
-                            if (!LTriggerLastFrame)
-                            {
-                                if (CatapultStatus == 1)
-                                {
-                                    CatapultStatus = 2;
-                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLaunchEffects");
-                                }
-                            }
-
-                            LTriggerLastFrame = true;
-                        }
-                        else { LTriggerLastFrame = false; }
-
-                        BrakeInput = 0;
-                        break;
-                    case 5://Brake
-                        if (!Taxiing)
-                        {
-                            if (HasAirBrake) { BrakeInput = LTrigger; }
-                            else { BrakeInput = 0; }
-                        }
-                        else { BrakeInput = LTrigger; }
-
-                        if (LTrigger > 0.75) { LTriggerLastFrame = true; }
-                        else { LTriggerLastFrame = false; }
-                        break;
-                    case 6://Alt. Hold
-                        if (LTrigger > 0.75)
-                        {
-                            if (!LTriggerLastFrame) AltHold = !AltHold;
-                            LTriggerLastFrame = true;
-                        }
-                        else { LTriggerLastFrame = false; }
-                        BrakeInput = 0;
-                        break;
-                    case 7://Canopy
-                        if (LTrigger > 0.75)
-                        {
-                            if (!LTriggerLastFrame && Speed < 20)
-                            {
-                                ToggleCanopy();
-                            }
-
-                            //ejection
-                            if (InVR)
-                            {
-                                Vector3 handposL = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                                handposL = VehicleTransform.InverseTransformDirection(handposL);
-                                Vector3 handposR = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                                handposR = VehicleTransform.InverseTransformDirection(handposR);
-
-                                if (!LTriggerLastFrame && (handposL.y - handposR.y) < 0.20f)
-                                {
-                                    EjectZeroPoint = handposL.y;
-                                    EjectTimer = 0;
-                                }
-                                if (EjectZeroPoint - handposL.y > .5f && EjectTimer < 1)
-                                {
-                                    Ejected = true;
-                                    HUDControl.ExitStation();
-                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
-                                }
-                            }
-
-                            EjectTimer += DeltaTime;
-                            LTriggerLastFrame = true;
-                        }
-                        else
-                        {
-                            LTriggerLastFrame = false;
-                            EjectTimer = 2;
-                        }
-                        BrakeInput = 0;
-                        break;
-                    case 8://Cruise
-                        if (LTrigger > 0.75)
-                        {
-                            //for setting speed in VR
-                            Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                            handpos = VehicleTransform.InverseTransformDirection(handpos);
-
-                            //enable and disable
-                            if (!LTriggerLastFrame)
-                            {
-                                if (!Cruise)
-                                {
-                                    SetSpeed = AirSpeed;
-                                    Cruise = true;
-                                }
-                                if (LTriggerTapTime > .4f)//no double tap
-                                {
-                                    LTriggerTapTime = 0;
-                                }
-                                else//double tap detected, turn off cruise
-                                {
-                                    Cruise = false;
-                                    PlayerThrottle = ThrottleInput;
-                                }
-                                //end of enable disable
-
-                                //more set speed stuff
-                                SpeedZeroPoint = handpos.z;
-                                CruiseTemp = SetSpeed;
-                            }
-                            float SpeedDifference = (SpeedZeroPoint - handpos.z) * 250;
-                            SetSpeed = Mathf.Floor(Mathf.Clamp(CruiseTemp + SpeedDifference, 0, 2000));
-
-                            LTriggerLastFrame = true;
-                        }
-                        else { LTriggerLastFrame = false; }
-                        BrakeInput = 0;
-                        break;
-                }
-
-
-                RTriggerTapTime += DeltaTime;
-                switch (RStickSelection)
-                {
-                    case 0://player just got in and hasn't selected anything
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        IsFiringGun = false;
-                        DoAAMTargeting = false;
-                        break;
-                    case 1://GUN
-                        if ((RTrigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
-                        {
-                            IsFiringGun = true;
-                            GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
-                            if (GunRecoilEmptyNULL)
-                            {
-                                VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime);
-                            }
-                            else
-                            {
-                                VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in the same range as above*/, GunRecoilEmpty.position, ForceMode.Force);
-                            }
-                            RTriggerLastFrame = true;
-                        }
-                        else { IsFiringGun = false; RTriggerLastFrame = false; }
-
-                        TargetingAngle = 70;
-                        DoAAMTargeting = true;//gun lead indiactor uses this
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        break;
-                    case 2://AAM
-                        if (NumAAMTargets != 0)
-                        {
-                            DoAAMTargeting = true;
-                            TargetingAngle = AAMLockAngle;
-
-                            if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
-                            else { AAMLocked = false; }
-
-                            //firing AAM
-                            if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Space)))
-                            {
-                                if (!RTriggerLastFrame)
-                                {
-                                    if (AAMLocked && !Taxiing && Time.time - AAMLastFiredTime > AAMLaunchDelay)
-                                    {
-                                        AAMLastFiredTime = Time.time;
-                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
-                                        if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
-                                    }
-                                }
-                                RTriggerLastFrame = true;
-                            }
-                            else RTriggerLastFrame = false;
-                        }
-                        else { AAMLocked = false; AAMHasTarget = false; }
-                        IsFiringGun = false;
-                        break;
-                    case 3://AGM
-                        AGMUnlockTimer += DeltaTime * AGMUnlocking;//AGMUnlocking is 1 if it was locked and just pressed, else 0, (waits for double tap delay to disable)
-                        if (AGMUnlockTimer > 0.4f && AGMLocked == true)
-                        {
-                            AGMLocked = false;
-                            AGMUnlockTimer = 0;
-                            AGMUnlocking = 0;
-                            if (!SoundControl.AGMUnlockNull)
-                                SoundControl.AGMUnlock.Play();
-                        }
-                        if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Space)))
-                        {
-                            if (!RTriggerLastFrame)
-                                if (RTriggerTapTime < 0.4f)
-                                {
-                                    if (AGMLocked)
-                                    {
-                                        //double tap detected
-                                        if (NumAGM > 0 && !Taxiing)
-                                        {
-                                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAGM");
-                                        }
-                                        AGMUnlocking = 0;
-                                    }
-                                }
-                                else if (!AGMLocked)
-                                {
-                                    if (AtGCam != null)
-                                    {
-                                        float targetangle = 999;
-                                        RaycastHit lockpoint;
-                                        RaycastHit[] agmtargs = Physics.SphereCastAll(AtGCam.transform.position, 150, AtGCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);
-                                        if (agmtargs.Length > 0)
-                                        {
-                                            //find target with lowest angle from crosshair
-                                            foreach (RaycastHit target in agmtargs)
-                                            {
-                                                Vector3 targetdirection = target.point - AtGCam.transform.position;
-                                                float angle = Vector3.Angle(AtGCam.transform.forward, targetdirection);
-                                                if (angle < targetangle)
-                                                {
-                                                    targetangle = angle;
-                                                    AGMTarget = target.collider.transform.position;
-                                                    AGMLocked = true;
-                                                    AGMUnlocking = 0;
-                                                }
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
-                                            if (lockpoint.point != null)
-                                            {
-                                                if (!SoundControl.AGMUnlockNull)
-                                                { SoundControl.AGMLock.Play(); }
-                                                AGMTarget = lockpoint.point;
-                                                AGMLocked = true;
-                                                AGMUnlocking = 0;
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    RTriggerTapTime = 0;
-                                    AGMUnlockTimer = 0;
-                                    AGMUnlocking = 1;
-                                }
-                            RTriggerLastFrame = true;
-                        }
-                        else { RTriggerLastFrame = false; }
-                        //AGM Camera, more in hudcontroller
-                        if (!AGMLocked)
-                        {
-                            Quaternion newangle;
-                            if (InVR)
-                            {
-                                newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0);
-                            }
-                            else if (!InEditor)//desktop mode
-                            {
-                                newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
-                            }
-                            else//editor
-                            {
-                                newangle = VehicleTransform.rotation;
-                            }
-                            float ZoomLevel = AtGCam.fieldOfView / 90;
-                            AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, ZoomLevel * 220f * DeltaTime);
-
-                            if (AtGCam != null)
-                            {
-                                AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamLastFrame * Vector3.forward);
-                                // AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotSlerper * Vector3.forward);
-                                AtGCam.transform.rotation = AGMCamRotSlerper;
-
-                                Vector3 temp2 = AtGCam.transform.localRotation.eulerAngles;
-                                temp2.z = 0;
-                                AtGCam.transform.localRotation = Quaternion.Euler(temp2);
-                            }
-                            AGMCamLastFrame = newangle;
-                        }
-
-
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        IsFiringGun = false;
-                        DoAAMTargeting = false;
-                        break;
-                    case 4://Bomb
-                        if (RTrigger > 0.75 || (Input.GetKey(KeyCode.Space)))
-                        {
-                            if (!RTriggerLastFrame)
-                            {
-                                if (NumBomb > 0 && !Taxiing && ((Time.time - LastBombDropTime) > BombDelay))
-                                {
-                                    LastBombDropTime = Time.time;
-                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
-                                }
-                            }
-                            else//launch every BombHoldDelay
-                                if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !Taxiing)
-                            {
-                                {
-                                    LastBombDropTime = Time.time;
-                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
-                                }
-                            }
-
-                            RTriggerLastFrame = true;
-                        }
-                        else { RTriggerLastFrame = false; }
-
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        IsFiringGun = false;
-                        DoAAMTargeting = false;
-                        break;
-                    case 5://GEAR
-                        if (RTrigger > 0.75)
-                        {
-                            if (!RTriggerLastFrame && CatapultStatus == 0) { ToggleGear(); }
-                            RTriggerLastFrame = true;
-                        }
-                        else { RTriggerLastFrame = false; }
-
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        IsFiringGun = false;
-                        DoAAMTargeting = false;
-                        break;
-                    case 6://flaps
-                        if (RTrigger > 0.75)
-                        {
-                            if (!RTriggerLastFrame) ToggleFlaps();
-                            RTriggerLastFrame = true;
-                        }
-                        else { RTriggerLastFrame = false; }
-
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        IsFiringGun = false;
-                        DoAAMTargeting = false;
-                        break;
-                    case 7://Hook
-                        if (RTrigger > 0.75)
-                        {
-                            if (!RTriggerLastFrame)
-                            {
-                                if (HookDetector != null)
-                                {
-                                    ToggleHook();
-                                }
-                                Hooked = false;
-                            }
-
-                            RTriggerLastFrame = true;
-                        }
-                        else { RTriggerLastFrame = false; }
-
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        IsFiringGun = false;
-                        DoAAMTargeting = false;
-                        break;
-                    case 8://Smoke
-                        if (RTrigger > 0.75)
-                        {
-                            //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
-                            Vector3 HandPosSmoke = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
-                            HandPosSmoke = VehicleTransform.InverseTransformDirection(HandPosSmoke);
-                            if (!RTriggerLastFrame)
-                            {
-                                SmokeZeroPoint = HandPosSmoke;
-                                TempSmokeCol = SmokeColor;
-
-                                ToggleSmoking();
-                                SmokeHoldTime = 0;
-                            }
-                            SmokeHoldTime += DeltaTime;
-                            if (SmokeHoldTime > .4f)
-                            {
-                                //VR Set Smoke
-
-                                Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -ThrottleSensitivity;
-                                SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
-                                SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
-                                SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
-                            }
-                            RTriggerLastFrame = true;
-                        }
-                        else { RTriggerLastFrame = false; }
-
-                        AAMHasTarget = false;
-                        AAMLocked = false;
-                        AAMLockTimer = 0;
-                        IsFiringGun = false;
-                        DoAAMTargeting = false;
-                        break;
-                }
-                //keyboard control for brake
-                if (Input.GetKey(KeyCode.B) && HasBrake)
-                {
-                    if (!Taxiing)
+                    //new function selected, send deselected to old one
+                    if (CurrentSelectedFunctionL != null) CurrentSelectedFunctionL.SendCustomEvent("DFUNC_Deselected");
+                    //get udonbehaviour for newly selected function and then send selected
+                    if (Dial_Functions_L[LStickSelection] != null)
                     {
-                        if (HasAirBrake) { BrakeInput = 1; }
-                        else { BrakeInput = 0; }
+                        CurrentSelectedFunctionL = (UdonBehaviour)Dial_Functions_L[LStickSelection].GetComponent(typeof(UdonBehaviour));
+                        if (CurrentSelectedFunctionL != null) CurrentSelectedFunctionL.SendCustomEvent("DFUNC_Selected");
                     }
-                    else { BrakeInput = 1; }
+                    else { CurrentSelectedFunctionR = null; }
                 }
+
+
+                if (RStickSelection != RStickSelectionLastFrame)
+                {
+                    //new function selected, send deselect  ed to old one
+                    if (CurrentSelectedFunctionR != null) CurrentSelectedFunctionR.SendCustomEvent("DFUNC_Deselected");
+                    //get udonbehaviour for newly selected function and then send selected
+                    if (Dial_Functions_R[RStickSelection] != null)
+                    {
+                        CurrentSelectedFunctionR = (UdonBehaviour)Dial_Functions_R[RStickSelection].GetComponent(typeof(UdonBehaviour));
+                        if (CurrentSelectedFunctionR != null) CurrentSelectedFunctionR.SendCustomEvent("DFUNC_Selected");
+                    }
+                    else { CurrentSelectedFunctionR = null; }
+                }
+                if (CurrentSelectedFunctionR != null) { CurrentSelectedFunctionR.SendCustomEvent("DFUNC_Update"); }
+
+                RStickSelectionLastFrame = RStickSelection;
+                LStickSelectionLastFrame = LStickSelection;
+
                 //VR Joystick
                 if (RGrip > 0.75)
                 {
@@ -1516,44 +919,44 @@ public class EngineController : UdonSharpBehaviour
                         }
                     }
                     //check for catapult below us and attach if there is one    
-                    if (HasCatapult && CatapultStatus == 0)
-                    {
-                        RaycastHit hit;
-                        if (Physics.Raycast(CatapultDetector.position, CatapultDetector.TransformDirection(Vector3.down), out hit, 1f, CatapultLayer))
-                        {
-                            Transform CatapultTrigger = hit.collider.transform;//get the transform from the trigger hit
+                    /*                     if (HasCatapult && CatapultStatus == 0)
+                                        {
+                                            RaycastHit hit;
+                                            if (Physics.Raycast(CatapultDetector.position, CatapultDetector.TransformDirection(Vector3.down), out hit, 1f, CatapultLayer))
+                                            {
+                                                Transform CatapultTrigger = hit.collider.transform;//get the transform from the trigger hit
 
-                            //Hit detected, check if the plane is facing in the right direction..
-                            if (Vector3.Angle(VehicleTransform.forward, CatapultTrigger.transform.forward) < 15)
-                            {
-                                //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
-                                CatapultTransform = CatapultTrigger.transform;
-                                //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
-                                VehicleTransform.rotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
+                                                //Hit detected, check if the plane is facing in the right direction..
+                                                if (Vector3.Angle(VehicleTransform.forward, CatapultTrigger.transform.forward) < 15)
+                                                {
+                                                    //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
+                                                    CatapultTransform = CatapultTrigger.transform;
+                                                    //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
+                                                    VehicleTransform.rotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
 
-                                //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
-                                Vector3 PlaneCatapultDistance = CatapultTransform.position - VehicleTransform.position;
-                                PlaneCatapultDistance = CatapultTransform.transform.InverseTransformDirection(PlaneCatapultDistance);
-                                VehicleTransform.position = CatapultTransform.position;
-                                VehicleTransform.position -= CatapultTransform.up * PlaneCatapultDistance.y;
+                                                    //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
+                                                    Vector3 PlaneCatapultDistance = CatapultTransform.position - VehicleTransform.position;
+                                                    PlaneCatapultDistance = CatapultTransform.transform.InverseTransformDirection(PlaneCatapultDistance);
+                                                    VehicleTransform.position = CatapultTransform.position;
+                                                    VehicleTransform.position -= CatapultTransform.up * PlaneCatapultDistance.y;
 
-                                //move the plane back so that the catapult is aligned to the catapult detector
-                                Vector3 CatapultDetectorDist = VehicleTransform.position - CatapultDetector.position;
-                                CatapultDetectorDist = VehicleTransform.InverseTransformDirection(CatapultDetectorDist);
-                                VehicleTransform.position += CatapultTrigger.forward * CatapultDetectorDist.z;
+                                                    //move the plane back so that the catapult is aligned to the catapult detector
+                                                    Vector3 CatapultDetectorDist = VehicleTransform.position - CatapultDetector.position;
+                                                    CatapultDetectorDist = VehicleTransform.InverseTransformDirection(CatapultDetectorDist);
+                                                    VehicleTransform.position += CatapultTrigger.forward * CatapultDetectorDist.z;
 
-                                CatapultLockRot = VehicleTransform.rotation;//rotation to lock the plane to on the catapult
-                                CatapultLockPos = VehicleTransform.position;
-                                CatapultStatus = 1;//locked to catapult
+                                                    CatapultLockRot = VehicleTransform.rotation;//rotation to lock the plane to on the catapult
+                                                    CatapultLockPos = VehicleTransform.position;
+                                                    CatapultStatus = 1;//locked to catapult
 
-                                //use dead to make plane invincible for 1 frame when entering the catapult to prevent damage which will be worse the higher your framerate is
-                                dead = true;
-                                CatapultDeadTimer = 2;//to make
+                                                    //use dead to make plane invincible for 1 frame when entering the catapult to prevent damage which will be worse the higher your framerate is
+                                                    dead = true;
+                                                    CatapultDeadTimer = 2;//to make
 
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockIn");
-                            }
-                        }
-                    }
+                                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockIn");
+                                                }
+                                            }
+                                        } */
                 }
                 else
                 {
@@ -1996,7 +1399,7 @@ public class EngineController : UdonSharpBehaviour
             else if (Landed == true && Taxiing == false)
             {
                 Landed = false;
-                SendEventToExtensions("TakeOff", false);
+                SendEventToExtensions("SFEXT_TakeOff", false);
             }
             else
             { Landed = false; }
@@ -2021,10 +1424,6 @@ public class EngineController : UdonSharpBehaviour
     {
         if (IsOwner)
         {
-            if (DoAAMTargeting)
-            {
-                AAMTargeting(TargetingAngle);
-            }
             float DeltaTime = Time.fixedDeltaTime;
             //lerp velocity toward 0 to simulate air friction
             Vector3 VehicleVel = VehicleRigidbody.velocity;
@@ -2229,10 +1628,7 @@ public class EngineController : UdonSharpBehaviour
         NumAAM = FullAAMs;
         NumAGM = FullAGMs;
         NumBomb = FullBombs;
-        GunAmmoInSeconds = FullGunAmmo;
         Fuel = FullFuel;
-        RStickSelection = 0;
-        LStickSelection = 0;
         Atmosphere = 1;//planemoving optimization requires this to be here
 
         if (HasCanopy) { CanopyOpening(); }
@@ -2249,7 +1645,7 @@ public class EngineController : UdonSharpBehaviour
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
 
-            SendEventToExtensions("Explode", false);
+            SendEventToExtensions("SFEXT_Explode", false);
         }
 
         //our killer increases their kills
@@ -2295,138 +1691,6 @@ public class EngineController : UdonSharpBehaviour
             }
         }
     }
-    private void AAMTargeting(float Lock_Angle)
-    {
-        float DeltaTime = Time.fixedDeltaTime;
-        var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-        float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - CenterOfMass.position));
-        Vector3 HudControlPosition = HUDControl.transform.position;
-
-        //check 1 target per frame to see if it's infront of us and worthy of being our current target
-        var TargetChecker = AAMTargets[AAMTargetChecker];
-        var TargetCheckerTransform = TargetChecker.transform;
-        var TargetCheckerParent = TargetCheckerTransform.parent;
-
-        Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - CenterOfMass.position);
-        float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
-        float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-        bool AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
-
-        if (TargetChecker.activeInHierarchy)
-        {
-            EngineController NextTargetEngineControl = null;
-
-            if (TargetCheckerParent)
-            {
-                NextTargetEngineControl = TargetCheckerParent.GetComponent<EngineController>();
-            }
-            //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
-            if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead)))
-            {
-                RaycastHit hitnext;
-                //raycast to check if it's behind something
-                bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
-
-                if ((LineOfSightNext
-                    && hitnext.collider.gameObject.layer == OutsidePlaneLayer //did raycast hit an object on the layer planes are on?
-                        && NextTargetAngle < Lock_Angle
-                            && NextTargetAngle < AAMCurrentTargetAngle)
-                                && NextTargetDistance < AAMMaxTargetDistance
-                                    || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
-                                        || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
-                {
-                    //found new target
-                    AAMCurrentTargetAngle = NextTargetAngle;
-                    AAMTarget = AAMTargetChecker;
-                    AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                    AAMCurrentTargetEngineControl = NextTargetEngineControl;
-                    AAMLockTimer = 0;
-                    AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
-                    AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
-                    if (HUDControl != null)
-                    {
-                        HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
-                        HUDControl.GUN_TargetSpeedLerper = 0f;
-                        HUDControl.GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
-                    }
-                }
-            }
-        }
-        //increase target checker ready for next frame
-        AAMTargetChecker++;
-        if (AAMTargetChecker == AAMTarget && AAMTarget == NumAAMTargets - 1)
-        { AAMTargetChecker = 0; }
-        else if (AAMTargetChecker == AAMTarget)
-        { AAMTargetChecker++; }
-        else if (AAMTargetChecker > NumAAMTargets - 1)
-        { AAMTargetChecker = 0; }
-
-        //if target is currently in front of plane, lock onto it
-        if (AAMCurrentTargetEngineControlNull)
-        { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
-        else
-        { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HudControlPosition; }
-        float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
-        //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
-        //raycast to check if it's behind something
-        RaycastHit hitcurrent;
-        bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
-        //used to make lock remain for .25 seconds after target is obscured
-        if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
-        { AAMTargetObscuredDelay += DeltaTime; }
-        else
-        { AAMTargetObscuredDelay = 0; }
-
-        if (!Taxiing
-            && (AAMTargetObscuredDelay < .25f)
-                && AAMCurrentTargetDistance < AAMMaxTargetDistance
-                    && AAMTargets[AAMTarget].activeInHierarchy
-                        && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
-        {
-            if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
-            {
-                AAMHasTarget = true;
-                if (AAMCurrentTargetAngle < Lock_Angle && NumAAM > 0)
-                {
-                    AAMLockTimer += DeltaTime;
-                    //give enemy radar lock even if you're out of missiles
-                    if (!AAMCurrentTargetEngineControlNull && RStickSelection == 2)// Only send Targeted if using AAMs, not gun.
-                    {
-                        //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
-                        AAMTargetedTimer += DeltaTime;
-                        if (AAMTargetedTimer > 1)
-                        {
-                            AAMTargetedTimer = 0;
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted");
-                        }
-                    }
-                }
-                else
-                {
-                    AAMTargetedTimer = 2f;
-                    AAMLockTimer = 0;
-                }
-            }
-        }
-        else
-        {
-            AAMTargetedTimer = 2f;
-            AAMLockTimer = 0;
-            AAMHasTarget = false;
-        }
-        /*         if (HUDControl.gameObject.activeInHierarchy)
-                {
-                    Debug.Log(string.Concat("AAMTarget ", AAMTarget));
-                    Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
-                    Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
-                    Debug.Log(string.Concat("LoS ", LineOfSightCur));
-                    Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsidePlaneLayer)));
-                    Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
-                    Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
-                    Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < Lock_Angle));
-                    Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance));
-                } */
-    }
     public void PlayCableSnap()
     {
         if (!SoundControl.CableSnapNull) { SoundControl.CableSnap.Play(); }
@@ -2449,7 +1713,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("AfterburnerOn", false);
+            SendEventToExtensions("SFEXT_AfterburnerOn", false);
         }
     }
     public void SetAfterburnerOff()
@@ -2460,7 +1724,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("AfterburnerOff", false);
+            SendEventToExtensions("SFEXT_AfterburnerOff", false);
         }
     }
     private void ToggleAfterburner()
@@ -2478,7 +1742,7 @@ public class EngineController : UdonSharpBehaviour
     public void ResupplyPlane()
     {
         //only play the sound if we're actually repairing/getting ammo/fuel
-        if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || GunAmmoInSeconds != FullGunAmmo || Health != FullHealth))
+        if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || Health != FullHealth))
         {
             SoundControl.Reloading.Play();
         }
@@ -2498,20 +1762,19 @@ public class EngineController : UdonSharpBehaviour
           Debug.Log(string.Concat("GunAmmoInSeconds ", GunAmmoInSeconds));
           Debug.Log(string.Concat("FullGunAmmo ", FullGunAmmo)); */
         Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
-        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
         Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
         PlaneAnimator.SetTrigger(RESUPPLY_STRING);
         BombPoint = 0;
 
         if (IsOwner)
         {
-            SendEventToExtensions("ReSupply", false);
+            SendEventToExtensions("SFEXT_ReSupply", false);
         }
     }
-    public void ResupplyPlane_FuelOnly()
+    public void ResupplyPlane_FuelOnly()//not done and unused
     {
         //only play the sound if we're actually repairing/getting ammo/fuel
-        if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || GunAmmoInSeconds != FullGunAmmo || Health != FullHealth))
+        if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || Health != FullHealth))
         {
             SoundControl.Reloading.Play();
         }
@@ -2531,7 +1794,6 @@ public class EngineController : UdonSharpBehaviour
           Debug.Log(string.Concat("GunAmmoInSeconds ", GunAmmoInSeconds));
           Debug.Log(string.Concat("FullGunAmmo ", FullGunAmmo)); */
         Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
-        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
         Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
         PlaneAnimator.SetTrigger(RESUPPLY_STRING);
         BombPoint = 0;
@@ -2550,7 +1812,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("CanopyOpened", false);
+            SendEventToExtensions("SFEXT_CanopyOpened", false);
         }
     }
     public void CanopyClosing()
@@ -2566,7 +1828,7 @@ public class EngineController : UdonSharpBehaviour
         }
         if (IsOwner)
         {
-            SendEventToExtensions("CanopyClosed", false);
+            SendEventToExtensions("SFEXT_CanopyClosed", false);
         }
     }
     private void ToggleCanopy()
@@ -2587,7 +1849,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("GearUp", false);
+            SendEventToExtensions("SFEXT_GearUp", false);
         }
     }
     public void SetGearDown()
@@ -2597,7 +1859,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("GearDown", false);
+            SendEventToExtensions("SFEXT_GearDown", false);
         }
     }
     public void ToggleGear()
@@ -2621,7 +1883,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("FlapsOff", false);
+            SendEventToExtensions("SFEXT_FlapsOff", false);
         }
     }
     public void SetFlapsOn()
@@ -2632,7 +1894,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("FlapsOn", false);
+            SendEventToExtensions("SFEXT_FlapsOn", false);
         }
     }
     public void ToggleFlaps()
@@ -2653,7 +1915,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("HookDown", false);
+            SendEventToExtensions("SFEXT_HookDown", false);
         }
     }
     public void SetHookUp()
@@ -2663,7 +1925,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("HookUp", false);
+            SendEventToExtensions("SFEXT_HookUp", false);
         }
     }
     public void ToggleHook()
@@ -2684,7 +1946,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SmokeOn", false);
+            SendEventToExtensions("SFEXT_SmokeOn", false);
         }
     }
     public void SetSmokingOff()
@@ -2694,7 +1956,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SmokeOff", false);
+            SendEventToExtensions("SFEXT_SmokeOff", false);
         }
     }
     public void ToggleSmoking()
@@ -2714,7 +1976,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("LimitsOn", false);
+            SendEventToExtensions("SFEXT_LimitsOn", false);
         }
     }
     public void SetLimitsOff()
@@ -2723,7 +1985,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("LimitsOff", false);
+            SendEventToExtensions("SFEXT_LimitsOff", false);
         }
     }
     public void ToggleLimits()
@@ -2747,13 +2009,12 @@ public class EngineController : UdonSharpBehaviour
         //synced variables
         Health = FullHealth;
         Fuel = FullFuel;
-        GunAmmoInSeconds = FullGunAmmo;
         VTOLAngle = VTOLDefaultValue;
         VTOLAngleInput = VTOLDefaultValue;
         VehicleObjectSync.Respawn();//this works if done just locally
 
 
-        SendEventToExtensions("Respawn", true);
+        SendEventToExtensions("SFEXT_Respawn", true);
     }
     public void ResetStatus()//called globally when using respawn button
     {
@@ -2805,7 +2066,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("PlaneHit", false);
+            SendEventToExtensions("SFEXT_PlaneHit", false);
         }
     }
     public void Respawn_event()//called by Respawn()
@@ -2878,7 +2139,7 @@ public class EngineController : UdonSharpBehaviour
         if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool(LOCALPASSENGER_STRING, true); }
         SetPlaneLayerInside();
 
-        SendEventToExtensions("PassengerEnter", false);
+        SendEventToExtensions("SFEXT_PassengerEnter", false);
     }
     public void PassengerExitPlaneLocal()
     {
@@ -2891,7 +2152,7 @@ public class EngineController : UdonSharpBehaviour
         if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
         SetPlaneLayerOutside();
 
-        SendEventToExtensions("PassengerExit", false);
+        SendEventToExtensions("SFEXT_PassengerExit", false);
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
@@ -2899,13 +2160,13 @@ public class EngineController : UdonSharpBehaviour
         {
             SetOwnerships();
 
-            SendEventToExtensions("TakeOwnership", false);
+            SendEventToExtensions("SFEXT_TakeOwnership", false);
         }
         else
         {
             if (IsOwner)
             {
-                SendEventToExtensions("LoseOwnership", false);
+                SendEventToExtensions("SFEXT_LoseOwnership", false);
             }
         }
     }
@@ -2933,7 +2194,6 @@ public class EngineController : UdonSharpBehaviour
         EngineOutput = 0;
         ThrottleInput = 0;
         PlayerThrottle = 0;
-        IsFiringGun = false;
         VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
         VTOLAngleInput = VTOLAngle;
 
@@ -2974,7 +2234,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("PilotEnter", false);
+            SendEventToExtensions("SFEXT_PilotEnter", false);
         }
     }
     public void PilotEnterPlaneGlobal(VRCPlayerApi player)
@@ -2995,7 +2255,6 @@ public class EngineController : UdonSharpBehaviour
         PilotExitTime = Time.time;
         PilotName = string.Empty;
         PilotID = -1;
-        IsFiringGun = false;
         SetSmokingOff();
         SetAfterburnerOff();
         if (EffectsControl != null)
@@ -3023,8 +2282,10 @@ public class EngineController : UdonSharpBehaviour
             Taxiinglerper = 0;
             LGripLastFrame = false;
             RGripLastFrame = false;
-            LStickSelection = 0;
-            RStickSelection = 0;
+            LStickSelection = -1;
+            RStickSelection = -1;
+            LStickSelectionLastFrame = -1;
+            RStickSelectionLastFrame = -1;
             BrakeInput = 0;
             LTriggerLastFrame = false;
             RTriggerLastFrame = false;
@@ -3047,7 +2308,7 @@ public class EngineController : UdonSharpBehaviour
             //set plane's layer back
             SetPlaneLayerOutside();
 
-            SendEventToExtensions("PilotExit", false);
+            SendEventToExtensions("SFEXT_PilotExit", false);
         }
         if (KillsBoard != null)
         {
@@ -3255,14 +2516,39 @@ public class EngineController : UdonSharpBehaviour
         }
     }
     private void SendEventToExtensions(string eventname, bool takeownership)
-    {
+    {//replace my code if fixed: https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/589-udonbehaviour-array-type-is-not-defined
         foreach (GameObject obj in ExtensionUdonBehaviours)
         {
             if (obj != null)
             {
                 if (takeownership)
-                { }
-
+                {
+                    if (!localPlayer.IsOwner(obj)) { Networking.SetOwner(localPlayer, obj); }
+                }
+                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                ud.SendCustomEvent(eventname);
+            }
+        }
+        foreach (GameObject obj in Dial_Functions_L)
+        {
+            if (obj != null)
+            {
+                if (takeownership)
+                {
+                    if (!localPlayer.IsOwner(obj)) { Networking.SetOwner(localPlayer, obj); }
+                }
+                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
+                ud.SendCustomEvent(eventname);
+            }
+        }
+        foreach (GameObject obj in Dial_Functions_R)
+        {
+            if (obj != null)
+            {
+                if (takeownership)
+                {
+                    if (!localPlayer.IsOwner(obj)) { Networking.SetOwner(localPlayer, obj); }
+                }
                 UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
                 ud.SendCustomEvent(eventname);
             }
@@ -3275,5 +2561,4 @@ public class EngineController : UdonSharpBehaviour
             Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
-
 }

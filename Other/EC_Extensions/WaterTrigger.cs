@@ -64,11 +64,11 @@ public class WaterTrigger : UdonSharpBehaviour
         InWater = false;
         NumTriggers = 0;
     }
-    public void TakeOwnership()
+    public void SFEXT_TakeOwnership()
     {
         { gameObject.SetActive(true); }
     }
-    public void LoseOwnership()
+    public void SFEXT_LoseOwnership()
     {
         { gameObject.SetActive(false); }
     }

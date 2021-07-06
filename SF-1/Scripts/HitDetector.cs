@@ -80,13 +80,12 @@ public class HitDetector : UdonSharpBehaviour
     {
         if (EngineControl.IsOwner)
         {
-            VehicleRigid.velocity = Vector3.zero;//there's a weird jump it does on respawn otherwise
             foreach (GameObject obj in ExtensionUdonBehaviours)
             {
                 if (obj != null)
                 {
                     UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("ReAppear");
+                    ud.SendCustomEvent("SFEXT_ReAppear");
                 }
             }
         }

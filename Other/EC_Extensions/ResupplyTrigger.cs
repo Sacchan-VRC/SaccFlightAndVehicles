@@ -70,11 +70,11 @@ public class ResupplyTrigger : UdonSharpBehaviour
         InResupplyZone = false;
         NumTriggers = 0;
     }
-    public void PilotEnter()
+    public void SFEXT_PilotEnter()
     {
         gameObject.SetActive(true);
     }
-    public void PilotExit()
+    public void SFEXT_PilotExit()
     {
         gameObject.SetActive(false);
     }

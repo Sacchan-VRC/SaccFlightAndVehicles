@@ -17,7 +17,6 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource PlaneWind;
     public AudioSource[] SonicBoom;
     public AudioSource[] Explosion;
-    public AudioSource GunSound;
     public AudioSource[] BulletHit;
     public AudioSource Rolling;
     public AudioSource Reloading;
@@ -32,6 +31,8 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource CatapultLaunch;
     public AudioSource CableSnap;
     public AudioSource MenuSelect;
+    [SerializeField] private AudioSource[] DopplerSounds;
+    private float[] DopplerSounds_InitialVolumes;
     [System.NonSerializedAttribute] public bool PlaneIdleNull;
     [System.NonSerializedAttribute] public bool PlaneInsideNull;
     [System.NonSerializedAttribute] public bool PlaneDistantNull;
@@ -42,7 +43,6 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool PlaneWindNull;
     [System.NonSerializedAttribute] public bool SonicBoomNull;
     [System.NonSerializedAttribute] public bool ExplosionNull;
-    [System.NonSerializedAttribute] public bool GunSoundNull;
     [System.NonSerializedAttribute] public bool BulletHitNull;
     [System.NonSerializedAttribute] public bool MissileIncomingNull;
     [System.NonSerializedAttribute] public bool RollingNull;
@@ -72,7 +72,6 @@ public class SoundController : UdonSharpBehaviour
     private float PlaneInsideInitialVolume;
     private float LastFramePlaneIdlePitch;
     private float LastFramePlaneThrustPitch;
-    private float LastFrameGunPitch;
     private float PlaneIdleInitialVolume;
     private float PlaneThrustInitialVolume;
     private float PlaneWindInitialVolume;
@@ -83,7 +82,6 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float DoSound = 20; //15 seconds before idle so late joiners have time to sync before going idle
     [System.NonSerializedAttribute] public bool silent;
     private int silentint = 0;
-    private float GunSoundInitialVolume;
     [System.NonSerializedAttribute] public bool soundsoff;
     float relativespeed;
     private float SonicBoomPreventer = 5f;//used to prevent sonic booms from occuring too often in case of laggers etc
@@ -100,7 +98,6 @@ public class SoundController : UdonSharpBehaviour
         Assert(ABOnInside != null, "Start: ABOnInside != null");
         Assert(ABOnOutside != null, "Start: ABOnOutside != null");
         Assert(PlaneWind != null, "Start: PlaneWind != null");
-        Assert(GunSound != null, "Start: GunSound != null");
         Assert(MenuSelect != null, "Start: MenuSelect != null");
         Assert(AAMTargeting != null, "Start: AAMTargeting != null");
         Assert(AAMTargetLock != null, "Start: AAMTargetLock != null");
@@ -126,7 +123,6 @@ public class SoundController : UdonSharpBehaviour
         ABOnInsideNull = (ABOnOutside == null) ? true : false;
         ABOnOutsideNull = (ABOnOutside == null) ? true : false;
         PlaneWindNull = (PlaneWind == null) ? true : false;
-        GunSoundNull = (GunSound == null) ? true : false;
         MenuSelectNull = (MenuSelect == null) ? true : false;
         AAMTargetingNull = (AAMTargeting == null) ? true : false;
         AAMTargetLockNull = (AAMTargetLock == null) ? true : false;
@@ -199,11 +195,12 @@ public class SoundController : UdonSharpBehaviour
         }
 
         if (!PlaneWindNull) { PlaneWindInitialVolume = PlaneWind.volume; PlaneWind.volume = 0f; }
-        if (!GunSoundNull)
-        {
-            GunSoundInitialVolume = GunSound.volume;
-        }
+
         dopplecounter = Random.Range(0, 5);
+
+        DopplerSounds_InitialVolumes = new float[DopplerSounds.Length];
+        for (int x = 0; x != DopplerSounds.Length; x++)
+        { DopplerSounds_InitialVolumes[x] = DopplerSounds[x].volume; }
     }
 
     private void Update()
@@ -236,6 +233,7 @@ public class SoundController : UdonSharpBehaviour
         //undo doppler
         PlaneIdlePitch = LastFramePlaneIdlePitch;
         PlaneThrustPitch = LastFramePlaneThrustPitch;
+
 
         //the doppler code is done in a really hacky way to avoid having to do it in fixedupdate and have worse performance.
         //and because even if you do it in fixedupate, it only works properly in VRChat if you have max framerate. (objects owned by other players positions are only updated in Update())
@@ -481,28 +479,12 @@ public class SoundController : UdonSharpBehaviour
             PlaneWind.volume = (Mathf.Min(((EngineControl.Speed / 20) * PlaneWindInitialVolume), 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) * .125f, 0, 1) * .2f)) * silentint;
         }
 
-        if (!GunSoundNull)
+        int x = 0;
+        foreach (AudioSource snd in DopplerSounds)
         {
-            if (EngineControl.IsFiringGun && !silent)
-            {
-                GunSound.pitch = Mathf.Min(Doppler, 2f);
-                if (!GunSound.isPlaying)
-                {
-                    GunSound.Play();
-                }
-                if (Doppler > 50f)
-                {
-                    GunSound.volume = Mathf.Lerp(GunSound.volume, 0, 3f * DeltaTime);
-                }
-                else
-                {
-                    GunSound.volume = Mathf.Lerp(GunSound.volume, GunSoundInitialVolume, 9f * DeltaTime);
-                }
-            }
-            else if (!EngineControl.IsFiringGun || silent && GunSound.isPlaying)
-            {
-                GunSound.Stop();
-            }
+            snd.pitch = Doppler;
+            snd.volume = DopplerSounds_InitialVolumes[x] * silentint;
+            x++;
         }
     }
     private void Exitplane()//sets sound values to give continuity of engine sound when exiting the plane

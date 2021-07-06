@@ -29,8 +29,6 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Transform ElevationIndicator;
     [SerializeField] private Transform HeadingIndicator;
     [SerializeField] private Transform VelocityIndicator;
-    [SerializeField] private Transform AAMTargetIndicator;
-    [SerializeField] private Transform GUNLeadIndicator;
     [SerializeField] private float BulletSpeed = 1050;
     [SerializeField] private Transform PitchRoll;
     [SerializeField] private Transform Yaw;
@@ -49,7 +47,7 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private GameObject RStick_funcon7;
     [SerializeField] private GameObject RStick_funcon8;
     private Animator PlaneAnimator;
-    [SerializeField] private float distance_from_head = 1.333f;
+    public float distance_from_head = 1.333f;
     private float maxGs = 0f;
     private Vector3 InputsZeroPos;
     private Vector3 startingpos;
@@ -97,8 +95,6 @@ public class HUDController : UdonSharpBehaviour
         Assert(ElevationIndicator != null, "Start: ElevationIndicator != null");
         Assert(HeadingIndicator != null, "Start: HeadingIndicator != null");
         Assert(VelocityIndicator != null, "Start: VelocityIndicator != null");
-        Assert(AAMTargetIndicator != null, "Start: AAMTargetIndicator != null");
-        Assert(GUNLeadIndicator != null, "Start: GUNLeadIndicator != null");
         Assert(LStickDisplayHighlighter != null, "Start: LStickDisplayHighlighter != null");
         Assert(RStickDisplayHighlighter != null, "Start: RStickDisplayHighlighter != null");
         Assert(PitchRoll != null, "Start: PitchRoll != null");
@@ -124,8 +120,6 @@ public class HUDController : UdonSharpBehaviour
 
         float fuel = EngineControl.Fuel;
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
-        float gunammo = EngineControl.GunAmmoInSeconds;
-        FullGunAmmoDivider = 1f / (gunammo > 0 ? gunammo : 10000000);
 
         VTOLDefaultValue = EngineControl.VTOLDefaultValue;
 
@@ -160,68 +154,8 @@ public class HUDController : UdonSharpBehaviour
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
         /////////////////
 
-        if (EngineControl.RStickSelection == 1)
-        {
-            HudCrosshairGun.SetActive(true);
-            HudCrosshair.SetActive(false);
-        }
-        else
-        {
-            HudCrosshairGun.SetActive(false);
-            HudCrosshair.SetActive(true);
-        }
 
-        //AAM Target Indicator
-        if (EngineControl.AAMHasTarget && (EngineControl.RStickSelection == 1 || EngineControl.RStickSelection == 2))//GUN or AAM
-        {
-            AAMTargetIndicator.gameObject.SetActive(true);
-            AAMTargetIndicator.position = transform.position + EngineControl.AAMCurrentTargetDirection;
-            AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
-            if (EngineControl.AAMLocked)
-            {
-                AAMTargetIndicator.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));//back of mesh is locked version
-            }
-            else
-            {
-                AAMTargetIndicator.localRotation = Quaternion.identity;
-            }
-        }
-        else AAMTargetIndicator.gameObject.SetActive(false);
-        /////////////////
 
-        //GUN Lead Indicator
-        if (EngineControl.AAMHasTarget && EngineControl.RStickSelection == 1)
-        {
-            GUNLeadIndicator.gameObject.SetActive(true);
-            Vector3 TargetDir;
-            if (EngineControl.AAMCurrentTargetEngineControl == null)//target is a dummy target
-            { TargetDir = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.position - transform.position; }
-            else
-            { TargetDir = EngineControl.AAMCurrentTargetEngineControl.CenterOfMass.position - transform.position; }
-            GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
-
-            Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-            float BulletPlusPlaneSpeed = (EngineControl.CurrentVel + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .25f)).magnitude;
-            Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
-            //GUN_TargetDirOld is around 4 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
-            //multiplying the result by .25(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
-            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .25f) / SmoothDeltaTime, 15 * SmoothDeltaTime);
-            float BulletHitTime = TargetDir.magnitude / BulletPlusPlaneSpeed;
-            //normalize lerped relative target velocity vector and multiply by lerped speed
-            Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
-            Vector3 PredictedPos = (TargetDir
-                + ((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
-                    //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
-                    + (TargetAccel * .125f * BulletHitTime)
-                        + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
-                            * BulletHitTime);
-            GUNLeadIndicator.position = transform.position + PredictedPos;
-            GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
-
-            RelativeTargetVelLastFrame = RelativeTargetVel;
-        }
-        else GUNLeadIndicator.gameObject.SetActive(false);
-        /////////////////
 
         //Smoke Color Indicator
         SmokeColorIndicator.color = EngineControl.SmokeColor_Color;
@@ -256,31 +190,31 @@ public class HUDController : UdonSharpBehaviour
         //Left Stick Selector
         switch (EngineControl.LStickSelection)
         {
-            case 0:
+            case -1:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);//invisible, backfacing
                 break;
-            case 1:
+            case 0:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
                 break;
-            case 2:
+            case 1:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 45, 0);
                 break;
-            case 3:
+            case 2:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 90, 0);
                 break;
-            case 4:
+            case 3:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 135, 0);
                 break;
-            case 5:
+            case 4:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);
                 break;
-            case 6:
+            case 5:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 225, 0);
                 break;
-            case 7:
+            case 6:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 270, 0);
                 break;
-            case 8:
+            case 7:
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 315, 0);
                 break;
         }
@@ -288,31 +222,31 @@ public class HUDController : UdonSharpBehaviour
         //Right Stick Selector
         switch (EngineControl.RStickSelection)
         {
-            case 0:
+            case -1:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);//invisible, backfacing
                 break;
-            case 1:
+            case 0:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
                 break;
-            case 2:
+            case 1:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 45, 0);
                 break;
-            case 3:
+            case 2:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 90, 0);
                 break;
-            case 4:
+            case 3:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 135, 0);
                 break;
-            case 5:
+            case 4:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);
                 break;
-            case 6:
+            case 5:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 225, 0);
                 break;
-            case 7:
+            case 6:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 270, 0);
                 break;
-            case 8:
+            case 7:
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 315, 0);
                 break;
         }
@@ -453,7 +387,6 @@ public class HUDController : UdonSharpBehaviour
         else HUDText_Bomb_ammo.text = string.Empty;
 
         PlaneAnimator.SetFloat(FUEL_STRING, EngineControl.Fuel * FullFuelDivider);
-        PlaneAnimator.SetFloat(GUNAMMO_STRING, EngineControl.GunAmmoInSeconds * FullGunAmmoDivider);
 
 
         //Replacement for leavebuttons below this point
@@ -478,7 +411,10 @@ public class HUDController : UdonSharpBehaviour
         if (FindSeatsDone) { return; }
         VehicleStations = (VRC.SDK3.Components.VRCStation[])EngineControl.VehicleMainObj.GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
         SeatedPlayers = new int[VehicleStations.Length];
-        foreach (int i in SeatedPlayers) SeatedPlayers[i] = -1;
+        for (int i = 0; i != SeatedPlayers.Length; i++)
+        {
+            SeatedPlayers[i] = -1;
+        }
         FindSeatsDone = true;
     }
 

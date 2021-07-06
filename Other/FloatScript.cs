@@ -69,19 +69,19 @@ public class FloatScript : UdonSharpBehaviour
     {
         LastRayHitHeight = float.MinValue;
     }
-    public void TakeOwnership()
+    public void SFEXT_TakeOwnership()
     {
         if (!HoverBike) { gameObject.SetActive(true); }
     }
-    public void LoseOwnership()
+    public void SFEXT_LoseOwnership()
     {
         if (!HoverBike) { gameObject.SetActive(false); }
     }
-    public void PilotExit()
+    public void SFEXT_PilotExit()
     {
         if (HoverBike) { gameObject.SetActive(false); }
     }
-    public void PilotEnter()
+    public void SFEXT_PilotEnter()
     {
         if (HoverBike) { gameObject.SetActive(true); }
     }
