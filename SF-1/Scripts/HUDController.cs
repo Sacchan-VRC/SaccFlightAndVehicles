@@ -468,15 +468,18 @@ public class HUDController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int[] SeatedPlayers;
     [System.NonSerializedAttribute] public VRCStation[] VehicleStations;
     [System.NonSerializedAttribute] public int[] InsidePlayers;
+    private bool FindSeatsDone = false;
     public void ExitStation()
     {
         VehicleStations[MySeat].ExitStation(EngineControl.localPlayer);
     }
     public void FindSeats()
     {
+        if (FindSeatsDone) { return; }
         VehicleStations = (VRC.SDK3.Components.VRCStation[])EngineControl.VehicleMainObj.GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
         SeatedPlayers = new int[VehicleStations.Length];
         foreach (int i in SeatedPlayers) SeatedPlayers[i] = -1;
+        FindSeatsDone = true;
     }
 
 
