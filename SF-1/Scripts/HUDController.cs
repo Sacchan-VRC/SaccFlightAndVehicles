@@ -73,7 +73,6 @@ public class HUDController : UdonSharpBehaviour
     private float VTOLDefaultValue;
     private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
-    private GameObject[] ExtensionUdonBehaviours;
     VRCPlayerApi localPlayer;
     private void Start()
     {
@@ -123,7 +122,6 @@ public class HUDController : UdonSharpBehaviour
 
         VTOLDefaultValue = EngineControl.VTOLDefaultValue;
 
-        ExtensionUdonBehaviours = EngineControl.ExtensionUdonBehaviours;
         localPlayer = Networking.LocalPlayer;
     }
     private void OnEnable()

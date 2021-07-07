@@ -11,7 +11,7 @@ public class HitDetector : UdonSharpBehaviour
     [System.NonSerializedAttribute] public EngineController LastAttacker;
     private bool InEditor = true;
     VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
-    private GameObject[] ExtensionUdonBehaviours;
+    private UdonSharpBehaviour[] ExtensionUdonBehaviours;
     private Rigidbody VehicleRigid;
 
     private void Start()
@@ -80,12 +80,11 @@ public class HitDetector : UdonSharpBehaviour
     {
         if (EngineControl.IsOwner)
         {
-            foreach (GameObject obj in ExtensionUdonBehaviours)
+            foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
             {
-                if (obj != null)
+                if (EXT != null)
                 {
-                    UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                    ud.SendCustomEvent("SFEXT_ReAppear");
+                    EXT.SendCustomEvent("SFEXT_ReAppear");
                 }
             }
         }

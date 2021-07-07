@@ -319,7 +319,7 @@ MonoBehaviour:
       Data: 20|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: UnityEngine.GameObject[], UnityEngine.CoreModule
+      Data: UdonSharp.UdonSharpBehaviour[], UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -331,7 +331,7 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineGameObjectArray
+      Data: UnityEngineComponentArray
     - Name: symbolOriginalName
       Entry: 1
       Data: ExtensionUdonBehaviours
@@ -388,7 +388,7 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineGameObjectArray
+      Data: UnityEngineComponentArray
     - Name: symbolOriginalName
       Entry: 1
       Data: Dial_Functions_L
@@ -427,7 +427,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: CurrentSelectedFunctionL
+      Data: Dial_Functions_R
     - Name: $v
       Entry: 7
       Data: 25|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -435,29 +435,23 @@ MonoBehaviour:
       Entry: 7
       Data: 26|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 27|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: VRC.Udon.UdonBehaviour, VRC.Udon
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 20
     - Name: declarationType
       Entry: 3
-      Data: 2
+      Data: 1
     - Name: syncMode
       Entry: 3
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: VRCUdonUdonBehaviour
+      Data: UnityEngineComponentArray
     - Name: symbolOriginalName
       Entry: 1
-      Data: CurrentSelectedFunctionL
+      Data: Dial_Functions_R
     - Name: symbolUniqueName
       Entry: 1
-      Data: CurrentSelectedFunctionL
+      Data: Dial_Functions_R
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -466,7 +460,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 28|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 27|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -490,16 +484,22 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: CurrentSelectedFunctionR
+      Data: CurrentSelectedFunctionL
     - Name: $v
       Entry: 7
-      Data: 29|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 28|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 30|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 29|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 27
+      Entry: 7
+      Data: 30|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UdonSharp.UdonSharpBehaviour, UdonSharp.Runtime
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -511,10 +511,10 @@ MonoBehaviour:
       Data: VRCUdonUdonBehaviour
     - Name: symbolOriginalName
       Entry: 1
-      Data: CurrentSelectedFunctionR
+      Data: CurrentSelectedFunctionL
     - Name: symbolUniqueName
       Entry: 1
-      Data: CurrentSelectedFunctionR
+      Data: CurrentSelectedFunctionL
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -547,7 +547,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Dial_Functions_R
+      Data: CurrentSelectedFunctionR
     - Name: $v
       Entry: 7
       Data: 32|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -556,22 +556,22 @@ MonoBehaviour:
       Data: 33|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 20
+      Data: 30
     - Name: declarationType
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: syncMode
       Entry: 3
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineGameObjectArray
+      Data: VRCUdonUdonBehaviour
     - Name: symbolOriginalName
       Entry: 1
-      Data: Dial_Functions_R
+      Data: CurrentSelectedFunctionR
     - Name: symbolUniqueName
       Entry: 1
-      Data: Dial_Functions_R
+      Data: CurrentSelectedFunctionR
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -16344,8 +16344,14 @@ MonoBehaviour:
       Entry: 7
       Data: 927|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 20
+      Entry: 7
+      Data: 928|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UnityEngine.GameObject[], UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -16369,13 +16375,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 928|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 929|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 929|System.NonSerializedAttribute, mscorlib
+      Data: 930|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -16402,10 +16408,10 @@ MonoBehaviour:
       Data: NumAAMTargets
     - Name: $v
       Entry: 7
-      Data: 930|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 931|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 931|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 932|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -16432,13 +16438,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 932|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 933|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 933|System.NonSerializedAttribute, mscorlib
+      Data: 934|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -16465,10 +16471,10 @@ MonoBehaviour:
       Data: AAMTargetChecker
     - Name: $v
       Entry: 7
-      Data: 934|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 935|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 935|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 936|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -16495,7 +16501,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 936|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 937|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -16522,10 +16528,10 @@ MonoBehaviour:
       Data: AAMHasTarget
     - Name: $v
       Entry: 7
-      Data: 937|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 938|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 938|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 939|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -16552,13 +16558,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 939|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 940|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 940|System.NonSerializedAttribute, mscorlib
+      Data: 941|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -16585,10 +16591,10 @@ MonoBehaviour:
       Data: AAMTargetedTimer
     - Name: $v
       Entry: 7
-      Data: 941|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 942|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 942|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 943|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -16615,7 +16621,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 943|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 944|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -16642,10 +16648,10 @@ MonoBehaviour:
       Data: AAMLocked
     - Name: $v
       Entry: 7
-      Data: 944|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 945|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 945|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 946|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -16672,13 +16678,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 946|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 947|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 947|System.NonSerializedAttribute, mscorlib
+      Data: 948|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -16705,10 +16711,10 @@ MonoBehaviour:
       Data: AAMLockTimer
     - Name: $v
       Entry: 7
-      Data: 948|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 949|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 949|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 950|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -16735,13 +16741,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 950|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 951|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 951|System.NonSerializedAttribute, mscorlib
+      Data: 952|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -16768,10 +16774,10 @@ MonoBehaviour:
       Data: AAMLastFiredTime
     - Name: $v
       Entry: 7
-      Data: 952|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 953|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 953|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 954|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -16798,7 +16804,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 954|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 955|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -16825,10 +16831,10 @@ MonoBehaviour:
       Data: AAMCurrentTargetDirection
     - Name: $v
       Entry: 7
-      Data: 955|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 956|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 956|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 957|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 458
@@ -16855,13 +16861,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 957|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 958|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 958|System.NonSerializedAttribute, mscorlib
+      Data: 959|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -16888,10 +16894,10 @@ MonoBehaviour:
       Data: FullFuel
     - Name: $v
       Entry: 7
-      Data: 959|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 960|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 960|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 961|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -16918,13 +16924,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 961|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 962|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 962|System.NonSerializedAttribute, mscorlib
+      Data: 963|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -16951,10 +16957,10 @@ MonoBehaviour:
       Data: LowFuel
     - Name: $v
       Entry: 7
-      Data: 963|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 964|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 964|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 965|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -16981,7 +16987,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 965|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 966|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17008,10 +17014,10 @@ MonoBehaviour:
       Data: AGMLocked
     - Name: $v
       Entry: 7
-      Data: 966|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 967|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 967|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 968|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -17038,13 +17044,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 968|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 969|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 969|System.NonSerializedAttribute, mscorlib
+      Data: 970|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17071,10 +17077,10 @@ MonoBehaviour:
       Data: AGMUnlocking
     - Name: $v
       Entry: 7
-      Data: 970|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 971|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 971|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 972|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -17101,13 +17107,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 972|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 973|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 973|System.NonSerializedAttribute, mscorlib
+      Data: 974|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17134,10 +17140,10 @@ MonoBehaviour:
       Data: AGMUnlockTimer
     - Name: $v
       Entry: 7
-      Data: 974|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 975|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 975|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 976|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -17164,13 +17170,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 976|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 977|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 977|System.NonSerializedAttribute, mscorlib
+      Data: 978|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17197,10 +17203,10 @@ MonoBehaviour:
       Data: AGMRotDif
     - Name: $v
       Entry: 7
-      Data: 978|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 979|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 979|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 980|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -17227,13 +17233,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 980|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 981|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 981|System.NonSerializedAttribute, mscorlib
+      Data: 982|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17260,10 +17266,10 @@ MonoBehaviour:
       Data: BombPoint
     - Name: $v
       Entry: 7
-      Data: 982|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 983|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 983|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 984|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -17290,13 +17296,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 984|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 985|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 985|System.NonSerializedAttribute, mscorlib
+      Data: 986|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17323,10 +17329,10 @@ MonoBehaviour:
       Data: LastBombDropTime
     - Name: $v
       Entry: 7
-      Data: 986|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 987|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 987|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 988|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -17353,7 +17359,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 988|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 989|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17380,10 +17386,10 @@ MonoBehaviour:
       Data: AGMCamRotSlerper
     - Name: $v
       Entry: 7
-      Data: 989|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 990|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 990|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 991|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 617
@@ -17410,7 +17416,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 991|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 992|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17437,10 +17443,10 @@ MonoBehaviour:
       Data: LastResupplyTime
     - Name: $v
       Entry: 7
-      Data: 992|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 993|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 993|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 994|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -17467,7 +17473,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 994|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 995|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -17494,10 +17500,10 @@ MonoBehaviour:
       Data: FullAAMs
     - Name: $v
       Entry: 7
-      Data: 995|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 996|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 996|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 997|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -17524,13 +17530,13 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 997|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 998|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 998|System.NonSerializedAttribute, mscorlib
+      Data: 999|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17557,10 +17563,10 @@ MonoBehaviour:
       Data: FullAGMs
     - Name: $v
       Entry: 7
-      Data: 999|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1000|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1000|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1001|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -17587,14 +17593,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1001|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1002|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1002|System.NonSerializedAttribute, mscorlib
+      Data: 1003|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17621,10 +17627,10 @@ MonoBehaviour:
       Data: FullBombs
     - Name: $v
       Entry: 7
-      Data: 1003|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1004|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1004|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1005|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -17651,14 +17657,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1005|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1006|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1006|System.NonSerializedAttribute, mscorlib
+      Data: 1007|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17685,10 +17691,10 @@ MonoBehaviour:
       Data: FullGunAmmo
     - Name: $v
       Entry: 7
-      Data: 1007|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1008|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1008|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1009|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -17715,14 +17721,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1009|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1010|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1010|System.NonSerializedAttribute, mscorlib
+      Data: 1011|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17749,10 +17755,10 @@ MonoBehaviour:
       Data: MissilesIncoming
     - Name: $v
       Entry: 7
-      Data: 1011|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1012|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1012|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1013|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -17779,14 +17785,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1013|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1014|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1014|System.NonSerializedAttribute, mscorlib
+      Data: 1015|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17813,13 +17819,13 @@ MonoBehaviour:
       Data: AAMCurrentTargetEngineControl
     - Name: $v
       Entry: 7
-      Data: 1015|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1016|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1016|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1017|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 1017|System.RuntimeType, mscorlib
+      Data: 1018|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: EngineController, Assembly-CSharp
@@ -17849,14 +17855,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1018|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1019|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1019|System.NonSerializedAttribute, mscorlib
+      Data: 1020|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -17883,10 +17889,10 @@ MonoBehaviour:
       Data: WeaponSelected
     - Name: $v
       Entry: 7
-      Data: 1020|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1021|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1021|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1022|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -17913,7 +17919,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1022|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1023|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -17941,10 +17947,10 @@ MonoBehaviour:
       Data: CatapultDeadTimer
     - Name: $v
       Entry: 7
-      Data: 1023|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1024|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1024|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1025|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -17971,7 +17977,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1025|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1026|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -17999,10 +18005,10 @@ MonoBehaviour:
       Data: Spawnposition
     - Name: $v
       Entry: 7
-      Data: 1026|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1027|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1027|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1028|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 458
@@ -18029,14 +18035,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1028|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1029|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1029|System.NonSerializedAttribute, mscorlib
+      Data: 1030|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -18063,10 +18069,10 @@ MonoBehaviour:
       Data: Spawnrotation
     - Name: $v
       Entry: 7
-      Data: 1030|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1031|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1031|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1032|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 458
@@ -18093,14 +18099,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1032|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1033|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1033|System.NonSerializedAttribute, mscorlib
+      Data: 1034|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -18127,10 +18133,10 @@ MonoBehaviour:
       Data: OutsidePlaneLayer
     - Name: $v
       Entry: 7
-      Data: 1034|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1035|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1035|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1036|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -18157,7 +18163,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1036|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1037|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18185,10 +18191,10 @@ MonoBehaviour:
       Data: AAMTargetObscuredDelay
     - Name: $v
       Entry: 7
-      Data: 1037|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1038|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1038|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1039|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -18215,7 +18221,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1039|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1040|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18243,10 +18249,10 @@ MonoBehaviour:
       Data: DoAAMTargeting
     - Name: $v
       Entry: 7
-      Data: 1040|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1041|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1041|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1042|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -18273,14 +18279,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1042|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1043|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1043|System.NonSerializedAttribute, mscorlib
+      Data: 1044|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -18307,10 +18313,10 @@ MonoBehaviour:
       Data: TargetingAngle
     - Name: $v
       Entry: 7
-      Data: 1044|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1045|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1045|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1046|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -18337,7 +18343,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1046|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1047|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18365,10 +18371,10 @@ MonoBehaviour:
       Data: FullAAMsDivider
     - Name: $v
       Entry: 7
-      Data: 1047|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1048|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1048|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1049|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -18395,7 +18401,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1049|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1050|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18423,10 +18429,10 @@ MonoBehaviour:
       Data: FullAGMsDivider
     - Name: $v
       Entry: 7
-      Data: 1050|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1051|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1051|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1052|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -18453,7 +18459,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1052|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1053|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18481,10 +18487,10 @@ MonoBehaviour:
       Data: FullBombsDivider
     - Name: $v
       Entry: 7
-      Data: 1053|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1054|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1054|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1055|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -18511,7 +18517,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1055|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1056|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18539,10 +18545,10 @@ MonoBehaviour:
       Data: AGMCamLastFrame
     - Name: $v
       Entry: 7
-      Data: 1056|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1057|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1057|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1058|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 617
@@ -18569,7 +18575,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1058|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1059|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18597,10 +18603,10 @@ MonoBehaviour:
       Data: Landed
     - Name: $v
       Entry: 7
-      Data: 1059|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1060|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1060|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1061|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -18627,7 +18633,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1061|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1062|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18655,10 +18661,10 @@ MonoBehaviour:
       Data: VelLiftStart
     - Name: $v
       Entry: 7
-      Data: 1062|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1063|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1063|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1064|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -18685,7 +18691,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1064|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1065|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18713,13 +18719,13 @@ MonoBehaviour:
       Data: PlaneHitDetector
     - Name: $v
       Entry: 7
-      Data: 1065|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1066|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1066|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1067|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 7
-      Data: 1067|System.RuntimeType, mscorlib
+      Data: 1068|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: HitDetector, Assembly-CSharp
@@ -18749,7 +18755,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1068|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1069|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18777,10 +18783,10 @@ MonoBehaviour:
       Data: PilotExitTime
     - Name: $v
       Entry: 7
-      Data: 1069|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1070|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1070|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1071|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -18807,14 +18813,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1071|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1072|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 1072|System.NonSerializedAttribute, mscorlib
+      Data: 1073|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -18841,10 +18847,10 @@ MonoBehaviour:
       Data: Planelayer
     - Name: $v
       Entry: 7
-      Data: 1073|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1074|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1074|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1075|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -18871,7 +18877,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1075|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1076|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18899,10 +18905,10 @@ MonoBehaviour:
       Data: PlaneMeshParts
     - Name: $v
       Entry: 7
-      Data: 1076|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1077|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1077|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1078|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 133
@@ -18929,7 +18935,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1078|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1079|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -18957,10 +18963,10 @@ MonoBehaviour:
       Data: VelLiftMaxStart
     - Name: $v
       Entry: 7
-      Data: 1079|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1080|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1080|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1081|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -18987,7 +18993,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1081|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1082|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19015,10 +19021,10 @@ MonoBehaviour:
       Data: HasAirBrake
     - Name: $v
       Entry: 7
-      Data: 1082|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1083|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1083|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1084|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -19045,7 +19051,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1084|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1085|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19073,10 +19079,10 @@ MonoBehaviour:
       Data: HandDistanceZLastFrame
     - Name: $v
       Entry: 7
-      Data: 1085|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1086|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1086|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1087|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19103,7 +19109,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1087|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1088|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19131,10 +19137,10 @@ MonoBehaviour:
       Data: EngineAngle
     - Name: $v
       Entry: 7
-      Data: 1088|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1089|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1089|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1090|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19161,7 +19167,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1090|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1091|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19189,10 +19195,10 @@ MonoBehaviour:
       Data: PitchThrustVecMultiStart
     - Name: $v
       Entry: 7
-      Data: 1091|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1092|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1092|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1093|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19219,7 +19225,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1093|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1094|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19247,10 +19253,10 @@ MonoBehaviour:
       Data: YawThrustVecMultiStart
     - Name: $v
       Entry: 7
-      Data: 1094|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1095|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1095|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1096|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19277,7 +19283,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1096|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1097|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19305,10 +19311,10 @@ MonoBehaviour:
       Data: RollThrustVecMultiStart
     - Name: $v
       Entry: 7
-      Data: 1097|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1098|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1098|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1099|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19335,7 +19341,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1099|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1100|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19363,10 +19369,10 @@ MonoBehaviour:
       Data: VTOLenabled
     - Name: $v
       Entry: 7
-      Data: 1100|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1101|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1101|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1102|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -19393,7 +19399,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1102|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1103|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19421,10 +19427,10 @@ MonoBehaviour:
       Data: VTOLAngleInput
     - Name: $v
       Entry: 7
-      Data: 1103|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1104|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1104|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1105|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19451,7 +19457,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1105|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1106|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19479,10 +19485,10 @@ MonoBehaviour:
       Data: VTOL90Degrees
     - Name: $v
       Entry: 7
-      Data: 1106|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1107|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1107|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1108|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19509,7 +19515,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1108|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1109|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19537,10 +19543,10 @@ MonoBehaviour:
       Data: throttleABPointDivider
     - Name: $v
       Entry: 7
-      Data: 1109|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1110|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1110|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1111|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19567,7 +19573,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1111|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1112|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19595,10 +19601,10 @@ MonoBehaviour:
       Data: VTOLAngleDivider
     - Name: $v
       Entry: 7
-      Data: 1112|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1113|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1113|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1114|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19625,7 +19631,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1114|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1115|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19653,10 +19659,10 @@ MonoBehaviour:
       Data: InverseThrottleABPointDivider
     - Name: $v
       Entry: 7
-      Data: 1115|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1116|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1116|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1117|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19683,7 +19689,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1117|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1118|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19711,10 +19717,10 @@ MonoBehaviour:
       Data: EngineOutputLastFrame
     - Name: $v
       Entry: 7
-      Data: 1118|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1119|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1119|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1120|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19741,7 +19747,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1120|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1121|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19769,10 +19775,10 @@ MonoBehaviour:
       Data: VTOLAngle90
     - Name: $v
       Entry: 7
-      Data: 1121|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1122|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1122|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1123|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19799,7 +19805,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1123|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1124|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19827,10 +19833,10 @@ MonoBehaviour:
       Data: PlaneMoving
     - Name: $v
       Entry: 7
-      Data: 1124|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1125|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1125|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1126|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -19857,7 +19863,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1126|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1127|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19885,10 +19891,10 @@ MonoBehaviour:
       Data: HasWheelColliders
     - Name: $v
       Entry: 7
-      Data: 1127|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1128|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1128|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1129|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -19915,7 +19921,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1129|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1130|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -19943,10 +19949,10 @@ MonoBehaviour:
       Data: vtolangledif
     - Name: $v
       Entry: 7
-      Data: 1130|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1131|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1131|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1132|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -19973,7 +19979,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1132|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1133|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20001,10 +20007,10 @@ MonoBehaviour:
       Data: GunRecoilEmptyNULL
     - Name: $v
       Entry: 7
-      Data: 1133|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1134|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1134|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1135|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 147
@@ -20031,7 +20037,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1135|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1136|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20059,10 +20065,10 @@ MonoBehaviour:
       Data: StartMaxLift
     - Name: $v
       Entry: 7
-      Data: 1136|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1137|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1137|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1138|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 63
@@ -20089,7 +20095,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1138|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1139|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20117,10 +20123,10 @@ MonoBehaviour:
       Data: HOOKED_STRING
     - Name: $v
       Entry: 7
-      Data: 1139|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1140|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1140|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1141|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20147,7 +20153,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1141|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1142|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20175,10 +20181,10 @@ MonoBehaviour:
       Data: FLARES_STRING
     - Name: $v
       Entry: 7
-      Data: 1142|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1143|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1143|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1144|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20205,7 +20211,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1144|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1145|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20233,10 +20239,10 @@ MonoBehaviour:
       Data: AAMLAUNCHED_STRING
     - Name: $v
       Entry: 7
-      Data: 1145|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1146|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1146|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1147|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20263,7 +20269,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1147|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1148|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20291,10 +20297,10 @@ MonoBehaviour:
       Data: AAMS_STRING
     - Name: $v
       Entry: 7
-      Data: 1148|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1149|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1149|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1150|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20321,7 +20327,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1150|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1151|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20349,10 +20355,10 @@ MonoBehaviour:
       Data: AGMLAUNCHED_STRING
     - Name: $v
       Entry: 7
-      Data: 1151|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1152|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1152|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1153|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20379,7 +20385,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1153|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1154|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20407,10 +20413,10 @@ MonoBehaviour:
       Data: AGMS_STRING
     - Name: $v
       Entry: 7
-      Data: 1154|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1155|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1155|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1156|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20437,7 +20443,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1156|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1157|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20465,10 +20471,10 @@ MonoBehaviour:
       Data: BOMBLAUNCHED_STRING
     - Name: $v
       Entry: 7
-      Data: 1157|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1158|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1158|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1159|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20495,7 +20501,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1159|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1160|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20523,10 +20529,10 @@ MonoBehaviour:
       Data: BOMBS_STRING
     - Name: $v
       Entry: 7
-      Data: 1160|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1161|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1161|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1162|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20553,7 +20559,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1162|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1163|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20581,10 +20587,10 @@ MonoBehaviour:
       Data: RADARLOCKED_STRING
     - Name: $v
       Entry: 7
-      Data: 1163|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1164|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1164|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1165|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20611,7 +20617,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1165|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1166|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20639,10 +20645,10 @@ MonoBehaviour:
       Data: ONCATAPULT_STRING
     - Name: $v
       Entry: 7
-      Data: 1166|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1167|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1167|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1168|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20669,7 +20675,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1168|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1169|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20697,10 +20703,10 @@ MonoBehaviour:
       Data: WEAPON_STRING
     - Name: $v
       Entry: 7
-      Data: 1169|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1170|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1170|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1171|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20727,7 +20733,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1171|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1172|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20755,10 +20761,10 @@ MonoBehaviour:
       Data: AFTERBURNERON_STRING
     - Name: $v
       Entry: 7
-      Data: 1172|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1173|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1173|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1174|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20785,7 +20791,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1174|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1175|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20813,10 +20819,10 @@ MonoBehaviour:
       Data: RESUPPLY_STRING
     - Name: $v
       Entry: 7
-      Data: 1175|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1176|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1176|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1177|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20843,7 +20849,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1177|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1178|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20871,10 +20877,10 @@ MonoBehaviour:
       Data: CANOPYOPEN_STRING
     - Name: $v
       Entry: 7
-      Data: 1178|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1179|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1179|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1180|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20901,7 +20907,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1180|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1181|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20929,10 +20935,10 @@ MonoBehaviour:
       Data: GEARUP_STRING
     - Name: $v
       Entry: 7
-      Data: 1181|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1182|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1182|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1183|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -20959,7 +20965,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1183|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1184|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -20987,10 +20993,10 @@ MonoBehaviour:
       Data: FLAPS_STRING
     - Name: $v
       Entry: 7
-      Data: 1184|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1185|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1185|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1186|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21017,7 +21023,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1186|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1187|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -21045,10 +21051,10 @@ MonoBehaviour:
       Data: HOOKDOWN_STRING
     - Name: $v
       Entry: 7
-      Data: 1187|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1188|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1188|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1189|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21075,7 +21081,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1189|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1190|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -21103,10 +21109,10 @@ MonoBehaviour:
       Data: DISPLAYSMOKE_STRING
     - Name: $v
       Entry: 7
-      Data: 1190|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1191|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1191|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1192|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21133,7 +21139,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1192|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1193|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -21161,10 +21167,10 @@ MonoBehaviour:
       Data: BULLETHIT_STRING
     - Name: $v
       Entry: 7
-      Data: 1193|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1194|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1194|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1195|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21191,7 +21197,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1195|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1196|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -21219,10 +21225,10 @@ MonoBehaviour:
       Data: INSTANTGEARDOWN_STRING
     - Name: $v
       Entry: 7
-      Data: 1196|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1197|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1197|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1198|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21249,7 +21255,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1198|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1199|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -21277,10 +21283,10 @@ MonoBehaviour:
       Data: LOCALPILOT_STRING
     - Name: $v
       Entry: 7
-      Data: 1199|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1200|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1200|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1201|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21307,7 +21313,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1201|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1202|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -21335,10 +21341,10 @@ MonoBehaviour:
       Data: LOCALPASSENGER_STRING
     - Name: $v
       Entry: 7
-      Data: 1202|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1203|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1203|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1204|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21365,7 +21371,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1204|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1205|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -21393,10 +21399,10 @@ MonoBehaviour:
       Data: OCCUPIED_STRING
     - Name: $v
       Entry: 7
-      Data: 1205|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1206|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1206|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1207|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21423,7 +21429,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1207|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1208|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -21451,10 +21457,10 @@ MonoBehaviour:
       Data: RESPAWN_STRING
     - Name: $v
       Entry: 7
-      Data: 1208|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 1209|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 1209|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 1210|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 41
@@ -21481,7 +21487,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 1210|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 1211|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12

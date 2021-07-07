@@ -9,11 +9,13 @@ public class DFUNC_Gun : UdonSharpBehaviour
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private Animator Animator;
     [SerializeField] private Transform GunRecoilEmpty;
+    [SerializeField] private Transform GunDamageParticle;
     [SerializeField] private GameObject HudCrosshairGun;
     [SerializeField] private GameObject HudCrosshair;
-    [SerializeField] private GameObject GunSound;
-    [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
-    [UdonSynced(UdonSyncMode.None)] private bool IsFiringGun;
+    [SerializeField] private bool UseLeftTrigger = false;
+    [SerializeField] private float FullReloadTimeSec = 20;
+    [SerializeField] private float FullGunAmmoInSeconds = 12;
+    [UdonSynced(UdonSyncMode.None)] private float gunammo = 12;
     private float GunRecoil;
     private Rigidbody VehicleRigidbody;
     private bool RTriggerLastFrame;
@@ -25,23 +27,27 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool Passenger;
     private float FullGunAmmoDivider;
     private bool active = false;
-    private float FullGunAmmo;
+    private float reloadspeed;
+    private bool Initialized = false;
     public void Update()
     {
-        if (!Passenger)
+        if (!Passenger && active)
         {
-            float RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-            float GunAmmoSec = GunAmmoInSeconds;
             float DeltaTime = Time.deltaTime;
             timesinceupdate += DeltaTime;
-            if ((RTrigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoSec > 0)
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            if ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && gunammo > 0)
             {
                 if (!firing)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStartFiring");
+                    firing = true;
                 }
-                IsFiringGun = firing = true;
-                GunAmmoInSeconds = Mathf.Max(GunAmmoSec - DeltaTime, 0);
+                gunammo = Mathf.Max(gunammo - DeltaTime, 0);
                 if (GunRecoilEmptyNULL)
                 {
                     VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime);
@@ -58,7 +64,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
                     firing = false;
-                    IsFiringGun = false;
                     RTriggerLastFrame = false;
                 }
             }
@@ -69,7 +74,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             }
             Hud();
         }
-        Animator.SetFloat(GUNAMMO_STRING, GunAmmoInSeconds * FullGunAmmoDivider);
+        Animator.SetFloat(GUNAMMO_STRING, gunammo * FullGunAmmoDivider);
     }
     public void DFUNC_Selected()
     {
@@ -78,29 +83,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
-        gameObject.SetActive(false);
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
-    }
-    public void SetActive()
-    {
-        HudCrosshairGun.SetActive(true);
-        HudCrosshair.SetActive(false);
-        active = true;
-        if (EngineControl.Passenger)
-        { gameObject.SetActive(true); }
-    }
-    public void SetInactive()
-    {
-        HudCrosshairGun.SetActive(false);
-        HudCrosshair.SetActive(true);
-        AAMTargetIndicator.gameObject.SetActive(false);
-        GUNLeadIndicator.gameObject.SetActive(false);
-        active = false;
-        if (EngineControl.Passenger)
-        {
-            gameObject.SetActive(false);
-        }
     }
     public void SFEXT_PassengerEnter()
     {
@@ -111,53 +94,81 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
     }
+    public void SFEXT_PilotEnter()
+    {
+        GunDamageParticle.gameObject.SetActive(true);
+    }
     public void SFEXT_PilotExit()
     {
         firing = false;
-        IsFiringGun = false;
         RTriggerLastFrame = false;
         RequestSerialization();
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
         gameObject.SetActive(false);
+        GunDamageParticle.gameObject.SetActive(false);
     }
-    public void SFEXT_Resupply()
+    public void SFEXT_ReSupply()
     {
-        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + (FullGunAmmo / 20), FullGunAmmo);
-        //resupplyint +=1;
+        gunammo = Mathf.Min(gunammo + reloadspeed, FullGunAmmoInSeconds);
+        //enginecontrol.resupplyint +=1;
+    }
+    public void SetActive()
+    {
+        HudCrosshairGun.SetActive(true);
+        HudCrosshair.SetActive(false);
+        active = true;
+        if (EngineControl.Passenger)
+        { gameObject.SetActive(true); }
+        if (!Initialized)
+        { Initialize(); }
+    }
+    public void SetInactive()
+    {
+        HudCrosshairGun.SetActive(false);
+        HudCrosshair.SetActive(true);
+        AAMTargetIndicator.gameObject.SetActive(false);
+        GUNLeadIndicator.gameObject.SetActive(false);
+        Animator.SetBool(GUNFIRING_STRING, false);
+        active = false;
+        gameObject.SetActive(false);
+    }
+    public void SFEXT_TakeOwnership()
+    {
+        if (!EngineControl.Piloting)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
+        }
     }
     public void GunStartFiring()
     {
         Animator.SetBool(GUNFIRING_STRING, true);
-        GunSound.SetActive(true);
     }
     public void GunStopFiring()
     {
         Animator.SetBool(GUNFIRING_STRING, false);
-        GunSound.SetActive(false);
     }
-
-    private void OnEnable()
+    private void Initialize()
     {
-        if (!Initialized)
-        {
-            VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
-            GunRecoil = EngineControl.GunRecoil;
-            GunRecoilEmptyNULL = GunRecoilEmpty == null;
-            FullGunAmmo = GunAmmoInSeconds;
-            FullGunAmmoDivider = 1f / (FullGunAmmo > 0 ? FullGunAmmo : 10000000);
-            AAMTargets = EngineControl.AAMTargets;
-            NumAAMTargets = EngineControl.NumAAMTargets;
-            VehicleTransform = EngineControl.VehicleMainObj.transform;
-            HUDControl = EngineControl.HUDControl;
-            CenterOfMass = EngineControl.CenterOfMass;
-            OutsidePlaneLayer = LayerMask.NameToLayer("Walkthrough");
-            distance_from_head = HUDControl.distance_from_head;
+        reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
 
-            Initialized = true;
-        }
+        //Targeting
+        VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
+        GunRecoil = EngineControl.GunRecoil;
+        GunRecoilEmptyNULL = GunRecoilEmpty == null;
+        FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
+        AAMTargets = EngineControl.AAMTargets;
+        NumAAMTargets = EngineControl.NumAAMTargets;
+        VehicleTransform = EngineControl.VehicleMainObj.transform;
+        HUDControl = EngineControl.HUDControl;
+        CenterOfMass = EngineControl.CenterOfMass;
+        OutsidePlaneLayer = LayerMask.NameToLayer("Walkthrough");
+
+        //HUD
+        distance_from_head = HUDControl.distance_from_head;
+
+
+        Initialized = true;
     }
-    private bool Initialized;
     private GameObject[] AAMTargets;
     private Transform VehicleTransform;
     private int AAMTarget;

@@ -10,11 +10,11 @@ public class EngineController : UdonSharpBehaviour
     public EffectsController EffectsControl;
     public SoundController SoundControl;
     public HUDController HUDControl;
-    public GameObject[] ExtensionUdonBehaviours;
-    public GameObject[] Dial_Functions_L;
-    private UdonBehaviour CurrentSelectedFunctionL;
-    private UdonBehaviour CurrentSelectedFunctionR;
-    public GameObject[] Dial_Functions_R;
+    public UdonSharpBehaviour[] ExtensionUdonBehaviours;
+    public UdonSharpBehaviour[] Dial_Functions_L;
+    public UdonSharpBehaviour[] Dial_Functions_R;
+    private UdonSharpBehaviour CurrentSelectedFunctionL;
+    private UdonSharpBehaviour CurrentSelectedFunctionR;
     public Transform PlaneMesh;
     public int OnboardPlaneLayer = 19;
     public Transform CenterOfMass;
@@ -531,6 +531,9 @@ public class EngineController : UdonSharpBehaviour
             GunRecoilEmptyNULL = false;
         }
         LowFuel = FullFuel * .13888888f;//to match the old default settings
+
+
+        SendEventToExtensions("SFEXT_ECStart", false);
     }
 
     private void LateUpdate()
@@ -751,30 +754,33 @@ public class EngineController : UdonSharpBehaviour
                 if (LStickSelection != LStickSelectionLastFrame)
                 {
                     //new function selected, send deselected to old one
-                    if (CurrentSelectedFunctionL != null) CurrentSelectedFunctionL.SendCustomEvent("DFUNC_Deselected");
+                    if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
+                    {
+                        Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
+                    }
                     //get udonbehaviour for newly selected function and then send selected
                     if (Dial_Functions_L[LStickSelection] != null)
                     {
-                        CurrentSelectedFunctionL = (UdonBehaviour)Dial_Functions_L[LStickSelection].GetComponent(typeof(UdonBehaviour));
-                        if (CurrentSelectedFunctionL != null) CurrentSelectedFunctionL.SendCustomEvent("DFUNC_Selected");
+                        Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                     }
-                    else { CurrentSelectedFunctionR = null; }
+                    else { CurrentSelectedFunctionL = null; }
                 }
 
 
                 if (RStickSelection != RStickSelectionLastFrame)
                 {
-                    //new function selected, send deselect  ed to old one
-                    if (CurrentSelectedFunctionR != null) CurrentSelectedFunctionR.SendCustomEvent("DFUNC_Deselected");
+                    //new function selected, send deselected to old one
+                    if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
+                    {
+                        Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
+                    }
                     //get udonbehaviour for newly selected function and then send selected
                     if (Dial_Functions_R[RStickSelection] != null)
                     {
-                        CurrentSelectedFunctionR = (UdonBehaviour)Dial_Functions_R[RStickSelection].GetComponent(typeof(UdonBehaviour));
-                        if (CurrentSelectedFunctionR != null) CurrentSelectedFunctionR.SendCustomEvent("DFUNC_Selected");
+                        Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                     }
                     else { CurrentSelectedFunctionR = null; }
                 }
-                if (CurrentSelectedFunctionR != null) { CurrentSelectedFunctionR.SendCustomEvent("DFUNC_Update"); }
 
                 RStickSelectionLastFrame = RStickSelection;
                 LStickSelectionLastFrame = LStickSelection;
@@ -2176,7 +2182,7 @@ public class EngineController : UdonSharpBehaviour
         if (!localPlayer.IsOwner(VehicleMainObj)) { Networking.SetOwner(localPlayer, VehicleMainObj); }
         if (!localPlayer.IsOwner(EffectsControl.gameObject)) { Networking.SetOwner(localPlayer, EffectsControl.gameObject); }
         if (!localPlayer.IsOwner(HUDControl.gameObject)) { Networking.SetOwner(localPlayer, HUDControl.gameObject); }
-        foreach (GameObject obj in ExtensionUdonBehaviours)
+        foreach (UdonSharpBehaviour obj in ExtensionUdonBehaviours)
         {
             if (obj != null && !localPlayer.IsOwner(obj.gameObject)) { Networking.SetOwner(localPlayer, obj.gameObject); }
         }
@@ -2516,42 +2522,36 @@ public class EngineController : UdonSharpBehaviour
         }
     }
     private void SendEventToExtensions(string eventname, bool takeownership)
-    {//replace my code if fixed: https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/589-udonbehaviour-array-type-is-not-defined
-        foreach (GameObject obj in ExtensionUdonBehaviours)
+    {
+        foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
         {
-            if (obj != null)
+            if (EXT != null)
             {
-                if (takeownership)
-                {
-                    if (!localPlayer.IsOwner(obj)) { Networking.SetOwner(localPlayer, obj); }
-                }
-                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                ud.SendCustomEvent(eventname);
+                EXT.SendCustomEvent(eventname);
             }
         }
-        foreach (GameObject obj in Dial_Functions_L)
+        foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
         {
-            if (obj != null)
+            if (EXT != null)
             {
-                if (takeownership)
-                {
-                    if (!localPlayer.IsOwner(obj)) { Networking.SetOwner(localPlayer, obj); }
-                }
-                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                ud.SendCustomEvent(eventname);
+                EXT.SendCustomEvent(eventname);
             }
         }
-        foreach (GameObject obj in Dial_Functions_R)
+        foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
         {
-            if (obj != null)
+            if (EXT != null)
             {
-                if (takeownership)
-                {
-                    if (!localPlayer.IsOwner(obj)) { Networking.SetOwner(localPlayer, obj); }
-                }
-                UdonBehaviour ud = (UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour));
-                ud.SendCustomEvent(eventname);
+                EXT.SendCustomEvent(eventname);
             }
+        }
+        if (takeownership)
+        {
+            foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
+            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
+            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
         }
     }
     private void Assert(bool condition, string message)

@@ -93,12 +93,12 @@ public class PassengerSeat : UdonSharpBehaviour
         if (!SeatInitialized) { InitializeSeat(); }
 
         HUDControl.SeatedPlayers[ThisStationID] = -1;
-        HUDControl.MySeat = -1;
         if (player != null)
         {
             SetVoiceOutside(player);
             if (player.isLocal)
             {
+                HUDControl.MySeat = -1;
                 EngineControl.PassengerExitPlaneLocal();
                 //undo voice distances of all players inside the vehicle
                 foreach (int crew in HUDControl.SeatedPlayers)
