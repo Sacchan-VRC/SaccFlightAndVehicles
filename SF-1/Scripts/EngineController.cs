@@ -28,13 +28,7 @@ public class EngineController : UdonSharpBehaviour
     public LayerMask HookCableLayer;
     public Transform CatapultDetector;
     public LayerMask CatapultLayer;
-    public GameObject AAM;
-    public int NumAAM = 6;
     public float AAMMaxTargetDistance = 6000;
-    public float AAMLockAngle = 15;
-    public float AAMLockTime = 1.5f;
-    public float AAMLaunchDelay = 0.5f;
-    public Transform AAMLaunchPoint;
     public LayerMask AAMTargetsLayer;
     public GameObject AGM;
     public int NumAGM = 4;
@@ -174,7 +168,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 CurrentVel = Vector3.zero;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float Gs = 1f;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 SmokeColor = Vector3.one;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
@@ -296,13 +289,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float CanopyCloseTimer = -200000;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
     [System.NonSerializedAttribute] public int NumAAMTargets = 0;
-    private int AAMTargetChecker = 0;
-    [System.NonSerializedAttribute] public bool AAMHasTarget = false;
-    private float AAMTargetedTimer = 2f;
-    [System.NonSerializedAttribute] public bool AAMLocked = false;
-    [System.NonSerializedAttribute] public float AAMLockTimer = 0;
-    private float AAMLastFiredTime;
-    [System.NonSerializedAttribute] public Vector3 AAMCurrentTargetDirection;
     [System.NonSerializedAttribute] public float FullFuel;
     private float LowFuel;
     [System.NonSerializedAttribute] public bool AGMLocked;
@@ -313,21 +299,16 @@ public class EngineController : UdonSharpBehaviour
     private float LastBombDropTime = 0f;
     private Quaternion AGMCamRotSlerper;
     private float LastResupplyTime = 5;//can't resupply for the first 10 seconds after joining, fixes potential null ref if sending something to PlaneAnimator on first frame
-    [System.NonSerializedAttribute] public int FullAAMs;
     [System.NonSerializedAttribute] public int FullAGMs;
     [System.NonSerializedAttribute] public int FullBombs;
     [System.NonSerializedAttribute] public float FullGunAmmo;
     [System.NonSerializedAttribute] public int MissilesIncoming = 0;
-    [System.NonSerializedAttribute] public EngineController AAMCurrentTargetEngineControl;
     private bool WeaponSelected = false;
     private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] public Vector3 Spawnrotation;
     private int OutsidePlaneLayer;
-    private float AAMTargetObscuredDelay;
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
-    private float TargetingAngle;
-    private float FullAAMsDivider;
     private float FullAGMsDivider;
     private float FullBombsDivider;
     private Quaternion AGMCamLastFrame;
@@ -361,12 +342,10 @@ public class EngineController : UdonSharpBehaviour
     private int HOOKED_STRING = Animator.StringToHash("hooked");
     private int FLARES_STRING = Animator.StringToHash("flares");
     private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
-    private int AAMS_STRING = Animator.StringToHash("AAMs");
     private int AGMLAUNCHED_STRING = Animator.StringToHash("agmlaunched");
     private int AGMS_STRING = Animator.StringToHash("AGMs");
     private int BOMBLAUNCHED_STRING = Animator.StringToHash("bomblaunched");
     private int BOMBS_STRING = Animator.StringToHash("bombs");
-    private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
     private int ONCATAPULT_STRING = Animator.StringToHash("oncatapult");
     private int WEAPON_STRING = Animator.StringToHash("weapon");
     private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
@@ -401,8 +380,6 @@ public class EngineController : UdonSharpBehaviour
         Assert(HookDetector != null, "Start: HookDetector != null");
         Assert(AtGCam != null, "Start: AGMCam != null");
         Assert(CatapultDetector != null, "Start: CatapultDetector != null");
-        Assert(AAM != null, "Start: AAM != null");
-        Assert(AAMLaunchPoint != null, "Start: AAMLaunchPoint != null");
         Assert(AGM != null, "Start: AGM != null");
         Assert(AGMLaunchPoint != null, "Start: AGMLaunchPoint != null");
         Assert(Bomb != null, "Start: Bomb != null");
@@ -437,7 +414,6 @@ public class EngineController : UdonSharpBehaviour
 
         FullHealth = Health;
         FullFuel = Fuel;
-        FullAAMs = NumAAM;
         FullAGMs = NumAGM;
         FullBombs = NumBomb;
 
@@ -500,7 +476,6 @@ public class EngineController : UdonSharpBehaviour
             ReversingRollStrengthZeroStart = ReversingRollStrengthZero = RollThrustVecMulti == 0 ? -ReversingRollStrengthMulti : 1;
         }
 
-        FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
         FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
 
@@ -533,7 +508,7 @@ public class EngineController : UdonSharpBehaviour
         LowFuel = FullFuel * .13888888f;//to match the old default settings
 
 
-        SendEventToExtensions("SFEXT_ECStart", false);
+        SendEventToExtensions("SFEXT_L_ECStart", false);
     }
 
     private void LateUpdate()
@@ -901,8 +876,6 @@ public class EngineController : UdonSharpBehaviour
 
                 if (Taxiing)
                 {
-                    AAMLockTimer = 0;
-                    AAMTargetedTimer = 2;
                     AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                     Cruise = false;
                     AltHold = false;
@@ -1405,7 +1378,7 @@ public class EngineController : UdonSharpBehaviour
             else if (Landed == true && Taxiing == false)
             {
                 Landed = false;
-                SendEventToExtensions("SFEXT_TakeOff", false);
+                SendEventToExtensions("SFEXT_O_TakeOff", false);
             }
             else
             { Landed = false; }
@@ -1453,32 +1426,6 @@ public class EngineController : UdonSharpBehaviour
         PlaneAnimator.SetTrigger(FLARES_STRING);
     }
 
-    public void LaunchAAM()
-    {
-        if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
-        PlaneAnimator.SetTrigger(AAMLAUNCHED_STRING);
-        if (AAM != null)
-        {
-            GameObject NewAAM = VRCInstantiate(AAM);
-            if (!(NumAAM % 2 == 0))
-            {
-                //invert local x coordinates of launch point, launch, then revert
-                Vector3 temp = AAMLaunchPoint.localPosition;
-                temp.x *= -1;
-                AAMLaunchPoint.localPosition = temp;
-                NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
-                temp.x *= -1;
-                AAMLaunchPoint.localPosition = temp;
-            }
-            else
-            {
-                NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
-            }
-            NewAAM.SetActive(true);
-            NewAAM.GetComponent<Rigidbody>().velocity = CurrentVel;
-        }
-        PlaneAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
-    }
     public void LaunchAGM()
     {
         if (NumAGM > 0) { NumAGM--; }
@@ -1536,17 +1483,6 @@ public class EngineController : UdonSharpBehaviour
                     Targets[j] = k;
                 }
             }
-        }
-    }
-    public void Targeted()
-    {
-        EngineController TargetEngine = null;
-        if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
-            TargetEngine = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
-        if (TargetEngine != null)
-        {
-            if (TargetEngine.Piloting || TargetEngine.Passenger)
-            { TargetEngine.EffectsControl.PlaneAnimator.SetTrigger(RADARLOCKED_STRING); }
         }
     }
     public void CatapultLaunchEffects()
@@ -1631,7 +1567,6 @@ public class EngineController : UdonSharpBehaviour
         }
         Hooked = false;
         BombPoint = 0;
-        NumAAM = FullAAMs;
         NumAGM = FullAGMs;
         NumBomb = FullBombs;
         Fuel = FullFuel;
@@ -1651,7 +1586,7 @@ public class EngineController : UdonSharpBehaviour
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
 
-            SendEventToExtensions("SFEXT_Explode", false);
+            SendEventToExtensions("SFEXT_O_Explode", false);
         }
 
         //our killer increases their kills
@@ -1719,7 +1654,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_AfterburnerOn", false);
+            SendEventToExtensions("SFEXT_O_AfterburnerOn", false);
         }
     }
     public void SetAfterburnerOff()
@@ -1730,7 +1665,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_AfterburnerOff", false);
+            SendEventToExtensions("SFEXT_O_AfterburnerOff", false);
         }
     }
     private void ToggleAfterburner()
@@ -1748,16 +1683,14 @@ public class EngineController : UdonSharpBehaviour
     public void ResupplyPlane()
     {
         //only play the sound if we're actually repairing/getting ammo/fuel
-        if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || Health != FullHealth))
+        if (!SoundControl.ReloadingNull && (NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || Health != FullHealth))
         {
             SoundControl.Reloading.Play();
         }
         LastResupplyTime = Time.time;
-        NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(FullAAMs / 10), 1), FullAAMs);
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
 
-        PlaneAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
         PlaneAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
         PlaneAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
 
@@ -1774,22 +1707,20 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_ReSupply", false);
+            SendEventToExtensions("SFEXT_O_ReSupply", false);
         }
     }
     public void ResupplyPlane_FuelOnly()//not done and unused
     {
         //only play the sound if we're actually repairing/getting ammo/fuel
-        if (!SoundControl.ReloadingNull && (NumAAM != FullAAMs || NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || Health != FullHealth))
+        if (!SoundControl.ReloadingNull && (NumAGM != FullAGMs || NumBomb != FullBombs || Fuel < FullFuel - 10 || Health != FullHealth))
         {
             SoundControl.Reloading.Play();
         }
         LastResupplyTime = Time.time;
-        NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(FullAAMs / 10), 1), FullAAMs);
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
 
-        PlaneAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
         PlaneAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
         PlaneAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
 
@@ -1818,7 +1749,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_CanopyOpened", false);
+            SendEventToExtensions("SFEXT_O_CanopyOpened", false);
         }
     }
     public void CanopyClosing()
@@ -1834,7 +1765,7 @@ public class EngineController : UdonSharpBehaviour
         }
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_CanopyClosed", false);
+            SendEventToExtensions("SFEXT_O_CanopyClosed", false);
         }
     }
     private void ToggleCanopy()
@@ -1855,7 +1786,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_GearUp", false);
+            SendEventToExtensions("SFEXT_O_GearUp", false);
         }
     }
     public void SetGearDown()
@@ -1865,7 +1796,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_GearDown", false);
+            SendEventToExtensions("SFEXT_O_GearDown", false);
         }
     }
     public void ToggleGear()
@@ -1889,7 +1820,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_FlapsOff", false);
+            SendEventToExtensions("SFEXT_O_FlapsOff", false);
         }
     }
     public void SetFlapsOn()
@@ -1900,7 +1831,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_FlapsOn", false);
+            SendEventToExtensions("SFEXT_O_FlapsOn", false);
         }
     }
     public void ToggleFlaps()
@@ -1921,7 +1852,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_HookDown", false);
+            SendEventToExtensions("SFEXT_O_HookDown", false);
         }
     }
     public void SetHookUp()
@@ -1962,7 +1893,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_SmokeOff", false);
+            SendEventToExtensions("SFEXT_O_SmokeOff", false);
         }
     }
     public void ToggleSmoking()
@@ -1982,7 +1913,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_LimitsOn", false);
+            SendEventToExtensions("SFEXT_O_LimitsOn", false);
         }
     }
     public void SetLimitsOff()
@@ -1991,7 +1922,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_LimitsOff", false);
+            SendEventToExtensions("SFEXT_O_LimitsOff", false);
         }
     }
     public void ToggleLimits()
@@ -2020,7 +1951,7 @@ public class EngineController : UdonSharpBehaviour
         VehicleObjectSync.Respawn();//this works if done just locally
 
 
-        SendEventToExtensions("SFEXT_Respawn", true);
+        SendEventToExtensions("SFEXT_O_RespawnButton", true);
     }
     public void ResetStatus()//called globally when using respawn button
     {
@@ -2040,16 +1971,16 @@ public class EngineController : UdonSharpBehaviour
         if (HasCanopy && !EffectsControl.CanopyOpen)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
         WeaponSelected = false;
-        NumAAM = FullAAMs;
         NumAGM = FullAGMs;
         NumBomb = FullBombs;
-        PlaneAnimator.SetFloat(AAMS_STRING, 1);
         PlaneAnimator.SetFloat(AGMS_STRING, 1);
         PlaneAnimator.SetFloat(BOMBS_STRING, 1);
         BombPoint = 0;
         //these two make it invincible and unable to be respawned again for 5s
         dead = true;
         PlaneAnimator.SetTrigger(RESPAWN_STRING);
+
+        SendEventToExtensions("SFEXT_G_RespawnButton", false);
     }
     public void PlaneHit()
     {
@@ -2072,7 +2003,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_PlaneHit", false);
+            SendEventToExtensions("SFEXT_O_PlaneHit", false);
         }
     }
     public void Respawn_event()//called by Respawn()
@@ -2145,7 +2076,7 @@ public class EngineController : UdonSharpBehaviour
         if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool(LOCALPASSENGER_STRING, true); }
         SetPlaneLayerInside();
 
-        SendEventToExtensions("SFEXT_PassengerEnter", false);
+        SendEventToExtensions("SFEXT_P_PassengerEnter", false);
     }
     public void PassengerExitPlaneLocal()
     {
@@ -2158,7 +2089,7 @@ public class EngineController : UdonSharpBehaviour
         if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
         SetPlaneLayerOutside();
 
-        SendEventToExtensions("SFEXT_PassengerExit", false);
+        SendEventToExtensions("SFEXT_P_PassengerExit", false);
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
@@ -2166,13 +2097,13 @@ public class EngineController : UdonSharpBehaviour
         {
             SetOwnerships();
 
-            SendEventToExtensions("SFEXT_TakeOwnership", false);
+            SendEventToExtensions("SFEXT_O_TakeOwnership", false);
         }
         else
         {
             if (IsOwner)
             {
-                SendEventToExtensions("SFEXT_LoseOwnership", false);
+                SendEventToExtensions("SFEXT_O_LoseOwnership", false);
             }
         }
     }
@@ -2226,12 +2157,6 @@ public class EngineController : UdonSharpBehaviour
 
         SetPlaneLayerInside();
 
-        //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
-        var Target = AAMTargets[AAMTarget];
-        if (Target && Target.transform.parent)
-        {
-            AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
-        }
 
         if (KillsBoard != null)
         {
@@ -2240,7 +2165,7 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            SendEventToExtensions("SFEXT_PilotEnter", false);
+            SendEventToExtensions("SFEXT_O_PilotEnter", false);
         }
     }
     public void PilotEnterPlaneGlobal(VRCPlayerApi player)
@@ -2296,11 +2221,8 @@ public class EngineController : UdonSharpBehaviour
             LTriggerLastFrame = false;
             RTriggerLastFrame = false;
             AGMLocked = false;
-            AAMHasTarget = false;
             DoAAMTargeting = false;
             MissilesIncoming = 0;
-            AAMLockTimer = 0;
-            AAMLocked = false;
             HUDControl.MenuSoundCheckLast = 0;
             if (Ejected)
             {
@@ -2314,7 +2236,7 @@ public class EngineController : UdonSharpBehaviour
             //set plane's layer back
             SetPlaneLayerOutside();
 
-            SendEventToExtensions("SFEXT_PilotExit", false);
+            SendEventToExtensions("SFEXT_O_PilotExit", false);
         }
         if (KillsBoard != null)
         {

@@ -21,8 +21,12 @@ public class WaterTrigger : UdonSharpBehaviour
         WaterLayer = LayerMask.NameToLayer("Water");
         VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
         ThisCollider = gameObject.GetComponent<Collider>();
-        if (Networking.LocalPlayer != null)
-        { gameObject.SetActive(false); }
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+        if (localPlayer != null)
+        {
+            if (!localPlayer.isMaster)
+            { gameObject.SetActive(false); }
+        }
     }
     private void Update()
     {
@@ -64,12 +68,12 @@ public class WaterTrigger : UdonSharpBehaviour
         InWater = false;
         NumTriggers = 0;
     }
-    public void SFEXT_TakeOwnership()
+    public void SFEXT_O_TakeOwnership()
     {
-        { gameObject.SetActive(true); }
+        gameObject.SetActive(true);
     }
-    public void SFEXT_LoseOwnership()
+    public void SFEXT_O_LoseOwnership()
     {
-        { gameObject.SetActive(false); }
+        gameObject.SetActive(false);
     }
 }

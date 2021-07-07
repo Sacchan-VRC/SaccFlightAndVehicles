@@ -5,7 +5,6 @@ using VRC.SDKBase;
 using VRC.Udon;
 using UnityEngine.UI;
 
-[SerializeField]
 public class HUDController : UdonSharpBehaviour
 {
     [SerializeField] private EngineController EngineControl;
@@ -17,7 +16,6 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Text HUDText_knots;
     [SerializeField] private Text HUDText_knotsairspeed;
     [SerializeField] private Text HUDText_angleofattack;
-    [SerializeField] private Text HUDText_AAM_ammo;
     [SerializeField] private Text HUDText_AGM_ammo;
     [SerializeField] private Text HUDText_Bomb_ammo;
     [SerializeField] private GameObject HudCrosshairGun;
@@ -55,16 +53,10 @@ public class HUDController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float MenuSoundCheckLast = 0;
     private int showvel;
     const float InputSquareSize = 0.0284317f;//size of the square on the HUD that shows inputs
-    [System.NonSerializedAttribute] public Vector3 GUN_TargetDirOld;
-    [System.NonSerializedAttribute] public float GUN_TargetSpeedLerper;
-    [System.NonSerializedAttribute] public Vector3 RelativeTargetVelLastFrame;
     private Vector3 TargetDir = Vector3.zero;
     private Vector3 TargetSpeed;
-    private bool HasAAMTargets = false;
     private float FullFuelDivider;
     private float FullGunAmmoDivider;
-    private Vector3 RelativeTargetVel;
-    private Vector3 AAMCurrentTargetPositionLastFrame;
     private Transform VehicleTransform;
     private EffectsController EffectsControl;
     private Camera AtGCam;
@@ -377,8 +369,6 @@ public class HUDController : UdonSharpBehaviour
         }
         check += SmoothDeltaTime;
 
-        if (EngineControl.HasAAM) HUDText_AAM_ammo.text = EngineControl.NumAAM.ToString("F0");
-        else HUDText_AAM_ammo.text = string.Empty;
         if (EngineControl.HasAGM) HUDText_AGM_ammo.text = EngineControl.NumAGM.ToString("F0");
         else HUDText_AGM_ammo.text = string.Empty;
         if (EngineControl.HasBomb) HUDText_Bomb_ammo.text = EngineControl.NumBomb.ToString("F0");

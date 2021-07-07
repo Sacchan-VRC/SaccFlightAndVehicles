@@ -22,8 +22,6 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource Reloading;
     public AudioSource RadarLocked;
     public AudioSource MissileIncoming;
-    public AudioSource AAMTargeting;
-    public AudioSource AAMTargetLock;
     public AudioSource AGMLock;
     public AudioSource AGMUnlock;
     public AudioSource Airbrake;
@@ -48,8 +46,6 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool RollingNull;
     [System.NonSerializedAttribute] public bool ReloadingNull;
     [System.NonSerializedAttribute] public bool RadarLockedNull;
-    [System.NonSerializedAttribute] public bool AAMTargetingNull;
-    [System.NonSerializedAttribute] public bool AAMTargetLockNull;
     [System.NonSerializedAttribute] public bool AGMTargetLockNull;
     [System.NonSerializedAttribute] public bool AGMUnlockNull;
     [System.NonSerializedAttribute] public bool AirbrakeNull;
@@ -99,8 +95,6 @@ public class SoundController : UdonSharpBehaviour
         Assert(ABOnOutside != null, "Start: ABOnOutside != null");
         Assert(PlaneWind != null, "Start: PlaneWind != null");
         Assert(MenuSelect != null, "Start: MenuSelect != null");
-        Assert(AAMTargeting != null, "Start: AAMTargeting != null");
-        Assert(AAMTargetLock != null, "Start: AAMTargetLock != null");
         Assert(AGMLock != null, "Start: AGMLock != null");
         Assert(AGMUnlock != null, "Start: AGMUnlock != null");
         Assert(Airbrake != null, "Start: Airbrake != null");
@@ -124,8 +118,6 @@ public class SoundController : UdonSharpBehaviour
         ABOnOutsideNull = (ABOnOutside == null) ? true : false;
         PlaneWindNull = (PlaneWind == null) ? true : false;
         MenuSelectNull = (MenuSelect == null) ? true : false;
-        AAMTargetingNull = (AAMTargeting == null) ? true : false;
-        AAMTargetLockNull = (AAMTargetLock == null) ? true : false;
         AGMTargetLockNull = (AGMLock == null) ? true : false;
         AGMUnlockNull = (AGMUnlock == null) ? true : false;
         AirbrakeNull = (Airbrake == null) ? true : false;
@@ -345,21 +337,6 @@ public class SoundController : UdonSharpBehaviour
                 foreach (AudioSource idle in PlaneIdle)
                     idle.Stop();
             }
-            if (EngineControl.AAMLockTimer > 0 && !EngineControl.AAMLocked && EngineControl.RStickSelection == 2)
-            {
-                AAMTargeting.gameObject.SetActive(true);
-                AAMTargetLock.gameObject.SetActive(false);
-            }
-            else if (EngineControl.AAMLocked)
-            {
-                AAMTargeting.gameObject.SetActive(false);
-                AAMTargetLock.gameObject.SetActive(true);
-            }
-            else
-            {
-                AAMTargeting.gameObject.SetActive(false);
-                AAMTargetLock.gameObject.SetActive(false);
-            }
             if (!AirbrakeNull)
             {
                 if (!Airbrake.isPlaying)
@@ -489,8 +466,6 @@ public class SoundController : UdonSharpBehaviour
     }
     private void Exitplane()//sets sound values to give continuity of engine sound when exiting the plane
     {
-        if (!AAMTargetingNull) AAMTargeting.gameObject.SetActive(false);
-        if (!AAMTargetLockNull) AAMTargetLock.gameObject.SetActive(false);
         if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
         if (!RadarLockedNull) { RadarLocked.Stop(); }
         if (!CatapultLaunchNull) CatapultLaunch.volume /= InVehicleThrustVolumeFactor;

@@ -14,40 +14,40 @@ public class DFUNC_Gun : UdonSharpBehaviour
     [SerializeField] private GameObject HudCrosshair;
     [SerializeField] private bool UseLeftTrigger = false;
     [SerializeField] private float FullReloadTimeSec = 20;
-    [SerializeField] private float FullGunAmmoInSeconds = 12;
-    [UdonSynced(UdonSyncMode.None)] private float gunammo = 12;
+    private float FullGunAmmoInSeconds = 12;
+    [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
     private float GunRecoil;
     private Rigidbody VehicleRigidbody;
     private bool RTriggerLastFrame;
     private bool GunRecoilEmptyNULL = true;
-    private float timesinceupdate = 0;
+    private float TimeSinceSerialization = 0;
     private bool firing;
     private int GUNFIRING_STRING = Animator.StringToHash("gunfiring");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     private bool Passenger;
     private float FullGunAmmoDivider;
-    private bool active = false;
+    private bool func_active = false;
     private float reloadspeed;
     private bool Initialized = false;
     public void Update()
     {
-        if (!Passenger && active)
+        if (!Passenger && func_active)
         {
             float DeltaTime = Time.deltaTime;
-            timesinceupdate += DeltaTime;
+            TimeSinceSerialization += DeltaTime;
             float Trigger;
             if (UseLeftTrigger)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-            if ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && gunammo > 0)
+            if ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
             {
                 if (!firing)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStartFiring");
                     firing = true;
                 }
-                gunammo = Mathf.Max(gunammo - DeltaTime, 0);
+                GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
                 if (GunRecoilEmptyNULL)
                 {
                     VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime);
@@ -67,14 +67,14 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     RTriggerLastFrame = false;
                 }
             }
-            if (timesinceupdate > 1f)
+            if (TimeSinceSerialization > 1f)
             {
-                timesinceupdate = 0;
+                TimeSinceSerialization = 0;
                 RequestSerialization();
             }
             Hud();
         }
-        Animator.SetFloat(GUNAMMO_STRING, gunammo * FullGunAmmoDivider);
+        Animator.SetFloat(GUNAMMO_STRING, GunAmmoInSeconds * FullGunAmmoDivider);
     }
     public void DFUNC_Selected()
     {
@@ -85,20 +85,20 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
     }
-    public void SFEXT_PassengerEnter()
+    public void SFEXT_P_PassengerEnter()
     {
-        if (EngineControl.Passenger && active)
+        if (EngineControl.Passenger && func_active)
         { SetActive(); }
     }
-    public void SFEXT_PassengerExit()
+    public void SFEXT_P_PassengerExit()
     {
         gameObject.SetActive(false);
     }
-    public void SFEXT_PilotEnter()
+    public void SFEXT_O_PilotEnter()
     {
         GunDamageParticle.gameObject.SetActive(true);
     }
-    public void SFEXT_PilotExit()
+    public void SFEXT_O_PilotExit()
     {
         firing = false;
         RTriggerLastFrame = false;
@@ -107,20 +107,18 @@ public class DFUNC_Gun : UdonSharpBehaviour
         gameObject.SetActive(false);
         GunDamageParticle.gameObject.SetActive(false);
     }
-    public void SFEXT_ReSupply()
+    public void SFEXT_O_ReSupply()
     {
-        gunammo = Mathf.Min(gunammo + reloadspeed, FullGunAmmoInSeconds);
+        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
         //enginecontrol.resupplyint +=1;
     }
     public void SetActive()
     {
         HudCrosshairGun.SetActive(true);
         HudCrosshair.SetActive(false);
-        active = true;
+        func_active = true;
         if (EngineControl.Passenger)
         { gameObject.SetActive(true); }
-        if (!Initialized)
-        { Initialize(); }
     }
     public void SetInactive()
     {
@@ -129,10 +127,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
         AAMTargetIndicator.gameObject.SetActive(false);
         GUNLeadIndicator.gameObject.SetActive(false);
         Animator.SetBool(GUNFIRING_STRING, false);
-        active = false;
+        func_active = false;
         gameObject.SetActive(false);
     }
-    public void SFEXT_TakeOwnership()
+    public void SFEXT_O_TakeOwnership()
     {
         if (!EngineControl.Piloting)
         {
@@ -147,9 +145,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         Animator.SetBool(GUNFIRING_STRING, false);
     }
-    private void Initialize()
+    public void SFEXT_L_ECStart()
     {
         reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
+        FullGunAmmoInSeconds = GunAmmoInSeconds;
 
         //Targeting
         VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
@@ -165,9 +164,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
         //HUD
         distance_from_head = HUDControl.distance_from_head;
-
-
-        Initialized = true;
     }
     private GameObject[] AAMTargets;
     private Transform VehicleTransform;
@@ -189,8 +185,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         float DeltaTime = Time.fixedDeltaTime;
         var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-        float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - CenterOfMass.position));
         Vector3 HudControlPosition = HUDControl.transform.position;
+        float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
 
         //check 1 target per frame to see if it's infront of us and worthy of being our current target
         var TargetChecker = AAMTargets[AAMTargetChecker];
@@ -242,9 +238,9 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
                     if (HUDControl != null)
                     {
-                        HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
-                        HUDControl.GUN_TargetSpeedLerper = 0f;
-                        HUDControl.GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
+                        RelativeTargetVelLastFrame = Vector3.zero;
+                        GUN_TargetSpeedLerper = 0f;
+                        GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
                     }
                 }
 
@@ -326,7 +322,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private void Hud()
     {
         float SmoothDeltaTime = Time.smoothDeltaTime;
-        if (AAMHasTarget && active)//GUN or AAM
+        if (AAMHasTarget && func_active)//GUN or AAM
         {
             AAMTargetIndicator.gameObject.SetActive(true);
             AAMTargetIndicator.position = transform.position + AAMCurrentTargetDirection;
@@ -337,14 +333,15 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
 
         //GUN Lead Indicator
-        if (AAMHasTarget && active)
+        if (AAMHasTarget && func_active)
         {
+            Vector3 HudControlPosition = HUDControl.transform.position;
             GUNLeadIndicator.gameObject.SetActive(true);
             Vector3 TargetDir;
             if (AAMCurrentTargetEngineControl == null)//target is a dummy target
-            { TargetDir = AAMTargets[AAMTarget].transform.position - transform.position; }
+            { TargetDir = AAMTargets[AAMTarget].transform.position - HudControlPosition; }
             else
-            { TargetDir = CenterOfMass.position - transform.position; }
+            { TargetDir = AAMCurrentTargetEngineControl.CenterOfMass.position - HudControlPosition; }
             GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
@@ -362,7 +359,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     + (TargetAccel * .125f * BulletHitTime)
                         + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
                             * BulletHitTime);
-            GUNLeadIndicator.position = transform.position + PredictedPos;
+            GUNLeadIndicator.position = HUDControl.transform.position + PredictedPos;
             GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
             RelativeTargetVelLastFrame = RelativeTargetVel;

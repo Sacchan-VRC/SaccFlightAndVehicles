@@ -12,7 +12,6 @@ public class FloatScript : UdonSharpBehaviour
     private Transform VehicleTransform;
     [SerializeField] private float FloatForce;
     [SerializeField] private float Compressing;
-    [SerializeField] private bool DoOnLand;
     [SerializeField] private float SuspMaxDist = .5f;
     [SerializeField] private float WaterSidewaysDrag = .1f;
     [SerializeField] private float WaterForwardDrag = .1f;
@@ -21,6 +20,7 @@ public class FloatScript : UdonSharpBehaviour
     [SerializeField] private float WaveHeight = .2f;
     [SerializeField] private float WaveScale = 1;
     [SerializeField] private float WaveSpeed = 1;
+    [SerializeField] private bool DoOnLand;
 
     [Header("HoverBike Only")]
     [SerializeField] private EngineController EngineControl;
@@ -69,19 +69,19 @@ public class FloatScript : UdonSharpBehaviour
     {
         LastRayHitHeight = float.MinValue;
     }
-    public void SFEXT_TakeOwnership()
+    public void SFEXT_O_TakeOwnership()
     {
         if (!HoverBike) { gameObject.SetActive(true); }
     }
-    public void SFEXT_LoseOwnership()
+    public void SFEXT_O_LoseOwnership()
     {
         if (!HoverBike) { gameObject.SetActive(false); }
     }
-    public void SFEXT_PilotExit()
+    public void SFEXT_O_PilotExit()
     {
         if (HoverBike) { gameObject.SetActive(false); }
     }
-    public void SFEXT_PilotEnter()
+    public void SFEXT_O_PilotEnter()
     {
         if (HoverBike) { gameObject.SetActive(true); }
     }

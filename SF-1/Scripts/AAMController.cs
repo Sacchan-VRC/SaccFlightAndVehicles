@@ -6,7 +6,8 @@ using VRC.Udon;
 
 public class AAMController : UdonSharpBehaviour
 {
-    public EngineController EngineControl;
+    [SerializeField] private DFUNC_AAM DFUNC_AAMOControl;
+    [System.NonSerializedAttribute] public EngineController EngineControl;
     [SerializeField] private float MaxLifetime = 12;
     [SerializeField] private AudioSource[] ExplosionSounds;
     [SerializeField] private float ColliderActiveDistance = 45;
@@ -30,10 +31,11 @@ public class AAMController : UdonSharpBehaviour
     //public Transform testobj;
     void Start()
     {
+        EngineControl = DFUNC_AAMOControl.EngineControl;
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
-        if (EngineControl.AAMTargets[EngineControl.AAMTarget] != null)
-        { Target = EngineControl.AAMTargets[EngineControl.AAMTarget].transform; }
+        if (EngineControl.AAMTargets[DFUNC_AAMOControl.AAMTarget] != null)
+        { Target = EngineControl.AAMTargets[DFUNC_AAMOControl.AAMTarget].transform; }
         if (Target == null)
         {
             TargetLost = true;
@@ -43,9 +45,9 @@ public class AAMController : UdonSharpBehaviour
         {
             TargDistlastframe = Vector3.Distance(transform.position, Target.position) + 1;//1 meter further so the number is different and missile knows we're already moving toward target
             TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
-            if (EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent != null)
+            if (EngineControl.AAMTargets[DFUNC_AAMOControl.AAMTarget].transform.parent != null)
             {
-                TargetEngineControl = EngineControl.AAMTargets[EngineControl.AAMTarget].transform.parent.GetComponent<EngineController>();
+                TargetEngineControl = EngineControl.AAMTargets[DFUNC_AAMOControl.AAMTarget].transform.parent.GetComponent<EngineController>();
                 if (TargetEngineControl != null)
                 {
                     if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)

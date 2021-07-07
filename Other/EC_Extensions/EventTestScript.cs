@@ -63,132 +63,132 @@ public class EventTestScript : UdonSharpBehaviour
             x++;
         }
     }
-    public void SFEXT_Respawn()
+    public void SFEXT_O_Respawn()
     {
         Ints[0] += 1;
         CompileString();
     }
-    public void SFEXT_PilotEnter()
+    public void SFEXT_O_PilotEnter()
     {
         Ints[1] += 1;
         CompileString();
     }
-    public void SFEXT_PilotExit()
+    public void SFEXT_O_PilotExit()
     {
         Ints[2] += 1;
         CompileString();
     }
-    public void SFEXT_PassengerEnter()
+    public void SFEXT_P_PassengerEnter()
     {
         Ints[3] += 1;
         CompileString();
     }
-    public void SFEXT_PassengerExit()
+    public void SFEXT_P_PassengerExit()
     {
         Ints[4] += 1;
         CompileString();
     }
-    public void SFEXT_Explode()
+    public void SFEXT_O_Explode()
     {
         Ints[5] += 1;
         CompileString();
     }
-    public void SFEXT_ReSupply()
+    public void SFEXT_O_ReSupply()
     {
         Ints[6] += 1;
         CompileString();
     }
-    public void SFEXT_TakeOff()
+    public void SFEXT_O_TakeOff()
     {
         Ints[7] += 1;
         CompileString();
     }
-    public void SFEXT_TouchDown()
+    public void SFEXT_O_TouchDown()
     {
         Ints[8] += 1;
         CompileString();
     }
-    public void SFEXT_AfterburnerOn()
+    public void SFEXT_O_AfterburnerOn()
     {
         Ints[9] += 1;
         CompileString();
     }
-    public void SFEXT_AfterburnerOff()
+    public void SFEXT_O_AfterburnerOff()
     {
         Ints[10] += 1;
         CompileString();
     }
-    public void SFEXT_CanopyOpened()
+    public void SFEXT_O_CanopyOpened()
     {
         Ints[11] += 1;
         CompileString();
     }
-    public void SFEXT_CanopyClosed()
+    public void SFEXT_O_CanopyClosed()
     {
         Ints[12] += 1;
         CompileString();
     }
-    public void SFEXT_GearUp()
+    public void SFEXT_O_GearUp()
     {
         Ints[13] += 1;
         CompileString();
     }
-    public void SFEXT_GearDown()
+    public void SFEXT_O_GearDown()
     {
         Ints[14] += 1;
         CompileString();
     }
-    public void SFEXT_FlapsOn()
+    public void SFEXT_O_FlapsOn()
     {
         Ints[15] += 1;
         CompileString();
     }
-    public void SFEXT_FlapsOff()
+    public void SFEXT_O_FlapsOff()
     {
         Ints[16] += 1;
         CompileString();
     }
-    public void SFEXT_HookDown()
+    public void SFEXT_O_HookDown()
     {
         Ints[17] += 1;
         CompileString();
     }
-    public void SFEXT_HookUp()
+    public void SFEXT_O_HookUp()
     {
         Ints[18] += 1;
         CompileString();
     }
-    public void SFEXT_SmokeOn()
+    public void SFEXT_O_SmokeOn()
     {
         Ints[19] += 1;
         CompileString();
     }
-    public void SFEXT_SmokeOff()
+    public void SFEXT_O_SmokeOff()
     {
         Ints[20] += 1;
         CompileString();
     }
-    public void SFEXT_LimitsOn()
+    public void SFEXT_O_LimitsOn()
     {
         Ints[21] += 1;
         CompileString();
     }
-    public void SFEXT_LimitsOff()
+    public void SFEXT_O_LimitsOff()
     {
         Ints[22] += 1;
         CompileString();
     }
-    public void SFEXT_PlaneHit()
+    public void SFEXT_O_PlaneHit()
     {
         Ints[23] += 1;
         CompileString();
     }
-    public void SFEXT_TakeOwnership()
+    public void SFEXT_O_TakeOwnership()
     {
         Ints[24] += 1;
         CompileString();
     }
-    public void SFEXT_LoseOwnership()
+    public void SFEXT_L_LoseOwnership()
     {
         Ints[25] += 1;
         CompileString();
