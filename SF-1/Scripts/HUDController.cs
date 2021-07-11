@@ -8,7 +8,6 @@ using UnityEngine.UI;
 public class HUDController : UdonSharpBehaviour
 {
     [SerializeField] private EngineController EngineControl;
-    [SerializeField] private Material SmokeColorIndicator;
     [SerializeField] private Text HUDText_G;
     [SerializeField] private Text HUDText_mach;
     [SerializeField] private Text HUDText_altitude;
@@ -16,8 +15,6 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Text HUDText_knots;
     [SerializeField] private Text HUDText_knotsairspeed;
     [SerializeField] private Text HUDText_angleofattack;
-    [SerializeField] private Text HUDText_AGM_ammo;
-    [SerializeField] private Text HUDText_Bomb_ammo;
     [SerializeField] private GameObject HudCrosshairGun;
     [SerializeField] private GameObject HudCrosshair;
     [SerializeField] private GameObject HudHold;
@@ -32,18 +29,6 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Transform Yaw;
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
-    [SerializeField] private GameObject AtGScreen;
-    [SerializeField] private GameObject LStick_funcon1;
-    [SerializeField] private GameObject LStick_funcon2;
-    [SerializeField] private GameObject LStick_funcon4;
-    [SerializeField] private GameObject LStick_funcon6;
-    [SerializeField] private GameObject LStick_funcon7;
-    [SerializeField] private GameObject LStick_funcon8;
-    [SerializeField] private GameObject RStick_funcon3;
-    [SerializeField] private GameObject RStick_funcon5;
-    [SerializeField] private GameObject RStick_funcon6;
-    [SerializeField] private GameObject RStick_funcon7;
-    [SerializeField] private GameObject RStick_funcon8;
     private Animator PlaneAnimator;
     public float distance_from_head = 1.333f;
     private float maxGs = 0f;
@@ -59,7 +44,6 @@ public class HUDController : UdonSharpBehaviour
     private float FullGunAmmoDivider;
     private Transform VehicleTransform;
     private EffectsController EffectsControl;
-    private Camera AtGCam;
     float debuglerper;
     float debugcurrentframe;
     private float VTOLDefaultValue;
@@ -69,7 +53,6 @@ public class HUDController : UdonSharpBehaviour
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(SmokeColorIndicator != null, "Start: SmokeColorIndicator != null");
         Assert(HUDText_G != null, "Start: HUDText_G != null");
         Assert(HUDText_mach != null, "Start: HUDText_mach != null");
         Assert(HUDText_altitude != null, "Start: HUDText_altitude != null");
@@ -90,24 +73,11 @@ public class HUDController : UdonSharpBehaviour
         Assert(RStickDisplayHighlighter != null, "Start: RStickDisplayHighlighter != null");
         Assert(PitchRoll != null, "Start: PitchRoll != null");
         Assert(Yaw != null, "Start: Yaw != null");
-        Assert(AtGScreen != null, "Start: AGMScreen != null");
-        Assert(LStick_funcon1 != null, "Start: LStick_funcon1 != null");
-        Assert(LStick_funcon2 != null, "Start: LStick_funcon2 != null");
-        Assert(LStick_funcon4 != null, "Start: LStick_funcon4 != null");
-        Assert(LStick_funcon6 != null, "Start: LStick_funcon6 != null");
-        Assert(LStick_funcon7 != null, "Start: LStick_funcon7 != null");
-        Assert(LStick_funcon8 != null, "Start: LStick_funcon8 != null");
-        Assert(RStick_funcon3 != null, "Start: LStick_funcon3 != null");
-        Assert(RStick_funcon5 != null, "Start: LStick_funcon5 != null");
-        Assert(RStick_funcon6 != null, "Start: LStick_funcon6 != null");
-        Assert(RStick_funcon7 != null, "Start: LStick_funcon7 != null");
-        Assert(RStick_funcon8 != null, "Start: LStick_funcon8 != null");
 
         PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
         VehicleTransform = EngineControl.VehicleMainObj.transform;
         EffectsControl = EngineControl.EffectsControl;
-        AtGCam = EngineControl.AtGCam;
 
         float fuel = EngineControl.Fuel;
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
@@ -144,11 +114,6 @@ public class HUDController : UdonSharpBehaviour
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
         /////////////////
 
-
-
-
-        //Smoke Color Indicator
-        SmokeColorIndicator.color = EngineControl.SmokeColor_Color;
 
         //Heading indicator
         Vector3 VehicleEuler = EngineControl.VehicleMainObj.transform.rotation.eulerAngles;
@@ -248,42 +213,6 @@ public class HUDController : UdonSharpBehaviour
         }
         else { HUDText_knotstarget.text = string.Empty; }
 
-        //left stick toggles/functions on?
-        if (EngineControl.VTOLAngle != VTOLDefaultValue) { LStick_funcon1.SetActive(true); }
-        else { LStick_funcon1.SetActive(false); }
-
-        if (EngineControl.FlightLimitsEnabled) { LStick_funcon2.SetActive(true); }
-        else { LStick_funcon2.SetActive(false); }
-
-        if (EngineControl.CatapultStatus == 1) { LStick_funcon4.SetActive(true); }
-        else { LStick_funcon4.SetActive(false); }
-
-        if (EngineControl.AltHold) { LStick_funcon6.SetActive(true); }
-        else { LStick_funcon6.SetActive(false); }
-
-        if (EffectsControl.CanopyOpen) { LStick_funcon7.SetActive(true); }
-        else { LStick_funcon7.SetActive(false); }
-
-        if (EngineControl.Cruise) { LStick_funcon8.SetActive(true); }
-        else { LStick_funcon8.SetActive(false); }
-
-
-        //right stick toggles/functions on?
-        if (EngineControl.AGMLocked) { RStick_funcon3.SetActive(true); }
-        else { RStick_funcon3.SetActive(false); }
-
-        if (!EffectsControl.GearUp) { RStick_funcon5.SetActive(true); }
-        else { RStick_funcon5.SetActive(false); }
-
-        if (EffectsControl.Flaps) { RStick_funcon6.SetActive(true); }
-        else { RStick_funcon6.SetActive(false); }
-
-        if (EffectsControl.HookDown) { RStick_funcon7.SetActive(true); }
-        else { RStick_funcon7.SetActive(false); }
-
-        if (EffectsControl.Smoking) { RStick_funcon8.SetActive(true); }
-        else { RStick_funcon8.SetActive(false); }
-
         //play menu sound if selection changed since last frame
         float MenuSoundCheck = EngineControl.RStickSelection + EngineControl.LStickSelection;
         if (!EngineControl.SoundControl.MenuSelectNull && MenuSoundCheck != MenuSoundCheckLast)
@@ -291,60 +220,6 @@ public class HUDController : UdonSharpBehaviour
             EngineControl.SoundControl.MenuSelect.Play();
         }
         MenuSoundCheckLast = MenuSoundCheck;
-
-        //AGMScreen
-        if (EngineControl.RStickSelection == 3)
-        {
-            if (!EngineControl.AGMLocked)
-            {
-                AtGScreen.SetActive(true);
-                AtGCam.gameObject.SetActive(true);
-                //if turning camera fast, zoom out
-                if (EngineControl.AGMRotDif < 2.5f)
-                {
-                    RaycastHit camhit;
-                    Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
-                    if (camhit.point != null)
-                    {
-                        //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
-                        float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
-                    }
-                }
-                else
-                {
-                    float newzoom = 80;
-                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 3.5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
-                }
-            }
-            else
-            {
-                AtGScreen.SetActive(true);
-                AtGCam.gameObject.SetActive(true);
-                AtGCam.transform.LookAt(EngineControl.AGMTarget, EngineControl.VehicleMainObj.transform.up);
-
-                RaycastHit camhit;
-                Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
-                if (camhit.point != null)
-                {
-                    //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                    AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * SmoothDeltaTime), 0.3f);
-                }
-            }
-        }
-        else if (EngineControl.RStickSelection == 4)//bomb selected
-        {
-            AtGScreen.SetActive(true);
-            AtGCam.gameObject.SetActive(true);
-            AtGCam.fieldOfView = 60;
-            AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
-        }
-        else
-        {
-            AtGScreen.SetActive(false);
-            AtGCam.gameObject.SetActive(false);
-        }
-
 
 
         //updating numbers 3~ times a second
@@ -368,11 +243,6 @@ public class HUDController : UdonSharpBehaviour
             check = 0;
         }
         check += SmoothDeltaTime;
-
-        if (EngineControl.HasAGM) HUDText_AGM_ammo.text = EngineControl.NumAGM.ToString("F0");
-        else HUDText_AGM_ammo.text = string.Empty;
-        if (EngineControl.HasBomb) HUDText_Bomb_ammo.text = EngineControl.NumBomb.ToString("F0");
-        else HUDText_Bomb_ammo.text = string.Empty;
 
         PlaneAnimator.SetFloat(FUEL_STRING, EngineControl.Fuel * FullFuelDivider);
 

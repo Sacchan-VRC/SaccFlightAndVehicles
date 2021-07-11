@@ -22,8 +22,6 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource Reloading;
     public AudioSource RadarLocked;
     public AudioSource MissileIncoming;
-    public AudioSource AGMLock;
-    public AudioSource AGMUnlock;
     public AudioSource Airbrake;
     public AudioSource CatapultLock;
     public AudioSource CatapultLaunch;
@@ -46,8 +44,6 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool RollingNull;
     [System.NonSerializedAttribute] public bool ReloadingNull;
     [System.NonSerializedAttribute] public bool RadarLockedNull;
-    [System.NonSerializedAttribute] public bool AGMTargetLockNull;
-    [System.NonSerializedAttribute] public bool AGMUnlockNull;
     [System.NonSerializedAttribute] public bool AirbrakeNull;
     [System.NonSerializedAttribute] public bool CatapultLockNull;
     [System.NonSerializedAttribute] public bool CatapultLaunchNull;
@@ -86,6 +82,7 @@ public class SoundController : UdonSharpBehaviour
     private bool TooFarToHear = false;
     private bool InEditor = true;
     private Transform CenterOfMass;
+    private VRCPlayerApi localPlayer;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -95,8 +92,6 @@ public class SoundController : UdonSharpBehaviour
         Assert(ABOnOutside != null, "Start: ABOnOutside != null");
         Assert(PlaneWind != null, "Start: PlaneWind != null");
         Assert(MenuSelect != null, "Start: MenuSelect != null");
-        Assert(AGMLock != null, "Start: AGMLock != null");
-        Assert(AGMUnlock != null, "Start: AGMUnlock != null");
         Assert(Airbrake != null, "Start: Airbrake != null");
         Assert(CatapultLock != null, "Start: CatapultLock != null");
         Assert(CatapultLaunch != null, "Start: CatapultLaunch != null");
@@ -118,8 +113,6 @@ public class SoundController : UdonSharpBehaviour
         ABOnOutsideNull = (ABOnOutside == null) ? true : false;
         PlaneWindNull = (PlaneWind == null) ? true : false;
         MenuSelectNull = (MenuSelect == null) ? true : false;
-        AGMTargetLockNull = (AGMLock == null) ? true : false;
-        AGMUnlockNull = (AGMUnlock == null) ? true : false;
         AirbrakeNull = (Airbrake == null) ? true : false;
         CatapultLockNull = (CatapultLock == null) ? true : false;
         CatapultLaunchNull = (CatapultLaunch == null) ? true : false; ;
@@ -135,7 +128,8 @@ public class SoundController : UdonSharpBehaviour
         ExplosionNull = (Explosion.Length < 1) ? true : false;
         BulletHitNull = (BulletHit.Length < 1) ? true : false;
 
-        if (Networking.LocalPlayer != null)
+        localPlayer = Networking.LocalPlayer;
+        if (localPlayer != null)
         { InEditor = false; }
         CenterOfMass = EngineControl.CenterOfMass;
 
@@ -236,7 +230,7 @@ public class SoundController : UdonSharpBehaviour
             //find distance to player or testcamera
             if (!InEditor)
             {
-                ThisFrameDist = Vector3.Distance(EngineControl.localPlayer.GetPosition(), CenterOfMass.position);
+                ThisFrameDist = Vector3.Distance(localPlayer.GetPosition(), CenterOfMass.position);
                 if (ThisFrameDist > MaxAudibleDistance)
                 {
                     LastFrameDist = ThisFrameDist; TooFarToHear = true;

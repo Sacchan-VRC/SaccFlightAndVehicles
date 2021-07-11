@@ -23,8 +23,8 @@ public class FloatScript : UdonSharpBehaviour
     [SerializeField] private bool DoOnLand;
 
     [Header("HoverBike Only")]
-    [SerializeField] private EngineController EngineControl;
     [SerializeField] private bool HoverBike = false;
+    [SerializeField] private EngineController EngineControl;
     [SerializeField] private float HoverBikeTurningStrength = 1;
     [SerializeField] private float BackThrustStrength = 5;
     private float[] SuspensionCompression;
@@ -42,7 +42,7 @@ public class FloatScript : UdonSharpBehaviour
     private bool HitLandLast;
     void Start()
     {
-        localPlayer = Networking.LocalPlayer;
+        localPlayer = EngineControl.localPlayer;
         if (localPlayer == null)
         { InEditor = true; }
 

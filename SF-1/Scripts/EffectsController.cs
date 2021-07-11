@@ -9,14 +9,12 @@ public class EffectsController : UdonSharpBehaviour
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
     public Transform FrontWheel;
-    public ParticleSystem[] DisplaySmoke;
     public ParticleSystem CatapultSteam;
     private bool VehicleMainObjNull = true;
     private bool EngineControlNull = true;
     private bool JoyStickNull = true;
     [System.NonSerializedAttribute] public bool FrontWheelNull = true;
     private bool CatapultSteamNull = true;
-    private bool DisplaySmokeNull = true;
 
 
 
@@ -26,7 +24,6 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool GearUp = false;
     [System.NonSerializedAttribute] public bool Flaps = true;
     [System.NonSerializedAttribute] public bool HookDown = false;
-    [System.NonSerializedAttribute] public bool Smoking = false;
 
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
@@ -71,7 +68,6 @@ public class EffectsController : UdonSharpBehaviour
         if (EngineControl != null) EngineControlNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
         if (CatapultSteam != null) CatapultSteamNull = false;
-        if (DisplaySmoke.Length > 0) DisplaySmokeNull = false;
 
         FullHealthDivider = 1f / EngineControl.Health;
 
@@ -145,18 +141,6 @@ public class EffectsController : UdonSharpBehaviour
     private void LargeEffects()//large effects visible from a long distance
     {
         float DeltaTime = Time.deltaTime;
-        if (EngineControl.Occupied)
-        {
-            if (Smoking && !DisplaySmokeNull)
-            {
-                Color SmokeCol = EngineControl.SmokeColor_Color;
-                foreach (ParticleSystem smoke in DisplaySmoke)
-                {
-                    var main = smoke.main;
-                    main.startColor = new ParticleSystem.MinMaxGradient(SmokeCol, SmokeCol * .8f);
-                }
-            }
-        }
 
         //this is to finetune when wingtrails appear and disappear
         if (EngineControl.Gs >= Gs_trail) //Gs are increasing
@@ -204,7 +188,6 @@ public class EffectsController : UdonSharpBehaviour
     }
     public void EffectsLeavePlane()
     {
-        Smoking = false;
         PlaneAnimator.SetBool(OCCUPIED_STRING, false);
         PlaneAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
         PlaneAnimator.SetBool(LOCALPILOT_STRING, false);

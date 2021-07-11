@@ -7,9 +7,9 @@ using VRC.Udon;
 
 public class DFUNC_AAM : UdonSharpBehaviour
 {
-    [SerializeField] public EngineController EngineControl;
     [SerializeField] private bool UseLeftTrigger = false;
-    [SerializeField] private Animator PlaneAnimator;
+    [SerializeField] public EngineController EngineControl;
+    [SerializeField] private Animator AAMAnimator;
     [SerializeField] private int NumAAM = 0;
     [SerializeField] private float Lock_Angle = 15;
     [SerializeField] private float AAMLockTime = 1.5f;
@@ -29,18 +29,17 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public GameObject AAM;
     public Transform AAMLaunchPoint;
     float TimeSinceSerialization;
-    private bool Passenger;
     private bool func_active = false;
     public AudioSource AAMTargeting;
     public AudioSource AAMTargetLock;
     [System.NonSerializedAttribute] public bool AAMTargetingNull;
     [System.NonSerializedAttribute] public bool AAMTargetLockNull;
     private float reloadspeed;
+    private bool LeftDial = false;
+    private int DialPosition = -999;
 
     public void SFEXT_L_ECStart()
     {
-        HUDText_AAM_ammoNULL = HUDText_AAM_ammo == null;
-
         reloadspeed = FullAAMs / FullReloadTimeSec;
         FullAAMs = NumAAM;
         NumAAMTargets = EngineControl.NumAAMTargets;
@@ -53,30 +52,36 @@ public class DFUNC_AAM : UdonSharpBehaviour
         distance_from_head = EngineControl.HUDControl.distance_from_head;
         AAMTargetingNull = (AAMTargeting == null) ? true : false;
         AAMTargetLockNull = (AAMTargetLock == null) ? true : false;
+
+        FindSelf();
     }
-    public void SFEXT_P_PassengerEnter()
+    public void SFEXT_O_PilotEnter()
     {
-        if (EngineControl.Passenger && func_active)
-        { SetActive(); }
-    }
-    public void SFEXT_P_PassengerExit()
-    {
-        gameObject.SetActive(false);
+        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
+        //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
+        var Target = AAMTargets[AAMTarget];
+        if (Target && Target.transform.parent)
+        {
+            AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
+        }
     }
     public void SFEXT_O_PilotExit()
     {
         TriggerLastFrame = false;
         RequestSerialization();
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
         gameObject.SetActive(false);
         AAMLockTimer = 0;
         AAMHasTarget = false;
         AAMLocked = false;
+        func_active = false;
         if (!AAMTargetingNull) AAMTargeting.gameObject.SetActive(false);
         if (!AAMTargetLockNull) AAMTargetLock.gameObject.SetActive(false);
     }
-
-    public void SFEXT_O_Explode()
+    public void SFEXT_P_PassengerEnter()
+    {
+        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
+    }
+    public void SFEXT_G_Explode()
     {
         NumAAM = FullAAMs;
     }
@@ -84,26 +89,15 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         NumAAM = FullAAMs;
     }
-
-    public void SFEXT_O_ReSuppy()
+    public void SFEXT_O_ReSupply()
     {
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
-        PlaneAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
+        AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
     }
-
     public void SFEXT_G_RespawnButton()
     {
         NumAAM = FullAAMs;
-        PlaneAnimator.SetFloat(AAMS_STRING, 1);
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
-        var Target = AAMTargets[AAMTarget];
-        if (Target && Target.transform.parent)
-        {
-            AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<EngineController>();
-        }
+        AAMAnimator.SetFloat(AAMS_STRING, 1);
     }
     public void SFEXT_O_TouchDown()
     {
@@ -113,33 +107,33 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetActive");
+        func_active = true;
     }
     public void DFUNC_Deselected()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
         if (!AAMTargetingNull) AAMTargeting.gameObject.SetActive(false);
         if (!AAMTargetLockNull) AAMTargetLock.gameObject.SetActive(false);
         AAMLockTimer = 0;
         AAMHasTarget = false;
         AAMLocked = false;
-    }
-    public void SetActive()
-    {
-        func_active = true;
-        if (EngineControl.Passenger)
-        { gameObject.SetActive(true); }
-    }
-    public void SetInactive()
-    {
         AAMTargetIndicator.gameObject.SetActive(false);
         func_active = false;
         gameObject.SetActive(false);
     }
-
+    //synced variables recieved while object is disabled do not get set until the object is enabled, 1 frame is fine.
+    public void EnableToSyncVariables()
+    {
+        gameObject.SetActive(true);
+        SendCustomEventDelayedFrames("DisableSelf", 1);
+    }
+    public void DisableSelf()
+    {
+        if (!func_active)
+        { gameObject.SetActive(false); }
+    }
     void Update()
     {
-        if (!Passenger && func_active)
+        if (func_active)
         {
             TimeSinceSerialization += Time.deltaTime;
             float Trigger;
@@ -147,8 +141,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-
 
             if (NumAAMTargets != 0)
             {
@@ -166,13 +158,15 @@ public class DFUNC_AAM : UdonSharpBehaviour
                             AAMLastFiredTime = Time.time;
                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
                             if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
+                            if (EngineControl.IsOwner)
+                            { EngineControl.SendEventToExtensions("SFEXT_O_AAMLaunch", false); }
                         }
                     }
                     TriggerLastFrame = true;
                 }
                 else TriggerLastFrame = false;
 
-                if (TimeSinceSerialization > 1f)
+                if (TimeSinceSerialization > .5f)
                 {
                     TimeSinceSerialization = 0;
                     RequestSerialization();
@@ -199,8 +193,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
             }
             Hud();
         }
-
-        if (EngineControl.HasAAM) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
     }
 
     //AAMTargeting
@@ -216,156 +208,149 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private Vector3 AAMCurrentTargetDirection;
     private float AAMTargetedTimer = 2;
     private float AAMTargetObscuredDelay;
-    private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
     private void FixedUpdate()//old AAMTargeting function
     {
-        if (!Passenger)
+        float DeltaTime = Time.fixedDeltaTime;
+        var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+        Vector3 HudControlPosition = HUDControl.transform.position;
+        float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
+
+        //check 1 target per frame to see if it's infront of us and worthy of being our current target
+        var TargetChecker = AAMTargets[AAMTargetChecker];
+        var TargetCheckerTransform = TargetChecker.transform;
+        var TargetCheckerParent = TargetCheckerTransform.parent;
+
+        Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
+        float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
+        float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
+        bool AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
+
+        if (TargetChecker.activeInHierarchy)
         {
-            float DeltaTime = Time.fixedDeltaTime;
-            var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-            Vector3 HudControlPosition = HUDControl.transform.position;
-            float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
+            EngineController NextTargetEngineControl = null;
 
-            //check 1 target per frame to see if it's infront of us and worthy of being our current target
-            var TargetChecker = AAMTargets[AAMTargetChecker];
-            var TargetCheckerTransform = TargetChecker.transform;
-            var TargetCheckerParent = TargetCheckerTransform.parent;
-
-            Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
-            float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
-            float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-            bool AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
-
-            if (TargetChecker.activeInHierarchy)
+            if (TargetCheckerParent)
             {
-                EngineController NextTargetEngineControl = null;
+                NextTargetEngineControl = TargetCheckerParent.GetComponent<EngineController>();
+            }
+            //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
+            if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead)))
+            {
+                RaycastHit hitnext;
+                //raycast to check if it's behind something
+                bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
 
-                if (TargetCheckerParent)
+                /*                 Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
+                                if (hitnext.collider != null) Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsidePlaneLayer)));
+                                if (hitnext.collider != null) Debug.Log(string.Concat("RayCastLayer_next ", hitnext.collider.gameObject.layer));
+                                Debug.Log(string.Concat("LowerAngle_next ", NextTargetAngle < AAMCurrentTargetAngle));
+                                Debug.Log(string.Concat("InAngle_next ", NextTargetAngle < 70));
+                                Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
+
+                if ((LineOfSightNext
+                    && hitnext.collider.gameObject.layer == OutsidePlaneLayer //did raycast hit an object on the layer planes are on?
+                        && NextTargetAngle < Lock_Angle
+                            && NextTargetAngle < AAMCurrentTargetAngle)
+                                && NextTargetDistance < AAMMaxTargetDistance
+                                    || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                        || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                 {
-                    NextTargetEngineControl = TargetCheckerParent.GetComponent<EngineController>();
-                }
-                //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
-                if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.dead)))
-                {
-                    RaycastHit hitnext;
-                    //raycast to check if it's behind something
-                    bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
-
-                    /*                 Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
-                                    if (hitnext.collider != null) Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsidePlaneLayer)));
-                                    if (hitnext.collider != null) Debug.Log(string.Concat("RayCastLayer_next ", hitnext.collider.gameObject.layer));
-                                    Debug.Log(string.Concat("LowerAngle_next ", NextTargetAngle < AAMCurrentTargetAngle));
-                                    Debug.Log(string.Concat("InAngle_next ", NextTargetAngle < 70));
-                                    Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
-
-                    if ((LineOfSightNext
-                        && hitnext.collider.gameObject.layer == OutsidePlaneLayer //did raycast hit an object on the layer planes are on?
-                            && NextTargetAngle < Lock_Angle
-                                && NextTargetAngle < AAMCurrentTargetAngle)
-                                    && NextTargetDistance < AAMMaxTargetDistance
-                                        || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
-                                            || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
-                    {
-                        //found new target
-                        AAMCurrentTargetAngle = NextTargetAngle;
-                        AAMTarget = AAMTargetChecker;
-                        AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                        AAMCurrentTargetEngineControl = NextTargetEngineControl;
-                        AAMLockTimer = 0;
-                        AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
-                        AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
-                    }
+                    //found new target
+                    AAMCurrentTargetAngle = NextTargetAngle;
+                    AAMTarget = AAMTargetChecker;
+                    AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+                    AAMCurrentTargetEngineControl = NextTargetEngineControl;
+                    AAMLockTimer = 0;
+                    AAMTargetedTimer = .9f;//send targeted .1s after targeting so it can't get spammed too fast (and doesnt send if you instantly target something else)
+                    AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
                 }
             }
-            //increase target checker ready for next frame
-            AAMTargetChecker++;
-            if (AAMTargetChecker == AAMTarget && AAMTarget == NumAAMTargets - 1)
-            { AAMTargetChecker = 0; }
-            else if (AAMTargetChecker == AAMTarget)
-            { AAMTargetChecker++; }
-            else if (AAMTargetChecker > NumAAMTargets - 1)
-            { AAMTargetChecker = 0; }
+        }
+        //increase target checker ready for next frame
+        AAMTargetChecker++;
+        if (AAMTargetChecker == AAMTarget && AAMTarget == NumAAMTargets - 1)
+        { AAMTargetChecker = 0; }
+        else if (AAMTargetChecker == AAMTarget)
+        { AAMTargetChecker++; }
+        else if (AAMTargetChecker > NumAAMTargets - 1)
+        { AAMTargetChecker = 0; }
 
-            //if target is currently in front of plane, lock onto it
-            if (AAMCurrentTargetEngineControlNull)
-            { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
-            else
-            { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HudControlPosition; }
-            float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
-            //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
-            //raycast to check if it's behind something
-            RaycastHit hitcurrent;
-            bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
-            //used to make lock remain for .25 seconds after target is obscured
-            if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
-            { AAMTargetObscuredDelay += DeltaTime; }
-            else
-            { AAMTargetObscuredDelay = 0; }
+        //if target is currently in front of plane, lock onto it
+        if (AAMCurrentTargetEngineControlNull)
+        { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
+        else
+        { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HudControlPosition; }
+        float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
+        //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
+        //raycast to check if it's behind something
+        RaycastHit hitcurrent;
+        bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+        //used to make lock remain for .25 seconds after target is obscured
+        if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
+        { AAMTargetObscuredDelay += DeltaTime; }
+        else
+        { AAMTargetObscuredDelay = 0; }
 
-            if (!EngineControl.Taxiing
-                && (AAMTargetObscuredDelay < .25f)
-                    && AAMCurrentTargetDistance < AAMMaxTargetDistance
-                        && AAMTargets[AAMTarget].activeInHierarchy
-                            && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
+        if (!EngineControl.Taxiing
+            && (AAMTargetObscuredDelay < .25f)
+                && AAMCurrentTargetDistance < AAMMaxTargetDistance
+                    && AAMTargets[AAMTarget].activeInHierarchy
+                        && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
+        {
+            if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
             {
-                if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
+                AAMHasTarget = true;
+                if (AAMCurrentTargetAngle < Lock_Angle && NumAAM > 0)
                 {
-                    AAMHasTarget = true;
-                    if (AAMCurrentTargetAngle < Lock_Angle && NumAAM > 0)
+                    AAMLockTimer += DeltaTime;
+                    //give enemy radar lock even if you're out of missiles
+                    if (!AAMCurrentTargetEngineControlNull)
                     {
-                        AAMLockTimer += DeltaTime;
-                        //give enemy radar lock even if you're out of missiles
-                        if (!AAMCurrentTargetEngineControlNull)
+                        //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
+                        AAMTargetedTimer += DeltaTime;
+                        if (AAMTargetedTimer > 1)
                         {
-                            //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
-                            AAMTargetedTimer += DeltaTime;
-                            if (AAMTargetedTimer > 1)
-                            {
-                                AAMTargetedTimer = 0;
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SendTargeted");
-                            }
+                            AAMTargetedTimer = 0;
+                            AAMCurrentTargetEngineControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetTargeted");
                         }
                     }
-                    else
-                    {
-                        AAMTargetedTimer = 2f;
-                        AAMLockTimer = 0;
-                    }
+                }
+                else
+                {
+                    AAMTargetedTimer = 2f;
+                    AAMLockTimer = 0;
                 }
             }
-            else
-            {
-                AAMTargetedTimer = 2f;
-                AAMLockTimer = 0;
-                AAMHasTarget = false;
-            }
-            /*         if (HUDControl.gameObject.activeInHierarchy)
-                    {
-                        Debug.Log(string.Concat("AAMTarget ", AAMTarget));
-                        Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
-                        Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
-                        Debug.Log(string.Concat("LoS ", LineOfSightCur));
-                        Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsidePlaneLayer)));
-                        Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
-                        Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
-                        Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < Lock_Angle));
-                        Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance));
-                    } */
         }
+        else
+        {
+            AAMTargetedTimer = 2f;
+            AAMLockTimer = 0;
+            AAMHasTarget = false;
+        }
+        /*         if (HUDControl.gameObject.activeInHierarchy)
+                {
+                    Debug.Log(string.Concat("AAMTarget ", AAMTarget));
+                    Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
+                    Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
+                    Debug.Log(string.Concat("LoS ", LineOfSightCur));
+                    Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsidePlaneLayer)));
+                    Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
+                    Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
+                    Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < Lock_Angle));
+                    Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance));
+                } */
     }
-
-
 
 
 
     //hud stuff
     [SerializeField] private Text HUDText_AAM_ammo;
-    private bool HUDText_AAM_ammoNULL = true;
     [SerializeField] private Transform AAMTargetIndicator;
     private float distance_from_head;
     private void Hud()
     {
-        if (AAMHasTarget && func_active)//GUN or AAM
+        if (AAMHasTarget)//GUN or AAM
         {
             AAMTargetIndicator.gameObject.SetActive(true);
             AAMTargetIndicator.position = transform.position + AAMCurrentTargetDirection;
@@ -391,24 +376,12 @@ public class DFUNC_AAM : UdonSharpBehaviour
         else AAMTargetIndicator.localScale = Vector3.zero;
         /////////////////
     }
-
-
-    public void SendTargeted()
-    {
-        EngineController TargetEngine = null;
-        if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
-            TargetEngine = AAMTargets[AAMTarget].transform.parent.GetComponent<EngineController>();
-        if (TargetEngine != null)
-        {
-            if (TargetEngine.Piloting || TargetEngine.Passenger)
-            { TargetEngine.EffectsControl.PlaneAnimator.SetTrigger(RADARLOCKED_STRING); }
-        }
-    }
-
     public void LaunchAAM()
     {
+        if (!func_active) { EnableToSyncVariables(); }
+
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
-        PlaneAnimator.SetTrigger(AAMLAUNCHED_STRING);
+        AAMAnimator.SetTrigger(AAMLAUNCHED_STRING);
         if (AAM != null)
         {
             GameObject NewAAM = VRCInstantiate(AAM);
@@ -429,6 +402,50 @@ public class DFUNC_AAM : UdonSharpBehaviour
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = EngineControl.CurrentVel;
         }
-        PlaneAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
+        AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
+        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
+    }
+    private void FindSelf()
+    {
+        int x = 0;
+        foreach (UdonSharpBehaviour usb in EngineControl.Dial_Functions_R)
+        {
+            if (this == usb)
+            {
+                DialPosition = x;
+                return;
+            }
+            x++;
+        }
+        LeftDial = true;
+        x = 0;
+        foreach (UdonSharpBehaviour usb in EngineControl.Dial_Functions_L)
+        {
+            if (this == usb)
+            {
+                DialPosition = x;
+                return;
+            }
+            x++;
+        }
+        DialPosition = -999;
+        return;
+    }
+    public void KeyboardInput()
+    {
+        if (LeftDial)
+        {
+            if (EngineControl.LStickSelection == DialPosition)
+            { EngineControl.LStickSelection = -1; }
+            else
+            { EngineControl.LStickSelection = DialPosition; }
+        }
+        else
+        {
+            if (EngineControl.RStickSelection == DialPosition)
+            { EngineControl.RStickSelection = -1; }
+            else
+            { EngineControl.RStickSelection = DialPosition; }
+        }
     }
 }

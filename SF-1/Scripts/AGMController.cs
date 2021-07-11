@@ -6,7 +6,8 @@ using VRC.Udon;
 
 public class AGMController : UdonSharpBehaviour
 {
-    [SerializeField] private EngineController EngineControl;
+    [SerializeField] private DFUNC_AGM DFUNC_AGMControl;
+    private EngineController EngineControl;
     [SerializeField] private float MaxLifetime = 20;
     [SerializeField] private AudioSource[] ExplosionSounds;
     [SerializeField] private float ColliderActiveDistance = 30;
@@ -19,7 +20,8 @@ public class AGMController : UdonSharpBehaviour
     private CapsuleCollider AGMCollider;
     private void Start()
     {
-        Target = EngineControl.AGMTarget;
+        EngineControl = DFUNC_AGMControl.EngineControl;
+        Target = DFUNC_AGMControl.AGMTarget;
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
     }
     void LateUpdate()

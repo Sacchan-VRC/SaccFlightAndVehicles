@@ -7,7 +7,7 @@ using VRC.Udon;
 public class DFUNC_Gun : UdonSharpBehaviour
 {
     [SerializeField] private EngineController EngineControl;
-    [SerializeField] private Animator Animator;
+    [SerializeField] private Animator GunAnimator;
     [SerializeField] private Transform GunRecoilEmpty;
     [SerializeField] private Transform GunDamageParticle;
     [SerializeField] private GameObject HudCrosshairGun;
@@ -29,6 +29,114 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool func_active = false;
     private float reloadspeed;
     private bool Initialized = false;
+    private bool LeftDial = false;
+    private int DialPosition = -999;
+    public void SFEXT_L_ECStart()
+    {
+        reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
+        FullGunAmmoInSeconds = GunAmmoInSeconds;
+
+        //Targeting
+        VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
+        GunRecoil = EngineControl.GunRecoil;
+        GunRecoilEmptyNULL = GunRecoilEmpty == null;
+        FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
+        AAMTargets = EngineControl.AAMTargets;
+        NumAAMTargets = EngineControl.NumAAMTargets;
+        VehicleTransform = EngineControl.VehicleMainObj.transform;
+        HUDControl = EngineControl.HUDControl;
+        CenterOfMass = EngineControl.CenterOfMass;
+        OutsidePlaneLayer = LayerMask.NameToLayer("Walkthrough");
+
+        FindSelf();
+
+        //HUD
+        distance_from_head = HUDControl.distance_from_head;
+    }
+    public void DFUNC_Selected()
+    {
+        gameObject.SetActive(true);
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Active");
+    }
+    public void DFUNC_Deselected()
+    {
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive");
+    }
+    public void SFEXT_O_PilotEnter()
+    {
+        GunDamageParticle.gameObject.SetActive(true);
+        EnableToSyncVariables();
+    }
+    public void SFEXT_O_PilotExit()
+    {
+        firing = false;
+        RTriggerLastFrame = false;
+        RequestSerialization();
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive");
+        gameObject.SetActive(false);
+        GunDamageParticle.gameObject.SetActive(false);
+        func_active = false;
+    }
+    public void SFEXT_P_PassengerEnter()
+    {
+        if (EngineControl.Passenger && func_active)
+        { Set_Active(); }
+    }
+    public void SFEXT_P_PassengerExit()
+    {
+        gameObject.SetActive(false);
+    }
+    public void SFEXT_O_ReSupply()
+    {
+        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+        //enginecontrol.resupplyint +=1;
+    }
+    public void Set_Active()
+    {
+        HudCrosshairGun.SetActive(true);
+        HudCrosshair.SetActive(false);
+        func_active = true;
+        if (EngineControl.Passenger)
+        { gameObject.SetActive(true); }
+    }
+    public void Set_Inactive()
+    {
+        HudCrosshairGun.SetActive(false);
+        HudCrosshair.SetActive(true);
+        AAMTargetIndicator.gameObject.SetActive(false);
+        GUNLeadIndicator.gameObject.SetActive(false);
+        GunAnimator.SetBool(GUNFIRING_STRING, false);
+        func_active = false;
+        gameObject.SetActive(false);
+    }
+    public void SFEXT_O_TakeOwnership()
+    {
+        if (firing)//if someone times out, tell weapon to stop firing if you take ownership.
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
+    }
+    public void SFEXT_G_Explode()
+    {
+        GunAmmoInSeconds = FullGunAmmoInSeconds;
+    }
+    public void GunStartFiring()
+    {
+        GunAnimator.SetBool(GUNFIRING_STRING, true);
+    }
+    public void GunStopFiring()
+    {
+        GunAnimator.SetBool(GUNFIRING_STRING, false);
+    }
+    //synced variables recieved while object is disabled do not get set until the object is enabled, 1 frame is fine.
+    public void EnableToSyncVariables()
+    {
+        gameObject.SetActive(true);
+        SendCustomEventDelayedFrames("DisableSelf", 1);
+    }
+    public void DisableSelf()
+    {
+        if (!func_active)//don't disable if the object happened to also be activated on this frame
+        { gameObject.SetActive(false); }
+    }
     public void Update()
     {
         if (!Passenger && func_active)
@@ -46,6 +154,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStartFiring");
                     firing = true;
+                    if (EngineControl.IsOwner)
+                    { EngineControl.SendEventToExtensions("SFEXT_O_GunStartFiring", false); }
                 }
                 GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
                 if (GunRecoilEmptyNULL)
@@ -65,6 +175,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
                     firing = false;
                     RTriggerLastFrame = false;
+                    if (EngineControl.IsOwner)
+                    { EngineControl.SendEventToExtensions("SFEXT_O_GunStopFiring", false); }
                 }
             }
             if (TimeSinceSerialization > 1f)
@@ -74,96 +186,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             }
             Hud();
         }
-        Animator.SetFloat(GUNAMMO_STRING, GunAmmoInSeconds * FullGunAmmoDivider);
-    }
-    public void DFUNC_Selected()
-    {
-        gameObject.SetActive(true);
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetActive");
-    }
-    public void DFUNC_Deselected()
-    {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
-    }
-    public void SFEXT_P_PassengerEnter()
-    {
-        if (EngineControl.Passenger && func_active)
-        { SetActive(); }
-    }
-    public void SFEXT_P_PassengerExit()
-    {
-        gameObject.SetActive(false);
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        GunDamageParticle.gameObject.SetActive(true);
-    }
-    public void SFEXT_O_PilotExit()
-    {
-        firing = false;
-        RTriggerLastFrame = false;
-        RequestSerialization();
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
-        gameObject.SetActive(false);
-        GunDamageParticle.gameObject.SetActive(false);
-    }
-    public void SFEXT_O_ReSupply()
-    {
-        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
-        //enginecontrol.resupplyint +=1;
-    }
-    public void SetActive()
-    {
-        HudCrosshairGun.SetActive(true);
-        HudCrosshair.SetActive(false);
-        func_active = true;
-        if (EngineControl.Passenger)
-        { gameObject.SetActive(true); }
-    }
-    public void SetInactive()
-    {
-        HudCrosshairGun.SetActive(false);
-        HudCrosshair.SetActive(true);
-        AAMTargetIndicator.gameObject.SetActive(false);
-        GUNLeadIndicator.gameObject.SetActive(false);
-        Animator.SetBool(GUNFIRING_STRING, false);
-        func_active = false;
-        gameObject.SetActive(false);
-    }
-    public void SFEXT_O_TakeOwnership()
-    {
-        if (!EngineControl.Piloting)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetInactive");
-        }
-    }
-    public void GunStartFiring()
-    {
-        Animator.SetBool(GUNFIRING_STRING, true);
-    }
-    public void GunStopFiring()
-    {
-        Animator.SetBool(GUNFIRING_STRING, false);
-    }
-    public void SFEXT_L_ECStart()
-    {
-        reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
-        FullGunAmmoInSeconds = GunAmmoInSeconds;
-
-        //Targeting
-        VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
-        GunRecoil = EngineControl.GunRecoil;
-        GunRecoilEmptyNULL = GunRecoilEmpty == null;
-        FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
-        AAMTargets = EngineControl.AAMTargets;
-        NumAAMTargets = EngineControl.NumAAMTargets;
-        VehicleTransform = EngineControl.VehicleMainObj.transform;
-        HUDControl = EngineControl.HUDControl;
-        CenterOfMass = EngineControl.CenterOfMass;
-        OutsidePlaneLayer = LayerMask.NameToLayer("Walkthrough");
-
-        //HUD
-        distance_from_head = HUDControl.distance_from_head;
+        GunAnimator.SetFloat(GUNAMMO_STRING, GunAmmoInSeconds * FullGunAmmoDivider);
     }
     private GameObject[] AAMTargets;
     private Transform VehicleTransform;
@@ -367,32 +390,47 @@ public class DFUNC_Gun : UdonSharpBehaviour
         else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
     }
-}
-
-
-
-//soundcontroller
-/*         if (!GunSoundNull)
+    private void FindSelf()
+    {
+        int x = 0;
+        foreach (UdonSharpBehaviour usb in EngineControl.Dial_Functions_R)
         {
-            if (EngineControl.IsFiringGun && !silent)
+            if (this == usb)
             {
-                GunSound.pitch = Mathf.Min(Doppler, 2f);
-                if (!GunSound.isPlaying)
-                {
-                    GunSound.Play();
-                }
-                if (Doppler > 50f)
-                {
-                    GunSound.volume = Mathf.Lerp(GunSound.volume, 0, 3f * DeltaTime);
-                }
-                else
-                {
-                    GunSound.volume = Mathf.Lerp(GunSound.volume, GunSoundInitialVolume, 9f * DeltaTime);
-                }
+                DialPosition = x;
+                return;
             }
-            else if (!EngineControl.IsFiringGun || silent && GunSound.isPlaying)
+            x++;
+        }
+        LeftDial = true;
+        x = 0;
+        foreach (UdonSharpBehaviour usb in EngineControl.Dial_Functions_L)
+        {
+            if (this == usb)
             {
-                GunSound.Stop();
+                DialPosition = x;
+                return;
             }
-        } */
-
+            x++;
+        }
+        DialPosition = -999;
+        return;
+    }
+    public void KeyboardInput()
+    {
+        if (LeftDial)
+        {
+            if (EngineControl.LStickSelection == DialPosition)
+            { EngineControl.LStickSelection = -1; }
+            else
+            { EngineControl.LStickSelection = DialPosition; }
+        }
+        else
+        {
+            if (EngineControl.RStickSelection == DialPosition)
+            { EngineControl.RStickSelection = -1; }
+            else
+            { EngineControl.RStickSelection = DialPosition; }
+        }
+    }
+}
