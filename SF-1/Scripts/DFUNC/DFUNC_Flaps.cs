@@ -11,6 +11,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     private bool UseLeftTrigger;
+    private EffectsController EffectsControl;
     private void Update()
     {
         float Trigger;
@@ -35,16 +36,21 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_L_ECStart()
     {
+        EffectsControl = EngineControl.EffectsControl;
         Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.EffectsControl.Flaps);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.Flaps);
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.EffectsControl.Flaps);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.Flaps);
+    }
+    public void SFEXT_O_PilotExit()
+    {
+        gameObject.SetActive(false);
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.EffectsControl.Flaps);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.Flaps);
     }
     public void KeyboardInput()
     {

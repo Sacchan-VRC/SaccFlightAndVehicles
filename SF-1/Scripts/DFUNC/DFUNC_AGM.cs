@@ -13,6 +13,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private Camera AtGCam;
     [SerializeField] private Text HUDText_AGM_ammo;
     [SerializeField] private GameObject AtGScreen;
+    [SerializeField] private GameObject Dial_Funcon;
+    private bool Dial_FunconNULL = true;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] private int AGMUnlocking = 0;
     [System.NonSerializedAttribute] private float AGMUnlockTimer;
@@ -51,6 +53,9 @@ public class DFUNC_AGM : UdonSharpBehaviour
         localPlayer = EngineControl.localPlayer;
         InEditor = EngineControl.InEditor;
         VehicleTransform = EngineControl.VehicleTransform;
+        AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
+        Dial_FunconNULL = Dial_Funcon == null;
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
 
         FindSelf();
     }
@@ -60,7 +65,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         InVR = EngineControl.InVR;
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
-    public void SFEXT_O_PassengerEnter()
+    public void SFEXT_P_PassengerEnter()
     {
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
@@ -126,6 +131,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 AGMLocked = false;
                 AGMUnlockTimer = 0;
                 AGMUnlocking = 0;
+                if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
                 if (!AGMUnlockNull)
                 { AGMUnlock.Play(); }
             }
@@ -168,6 +174,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                         AGMLocked = true;
                                         AGMUnlocking = 0;
                                         RequestSerialization();
+                                        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
                                     }
                                 }
                             }
@@ -182,6 +189,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                     AGMLocked = true;
                                     AGMUnlocking = 0;
                                     RequestSerialization();
+                                    if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
                                 }
                             }
                         }

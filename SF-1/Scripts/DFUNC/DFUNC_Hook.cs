@@ -10,7 +10,8 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [SerializeField] private GameObject Dial_Funcon;
     private bool Dial_FunconNULL = true;
     [SerializeField] private bool UseLeftTrigger;
-    private bool RTriggerLastFrame;
+    private bool TriggerLastFrame;
+    private EffectsController EffectsControl;
     private void Update()
     {
         float Trigger;
@@ -21,14 +22,14 @@ public class DFUNC_Hook : UdonSharpBehaviour
 
         if (Trigger > 0.75)
         {
-            if (!RTriggerLastFrame)
+            if (!TriggerLastFrame)
             {
                 EngineControl.ToggleHook();
                 EngineControl.Hooked = false;
             }
-            RTriggerLastFrame = true;
+            TriggerLastFrame = true;
         }
-        else { RTriggerLastFrame = false; }
+        else { TriggerLastFrame = false; }
     }
     public void DFUNC_Selected()
     {
@@ -40,16 +41,17 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void SFEXT_L_ECStart()
     {
+        EffectsControl = EngineControl.EffectsControl;
         Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.EffectsControl.HookDown);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.HookDown);
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.EffectsControl.HookDown);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.HookDown);
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.EffectsControl.HookDown);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.HookDown);
     }
     public void KeyboardInput()
     {

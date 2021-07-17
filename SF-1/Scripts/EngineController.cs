@@ -183,16 +183,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float ThrottleZeroPoint;
-    private float CruiseTemp;
-    private float VTOLTemp;
-    private float VTOLZeroPoint;
     [System.NonSerializedAttribute] public float SetSpeed;
-    private float SpeedZeroPoint;
-    private float EjectZeroPoint;
-    [System.NonSerializedAttribute] public float EjectTimer = 1;
-    [System.NonSerializedAttribute] public bool Ejected = false;
-    [System.NonSerializedAttribute] public float LTriggerTapTime = 1;
-    [System.NonSerializedAttribute] public float RTriggerTapTime = 1;
     [System.NonSerializedAttribute] public bool RGripLastFrame = false;
     [System.NonSerializedAttribute] public float ThrottleInput = 0f;
     private float roll = 0f;
@@ -296,7 +287,7 @@ public class EngineController : UdonSharpBehaviour
     private float YawThrustVecMultiStart;
     private float RollThrustVecMultiStart;
     private bool VTOLenabled;
-    private float VTOLAngleInput;
+    [System.NonSerializedAttribute] public float VTOLAngleInput;
     private float VTOL90Degrees;
     private float throttleABPointDivider;
     private float VTOLAngleDivider;
@@ -310,7 +301,6 @@ public class EngineController : UdonSharpBehaviour
     private float StartMaxLift;
 
     private int HOOKED_STRING = Animator.StringToHash("hooked");
-    private int FLARES_STRING = Animator.StringToHash("flares");
     private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
     private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
     private int ONCATAPULT_STRING = Animator.StringToHash("oncatapult");
@@ -581,12 +571,6 @@ public class EngineController : UdonSharpBehaviour
 
                 if (VTOLenabled)
                 {
-                    if (HasVTOLAngle)
-                    {
-                        float pgup = Input.GetKey(KeyCode.PageUp) ? 1 : 0;
-                        float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
-                        VTOLAngleInput = Mathf.Clamp(VTOLAngleInput + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime)), 0, 1);
-                    }
                     if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
                     { SetVTOLValues(); }
                 }
@@ -904,10 +888,6 @@ public class EngineController : UdonSharpBehaviour
                 //Cruise PI Controller
                 if (Cruise && !LGripLastFrame && !Shift && !Ctrl)
                 {
-                    float equals = Input.GetKey(KeyCode.Equals) ? DeltaTime * 10 : 0;
-                    float minus = Input.GetKey(KeyCode.Minus) ? DeltaTime * 10 : 0;
-                    SetSpeed = Mathf.Max(SetSpeed + (equals - minus), 0);
-
                     float error = (SetSpeed - AirSpeed);
 
                     CruiseIntegrator += error * DeltaTime;
@@ -1370,10 +1350,6 @@ public class EngineController : UdonSharpBehaviour
 
     //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
     //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
-    public void LaunchFlares()
-    {
-        VehicleAnimator.SetTrigger(FLARES_STRING);
-    }
     void SortTargets(GameObject[] Targets, float[] order)
     {
         for (int i = 1; i < order.Length; i++)
@@ -1647,7 +1623,7 @@ public class EngineController : UdonSharpBehaviour
             SendEventToExtensions("SFEXT_O_CanopyClosed", false);
         }
     }
-    private void ToggleCanopy()
+    public void ToggleCanopy()
     {
         if (CanopyCloseTimer <= -100000 - CanopyCloseTime)
         {
@@ -2042,11 +2018,8 @@ public class EngineController : UdonSharpBehaviour
             ThrottleInput = 0;
             //reset everything
             Piloting = false;
-            EjectTimer = 2;
             Hooked = false;
             BrakeInput = 0;
-            LTriggerTapTime = 1;
-            RTriggerTapTime = 1;
             Taxiinglerper = 0;
             LGripLastFrame = false;
             RGripLastFrame = false;
@@ -2054,18 +2027,12 @@ public class EngineController : UdonSharpBehaviour
             RStickSelection = -1;
             LStickSelectionLastFrame = -1;
             RStickSelectionLastFrame = -1;
-            BrakeInput = 0;
             LTriggerLastFrame = false;
             RTriggerLastFrame = false;
             DoAAMTargeting = false;
             MissilesIncoming = 0;
             HUDControl.MenuSoundCheckLast = 0;
-            if (Ejected)
-            {
-                localPlayer.SetVelocity(CurrentVel + VehicleTransform.up * 25);
-                Ejected = false;
-            }
-            else { localPlayer.SetVelocity(CurrentVel); }
+            localPlayer.SetVelocity(CurrentVel);
             if (CatapultStatus == 1) { CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
 
             if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }

@@ -23,8 +23,35 @@ public class KeyboardControls : UdonSharpBehaviour
     [SerializeField] private KeyCode Rfunc6key;
     [SerializeField] private KeyCode Rfunc7key;
     [SerializeField] private KeyCode Rfunc8key;
+    [SerializeField] private bool DoVTOL;
+    [SerializeField] private bool DoCruise;
+    private float VTOLAngleDivider;
+
+    private void Start()
+    {
+        float vtolangledif = EngineControl.VTOLMaxAngle - EngineControl.VTOLMinAngle;
+        VTOLAngleDivider = EngineControl.VTOLAngleTurnRate / vtolangledif;
+    }
     void Update()
     {
+        if (DoVTOL)
+        {
+            float pgup = Input.GetKey(KeyCode.PageUp) ? 1 : 0;
+            float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
+            if (pgup + pgdn != 0)
+            {
+                EngineControl.VTOLAngleInput = Mathf.Clamp(EngineControl.VTOLAngleInput + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime)), 0, 1);
+            }
+        }
+        float DeltaTime = Time.deltaTime;
+        if (DoCruise)
+        {
+            float equals = Input.GetKey(KeyCode.Equals) ? DeltaTime * 10 : 0;
+            float minus = Input.GetKey(KeyCode.Minus) ? DeltaTime * 10 : 0;
+            EngineControl.SetSpeed = Mathf.Max(EngineControl.SetSpeed + (equals - minus), 0);
+        }
+
+
         if (Input.GetKeyDown(Lfunc1key))
         {
             EngineControl.Dial_Functions_L[0].SendCustomEvent("KeyboardInput");

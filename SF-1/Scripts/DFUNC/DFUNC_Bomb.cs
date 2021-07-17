@@ -7,7 +7,7 @@ using VRC.Udon;
 
 public class DFUNC_Bomb : UdonSharpBehaviour
 {
-    private bool UseLeftTrigger;
+    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private Animator BombAnimator;
     [SerializeField] private GameObject Bomb;
@@ -34,6 +34,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
         BombAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         VehicleTransform = EngineControl.VehicleMainObj.transform;
+        BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
 
         FindSelf();
     }
@@ -41,7 +42,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     {
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }
-    public void SFEXT_O_PassengerEnter()
+    public void SFEXT_P_PassengerEnter()
     {
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }

@@ -31,10 +31,10 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         VehicleTransform = EngineControl.VehicleMainObj.GetComponent<Transform>();
         Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.EffectsControl.Flaps);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         if (DisplaySmoke.Length > 0) DisplaySmokeNull = false;
     }
-    private void Update()
+    private void LateUpdate()
     {
         if (InPlane)
         {
