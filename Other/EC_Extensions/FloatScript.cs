@@ -12,7 +12,7 @@ public class FloatScript : UdonSharpBehaviour
     private Transform VehicleTransform;
     [SerializeField] private float FloatForce;
     [SerializeField] private float Compressing;
-    [SerializeField] private float SuspMaxDist = .5f;
+    [SerializeField] private float FloatRadius = .5f;
     [SerializeField] private float WaterSidewaysDrag = .1f;
     [SerializeField] private float WaterForwardDrag = .1f;
     [SerializeField] private float WaterRotDrag = .1f;
@@ -31,22 +31,22 @@ public class FloatScript : UdonSharpBehaviour
     private float[] SuspensionCompressionLastFrame;
     private float[] FloatPointHeightLastFrame;
     private float[] DepthBeyondMaxSusp;
+    private float[] FloatRayHitPointLastFrame;
+    private bool[] HitLandLast;
     private Vector3[] FloatLocalPos;
-    private float LastRayHitHeight = float.MinValue;
     private Vector3[] FloatPointForce;
     private int currentfloatpoint;
     [System.NonSerializedAttribute] public float depth;
     float SuspDispToMeters;
     private VRCPlayerApi localPlayer;
     private bool InEditor = false;
-    private bool HitLandLast;
     void Start()
     {
-        localPlayer = EngineControl.localPlayer;
+        localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         { InEditor = true; }
 
-        SuspDispToMeters = 1 / SuspMaxDist;
+        SuspDispToMeters = 1 / FloatRadius;
 
         VehicleTransform = VehicleRigidbody.transform;
 
@@ -54,20 +54,19 @@ public class FloatScript : UdonSharpBehaviour
         SuspensionCompressionLastFrame = new float[FloatPoints.Length];
         FloatPointHeightLastFrame = new float[FloatPoints.Length];
         DepthBeyondMaxSusp = new float[FloatPoints.Length];
+        FloatRayHitPointLastFrame = new float[FloatPoints.Length];
         FloatPointForce = new Vector3[FloatPoints.Length];
         FloatLocalPos = new Vector3[FloatPoints.Length];
+        HitLandLast = new bool[FloatPoints.Length];
         for (int i = 0; i != FloatPoints.Length; i++)
         {
             FloatLocalPos[i] = FloatPoints[i].localPosition;
+            FloatPointHeightLastFrame[i] = FloatPoints[i].position.y;
         }
         if (HoverBike || (!InEditor && !localPlayer.isMaster))
         {
             gameObject.SetActive(false);
         }
-    }
-    private void OnEnable()
-    {
-        LastRayHitHeight = float.MinValue;
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -85,80 +84,86 @@ public class FloatScript : UdonSharpBehaviour
     {
         if (HoverBike) { gameObject.SetActive(true); }
     }
+    private void Underwater()
+    {
+        DepthBeyondMaxSusp[currentfloatpoint] = FloatRayHitPointLastFrame[currentfloatpoint] - FloatPoints[currentfloatpoint].position.y;
+        SuspensionCompression[currentfloatpoint] = 1;
+        SuspensionCompressionLastFrame[currentfloatpoint] = 1;
+
+        float CompressionDifference = FloatPoints[currentfloatpoint].position.y - FloatPointHeightLastFrame[currentfloatpoint];
+        if (CompressionDifference < 0)
+        { CompressionDifference *= -Compressing; }
+        else
+        {
+            CompressionDifference = 0;
+        }
+        FloatPointForce[currentfloatpoint] = Vector3.up * (FloatForce + (CompressionDifference));
+        FloatPointHeightLastFrame[currentfloatpoint] = FloatPoints[currentfloatpoint].position.y;
+        //don't set FloatRayHitPointLastFrame[currentfloatpoint] while underwater(we have to float to the surface first)
+    }
+    private void Air()
+    {
+        SuspensionCompression[currentfloatpoint] = 0;
+        SuspensionCompressionLastFrame[currentfloatpoint] = 0;
+        DepthBeyondMaxSusp[currentfloatpoint] = 0;
+        FloatPointForce[currentfloatpoint] = Vector3.zero;
+        FloatRayHitPointLastFrame[currentfloatpoint] = float.MinValue;
+    }
+
     private void FixedUpdate()
     {
-        //fire test ray to check if it's worth firing another ray, and to check the height of the water/ground surface and if it's water or land
-        if (LastRayHitHeight < transform.position.y)
+        if (!HitLandLast[currentfloatpoint])//move floats around to simulate waves
         {
-            RaycastHit hit;
-            //15 meters should be far enough for this to work with any size of plane, needs to be increased if you're trying to make something gigantic float
-            if (Physics.Raycast(transform.position, -Vector3.up, out hit, 15, FloatLayers, QueryTriggerInteraction.Collide))
-            {
-                if (hit.collider.isTrigger)//trigger = water
-                {
-                    HitLandLast = false;
-                }
-                else
-                {
-                    HitLandLast = true;
-                }
-
-                if (DoOnLand || !HitLandLast)
-                {
-                    LastRayHitHeight = hit.point.y;
-                }
-            }
-            else
-            {
-                LastRayHitHeight = float.MinValue;
-            }
+            Vector3 floatpos = FloatPoints[currentfloatpoint].position;
+            float time = Time.time;
+            FloatPoints[currentfloatpoint].localPosition = new Vector3(FloatLocalPos[currentfloatpoint].x, FloatLocalPos[currentfloatpoint].y - (Mathf.PerlinNoise(((floatpos.x + (time * WaveSpeed)) * WaveScale), ((floatpos.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight), FloatLocalPos[currentfloatpoint].z);
         }
-        //if the water/ground level found above is higher than the current floatpoint, values are based on how far underneath the water it is rather than using a raycast to it
-        if (LastRayHitHeight > FloatPoints[currentfloatpoint].position.y)
+        else//we're a hoverbike-like vehicle that is currently over land, no waves
         {
-            DepthBeyondMaxSusp[currentfloatpoint] = LastRayHitHeight - FloatPoints[currentfloatpoint].position.y;
-            SuspensionCompression[currentfloatpoint] = 1;
-            SuspensionCompressionLastFrame[currentfloatpoint] = 1;
-
-            float CompressionDifference = FloatPoints[currentfloatpoint].position.y - FloatPointHeightLastFrame[currentfloatpoint];
-            if (CompressionDifference < 0)
-            { CompressionDifference *= -Compressing; }
-            FloatPointForce[currentfloatpoint] = Vector3.up * (FloatForce + (CompressionDifference * SuspDispToMeters));
-            FloatPointHeightLastFrame[currentfloatpoint] = FloatPoints[currentfloatpoint].position.y;
+            FloatPoints[currentfloatpoint].localPosition = FloatLocalPos[currentfloatpoint];
         }
-        else//check depth and calc values for one floatpoint per frame
+        RaycastHit hit;
+        if (Physics.Raycast(FloatPoints[currentfloatpoint].position, -Vector3.up, out hit, 35, FloatLayers, QueryTriggerInteraction.Collide))
         {
-            DepthBeyondMaxSusp[currentfloatpoint] = 0;
-            if (!HitLandLast)//move floats around to simulate waves
+            bool hitland = !hit.collider.isTrigger;
+            HitLandLast[currentfloatpoint] = hitland;
+            if (hit.distance < FloatRadius)
             {
-                Vector3 floatpos = FloatPoints[currentfloatpoint].position;
-                float time = Time.time;
-                FloatPoints[currentfloatpoint].localPosition = new Vector3(FloatLocalPos[currentfloatpoint].x, FloatLocalPos[currentfloatpoint].y - (Mathf.PerlinNoise(((floatpos.x + (time * WaveSpeed)) * WaveScale), ((floatpos.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight), FloatLocalPos[currentfloatpoint].z);
-            }
-            else//we're a hoverbike-like vehicle that is currently over land, no waves
-            {
-                FloatPoints[currentfloatpoint].localPosition = FloatLocalPos[currentfloatpoint];
-            }
-            RaycastHit hit;
-            if (Physics.Raycast(FloatPoints[currentfloatpoint].position, -Vector3.up, out hit, SuspMaxDist, FloatLayers, QueryTriggerInteraction.Collide))
-            {
+                DepthBeyondMaxSusp[currentfloatpoint] = 0;
                 if (DoOnLand || hit.collider.isTrigger)
                 {
-                    SuspensionCompression[currentfloatpoint] = Mathf.Clamp(((hit.distance / SuspMaxDist) * -1) + 1, 0, 1);
+                    SuspensionCompression[currentfloatpoint] = Mathf.Clamp(((hit.distance / FloatRadius) * -1) + 1, 0, 1);
                     float CompressionDifference = (SuspensionCompression[currentfloatpoint] - SuspensionCompressionLastFrame[currentfloatpoint]);
                     if (CompressionDifference > 0)
                     { CompressionDifference *= Compressing; }
-
+                    else
+                    {
+                        CompressionDifference = 0;
+                    }
                     SuspensionCompressionLastFrame[currentfloatpoint] = SuspensionCompression[currentfloatpoint];
                     FloatPointForce[currentfloatpoint] = Vector3.up * (((SuspensionCompression[currentfloatpoint] * FloatForce) + CompressionDifference));
+                    FloatPointHeightLastFrame[currentfloatpoint] = FloatPoints[currentfloatpoint].position.y;
+                    FloatRayHitPointLastFrame[currentfloatpoint] = hit.point.y;
                 }
+            }
+            else if (FloatRayHitPointLastFrame[currentfloatpoint] > FloatPoints[currentfloatpoint].position.y)
+            {//plane is below last detected water height
+                Underwater();
             }
             else
             {
-                SuspensionCompression[currentfloatpoint] = 0;
-                FloatPointForce[currentfloatpoint] = Vector3.zero;
+                Air();
             }
         }
+        else if (FloatRayHitPointLastFrame[currentfloatpoint] > FloatPoints[currentfloatpoint].position.y)
+        {
+            Underwater();
+        }
+        else
+        {
+            Air();
+        }
+
         //set float back to it's original position before adding forces
         FloatPoints[currentfloatpoint].localPosition = FloatLocalPos[currentfloatpoint];
 
@@ -168,7 +173,7 @@ public class FloatScript : UdonSharpBehaviour
             depth += SuspensionCompression[i] + (DepthBeyondMaxSusp[i] * SuspDispToMeters);
         }
         if (depth > 0)
-        {//apply last calculated floating force to all floatpoints
+        {//apply last calculated floating force for each floatpoint to respective floatpoints
             for (int i = 0; i != FloatPoints.Length; i++)
             {
                 VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.Force);

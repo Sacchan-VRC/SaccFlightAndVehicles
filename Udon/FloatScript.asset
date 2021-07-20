@@ -452,7 +452,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: SuspMaxDist
+      Data: FloatRadius
     - Name: $v
       Entry: 7
       Data: 30|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -473,10 +473,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: SuspMaxDist
+      Data: FloatRadius
     - Name: symbolUniqueName
       Entry: 1
-      Data: SuspMaxDist
+      Data: FloatRadius
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1526,7 +1526,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FloatLocalPos
+      Data: FloatRayHitPointLastFrame
     - Name: $v
       Entry: 7
       Data: 98|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1534,14 +1534,8 @@ MonoBehaviour:
       Entry: 7
       Data: 99|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 100|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: UnityEngine.Vector3[], UnityEngine.CoreModule
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 87
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1550,13 +1544,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineVector3Array
+      Data: SystemSingleArray
     - Name: symbolOriginalName
       Entry: 1
-      Data: FloatLocalPos
+      Data: FloatRayHitPointLastFrame
     - Name: symbolUniqueName
       Entry: 1
-      Data: FloatLocalPos
+      Data: FloatRayHitPointLastFrame
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1565,7 +1559,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 101|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 100|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1589,16 +1583,22 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LastRayHitHeight
+      Data: HitLandLast
     - Name: $v
       Entry: 7
-      Data: 102|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 101|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 103|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 102|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 23
+      Entry: 7
+      Data: 103|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: System.Boolean[], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1607,13 +1607,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemBooleanArray
     - Name: symbolOriginalName
       Entry: 1
-      Data: LastRayHitHeight
+      Data: HitLandLast
     - Name: symbolUniqueName
       Entry: 1
-      Data: LastRayHitHeight
+      Data: HitLandLast
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1646,7 +1646,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FloatPointForce
+      Data: FloatLocalPos
     - Name: $v
       Entry: 7
       Data: 105|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1654,8 +1654,14 @@ MonoBehaviour:
       Entry: 7
       Data: 106|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 100
+      Entry: 7
+      Data: 107|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UnityEngine.Vector3[], UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1667,10 +1673,10 @@ MonoBehaviour:
       Data: UnityEngineVector3Array
     - Name: symbolOriginalName
       Entry: 1
-      Data: FloatPointForce
+      Data: FloatLocalPos
     - Name: symbolUniqueName
       Entry: 1
-      Data: FloatPointForce
+      Data: FloatLocalPos
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1679,7 +1685,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 107|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 108|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1703,22 +1709,16 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: currentfloatpoint
+      Data: FloatPointForce
     - Name: $v
       Entry: 7
-      Data: 108|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 109|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 109|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 110|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 110|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: System.Int32, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 107
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1727,13 +1727,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt32
+      Data: UnityEngineVector3Array
     - Name: symbolOriginalName
       Entry: 1
-      Data: currentfloatpoint
+      Data: FloatPointForce
     - Name: symbolUniqueName
       Entry: 1
-      Data: currentfloatpoint
+      Data: FloatPointForce
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1766,7 +1766,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: depth
+      Data: currentfloatpoint
     - Name: $v
       Entry: 7
       Data: 112|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1774,8 +1774,14 @@ MonoBehaviour:
       Entry: 7
       Data: 113|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 23
+      Entry: 7
+      Data: 114|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: System.Int32, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1784,13 +1790,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: depth
+      Data: currentfloatpoint
     - Name: symbolUniqueName
       Entry: 1
-      Data: depth
+      Data: currentfloatpoint
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1799,16 +1805,10 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 114|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 115|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 115|System.NonSerializedAttribute, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -1829,7 +1829,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: SuspDispToMeters
+      Data: depth
     - Name: $v
       Entry: 7
       Data: 116|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1850,10 +1850,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: SuspDispToMeters
+      Data: depth
     - Name: symbolUniqueName
       Entry: 1
-      Data: SuspDispToMeters
+      Data: depth
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1865,7 +1865,13 @@ MonoBehaviour:
       Data: 118|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 119|System.NonSerializedAttribute, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -1886,22 +1892,16 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: localPlayer
+      Data: SuspDispToMeters
     - Name: $v
       Entry: 7
-      Data: 119|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 120|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 120|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 121|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 121|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: VRC.SDKBase.VRCPlayerApi, VRCSDKBase
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 23
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1910,13 +1910,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: VRCSDKBaseVRCPlayerApi
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: localPlayer
+      Data: SuspDispToMeters
     - Name: symbolUniqueName
       Entry: 1
-      Data: localPlayer
+      Data: SuspDispToMeters
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1949,7 +1949,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: InEditor
+      Data: localPlayer
     - Name: $v
       Entry: 7
       Data: 123|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1957,8 +1957,14 @@ MonoBehaviour:
       Entry: 7
       Data: 124|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 64
+      Entry: 7
+      Data: 125|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: VRC.SDKBase.VRCPlayerApi, VRCSDKBase
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1967,13 +1973,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: VRCSDKBaseVRCPlayerApi
     - Name: symbolOriginalName
       Entry: 1
-      Data: InEditor
+      Data: localPlayer
     - Name: symbolUniqueName
       Entry: 1
-      Data: InEditor
+      Data: localPlayer
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1982,7 +1988,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 125|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 126|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -2006,13 +2012,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HitLandLast
+      Data: InEditor
     - Name: $v
       Entry: 7
-      Data: 126|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 127|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 127|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 128|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 64
@@ -2027,10 +2033,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: HitLandLast
+      Data: InEditor
     - Name: symbolUniqueName
       Entry: 1
-      Data: HitLandLast
+      Data: InEditor
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2039,7 +2045,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 128|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 129|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

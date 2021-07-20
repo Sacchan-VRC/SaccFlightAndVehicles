@@ -90,6 +90,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         NumAGM = FullAGMs;
+        if (func_active)
+        { DFUNC_Deselected(); }
     }
     public void DFUNC_Selected()
     {
@@ -104,15 +106,13 @@ public class DFUNC_AGM : UdonSharpBehaviour
         gameObject.SetActive(false);
     }
     //synced variables recieved while object is disabled do not get set until the object is enabled, 1 frame is fine.
-    public void EnableToSyncVariables()
+    public void EnableForOthers()
     {
         gameObject.SetActive(true);
-        SendCustomEventDelayedFrames("DisableSelf", 1);
     }
-    public void DisableSelf()
+    public void DisableForOthers()
     {
-        if (!func_active)//don't disable if the object happened to also be activated on this frame
-        { gameObject.SetActive(false); }
+        gameObject.SetActive(false);
     }
     private void Update()
     {
@@ -128,6 +128,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
             if (AGMUnlockTimer > 0.4f && AGMLocked == true)
             {
+                //disable for others because they no longer need to sync
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DisableForOthers");
                 AGMLocked = false;
                 AGMUnlockTimer = 0;
                 AGMUnlocking = 0;
@@ -169,6 +171,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                     float angle = Vector3.Angle(AtGCam.transform.forward, targetdirection);
                                     if (angle < targetangle)
                                     {
+                                        //enable for others so they sync the variable
+                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
                                         targetangle = angle;
                                         AGMTarget = target.collider.transform.position;
                                         AGMLocked = true;
@@ -183,6 +187,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                 Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
                                 if (lockpoint.point != null)
                                 {
+                                    //enable for others so they sync the variable
+                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
                                     if (!AGMUnlockNull)
                                     { AGMLock.Play(); }
                                     AGMTarget = lockpoint.point;
@@ -204,7 +210,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 TriggerLastFrame = true;
             }
             else { TriggerLastFrame = false; }
-            //AGM Camera, more in hudcontroller
             if (!AGMLocked)
             {
                 Quaternion newangle;
@@ -280,8 +285,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
 
     public void LaunchAGM()
     {
-        if (!func_active) { EnableToSyncVariables(); }
-
         if (NumAGM > 0) { NumAGM--; }
         AGMAnimator.SetTrigger(AGMLAUNCHED_STRING);
         if (AGM != null)
