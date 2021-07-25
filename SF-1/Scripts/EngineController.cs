@@ -26,8 +26,6 @@ public class EngineController : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
     public LayerMask ResupplyLayer;
     public LayerMask HookCableLayer;
-    public Transform CatapultDetector;
-    public LayerMask CatapultLayer;
     public LayerMask AAMTargetsLayer;
     public Transform GunRecoilEmpty;
     public float GunRecoil = 150;
@@ -43,7 +41,6 @@ public class EngineController : UdonSharpBehaviour
     public bool HasVTOLAngle = false;
     public bool HasLimits = true;
     public bool HasFlare = true;
-    public bool HasCatapult = true;
     public bool HasBrake = true;
     public bool HasAltHold = true;
     public bool HasCanopy = true;
@@ -120,8 +117,6 @@ public class EngineController : UdonSharpBehaviour
     public float GroundEffectMaxDistance = 7;
     public float GroundEffectStrength = 4;
     public float GroundEffectLiftMax = 999999;
-    public float CatapultLaunchStrength = 50f;
-    public float CatapultLaunchTime = 2f;
     public float GLimiter = 12f;
     public float AoALimiter = 15f;
     [Header("Response VTOL:")]
@@ -254,21 +249,16 @@ public class EngineController : UdonSharpBehaviour
     private int ThrustVecGrounded;
     private float SoundBarrier;
     [System.NonSerializedAttribute] private float Afterburner = 1;
-    [System.NonSerializedAttribute] public int CatapultStatus = 0;
-    private Vector3 CatapultLockPos;
-    private Quaternion CatapultLockRot;
-    private Transform CatapultTransform;
-    private float CatapultLaunchTimeStart;
     [System.NonSerializedAttribute] public float CanopyCloseTimer = -200000;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
     [System.NonSerializedAttribute] public int NumAAMTargets = 0;
     [System.NonSerializedAttribute] public float FullFuel;
     private float LowFuel;
+    private float LowFuelDivider;
     private float LastResupplyTime = 5;//can't resupply for the first 10 seconds after joining, fixes potential null ref if sending something to PlaneAnimator on first frame
     [System.NonSerializedAttribute] public float FullGunAmmo;
     [System.NonSerializedAttribute] public int MissilesIncoming = 0;
     private bool WeaponSelected = false;
-    private int CatapultDeadTimer = 0;//needed to be invincible for a frame when entering catapult
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] public Vector3 Spawnrotation;
     private int OutsidePlaneLayer;
@@ -299,11 +289,12 @@ public class EngineController : UdonSharpBehaviour
     private float vtolangledif;
     private bool GunRecoilEmptyNULL = true;
     private float StartMaxLift;
+    [System.NonSerializedAttribute] public bool GearToggleDisabled = false;
+    [System.NonSerializedAttribute] public bool ConstantForceZero = false;
 
     private int HOOKED_STRING = Animator.StringToHash("hooked");
     private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
     private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
-    private int ONCATAPULT_STRING = Animator.StringToHash("oncatapult");
     private int WEAPON_STRING = Animator.StringToHash("weapon");
     private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
     private int RESUPPLY_STRING = Animator.StringToHash("resupply");
@@ -334,7 +325,6 @@ public class EngineController : UdonSharpBehaviour
         Assert(YawMoment != null, "Start: YawMoment != null");
         Assert(GroundDetector != null, "Start: GroundDetector != null");
         Assert(HookDetector != null, "Start: HookDetector != null");
-        Assert(CatapultDetector != null, "Start: CatapultDetector != null");
         Assert(GroundEffectEmpty != null, "Start: GroundEffectEmpty != null");
         Assert(GunRecoilEmpty != null, "Start: GunRecoilEmpty != null");
         Assert(KillsBoard != null, "Start: KillsBoard != null");
@@ -368,7 +358,6 @@ public class EngineController : UdonSharpBehaviour
 
         VelLiftMaxStart = VelLiftMax;
         VelLiftStart = VelLift;
-        CatapultLaunchTimeStart = CatapultLaunchTime;
         HasAirBrake = AirbrakeStrength != 0;
 
         PitchThrustVecMultiStart = PitchThrustVecMulti;
@@ -451,8 +440,8 @@ public class EngineController : UdonSharpBehaviour
         {
             GunRecoilEmptyNULL = false;
         }
-        LowFuel = FullFuel * .13888888f;//to match the old default settings
-
+        LowFuel = 200;//FullFuel * .13888888f;//to match the old default settings
+        LowFuelDivider = 1 / LowFuel;
 
         SendEventToExtensions("SFEXT_L_ECStart", false);
     }
@@ -792,7 +781,7 @@ public class EngineController : UdonSharpBehaviour
                     bool VTOLandAB_Disallowed = (!VTOLAllowAfterburner && VTOLAngle != 0);/*don't allow VTOL AB disabled planes, false if attemping to*/
 
                     //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
-                    if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !VTOLandAB_Disallowed || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/&& !VTOLandAB_Disallowed) || !HasAfterburner))
+                    if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !VTOLandAB_Disallowed && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/&& !VTOLandAB_Disallowed) || !HasAfterburner))
                     {
                         PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
                     }
@@ -831,45 +820,6 @@ public class EngineController : UdonSharpBehaviour
                             VehicleRigidbody.velocity = Vector3.zero;
                         }
                     }
-                    //check for catapult below us and attach if there is one    
-                    /*                     if (HasCatapult && CatapultStatus == 0)
-                                        {
-                                            RaycastHit hit;
-                                            if (Physics.Raycast(CatapultDetector.position, CatapultDetector.TransformDirection(Vector3.down), out hit, 1f, CatapultLayer))
-                                            {
-                                                Transform CatapultTrigger = hit.collider.transform;//get the transform from the trigger hit
-
-                                                //Hit detected, check if the plane is facing in the right direction..
-                                                if (Vector3.Angle(VehicleTransform.forward, CatapultTrigger.transform.forward) < 15)
-                                                {
-                                                    //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
-                                                    CatapultTransform = CatapultTrigger.transform;
-                                                    //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
-                                                    VehicleTransform.rotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
-
-                                                    //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
-                                                    Vector3 PlaneCatapultDistance = CatapultTransform.position - VehicleTransform.position;
-                                                    PlaneCatapultDistance = CatapultTransform.transform.InverseTransformDirection(PlaneCatapultDistance);
-                                                    VehicleTransform.position = CatapultTransform.position;
-                                                    VehicleTransform.position -= CatapultTransform.up * PlaneCatapultDistance.y;
-
-                                                    //move the plane back so that the catapult is aligned to the catapult detector
-                                                    Vector3 CatapultDetectorDist = VehicleTransform.position - CatapultDetector.position;
-                                                    CatapultDetectorDist = VehicleTransform.InverseTransformDirection(CatapultDetectorDist);
-                                                    VehicleTransform.position += CatapultTrigger.forward * CatapultDetectorDist.z;
-
-                                                    CatapultLockRot = VehicleTransform.rotation;//rotation to lock the plane to on the catapult
-                                                    CatapultLockPos = VehicleTransform.position;
-                                                    CatapultStatus = 1;//locked to catapult
-
-                                                    //use dead to make plane invincible for 1 frame when entering the catapult to prevent damage which will be worse the higher your framerate is
-                                                    dead = true;
-                                                    CatapultDeadTimer = 2;//to make
-
-                                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockIn");
-                                                }
-                                            }
-                                        } */
                 }
                 else
                 {
@@ -878,7 +828,7 @@ public class EngineController : UdonSharpBehaviour
                     Taxiinglerper = 0;
                 }
                 //keyboard control for afterburner
-                if (Input.GetKeyDown(KeyCode.T) && HasAfterburner && (VTOLAngle == 0 || VTOLAllowAfterburner))
+                if (Input.GetKeyDown(KeyCode.T) && HasAfterburner && (VTOLAngle == 0 || VTOLAllowAfterburner) && Fuel > LowFuel)
                 {
                     if (AfterburnerOn)
                         PlayerThrottle = ThrottleAfterburnerPoint;
@@ -905,20 +855,14 @@ public class EngineController : UdonSharpBehaviour
                     if (!InVR)
                     {
                         if (LTrigger > .05f)//axis throttle input for people who wish to use it //.05 deadzone so it doesn't take effect for keyboard users with something plugged in
-                            ThrottleInput = LTrigger;
-                        else
-                        {
-                            ThrottleInput = PlayerThrottle;
-                        }
+                        { ThrottleInput = LTrigger; }
+                        else { ThrottleInput = PlayerThrottle; }
                     }
-                    else
-                    {
-                        ThrottleInput = PlayerThrottle;
-                    }
+                    else { ThrottleInput = PlayerThrottle; }
                 }
 
                 Fuel = Mathf.Max(Fuel - ((FuelConsumption * (AfterburnerOn ? Mathf.Max(ThrottleInput, 0.35f) * FuelConsumptionABMulti : Mathf.Max(ThrottleInput, 0.35f))) * DeltaTime), 0);
-                if (Fuel < LowFuel) ThrottleInput = Mathf.Clamp(ThrottleInput * (Fuel / LowFuel), 0, 1);//decrease max throttle as fuel runs out
+                if (Fuel < LowFuel) { ThrottleInput = ThrottleInput * (Fuel * LowFuelDivider); }//decrease max throttle as fuel runs out
 
                 if (HasAfterburner)
                 {
@@ -1182,113 +1126,74 @@ public class EngineController : UdonSharpBehaviour
             {
                 VelLift = pitch = yaw = roll = 0;
             }
-            switch (CatapultStatus)
+
+            if ((PlaneMoving || Piloting) && !ConstantForceZero)
             {
-                case 0://normal
-                    if (PlaneMoving || Piloting)
+                //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
+                //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
+                Vector3 FinalInputAcc;
+                float GroundEffectAndVelLift = 0;
+                if (VTOLenabled)
+                {
+                    float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
+
+                    Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
+                    float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
+                                                                                 //rotate and scale Vector for VTOL thrust
+                    if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
                     {
-                        //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
-                        //engine output is multiplied by so that max throttle without afterburner is max strength (unrelated to vtol)
-                        Vector3 FinalInputAcc;
-                        float GroundEffectAndVelLift = 0;
-                        if (VTOLenabled)
-                        {
-                            float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
-
-                            Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
-                            float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
-                                                                                         //rotate and scale Vector for VTOL thrust
-                            if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
-                            {
-                                FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
-                            }
-                            else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
-                            {
-                                float downthrust = thrust * VTOLThrottleStrengthMulti;
-                                FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
-                            }
-                            //add ground effect to the VTOL thrust
-                            GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, false, 1);
-                            FinalInputAcc *= GroundEffectAndVelLift;
-
-                            //Add Airplane Ground Effect
-                            GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
-                            //add lift and thrust
-                            FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                                ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
-                                    0);//(HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
-                        }
-                        else//Simpler version for non-VTOL craft
-                        {
-                            GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
-                            FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                                ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
-                                    (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
-                        }
-
-                        float outputdif = (EngineOutput - EngineOutputLastFrame);
-                        float ADVYaw = outputdif * AdverseYaw;
-                        float ADVRoll = outputdif * AdverseRoll;
-                        EngineOutputLastFrame = EngineOutput;
-                        //used to add rotation friction
-                        Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
-
-
-                        //roll + rotational frictions
-                        Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere) - (localAngularVelocity.x * PitchConstantFriction),// X Pitch
-                            (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere - (localAngularVelocity.y * YawConstantFriction),// Y Yaw
-                                ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere) - (localAngularVelocity.z * RollConstantFriction));// Z Roll
-
-                        //create values for use in fixedupdate (control input and straightening forces)
-                        Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
-                        Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
-
-                        VehicleConstantForce.relativeForce = FinalInputAcc;
-                        VehicleConstantForce.relativeTorque = FinalInputRot;
+                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
                     }
-                    else
+                    else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
                     {
-                        VehicleConstantForce.relativeForce = Vector3.zero;
-                        VehicleConstantForce.relativeTorque = Vector3.zero;
+                        float downthrust = thrust * VTOLThrottleStrengthMulti;
+                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
                     }
-                    break;
-                case 1://locked on catapult
-                       //dead == invincible, turn off once a frame has passed since attaching
-                    if (dead)
-                    {
-                        CatapultDeadTimer -= 1;
-                        if (CatapultDeadTimer == 0) dead = false;
-                    }
+                    //add ground effect to the VTOL thrust
+                    GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, false, 1);
+                    FinalInputAcc *= GroundEffectAndVelLift;
 
-                    VehicleConstantForce.relativeForce = Vector3.zero;
-                    VehicleConstantForce.relativeTorque = Vector3.zero;
+                    //Add Airplane Ground Effect
+                    GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
+                    //add lift and thrust
+                    FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
+                        ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
+                            0);//(HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
+                }
+                else//Simpler version for non-VTOL craft
+                {
+                    GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
+                    FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
+                        ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
+                            (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
+                }
 
-                    CatapultLaunchTime = CatapultLaunchTimeStart;
-                    VehicleTransform.SetPositionAndRotation(CatapultLockPos, CatapultLockRot);
-                    VehicleRigidbody.velocity = Vector3.zero;
-                    VehicleRigidbody.angularVelocity = Vector3.zero;
-                    break;
-                case 2://launching
-                    VehicleTransform.rotation = CatapultLockRot;
-                    VehicleConstantForce.relativeForce = VehicleTransform.InverseTransformDirection(CatapultTransform.forward) * CatapultLaunchStrength;
-                    //lock all movment except for forward movement
-                    Vector3 temp = CatapultTransform.InverseTransformDirection(VehicleRigidbody.velocity);
-                    temp.x = 0;
-                    temp.y = 0;
-                    temp = CatapultTransform.TransformDirection(temp);
-                    VehicleRigidbody.velocity = temp;
-                    VehicleRigidbody.angularVelocity = Vector3.zero;
-                    VehicleConstantForce.relativeTorque = Vector3.zero;
-                    CatapultLaunchTime -= DeltaTime;
-                    if (CatapultLaunchTime < 0)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff");
-                        dead = false;//just in case
-                        CatapultStatus = 0;
-                        Taxiinglerper = 0;
-                    }
-                    break;
+                float outputdif = (EngineOutput - EngineOutputLastFrame);
+                float ADVYaw = outputdif * AdverseYaw;
+                float ADVRoll = outputdif * AdverseRoll;
+                EngineOutputLastFrame = EngineOutput;
+                //used to add rotation friction
+                Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
+
+
+                //roll + rotational frictions
+                Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere) - (localAngularVelocity.x * PitchConstantFriction),// X Pitch
+                    (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere - (localAngularVelocity.y * YawConstantFriction),// Y Yaw
+                        ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere) - (localAngularVelocity.z * RollConstantFriction));// Z Roll
+
+                //create values for use in fixedupdate (control input and straightening forces)
+                Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
+                Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
+
+                VehicleConstantForce.relativeForce = FinalInputAcc;
+                VehicleConstantForce.relativeTorque = FinalInputRot;
             }
+            else
+            {
+                VehicleConstantForce.relativeForce = Vector3.zero;
+                VehicleConstantForce.relativeTorque = Vector3.zero;
+            }
+
             SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
 
             //play a touchdown sound the frame we start taxiing
@@ -1338,7 +1243,7 @@ public class EngineController : UdonSharpBehaviour
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag)) * 90) * DeltaTime);
             //apply pitching using pitch moment
             VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);//deltatime is built into ForceMode.Force
-            //apply yawing using yaw moment
+                                                                                                 //apply yawing using yaw moment
             VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
             //calc Gs
             float gravity = 9.81f * DeltaTime;
@@ -1367,35 +1272,6 @@ public class EngineController : UdonSharpBehaviour
                 }
             }
         }
-    }
-    public void CatapultLaunchEffects()
-    {
-        VehicleRigidbody.WakeUp(); //i don't think it actually sleeps anyway but this might help other clients sync the launch faster idk
-        if (EffectsControl.CatapultSteam != null) { EffectsControl.CatapultSteam.Play(); }
-        if (Piloting || Passenger)
-        {
-            if (!SoundControl.CatapultLaunchNull)
-            {
-                SoundControl.CatapultLaunch.Play();
-            }
-        }
-        else
-        {
-            if (!SoundControl.CatapultLaunchNull)
-            {
-                SoundControl.CatapultLaunch.Play();
-            }
-        }
-    }
-    public void CatapultLockIn()
-    {
-        VehicleAnimator.SetBool(ONCATAPULT_STRING, true);
-        VehicleRigidbody.Sleep();//don't think this actually helps
-        if (!SoundControl.CatapultLockNull) { SoundControl.CatapultLock.Play(); }
-    }
-    public void CatapultLockOff()
-    {
-        VehicleAnimator.SetBool(ONCATAPULT_STRING, false);
     }
     //these are used for syncing weapon selection for bomb bay doors animation etc
     public void RStick0()//Rstick is something other than a weapon
@@ -1429,7 +1305,6 @@ public class EngineController : UdonSharpBehaviour
         dead = true;
         BrakeInput = 0;
         Cruise = false;
-        CatapultStatus = 0;
         PlayerThrottle = 0;
         ThrottleInput = 0;
         EngineOutput = 0;
@@ -1550,7 +1425,7 @@ public class EngineController : UdonSharpBehaviour
     private void ToggleAfterburner()
     {
         bool AfterburnerOn = EffectsControl.AfterburnerOn;
-        if (!AfterburnerOn && ThrottleInput > 0.8)
+        if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
         }
@@ -1770,7 +1645,7 @@ public class EngineController : UdonSharpBehaviour
         Networking.SetOwner(localPlayer, EffectsControl.gameObject);
         //VehicleTransform.position = new Vector3(VehicleTransform.position.x, -10000, VehicleTransform.position.z);
         Atmosphere = 1;//planemoving optimization requires this to be here
-        //synced variables
+                       //synced variables
         Health = FullHealth;
         Fuel = FullFuel;
         VTOLAngle = VTOLDefaultValue;
@@ -1956,7 +1831,7 @@ public class EngineController : UdonSharpBehaviour
             //canopy closed/open sound
             if (EffectsControl.CanopyOpen) { CanopyCloseTimer = -100000 - CanopyCloseTime; }
             else CanopyCloseTimer = -CanopyCloseTime;//less than 0
-            //SetSmokingOff();
+                                                     //SetSmokingOff();
             EffectsControl.PlaneAnimator.SetBool(LOCALPILOT_STRING, true);
         }
         if (HUDControl != null)
@@ -2033,7 +1908,6 @@ public class EngineController : UdonSharpBehaviour
             MissilesIncoming = 0;
             HUDControl.MenuSoundCheckLast = 0;
             localPlayer.SetVelocity(CurrentVel);
-            if (CatapultStatus == 1) { CatapultStatus = 0; }//keep launching if launching, otherwise unlock from catapult
 
             if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
             //set plane's layer back

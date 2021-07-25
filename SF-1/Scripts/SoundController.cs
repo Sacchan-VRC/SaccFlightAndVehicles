@@ -23,8 +23,6 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource RadarLocked;
     public AudioSource MissileIncoming;
     public AudioSource Airbrake;
-    public AudioSource CatapultLock;
-    public AudioSource CatapultLaunch;
     public AudioSource CableSnap;
     public AudioSource MenuSelect;
     [SerializeField] private AudioSource[] DopplerSounds;
@@ -45,8 +43,6 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool ReloadingNull;
     [System.NonSerializedAttribute] public bool RadarLockedNull;
     [System.NonSerializedAttribute] public bool AirbrakeNull;
-    [System.NonSerializedAttribute] public bool CatapultLockNull;
-    [System.NonSerializedAttribute] public bool CatapultLaunchNull;
     [System.NonSerializedAttribute] public bool CableSnapNull;
     [System.NonSerializedAttribute] public bool MenuSelectNull;
     public Transform testcamera;
@@ -93,8 +89,6 @@ public class SoundController : UdonSharpBehaviour
         Assert(PlaneWind != null, "Start: PlaneWind != null");
         Assert(MenuSelect != null, "Start: MenuSelect != null");
         Assert(Airbrake != null, "Start: Airbrake != null");
-        Assert(CatapultLock != null, "Start: CatapultLock != null");
-        Assert(CatapultLaunch != null, "Start: CatapultLaunch != null");
         Assert(CableSnap != null, "Start: CableSnap != null");
         Assert(Rolling != null, "Start: Rolling != null");
         Assert(Reloading != null, "Start: Reloading != null");
@@ -114,8 +108,6 @@ public class SoundController : UdonSharpBehaviour
         PlaneWindNull = (PlaneWind == null) ? true : false;
         MenuSelectNull = (MenuSelect == null) ? true : false;
         AirbrakeNull = (Airbrake == null) ? true : false;
-        CatapultLockNull = (CatapultLock == null) ? true : false;
-        CatapultLaunchNull = (CatapultLaunch == null) ? true : false; ;
         CableSnapNull = (CableSnap == null) ? true : false;
         RollingNull = (Rolling == null) ? true : false;
         ReloadingNull = (Reloading == null) ? true : false;
@@ -292,7 +284,6 @@ public class SoundController : UdonSharpBehaviour
             {
                 if (!ABOnOutsideNull) { ABOnOutside.Stop(); }
                 //change stuff when you get in
-                if (!CatapultLaunchNull) { CatapultLaunch.volume *= InVehicleThrustVolumeFactor; }
                 PlaneThrustPitch = 0.8f;
                 if (!PlaneInsideNull && !PlaneIdleNull)
                 {
@@ -462,7 +453,6 @@ public class SoundController : UdonSharpBehaviour
     {
         if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
         if (!RadarLockedNull) { RadarLocked.Stop(); }
-        if (!CatapultLaunchNull) CatapultLaunch.volume /= InVehicleThrustVolumeFactor;
         if (!RollingNull) { Rolling.Stop(); }
         if (!PlaneInsideNull) { PlaneInside.Stop(); }
         foreach (AudioSource idle in PlaneIdle) { idle.Play(); }

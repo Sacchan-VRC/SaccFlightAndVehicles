@@ -21,7 +21,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
         if (Trigger > 0.75)
         {
-            if (!RTriggerLastFrame && EngineControl.CatapultStatus == 0) { EngineControl.ToggleGear(); }
+            if (!RTriggerLastFrame && !EngineControl.GearToggleDisabled) { EngineControl.ToggleGear(); }
             RTriggerLastFrame = true;
         }
         else { RTriggerLastFrame = false; }

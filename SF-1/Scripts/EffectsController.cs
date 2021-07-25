@@ -9,12 +9,10 @@ public class EffectsController : UdonSharpBehaviour
     public GameObject VehicleMainObj;
     public EngineController EngineControl;
     public Transform FrontWheel;
-    public ParticleSystem CatapultSteam;
     private bool VehicleMainObjNull = true;
     private bool EngineControlNull = true;
     private bool JoyStickNull = true;
     [System.NonSerializedAttribute] public bool FrontWheelNull = true;
-    private bool CatapultSteamNull = true;
 
 
 
@@ -67,7 +65,6 @@ public class EffectsController : UdonSharpBehaviour
         if (VehicleMainObj != null) VehicleMainObjNull = false;
         if (EngineControl != null) EngineControlNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
-        if (CatapultSteam != null) CatapultSteamNull = false;
 
         FullHealthDivider = 1f / EngineControl.Health;
 
