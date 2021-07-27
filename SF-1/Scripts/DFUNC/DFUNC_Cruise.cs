@@ -43,7 +43,6 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
-        localPlayer.SetVelocity(localPlayer.GetVelocity() + VehicleTransform.up * 25);
         TriggerTapTime = 1;
     }
     private void LateUpdate()
@@ -56,7 +55,6 @@ public class DFUNC_Cruise : UdonSharpBehaviour
 
         if (Trigger > 0.75)
         {
-            float CruiseTemp = 0;
             //for setting speed in VR
             Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
             handpos = VehicleTransform.InverseTransformDirection(handpos);
@@ -80,9 +78,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                     EngineControl.Cruise = false;
                     if (!Dial_FunconNULL) { Dial_Funcon.SetActive(EngineControl.Cruise); }
                 }
-                //end of enable disable
 
-                //more set speed stuff
                 SpeedZeroPoint = handpos.z;
                 CruiseTemp = EngineControl.SetSpeed;
             }

@@ -54,6 +54,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMTargetLockNull = (AAMTargetLock == null) ? true : false;
 
         FindSelf();
+
+        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
     }
     public void SFEXT_O_PilotEnter()
     {

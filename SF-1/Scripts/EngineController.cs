@@ -289,8 +289,10 @@ public class EngineController : UdonSharpBehaviour
     private float vtolangledif;
     private bool GunRecoilEmptyNULL = true;
     private float StartMaxLift;
-    [System.NonSerializedAttribute] public bool GearToggleDisabled = false;
+    //this stuff can be used by DFUNCs
     [System.NonSerializedAttribute] public bool ConstantForceZero = false;
+    [System.NonSerializedAttribute] public bool DisableGearToggle = false;
+    [System.NonSerializedAttribute] public bool DisableTaxiRotation = false;
 
     private int HOOKED_STRING = Animator.StringToHash("hooked");
     private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
@@ -652,7 +654,7 @@ public class EngineController : UdonSharpBehaviour
                         Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
                     //get udonbehaviour for newly selected function and then send selected
-                    if (RStickSelection > -1)
+                    if (LStickSelection > -1)
                     {
                         if (Dial_Functions_L[LStickSelection] != null)
                         {
@@ -802,9 +804,12 @@ public class EngineController : UdonSharpBehaviour
                     AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                     Cruise = false;
                     AltHold = false;
-                    //rotate if trying to yaw
-                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
-                    VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
+                    if (!DisableTaxiRotation)
+                    {
+                        //rotate if trying to yaw
+                        Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
+                        VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
+                    }
 
                     StillWindMulti = Mathf.Min(Speed / 10, 1);
                     ThrustVecGrounded = 0;

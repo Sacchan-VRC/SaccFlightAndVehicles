@@ -58,6 +58,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
 
         FindSelf();
+
+        HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -71,6 +73,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
+        if (AGMLocked) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DisableForOthers"); }
         AGMLocked = false;
         AtGScreen.SetActive(false);
         AtGCam.gameObject.SetActive(false);
@@ -112,7 +115,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void DisableForOthers()
     {
-        gameObject.SetActive(false);
+        if (!EngineControl.Piloting)
+        { gameObject.SetActive(false); }
     }
     private void Update()
     {
@@ -158,7 +162,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                     {//lock onto a target
                         if (AtGCam != null)
                         {
-                            //check for agmtargets to lcok to
+                            //check for agmtargets to lock to
                             float targetangle = 999;
                             RaycastHit lockpoint;
                             RaycastHit[] agmtargs = Physics.SphereCastAll(AtGCam.transform.position, 150, AtGCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);

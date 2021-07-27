@@ -9,7 +9,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     private bool KeyboardActivated;
-    private bool LTriggerLastFrame;
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);

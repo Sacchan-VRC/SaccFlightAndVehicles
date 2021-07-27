@@ -11,13 +11,14 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     [SerializeField] private GameObject Dial_Funcon;
     private EffectsController EffectsControl;
     private bool Dial_FunconNULL = true;
-    private bool LTriggerLastFrame;
+    private bool TriggerLastFrame;
     private Transform VehicleTransform;
     private VRCPlayerApi localPlayer;
     private float EjectZeroPoint;
     [System.NonSerializedAttribute] public float EjectTimer = 1;
     private HUDController HUDControl;
     [System.NonSerializedAttribute] public bool Ejected = false;
+    private bool InVR;
     public void SFEXT_L_ECStart()
     {
         localPlayer = Networking.LocalPlayer;
@@ -38,10 +39,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.CanopyOpen);
-    }
-    public void SFEXT_O_PassengerEnter()
-    {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.CanopyOpen);
+        InVR = EngineControl.InVR;
     }
     public void SFEXT_O_PilotExit()
     {
@@ -51,6 +49,14 @@ public class DFUNC_Canopy : UdonSharpBehaviour
             localPlayer.SetVelocity(localPlayer.GetVelocity() + VehicleTransform.up * 25);
             Ejected = false;
         }
+    }
+    public void SFEXT_O_RespawnButton()
+    {
+        EngineControl.CanopyOpening();
+    }
+    public void SFEXT_O_PassengerEnter()
+    {
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.CanopyOpen);
     }
     private void Update()
     {
@@ -62,7 +68,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
 
         if (Trigger > 0.75)
         {
-            if (!LTriggerLastFrame && EngineControl.Speed < 20)
+            if (!TriggerLastFrame && EngineControl.Speed < 20)
             {
                 if (EngineControl.CanopyCloseTimer <= -100000 - EngineControl.CanopyCloseTime)
                 {
@@ -76,14 +82,14 @@ public class DFUNC_Canopy : UdonSharpBehaviour
             }
 
             //ejection
-            if (EngineControl.InVR)
+            if (InVR)
             {
                 Vector3 handposL = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
                 handposL = VehicleTransform.InverseTransformDirection(handposL);
-                Vector3 handposR = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                Vector3 handposR = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
                 handposR = VehicleTransform.InverseTransformDirection(handposR);
 
-                if (!LTriggerLastFrame && (handposL.y - handposR.y) < 0.20f)
+                if (!TriggerLastFrame && (handposL.y - handposR.y) < 0.20f)
                 {
                     EjectZeroPoint = handposL.y;
                     EjectTimer = 0;
@@ -97,11 +103,11 @@ public class DFUNC_Canopy : UdonSharpBehaviour
             }
 
             EjectTimer += Time.deltaTime;
-            LTriggerLastFrame = true;
+            TriggerLastFrame = true;
         }
         else
         {
-            LTriggerLastFrame = false;
+            TriggerLastFrame = false;
             EjectTimer = 2;
         }
     }

@@ -49,6 +49,10 @@ public class DFUNC_Hook : UdonSharpBehaviour
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.HookDown);
     }
+    public void SFEXT_O_PilotExit()
+    {
+        gameObject.SetActive(false);
+    }
     public void SFEXT_O_PassengerEnter()
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(EffectsControl.HookDown);

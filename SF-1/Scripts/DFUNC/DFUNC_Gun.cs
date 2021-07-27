@@ -103,7 +103,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         HudCrosshairGun.SetActive(false);
         HudCrosshair.SetActive(true);
-        AAMTargetIndicator.gameObject.SetActive(false);
+        TargetIndicator.gameObject.SetActive(false);
         GUNLeadIndicator.gameObject.SetActive(false);
         GunAnimator.SetBool(GUNFIRING_STRING, false);
         func_active = false;
@@ -196,7 +196,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private Transform CenterOfMass;
     private EngineController AAMCurrentTargetEngineControl;
     private int OutsidePlaneLayer;
-    [SerializeField] private float AAMMaxTargetDistance = 6000;
+    [SerializeField] private float MaxTargetDistance = 6000;
     private float AAMLockTimer;
     private float AAMTargetedTimer;
     private int NumAAMTargets;
@@ -247,7 +247,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     && hitnext.collider.gameObject.layer == OutsidePlaneLayer //did raycast hit an object on the layer planes are on?
                         && NextTargetAngle < 70//lock angle
                             && NextTargetAngle < AAMCurrentTargetAngle)
-                                && NextTargetDistance < AAMMaxTargetDistance
+                                && NextTargetDistance < MaxTargetDistance
                                     || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                                         || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                 {
@@ -296,11 +296,11 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
         if (!EngineControl.Taxiing
             && (AAMTargetObscuredDelay < .25f)
-                && AAMCurrentTargetDistance < AAMMaxTargetDistance
+                && AAMCurrentTargetDistance < MaxTargetDistance
                     && AAMTargets[AAMTarget].activeInHierarchy
                         && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.dead)))
         {
-            if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
+            if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < MaxTargetDistance)
             {
                 AAMHasTarget = true;
                 if (AAMCurrentTargetAngle < 70)//lock angle
@@ -334,7 +334,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
 
     //hud stuff
-    [SerializeField] private Transform AAMTargetIndicator;
+    [SerializeField] private Transform TargetIndicator;
     [SerializeField] private Transform GUNLeadIndicator;
     private float GUN_TargetSpeedLerper;
     private Vector3 RelativeTargetVelLastFrame;
@@ -347,11 +347,11 @@ public class DFUNC_Gun : UdonSharpBehaviour
         float SmoothDeltaTime = Time.smoothDeltaTime;
         if (AAMHasTarget && func_active)//GUN or AAM
         {
-            AAMTargetIndicator.gameObject.SetActive(true);
-            AAMTargetIndicator.position = transform.position + AAMCurrentTargetDirection;
-            AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
+            TargetIndicator.gameObject.SetActive(true);
+            TargetIndicator.position = transform.position + AAMCurrentTargetDirection;
+            TargetIndicator.localPosition = TargetIndicator.localPosition.normalized * distance_from_head;
         }
-        else AAMTargetIndicator.gameObject.SetActive(false);
+        else TargetIndicator.gameObject.SetActive(false);
 
 
 

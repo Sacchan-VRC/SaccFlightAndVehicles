@@ -44,6 +44,10 @@ public class DFUNC_Gear : UdonSharpBehaviour
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(!EffectsControl.GearUp);
     }
+    public void SFEXT_O_PilotExit()
+    {
+        gameObject.SetActive(false);
+    }
     public void SFEXT_O_PassengerEnter()
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(!EffectsControl.GearUp);

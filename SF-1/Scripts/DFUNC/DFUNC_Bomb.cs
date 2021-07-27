@@ -37,10 +37,16 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
 
         FindSelf();
+
+        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }
     public void SFEXT_O_PilotEnter()
     {
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
+    }
+    public void SFEXT_O_PilotExit()
+    {
+        gameObject.SetActive(false);
     }
     public void SFEXT_P_PassengerEnter()
     {

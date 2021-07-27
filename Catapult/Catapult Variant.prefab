@@ -26,7 +26,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 453389121}
   m_LocalRotation: {x: -0, y: -0, z: -1.1368681e-13, w: 1}
-  m_LocalPosition: {x: -0.17001343, y: 0.6513519, z: -23.4831}
+  m_LocalPosition: {x: 0, y: 0.247, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 670490839}
@@ -47,9 +47,9 @@ ParticleSystem:
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
-  looping: 0
+  looping: 1
   prewarm: 0
-  playOnAwake: 0
+  playOnAwake: 1
   useUnscaledTime: 0
   autoRandomSeed: 1
   useRigidbodyForVelocity: 1
@@ -861,7 +861,7 @@ ParticleSystem:
           m_PostInfinity: 2
           m_RotationOrder: 4
   EmissionModule:
-    enabled: 1
+    enabled: 0
     serializedVersion: 4
     rateOverTime:
       serializedVersion: 2
@@ -4747,7 +4747,7 @@ ParticleSystem:
   ringBufferLoopRange: {x: 0, y: 1}
   looping: 1
   prewarm: 0
-  playOnAwake: 0
+  playOnAwake: 1
   useUnscaledTime: 0
   autoRandomSeed: 1
   useRigidbodyForVelocity: 1
@@ -9480,8 +9480,27 @@ BoxCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1, y: 0.1, z: 1}
+  m_Size: {x: 1.5, y: 0.1, z: 1.5}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &5081421057213433336
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8925245841083332302}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 626705a9ebebca94daaf89d2865ef6ac, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1001 &8925245841083232366
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9491,7 +9510,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 100000, guid: 4214adec4c839774db8ce27f2677d93f, type: 3}
       propertyPath: m_Name
-      value: Catapult Variant
+      value: Catapult
       objectReference: {fileID: 0}
     - target: {fileID: 400000, guid: 4214adec4c839774db8ce27f2677d93f, type: 3}
       propertyPath: m_LocalPosition.x
@@ -9537,8 +9556,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2300000, guid: 4214adec4c839774db8ce27f2677d93f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0f594b6c9564be84a9fa6ab3c06cb79f, type: 2}
+    - target: {fileID: 2300002, guid: 4214adec4c839774db8ce27f2677d93f, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b97ee79f6b6a6c948adf834a550dfed6, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4214adec4c839774db8ce27f2677d93f, type: 3}
+--- !u!1 &8925245841083332302 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 4214adec4c839774db8ce27f2677d93f,
+    type: 3}
+  m_PrefabInstance: {fileID: 8925245841083232366}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &8925245841083099886 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 4214adec4c839774db8ce27f2677d93f,

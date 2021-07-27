@@ -19,7 +19,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
     }
-    private void SFEXT_O_PilotExit()
+    public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
     }

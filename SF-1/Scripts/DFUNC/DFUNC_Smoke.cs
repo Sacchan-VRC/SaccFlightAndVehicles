@@ -8,7 +8,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
 {
     [SerializeField] EngineController EngineControl;
     [SerializeField] private Animator SmokeAnimator;
-    [SerializeField] private Material SmokeColorIndicator;
+    [SerializeField] private Material SmokeColorIndicatorMaterial;
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private GameObject Dial_Funcon;
     private Transform VehicleTransform;
@@ -89,7 +89,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                 }
             }
             //Smoke Color Indicator
-            SmokeColorIndicator.color = SmokeColor_Color;
+            SmokeColorIndicatorMaterial.color = SmokeColor_Color;
         }
 
 
@@ -132,6 +132,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         Pilot = false;
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
+        gameObject.SetActive(false);
     }
     public void SFEXT_O_PassengerEnter()
     {
