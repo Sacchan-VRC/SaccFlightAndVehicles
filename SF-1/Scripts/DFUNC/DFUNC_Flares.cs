@@ -18,10 +18,12 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     private void Update()
     {

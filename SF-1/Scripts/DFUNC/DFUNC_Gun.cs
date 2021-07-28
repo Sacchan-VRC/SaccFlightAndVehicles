@@ -6,19 +6,19 @@ using VRC.Udon;
 
 public class DFUNC_Gun : UdonSharpBehaviour
 {
+    [SerializeField] private bool UseLeftTrigger = false;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private Animator GunAnimator;
     [SerializeField] private Transform GunRecoilEmpty;
     [SerializeField] private Transform GunDamageParticle;
     [SerializeField] private GameObject HudCrosshairGun;
     [SerializeField] private GameObject HudCrosshair;
-    [SerializeField] private bool UseLeftTrigger = false;
     [SerializeField] private float FullReloadTimeSec = 20;
     private float FullGunAmmoInSeconds = 12;
     [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
     private float GunRecoil;
     private Rigidbody VehicleRigidbody;
-    private bool RTriggerLastFrame;
+    private bool TriggerLastFrame;
     private bool GunRecoilEmptyNULL = true;
     private float TimeSinceSerialization = 0;
     private bool firing;
@@ -61,6 +61,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive");
+        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -70,7 +71,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         firing = false;
-        RTriggerLastFrame = false;
+        TriggerLastFrame = false;
         RequestSerialization();
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive");
         gameObject.SetActive(false);
@@ -88,6 +89,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
+        if (GunAmmoInSeconds != FullGunAmmoInSeconds) { EngineControl.ReSupplied++; }
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
         //enginecontrol.resupplyint +=1;
     }
@@ -166,7 +168,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 {
                     VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in the same range as above*/, GunRecoilEmpty.position, ForceMode.Force);
                 }
-                RTriggerLastFrame = true;
+                TriggerLastFrame = true;
             }
             else
             {
@@ -174,7 +176,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
                     firing = false;
-                    RTriggerLastFrame = false;
+                    TriggerLastFrame = false;
                     if (EngineControl.IsOwner)
                     { EngineControl.SendEventToExtensions("SFEXT_O_GunStopFiring", false); }
                 }

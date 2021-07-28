@@ -79,6 +79,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         AtGCam.gameObject.SetActive(false);
         gameObject.SetActive(false);
         func_active = false;
+        TriggerLastFrame = false;
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -87,6 +88,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
+        if (NumAGM != FullAGMs) { EngineControl.ReSupplied++; }
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
     }
@@ -107,6 +109,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         AtGScreen.SetActive(false);
         AtGCam.gameObject.SetActive(false);
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     //synced variables recieved while object is disabled do not get set until the object is enabled, 1 frame is fine.
     public void EnableForOthers()

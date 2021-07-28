@@ -47,6 +47,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -59,6 +60,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     public void SFEXT_G_Explode()
     {
@@ -73,8 +75,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
+        if (NumBomb != FullBombs) { EngineControl.ReSupplied++; }
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
-
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
         BombPoint = 0;
     }

@@ -31,6 +31,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
         TriggerTapTime = 1;
+        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -44,6 +45,9 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
         TriggerTapTime = 1;
+        TriggerLastFrame = false;
+        if (EngineControl.Cruise)
+        { EngineControl.SendEventToExtensions("SFEXT_O_CruiseDisabled", false); }
     }
     private void LateUpdate()
     {
@@ -67,6 +71,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                     EngineControl.SetSpeed = EngineControl.AirSpeed;
                     EngineControl.Cruise = true;
                     if (!Dial_FunconNULL) { Dial_Funcon.SetActive(EngineControl.Cruise); }
+                    EngineControl.SendEventToExtensions("SFEXT_O_CruiseEnabled", false);
                 }
                 if (TriggerTapTime > .4f)//no double tap
                 {
@@ -77,6 +82,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                     EngineControl.PlayerThrottle = EngineControl.ThrottleInput;
                     EngineControl.Cruise = false;
                     if (!Dial_FunconNULL) { Dial_Funcon.SetActive(EngineControl.Cruise); }
+                    EngineControl.SendEventToExtensions("SFEXT_O_CruiseDisabled", false);
                 }
 
                 SpeedZeroPoint = handpos.z;

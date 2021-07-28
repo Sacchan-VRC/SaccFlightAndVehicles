@@ -6,10 +6,10 @@ using VRC.Udon;
 
 public class DFUNC_Smoke : UdonSharpBehaviour
 {
+    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] EngineController EngineControl;
     [SerializeField] private Animator SmokeAnimator;
     [SerializeField] private Material SmokeColorIndicatorMaterial;
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private GameObject Dial_Funcon;
     private Transform VehicleTransform;
     private bool Dial_FunconNULL = true;
@@ -24,6 +24,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool Smoking = false;
     private int DISPLAYSMOKE_STRING = Animator.StringToHash("displaysmoke");
     [System.NonSerializedAttribute] public Color SmokeColor_Color;
+    private Vector3 TempSmokeCol = Vector3.zero;
     private bool Pilot;
     private bool InPlane;
     public void SFEXT_L_ECStart()
@@ -33,6 +34,42 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         if (DisplaySmoke.Length > 0) DisplaySmokeNull = false;
+    }
+    public void DFUNC_Selected()
+    {
+        gameObject.SetActive(true);
+    }
+    public void DFUNC_Deselected()
+    {
+        if (!Smoking)
+        { gameObject.SetActive(false); }
+        TriggerLastFrame = false;
+    }
+    public void SFEXT_O_PilotEnter()
+    {
+        Pilot = true;
+        InPlane = true;
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Smoking);
+    }
+    public void SFEXT_O_PilotExit()
+    {
+        Pilot = false;
+        TriggerLastFrame = false;
+        if (Smoking) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
+        gameObject.SetActive(false);
+    }
+    public void SFEXT_O_PassengerEnter()
+    {
+        InPlane = true;
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Smoking);
+    }
+    public void SFEXT_G_RespawnButton()
+    {
+        SetSmokingOff();
+    }
+    public void KeyboardInput()
+    {
+        ToggleSmoking();
     }
     private void LateUpdate()
     {
@@ -51,12 +88,10 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                     //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
                     Vector3 HandPosSmoke = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
                     HandPosSmoke = VehicleTransform.InverseTransformDirection(HandPosSmoke);
-                    Vector3 smokcol = SmokeColor;
-                    Vector3 TempSmokeCol = Vector3.zero;
                     if (!TriggerLastFrame)
                     {
                         SmokeZeroPoint = HandPosSmoke;
-                        TempSmokeCol = smokcol;
+                        TempSmokeCol = SmokeColor;
 
                         ToggleSmoking();
                         SmokeHoldTime = 0;
@@ -67,9 +102,9 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                         //VR Set Smoke
 
                         Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -EngineControl.ThrottleSensitivity;
-                        smokcol.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
-                        smokcol.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
-                        smokcol.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
+                        SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
+                        SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
+                        SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
                     }
                     TriggerLastFrame = true;
                 }
@@ -91,8 +126,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
             //Smoke Color Indicator
             SmokeColorIndicatorMaterial.color = SmokeColor_Color;
         }
-
-
+        SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
         //everyone does this while smoke is active
         if (Smoking && !DisplaySmokeNull)
         {
@@ -103,65 +137,13 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                 main.startColor = new ParticleSystem.MinMaxGradient(SmokeCol, SmokeCol * .8f);
             }
         }
-        SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
-    }
-    public void DFUNC_Selected()
-    {
-        gameObject.SetActive(true);
-    }
-    public void DFUNC_Deselected()
-    {
-        if (!Smoking)
-        { gameObject.SetActive(false); }
-    }
-
-    public void Set_Active()
-    { gameObject.SetActive(true); }
-    public void Set_Inactive()
-    {
-        if (!Pilot)
-        { gameObject.SetActive(false); }
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        Pilot = true;
-        InPlane = true;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Smoking);
-    }
-    public void SFEXT_O_PilotExit()
-    {
-        Pilot = false;
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
-        gameObject.SetActive(false);
-    }
-    public void SFEXT_O_PassengerEnter()
-    {
-        InPlane = true;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Smoking);
-    }
-    public void KeyboardInput()
-    {
-        ToggleSmoking();
-    }
-    public void SFEXT_O_SmokeOn()
-    {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Active");
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
-    }
-    public void SFEXT_O_SmokeOff()
-    {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive");
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
-    }
-    public void SFEXT_G_RespawnButton()
-    {
-        SetSmokingOff();
     }
     public void SetSmokingOn()
     {
         Smoking = true;
         SmokeAnimator.SetBool(DISPLAYSMOKE_STRING, true);
-
+        gameObject.SetActive(true);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
         if (EngineControl.IsOwner)
         {
             EngineControl.SendEventToExtensions("SFEXT_O_SmokeOn", false);
@@ -171,7 +153,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         Smoking = false;
         SmokeAnimator.SetBool(DISPLAYSMOKE_STRING, false);
-
+        gameObject.SetActive(false);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         if (EngineControl.IsOwner)
         {
             EngineControl.SendEventToExtensions("SFEXT_O_SmokeOff", false);

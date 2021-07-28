@@ -101,6 +101,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
+        if (NumAAM != FullAAMs) { EngineControl.ReSupplied++; }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
         AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
     }
@@ -131,6 +132,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         func_active = false;
         gameObject.SetActive(false);
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DisableForOthers");
+        TriggerLastFrame = false;
     }
     //synced variables recieved while object is disabled do not get set until the object is enabled
     public void EnableForOthers()

@@ -20,8 +20,6 @@ public class EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool AfterburnerOn;
     [System.NonSerializedAttribute] public bool CanopyOpen = true;
     [System.NonSerializedAttribute] public bool GearUp = false;
-    [System.NonSerializedAttribute] public bool Flaps = true;
-    [System.NonSerializedAttribute] public bool HookDown = false;
 
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame

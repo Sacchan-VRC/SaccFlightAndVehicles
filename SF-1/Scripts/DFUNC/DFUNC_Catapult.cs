@@ -33,6 +33,10 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private Quaternion CatapultRotLastFrame;
     private Vector3 CatapultPosLastFrame;
     private Animator CatapultAnimator;
+    //these bools exist to make sure this script only ever adds/removes 1 from the value in enginecontroller
+    private bool DisableTaxiRotation = false;
+    private bool DisableGearToggle = false;
+    private bool SetConstantForceZero = false;
     public void SFEXT_L_ECStart()
     {
         Dial_FunconNULL = Dial_Funcon == null;
@@ -60,13 +64,14 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         Selected = false;
+        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
         gameObject.SetActive(true);
         Pilot = true;
-        EngineControl.DisableTaxiRotation = false;
-        EngineControl.DisableGearToggle = false;
+        if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+        if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
         TriggerLastFrame = false;
         OnCatapult = false;
     }
@@ -79,17 +84,13 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff"); }
         }
         Selected = false;
-        EngineControl.ConstantForceZero = false;
-        EngineControl.DisableTaxiRotation = false;
-        EngineControl.DisableGearToggle = false;
+        TriggerLastFrame = false;
+        if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+        if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
     }
     public void SFEXT_O_PassengerEnter()
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(OnCatapult);
-    }
-    public void SFEXT_O_CatapultLocked()
-    {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -101,22 +102,23 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         OnCatapult = false;
         gameObject.SetActive(false);
         Pilot = false;
+        if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+        if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
+        if (SetConstantForceZero) { EngineControl.SetConstantForceZero -= 1; SetConstantForceZero = false; }
     }
     private void EnableOneFrameToFindAnimator()
     {
         if (!EngineControl.IsOwner)
         {
             gameObject.SetActive(true);
-            SendCustomEventDelayedFrames("DisableThisObj", 1);
+            SendCustomEventDelayedFrames("DisableThisObjNonOnwer", 1);
         }
     }
-    private void DisableThisObj()
+    private void DisableThisObjNonOnwer()
     {
         if (!EngineControl.IsOwner)
         {
             gameObject.SetActive(false);
-            EngineControl.DisableTaxiRotation = false;
-            EngineControl.DisableGearToggle = false;
         }
     }
     private void FindCatapultAnimator(GameObject other)
@@ -158,10 +160,9 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                             CatapultDetectorDist = VehicleTransform.InverseTransformDirection(VehicleTransform.position - transform.position).z;
                             VehicleTransform.position += CatapultTransform.forward * CatapultDetectorDist;
 
-                            EngineControl.ConstantForceZero = true;
-
-                            EngineControl.DisableTaxiRotation = true;
-                            EngineControl.DisableGearToggle = true;
+                            if (DisableGearToggle) { EngineControl.DisableGearToggle += 1; DisableGearToggle = true; }
+                            if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation += 1; DisableTaxiRotation = true; }
+                            if (SetConstantForceZero) { EngineControl.SetConstantForceZero += 1; SetConstantForceZero = true; }
                             //use dead to make plane invincible for x frames when entering the catapult to prevent taking G damage from stopping instantly
                             EngineControl.dead = true;
                             CatapultDeadTimer = 5;
@@ -199,6 +200,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                     {
                         Launching = true;
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PreLaunchCatapult");
+                        EngineControl.SendEventToExtensions("SFEXT_O_LaunchFromCatapult", false);
                     }
                     TriggerLastFrame = true;
                 }
@@ -221,9 +223,9 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             {
                 TriggerLastFrame = false;
                 Launching = false;
-                EngineControl.ConstantForceZero = false;
-                EngineControl.DisableTaxiRotation = false;
-                EngineControl.DisableGearToggle = false;
+                if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+                if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
+                if (SetConstantForceZero) { EngineControl.SetConstantForceZero -= 1; SetConstantForceZero = false; }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff");
                 EngineControl.Taxiinglerper = 0;
                 VehicleRigidbody.velocity = (CatapultTransform.position - CatapultPosLastFrame) / Time.deltaTime;
@@ -277,6 +279,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         VehicleAnimator.SetBool(ONCATAPULT_STRING, true);
         VehicleRigidbody.Sleep();//don't think this actually helps
         if (!CatapultLockNull) { CatapultLock.Play(); }
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
     }
     public void CatapultLockOff()
     {

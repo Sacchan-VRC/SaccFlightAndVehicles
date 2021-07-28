@@ -18,7 +18,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
         EngineControl.BrakeInput = 0;
         gameObject.SetActive(false);
     }
-    private void SFEXT_O_PilotExit()
+    public void SFEXT_O_PilotExit()
     {
         EngineControl.BrakeInput = 0;
         gameObject.SetActive(false);

@@ -6,10 +6,10 @@ using VRC.Udon;
 
 public class DFUNC_Limits : UdonSharpBehaviour
 {
+    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private GameObject Dial_Funcon;
     private bool Dial_FunconNULL = true;
-    [SerializeField] private bool UseLeftTrigger;
     private bool TriggerLastFrame;
     private EffectsController EffectsControl;
     private void Update()
@@ -37,10 +37,12 @@ public class DFUNC_Limits : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     private void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     public void SFEXT_L_ECStart()
     {

@@ -35,6 +35,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -44,6 +45,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
         if (Ejected)
         {
             localPlayer.SetVelocity(localPlayer.GetVelocity() + VehicleTransform.up * 25);

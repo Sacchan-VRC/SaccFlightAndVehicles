@@ -20,10 +20,12 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     private void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
+        TriggerLastFrame = false;
     }
     public void SFEXT_L_ECStart()
     {

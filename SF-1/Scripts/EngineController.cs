@@ -22,37 +22,27 @@ public class EngineController : UdonSharpBehaviour
     public Transform PitchMoment;
     public Transform YawMoment;
     public Transform GroundDetector;
-    public Transform HookDetector;
     [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
     public LayerMask ResupplyLayer;
-    public LayerMask HookCableLayer;
     public LayerMask AAMTargetsLayer;
     public Transform GunRecoilEmpty;
     public float GunRecoil = 150;
     public Scoreboard_Kills KillsBoard;
     public bool RepeatingWorld = true;
     public float RepeatingWorldDistance = 20000;
+    [SerializeField] private bool SwitchHandsJoyThrottle = false;
     public bool HasAfterburner = true;
     public float ThrottleAfterburnerPoint = 0.8f;
     public bool VTOLOnly = false;
     public bool NoCanopy = false;
-    public bool DefaultFlapsOff = false;
-    [Header("Dial Functions Usable?")]
     public bool HasVTOLAngle = false;
     public bool HasLimits = true;
-    public bool HasFlare = true;
     public bool HasBrake = true;
     public bool HasAltHold = true;
     public bool HasCanopy = true;
     public bool HasCruise = true;
-    public bool HasGun = true;
-    public bool HasAAM = true;
-    public bool HasAGM = true;
-    public bool HasBomb = true;
     public bool HasGear = true;
     public bool HasFlaps = true;
-    public bool HasHook = true;
-    public bool HasSmoke = true;
     [Header("Response:")]
     public float ThrottleStrength = 20f;
     public bool VerticalThrottle = false;
@@ -106,14 +96,9 @@ public class EngineController : UdonSharpBehaviour
     public float MaxGs = 40f;
     public float GDamage = 10f;
     public float LandingGearDragMulti = 1.3f;
-    public float FlapsDragMulti = 1.4f;
-    public float FlapsLiftMulti = 1.35f;
-    public float FlapsMaxLiftMulti = 1;
     public float AirbrakeStrength = 4f;
     public float GroundBrakeStrength = 6f;
     public float GroundBrakeSpeed = 40f;
-    public float HookedBrakeStrength = 55f;
-    public float HookedCableSnapDistance = 120f;
     public float GroundEffectMaxDistance = 7;
     public float GroundEffectStrength = 4;
     public float GroundEffectLiftMax = 999999;
@@ -143,7 +128,9 @@ public class EngineController : UdonSharpBehaviour
     public float TouchDownSoundSpeed = 35;
     [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     public float FuelConsumption = 2;
-    public float FuelConsumptionABMulti = 4.4f;
+    public float FuelConsumptionABMulti = 3f;
+    public float RefuelTime;
+    public float RepairTime;
 
 
     //best to remove synced variables if you aren't using them
@@ -208,9 +195,8 @@ public class EngineController : UdonSharpBehaviour
     private Vector3 Yawing;
     [System.NonSerializedAttribute] public float Taxiinglerper;
     private float GearDrag;
-    private float FlapsGearBrakeDrag;
-    private float FlapsDrag;
-    private float FlapsLift;
+    [System.NonSerializedAttribute] public float ExtraDrag = 1;
+    [System.NonSerializedAttribute] public float ExtraLift = 1;
     private float ReversingPitchStrength;
     private float ReversingYawStrength;
     private float ReversingRollStrength;
@@ -237,9 +223,6 @@ public class EngineController : UdonSharpBehaviour
     private float AltHoldPitchlastframeerror;
     private float AltHoldRollProportional = -.005f;
     [System.NonSerializedAttribute] public bool AltHold;
-    [System.NonSerializedAttribute] public bool Hooked = false;
-    [System.NonSerializedAttribute] public float HookedTime = 0f;
-    private Vector3 HookedLoc;
     [System.NonSerializedAttribute] public float Speed;
     [System.NonSerializedAttribute] public float AirSpeed;
     [System.NonSerializedAttribute] public bool IsOwner = false;
@@ -288,13 +271,18 @@ public class EngineController : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float vtolangledif;
     private bool GunRecoilEmptyNULL = true;
-    private float StartMaxLift;
+    [System.NonSerializedAttribute] public bool PitchDown;
     //this stuff can be used by DFUNCs
-    [System.NonSerializedAttribute] public bool ConstantForceZero = false;
-    [System.NonSerializedAttribute] public bool DisableGearToggle = false;
-    [System.NonSerializedAttribute] public bool DisableTaxiRotation = false;
+    //if these == 0 then they are not disabled.
+    [System.NonSerializedAttribute] public int SetConstantForceZero = 0;
+    [System.NonSerializedAttribute] public int DisableGearToggle = 0;
+    [System.NonSerializedAttribute] public int DisableTaxiRotation = 0;
+    [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
+    [System.NonSerializedAttribute] public int DisableGroundDetector = 0;
 
-    private int HOOKED_STRING = Animator.StringToHash("hooked");
+
+    [System.NonSerializedAttribute] public int ReSupplied = 0;
+
     private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
     private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
     private int WEAPON_STRING = Animator.StringToHash("weapon");
@@ -302,7 +290,6 @@ public class EngineController : UdonSharpBehaviour
     private int RESUPPLY_STRING = Animator.StringToHash("resupply");
     private int CANOPYOPEN_STRING = Animator.StringToHash("canopyopen");
     private int GEARUP_STRING = Animator.StringToHash("gearup");
-    private int FLAPS_STRING = Animator.StringToHash("flaps");
     private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
     private int BULLETHIT_STRING = Animator.StringToHash("bullethit");
     private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
@@ -326,7 +313,6 @@ public class EngineController : UdonSharpBehaviour
         Assert(PitchMoment != null, "Start: PitchMoment != null");
         Assert(YawMoment != null, "Start: YawMoment != null");
         Assert(GroundDetector != null, "Start: GroundDetector != null");
-        Assert(HookDetector != null, "Start: HookDetector != null");
         Assert(GroundEffectEmpty != null, "Start: GroundEffectEmpty != null");
         Assert(GunRecoilEmpty != null, "Start: GunRecoilEmpty != null");
         Assert(KillsBoard != null, "Start: KillsBoard != null");
@@ -334,7 +320,6 @@ public class EngineController : UdonSharpBehaviour
         Planelayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
         VehicleAnimator = VehicleMainObj.GetComponent<Animator>();
-        StartMaxLift = MaxLift;
         //set these values at start in case they haven't been set correctly in editor
         if (!HasCanopy)
         {
@@ -350,9 +335,6 @@ public class EngineController : UdonSharpBehaviour
         else { EffectsControl.CanopyOpen = false; CanopyOpening(); }//always spawn with canopy open if has one
         if (HasGear) { SetGearDown(); }
         else { SetGearUp(); }
-        if (!HasFlaps || DefaultFlapsOff) { SetFlapsOff(); }
-        else { SetFlapsOn(); }
-        SetHookUp();
 
 
         FullHealth = Health;
@@ -693,10 +675,17 @@ public class EngineController : UdonSharpBehaviour
                     if (!RGripLastFrame)//first frame you gripped joystick
                     {
                         PlaneRotDif = Quaternion.identity;
-                        JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
+                        if (SwitchHandsJoyThrottle)
+                        { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the plane when it was pressed
+                        else
+                        { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }
                     }
                     //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
-                    Quaternion JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
+                    Quaternion JoystickDifference;
+                    if (SwitchHandsJoyThrottle)
+                    { JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
+                    else { JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
+
                     JoystickPosYaw = (JoystickDifference * VehicleTransform.forward);//angles to vector
                     JoystickPosYaw.y = 0;
                     JoystickPos = (JoystickDifference * VehicleTransform.up);
@@ -760,7 +749,11 @@ public class EngineController : UdonSharpBehaviour
                 //VR Throttle
                 if (LGrip > 0.75)
                 {
-                    Vector3 handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                    Vector3 handdistance;
+                    if (SwitchHandsJoyThrottle)
+                    { handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
+                    else { handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
+
                     handdistance = VehicleTransform.InverseTransformDirection(handdistance);
                     float HandThrottleAxis;
                     if (VerticalThrottle)
@@ -804,7 +797,7 @@ public class EngineController : UdonSharpBehaviour
                     AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                     Cruise = false;
                     AltHold = false;
-                    if (!DisableTaxiRotation)
+                    if (DisableTaxiRotation == 0)
                     {
                         //rotate if trying to yaw
                         Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
@@ -814,7 +807,7 @@ public class EngineController : UdonSharpBehaviour
                     StillWindMulti = Mathf.Min(Speed / 10, 1);
                     ThrustVecGrounded = 0;
 
-                    if (BrakeInput > 0 && Speed < GroundBrakeSpeed && !Hooked)
+                    if (BrakeInput > 0 && Speed < GroundBrakeSpeed && DisableGroundBrake == 0)
                     {
                         if (Speed > BrakeInput * GroundBrakeStrength * DeltaTime)
                         {
@@ -964,48 +957,6 @@ public class EngineController : UdonSharpBehaviour
                     RotationInputs.z = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRPitchRoll.x + Af + Df + leftf + rightf) * -1), -1, 1);
                 }
 
-                //check for catching a cable with hook
-                if (EffectsControl.HookDown)
-                {
-                    if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookCableLayer) && !Hooked)
-                    {
-                        HookedLoc = VehicleTransform.position;
-                        Hooked = true;
-                        HookedTime = Time.time;
-                        VehicleAnimator.SetTrigger(HOOKED_STRING);
-                    }
-                }
-                //slow down if hooked and on the ground
-                if (Hooked && Taxiing)
-                {
-                    if (Vector3.Distance(VehicleTransform.position, HookedLoc) > HookedCableSnapDistance)//real planes take around 80-90 meters to stop on a carrier
-                    {
-                        //if you go further than HookedBrakeMaxDistance you snap the cable and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
-                        float HookedDelta = (Time.time - HookedTime);
-                        if (HookedDelta < 2)
-                        {
-                            Health -= ((-HookedDelta + 2) / 2) * FullHealth;
-                        }
-                        Hooked = false;
-                        //if you catch a cable but go airborne before snapping it, keep your hook out and then land somewhere else
-                        //you would hear the cablesnap sound when you touchdown, so limit it to within 5 seconds of hooking
-                        //this results in 1 frame's worth of not being able to catch a cable if hook stays down after being 'hooked', not snapping and then trying to hook again
-                        //but that should be a very rare and unnoitcable(if it happens) occurance
-                        if (HookedDelta < 5)
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap"); }
-                    }
-
-                    if (Speed > HookedBrakeStrength * DeltaTime)
-                    {
-                        VehicleRigidbody.velocity += -CurrentVel.normalized * HookedBrakeStrength * DeltaTime;
-                    }
-                    else
-                    {
-                        VehicleRigidbody.velocity = Vector3.zero;
-                    }
-                    //Debug.Log("hooked");
-                }
-
                 //ability to adjust input to be more precise at low amounts. 'exponant'
                 /* RotationInputs.x = RotationInputs.x > 0 ? Mathf.Pow(RotationInputs.x, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.x), StickInputPower);
                 RotationInputs.y = RotationInputs.y > 0 ? Mathf.Pow(RotationInputs.y, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.y), StickInputPower);
@@ -1079,7 +1030,7 @@ public class EngineController : UdonSharpBehaviour
                 sidespeed = Vector3.Dot(AirVel, VehicleTransform.right);
                 downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
 
-                bool PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
+                PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
                 if (PitchDown)
                 {
                     downspeed *= PitchDownLiftMulti;
@@ -1106,33 +1057,17 @@ public class EngineController : UdonSharpBehaviour
                 LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
                 LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
 
-                Flaps = EffectsControl.Flaps;
-
-                //flaps drag and lift
-                if (Flaps)
-                {
-                    if (PitchDown)//flaps on, but plane's angle of attack is negative so they have no helpful effect
-                    {
-                        FlapsDrag = FlapsDragMulti;
-                        FlapsLift = 1;
-                    }
-                    else//flaps on positive angle of attack, flaps are useful
-                    {
-                        FlapsDrag = FlapsDragMulti;
-                        FlapsLift = FlapsLiftMulti;
-                    }
-                }
                 //gear drag
                 if (EffectsControl.GearUp) { GearDrag = 1; }
                 else { GearDrag = LandingGearDragMulti; }
-                FlapsGearBrakeDrag = (GearDrag + FlapsDrag + (BrakeInput * AirbrakeStrength)) - 1;//combine these so we don't have to do as much in fixedupdate
+                //ExtraDrag = (GearDrag + FlapsDrag + (BrakeInput * AirbrakeStrength)) - 1;//combine these so we don't have to do as much in fixedupdate
             }
             else
             {
                 VelLift = pitch = yaw = roll = 0;
             }
 
-            if ((PlaneMoving || Piloting) && !ConstantForceZero)
+            if ((PlaneMoving || Piloting) && SetConstantForceZero == 0)
             {
                 //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                 //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
@@ -1155,21 +1090,21 @@ public class EngineController : UdonSharpBehaviour
                         FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
                     }
                     //add ground effect to the VTOL thrust
-                    GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, false, 1);
+                    GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, 1);
                     FinalInputAcc *= GroundEffectAndVelLift;
 
                     //Add Airplane Ground Effect
-                    GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
+                    GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
                     //add lift and thrust
                     FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                        ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
+                        ((downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
                             0);//(HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
                 }
                 else//Simpler version for non-VTOL craft
                 {
-                    GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, Flaps, SpeedLiftFactor);
+                    GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
                     FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                        ((downspeed * FlapsLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
+                        ((downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
                             (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
                 }
 
@@ -1227,8 +1162,8 @@ public class EngineController : UdonSharpBehaviour
         {
             Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
             rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//so passengers can hear the airbrake
-            //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
-            //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
+                                                             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
+                                                             //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
             VehicleRigidbody.angularDrag = .5f;
             //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
             //AirSpeed = AirVel.magnitude;
@@ -1245,7 +1180,7 @@ public class EngineController : UdonSharpBehaviour
             float DeltaTime = Time.fixedDeltaTime;
             //lerp velocity toward 0 to simulate air friction
             Vector3 VehicleVel = VehicleRigidbody.velocity;
-            VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, ((((AirFriction + SoundBarrier) * FlapsGearBrakeDrag)) * 90) * DeltaTime);
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, ((((AirFriction + SoundBarrier) * ExtraDrag)) * 90) * DeltaTime);
             //apply pitching using pitch moment
             VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);//deltatime is built into ForceMode.Force
                                                                                                  //apply yawing using yaw moment
@@ -1318,16 +1253,7 @@ public class EngineController : UdonSharpBehaviour
         VTOLAngleInput = VTOLDefaultValue;
         if (HasAfterburner) { SetAfterburnerOff(); }
         if (HasLimits) { SetLimitsOn(); }
-        if (HasHook) { SetHookUp(); }
         if (HasGear) { SetGearDown(); }
-        if (HasFlaps)
-        {
-            if (DefaultFlapsOff)
-            { SetFlapsOff(); }
-            else
-            { SetFlapsOn(); }
-        }
-        Hooked = false;
         Fuel = FullFuel;
         Atmosphere = 1;//planemoving optimization requires this to be here
 
@@ -1346,12 +1272,14 @@ public class EngineController : UdonSharpBehaviour
             AoALiftYaw = 0;
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
+            SendEventToExtensions("SFEXT_O_Explode", false);
         }
 
         //our killer increases their kills
         float time = Time.time;
         if (PlaneHitDetector.LastAttacker != null && (time - PlaneHitDetector.LastHitTime) < 5 && !Taxiing && ((time - PilotExitTime) < 5 || Occupied))
         {
+            SendEventToExtensions("SFEXT_O_GotKilled", false);
             PlaneHitDetector.LastAttacker.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "IncreaseKills");
         }
         //Update Kills board (person with most kills will probably show as having one less kill than they really have until they die, because synced variables will update after this)
@@ -1390,6 +1318,7 @@ public class EngineController : UdonSharpBehaviour
                 }
             }
         }
+        SendEventToExtensions("SFEXT_O_GotAKill", false);
     }
     public void PlayCableSnap()
     {
@@ -1441,34 +1370,31 @@ public class EngineController : UdonSharpBehaviour
     }
     public void ResupplyPlane()
     {
+        ReSupplied = 0;//used to know if other scripts resupplied
+        if (IsOwner)
+        { SendEventToExtensions("SFEXT_O_ReSupply", false); }
+
         //only play the sound if we're actually repairing/getting ammo/fuel
-        if (!SoundControl.ReloadingNull && (Fuel < FullFuel - 10 || Health != FullHealth))
+        if (!SoundControl.ReloadingNull && (Fuel < FullFuel - 10 || Health != FullHealth || ReSupplied != 0))
         {
             SoundControl.Reloading.Play();
         }
         LastResupplyTime = Time.time;
 
-        /*Debug.Log(string.Concat("fuel ", Fuel));
-          Debug.Log(string.Concat("FullFuel ", FullFuel));
-          Debug.Log(string.Concat("Health ", Health));
-          Debug.Log(string.Concat("FullHealth ", FullHealth));
-          Debug.Log(string.Concat("GunAmmoInSeconds ", GunAmmoInSeconds));
-          Debug.Log(string.Concat("FullGunAmmo ", FullGunAmmo)); */
-        Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
-        Health = Mathf.Min(Health + (FullHealth / 30), FullHealth);
+        Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
+        Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
         VehicleAnimator.SetTrigger(RESUPPLY_STRING);
-
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_ReSupply", false);
-        }
     }
     public void ResupplyPlane_FuelOnly()//not done and unused
     {
+        ReSupplied = 0;//used to know if other scripts resupplied
+        if (IsOwner)
+        { SendEventToExtensions("SFEXT_O_ReFuel", false); }
+
         //only play the sound if we're actually getting fuel
-        if (!SoundControl.ReloadingNull && (Fuel < FullFuel - 10))
+        if (!SoundControl.ReloadingNull && (Fuel < FullFuel - 10 || ReSupplied != 0))
         { SoundControl.Reloading.Play(); }
-        Fuel = Mathf.Min(Fuel + (FullFuel / 25), FullFuel);
+        Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
     }
     public void CanopyOpening()
     {
@@ -1545,75 +1471,6 @@ public class EngineController : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearDown");
         }
     }
-    public void SetFlapsOff()
-    {
-        EffectsControl.Flaps = false;
-        MaxLift = StartMaxLift;
-        VehicleAnimator.SetBool(FLAPS_STRING, false);
-        FlapsDrag = 1;
-        FlapsLift = 1;
-
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_FlapsOff", false);
-        }
-    }
-    public void SetFlapsOn()
-    {
-        EffectsControl.Flaps = true;
-        MaxLift *= FlapsMaxLiftMulti;
-        VehicleAnimator.SetBool(FLAPS_STRING, true);
-
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_FlapsOn", false);
-        }
-    }
-    public void ToggleFlaps()
-    {
-        if (!EffectsControl.Flaps)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOn");
-        }
-        else
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
-        }
-    }
-    public void SetHookDown()
-    {
-        EffectsControl.HookDown = true;
-        VehicleAnimator.SetBool(HOOKDOWN_STRING, true);
-
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_HookDown", false);
-        }
-    }
-    public void SetHookUp()
-    {
-        EffectsControl.HookDown = false;
-        VehicleAnimator.SetBool(HOOKDOWN_STRING, false);
-
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_HookUp", false);
-        }
-    }
-    public void ToggleHook()
-    {
-        if (HookDetector != null)
-        {
-            if (!EffectsControl.HookDown)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown");
-            }
-            else
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookUp");
-            }
-        }
-    }
     public void SetLimitsOn()
     {
         FlightLimitsEnabled = true;
@@ -1665,15 +1522,7 @@ public class EngineController : UdonSharpBehaviour
         EffectsControl.DoEffects = 6;
         if (HasAfterburner) { SetAfterburnerOff(); }
         if (HasLimits) { SetLimitsOn(); }
-        if (HasHook) { SetHookUp(); }
         if (HasGear) { SetGearDown(); }
-        if (HasFlaps)
-        {
-            if (DefaultFlapsOff)
-            { SetFlapsOff(); }
-            else
-            { SetFlapsOn(); }
-        }
         if (HasCanopy && !EffectsControl.CanopyOpen)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
         WeaponSelected = false;
@@ -1707,7 +1556,7 @@ public class EngineController : UdonSharpBehaviour
             SendEventToExtensions("SFEXT_O_PlaneHit", false);
         }
     }
-    public void Respawn_event()//called by Respawn()
+    public void Respawn_event()//called by Respawn() in HitDetector
     {
         PlayerThrottle = 0;//for editor test mode
         EngineOutput = 0;//^
@@ -1719,13 +1568,11 @@ public class EngineController : UdonSharpBehaviour
             VehicleTransform.SetPositionAndRotation(Spawnposition, Quaternion.Euler(Spawnrotation));
             Health = FullHealth;
             EffectsControl.GearUp = false;
-            EffectsControl.Flaps = true;
         }
         else if (IsOwner)
         {
             Health = FullHealth;
             EffectsControl.GearUp = false;
-            EffectsControl.Flaps = true;
         }
     }
     public override void OnPlayerJoined(VRCPlayerApi player)
@@ -1749,13 +1596,6 @@ public class EngineController : UdonSharpBehaviour
                 if (EffectsControl.GearUp)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
-                }
-            }
-            if (HasFlaps)
-            {
-                if (!EffectsControl.Flaps)
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
                 }
             }
         }
@@ -1898,7 +1738,6 @@ public class EngineController : UdonSharpBehaviour
             ThrottleInput = 0;
             //reset everything
             Piloting = false;
-            Hooked = false;
             BrakeInput = 0;
             Taxiinglerper = 0;
             LGripLastFrame = false;
@@ -2055,7 +1894,7 @@ public class EngineController : UdonSharpBehaviour
 
         AngleOfAttack = Mathf.Max(Mathf.Abs(AngleOfAttackPitch), Mathf.Abs(AngleOfAttackYaw));
     }
-    private float GroundEffect(bool VTOL, Vector3 Position, Vector3 Direction, float GEStrength, bool Flaps, float speedliftfac)
+    private float GroundEffect(bool VTOL, Vector3 Position, Vector3 Direction, float GEStrength, float speedliftfac)
     {
         //Ground effect, extra lift caused by air pressure when close to the ground
         RaycastHit GE;
@@ -2063,7 +1902,7 @@ public class EngineController : UdonSharpBehaviour
         {
             float GroundEffect = ((-GE.distance + GroundEffectMaxDistance) / GroundEffectMaxDistance) * GEStrength;
             if (VTOL) { return 1 + GroundEffect; }
-            if (Flaps) { GroundEffect *= FlapsLiftMulti; }
+            GroundEffect *= ExtraLift;
             VelLift = VelLiftStart + GroundEffect;
             VelLiftMax = Mathf.Max(VelLiftMaxStart, VTOL ? 99999f : GroundEffectLiftMax);
         }

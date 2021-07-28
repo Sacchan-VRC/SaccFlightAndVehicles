@@ -80,13 +80,7 @@ public class HitDetector : UdonSharpBehaviour
     {
         if (EngineControl.IsOwner)
         {
-            foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
-            {
-                if (EXT != null)
-                {
-                    EXT.SendCustomEvent("SFEXT_ReAppear");
-                }
-            }
+            EngineControl.SendEventToExtensions("SFEXT_O_ReAppear", false);
         }
     }
     private void Assert(bool condition, string message)
