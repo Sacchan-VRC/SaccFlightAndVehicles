@@ -1020,7 +1020,6 @@ public class EngineController : UdonSharpBehaviour
             float sidespeed = 0;
             float downspeed = 0;
             float SpeedLiftFactor = 0;
-            bool Flaps = false;
 
             if (PlaneMoving)//optimization
             {

@@ -37,8 +37,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         }
         else { TriggerLastFrame = false; }
 
-
-
         if (Flaps)
         {
             if (EngineControl.PitchDown)//flaps on, but plane's angle of attack is negative so they have no helpful effect
@@ -66,15 +64,15 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_L_ECStart()
     {
-        EffectsControl = EngineControl.EffectsControl;
+        FlapsDragMulti -= 1f;
+        FlapsLiftMulti -= 1f;
         StartMaxLift = EngineControl.MaxLift;
+        EffectsControl = EngineControl.EffectsControl;
         Dial_FunconNULL = Dial_Funcon == null;
         VehicleAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
         if (DefaultFlapsOff) { SetFlapsOff(); }
         else { SetFlapsOn(); }
-        FlapsDragMulti -= 1f;
-        FlapsLiftMulti -= 1f;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -132,7 +130,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     public void SetFlapsOn()
     {
         Flaps = true;
-        EngineControl.MaxLift *= FlapsMaxLiftMulti;
         VehicleAnimator.SetBool(FLAPS_STRING, true);
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
 
