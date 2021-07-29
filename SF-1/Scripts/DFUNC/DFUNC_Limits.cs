@@ -30,6 +30,12 @@ public class DFUNC_Limits : UdonSharpBehaviour
         }
         else { TriggerLastFrame = false; }
     }
+    public void SFEXT_L_ECStart()
+    {
+        EffectsControl = EngineControl.EffectsControl;
+        Dial_FunconNULL = Dial_Funcon == null;
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.FlightLimitsEnabled);
+    }
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
@@ -44,11 +50,9 @@ public class DFUNC_Limits : UdonSharpBehaviour
         gameObject.SetActive(false);
         TriggerLastFrame = false;
     }
-    public void SFEXT_L_ECStart()
+    public void SFEXT_O_Explode()
     {
-        EffectsControl = EngineControl.EffectsControl;
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.FlightLimitsEnabled);
+        gameObject.SetActive(false);
     }
     public void SFEXT_O_PilotEnter()
     {

@@ -8,6 +8,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
 {
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] EngineController EngineControl;
+    [SerializeField] private Animator FlapsAnimator;
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private bool DefaultFlapsOff = false;
     [SerializeField] private float FlapsDragMulti = 1.4f;
@@ -19,7 +20,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private EffectsController EffectsControl;
     private float StartMaxLift;
     private int FLAPS_STRING = Animator.StringToHash("flaps");
-    private Animator VehicleAnimator;
     private bool DragApplied;
     private bool LiftApplied;
     private bool MaxLiftApplied;
@@ -41,13 +41,11 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         {
             if (EngineControl.PitchDown)//flaps on, but plane's angle of attack is negative so they have no helpful effect
             {
-                if (DragApplied) { EngineControl.ExtraDrag -= FlapsDragMulti; DragApplied = false; }
                 if (LiftApplied) { EngineControl.ExtraLift -= FlapsLiftMulti; LiftApplied = false; }
                 if (MaxLiftApplied) { EngineControl.MaxLift = StartMaxLift; MaxLiftApplied = false; }
             }
             else//flaps on positive angle of attack, flaps are useful
             {
-                if (!DragApplied) { EngineControl.ExtraDrag += FlapsDragMulti; DragApplied = true; }
                 if (!LiftApplied) { EngineControl.ExtraLift += FlapsLiftMulti; LiftApplied = true; }
                 if (!MaxLiftApplied) { EngineControl.MaxLift *= FlapsMaxLiftMulti; MaxLiftApplied = true; }
             }
@@ -64,12 +62,13 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_L_ECStart()
     {
+        //to match how the old values worked
         FlapsDragMulti -= 1f;
         FlapsLiftMulti -= 1f;
+
         StartMaxLift = EngineControl.MaxLift;
         EffectsControl = EngineControl.EffectsControl;
         Dial_FunconNULL = Dial_Funcon == null;
-        VehicleAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
         if (DefaultFlapsOff) { SetFlapsOff(); }
         else { SetFlapsOn(); }
@@ -116,7 +115,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         Flaps = false;
-        VehicleAnimator.SetBool(FLAPS_STRING, false);
+        FlapsAnimator.SetBool(FLAPS_STRING, false);
 
         if (DragApplied) { EngineControl.ExtraDrag -= FlapsDragMulti; DragApplied = false; }
         if (LiftApplied) { EngineControl.ExtraLift -= FlapsLiftMulti; LiftApplied = false; }
@@ -130,7 +129,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     public void SetFlapsOn()
     {
         Flaps = true;
-        VehicleAnimator.SetBool(FLAPS_STRING, true);
+        FlapsAnimator.SetBool(FLAPS_STRING, true);
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
 
         if (!DragApplied) { EngineControl.ExtraDrag += FlapsDragMulti; DragApplied = true; }
@@ -154,7 +153,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
         }
     }
-    public override void OnPlayerJoined(VRCPlayerApi player)
+    public void SFEXT_O_PlayerJoined()
     {
         if (!Flaps && !DefaultFlapsOff)
         {

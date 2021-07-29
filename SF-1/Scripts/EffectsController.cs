@@ -19,12 +19,10 @@ public class EffectsController : UdonSharpBehaviour
     //these used to be synced variables, might move them back to EngineController some time
     [System.NonSerializedAttribute] public bool AfterburnerOn;
     [System.NonSerializedAttribute] public bool CanopyOpen = true;
-    [System.NonSerializedAttribute] public bool GearUp = false;
 
     private bool vapor;
     private float Gs_trail = 1000; //ensures it wont cause effects at first frame
     [System.NonSerializedAttribute] public Animator PlaneAnimator;
-    [System.NonSerializedAttribute] public float AirbrakeLerper;
     [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     private float brake;
     [System.NonSerializedAttribute] public bool LargeEffectsOnly = false;
@@ -40,7 +38,6 @@ public class EffectsController : UdonSharpBehaviour
     private int VTOLANGLE_STRING = Animator.StringToHash("vtolangle");
     private int HEALTH_STRING = Animator.StringToHash("health");
     private int AOA_STRING = Animator.StringToHash("AoA");
-    private int BRAKE_STRING = Animator.StringToHash("brake");
     private int MACH10_STRING = Animator.StringToHash("mach10");
     private int GS_STRING = Animator.StringToHash("Gs");
     private int GS_TRAIL_STRING = Animator.StringToHash("Gs_trail");
@@ -126,11 +123,8 @@ public class EffectsController : UdonSharpBehaviour
 
         vapor = EngineControl.Speed > 20;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
-        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, EngineControl.BrakeInput, 1.3f * DeltaTime);
-
         PlaneAnimator.SetFloat(HEALTH_STRING, EngineControl.Health * FullHealthDivider);
         PlaneAnimator.SetFloat(AOA_STRING, vapor ? Mathf.Abs(EngineControl.AngleOfAttack * 0.00555555556f /* Divide by 180 */ ) : 0);
-        PlaneAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper);
     }
 
     private void LargeEffects()//large effects visible from a long distance

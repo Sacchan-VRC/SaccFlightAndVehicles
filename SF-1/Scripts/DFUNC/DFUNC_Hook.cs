@@ -9,9 +9,13 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private GameObject Dial_Funcon;
+    [SerializeField] private AudioSource CableSnap;
     [SerializeField] private Transform HookDetector;
     [SerializeField] private float HookedBrakeStrength = 55f;
     [SerializeField] private float HookedCableSnapDistance = 120f;
+    [SerializeField] private DFUNC_Brake BrakeFunction;
+    [System.NonSerializedAttribute] public bool CableSnapNull;
+    private bool BreakFunctionNULL;
     public LayerMask HookCableLayer;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
@@ -35,6 +39,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         VehicleAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
         SetHookUp();
+        BreakFunctionNULL = BrakeFunction == null;
     }
     public void DFUNC_Selected()
     {
@@ -42,20 +47,20 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
-        gameObject.SetActive(false);
+        if (!HookDown) { gameObject.SetActive(false); }
         TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(HookDown);
-        if (HookDown) { gameObject.SetActive(false); }
+        if (HookDown) { gameObject.SetActive(true); }
     }
     public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
         TriggerLastFrame = false;
         Hooked = false;
-        if (DisableGroundBrake) { EngineControl.DisableGroundBrake -= 1; DisableGroundBrake = false; }
+        if (DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake -= 1; DisableGroundBrake = false; }
         gameObject.SetActive(false);
     }
     public void SFEXT_O_Explode()
@@ -108,7 +113,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         //slow down if hooked and on the ground
         if (Hooked && EngineControl.Taxiing)
         {
-            if (DisableGroundBrake) { EngineControl.DisableGroundBrake += 1; DisableGroundBrake = true; }
+            if (!DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake += 1; DisableGroundBrake = true; }
             if (Vector3.Distance(VehicleTransform.position, HookedLoc) > HookedCableSnapDistance)//real planes take around 80-90 meters to stop on a carrier
             {
                 //if you go further than HookedBrakeMaxDistance you snap the cable and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
@@ -138,7 +143,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         }
         else
         {
-            if (DisableGroundBrake) { EngineControl.DisableGroundBrake -= 1; DisableGroundBrake = false; }
+            if (DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake -= 1; DisableGroundBrake = false; }
         }
     }
 
@@ -148,13 +153,13 @@ public class DFUNC_Hook : UdonSharpBehaviour
         {
             if (!HookDown)
             {
-                if (EngineControl.Piloting) { gameObject.SetActive(true); }
+                if (EngineControl.Piloting && !EngineControl.InVR) { gameObject.SetActive(true); }
                 if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown");
             }
             else
             {
-                if (EngineControl.Piloting) { gameObject.SetActive(false); }
+                if (EngineControl.Piloting && !EngineControl.InVR) { gameObject.SetActive(false); }
                 if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookUp");
             }
@@ -180,5 +185,9 @@ public class DFUNC_Hook : UdonSharpBehaviour
         {
             EngineControl.SendEventToExtensions("SFEXT_O_HookUp", false);
         }
+    }
+    public void PlayCableSnap()
+    {
+        if (!CableSnapNull) { CableSnap.Play(); }
     }
 }

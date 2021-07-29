@@ -8,48 +8,155 @@ public class DFUNC_Brake : UdonSharpBehaviour
 {
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
-    private bool KeyboardActivated;
-    public void DFUNC_Selected()
+    [SerializeField] private AudioSource Airbrake_snd;
+    [SerializeField] private Animator BrakeAnimator;
+    [SerializeField] private KeyCode KeyboardControl = KeyCode.B;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] private float BrakeInput;
+    [System.NonSerializedAttribute] private float KeyboardBrakeInput;
+    private Rigidbody VehicleRigidbody;
+    private bool HasAirBrake;
+    [SerializeField] private float AirbrakeStrength = 4f;
+    [SerializeField] private float GroundBrakeStrength = 6f;
+    [SerializeField] private float GroundBrakeSpeed = 40f;
+    //other functions can set this +1 to disable breaking
+    [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
+    private int BRAKE_STRING = Animator.StringToHash("brake");
+    private bool Airbrake_sndNULL;
+    private float AirbrakeLerper;
+    private bool Braking;
+    private bool BrakingLastFrame;
+    private float DragAdded = 0;
+    private float NonLocalActiveDelay;//this var is for adding a min delay for disabling for non-local users to account for lag
+    public void SFEXT_L_ECStart()
     {
-        gameObject.SetActive(true);
+        VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
+        HasAirBrake = AirbrakeStrength != 0;
+        Airbrake_sndNULL = Airbrake_snd == null;
+        if (!Networking.LocalPlayer.isMaster)
+        { gameObject.SetActive(false); }
+        else
+        { gameObject.SetActive(true); }
     }
     public void DFUNC_Deselected()
     {
-        EngineControl.BrakeInput = 0;
-        gameObject.SetActive(false);
+        BrakeInput = 0;
     }
     public void SFEXT_O_PilotExit()
     {
-        EngineControl.BrakeInput = 0;
+        BrakeInput = 0;
+    }
+    public void SFEXT_G_Explode()
+    {
+        BrakeInput = 0;
+        BrakeAnimator.SetFloat(BRAKE_STRING, 0);
+        AirbrakeLerper = 0;
+    }
+    public void SFEXT_O_TakeOwnership()
+    {
+        gameObject.SetActive(true);
+    }
+    public void SFEXT_O_LoseOwnership()
+    {
+        gameObject.SetActive(false);
+    }
+    public void EnableForAnimation()
+    {
+        if (!EngineControl.IsOwner)
+        {
+            gameObject.SetActive(true);
+            NonLocalActiveDelay = 3;
+        }
+    }
+    public void DisableForAnimation()
+    {
+        BrakeAnimator.SetFloat(BRAKE_STRING, 0);
+        AirbrakeLerper = 0;
         gameObject.SetActive(false);
     }
     private void Update()
     {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-        EngineControl.BrakeInput = Trigger;
-
-        if (KeyboardActivated)
+        float DeltaTime = Time.deltaTime;
+        if (EngineControl.IsOwner)
         {
-            if (Input.GetKey(KeyCode.B))
+            float Speed = EngineControl.Speed;
+            Vector3 CurrentVel = EngineControl.CurrentVel;
+            if (EngineControl.Piloting)
             {
-                EngineControl.BrakeInput = 1;
+                float Trigger;
+                if (UseLeftTrigger)
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                else
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+                BrakeInput = Trigger;
+
+                if (Input.GetKey(KeyboardControl))
+                {
+                    KeyboardBrakeInput = 1;
+                }
+                else
+                {
+                    KeyboardBrakeInput = 0;
+                }
+                BrakeInput = Mathf.Max(BrakeInput, KeyboardBrakeInput);
+
+                if (EngineControl.Taxiing && BrakeInput > 0 && Speed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
+                {
+                    if (Speed > BrakeInput * GroundBrakeStrength * DeltaTime)
+                    {
+                        VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
+                    }
+                    else
+                    {
+                        VehicleRigidbody.velocity = Vector3.zero;
+                    }
+                }
+                //remove the drag added last frame to add the new value for this frame
+                EngineControl.ExtraDrag -= DragAdded;
+                DragAdded = AirbrakeStrength * BrakeInput;
+                EngineControl.ExtraDrag += DragAdded;
+
+                //send events to other users to tell them to enable the function so they can see the animation
+                if (BrakeInput > .1f)
+                { Braking = true; }
+                else
+                { Braking = false; }
+                if (Braking && !BrakingLastFrame)
+                {
+                    if (!Airbrake_sndNULL && !Airbrake_snd.isPlaying) { Airbrake_snd.Play(); }
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForAnimation");
+                }
+                if (AirbrakeLerper < .03 && BrakeInput < .03)
+                {
+                    if (!Airbrake_sndNULL && Airbrake_snd.isPlaying) { Airbrake_snd.Stop(); }
+                }
+                BrakingLastFrame = Braking;
             }
             else
             {
-                EngineControl.BrakeInput = 0;
-                KeyboardActivated = false;
-                gameObject.SetActive(false);
+                if (EngineControl.Taxiing)
+                {
+                    if (Speed > GroundBrakeStrength * DeltaTime)
+                    {
+                        VehicleRigidbody.velocity += -CurrentVel.normalized * GroundBrakeStrength * DeltaTime;
+                    }
+                    else VehicleRigidbody.velocity = Vector3.zero;
+                }
             }
         }
-    }
-    public void KeyboardInput()
-    {
-        gameObject.SetActive(true);
-        KeyboardActivated = true;
+        else
+        {
+            //this object is enabled for non-owners only while animating
+            NonLocalActiveDelay -= DeltaTime;
+            if (NonLocalActiveDelay < 0 && AirbrakeLerper < 0.03)
+            {
+                DisableForAnimation();
+            }
+        }
+
+        AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, BrakeInput, 1.3f * DeltaTime);
+        BrakeAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper);
+        Airbrake_snd.pitch = BrakeInput * .2f + .9f;
+        Airbrake_snd.volume = AirbrakeLerper * EngineControl.rotlift;
     }
 }

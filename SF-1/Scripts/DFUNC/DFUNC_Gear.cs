@@ -9,22 +9,20 @@ public class DFUNC_Gear : UdonSharpBehaviour
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private GameObject Dial_Funcon;
+    [SerializeField] private Animator GearAnimator;
+    [SerializeField] private float LandingGearDragMulti = 1.3f;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
-    private EffectsController EffectsControl;
-    private void Update()
+    [System.NonSerializedAttribute] public bool GearUp = false;
+    private bool DragApplied = false;
+    private bool DisableGroundDetector = false;
+    private int GEARUP_STRING = Animator.StringToHash("gearup");
+    public void SFEXT_L_ECStart()
     {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-        if (Trigger > 0.75)
-        {
-            if (!TriggerLastFrame && EngineControl.DisableGearToggle != 0) { EngineControl.ToggleGear(); }
-            TriggerLastFrame = true;
-        }
-        else { TriggerLastFrame = false; }
+        LandingGearDragMulti -= 1;//to match how the old values worked
+        SetGearDown();
+        Dial_FunconNULL = Dial_Funcon == null;
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!GearUp);
     }
     public void DFUNC_Selected()
     {
@@ -35,15 +33,9 @@ public class DFUNC_Gear : UdonSharpBehaviour
         gameObject.SetActive(false);
         TriggerLastFrame = false;
     }
-    public void SFEXT_L_ECStart()
-    {
-        EffectsControl = EngineControl.EffectsControl;
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!EffectsControl.GearUp);
-    }
     public void SFEXT_O_PilotEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!EffectsControl.GearUp);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!GearUp);
     }
     public void SFEXT_O_PilotExit()
     {
@@ -52,18 +44,77 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!EffectsControl.GearUp);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!GearUp);
+    }
+    public void SFEXT_G_Explode()
+    {
+        SetGearDown();
+    }
+    public void SFEXT_O_RespawnButton()
+    {
+        SetGearDown();
     }
     public void KeyboardInput()
     {
-        EngineControl.ToggleGear();
+        ToggleGear();
     }
-    public void SFEXT_O_GearDown()
+    private void Update()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
+        float Trigger;
+        if (UseLeftTrigger)
+        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+        else
+        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+        if (Trigger > 0.75)
+        {
+            if (!TriggerLastFrame && EngineControl.DisableGearToggle == 0) { ToggleGear(); }
+            TriggerLastFrame = true;
+        }
+        else { TriggerLastFrame = false; }
     }
-    public void SFEXT_O_GearUp()
+    public void SetGearUp()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
+        if (!DisableGroundDetector) { EngineControl.DisableGroundDetector += 1; DisableGroundDetector = true; }
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        GearUp = true;
+        GearAnimator.SetBool(GEARUP_STRING, true);
+        if (DragApplied) { EngineControl.ExtraDrag -= LandingGearDragMulti; DragApplied = false; }
+
+        if (EngineControl.IsOwner)
+        {
+            EngineControl.SendEventToExtensions("SFEXT_O_GearUp", false);
+        }
     }
+    public void SetGearDown()
+    {
+        if (DisableGroundDetector) { EngineControl.DisableGroundDetector -= 1; DisableGroundDetector = false; }
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+        GearUp = false;
+        GearAnimator.SetBool(GEARUP_STRING, false);
+        if (!DragApplied) { EngineControl.ExtraDrag += LandingGearDragMulti; DragApplied = true; }
+
+        if (EngineControl.IsOwner)
+        {
+            EngineControl.SendEventToExtensions("SFEXT_O_GearDown", false);
+        }
+    }
+    public void ToggleGear()
+    {
+        if (!GearUp)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
+        }
+        else
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearDown");
+        }
+    }
+    public void SFEXT_O_PlayerJoined()
+    {
+        if (GearUp)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
+        }
+    }
+
 }
