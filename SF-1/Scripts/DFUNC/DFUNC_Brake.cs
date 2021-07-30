@@ -12,7 +12,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
     [SerializeField] private Animator BrakeAnimator;
     [SerializeField] private KeyCode KeyboardControl = KeyCode.B;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] private float BrakeInput;
-    [System.NonSerializedAttribute] private float KeyboardBrakeInput;
     private Rigidbody VehicleRigidbody;
     private bool HasAirBrake;
     [SerializeField] private float AirbrakeStrength = 4f;
@@ -27,6 +26,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private bool BrakingLastFrame;
     private float DragAdded = 0;
     private float NonLocalActiveDelay;//this var is for adding a min delay for disabling for non-local users to account for lag
+    private bool Selected;
     public void SFEXT_L_ECStart()
     {
         VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
@@ -37,13 +37,21 @@ public class DFUNC_Brake : UdonSharpBehaviour
         else
         { gameObject.SetActive(true); }
     }
+    public void DFUNC_Selected()
+    {
+        Selected = true;
+    }
     public void DFUNC_Deselected()
     {
         BrakeInput = 0;
+        Selected = false;
     }
     public void SFEXT_O_PilotExit()
     {
         BrakeInput = 0;
+        EngineControl.ExtraDrag -= DragAdded;
+        DragAdded = 0;
+        Selected = false;
     }
     public void SFEXT_G_Explode()
     {
@@ -82,23 +90,26 @@ public class DFUNC_Brake : UdonSharpBehaviour
             Vector3 CurrentVel = EngineControl.CurrentVel;
             if (EngineControl.Piloting)
             {
-                float Trigger;
-                if (UseLeftTrigger)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                float KeyboardBrakeInput = 0;
+                float VRBrakeInput = 0;
 
-                BrakeInput = Trigger;
+                if (Selected)
+                {
+                    float Trigger;
+                    if (UseLeftTrigger)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+                    VRBrakeInput = Trigger;
+                }
 
                 if (Input.GetKey(KeyboardControl))
                 {
                     KeyboardBrakeInput = 1;
                 }
-                else
-                {
-                    KeyboardBrakeInput = 0;
-                }
-                BrakeInput = Mathf.Max(BrakeInput, KeyboardBrakeInput);
+
+                BrakeInput = Mathf.Max(VRBrakeInput, KeyboardBrakeInput);
 
                 if (EngineControl.Taxiing && BrakeInput > 0 && Speed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
                 {
@@ -148,7 +159,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
         {
             //this object is enabled for non-owners only while animating
             NonLocalActiveDelay -= DeltaTime;
-            if (NonLocalActiveDelay < 0 && AirbrakeLerper < 0.03)
+            if (NonLocalActiveDelay < 0 && AirbrakeLerper < 0.01)
             {
                 DisableForAnimation();
             }

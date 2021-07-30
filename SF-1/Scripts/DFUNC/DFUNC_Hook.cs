@@ -32,7 +32,6 @@ public class DFUNC_Hook : UdonSharpBehaviour
     private bool DisableGroundBrake;
     public void SFEXT_L_ECStart()
     {
-        EffectsControl = EngineControl.EffectsControl;
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(HookDown);
         VehicleTransform = EngineControl.VehicleMainObj.GetComponent<Transform>();
@@ -63,12 +62,12 @@ public class DFUNC_Hook : UdonSharpBehaviour
         if (DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake -= 1; DisableGroundBrake = false; }
         gameObject.SetActive(false);
     }
-    public void SFEXT_O_Explode()
+    public void SFEXT_G_Explode()
     {
         Hooked = false;
         SetHookUp();
     }
-    public void SFEXT_O_RespawnButton()
+    public void SFEXT_G_RespawnButton()
     {
         SetHookUp();
     }
@@ -79,6 +78,11 @@ public class DFUNC_Hook : UdonSharpBehaviour
     public void KeyboardInput()
     {
         ToggleHook();
+    }
+    public void SFEXT_O_PlayerJoined()
+    {
+        if (HookDown)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown"); }
     }
     private void Update()
     {

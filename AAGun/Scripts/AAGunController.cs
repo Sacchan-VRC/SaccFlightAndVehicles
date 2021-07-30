@@ -546,7 +546,7 @@ public class AAGunController : UdonSharpBehaviour
         if (TargetEngine != null)
         {
             if (TargetEngine.Piloting || TargetEngine.Passenger)
-                TargetEngine.EffectsControl.PlaneAnimator.SetTrigger("radarlocked");
+            { TargetEngine.VehicleAnimator.SetTrigger("radarlocked"); }
         }
     }
     public void LaunchAAM()

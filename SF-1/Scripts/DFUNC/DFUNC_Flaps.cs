@@ -17,7 +17,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private bool Flaps = true;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
-    private EffectsController EffectsControl;
     private float StartMaxLift;
     private int FLAPS_STRING = Animator.StringToHash("flaps");
     private bool DragApplied;
@@ -67,7 +66,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         FlapsLiftMulti -= 1f;
 
         StartMaxLift = EngineControl.MaxLift;
-        EffectsControl = EngineControl.EffectsControl;
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
         if (DefaultFlapsOff) { SetFlapsOff(); }
@@ -87,13 +85,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
     }
     public void SFEXT_G_Explode()
-    {
-        if (DefaultFlapsOff)
-        { SetFlapsOff(); }
-        else
-        { SetFlapsOn(); }
-    }
-    public void SFEXT_O_ReAppear()
     {
         if (DefaultFlapsOff)
         { SetFlapsOff(); }

@@ -78,6 +78,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         if (NumBomb != FullBombs) { EngineControl.ReSupplied++; }
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
+        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
         BombPoint = 0;
     }
     private void Update()

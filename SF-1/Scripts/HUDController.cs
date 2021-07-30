@@ -35,7 +35,6 @@ public class HUDController : UdonSharpBehaviour
     private Vector3 InputsZeroPos;
     private Vector3 startingpos;
     private float check = 0;
-    [System.NonSerializedAttribute] public float MenuSoundCheckLast = 0;
     private int showvel;
     const float InputSquareSize = 0.0284317f;//size of the square on the HUD that shows inputs
     private Vector3 TargetDir = Vector3.zero;
@@ -77,7 +76,6 @@ public class HUDController : UdonSharpBehaviour
         PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
         VehicleTransform = EngineControl.VehicleMainObj.transform;
-        EffectsControl = EngineControl.EffectsControl;
 
         float fuel = EngineControl.Fuel;
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
@@ -213,13 +211,6 @@ public class HUDController : UdonSharpBehaviour
         }
         else { HUDText_knotstarget.text = string.Empty; }
 
-        //play menu sound if selection changed since last frame
-        float MenuSoundCheck = EngineControl.RStickSelection + EngineControl.LStickSelection;
-        if (!EngineControl.SoundControl.MenuSelectNull && MenuSoundCheck != MenuSoundCheckLast)
-        {
-            EngineControl.SoundControl.MenuSelect.Play();
-        }
-        MenuSoundCheckLast = MenuSoundCheck;
 
 
         //updating numbers 3~ times a second
@@ -245,37 +236,7 @@ public class HUDController : UdonSharpBehaviour
         check += SmoothDeltaTime;
 
         PlaneAnimator.SetFloat(FUEL_STRING, EngineControl.Fuel * FullFuelDivider);
-
-
-        //Replacement for leavebuttons below this point
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
-        {
-            ExitStation();
-        }
     }
-
-    [System.NonSerializedAttribute] public int PilotSeat = -1;
-    [System.NonSerializedAttribute] public int MySeat = -1;
-    [System.NonSerializedAttribute] public int[] SeatedPlayers;
-    [System.NonSerializedAttribute] public VRCStation[] VehicleStations;
-    [System.NonSerializedAttribute] public int[] InsidePlayers;
-    private bool FindSeatsDone = false;
-    public void ExitStation()
-    {
-        VehicleStations[MySeat].ExitStation(EngineControl.localPlayer);
-    }
-    public void FindSeats()
-    {
-        if (FindSeatsDone) { return; }
-        VehicleStations = (VRC.SDK3.Components.VRCStation[])EngineControl.VehicleMainObj.GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
-        SeatedPlayers = new int[VehicleStations.Length];
-        for (int i = 0; i != SeatedPlayers.Length; i++)
-        {
-            SeatedPlayers[i] = -1;
-        }
-        FindSeatsDone = true;
-    }
-
 
     private void Assert(bool condition, string message)
     {

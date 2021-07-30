@@ -89,8 +89,8 @@ public class ViewScreenController : UdonSharpBehaviour
                     Disabled = true;
                 }
             }
-            if (TargetEngine.EffectsControl.LargeEffectsOnly)
-            { TargetEngine.EffectsControl.Effects(); }//this is skipped in effectscontroller as an optimization if plane is distant, but the camera can see it close up, so do it here.
+            //        if (TargetEngine.EffectsControl.LargeEffectsOnly)
+            //        { TargetEngine.EffectsControl.Effects(); }//this is skipped in effectscontroller as an optimization if plane is distant, but the camera can see it close up, so do it here.
 
             var VehicleTrans = TargetEngine.VehicleMainObj.transform;
             Quaternion NewRot;

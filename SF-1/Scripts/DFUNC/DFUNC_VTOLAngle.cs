@@ -64,12 +64,9 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
         }
         else { TriggerLastFrame = false; }
         if (EngineControl.VTOLAngle != VTOLDefault)
-        {
-            if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
-        }
+        
+        { if (!Dial_FunconNULL) Dial_Funcon.SetActive(true); }
         else
-        {
-            if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
-        }
+        { if (!Dial_FunconNULL) Dial_Funcon.SetActive(false); }
     }
 }

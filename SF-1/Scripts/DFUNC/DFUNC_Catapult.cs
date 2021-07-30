@@ -230,6 +230,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             Quaternion CatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(CatapultRotLastFrame);
             if (Launching && !CatapultTransform.gameObject.activeInHierarchy)
             {
+                float DeltaTime = Time.deltaTime;
                 TriggerLastFrame = false;
                 Launching = false;
                 if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
@@ -237,13 +238,13 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 if (SetConstantForceZero) { EngineControl.SetConstantForceZero -= 1; SetConstantForceZero = false; }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff");
                 EngineControl.Taxiinglerper = 0;
-                VehicleRigidbody.velocity = (CatapultTransform.position - CatapultPosLastFrame) / Time.deltaTime;
+                VehicleRigidbody.velocity = (CatapultTransform.position - CatapultPosLastFrame) / DeltaTime;
                 Vector3 CatapultRotDifEULER = CatapultRotDif.eulerAngles;
                 //.eulerangles is dumb (convert 0 - 360 to -180 - 180)
                 if (CatapultRotDifEULER.x > 180) { CatapultRotDifEULER.x -= 360; }
                 if (CatapultRotDifEULER.y > 180) { CatapultRotDifEULER.y -= 360; }
                 if (CatapultRotDifEULER.z > 180) { CatapultRotDifEULER.z -= 360; }
-                Vector3 CatapultRotDifrad = (CatapultRotDifEULER * Mathf.Deg2Rad) / Time.deltaTime;
+                Vector3 CatapultRotDifrad = (CatapultRotDifEULER * Mathf.Deg2Rad) / DeltaTime;
                 VehicleRigidbody.angularVelocity = CatapultRotDifrad;
                 EngineControl.dead = true;
                 SendCustomEventDelayedFrames("deadfalse", 5);

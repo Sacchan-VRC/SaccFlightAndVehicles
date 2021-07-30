@@ -6,12 +6,7 @@ using VRC.Udon;
 
 public class EngineController : UdonSharpBehaviour
 {
-    [SerializeField] private float FlapsDragMulti = 1.4f;
-    [SerializeField] private float FlapsLiftMulti = 1.35f;
-    [SerializeField] private float FlapsMaxLiftMulti = 1;
     public GameObject VehicleMainObj;
-    public EffectsController EffectsControl;
-    public SoundController SoundControl;
     public HUDController HUDControl;
     public UdonSharpBehaviour[] ExtensionUdonBehaviours;
     public UdonSharpBehaviour[] Dial_Functions_L;
@@ -114,7 +109,6 @@ public class EngineController : UdonSharpBehaviour
     public float VTOLLoseControlSpeed = 120;
     public float VTOLGroundEffectStrength = 4;
     [Header("Other:")]
-    public float CanopyCloseTime = 1.8f;
     public float SeaLevel = -10f;
     public Vector3 Wind;
     public float WindGustStrength = 15;
@@ -122,12 +116,12 @@ public class EngineController : UdonSharpBehaviour
     public float WindTurbulanceScale = 0.0001f;
     public float SoundBarrierStrength = 0.0003f;
     public float SoundBarrierWidth = 20f;
-    public float TouchDownSoundSpeed = 35;
     [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     public float FuelConsumption = 2;
     public float FuelConsumptionABMulti = 3f;
     public float RefuelTime;
     public float RepairTime;
+    public float RespawnDelay = 10;
 
 
     //best to remove synced variables if you aren't using them
@@ -138,7 +132,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VTOLAngle;
 
-    private Animator VehicleAnimator;
+    [System.NonSerializedAttribute] public Animator VehicleAnimator;
     [System.NonSerializedAttribute] public int PilotID;
     [System.NonSerializedAttribute] public string PilotName;
     [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
@@ -227,7 +221,6 @@ public class EngineController : UdonSharpBehaviour
     private int ThrustVecGrounded;
     private float SoundBarrier;
     [System.NonSerializedAttribute] private float Afterburner = 1;
-    [System.NonSerializedAttribute] public float CanopyCloseTimer = -200000;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
     [System.NonSerializedAttribute] public int NumAAMTargets = 0;
     [System.NonSerializedAttribute] public float FullFuel;
@@ -256,7 +249,7 @@ public class EngineController : UdonSharpBehaviour
     private float RollThrustVecMultiStart;
     private bool VTOLenabled;
     [System.NonSerializedAttribute] public float VTOLAngleInput;
-    private float VTOL90Degrees;
+    private float VTOLAngle90orMax;//1=(90 degrees OR maxVTOLAngle if it's lower than 90) used for transition thrust values 
     private float throttleABPointDivider;
     private float VTOLAngleDivider;
     private float InverseThrottleABPointDivider;
@@ -265,10 +258,13 @@ public class EngineController : UdonSharpBehaviour
     bool PlaneMoving = false;
     bool HasWheelColliders = false;
     private float vtolangledif;
+    Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
     private bool GunRecoilEmptyNULL = true;
+    private float NormalizeThrottleABOff;
+    [System.NonSerializedAttribute] public bool AfterburnerOn;
     [System.NonSerializedAttribute] public bool PitchDown;
     //this stuff can be used by DFUNCs
-    //if these == 0 then they are not disabled.
+    //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
     [System.NonSerializedAttribute] public int SetConstantForceZero = 0;
     [System.NonSerializedAttribute] public int DisableGearToggle = 0;
     [System.NonSerializedAttribute] public int DisableTaxiRotation = 0;
@@ -282,24 +278,24 @@ public class EngineController : UdonSharpBehaviour
     private int WEAPON_STRING = Animator.StringToHash("weapon");
     private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
     private int RESUPPLY_STRING = Animator.StringToHash("resupply");
-    private int CANOPYOPEN_STRING = Animator.StringToHash("canopyopen");
     private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
-    private int BULLETHIT_STRING = Animator.StringToHash("bullethit");
     private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
     private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
     private int LOCALPASSENGER_STRING = Animator.StringToHash("localpassenger");
     private int OCCUPIED_STRING = Animator.StringToHash("occupied");
     private int RESPAWN_STRING = Animator.StringToHash("respawn");
 
-    //float MouseX;
-    //float MouseY;
-    //float mouseysens = 1; //mouse input can't be used because it's used to look around even when in a seat
-    //float mousexsens = 1;
+    //old Leavebutton Stuff
+    [System.NonSerializedAttribute] public int PilotSeat = -1;
+    [System.NonSerializedAttribute] public int MySeat = -1;
+    [System.NonSerializedAttribute] public int[] SeatedPlayers;
+    [System.NonSerializedAttribute] public VRCStation[] VehicleStations;
+    [System.NonSerializedAttribute] public int[] InsidePlayers;
+    private bool FindSeatsDone = false;
+    //end of old Leavebutton stuff
     private void Start()
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
-        Assert(EffectsControl != null, "Start: EffectsControl != null");
-        Assert(SoundControl != null, "Start: SoundControl != null");
         Assert(HUDControl != null, "Start: HUDControl != null");
         Assert(PlaneMesh != null, "Start: PlaneMesh != null");
         Assert(CenterOfMass != null, "Start: CenterOfMass != null");
@@ -314,18 +310,6 @@ public class EngineController : UdonSharpBehaviour
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
         VehicleAnimator = VehicleMainObj.GetComponent<Animator>();
         //set these values at start in case they haven't been set correctly in editor
-        if (!HasCanopy)
-        {
-            if (NoCanopy)
-            {
-                EffectsControl.CanopyOpen = false; CanopyOpening();
-            }
-            else
-            {
-                EffectsControl.CanopyOpen = true; CanopyClosing();
-            }
-        }
-        else { EffectsControl.CanopyOpen = false; CanopyOpening(); }//always spawn with canopy open if has one
 
 
         FullHealth = Health;
@@ -389,7 +373,7 @@ public class EngineController : UdonSharpBehaviour
 
 
         if (VTOLOnly || HasVTOLAngle) { VTOLenabled = true; }
-        VTOL90Degrees = Mathf.Min(90 / VTOLMaxAngle, 1);
+        VTOLAngle90orMax = Mathf.Min(Mathf.Min(90, VTOLMaxAngle) / VTOLMaxAngle, 1);
 
         throttleABPointDivider = 1 / ThrottleAfterburnerPoint;
         vtolangledif = VTOLMaxAngle - VTOLMinAngle;
@@ -417,11 +401,14 @@ public class EngineController : UdonSharpBehaviour
         LowFuel = 200;//FullFuel * .13888888f;//to match the old default settings
         LowFuelDivider = 1 / LowFuel;
 
+        NormalizeThrottleABOff = 1 / ThrottleAfterburnerPoint;
+
         SendEventToExtensions("SFEXT_L_ECStart", false);
     }
 
     private void LateUpdate()
     {
+        bool gay = !(bool)Dial_Functions_L[0].GetProgramVariable("gfayayy");
         float DeltaTime = Time.deltaTime;
         if (!InEditor) { IsOwner = localPlayer.IsOwner(VehicleMainObj); }
         else { IsOwner = true; }
@@ -522,16 +509,6 @@ public class EngineController : UdonSharpBehaviour
                 Vector3 JoystickPosYaw;
                 Vector3 JoystickPos;
                 Vector2 VRPitchRoll;
-
-
-                //close canopy when moving fast, can't fly with it open
-                if (Speed > 20 && EffectsControl.CanopyOpen && HasCanopy)
-                {
-                    if (CanopyCloseTimer < -100000)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
-                    }
-                }
 
                 if (VTOLenabled)
                 {
@@ -734,7 +711,6 @@ public class EngineController : UdonSharpBehaviour
                 }
                 PlaneRotLastFrame = VehicleTransform.rotation;
 
-                bool AfterburnerOn = EffectsControl.AfterburnerOn;
                 //keyboard throttle controls and afterburner strength
                 if (!HasAfterburner)
                 {
@@ -980,10 +956,15 @@ public class EngineController : UdonSharpBehaviour
                 //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it. Heard it doesn't happen so bad if rigidbody weight is much higher.
                 if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
                 {
-                    if (VTOLAngle > VTOL90Degrees)
+                    if (VTOLAngle > VTOLAngle90orMax)
                     { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
                     else
                     { VehicleRigidbody.velocity = VehicleTransform.forward * .25f; }
+                }
+                //Replacement for leavebutton
+                if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
+                {
+                    ExitStation();
                 }
             }
             else
@@ -1059,7 +1040,6 @@ public class EngineController : UdonSharpBehaviour
                 {
                     float thrust = (HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere;
 
-                    Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
                     float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
                                                                                  //rotate and scale Vector for VTOL thrust
                     if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
@@ -1080,14 +1060,14 @@ public class EngineController : UdonSharpBehaviour
                     //add lift and thrust
                     FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
                         ((downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
-                            0);//(HasAfterburner ? Mathf.Min(EngineOutput * (throttleABPointDivider), 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward
+                            0);
                 }
                 else//Simpler version for non-VTOL craft
                 {
                     GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
                     FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
                         ((downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
-                            (HasAfterburner ? Mathf.Min(EngineOutput * 1.25f, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);//
+                            (HasAfterburner ? Mathf.Min(EngineOutput * NormalizeThrottleABOff, 1) : EngineOutput) * ThrottleStrength * Afterburner * Atmosphere);// Z Forward);
                 }
 
                 float outputdif = (EngineOutput - EngineOutputLastFrame);
@@ -1121,13 +1101,7 @@ public class EngineController : UdonSharpBehaviour
             //play a touchdown sound the frame we start taxiing
             if (Landed == false && Taxiing == true)
             {
-                if (Speed > TouchDownSoundSpeed)
-                {
-                    if (SoundControl != null)
-                    {
-                        SoundControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayTouchDownSound");
-                    }
-                }
+                SendEventToExtensions("SFEXT_O_TouchDown", false);
                 Landed = true;
             }
             else if (Taxiing == true)
@@ -1144,15 +1118,18 @@ public class EngineController : UdonSharpBehaviour
         {
             Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
             rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//so passengers can hear the airbrake
-                                                             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody (it seems),
+                                                             //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody,
                                                              //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
             VehicleRigidbody.angularDrag = .5f;
             //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
             //AirSpeed = AirVel.magnitude;
-        }
-        if (Occupied)
-        {
-            CanopyCloseTimer -= DeltaTime;
+
+            if (Passenger)
+            {
+                //Replacement for leavebuttons below this point
+                if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
+                { ExitStation(); }
+            }
         }
     }
     private void FixedUpdate()
@@ -1174,9 +1151,6 @@ public class EngineController : UdonSharpBehaviour
             LastFrameVel = VehicleVel;
         }
     }
-
-    //In soundcontroller, CanopyCloseTimer < -100000 means play inside canopy sounds and between -100000 and 0 means play outside sounds.
-    //The value is set above these numbers by the length of the animation, and delta time is removed from it each frame.
     void SortTargets(GameObject[] Targets, float[] order)
     {
         for (int i = 1; i < order.Length; i++)
@@ -1237,9 +1211,7 @@ public class EngineController : UdonSharpBehaviour
         Fuel = FullFuel;
         Atmosphere = 1;//planemoving optimization requires this to be here
 
-        if (HasCanopy) { CanopyOpening(); }
-        EffectsControl.EffectsExplode();
-        SoundControl.Explode_Sound();
+        SendCustomEventDelayedSeconds("ReAppear", RespawnDelay);
 
         SendEventToExtensions("SFEXT_G_Explode", false);
 
@@ -1252,6 +1224,9 @@ public class EngineController : UdonSharpBehaviour
             AoALiftYaw = 0;
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
+            VTOLAngle90 = 0;
+            SendCustomEventDelayedSeconds("MoveToSpawn", RespawnDelay - 3);
+
             SendEventToExtensions("SFEXT_O_Explode", false);
         }
 
@@ -1271,8 +1246,23 @@ public class EngineController : UdonSharpBehaviour
         //pilot and passengers are dropped out of the plane
         if ((Piloting || Passenger) && !InEditor)
         {
-            HUDControl.ExitStation();
+            ExitStation();
         }
+    }
+    public void ReAppear()
+    {
+        VehicleAnimator.SetTrigger("reappear");
+    }
+    public void MoveToSpawn()
+    {
+        if (IsOwner)
+        {
+            VehicleObjectSync.Respawn();
+            if (IsOwner)
+            {
+                SendEventToExtensions("SFEXT_G_MoveToSpawn", false);
+            }
+        }//this works if done just locally; 
     }
     public void IncreaseKills()
     {
@@ -1302,18 +1292,9 @@ public class EngineController : UdonSharpBehaviour
     }
     public void SetAfterburnerOn()
     {
-        EffectsControl.AfterburnerOn = true;
+        AfterburnerOn = true;
         VehicleAnimator.SetBool(AFTERBURNERON_STRING, true);
-        if ((Piloting || Passenger) && (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000))
-        {
-            if (!SoundControl.ABOnInsideNull)
-                SoundControl.ABOnInside.Play();
-        }
-        else
-        {
-            if (!SoundControl.ABOnOutsideNull)
-                SoundControl.ABOnOutside.Play();
-        }
+
         Afterburner = AfterburnerThrustMulti;
 
         if (IsOwner)
@@ -1323,7 +1304,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public void SetAfterburnerOff()
     {
-        EffectsControl.AfterburnerOn = false;
+        AfterburnerOn = false;
         Afterburner = 1;
         VehicleAnimator.SetBool(AFTERBURNERON_STRING, false);
 
@@ -1334,7 +1315,6 @@ public class EngineController : UdonSharpBehaviour
     }
     private void ToggleAfterburner()
     {
-        bool AfterburnerOn = EffectsControl.AfterburnerOn;
         if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
@@ -1347,14 +1327,14 @@ public class EngineController : UdonSharpBehaviour
     public void ResupplyPlane()
     {
         ReSupplied = 0;//used to know if other scripts resupplied
+        if (Fuel < FullFuel - 10 || Health != FullHealth)
+        {
+            ReSupplied += 1;
+        }
         if (IsOwner)
         { SendEventToExtensions("SFEXT_O_ReSupply", false); }
 
         //only play the sound if we're actually repairing/getting ammo/fuel
-        if (!SoundControl.ReloadingNull && (Fuel < FullFuel - 10 || Health != FullHealth || ReSupplied != 0))
-        {
-            SoundControl.Reloading.Play();
-        }
         LastResupplyTime = Time.time;
 
         Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
@@ -1367,54 +1347,8 @@ public class EngineController : UdonSharpBehaviour
         if (IsOwner)
         { SendEventToExtensions("SFEXT_O_ReFuel", false); }
 
-        //only play the sound if we're actually getting fuel
-        if (!SoundControl.ReloadingNull && (Fuel < FullFuel - 10 || ReSupplied != 0))
-        { SoundControl.Reloading.Play(); }
-        Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
-    }
-    public void CanopyOpening()
-    {
-        if (!EffectsControl.CanopyOpen)//this if statement prevents sound issues when this is called by OnPlayerJoined()
-        {
-            EffectsControl.CanopyOpen = true;
-            if (CanopyCloseTimer > 0)
-            { CanopyCloseTimer -= 100000 + CanopyCloseTime; }
-            else
-            { CanopyCloseTimer = -100000; }
-            VehicleAnimator.SetBool(CANOPYOPEN_STRING, true);
-        }
 
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_CanopyOpened", false);
-        }
-    }
-    public void CanopyClosing()
-    {
-        if (EffectsControl.CanopyOpen)//this if statement prevents sound issues when this is called by OnPlayerJoined()
-        {
-            EffectsControl.CanopyOpen = false;
-            if (CanopyCloseTimer > (-100000 - CanopyCloseTime) && CanopyCloseTimer < 0)
-            { CanopyCloseTimer += 100000 + ((CanopyCloseTime * 2) + 0.1f); }//the 0.1 is for the delay in the animator that is needed because it's not set to write defaults
-            else
-            { CanopyCloseTimer = CanopyCloseTime; }
-            VehicleAnimator.SetBool(CANOPYOPEN_STRING, false);
-        }
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_CanopyClosed", false);
-        }
-    }
-    public void ToggleCanopy()
-    {
-        if (CanopyCloseTimer <= -100000 - CanopyCloseTime)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
-        }
-        else if (CanopyCloseTimer < 0 && CanopyCloseTimer > -100000)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
-        }
+        Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
     }
     public void SetLimitsOn()
     {
@@ -1438,6 +1372,7 @@ public class EngineController : UdonSharpBehaviour
     {
         if (!FlightLimitsEnabled)
         {
+            if (VTOLAngle != VTOLDefaultValue) return;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn");
         }
         else
@@ -1449,7 +1384,6 @@ public class EngineController : UdonSharpBehaviour
     {
         Networking.SetOwner(localPlayer, VehicleMainObj);
         Networking.SetOwner(localPlayer, gameObject);
-        Networking.SetOwner(localPlayer, EffectsControl.gameObject);
         //VehicleTransform.position = new Vector3(VehicleTransform.position.x, -10000, VehicleTransform.position.z);
         Atmosphere = 1;//planemoving optimization requires this to be here
                        //synced variables
@@ -1464,11 +1398,8 @@ public class EngineController : UdonSharpBehaviour
     }
     public void ResetStatus()//called globally when using respawn button
     {
-        EffectsControl.DoEffects = 6;
         if (HasAfterburner) { SetAfterburnerOff(); }
         if (HasLimits) { SetLimitsOn(); }
-        if (HasCanopy && !EffectsControl.CanopyOpen)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
         WeaponSelected = false;
         //these two make it invincible and unable to be respawned again for 5s
         dead = true;
@@ -1482,30 +1413,15 @@ public class EngineController : UdonSharpBehaviour
         {
             Health -= 10;
         }
-        if (EffectsControl != null)
-        {
-            EffectsControl.DoEffects = 0f;
-            VehicleAnimator.SetTrigger(BULLETHIT_STRING);
-        }
-
-        if (SoundControl != null && !SoundControl.BulletHitNull)
-        {
-            int rand = Random.Range(0, SoundControl.BulletHit.Length);
-            SoundControl.BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
-            SoundControl.BulletHit[rand].Play();
-        }
-
         if (IsOwner)
         {
             SendEventToExtensions("SFEXT_O_PlaneHit", false);
         }
     }
-    public void Respawn_event()//called by Respawn() in HitDetector
+    public void Respawn_event()//called by Respawn() in HitDetector 3 seconds before respawn by animation
     {
         PlayerThrottle = 0;//for editor test mode
         EngineOutput = 0;//^
-        EffectsControl.DoEffects = 6f; //wake up if was asleep
-        EffectsControl.PlaneAnimator.SetTrigger(INSTANTGEARDOWN_STRING);
         MissilesIncoming = 0;
         if (InEditor)
         {
@@ -1524,37 +1440,25 @@ public class EngineController : UdonSharpBehaviour
         //only change effects which are very visible, this is just so that it looks alright for late joiners, not to sync everything perfectly.
         //syncing everything perfectly would probably require too many events to be sent.
         //planes will be fully synced when they explode or are respawned anyway.
-        if (IsOwner)
-        {
-            if (HasCanopy)
-            {
-                if (!EffectsControl.CanopyOpen)
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetCanopyClosed");
-                }
-            }
-        }
         SendEventToExtensions("SFEXT_O_PlayerJoined", false);
     }
     public void PassengerEnterPlaneLocal()
     {
         Passenger = true;
         if (HUDControl != null) { HUDControl.gameObject.SetActive(true); }
-        if (EffectsControl.CanopyOpen) CanopyCloseTimer = -100001;
-        else CanopyCloseTimer = -1;
 
-        if (EffectsControl != null) { EffectsControl.PlaneAnimator.SetBool(LOCALPASSENGER_STRING, true); }
+        VehicleAnimator.SetBool(LOCALPASSENGER_STRING, true);
         SetPlaneLayerInside();
 
         SendEventToExtensions("SFEXT_P_PassengerEnter", false);
     }
     public void PassengerExitPlaneLocal()
     {
-        if (EffectsControl != null) { VehicleAnimator.SetBool("localpassenger", false); }
         Passenger = false;
         localPlayer.SetVelocity(CurrentVel);
         MissilesIncoming = 0;
         VehicleAnimator.SetInteger("missilesincoming", 0);
+        VehicleAnimator.SetBool("localpassenger", false);
 
         if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
         SetPlaneLayerOutside();
@@ -1581,7 +1485,6 @@ public class EngineController : UdonSharpBehaviour
     {
         if (!localPlayer.IsOwner(gameObject)) { Networking.SetOwner(localPlayer, gameObject); }
         if (!localPlayer.IsOwner(VehicleMainObj)) { Networking.SetOwner(localPlayer, VehicleMainObj); }
-        if (!localPlayer.IsOwner(EffectsControl.gameObject)) { Networking.SetOwner(localPlayer, EffectsControl.gameObject); }
         if (!localPlayer.IsOwner(HUDControl.gameObject)) { Networking.SetOwner(localPlayer, HUDControl.gameObject); }
         foreach (UdonSharpBehaviour obj in ExtensionUdonBehaviours)
         {
@@ -1607,14 +1510,8 @@ public class EngineController : UdonSharpBehaviour
         Piloting = true;
         if (dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
-        if (EffectsControl != null)
-        {
-            //canopy closed/open sound
-            if (EffectsControl.CanopyOpen) { CanopyCloseTimer = -100000 - CanopyCloseTime; }
-            else CanopyCloseTimer = -CanopyCloseTime;//less than 0
-                                                     //SetSmokingOff();
-            EffectsControl.PlaneAnimator.SetBool(LOCALPILOT_STRING, true);
-        }
+        VehicleAnimator.SetBool(LOCALPILOT_STRING, true);
+
         if (HUDControl != null)
         {
             HUDControl.gameObject.SetActive(true);
@@ -1643,13 +1540,9 @@ public class EngineController : UdonSharpBehaviour
         PilotName = player.displayName;
         PilotID = player.playerId;
 
-        if (EffectsControl != null)
-        {
-            VehicleAnimator.SetBool(OCCUPIED_STRING, true);
-            EffectsControl.DoEffects = 0f;
-        }
+        VehicleAnimator.SetBool(OCCUPIED_STRING, true);
         dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
-        if (SoundControl != null) { SoundControl.Wakeup(); }
+        SendEventToExtensions("SFEXT_G_PilotEnter", true);
     }
     public void PilotExitPlane(VRCPlayerApi player)
     {
@@ -1657,10 +1550,8 @@ public class EngineController : UdonSharpBehaviour
         PilotName = string.Empty;
         PilotID = -1;
         SetAfterburnerOff();
-        if (EffectsControl != null)
-        {
-            EffectsControl.EffectsLeavePlane();
-        }
+
+        SendEventToExtensions("SFEXT_G_PilotExit", false);
         if (player.isLocal)
         {
             //zero control values
@@ -1685,7 +1576,7 @@ public class EngineController : UdonSharpBehaviour
             RTriggerLastFrame = false;
             DoAAMTargeting = false;
             MissilesIncoming = 0;
-            HUDControl.MenuSoundCheckLast = 0;
+            VehicleAnimator.SetBool(LOCALPILOT_STRING, false);
             localPlayer.SetVelocity(CurrentVel);
 
             if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
@@ -1864,8 +1755,8 @@ public class EngineController : UdonSharpBehaviour
             }
             else
             {
-                VTOLAngle90 = Mathf.Min(VTOLAngle / VTOL90Degrees, 1);
-                //used to lerp values as vtol angle goes towards 90 degrees instead of max vtol angle which can be above 90
+                VTOLAngle90 = Mathf.Min(VTOLAngle / VTOLAngle90orMax, 1);//used to lerp values as vtol angle goes towards 90 degrees instead of max vtol angle which can be above 90
+
                 float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngle90;
 
                 PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
@@ -1877,7 +1768,6 @@ public class EngineController : UdonSharpBehaviour
                 ReversingRollStrengthZero = 1;
             }
 
-
             if (!VTOLAllowAfterburner)
             {
                 if (Afterburner != 1)
@@ -1885,8 +1775,6 @@ public class EngineController : UdonSharpBehaviour
             }
             if (Cruise)
             { Cruise = false; }
-            if (FlightLimitsEnabled)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff"); }
         }
         else
         {
@@ -1926,6 +1814,23 @@ public class EngineController : UdonSharpBehaviour
             { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
         }
     }
+
+    public void ExitStation()
+    {
+        VehicleStations[MySeat].ExitStation(localPlayer);
+    }
+    public void FindSeats()
+    {
+        if (FindSeatsDone) { return; }
+        VehicleStations = (VRC.SDK3.Components.VRCStation[])VehicleMainObj.GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
+        SeatedPlayers = new int[VehicleStations.Length];
+        for (int i = 0; i != SeatedPlayers.Length; i++)
+        {
+            SeatedPlayers[i] = -1;
+        }
+        FindSeatsDone = true;
+    }
+
     private void Assert(bool condition, string message)
     {
         if (!condition)

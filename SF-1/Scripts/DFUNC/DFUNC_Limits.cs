@@ -11,7 +11,6 @@ public class DFUNC_Limits : UdonSharpBehaviour
     [SerializeField] private GameObject Dial_Funcon;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
-    private EffectsController EffectsControl;
     private void Update()
     {
         float Trigger;
@@ -32,7 +31,6 @@ public class DFUNC_Limits : UdonSharpBehaviour
     }
     public void SFEXT_L_ECStart()
     {
-        EffectsControl = EngineControl.EffectsControl;
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.FlightLimitsEnabled);
     }

@@ -24,6 +24,7 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource MissileIncoming;
     public AudioSource MenuSelect;
     [SerializeField] private AudioSource[] DopplerSounds;
+    public float TouchDownSoundSpeed = 35;
     private float[] DopplerSounds_InitialVolumes;
     [System.NonSerializedAttribute] public bool PlaneIdleNull;
     [System.NonSerializedAttribute] public bool PlaneInsideNull;
@@ -64,7 +65,7 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float SonicBoomWave = 0f;
     [System.NonSerializedAttribute] public float SonicBoomDistance = -1f;
     private int dopplecounter;
-    [System.NonSerializedAttribute] public float DoSound = 20; //15 seconds before idle so late joiners have time to sync before going idle
+    [System.NonSerializedAttribute] public float DoSound = 20;//15 seconds before idle so late joiners have time to sync before going idle
     [System.NonSerializedAttribute] public bool silent;
     private int silentint = 0;
     [System.NonSerializedAttribute] public bool soundsoff;
@@ -74,6 +75,9 @@ public class SoundController : UdonSharpBehaviour
     private float MaxAudibleDistance;
     private bool TooFarToHear = false;
     private bool InEditor = true;
+    [System.NonSerializedAttribute] public bool CanopyDown = false;
+    [System.NonSerializedAttribute] public bool CanopyTransitioning = false;
+    [System.NonSerializedAttribute] public float MenuSoundCheckLast = 0;
     private Transform CenterOfMass;
     private VRCPlayerApi localPlayer;
     private void Start()
@@ -159,10 +163,6 @@ public class SoundController : UdonSharpBehaviour
         {
             if (MaxAudibleDistance < PlaneDistant.maxDistance)
             { MaxAudibleDistance = PlaneDistant.maxDistance + 50; }
-        }
-        if (MaxAudibleDistance < 100)
-        {
-            Debug.LogWarning("MaxAudibleDistance is set extrmely low");
         }
 
         if (!PlaneWindNull) { PlaneWindInitialVolume = PlaneWind.volume; PlaneWind.volume = 0f; }
@@ -258,7 +258,8 @@ public class SoundController : UdonSharpBehaviour
 
         if (SonicBoomWave < SonicBoomDistance)
         {
-            SonicBoomWave += Mathf.Max(343 * DeltaTime, -relativespeed * .2f); //simulate sound wave movement
+            //step sound wave movement
+            SonicBoomWave += Mathf.Max(343 * DeltaTime, -relativespeed * .2f);//*.2 because relativespeed is only calculated every 5th frame
             silent = true;
             silentint = 0;//for multiplying sound volumes
         }
@@ -269,9 +270,16 @@ public class SoundController : UdonSharpBehaviour
         }
 
         //EngineControl.Piloting = true in editor play mode
-        if ((EngineControl.Piloting || EngineControl.Passenger) && (EngineControl.CanopyCloseTimer < 0 && EngineControl.CanopyCloseTimer > -100000))
+        if ((EngineControl.Piloting || EngineControl.Passenger) && CanopyDown)
         {
-            EngineControl.EffectsControl.PlaneAnimator.SetInteger("missilesincoming", EngineControl.MissilesIncoming);
+            //play menu sound if selection changed since last frame
+            float MenuSoundCheck = EngineControl.RStickSelection + EngineControl.LStickSelection;
+            if (!MenuSelectNull && MenuSoundCheck != MenuSoundCheckLast)
+            {
+                MenuSelect.Play();
+            }
+            MenuSoundCheckLast = MenuSoundCheck;
+
             if (Leftplane == false)
             {
                 if (!ABOnOutsideNull) { ABOnOutside.Stop(); }
@@ -283,7 +291,7 @@ public class SoundController : UdonSharpBehaviour
                     PlaneInside.volume = PlaneIdle[0].volume * .4f;//it'll lerp up from here
                 }
                 PlaneThrustVolume *= InVehicleThrustVolumeFactor;
-                Leftplane = true;//used when we leave to see if we just left
+                Leftplane = true;//set when we leave to see if we just left later
             }
             if (!RollingNull)
             {
@@ -301,15 +309,15 @@ public class SoundController : UdonSharpBehaviour
                     thrust.Play();
                 }
             }
-            if ((!PlaneDistantNull) && PlaneDistant.isPlaying)
+            if (!PlaneDistantNull && PlaneDistant.isPlaying)
             {
                 PlaneDistant.Stop();
             }
-            if ((!PlaneInsideNull) && !PlaneInside.isPlaying)
+            if (!PlaneInsideNull && !PlaneInside.isPlaying)
             {
                 PlaneInside.Play();
             }
-            if ((!PlaneIdleNull) && PlaneIdle[0].isPlaying)
+            if (!PlaneIdleNull && PlaneIdle[0].isPlaying)
             {
                 foreach (AudioSource idle in PlaneIdle)
                     idle.Stop();
@@ -338,8 +346,8 @@ public class SoundController : UdonSharpBehaviour
         {
             if (Leftplane == true)
             {
-                Exitplane();
-            }//passenger left or canopy opened
+                Exitplane();//passenger left or canopy opened
+            }
             foreach (AudioSource thrust in Thrust)
             {
                 if (!thrust.isPlaying)
@@ -423,7 +431,7 @@ public class SoundController : UdonSharpBehaviour
         if (!PlaneWindNull)
         {
             PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
-            PlaneWind.volume = (Mathf.Min(((EngineControl.Speed / 20) * PlaneWindInitialVolume), 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) * .125f, 0, 1) * .2f)) * silentint;
+            PlaneWind.volume = (((EngineControl.Speed / 20) * PlaneWindInitialVolume) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) * .125f, 0, 1) * .2f)) * silentint;
         }
 
         int x = 0;
@@ -434,7 +442,7 @@ public class SoundController : UdonSharpBehaviour
             x++;
         }
     }
-    private void Exitplane()//sets sound values to give continuity of engine sound when exiting the plane
+    private void Exitplane()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
     {
         if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
         if (!RadarLockedNull) { RadarLocked.Stop(); }
@@ -453,7 +461,7 @@ public class SoundController : UdonSharpBehaviour
             if (!PlaneInsideNull) { PlaneIdlePitch = PlaneInside.pitch; }
         }
     }
-    public void Explode_Sound()
+    public void SFEXT_G_Explode()
     {
         //play sonic boom if it was going to play before it exploded
         if (playsonicboom && silent)
@@ -513,7 +521,7 @@ public class SoundController : UdonSharpBehaviour
             TouchDown[Random.Range(0, TouchDown.Length)].Play();
         }
     }
-    public void Wakeup()
+    public void SFEXT_G_PilotEnter()//old WakeUp
     {
         DoSound = 0f;
         foreach (AudioSource thrust in Thrust)
@@ -536,6 +544,61 @@ public class SoundController : UdonSharpBehaviour
             LastFramePlaneThrustPitch = 0;
         }
         soundsoff = false;
+    }
+    //called form DFUNC_Canopy Delayed by canopy close time when playing the canopy animation
+    public void SetCanopyDownTrue()
+    {
+        CanopyDown = true;
+        CanopyTransitioning = false;
+        if (EngineControl.IsOwner) { EngineControl.SendEventToExtensions("SFEXT_O_CanopyDown", false); }
+    }
+    public void SetCanopyDownFalse()
+    {
+        CanopyDown = false;
+        CanopyTransitioning = false;
+        if (EngineControl.IsOwner) { EngineControl.SendEventToExtensions("SFEXT_O_CanopyUp", false); }
+    }
+    public void SFEXT_O_PilotExit()
+    {
+        MenuSoundCheckLast = 0;
+    }
+    public void SFEXT_O_TakeOff()
+    {
+        if (EngineControl.Speed > TouchDownSoundSpeed)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayTouchDownSound");
+        }
+
+    }
+    public void SFEXT_O_ReSupply()
+    {
+        if (!ReloadingNull)
+        {
+            Reloading.Play();
+        }
+    }
+    public void SFEXT_O_AfterburnerOn()
+    {
+        if ((EngineControl.Piloting || EngineControl.Passenger) && (CanopyDown))
+        {
+            if (!ABOnInsideNull)
+                ABOnInside.Play();
+        }
+        else
+        {
+            if (!ABOnOutsideNull)
+                ABOnOutside.Play();
+        }
+    }
+    public void SFEXT_O_PlaneHit()
+    {
+
+        if (!BulletHitNull)
+        {
+            int rand = Random.Range(0, BulletHit.Length);
+            BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
+            BulletHit[rand].Play();
+        }
     }
     private void Assert(bool condition, string message)
     {

@@ -9,7 +9,6 @@ public class PilotSeat : UdonSharpBehaviour
     public EngineController EngineControl;
     public GameObject SeatAdjuster;
     public GameObject PilotOnly;
-    private HUDController HUDControl;
     private int ThisStationID;
     private bool SeatInitialized = false;
     private Transform Seat;
@@ -23,7 +22,6 @@ public class PilotSeat : UdonSharpBehaviour
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
         localPlayer = Networking.LocalPlayer;
-        HUDControl = EngineControl.HUDControl;
 
         Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
         SeatStartRot = Seat.localRotation;
@@ -52,7 +50,7 @@ public class PilotSeat : UdonSharpBehaviour
     private void Interact()//entering the plane
     {
         if (!SeatInitialized) { InitializeSeat(); }
-        HUDControl.MySeat = ThisStationID;
+        EngineControl.MySeat = ThisStationID;
 
         EngineControl.PilotEnterPlaneLocal();
 
@@ -65,15 +63,15 @@ public class PilotSeat : UdonSharpBehaviour
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
-        if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
+        if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because EngineControl might not have initialized
         if (player != null)
         {
             EngineControl.PilotEnterPlaneGlobal(player);
             //voice range change to allow talking inside cockpit (after VRC patch 1008)
-            HUDControl.SeatedPlayers[ThisStationID] = player.playerId;
+            EngineControl.SeatedPlayers[ThisStationID] = player.playerId;
             if (player.isLocal)
             {
-                foreach (int crew in HUDControl.SeatedPlayers)
+                foreach (int crew in EngineControl.SeatedPlayers)
                 {//get get a fresh VRCPlayerAPI every time to prevent players who left leaving a broken one behind and causing crashes
                     VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
                     if (guy != null)
@@ -96,7 +94,7 @@ public class PilotSeat : UdonSharpBehaviour
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
         if (!SeatInitialized) { InitializeSeat(); }
-        if (player.playerId == HUDControl.SeatedPlayers[ThisStationID])
+        if (player.playerId == EngineControl.SeatedPlayers[ThisStationID])
         {
             PlayerExitPlane(player);
         }
@@ -104,7 +102,7 @@ public class PilotSeat : UdonSharpBehaviour
     public void PlayerExitPlane(VRCPlayerApi player)
     {
         if (!SeatInitialized) { InitializeSeat(); }
-        HUDControl.SeatedPlayers[ThisStationID] = -1;
+        EngineControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)
         {
             EngineControl.PilotExitPlane(player);
@@ -113,12 +111,12 @@ public class PilotSeat : UdonSharpBehaviour
             if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
             if (player.isLocal)
             {
-                HUDControl.MySeat = -1;
+                EngineControl.MySeat = -1;
             }
             if (player.isLocal)
             {
                 //undo voice distances of all players inside the vehicle
-                foreach (int crew in HUDControl.SeatedPlayers)
+                foreach (int crew in EngineControl.SeatedPlayers)
                 {
                     VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
                     if (guy != null)
@@ -143,14 +141,14 @@ public class PilotSeat : UdonSharpBehaviour
     }
     private void InitializeSeat()
     {
-        HUDControl.FindSeats();
+        EngineControl.FindSeats();
         int x = 0;
-        foreach (VRCStation station in HUDControl.VehicleStations)
+        foreach (VRCStation station in EngineControl.VehicleStations)
         {
             if (station.gameObject == gameObject)
             {
                 ThisStationID = x;
-                HUDControl.PilotSeat = x;
+                EngineControl.PilotSeat = x;
             }
             x++;
         }

@@ -91,6 +91,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         if (NumAGM != FullAGMs) { EngineControl.ReSupplied++; }
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
+        HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
     public void SFEXT_G_Explode()
     {
