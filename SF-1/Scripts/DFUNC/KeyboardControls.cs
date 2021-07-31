@@ -8,21 +8,37 @@ public class KeyboardControls : UdonSharpBehaviour
 {
     [SerializeField] EngineController EngineControl;
     [SerializeField] private KeyCode Lfunc1key;
+    [SerializeField] private UdonSharpBehaviour Lfunc1;
     [SerializeField] private KeyCode Lfunc2key;
+    [SerializeField] private UdonSharpBehaviour Lfunc2;
     [SerializeField] private KeyCode Lfunc3key;
+    [SerializeField] private UdonSharpBehaviour Lfunc3;
     [SerializeField] private KeyCode Lfunc4key;
+    [SerializeField] private UdonSharpBehaviour Lfunc4;
     [SerializeField] private KeyCode Lfunc5key;
+    [SerializeField] private UdonSharpBehaviour Lfunc5;
     [SerializeField] private KeyCode Lfunc6key;
+    [SerializeField] private UdonSharpBehaviour Lfunc6;
     [SerializeField] private KeyCode Lfunc7key;
+    [SerializeField] private UdonSharpBehaviour Lfunc7;
     [SerializeField] private KeyCode Lfunc8key;
+    [SerializeField] private UdonSharpBehaviour Lfunc8;
     [SerializeField] private KeyCode Rfunc1key;
+    [SerializeField] private UdonSharpBehaviour Rfunc1;
     [SerializeField] private KeyCode Rfunc2key;
+    [SerializeField] private UdonSharpBehaviour Rfunc2;
     [SerializeField] private KeyCode Rfunc3key;
+    [SerializeField] private UdonSharpBehaviour Rfunc3;
     [SerializeField] private KeyCode Rfunc4key;
+    [SerializeField] private UdonSharpBehaviour Rfunc4;
     [SerializeField] private KeyCode Rfunc5key;
+    [SerializeField] private UdonSharpBehaviour Rfunc5;
     [SerializeField] private KeyCode Rfunc6key;
+    [SerializeField] private UdonSharpBehaviour Rfunc6;
     [SerializeField] private KeyCode Rfunc7key;
+    [SerializeField] private UdonSharpBehaviour Rfunc7;
     [SerializeField] private KeyCode Rfunc8key;
+    [SerializeField] private UdonSharpBehaviour Rfunc8;
     [SerializeField] private bool DoVTOL;
     [SerializeField] private bool DoCruise;
     private float VTOLAngleDivider;
@@ -43,9 +59,9 @@ public class KeyboardControls : UdonSharpBehaviour
                 EngineControl.VTOLAngleInput = Mathf.Clamp(EngineControl.VTOLAngleInput + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime)), 0, 1);
             }
         }
-        float DeltaTime = Time.deltaTime;
         if (DoCruise)
         {
+            float DeltaTime = Time.deltaTime;
             float equals = Input.GetKey(KeyCode.Equals) ? DeltaTime * 10 : 0;
             float minus = Input.GetKey(KeyCode.Minus) ? DeltaTime * 10 : 0;
             EngineControl.SetSpeed = Mathf.Max(EngineControl.SetSpeed + (equals - minus), 0);
@@ -54,69 +70,69 @@ public class KeyboardControls : UdonSharpBehaviour
 
         if (Input.GetKeyDown(Lfunc1key))
         {
-            if (EngineControl.Dial_Functions_L[0] != null) EngineControl.Dial_Functions_L[0].SendCustomEvent("KeyboardInput");
+            if (Lfunc1 != null) Lfunc1.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Lfunc2key))
         {
-            if (EngineControl.Dial_Functions_L[1] != null) EngineControl.Dial_Functions_L[1].SendCustomEvent("KeyboardInput");
+            if (Lfunc2 != null) Lfunc2.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Lfunc3key))
         {
-            if (EngineControl.Dial_Functions_L[2] != null) EngineControl.Dial_Functions_L[2].SendCustomEvent("KeyboardInput");
+            if (Lfunc3 != null) Lfunc3.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Lfunc4key))
         {
-            if (EngineControl.Dial_Functions_L[3] != null) EngineControl.Dial_Functions_L[3].SendCustomEvent("KeyboardInput");
+            if (Lfunc4 != null) Lfunc4.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Lfunc5key))
         {
-            if (EngineControl.Dial_Functions_L[4] != null) EngineControl.Dial_Functions_L[4].SendCustomEvent("KeyboardInput");
+            if (Lfunc5 != null) Lfunc5.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Lfunc6key))
         {
-            if (EngineControl.Dial_Functions_L[5] != null) EngineControl.Dial_Functions_L[5].SendCustomEvent("KeyboardInput");
+            if (Lfunc6 != null) Lfunc6.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Lfunc7key))
         {
-            if (EngineControl.Dial_Functions_L[6] != null) EngineControl.Dial_Functions_L[6].SendCustomEvent("KeyboardInput");
+            if (Lfunc7 != null) Lfunc7.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Lfunc8key))
         {
-            if (EngineControl.Dial_Functions_L[7] != null) EngineControl.Dial_Functions_L[7].SendCustomEvent("KeyboardInput");
+            if (Lfunc8 != null) Lfunc8.SendCustomEvent("KeyboardInput");
         }
 
 
         if (Input.GetKeyDown(Rfunc1key))
         {
-            if (EngineControl.Dial_Functions_R[0] != null) EngineControl.Dial_Functions_R[0].SendCustomEvent("KeyboardInput");
+            if (Rfunc1 != null) Rfunc1.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Rfunc2key))
         {
-            if (EngineControl.Dial_Functions_R[1] != null) EngineControl.Dial_Functions_R[1].SendCustomEvent("KeyboardInput");
+            if (Rfunc2 != null) Rfunc2.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Rfunc3key))
         {
-            if (EngineControl.Dial_Functions_R[2] != null) EngineControl.Dial_Functions_R[2].SendCustomEvent("KeyboardInput");
+            if (Rfunc3 != null) Rfunc3.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Rfunc4key))
         {
-            if (EngineControl.Dial_Functions_R[3] != null) EngineControl.Dial_Functions_R[3].SendCustomEvent("KeyboardInput");
+            if (Rfunc4 != null) Rfunc4.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Rfunc5key))
         {
-            if (EngineControl.Dial_Functions_R[4] != null) EngineControl.Dial_Functions_R[4].SendCustomEvent("KeyboardInput");
+            if (Rfunc5 != null) Rfunc5.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Rfunc6key))
         {
-            if (EngineControl.Dial_Functions_R[5] != null) EngineControl.Dial_Functions_R[5].SendCustomEvent("KeyboardInput");
+            if (Rfunc6 != null) Rfunc6.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Rfunc7key))
         {
-            if (EngineControl.Dial_Functions_R[6] != null) EngineControl.Dial_Functions_R[6].SendCustomEvent("KeyboardInput");
+            if (Rfunc7 != null) Rfunc7.SendCustomEvent("KeyboardInput");
         }
         if (Input.GetKeyDown(Rfunc8key))
         {
-            if (EngineControl.Dial_Functions_R[7] != null) EngineControl.Dial_Functions_R[7].SendCustomEvent("KeyboardInput");
+            if (Rfunc8 != null) Rfunc8.SendCustomEvent("KeyboardInput");
         }
     }
 }

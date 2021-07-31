@@ -189,7 +189,7 @@ public class EffectsController : UdonSharpBehaviour
         VehicleAnimator.SetFloat(PITCHINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(ROLLINPUT_STRING, .5f);
-        VehicleAnimator.SetFloat(THROTTLE_STRING, 0);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
+        VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
         VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);
         if (!InEditor) { VehicleAnimator.SetBool(OCCUPIED_STRING, false); }
         DoEffects = 0f;//keep awake

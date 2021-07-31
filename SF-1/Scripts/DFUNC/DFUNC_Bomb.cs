@@ -156,6 +156,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             x++;
         }
         DialPosition = -999;
+        Debug.LogWarning("DFUNC_Bomb: Can't find self in dial functions");
         return;
     }
     public void KeyboardInput()
@@ -166,6 +167,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
+            EngineControl.LStickSetAnimatorBool();
         }
         else
         {
@@ -173,6 +175,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
+            EngineControl.RStickSetAnimatorBool();
         }
     }
 }

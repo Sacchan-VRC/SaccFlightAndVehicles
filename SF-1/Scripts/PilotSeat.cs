@@ -8,7 +8,6 @@ public class PilotSeat : UdonSharpBehaviour
 {
     public EngineController EngineControl;
     public GameObject SeatAdjuster;
-    public GameObject PilotOnly;
     private int ThisStationID;
     private bool SeatInitialized = false;
     private Transform Seat;
@@ -18,34 +17,12 @@ public class PilotSeat : UdonSharpBehaviour
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(PilotOnly != null, "Start: PilotOnly != null");
         Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
 
         localPlayer = Networking.LocalPlayer;
 
         Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
         SeatStartRot = Seat.localRotation;
-
-        if (PilotOnly != null)
-        {
-            Transform[] PO = PilotOnly.GetComponentsInChildren<Transform>();
-            int i = 0;
-            foreach (Transform obj in PO)
-            {
-                if ((UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour)) != null)
-                { i++; }
-            }
-            PilotOnlyScripts = new Transform[i];
-            i = 0;
-            foreach (Transform obj in PO)
-            {
-                if ((UdonBehaviour)obj.GetComponent(typeof(UdonBehaviour)) != null)
-                {
-                    PilotOnlyScripts[i] = obj;
-                    i++;
-                }
-            }
-        }
     }
     private void Interact()//entering the plane
     {
@@ -58,7 +35,6 @@ public class PilotSeat : UdonSharpBehaviour
         localPlayer.UseAttachedStation();
         Seat.localRotation = SeatStartRot;
 
-        if (PilotOnly != null) { PilotOnly.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
     }
     public override void OnStationEntered(VRCPlayerApi player)
@@ -107,7 +83,6 @@ public class PilotSeat : UdonSharpBehaviour
         {
             EngineControl.PilotExitPlane(player);
             SetVoiceOutside(player);
-            if (PilotOnly != null) { PilotOnly.SetActive(false); }
             if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
             if (player.isLocal)
             {

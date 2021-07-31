@@ -8,6 +8,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
 {
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
+    [SerializeField] private UdonSharpBehaviour SoundControl;
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private Animator CanopyAnimator;
     [SerializeField] private float CanopyCloseTime = 1.8f;
@@ -15,7 +16,6 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     [Header("Meters/s")]
     [SerializeField] private float CanopyBreakSpeed = 50;
     [SerializeField] private float CanopyAutoCloseSpeed = 20;
-    [SerializeField] private UdonSharpBehaviour SoundControl;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     private Transform VehicleTransform;
@@ -34,7 +34,6 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void SFEXT_L_ECStart()
     {
         localPlayer = Networking.LocalPlayer;
-        HUDControl = EngineControl.HUDControl;
         VehicleTransform = EngineControl.VehicleMainObj.GetComponent<Transform>();
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(CanopyOpen);

@@ -47,6 +47,18 @@ public class ResupplyTrigger : UdonSharpBehaviour
             if (NumTriggers == 0) { InResupplyZone = false; }
         }
     }
+    //collider enabled and disabled so that it does ontriggerenter on enable
+    private void OnEnable()
+    {
+        if (!Initialized) { Initialize(); }
+        ThisCollider.enabled = true;
+    }
+    private void OnDisable()
+    {
+        ThisCollider.enabled = false;
+        InResupplyZone = false;
+        NumTriggers = 0;
+    }
     private int LayerMaskToLayer(int bitmask)
     {
         int result = bitmask > 0 ? 0 : 31;
@@ -56,26 +68,5 @@ public class ResupplyTrigger : UdonSharpBehaviour
             result++;
         }
         return result;
-    }
-    //collider enabled and disabled so that it does ontriggerenter on enable
-    private void OnEnable()
-    {
-        if (!Initialized) { Initialize(); return; }
-        ThisCollider.enabled = true;
-    }
-    private void OnDisable()
-    {
-        if (!Initialized) { Initialize(); }
-        ThisCollider.enabled = false;
-        InResupplyZone = false;
-        NumTriggers = 0;
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        gameObject.SetActive(true);
-    }
-    public void SFEXT_O_PilotExit()
-    {
-        gameObject.SetActive(false);
     }
 }

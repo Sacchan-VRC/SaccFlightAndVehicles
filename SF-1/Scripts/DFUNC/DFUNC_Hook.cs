@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -19,7 +19,6 @@ public class DFUNC_Hook : UdonSharpBehaviour
     public LayerMask HookCableLayer;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
-    private EffectsController EffectsControl;
     [System.NonSerializedAttribute] private bool Hooked = false;
     [System.NonSerializedAttribute] private float HookedTime = 0f;
     private Vector3 HookedLoc;

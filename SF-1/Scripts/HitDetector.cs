@@ -59,18 +59,6 @@ public class HitDetector : UdonSharpBehaviour
             EngineControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Respawn_event");//owner broadcasts because it's more reliable than everyone doing it individually
         }
     }
-    public void NotDead()//called by 'respawn' animation twice because calling on the last frame of animation is unreliable for some reason
-    {
-        if (InEditor)
-        {
-            EngineControl.Health = EngineControl.FullHealth;
-        }
-        else if (EngineControl.IsOwner)
-        {
-            EngineControl.Health = EngineControl.FullHealth;
-        }
-        EngineControl.dead = false;
-    }
     private void Assert(bool condition, string message)
     {
         if (!condition)

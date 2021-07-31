@@ -44,14 +44,17 @@ public class DFUNC_Gun : UdonSharpBehaviour
         AAMTargets = EngineControl.AAMTargets;
         NumAAMTargets = EngineControl.NumAAMTargets;
         VehicleTransform = EngineControl.VehicleMainObj.transform;
-        HUDControl = EngineControl.HUDControl;
         CenterOfMass = EngineControl.CenterOfMass;
         OutsidePlaneLayer = LayerMask.NameToLayer("Walkthrough");
 
         FindSelf();
 
         //HUD
-        distance_from_head = HUDControl.distance_from_head;
+        if (HUDControl != null)
+        {
+            distance_from_head = (float)HUDControl.GetProgramVariable("distance_from_head");
+        }
+        if (distance_from_head == 0) { distance_from_head = 1.333f; }
     }
     public void DFUNC_Selected()
     {
@@ -194,7 +197,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private Transform VehicleTransform;
     private int AAMTarget;
     private int AAMTargetChecker;
-    private HUDController HUDControl;
+    [SerializeField] private UdonSharpBehaviour HUDControl;
     private Transform CenterOfMass;
     private EngineController AAMCurrentTargetEngineControl;
     private int OutsidePlaneLayer;
@@ -416,6 +419,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             x++;
         }
         DialPosition = -999;
+        Debug.LogWarning("DFUNC_Gun: Can't find self in dial functions");
         return;
     }
     public void KeyboardInput()
@@ -426,6 +430,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
+            EngineControl.LStickSetAnimatorBool();
         }
         else
         {
@@ -433,6 +438,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
+            EngineControl.RStickSetAnimatorBool();
         }
     }
 }

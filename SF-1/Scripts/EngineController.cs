@@ -7,7 +7,8 @@ using VRC.Udon;
 public class EngineController : UdonSharpBehaviour
 {
     public GameObject VehicleMainObj;
-    public HUDController HUDControl;
+    [SerializeField] private GameObject InVehicleOnly;
+    [SerializeField] private GameObject PilotOnly;
     public UdonSharpBehaviour[] ExtensionUdonBehaviours;
     public UdonSharpBehaviour[] Dial_Functions_L;
     public UdonSharpBehaviour[] Dial_Functions_R;
@@ -122,6 +123,7 @@ public class EngineController : UdonSharpBehaviour
     public float RefuelTime;
     public float RepairTime;
     public float RespawnDelay = 10;
+    public float InvincibleAfterSpawn = 2.5f;
 
 
     //best to remove synced variables if you aren't using them
@@ -229,7 +231,6 @@ public class EngineController : UdonSharpBehaviour
     private float LastResupplyTime = 5;//can't resupply for the first 10 seconds after joining, fixes potential null ref if sending something to PlaneAnimator on first frame
     [System.NonSerializedAttribute] public float FullGunAmmo;
     [System.NonSerializedAttribute] public int MissilesIncoming = 0;
-    private bool WeaponSelected = false;
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] public Vector3 Spawnrotation;
     private int OutsidePlaneLayer;
@@ -249,7 +250,7 @@ public class EngineController : UdonSharpBehaviour
     private float RollThrustVecMultiStart;
     private bool VTOLenabled;
     [System.NonSerializedAttribute] public float VTOLAngleInput;
-    private float VTOLAngle90orMax;//1=(90 degrees OR maxVTOLAngle if it's lower than 90) used for transition thrust values 
+    private float VTOL90Degrees;//1=(90 degrees OR maxVTOLAngle if it's lower than 90) used for transition thrust values 
     private float throttleABPointDivider;
     private float VTOLAngleDivider;
     private float InverseThrottleABPointDivider;
@@ -261,6 +262,15 @@ public class EngineController : UdonSharpBehaviour
     Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
     private bool GunRecoilEmptyNULL = true;
     private float NormalizeThrottleABOff;
+    private Vector2 RStickCheckAngle;
+    private Vector2 LStickCheckAngle;
+    [System.NonSerializedAttribute] public float LStickFuncDegrees;
+    [System.NonSerializedAttribute] public float RStickFuncDegrees;
+    [System.NonSerializedAttribute] public int LStickNumFuncs;
+    [System.NonSerializedAttribute] public int RStickNumFuncs;
+    private bool VTolAngle90Plus;
+    [System.NonSerializedAttribute] public bool[] LStickNULL;
+    [System.NonSerializedAttribute] public bool[] RStickNULL;
     [System.NonSerializedAttribute] public bool AfterburnerOn;
     [System.NonSerializedAttribute] public bool PitchDown;
     //this stuff can be used by DFUNCs
@@ -275,7 +285,8 @@ public class EngineController : UdonSharpBehaviour
 
     private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
     private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
-    private int WEAPON_STRING = Animator.StringToHash("weapon");
+    private int Lstickselection_STRING = Animator.StringToHash("Lstickselection");
+    private int Rstickselection_STRING = Animator.StringToHash("Rstickselection");
     private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
     private int RESUPPLY_STRING = Animator.StringToHash("resupply");
     private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
@@ -296,7 +307,6 @@ public class EngineController : UdonSharpBehaviour
     private void Start()
     {
         Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
-        Assert(HUDControl != null, "Start: HUDControl != null");
         Assert(PlaneMesh != null, "Start: PlaneMesh != null");
         Assert(CenterOfMass != null, "Start: CenterOfMass != null");
         Assert(PitchMoment != null, "Start: PitchMoment != null");
@@ -373,7 +383,7 @@ public class EngineController : UdonSharpBehaviour
 
 
         if (VTOLOnly || HasVTOLAngle) { VTOLenabled = true; }
-        VTOLAngle90orMax = Mathf.Min(Mathf.Min(90, VTOLMaxAngle) / VTOLMaxAngle, 1);
+        VTOL90Degrees = Mathf.Min(90 / VTOLMaxAngle, 1);
 
         throttleABPointDivider = 1 / ThrottleAfterburnerPoint;
         vtolangledif = VTOLMaxAngle - VTOLMinAngle;
@@ -401,14 +411,43 @@ public class EngineController : UdonSharpBehaviour
         LowFuel = 200;//FullFuel * .13888888f;//to match the old default settings
         LowFuelDivider = 1 / LowFuel;
 
-        NormalizeThrottleABOff = 1 / ThrottleAfterburnerPoint;
+
+        LStickNumFuncs = Dial_Functions_L.Length;
+        RStickNumFuncs = Dial_Functions_R.Length;
+        LStickFuncDegrees = 360 / (float)LStickNumFuncs;
+        RStickFuncDegrees = 360 / (float)RStickNumFuncs;
+        LStickNULL = new bool[LStickNumFuncs];
+        RStickNULL = new bool[RStickNumFuncs];
+        int u = 0;
+        foreach (UdonSharpBehaviour usb in Dial_Functions_L)
+        {
+            if (usb == null) { LStickNULL[u] = true; }
+            u++;
+        }
+        u = 0;
+        foreach (UdonSharpBehaviour usb in Dial_Functions_R)
+        {
+            if (usb == null) { RStickNULL[u] = true; }
+            u++;
+        }
+        //work out angle to check against for function selection because straight up is the middle of a function
+        Vector3 angle = new Vector3(0, 0, -1);
+        angle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle;
+        LStickCheckAngle.x = angle.x;
+        LStickCheckAngle.y = angle.z;
+
+        angle = new Vector3(0, 0, -1);
+        angle = Quaternion.Euler(0, -((360 / RStickNumFuncs) / 2), 0) * angle;
+        RStickCheckAngle.x = angle.x;
+        RStickCheckAngle.y = angle.z;
+
+        //thrust is lerped towards VTOLThrottleStrengthMulti by VTOLAngle, unless VTOLMaxAngle is greater than 90 degrees, then it's lerped by 90=1
+        VTolAngle90Plus = VTOLMaxAngle > 90;
 
         SendEventToExtensions("SFEXT_L_ECStart", false);
     }
-
     private void LateUpdate()
     {
-        bool gay = !(bool)Dial_Functions_L[0].GetProgramVariable("gfayayy");
         float DeltaTime = Time.deltaTime;
         if (!InEditor) { IsOwner = localPlayer.IsOwner(VehicleMainObj); }
         else { IsOwner = true; }
@@ -515,83 +554,38 @@ public class EngineController : UdonSharpBehaviour
                     if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
                     { SetVTOLValues(); }
                 }
+
                 //LStick Selection wheel
                 if (InVR && LStick.magnitude > .7f)
                 {
-                    float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), LStick);
+                    float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStick);
 
-                    if (stickdir > 135)//down
+                    //R stick value is manually synced using events because i don't want to use too many synced variables.
+                    //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
+                    stickdir = (stickdir - 180) * -1;
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / LStickFuncDegrees, LStickNumFuncs - 1));
+                    if (!LStickNULL[newselection])
+                    { LStickSelection = newselection; }
+                    if (VehicleAnimator.GetInteger(Lstickselection_STRING) != LStickSelection)
                     {
-                        LStickSelection = 4;
-                    }
-                    else if (stickdir > 90)//downleft
-                    {
-                        LStickSelection = 5;
-                    }
-                    else if (stickdir > 45)//left
-                    {
-                        LStickSelection = 6;
-                    }
-                    else if (stickdir > 0)//upleft
-                    {
-                        LStickSelection = 7;
-                    }
-                    else if (stickdir > -45)//up
-                    {
-                        LStickSelection = 0;
-                    }
-                    else if (stickdir > -90)//upright
-                    {
-                        LStickSelection = 1;
-                    }
-                    else if (stickdir > -135)//right
-                    {
-                        LStickSelection = 2;
-                    }
-                    else//downright
-                    {
-                        LStickSelection = 3;
+                        LStickSetAnimatorBool();
                     }
                 }
 
                 //RStick Selection wheel
                 if (InVR && RStick.magnitude > .7f)
                 {
-                    float stickdir = Vector2.SignedAngle(new Vector2(-0.382683432365f, 0.923879532511f), RStick);//that number is 22.5 degrees to the left of straight up
+                    float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStick);
+
                     //R stick value is manually synced using events because i don't want to use too many synced variables.
                     //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
-                    //The WeaponSelected variable helps us not send more broadcasts than we need to.
-                    if (stickdir > 135)//down
+                    stickdir = (stickdir - 180) * -1;
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / RStickFuncDegrees, RStickNumFuncs - 1));
+                    if (!RStickNULL[newselection])
+                    { RStickSelection = newselection; }
+                    if (VehicleAnimator.GetInteger(Rstickselection_STRING) != RStickSelection)
                     {
-                        RStickSelection = 4;
-                    }
-                    else if (stickdir > 90)//downleft
-                    {
-                        RStickSelection = 5;
-                    }
-                    else if (stickdir > 45)//left
-                    {
-                        RStickSelection = 6;
-                    }
-                    else if (stickdir > 0)//upleft
-                    {
-                        RStickSelection = 7;
-                    }
-                    else if (stickdir > -45)//up
-                    {
-                        RStickSelection = 0;
-                    }
-                    else if (stickdir > -90)//upright
-                    {
-                        RStickSelection = 1;
-                    }
-                    else if (stickdir > -135)//right
-                    {
-                        RStickSelection = 2;
-                    }
-                    else//downright
-                    {
-                        RStickSelection = 3;
+                        RStickSetAnimatorBool();
                     }
                 }
 
@@ -956,7 +950,7 @@ public class EngineController : UdonSharpBehaviour
                 //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it. Heard it doesn't happen so bad if rigidbody weight is much higher.
                 if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
                 {
-                    if (VTOLAngle > VTOLAngle90orMax)
+                    if (VTOLAngle > VTOL90Degrees)
                     { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
                     else
                     { VehicleRigidbody.velocity = VehicleTransform.forward * .25f; }
@@ -1044,12 +1038,12 @@ public class EngineController : UdonSharpBehaviour
                                                                                  //rotate and scale Vector for VTOL thrust
                     if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
                     {
-                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * thrust;
+                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * thrust;
                     }
                     else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
                     {
                         float downthrust = thrust * VTOLThrottleStrengthMulti;
-                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, Mathf.Deg2Rad * VTOLAngle2, 0) * Mathf.Lerp(thrust, downthrust, VTOLAngle90);
+                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Mathf.Lerp(thrust, downthrust, VTolAngle90Plus ? VTOLAngle90 : VTOLAngle);
                     }
                     //add ground effect to the VTOL thrust
                     GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, 1);
@@ -1124,12 +1118,12 @@ public class EngineController : UdonSharpBehaviour
             //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
             //AirSpeed = AirVel.magnitude;
 
-            if (Passenger)
-            {
-                //Replacement for leavebuttons below this point
-                if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
-                { ExitStation(); }
-            }
+        }
+        if (Passenger)
+        {
+            //Replacement for leavebuttons below this point
+            if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
+            { ExitStation(); }
         }
     }
     private void FixedUpdate()
@@ -1169,35 +1163,8 @@ public class EngineController : UdonSharpBehaviour
             }
         }
     }
-    //these are used for syncing weapon selection for bomb bay doors animation etc
-    public void RStick0()//Rstick is something other than a weapon
-    {
-        WeaponSelected = false;
-        VehicleAnimator.SetInteger(WEAPON_STRING, 0);
-    }
-    public void RStick1()//GUN
-    {
-        WeaponSelected = true;
-        VehicleAnimator.SetInteger(WEAPON_STRING, 1);
-    }
-    public void RStick2()//AAM
-    {
-        WeaponSelected = true;
-        VehicleAnimator.SetInteger(WEAPON_STRING, 2);
-    }
-    public void RStick3()//AGM
-    {
-        WeaponSelected = true;
-        VehicleAnimator.SetInteger(WEAPON_STRING, 3);
-    }
-    public void RStick4()//Bomb
-    {
-        WeaponSelected = true;
-        VehicleAnimator.SetInteger(WEAPON_STRING, 4);
-    }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
-        WeaponSelected = false;
         dead = true;
         Cruise = false;
         PlayerThrottle = 0;
@@ -1210,9 +1177,11 @@ public class EngineController : UdonSharpBehaviour
         if (HasLimits) { SetLimitsOn(); }
         Fuel = FullFuel;
         Atmosphere = 1;//planemoving optimization requires this to be here
+        VehicleAnimator.SetInteger(Lstickselection_STRING, -1);
+        VehicleAnimator.SetInteger(Rstickselection_STRING, -1);
 
         SendCustomEventDelayedSeconds("ReAppear", RespawnDelay);
-
+        SendCustomEventDelayedSeconds("NotDead", RespawnDelay + InvincibleAfterSpawn);
         SendEventToExtensions("SFEXT_G_Explode", false);
 
         if (IsOwner)
@@ -1252,6 +1221,11 @@ public class EngineController : UdonSharpBehaviour
     public void ReAppear()
     {
         VehicleAnimator.SetTrigger("reappear");
+    }
+    public void NotDead()//called by 'respawn' animation twice because calling on the last frame of animation is unreliable for some reason
+    {
+        Health = FullHealth;
+        dead = false;
     }
     public void MoveToSpawn()
     {
@@ -1400,10 +1374,11 @@ public class EngineController : UdonSharpBehaviour
     {
         if (HasAfterburner) { SetAfterburnerOff(); }
         if (HasLimits) { SetLimitsOn(); }
-        WeaponSelected = false;
         //these two make it invincible and unable to be respawned again for 5s
         dead = true;
         VehicleAnimator.SetTrigger(RESPAWN_STRING);
+        RStick0();
+        LStick0();
 
         SendEventToExtensions("SFEXT_G_RespawnButton", false);
     }
@@ -1445,7 +1420,7 @@ public class EngineController : UdonSharpBehaviour
     public void PassengerEnterPlaneLocal()
     {
         Passenger = true;
-        if (HUDControl != null) { HUDControl.gameObject.SetActive(true); }
+        if (InVehicleOnly != null) { InVehicleOnly.SetActive(true); }
 
         VehicleAnimator.SetBool(LOCALPASSENGER_STRING, true);
         SetPlaneLayerInside();
@@ -1460,7 +1435,6 @@ public class EngineController : UdonSharpBehaviour
         VehicleAnimator.SetInteger("missilesincoming", 0);
         VehicleAnimator.SetBool("localpassenger", false);
 
-        if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
         SetPlaneLayerOutside();
 
         SendEventToExtensions("SFEXT_P_PassengerExit", false);
@@ -1485,7 +1459,6 @@ public class EngineController : UdonSharpBehaviour
     {
         if (!localPlayer.IsOwner(gameObject)) { Networking.SetOwner(localPlayer, gameObject); }
         if (!localPlayer.IsOwner(VehicleMainObj)) { Networking.SetOwner(localPlayer, VehicleMainObj); }
-        if (!localPlayer.IsOwner(HUDControl.gameObject)) { Networking.SetOwner(localPlayer, HUDControl.gameObject); }
         foreach (UdonSharpBehaviour obj in ExtensionUdonBehaviours)
         {
             if (obj != null && !localPlayer.IsOwner(obj.gameObject)) { Networking.SetOwner(localPlayer, obj.gameObject); }
@@ -1499,7 +1472,8 @@ public class EngineController : UdonSharpBehaviour
 
         Networking.SetOwner(localPlayer, gameObject);
         SetOwnerships();
-
+        if (InVehicleOnly != null) { InVehicleOnly.SetActive(true); }
+        if (PilotOnly != null) { PilotOnly.SetActive(true); }
 
         EngineOutput = 0;
         ThrottleInput = 0;
@@ -1511,11 +1485,6 @@ public class EngineController : UdonSharpBehaviour
         if (dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
         VehicleAnimator.SetBool(LOCALPILOT_STRING, true);
-
-        if (HUDControl != null)
-        {
-            HUDControl.gameObject.SetActive(true);
-        }
 
         //hopefully prevents explosions when you enter the plane
         VehicleRigidbody.velocity = CurrentVel;
@@ -1579,7 +1548,9 @@ public class EngineController : UdonSharpBehaviour
             VehicleAnimator.SetBool(LOCALPILOT_STRING, false);
             localPlayer.SetVelocity(CurrentVel);
 
-            if (HUDControl != null) { HUDControl.gameObject.SetActive(false); }
+            if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
+            if (PilotOnly != null) { PilotOnly.SetActive(false); }
+
             //set plane's layer back
             SetPlaneLayerOutside();
 
@@ -1682,7 +1653,7 @@ public class EngineController : UdonSharpBehaviour
         else
         {
             Debug.LogWarning(string.Concat(VehicleMainObj.name, ": NO AAM TARGETS FOUND"));
-            AAMTargets[0] = HUDControl.gameObject;//this should prevent HUDController from crashing with a null reference while causing no ill effects
+            AAMTargets[0] = gameObject;//this should prevent HUDController from crashing with a null reference while causing no ill effects
         }
     }
     private void WindAndAoA()
@@ -1755,10 +1726,10 @@ public class EngineController : UdonSharpBehaviour
             }
             else
             {
-                VTOLAngle90 = Mathf.Min(VTOLAngle / VTOLAngle90orMax, 1);//used to lerp values as vtol angle goes towards 90 degrees instead of max vtol angle which can be above 90
+                VTOLAngle90 = Mathf.Min(VTOLAngle / VTOL90Degrees, 1);//used to lerp values as vtol angle goes towards 90 degrees instead of max vtol angle which can be above 90
 
                 float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngle90;
-
+                //the thrust vec values are linearly scaled up the slow you go while in VTOL, from 0 at VTOLLoseControlSpeed
                 PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
                 YawThrustVecMulti = Mathf.Lerp(YawThrustVecMultiStart, VTOLYawThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
                 RollThrustVecMulti = Mathf.Lerp(RollThrustVecMultiStart, VTOLRollThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
@@ -1770,11 +1741,9 @@ public class EngineController : UdonSharpBehaviour
 
             if (!VTOLAllowAfterburner)
             {
-                if (Afterburner != 1)
+                if (AfterburnerOn)
                 { PlayerThrottle = ThrottleAfterburnerPoint; }
             }
-            if (Cruise)
-            { Cruise = false; }
         }
         else
         {
@@ -1830,6 +1799,85 @@ public class EngineController : UdonSharpBehaviour
         }
         FindSeatsDone = true;
     }
+    //these can be used for syncing weapon selection for bomb bay doors animation etc
+    public void LStickSetAnimatorBool()
+    {
+        switch (LStickSelection)
+        {
+            case 0: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick0"); break;
+            case 1: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick1"); break;
+            case 2: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick2"); break;
+            case 3: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick3"); break;
+            case 4: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick4"); break;
+            case 5: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick5"); break;
+            case 6: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick6"); break;
+            case 7: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick7"); break;
+            case 8: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick8"); break;
+            case 9: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick9"); break;
+            case 10: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick10"); break;
+            case 11: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick11"); break;
+            case 12: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick12"); break;
+            case 13: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick13"); break;
+            case 14: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick14"); break;
+            case 15: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick15"); break;
+        }
+    }
+    public void RStickSetAnimatorBool()
+    {
+        switch (RStickSelection)
+        {
+            case 0: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); break;
+            case 1: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1"); break;
+            case 2: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2"); break;
+            case 3: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3"); break;
+            case 4: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4"); break;
+            case 5: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick5"); break;
+            case 6: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick6"); break;
+            case 7: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick7"); break;
+            case 8: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick8"); break;
+            case 9: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick9"); break;
+            case 10: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick10"); break;
+            case 11: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick11"); break;
+            case 12: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick12"); break;
+            case 13: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick13"); break;
+            case 14: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick14"); break;
+            case 15: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick15"); break;
+        }
+    }
+    public void LStickNone() { VehicleAnimator.SetInteger(Lstickselection_STRING, -1); }
+    public void LStick0() { VehicleAnimator.SetInteger(Lstickselection_STRING, 0); }
+    public void LStick1() { VehicleAnimator.SetInteger(Lstickselection_STRING, 1); }
+    public void LStick2() { VehicleAnimator.SetInteger(Lstickselection_STRING, 2); }
+    public void LStick3() { VehicleAnimator.SetInteger(Lstickselection_STRING, 3); }
+    public void LStick4() { VehicleAnimator.SetInteger(Lstickselection_STRING, 4); }
+    public void LStick5() { VehicleAnimator.SetInteger(Lstickselection_STRING, 5); }
+    public void LStick6() { VehicleAnimator.SetInteger(Lstickselection_STRING, 6); }
+    public void LStick7() { VehicleAnimator.SetInteger(Lstickselection_STRING, 7); }
+    public void LStick8() { VehicleAnimator.SetInteger(Lstickselection_STRING, 8); }
+    public void LStick9() { VehicleAnimator.SetInteger(Lstickselection_STRING, 9); }
+    public void LStick10() { VehicleAnimator.SetInteger(Lstickselection_STRING, 10); }
+    public void LStick11() { VehicleAnimator.SetInteger(Lstickselection_STRING, 11); }
+    public void LStick12() { VehicleAnimator.SetInteger(Lstickselection_STRING, 12); }
+    public void LStick13() { VehicleAnimator.SetInteger(Lstickselection_STRING, 13); }
+    public void LStick14() { VehicleAnimator.SetInteger(Lstickselection_STRING, 14); }
+    public void LStick15() { VehicleAnimator.SetInteger(Lstickselection_STRING, 15); }
+    public void RStickNone() { VehicleAnimator.SetInteger(Rstickselection_STRING, -1); }
+    public void RStick0() { VehicleAnimator.SetInteger(Rstickselection_STRING, 0); }
+    public void RStick1() { VehicleAnimator.SetInteger(Rstickselection_STRING, 1); }
+    public void RStick2() { VehicleAnimator.SetInteger(Rstickselection_STRING, 2); }
+    public void RStick3() { VehicleAnimator.SetInteger(Rstickselection_STRING, 3); }
+    public void RStick4() { VehicleAnimator.SetInteger(Rstickselection_STRING, 4); }
+    public void RStick5() { VehicleAnimator.SetInteger(Rstickselection_STRING, 5); }
+    public void RStick6() { VehicleAnimator.SetInteger(Rstickselection_STRING, 6); }
+    public void RStick7() { VehicleAnimator.SetInteger(Rstickselection_STRING, 7); }
+    public void RStick8() { VehicleAnimator.SetInteger(Rstickselection_STRING, 8); }
+    public void RStick9() { VehicleAnimator.SetInteger(Rstickselection_STRING, 9); }
+    public void RStick10() { VehicleAnimator.SetInteger(Rstickselection_STRING, 10); }
+    public void RStick11() { VehicleAnimator.SetInteger(Rstickselection_STRING, 11); }
+    public void RStick12() { VehicleAnimator.SetInteger(Rstickselection_STRING, 12); }
+    public void RStick13() { VehicleAnimator.SetInteger(Rstickselection_STRING, 13); }
+    public void RStick14() { VehicleAnimator.SetInteger(Rstickselection_STRING, 14); }
+    public void RStick15() { VehicleAnimator.SetInteger(Rstickselection_STRING, 15); }
 
     private void Assert(bool condition, string message)
     {

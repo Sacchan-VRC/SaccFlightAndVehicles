@@ -7,7 +7,9 @@ using UnityEngine.UI;
 
 public class HUDController : UdonSharpBehaviour
 {
+    [SerializeField] private Transform PilotSeatAdjusterTarget;
     [SerializeField] private EngineController EngineControl;
+    [SerializeField] private Animator HUDAnimator;
     [SerializeField] private Text HUDText_G;
     [SerializeField] private Text HUDText_mach;
     [SerializeField] private Text HUDText_altitude;
@@ -29,23 +31,20 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Transform Yaw;
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
-    private Animator PlaneAnimator;
     public float distance_from_head = 1.333f;
     private float maxGs = 0f;
     private Vector3 InputsZeroPos;
     private Vector3 startingpos;
     private float check = 0;
     private int showvel;
-    const float InputSquareSize = 0.0284317f;//size of the square on the HUD that shows inputs
     private Vector3 TargetDir = Vector3.zero;
     private Vector3 TargetSpeed;
     private float FullFuelDivider;
     private float FullGunAmmoDivider;
     private Transform VehicleTransform;
     private EffectsController EffectsControl;
-    float debuglerper;
-    float debugcurrentframe;
-    private float VTOLDefaultValue;
+    private float LStickFuncDegrees;
+    private float RStickFuncDegrees;
     private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     VRCPlayerApi localPlayer;
@@ -73,14 +72,17 @@ public class HUDController : UdonSharpBehaviour
         Assert(PitchRoll != null, "Start: PitchRoll != null");
         Assert(Yaw != null, "Start: Yaw != null");
 
-        PlaneAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
+        HUDAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         InputsZeroPos = PitchRoll.localPosition;
         VehicleTransform = EngineControl.VehicleMainObj.transform;
 
         float fuel = EngineControl.Fuel;
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
 
-        VTOLDefaultValue = EngineControl.VTOLDefaultValue;
+        if (PilotSeatAdjusterTarget != null) { transform.position = PilotSeatAdjusterTarget.position; }
+
+        RStickFuncDegrees = EngineControl.RStickFuncDegrees;
+        LStickFuncDegrees = EngineControl.LStickFuncDegrees;
 
         localPlayer = Networking.LocalPlayer;
     }
@@ -91,11 +93,6 @@ public class HUDController : UdonSharpBehaviour
     private void LateUpdate()
     {
         float SmoothDeltaTime = Time.smoothDeltaTime;
-        //RollPitch Indicator
-        PitchRoll.localPosition = InputsZeroPos + (new Vector3(-EngineControl.RotationInputs.z, EngineControl.RotationInputs.x, 0)) * InputSquareSize;
-
-        //Yaw Indicator
-        Yaw.localPosition = InputsZeroPos + (new Vector3(EngineControl.RotationInputs.y, 0, 0)) * InputSquareSize;
 
         //Velocity indicator
         Vector3 tempvel;
@@ -140,69 +137,22 @@ public class HUDController : UdonSharpBehaviour
         }
         else { HudHold.SetActive(false); }
 
-        //Left Stick Selector
-        switch (EngineControl.LStickSelection)
+        int StickValue = EngineControl.LStickSelection;
+        if (StickValue < 0)
+        { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
+        else
         {
-            case -1:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);//invisible, backfacing
-                break;
-            case 0:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
-                break;
-            case 1:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 45, 0);
-                break;
-            case 2:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 90, 0);
-                break;
-            case 3:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 135, 0);
-                break;
-            case 4:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);
-                break;
-            case 5:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 225, 0);
-                break;
-            case 6:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 270, 0);
-                break;
-            case 7:
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 315, 0);
-                break;
+            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * StickValue, 0);
         }
 
-        //Right Stick Selector
-        switch (EngineControl.RStickSelection)
+        StickValue = EngineControl.RStickSelection;
+        if (StickValue < 0)
+        { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
+        else
         {
-            case -1:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);//invisible, backfacing
-                break;
-            case 0:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 0);
-                break;
-            case 1:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 45, 0);
-                break;
-            case 2:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 90, 0);
-                break;
-            case 3:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 135, 0);
-                break;
-            case 4:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0);
-                break;
-            case 5:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 225, 0);
-                break;
-            case 6:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 270, 0);
-                break;
-            case 7:
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 315, 0);
-                break;
+            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * StickValue, 0);
         }
+
 
         //Cruise Control target knots
         if (EngineControl.Cruise)
@@ -235,7 +185,7 @@ public class HUDController : UdonSharpBehaviour
         }
         check += SmoothDeltaTime;
 
-        PlaneAnimator.SetFloat(FUEL_STRING, EngineControl.Fuel * FullFuelDivider);
+        HUDAnimator.SetFloat(FUEL_STRING, EngineControl.Fuel * FullFuelDivider);
     }
 
     private void Assert(bool condition, string message)

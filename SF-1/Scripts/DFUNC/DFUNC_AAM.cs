@@ -32,8 +32,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private bool func_active = false;
     public AudioSource AAMTargeting;
     public AudioSource AAMTargetLock;
-    [System.NonSerializedAttribute] public bool AAMTargetingNull;
-    [System.NonSerializedAttribute] public bool AAMTargetLockNull;
     private float reloadspeed;
     private bool LeftDial = false;
     private int DialPosition = -999;
@@ -46,12 +44,15 @@ public class DFUNC_AAM : UdonSharpBehaviour
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
         AAMTargets = EngineControl.AAMTargets;
         CenterOfMass = EngineControl.CenterOfMass;
-        HUDControl = EngineControl.HUDControl;
         VehicleTransform = EngineControl.VehicleTransform;
         OutsidePlaneLayer = EngineControl.PlaneMesh.gameObject.layer;
-        distance_from_head = EngineControl.HUDControl.distance_from_head;
-        AAMTargetingNull = (AAMTargeting == null) ? true : false;
-        AAMTargetLockNull = (AAMTargetLock == null) ? true : false;
+
+        //HUD
+        if (HUDControl != null)
+        {
+            distance_from_head = (float)HUDControl.GetProgramVariable("distance_from_head");
+        }
+        if (distance_from_head == 0) { distance_from_head = 1.333f; }
 
         FindSelf();
 
@@ -76,8 +77,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMHasTarget = false;
         AAMLocked = false;
         func_active = false;
-        if (!AAMTargetingNull) AAMTargeting.gameObject.SetActive(false);
-        if (!AAMTargetLockNull) AAMTargetLock.gameObject.SetActive(false);
+        AAMTargeting.gameObject.SetActive(false);
+        AAMTargetLock.gameObject.SetActive(false);
+        AAMTargetIndicator.localRotation = Quaternion.identity;
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -123,11 +125,12 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
-        if (!AAMTargetingNull) AAMTargeting.gameObject.SetActive(false);
-        if (!AAMTargetLockNull) AAMTargetLock.gameObject.SetActive(false);
+        AAMTargeting.gameObject.SetActive(false);
+        AAMTargetLock.gameObject.SetActive(false);
         AAMLockTimer = 0;
         AAMHasTarget = false;
         AAMLocked = false;
+        AAMTargetIndicator.localRotation = Quaternion.identity;
         AAMTargetIndicator.gameObject.SetActive(false);
         func_active = false;
         gameObject.SetActive(false);
@@ -208,15 +211,15 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
 
     //AAMTargeting
+    [SerializeField] private UdonSharpBehaviour HUDControl;
+    [SerializeField] private float AAMMaxTargetDistance = 6000;
     private GameObject[] AAMTargets;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     private int AAMTargetChecker = 0;
     private Transform CenterOfMass;
-    private HUDController HUDControl;
     private Transform VehicleTransform;
     private EngineController AAMCurrentTargetEngineControl;
     private int OutsidePlaneLayer;
-    [SerializeField] private float AAMMaxTargetDistance = 6000;
     private Vector3 AAMCurrentTargetDirection;
     private float AAMTargetedTimer = 2;
     private float AAMTargetObscuredDelay;
@@ -430,7 +433,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
             }
             x++;
         }
-        LeftDial = true;
         x = 0;
         foreach (UdonSharpBehaviour usb in EngineControl.Dial_Functions_L)
         {
@@ -442,7 +444,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             x++;
         }
         DialPosition = -999;
-        return;
+        Debug.LogWarning("DFUNC_AAM: Can't find self in dial functions");
     }
     public void KeyboardInput()
     {
@@ -452,6 +454,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
+            EngineControl.LStickSetAnimatorBool();
         }
         else
         {
@@ -459,6 +462,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
+            EngineControl.RStickSetAnimatorBool();
         }
     }
 }

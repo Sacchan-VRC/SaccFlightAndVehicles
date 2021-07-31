@@ -38,7 +38,7 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
   m_PositionCurves: []
   m_ScaleCurves: []
   m_FloatCurves:
@@ -67,7 +67,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon
     classID: 1
     script: {fileID: 0}
   m_PPtrCurves: []
@@ -79,14 +79,14 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
-      path: 2688970321
+      path: 3586128940
       attribute: 4
       script: {fileID: 0}
       typeID: 4
       customType: 4
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 192919776
+      path: 2286527109
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
@@ -120,6 +120,34 @@ AnimationClip:
       - serializedVersion: 3
         time: 0
         value: 0
+        inSlope: Infinity
+        outSlope: 59.999996
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 0.016666668
+        value: 1
+        inSlope: 59.999996
+        outSlope: Infinity
+        tangentMode: 69
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_IsActive
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon
+    classID: 1
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
         inSlope: 0
         outSlope: 0
         tangentMode: 69
@@ -139,7 +167,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.x
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -167,7 +195,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.y
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -195,36 +223,8 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: localEulerAnglesRaw.z
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
     classID: 4
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: Infinity
-        outSlope: 59.999996
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 0.016666668
-        value: 1
-        inSlope: 59.999996
-        outSlope: Infinity
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_IsActive
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon
-    classID: 1
     script: {fileID: 0}
   m_EulerEditorCurves:
   - curve:
@@ -233,8 +233,8 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.z
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
+    attribute: m_LocalEulerAngles.x
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -244,7 +244,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_LocalEulerAngles.y
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
     classID: 4
     script: {fileID: 0}
   - curve:
@@ -253,8 +253,8 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_LocalEulerAngles.x
-    path: CabinAnimationEmpty/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
+    attribute: m_LocalEulerAngles.z
+    path: CabinAnimationEmpty/InVehicleOnly/HUDController/bigstuff/hud_VTOLIcon/Hud_VTOLVector
     classID: 4
     script: {fileID: 0}
   m_HasGenericRootTransform: 0
