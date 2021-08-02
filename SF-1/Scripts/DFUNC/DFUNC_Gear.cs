@@ -82,7 +82,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_GearUp", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_GearUp");
         }
     }
     public void SetGearDown()
@@ -95,7 +95,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_GearDown", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_GearDown");
         }
     }
     public void ToggleGear()

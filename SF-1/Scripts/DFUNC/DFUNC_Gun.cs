@@ -60,6 +60,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         gameObject.SetActive(true);
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Active");
+        if (LeftDial)
+        { EngineControl.LStickSetAnimatorInt(); }
+        else
+        { EngineControl.RStickSetAnimatorInt(); }
     }
     public void DFUNC_Deselected()
     {
@@ -76,6 +80,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         firing = false;
         TriggerLastFrame = false;
         RequestSerialization();
+        EnableToSyncVariables();
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive");
         gameObject.SetActive(false);
         GunDamageParticle.gameObject.SetActive(false);
@@ -92,9 +97,9 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
+        EngineControl.ReSupplied++;
         if (GunAmmoInSeconds != FullGunAmmoInSeconds) { EngineControl.ReSupplied++; }
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
-        //enginecontrol.resupplyint +=1;
     }
     public void Set_Active()
     {
@@ -160,7 +165,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStartFiring");
                     firing = true;
                     if (EngineControl.IsOwner)
-                    { EngineControl.SendEventToExtensions("SFEXT_O_GunStartFiring", false); }
+                    { EngineControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
                 }
                 GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
                 if (GunRecoilEmptyNULL)
@@ -181,7 +186,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     firing = false;
                     TriggerLastFrame = false;
                     if (EngineControl.IsOwner)
-                    { EngineControl.SendEventToExtensions("SFEXT_O_GunStopFiring", false); }
+                    { EngineControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
                 }
             }
             if (TimeSinceSerialization > 1f)
@@ -430,7 +435,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
-            EngineControl.LStickSetAnimatorBool();
+            EngineControl.LStickSetAnimatorInt();
         }
         else
         {
@@ -438,7 +443,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
-            EngineControl.RStickSetAnimatorBool();
+            EngineControl.RStickSetAnimatorInt();
         }
     }
 }

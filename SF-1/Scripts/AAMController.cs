@@ -9,6 +9,8 @@ public class AAMController : UdonSharpBehaviour
     [SerializeField] private DFUNC_AAM DFUNC_AAMControl;
     [System.NonSerializedAttribute] public EngineController EngineControl;
     [SerializeField] private float MaxLifetime = 12;
+    [Tooltip("Strength of the effect of countermeasures on the missile")]
+    [SerializeField] private float FlareEffect = 1;
     [SerializeField] private AudioSource[] ExplosionSounds;
     [SerializeField] private float ColliderActiveDistance = 45;
     [SerializeField] private float RotSpeed = 400;
@@ -51,7 +53,7 @@ public class AAMController : UdonSharpBehaviour
                 if (TargetEngineControl != null)
                 {
                     if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                    { TargetEngineControl.MissilesIncoming++; }
+                    { TargetEngineControl.MissilesIncomingHeat++; }
 
                     MissileIncoming = true;
                     TargetIsPlane = true;
@@ -100,9 +102,10 @@ public class AAMController : UdonSharpBehaviour
             Vector3 Position = transform.position;
             Vector3 TargetPos = Target.position;
             float TargetDistance = Vector3.Distance(Position, TargetPos);
+            bool Dumb = Random.Range(0, 100) > EngineControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
             if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
             {
-                if (((TargetDistance < TargDistlastframe || LockHack)))
+                if ((!Dumb && TargetDistance < TargDistlastframe) || LockHack)
                 {
                     UnlockTime = 0;
                     //turn towards the target
@@ -129,7 +132,7 @@ public class AAMController : UdonSharpBehaviour
                 {
                     //just flew past the target, stop missile warning sound
                     if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                    { TargetEngineControl.MissilesIncoming -= 1; }
+                    { TargetEngineControl.MissilesIncomingHeat -= 1; }
                     MissileIncoming = false;
                 }
             }
@@ -157,7 +160,7 @@ public class AAMController : UdonSharpBehaviour
         if (MissileIncoming)
         {
             if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-            { TargetEngineControl.MissilesIncoming -= 1; }
+            { TargetEngineControl.MissilesIncomingHeat -= 1; }
             MissileIncoming = false;
         }
         if (TargetEngineControl != null)

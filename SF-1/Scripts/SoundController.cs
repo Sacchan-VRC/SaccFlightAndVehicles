@@ -550,13 +550,13 @@ public class SoundController : UdonSharpBehaviour
     {
         CanopyDown = true;
         CanopyTransitioning = false;
-        if (EngineControl.IsOwner) { EngineControl.SendEventToExtensions("SFEXT_O_CanopyDown", false); }
+        if (EngineControl.IsOwner) { EngineControl.SendEventToExtensions("SFEXT_O_CanopyDown"); }
     }
     public void SetCanopyDownFalse()
     {
         CanopyDown = false;
         CanopyTransitioning = false;
-        if (EngineControl.IsOwner) { EngineControl.SendEventToExtensions("SFEXT_O_CanopyUp", false); }
+        if (EngineControl.IsOwner) { EngineControl.SendEventToExtensions("SFEXT_O_CanopyUp"); }
     }
     public void SFEXT_O_PilotExit()
     {

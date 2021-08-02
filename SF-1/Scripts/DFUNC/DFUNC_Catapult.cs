@@ -46,17 +46,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
         VehicleAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         CatapultLockNull = (CatapultLock == null) ? true : false;
-
-        //active if in play mode without cyanemu
-        if (Networking.LocalPlayer != null)
-        {
-            gameObject.SetActive(false);
-        }
-        else
-        {
-            gameObject.SetActive(true);
-            Pilot = true;
-        }
     }
     public void DFUNC_Selected()
     {
@@ -209,7 +198,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                     {
                         Launching = true;
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PreLaunchCatapult");
-                        EngineControl.SendEventToExtensions("SFEXT_O_LaunchFromCatapult", false);
+                        EngineControl.SendEventToExtensions("SFEXT_O_LaunchFromCatapult");
                     }
                     TriggerLastFrame = true;
                 }

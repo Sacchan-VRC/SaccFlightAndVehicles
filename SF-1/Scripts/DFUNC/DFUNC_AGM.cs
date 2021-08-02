@@ -14,6 +14,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private Text HUDText_AGM_ammo;
     [SerializeField] private GameObject AtGScreen;
     [SerializeField] private GameObject Dial_Funcon;
+    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
+    [SerializeField] private float FullReloadTimeSec = 8;
     private bool Dial_FunconNULL = true;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] private int AGMUnlocking = 0;
@@ -39,6 +41,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private Quaternion AGMCamRotSlerper;
     private Quaternion AGMCamLastFrame;
     private bool func_active;
+    private float reloadspeed;
     private int AGMLAUNCHED_STRING = Animator.StringToHash("agmlaunched");
     private int AGMS_STRING = Animator.StringToHash("AGMs");
     private bool LeftDial = false;
@@ -49,6 +52,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         AGMUnlockNull = (AGMUnlock == null) ? true : false;
         AGMTargetLockNull = (AGMLock == null) ? true : false;
         FullAGMs = NumAGM;
+        reloadspeed = FullAGMs / FullReloadTimeSec;
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
         localPlayer = EngineControl.localPlayer;
         InEditor = EngineControl.InEditor;
@@ -88,8 +92,9 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
+        EngineControl.ReSupplied++;
         if (NumAGM != FullAGMs) { EngineControl.ReSupplied++; }
-        NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(FullAGMs / 5), 1), FullAGMs);
+        NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
@@ -103,6 +108,10 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         func_active = true;
         gameObject.SetActive(true);
+        if (LeftDial)
+        { EngineControl.LStickSetAnimatorInt(); }
+        else
+        { EngineControl.RStickSetAnimatorInt(); }
     }
     public void DFUNC_Deselected()
     {
@@ -157,7 +166,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                             {
                                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAGM");
                                 if (EngineControl.IsOwner)
-                                { EngineControl.SendEventToExtensions("SFEXT_O_AGMLaunch", false); }
+                                { EngineControl.SendEventToExtensions("SFEXT_O_AGMLaunch"); }
                             }
                             AGMUnlocking = 0;
                         }
@@ -352,7 +361,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
-            EngineControl.LStickSetAnimatorBool();
+            EngineControl.LStickSetAnimatorInt();
         }
         else
         {
@@ -360,7 +369,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
-            EngineControl.RStickSetAnimatorBool();
+            EngineControl.RStickSetAnimatorInt();
         }
     }
 }

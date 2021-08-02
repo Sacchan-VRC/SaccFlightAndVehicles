@@ -11,6 +11,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private Animator BombAnimator;
     [SerializeField] private GameObject Bomb;
+    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
+    [SerializeField] private float FullReloadTimeSec = 8;
     [SerializeField] private Text HUDText_Bomb_ammo;
     private float Trigger;
     private bool TriggerLastFrame;
@@ -25,6 +27,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private int BOMBLAUNCHED_STRING = Animator.StringToHash("bomblaunched");
     private int BOMBS_STRING = Animator.StringToHash("bombs");
     private Transform VehicleTransform;
+    private float reloadspeed;
     private bool LeftDial = false;
     private int DialPosition = -999;
     public void SFEXT_L_ECStart()
@@ -32,6 +35,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         FullBombs = NumBomb;
         if (BombHoldDelay < BombDelay) { BombHoldDelay = BombDelay; }
         FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
+        reloadspeed = FullBombs / FullReloadTimeSec;
         BombAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
         VehicleTransform = EngineControl.VehicleMainObj.transform;
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
@@ -56,6 +60,10 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
+        if (LeftDial)
+        { EngineControl.LStickSetAnimatorInt(); }
+        else
+        { EngineControl.RStickSetAnimatorInt(); }
     }
     public void DFUNC_Deselected()
     {
@@ -75,10 +83,10 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
+        EngineControl.ReSupplied++;
         if (NumBomb != FullBombs) { EngineControl.ReSupplied++; }
-        NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(FullBombs / 5), 1), FullBombs);
+        NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), NumBomb);
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
-        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
         BombPoint = 0;
     }
     private void Update()
@@ -97,7 +105,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
                     LastBombDropTime = Time.time;
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
                     if (EngineControl.IsOwner)
-                    { EngineControl.SendEventToExtensions("SFEXT_O_BombLaunch", false); }
+                    { EngineControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                 }
             }
             else//launch every BombHoldDelay
@@ -107,7 +115,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
                     LastBombDropTime = Time.time;
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
                     if (EngineControl.IsOwner)
-                    { EngineControl.SendEventToExtensions("SFEXT_O_BombLaunch", false); }
+                    { EngineControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                 }
             }
 
@@ -167,7 +175,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
-            EngineControl.LStickSetAnimatorBool();
+            EngineControl.LStickSetAnimatorInt();
         }
         else
         {
@@ -175,7 +183,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
-            EngineControl.RStickSetAnimatorBool();
+            EngineControl.RStickSetAnimatorInt();
         }
     }
 }

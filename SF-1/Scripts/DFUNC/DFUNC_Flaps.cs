@@ -22,34 +22,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private bool DragApplied;
     private bool LiftApplied;
     private bool MaxLiftApplied;
-    private void Update()
-    {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-        if (Trigger > 0.75)
-        {
-            if (!TriggerLastFrame) ToggleFlaps();
-            TriggerLastFrame = true;
-        }
-        else { TriggerLastFrame = false; }
-
-        if (Flaps)
-        {
-            if (EngineControl.PitchDown)//flaps on, but plane's angle of attack is negative so they have no helpful effect
-            {
-                if (LiftApplied) { EngineControl.ExtraLift -= FlapsLiftMulti; LiftApplied = false; }
-                if (MaxLiftApplied) { EngineControl.MaxLift = StartMaxLift; MaxLiftApplied = false; }
-            }
-            else//flaps on positive angle of attack, flaps are useful
-            {
-                if (!LiftApplied) { EngineControl.ExtraLift += FlapsLiftMulti; LiftApplied = true; }
-                if (!MaxLiftApplied) { EngineControl.MaxLift *= FlapsMaxLiftMulti; MaxLiftApplied = true; }
-            }
-        }
-    }
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
@@ -98,6 +70,34 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         else
         { SetFlapsOn(); }
     }
+    private void Update()
+    {
+        float Trigger;
+        if (UseLeftTrigger)
+        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+        else
+        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+        if (Trigger > 0.75)
+        {
+            if (!TriggerLastFrame) ToggleFlaps();
+            TriggerLastFrame = true;
+        }
+        else { TriggerLastFrame = false; }
+
+        if (Flaps)
+        {
+            if (EngineControl.PitchDown)//flaps on, but plane's angle of attack is negative so they have no helpful effect
+            {
+                if (LiftApplied) { EngineControl.ExtraLift -= FlapsLiftMulti; LiftApplied = false; }
+                if (MaxLiftApplied) { EngineControl.MaxLift = StartMaxLift; MaxLiftApplied = false; }
+            }
+            else//flaps on positive angle of attack, flaps are useful
+            {
+                if (!LiftApplied) { EngineControl.ExtraLift += FlapsLiftMulti; LiftApplied = true; }
+                if (!MaxLiftApplied) { EngineControl.MaxLift *= FlapsMaxLiftMulti; MaxLiftApplied = true; }
+            }
+        }
+    }
     public void KeyboardInput()
     {
         ToggleFlaps();
@@ -114,7 +114,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_FlapsOff", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_FlapsOff");
         }
     }
     public void SetFlapsOn()
@@ -129,7 +129,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_FlapsOn", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_FlapsOn");
         }
     }
 

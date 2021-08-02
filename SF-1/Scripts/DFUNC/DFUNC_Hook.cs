@@ -175,7 +175,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_HookDown", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_HookDown");
         }
     }
     public void SetHookUp()
@@ -186,7 +186,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_HookUp", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_HookUp");
         }
     }
     public void PlayCableSnap()

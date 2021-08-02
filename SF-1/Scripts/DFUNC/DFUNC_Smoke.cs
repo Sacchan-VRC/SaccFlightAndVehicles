@@ -8,8 +8,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
 {
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] EngineController EngineControl;
-    [SerializeField] private Animator SmokeAnimator;
     [SerializeField] private Material SmokeColorIndicatorMaterial;
+    [SerializeField] private ParticleSystem[] DisplaySmoke;
     [SerializeField] private GameObject Dial_Funcon;
     private Transform VehicleTransform;
     private bool Dial_FunconNULL = true;
@@ -18,22 +18,27 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private float SmokeHoldTime;
     private bool SetSmokeLastFrame;
     private Vector3 SmokeZeroPoint;
-    public ParticleSystem[] DisplaySmoke;
+    private ParticleSystem.EmissionModule[] DisplaySmokeem;
     private bool DisplaySmokeNull = true;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 SmokeColor = Vector3.one;
     [System.NonSerializedAttribute] public bool Smoking = false;
-    private int DISPLAYSMOKE_STRING = Animator.StringToHash("displaysmoke");
     [System.NonSerializedAttribute] public Color SmokeColor_Color;
     private Vector3 TempSmokeCol = Vector3.zero;
     private bool Pilot;
     private bool InPlane;
+    private int NumSmokes;
     public void SFEXT_L_ECStart()
     {
         localPlayer = Networking.LocalPlayer;
         VehicleTransform = EngineControl.VehicleMainObj.GetComponent<Transform>();
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
-        if (DisplaySmoke.Length > 0) DisplaySmokeNull = false;
+        NumSmokes = DisplaySmoke.Length;
+        if (NumSmokes > 0) DisplaySmokeNull = false;
+        DisplaySmokeem = new ParticleSystem.EmissionModule[NumSmokes];
+
+        for (int x = 0; x < DisplaySmokeem.Length; x++)
+        { DisplaySmokeem[x] = DisplaySmoke[x].emission; }
     }
     public void DFUNC_Selected()
     {
@@ -56,12 +61,15 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         Pilot = false;
         TriggerLastFrame = false;
         if (Smoking) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
-        gameObject.SetActive(false);
     }
     public void SFEXT_O_PassengerEnter()
     {
         InPlane = true;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Smoking);
+    }
+    public void SFEXT_G_Explode()
+    {
+        SetSmokingOff();
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -141,23 +149,25 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void SetSmokingOn()
     {
         Smoking = true;
-        SmokeAnimator.SetBool(DISPLAYSMOKE_STRING, true);
         gameObject.SetActive(true);
+        for (int x = 0; x < DisplaySmokeem.Length; x++)
+        { DisplaySmokeem[x].enabled = true; }
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_SmokeOn", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_SmokeOn");
         }
     }
     public void SetSmokingOff()
     {
         Smoking = false;
-        SmokeAnimator.SetBool(DISPLAYSMOKE_STRING, false);
         gameObject.SetActive(false);
+        for (int x = 0; x < DisplaySmokeem.Length; x++)
+        { DisplaySmokeem[x].enabled = false; }
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_SmokeOff", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_SmokeOff");
         }
     }
     public void ToggleSmoking()

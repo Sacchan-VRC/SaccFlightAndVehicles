@@ -8,7 +8,15 @@ public class DFUNC_Flares : UdonSharpBehaviour
 {
     [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
-    [SerializeField] private Animator FlaresAnimator;
+    [SerializeField] private int NumFlares = 60;
+    [Tooltip("How long a flare has an effect for")]
+    [SerializeField] private ParticleSystem[] FlareParticles;
+    [SerializeField] private float FlareActiveTime = 4f;
+    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
+    [SerializeField] private float FullReloadTimeSec = 15;
+    private int FullFlares;
+    private float reloadspeed;
+
     private bool TriggerLastFrame;
     private int FLARES_STRING = Animator.StringToHash("flares");
     public void DFUNC_Selected()
@@ -20,10 +28,20 @@ public class DFUNC_Flares : UdonSharpBehaviour
         gameObject.SetActive(false);
         TriggerLastFrame = false;
     }
+    public void SFEXT_L_ECStart()
+    {
+        FullFlares = NumFlares;
+        reloadspeed = FullFlares / FullReloadTimeSec;
+    }
     public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
         TriggerLastFrame = false;
+    }
+    public void SFEXT_O_ReSupply()
+    {
+        if (NumFlares != FullFlares) { EngineControl.ReSupplied++; }
+        NumFlares = (int)Mathf.Min(NumFlares + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullFlares);
     }
     private void Update()
     {
@@ -43,12 +61,25 @@ public class DFUNC_Flares : UdonSharpBehaviour
         }
         else { TriggerLastFrame = false; }
     }
-    public void LaunchFlares()
+    public void LaunchFlare()
     {
-        FlaresAnimator.SetTrigger(FLARES_STRING);
+        NumFlares--;
+        int d = FlareParticles.Length;
+        for (int x = 0; x < d; x++)
+        { FlareParticles[x].Play(); }
     }
     public void KeyboardInput()
     {
-        FlaresAnimator.SetTrigger(FLARES_STRING);
+        LaunchFlare();
     }
+    public void AddFlare()
+    {
+        EngineControl.NumActiveFlares++;
+        EngineControl.SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
+    }
+    public void RemoveFlare()
+    {
+        EngineControl.NumActiveFlares--;
+    }
+
 }

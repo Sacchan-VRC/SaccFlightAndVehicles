@@ -32,7 +32,8 @@ public class DFUNC_Brake : UdonSharpBehaviour
         VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
         HasAirBrake = AirbrakeStrength != 0;
         Airbrake_sndNULL = Airbrake_snd == null;
-        if (!Networking.LocalPlayer.isMaster)
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+        if (localPlayer!= null && !localPlayer.isMaster)
         { gameObject.SetActive(false); }
         else
         { gameObject.SetActive(true); }

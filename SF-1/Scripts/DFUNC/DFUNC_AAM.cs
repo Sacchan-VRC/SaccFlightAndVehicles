@@ -13,6 +13,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private int NumAAM = 0;
     [SerializeField] private float Lock_Angle = 15;
     [SerializeField] private float AAMLockTime = 1.5f;
+    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 10;
     private int FullAAMs;
     private int NumAAMTargets;
@@ -38,8 +39,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
     public void SFEXT_L_ECStart()
     {
-        reloadspeed = FullAAMs / FullReloadTimeSec;
         FullAAMs = NumAAM;
+        reloadspeed = FullAAMs / FullReloadTimeSec;
         NumAAMTargets = EngineControl.NumAAMTargets;
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
         AAMTargets = EngineControl.AAMTargets;
@@ -103,9 +104,11 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
+        EngineControl.ReSupplied++;
         if (NumAAM != FullAAMs) { EngineControl.ReSupplied++; }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
         AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
+        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -122,6 +125,11 @@ public class DFUNC_AAM : UdonSharpBehaviour
         gameObject.SetActive(true);
         func_active = true;
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
+
+        if (LeftDial)
+        { EngineControl.LStickSetAnimatorInt(); }
+        else
+        { EngineControl.RStickSetAnimatorInt(); }
     }
     public void DFUNC_Deselected()
     {
@@ -174,7 +182,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
                             if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                             if (EngineControl.IsOwner)
-                            { EngineControl.SendEventToExtensions("SFEXT_O_AAMLaunch", false); }
+                            { EngineControl.SendEventToExtensions("SFEXT_O_AAMLaunch"); }
                         }
                     }
                     TriggerLastFrame = true;
@@ -454,7 +462,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
-            EngineControl.LStickSetAnimatorBool();
+            EngineControl.LStickSetAnimatorInt();
         }
         else
         {
@@ -462,7 +470,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
-            EngineControl.RStickSetAnimatorBool();
+            EngineControl.RStickSetAnimatorInt();
         }
     }
 }

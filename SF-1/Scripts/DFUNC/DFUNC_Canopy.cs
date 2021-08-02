@@ -178,7 +178,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         SoundControl.SendCustomEvent("SetCanopyDownFalse");
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_CanopyOpened", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_CanopyOpened");
         }
     }
     public void CanopyClosing()
@@ -192,7 +192,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         SoundControl.SendCustomEventDelayedSeconds("SetCanopyDownTrue", CanopyCloseTime);
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_CanopyClosed", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_CanopyClosed");
         }
     }
     public void CanopyBreakOff()
@@ -205,7 +205,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         SoundControl.SendCustomEvent("SetCanopyDownFalse");
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_CanopyBreak", false);
+            EngineControl.SendEventToExtensions("SFEXT_O_CanopyBreak");
         }
     }
     public void ToggleCanopy()

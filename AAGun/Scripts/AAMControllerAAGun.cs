@@ -40,7 +40,7 @@ public class AAMControllerAAGun : UdonSharpBehaviour
             if (TargetEngineControl != null)
             {
                 if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                { TargetEngineControl.MissilesIncoming++; }
+                { TargetEngineControl.MissilesIncomingHeat++; }
 
                 MissileIncoming = true;
             }
@@ -117,7 +117,7 @@ public class AAMControllerAAGun : UdonSharpBehaviour
                 {
                     //just flew past the target, stop missile warning sound
                     if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                    { TargetEngineControl.MissilesIncoming -= 1; }
+                    { TargetEngineControl.MissilesIncomingHeat -= 1; }
                     MissileIncoming = false;
                 }
             }
@@ -144,7 +144,7 @@ public class AAMControllerAAGun : UdonSharpBehaviour
         if (MissileIncoming)
         {
             if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-            { TargetEngineControl.MissilesIncoming -= 1; }
+            { TargetEngineControl.MissilesIncomingHeat -= 1; }
             MissileIncoming = false;
         }
         if (TargetEngineControl != null)
