@@ -6,11 +6,13 @@ using VRC.Udon;
 
 public class DFUNC_Limits : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private GameObject Dial_Funcon;
+    private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     private void Update()
     {
         float Trigger;

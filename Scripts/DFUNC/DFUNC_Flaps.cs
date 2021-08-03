@@ -6,7 +6,6 @@ using VRC.Udon;
 
 public class DFUNC_Flaps : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] EngineController EngineControl;
     [SerializeField] private Animator FlapsAnimator;
     [SerializeField] private GameObject Dial_Funcon;
@@ -14,6 +13,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     [SerializeField] private float FlapsDragMulti = 1.4f;
     [SerializeField] private float FlapsLiftMulti = 1.35f;
     [SerializeField] private float FlapsMaxLiftMulti = 1;
+    private bool UseLeftTrigger = false;
     private bool Flaps = true;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
@@ -22,6 +22,8 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private bool DragApplied;
     private bool LiftApplied;
     private bool MaxLiftApplied;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);

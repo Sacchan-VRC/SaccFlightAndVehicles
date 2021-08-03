@@ -6,7 +6,6 @@ using VRC.Udon;
 
 public class DFUNC_Flares : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private int NumFlares = 60;
     [Tooltip("How long a flare has an effect for")]
@@ -14,11 +13,14 @@ public class DFUNC_Flares : UdonSharpBehaviour
     [SerializeField] private float FlareActiveTime = 4f;
     [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 15;
+    private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;
 
     private bool TriggerLastFrame;
     private int FLARES_STRING = Animator.StringToHash("flares");
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);

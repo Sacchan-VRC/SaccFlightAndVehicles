@@ -6,7 +6,6 @@ using VRC.Udon;
 
 public class DFUNC_Gun : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger = false;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private Animator GunAnimator;
     [SerializeField] private Transform GunRecoilEmpty;
@@ -14,8 +13,9 @@ public class DFUNC_Gun : UdonSharpBehaviour
     [SerializeField] private GameObject HudCrosshairGun;
     [SerializeField] private GameObject HudCrosshair;
     [SerializeField] private float FullReloadTimeSec = 20;
-    private float FullGunAmmoInSeconds = 12;
     [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
+    private bool UseLeftTrigger = false;
+    private float FullGunAmmoInSeconds = 12;
     private float GunRecoil;
     private Rigidbody VehicleRigidbody;
     private bool TriggerLastFrame;
@@ -31,6 +31,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool Initialized = false;
     private bool LeftDial = false;
     private int DialPosition = -999;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;

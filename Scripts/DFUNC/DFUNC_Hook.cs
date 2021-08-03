@@ -6,7 +6,6 @@ using VRC.Udon;
 
 public class DFUNC_Hook : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private AudioSource CableSnap;
@@ -14,6 +13,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [SerializeField] private float HookedBrakeStrength = 55f;
     [SerializeField] private float HookedCableSnapDistance = 120f;
     [SerializeField] private DFUNC_Brake BrakeFunction;
+    private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool CableSnapNull;
     private bool BreakFunctionNULL;
     public LayerMask HookCableLayer;
@@ -29,6 +29,8 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [System.NonSerializedAttribute] private bool HookDown = false;
     private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
     private bool DisableGroundBrake;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         Dial_FunconNULL = Dial_Funcon == null;

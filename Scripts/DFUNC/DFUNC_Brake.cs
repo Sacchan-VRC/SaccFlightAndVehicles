@@ -6,11 +6,11 @@ using VRC.Udon;
 
 public class DFUNC_Brake : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private AudioSource Airbrake_snd;
     [SerializeField] private Animator BrakeAnimator;
     [SerializeField] private KeyCode KeyboardControl = KeyCode.B;
+    private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] private float BrakeInput;
     private Rigidbody VehicleRigidbody;
     private bool HasAirBrake;
@@ -27,6 +27,8 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private float DragAdded = 0;
     private float NonLocalActiveDelay;//this var is for adding a min delay for disabling for non-local users to account for lag
     private bool Selected;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();

@@ -7,7 +7,6 @@ using VRC.Udon;
 
 public class DFUNC_AGM : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] public EngineController EngineControl;
     [SerializeField] private Animator AGMAnimator;
     [SerializeField] private Camera AtGCam;
@@ -16,6 +15,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private GameObject Dial_Funcon;
     [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
+    private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] private int AGMUnlocking = 0;
@@ -46,7 +46,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private int AGMS_STRING = Animator.StringToHash("AGMs");
     private bool LeftDial = false;
     private int DialPosition = -999;
-
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         AGMUnlockNull = (AGMUnlock == null) ? true : false;

@@ -6,11 +6,11 @@ using VRC.Udon;
 
 public class DFUNC_Smoke : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] EngineController EngineControl;
     [SerializeField] private Material SmokeColorIndicatorMaterial;
     [SerializeField] private ParticleSystem[] DisplaySmoke;
     [SerializeField] private GameObject Dial_Funcon;
+    private bool UseLeftTrigger = false;
     private Transform VehicleTransform;
     private bool Dial_FunconNULL = true;
     private VRCPlayerApi localPlayer;
@@ -27,6 +27,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private bool Pilot;
     private bool InPlane;
     private int NumSmokes;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         localPlayer = Networking.LocalPlayer;

@@ -6,17 +6,19 @@ using VRC.Udon;
 
 public class DFUNC_Gear : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private Animator GearAnimator;
     [SerializeField] private float LandingGearDragMulti = 1.3f;
+    private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     [System.NonSerializedAttribute] public bool GearUp = false;
     private bool DragApplied = false;
     private bool DisableGroundDetector = false;
     private int GEARUP_STRING = Animator.StringToHash("gearup");
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         LandingGearDragMulti -= 1;//to match how the old values worked

@@ -6,7 +6,6 @@ using VRC.Udon;
 
 public class DFUNC_Canopy : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private UdonSharpBehaviour SoundControl;
     [SerializeField] private GameObject Dial_Funcon;
@@ -16,6 +15,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     [Header("Meters/s")]
     [SerializeField] private float CanopyBreakSpeed = 50;
     [SerializeField] private float CanopyAutoCloseSpeed = 20;
+    private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     private Transform VehicleTransform;
@@ -31,6 +31,8 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     private bool CanopyBroken;
     private bool Selected;
     private float LastCanopyToggleTime = -999;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         localPlayer = Networking.LocalPlayer;

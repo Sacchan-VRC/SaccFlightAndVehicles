@@ -7,22 +7,22 @@ using VRC.Udon;
 
 public class DFUNC_Bomb : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private Animator BombAnimator;
     [SerializeField] private GameObject Bomb;
     [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
     [SerializeField] private Text HUDText_Bomb_ammo;
+    [SerializeField] private int NumBomb = 4;
+    [SerializeField] private float BombHoldDelay = 0.5f;
+    [SerializeField] private float BombDelay = 0f;
+    [SerializeField] private Transform[] BombLaunchPoints;
+    private bool UseLeftTrigger = false;
     private float Trigger;
     private bool TriggerLastFrame;
-    public int NumBomb = 4;
-    public float BombHoldDelay = 0.5f;
-    public float BombDelay = 0f;
-    public Transform[] BombLaunchPoints;
-    [System.NonSerializedAttribute] public int BombPoint = 0;
+    private int BombPoint = 0;
     private float LastBombDropTime = 0f;
-    [System.NonSerializedAttribute] public int FullBombs;
+    private int FullBombs;
     private float FullBombsDivider;
     private int BOMBLAUNCHED_STRING = Animator.StringToHash("bomblaunched");
     private int BOMBS_STRING = Animator.StringToHash("bombs");
@@ -30,6 +30,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private float reloadspeed;
     private bool LeftDial = false;
     private int DialPosition = -999;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         FullBombs = NumBomb;

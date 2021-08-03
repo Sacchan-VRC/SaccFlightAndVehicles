@@ -6,8 +6,9 @@ using VRC.Udon;
 
 public class PilotSeat : UdonSharpBehaviour
 {
-    public EngineController EngineControl;
-    public GameObject SeatAdjuster;
+    [SerializeField] private EngineController EngineControl;
+    [SerializeField] private GameObject SeatAdjuster;
+    [SerializeField] private GameObject ThisPassengerOnly;
     private int ThisStationID;
     private bool SeatInitialized = false;
     private Transform Seat;

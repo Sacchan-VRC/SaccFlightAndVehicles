@@ -7,7 +7,6 @@ using VRC.Udon;
 
 public class DFUNC_AAM : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger = false;
     [SerializeField] public EngineController EngineControl;
     [SerializeField] private Animator AAMAnimator;
     [SerializeField] private int NumAAM = 0;
@@ -15,6 +14,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private float AAMLockTime = 1.5f;
     [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 10;
+    private bool UseLeftTrigger = false;
     private int FullAAMs;
     private int NumAAMTargets;
     private float AAMLockAngle = 15;
@@ -36,7 +36,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private float reloadspeed;
     private bool LeftDial = false;
     private int DialPosition = -999;
-
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         FullAAMs = NumAAM;

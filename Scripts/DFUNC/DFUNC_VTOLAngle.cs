@@ -6,9 +6,9 @@ using VRC.Udon;
 
 public class DFUNC_VTOLAngle : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] EngineController EngineControl;
     [SerializeField] private GameObject Dial_Funcon;
+    private bool UseLeftTrigger = false;
     private float VTOLDefault;
     private bool Dial_FunconNULL = true;
     private Transform VehicleTransform;
@@ -17,6 +17,8 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
     private float VTOLTemp;
     private float VTOLZeroPoint;
     private float ThrottleSensitivity;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         VTOLDefault = EngineControl.VTOLDefaultValue;

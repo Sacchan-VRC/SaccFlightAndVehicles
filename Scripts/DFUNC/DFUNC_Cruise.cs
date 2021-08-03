@@ -6,9 +6,9 @@ using VRC.Udon;
 
 public class DFUNC_Cruise : UdonSharpBehaviour
 {
-    [SerializeField] private bool UseLeftTrigger;
     [SerializeField] EngineController EngineControl;
     [SerializeField] private GameObject Dial_Funcon;
+    private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     private Transform VehicleTransform;
@@ -16,6 +16,8 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     private float CruiseTemp;
     private float SpeedZeroPoint;
     private float TriggerTapTime = 1;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
         localPlayer = Networking.LocalPlayer;

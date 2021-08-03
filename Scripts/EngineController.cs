@@ -482,6 +482,7 @@ public class EngineController : UdonSharpBehaviour
         VTolAngle90Plus = VTOLMaxAngle > 90;
 
 
+        TellDFUNCsLR();
         SendEventToExtensions("SFEXT_L_ECStart");
         if (InEditor)
         {
@@ -1820,6 +1821,19 @@ public class EngineController : UdonSharpBehaviour
             ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
             ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
             ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+        }
+    }
+    public void TellDFUNCsLR()
+    {
+        foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
+        {
+            if (EXT != null)
+            { EXT.SendCustomEvent("DFUNC_LeftDial"); }
+        }
+        foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+        {
+            if (EXT != null)
+            { EXT.SendCustomEvent("DFUNC_RightDial"); }
         }
     }
     public void TakeOwnerShipOfExtensions()
