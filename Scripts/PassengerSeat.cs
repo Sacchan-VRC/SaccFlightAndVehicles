@@ -15,7 +15,6 @@ public class PassengerSeat : UdonSharpBehaviour
     private bool SeatInitialized = false;
     private Transform Seat;
     private Quaternion SeatStartRot;
-    [SerializeField] private GameObject[] SetOwnerObjects;
     private VRCPlayerApi localPlayer;
     private void Start()
     {
@@ -41,16 +40,11 @@ public class PassengerSeat : UdonSharpBehaviour
         EngineControl.MySeat = ThisStationID;
         if (PassengerOnly != null) { PassengerOnly.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-
-        foreach (GameObject obj in SetOwnerObjects)
-        {
-            if (!localPlayer.IsOwner(obj.gameObject))
-            { Networking.SetOwner(localPlayer, obj); }
-        }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
         if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
+        EngineControl.PassengerEnterPlaneGlobal();
 
         //voice range change to allow talking inside cockpit (after VRC patch 1008)
         if (player != null)
@@ -89,6 +83,7 @@ public class PassengerSeat : UdonSharpBehaviour
     public void PlayerExitPlane(VRCPlayerApi player)
     {
         if (!SeatInitialized) { InitializeSeat(); }
+        EngineControl.PassengerExitPlaneGlobal();
 
         EngineControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)

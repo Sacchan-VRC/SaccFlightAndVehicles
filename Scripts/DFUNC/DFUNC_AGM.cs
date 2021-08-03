@@ -93,8 +93,10 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
-        EngineControl.ReSupplied++;
-        if (NumAGM != FullAGMs) { EngineControl.ReSupplied++; }
+        if (NumAGM != FullAGMs)
+        {
+            EngineControl.ReSupplied++;
+        }
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
@@ -109,10 +111,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         func_active = true;
         gameObject.SetActive(true);
-        if (LeftDial)
-        { EngineControl.LStickSetAnimatorInt(); }
-        else
-        { EngineControl.RStickSetAnimatorInt(); }
     }
     public void DFUNC_Deselected()
     {
@@ -362,7 +360,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
-            EngineControl.LStickSetAnimatorInt();
         }
         else
         {
@@ -370,7 +367,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
-            EngineControl.RStickSetAnimatorInt();
         }
     }
 }

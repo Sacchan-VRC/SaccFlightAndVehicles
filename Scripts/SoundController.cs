@@ -562,11 +562,11 @@ public class SoundController : UdonSharpBehaviour
     {
         MenuSoundCheckLast = 0;
     }
-    public void SFEXT_O_TakeOff()
+    public void SFEXT_G_TouchDown()
     {
         if (EngineControl.Speed > TouchDownSoundSpeed)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayTouchDownSound");
+            PlayTouchDownSound();
         }
 
     }

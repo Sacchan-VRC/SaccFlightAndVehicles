@@ -62,10 +62,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         gameObject.SetActive(true);
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Active");
-        if (LeftDial)
-        { EngineControl.LStickSetAnimatorInt(); }
-        else
-        { EngineControl.RStickSetAnimatorInt(); }
     }
     public void DFUNC_Deselected()
     {
@@ -437,7 +433,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
-            EngineControl.LStickSetAnimatorInt();
         }
         else
         {
@@ -445,7 +440,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
-            EngineControl.RStickSetAnimatorInt();
         }
     }
 }

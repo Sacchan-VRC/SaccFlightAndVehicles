@@ -105,7 +105,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
-        EngineControl.ReSupplied++;
         if (NumAAM != FullAAMs) { EngineControl.ReSupplied++; }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
         AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
@@ -116,7 +115,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         NumAAM = FullAAMs;
         AAMAnimator.SetFloat(AAMS_STRING, 1);
     }
-    public void SFEXT_O_TouchDown()
+    public void SFEXT_G_TouchDown()
     {
         AAMLockTimer = 0;
         AAMTargetedTimer = 2;
@@ -126,11 +125,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
         gameObject.SetActive(true);
         func_active = true;
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
-
-        if (LeftDial)
-        { EngineControl.LStickSetAnimatorInt(); }
-        else
-        { EngineControl.RStickSetAnimatorInt(); }
     }
     public void DFUNC_Deselected()
     {
@@ -463,7 +457,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
-            EngineControl.LStickSetAnimatorInt();
         }
         else
         {
@@ -471,7 +464,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
-            EngineControl.RStickSetAnimatorInt();
         }
     }
 }

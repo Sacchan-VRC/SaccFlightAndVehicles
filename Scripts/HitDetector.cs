@@ -52,13 +52,6 @@ public class HitDetector : UdonSharpBehaviour
     {
         EngineControl.PlaneHit();
     }
-    public void Respawn()//called by the explode animation on last frame
-    {
-        if (EngineControl.IsOwner)
-        {
-            EngineControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Respawn_event");//owner broadcasts because it's more reliable than everyone doing it individually
-        }
-    }
     private void Assert(bool condition, string message)
     {
         if (!condition)

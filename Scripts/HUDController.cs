@@ -48,6 +48,8 @@ public class HUDController : UdonSharpBehaviour
     private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     VRCPlayerApi localPlayer;
+    private int LStickSelectionLastFrame = -1;
+    private int RStickSelectionLastFrame = -1;
     private void Start()
     {
         Assert(EngineControl != null, "Start: EngineControl != null");
@@ -89,6 +91,8 @@ public class HUDController : UdonSharpBehaviour
     private void OnEnable()
     {
         maxGs = 0f;
+        LStickSelectionLastFrame = -1;
+        RStickSelectionLastFrame = -1;
     }
     private void LateUpdate()
     {
@@ -137,20 +141,26 @@ public class HUDController : UdonSharpBehaviour
         }
         else { HudHold.SetActive(false); }
 
-        int StickValue = EngineControl.LStickSelection;
-        if (StickValue < 0)
-        { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
-        else
+        int StickSelection = EngineControl.LStickSelection;
+        if (StickSelection != LStickSelectionLastFrame)
         {
-            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * StickValue, 0);
+            if (StickSelection < 0)
+            { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
+            else
+            {
+                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * StickSelection, 0);
+            }
         }
 
-        StickValue = EngineControl.RStickSelection;
-        if (StickValue < 0)
-        { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
-        else
+        StickSelection = EngineControl.RStickSelection;
+        if (StickSelection != RStickSelectionLastFrame)
         {
-            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * StickValue, 0);
+            if (StickSelection < 0)
+            { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
+            else
+            {
+                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * StickSelection, 0);
+            }
         }
 
 

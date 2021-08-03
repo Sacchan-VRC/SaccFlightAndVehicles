@@ -300,7 +300,7 @@ public class EngineController : UdonSharpBehaviour
     private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
     private int LOCALPASSENGER_STRING = Animator.StringToHash("localpassenger");
     private int OCCUPIED_STRING = Animator.StringToHash("occupied");
-    private int RESPAWN_STRING = Animator.StringToHash("respawn");
+    private int REAPPEAR_STRING = Animator.StringToHash("reappear");
 
     //old Leavebutton Stuff
     [System.NonSerializedAttribute] public int PilotSeat = -1;
@@ -312,6 +312,15 @@ public class EngineController : UdonSharpBehaviour
     //end of old Leavebutton stuff
     private void Start()
     {
+        localPlayer = Networking.LocalPlayer;
+        if (localPlayer == null) { InEditor = true; Piloting = true; }
+        else
+        {
+            InEditor = false;
+            InVR = localPlayer.IsUserInVR();
+            InVehicleOnly.SetActive(true);
+        }
+
         PlaneHitDetector = VehicleMainObj.GetComponent<HitDetector>();
         VehicleTransform = VehicleMainObj.GetComponent<Transform>();
         VehicleRigidbody = VehicleMainObj.GetComponent<Rigidbody>();
@@ -369,16 +378,6 @@ public class EngineController : UdonSharpBehaviour
         PitchThrustVecMultiStart = PitchThrustVecMulti;
         YawThrustVecMultiStart = YawThrustVecMulti;
         RollThrustVecMultiStart = RollThrustVecMulti;
-
-
-        localPlayer = Networking.LocalPlayer;
-        if (localPlayer == null) { InEditor = true; Piloting = true; }
-        else
-        {
-            InEditor = false;
-            InVR = localPlayer.IsUserInVR();
-            InVehicleOnly.SetActive(true);
-        }
 
         if (!HasLimits) { FlightLimitsEnabled = false; }
 
@@ -448,6 +447,8 @@ public class EngineController : UdonSharpBehaviour
         LowFuel = 200;//FullFuel * .13888888f;//to match the old default settings
         LowFuelDivider = 1 / LowFuel;
 
+        //thrust is lerped towards VTOLThrottleStrengthMulti by VTOLAngle, unless VTOLMaxAngle is greater than 90 degrees, then it's lerped by 90=1
+        VTolAngle90Plus = VTOLMaxAngle > 90;
 
         LStickNumFuncs = Dial_Functions_L.Length;
         RStickNumFuncs = Dial_Functions_R.Length;
@@ -478,10 +479,6 @@ public class EngineController : UdonSharpBehaviour
         RStickCheckAngle.x = angle.x;
         RStickCheckAngle.y = angle.z;
 
-        //thrust is lerped towards VTOLThrottleStrengthMulti by VTOLAngle, unless VTOLMaxAngle is greater than 90 degrees, then it's lerped by 90=1
-        VTolAngle90Plus = VTOLMaxAngle > 90;
-
-
         TellDFUNCsLR();
         SendEventToExtensions("SFEXT_L_ECStart");
         if (InEditor)
@@ -490,17 +487,43 @@ public class EngineController : UdonSharpBehaviour
             PilotEnterPlaneGlobal(null);
         }
     }
+    public void TouchDown()
+    {
+        Taxiing = true;
+        SendEventToExtensions("SFEXT_G_TouchDown");
+    }
+    public void TakeOff()
+    {
+        Taxiing = false;
+        SendEventToExtensions("SFEXT_G_TakeOff");
+    }
     private void LateUpdate()
     {
         float DeltaTime = Time.deltaTime;
         if (!InEditor) { IsOwner = localPlayer.IsOwner(VehicleMainObj); }
         else { IsOwner = true; }
-        if (DisableGroundDetector == 0 && DisableGroundDetector == 0 && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore))
-        { Taxiing = true; }
-        else { Taxiing = false; }
 
         if (IsOwner)//works in editor or ingame
         {
+            if (DisableGroundDetector == 0 && DisableGroundDetector == 0 && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore))
+            {//play a touchdown sound the frame we start taxiing
+                if (Landed == false)
+                {
+                    Landed = true;
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TouchDown");
+                }
+                Taxiing = true;
+            }
+            else
+            {
+                if (Landed == true)
+                {
+                    Landed = false;
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TakeOff");
+                }
+                Taxiing = false;
+            }
+
             if (!dead)
             {
                 //G/crash Damage
@@ -570,18 +593,18 @@ public class EngineController : UdonSharpBehaviour
                 bool Ctrl = Input.GetKey(KeyCode.LeftControl);
                 int Shiftf = Shift ? 1 : 0;
                 int LeftControlf = Ctrl ? 1 : 0;
-                Vector2 LStick = new Vector2(0, 0);
-                Vector2 RStick = new Vector2(0, 0);
+                Vector2 LStickPos = new Vector2(0, 0);
+                Vector2 RStickPos = new Vector2(0, 0);
                 float LGrip = 0;
                 float RGrip = 0;
                 float LTrigger = 0;
                 float RTrigger = 0;
                 if (!InEditor)
                 {
-                    LStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                    LStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                    RStick.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                    RStick.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                    LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                    LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                    RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                    RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                     LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
                     RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                     LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
@@ -600,9 +623,9 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 //LStick Selection wheel
-                if (InVR && LStick.magnitude > .7f)
+                if (InVR && LStickPos.magnitude > .7f)
                 {
-                    float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStick);
+                    float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
 
                     //R stick value is manually synced using events because i don't want to use too many synced variables.
                     //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
@@ -610,16 +633,17 @@ public class EngineController : UdonSharpBehaviour
                     int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / LStickFuncDegrees, LStickNumFuncs - 1));
                     if (!LStickNULL[newselection])
                     { LStickSelection = newselection; }
-                    if (VehicleAnimator.GetInteger(Lstickselection_STRING) != LStickSelection)
-                    {
-                        LStickSetAnimatorInt();
-                    }
+                    //doing this in DFUNC scripts that need it instead so that we send less events
+                    /*                     if (VehicleAnimator.GetInteger(Lstickselection_STRING) != LStickSelection)
+                                        {
+                                            LStickSetAnimatorInt();
+                                        } */
                 }
 
                 //RStick Selection wheel
-                if (InVR && RStick.magnitude > .7f)
+                if (InVR && RStickPos.magnitude > .7f)
                 {
-                    float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStick);
+                    float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
 
                     //R stick value is manually synced using events because i don't want to use too many synced variables.
                     //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
@@ -627,10 +651,11 @@ public class EngineController : UdonSharpBehaviour
                     int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / RStickFuncDegrees, RStickNumFuncs - 1));
                     if (!RStickNULL[newselection])
                     { RStickSelection = newselection; }
-                    if (VehicleAnimator.GetInteger(Rstickselection_STRING) != RStickSelection)
-                    {
-                        RStickSetAnimatorInt();
-                    }
+                    //doing this in DFUNC scripts that need it instead so that we send less events
+                    /*                     if (VehicleAnimator.GetInteger(Rstickselection_STRING) != RStickSelection)
+                                        {
+                                            RStickSetAnimatorInt();
+                                        } */
                 }
 
 
@@ -929,8 +954,8 @@ public class EngineController : UdonSharpBehaviour
                     if (!InVR)
                     {
                         //allow stick flight in desktop mode
-                        VRPitchRoll = LStick;
-                        JoystickPosYaw.x = RStick.x;
+                        VRPitchRoll = LStickPos;
+                        JoystickPosYaw.x = RStickPos.x;
                         //make stick input square
                         if (Mathf.Abs(VRPitchRoll.x) > Mathf.Abs(VRPitchRoll.y))
                         {
@@ -1143,22 +1168,6 @@ public class EngineController : UdonSharpBehaviour
             }
 
             SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
-
-            //play a touchdown sound the frame we start taxiing
-            if (Landed == false && Taxiing == true)
-            {
-                SendEventToExtensions("SFEXT_O_TouchDown");
-                Landed = true;
-            }
-            else if (Taxiing == true)
-            { Landed = true; }
-            else if (Landed == true && Taxiing == false)
-            {
-                Landed = false;
-                SendEventToExtensions("SFEXT_O_TakeOff");
-            }
-            else
-            { Landed = false; }
         }
         else//non-owners need to know these values
         {
@@ -1276,21 +1285,28 @@ public class EngineController : UdonSharpBehaviour
     {
         VehicleAnimator.SetTrigger("reappear");
     }
-    public void NotDead()//called by 'respawn' animation twice because calling on the last frame of animation is unreliable for some reason
+    public void NotDead()
     {
         Health = FullHealth;
         dead = false;
     }
     public void MoveToSpawn()
     {
+        PlayerThrottle = 0;//for editor test mode
+        EngineOutput = 0;//^
+        //these could get set after death by lag, probably
+        MissilesIncomingHeat = 0;
+        MissilesIncomingRadar = 0;
+        MissilesIncomingOther = 0;
         if (IsOwner)
         {
-            VehicleObjectSync.Respawn();
+            Health = FullHealth;
+            VehicleObjectSync.Respawn();//this works if done just locally;
             if (IsOwner)
             {
-                SendEventToExtensions("SFEXT_G_MoveToSpawn");
+                SendEventToExtensions("SFEXT_O_MoveToSpawn");
             }
-        }//this works if done just locally; 
+        }
     }
     public void IncreaseKills()
     {
@@ -1429,9 +1445,7 @@ public class EngineController : UdonSharpBehaviour
         if (HasLimits) { SetLimitsOn(); }
         //these two make it invincible and unable to be respawned again for 5s
         dead = true;
-        VehicleAnimator.SetTrigger(RESPAWN_STRING);
-        RStick0();
-        LStick0();
+
 
         SendEventToExtensions("SFEXT_G_RespawnButton");
     }
@@ -1444,23 +1458,6 @@ public class EngineController : UdonSharpBehaviour
         if (IsOwner)
         {
             SendEventToExtensions("SFEXT_O_PlaneHit");
-        }
-    }
-    public void Respawn_event()//called by Respawn() in HitDetector 3 seconds before respawn by animation
-    {
-        PlayerThrottle = 0;//for editor test mode
-        EngineOutput = 0;//^
-        MissilesIncomingHeat = 0;
-        MissilesIncomingRadar = 0;
-        MissilesIncomingOther = 0;
-        if (InEditor)
-        {
-            VehicleTransform.SetPositionAndRotation(Spawnposition, Quaternion.Euler(Spawnrotation));
-            Health = FullHealth;
-        }
-        else if (IsOwner)
-        {
-            Health = FullHealth;
         }
     }
     public override void OnPlayerJoined(VRCPlayerApi player)
@@ -1496,6 +1493,14 @@ public class EngineController : UdonSharpBehaviour
         SetPlaneLayerOutside();
 
         SendEventToExtensions("SFEXT_P_PassengerExit");
+    }
+    public void PassengerEnterPlaneGlobal()
+    {
+        SendEventToExtensions("SFEXT_G_PassengerEnter");
+    }
+    public void PassengerExitPlaneGlobal()
+    {
+        SendEventToExtensions("SFEXT_G_PassengerExit");
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
@@ -1889,85 +1894,6 @@ public class EngineController : UdonSharpBehaviour
         Mathf.Max((Mathf.Max(Throttle, ThrottleAfterburnerPoint) - ThrottleAfterburnerPoint) * ABNormalizer, 0));
     }
     //these can be used for syncing weapon selection for bomb bay doors animation etc
-    public void LStickSetAnimatorInt()
-    {
-        switch (LStickSelection)
-        {
-            case 0: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick0"); break;
-            case 1: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick1"); break;
-            case 2: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick2"); break;
-            case 3: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick3"); break;
-            case 4: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick4"); break;
-            case 5: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick5"); break;
-            case 6: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick6"); break;
-            case 7: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick7"); break;
-            case 8: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick8"); break;
-            case 9: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick9"); break;
-            case 10: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick10"); break;
-            case 11: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick11"); break;
-            case 12: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick12"); break;
-            case 13: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick13"); break;
-            case 14: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick14"); break;
-            case 15: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LStick15"); break;
-        }
-    }
-    public void RStickSetAnimatorInt()
-    {
-        switch (RStickSelection)
-        {
-            case 0: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick0"); break;
-            case 1: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick1"); break;
-            case 2: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick2"); break;
-            case 3: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick3"); break;
-            case 4: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick4"); break;
-            case 5: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick5"); break;
-            case 6: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick6"); break;
-            case 7: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick7"); break;
-            case 8: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick8"); break;
-            case 9: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick9"); break;
-            case 10: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick10"); break;
-            case 11: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick11"); break;
-            case 12: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick12"); break;
-            case 13: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick13"); break;
-            case 14: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick14"); break;
-            case 15: SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RStick15"); break;
-        }
-    }
-    public void LStickNone() { VehicleAnimator.SetInteger(Lstickselection_STRING, -1); }
-    public void LStick0() { VehicleAnimator.SetInteger(Lstickselection_STRING, 0); }
-    public void LStick1() { VehicleAnimator.SetInteger(Lstickselection_STRING, 1); }
-    public void LStick2() { VehicleAnimator.SetInteger(Lstickselection_STRING, 2); }
-    public void LStick3() { VehicleAnimator.SetInteger(Lstickselection_STRING, 3); }
-    public void LStick4() { VehicleAnimator.SetInteger(Lstickselection_STRING, 4); }
-    public void LStick5() { VehicleAnimator.SetInteger(Lstickselection_STRING, 5); }
-    public void LStick6() { VehicleAnimator.SetInteger(Lstickselection_STRING, 6); }
-    public void LStick7() { VehicleAnimator.SetInteger(Lstickselection_STRING, 7); }
-    public void LStick8() { VehicleAnimator.SetInteger(Lstickselection_STRING, 8); }
-    public void LStick9() { VehicleAnimator.SetInteger(Lstickselection_STRING, 9); }
-    public void LStick10() { VehicleAnimator.SetInteger(Lstickselection_STRING, 10); }
-    public void LStick11() { VehicleAnimator.SetInteger(Lstickselection_STRING, 11); }
-    public void LStick12() { VehicleAnimator.SetInteger(Lstickselection_STRING, 12); }
-    public void LStick13() { VehicleAnimator.SetInteger(Lstickselection_STRING, 13); }
-    public void LStick14() { VehicleAnimator.SetInteger(Lstickselection_STRING, 14); }
-    public void LStick15() { VehicleAnimator.SetInteger(Lstickselection_STRING, 15); }
-    public void RStickNone() { VehicleAnimator.SetInteger(Rstickselection_STRING, -1); }
-    public void RStick0() { VehicleAnimator.SetInteger(Rstickselection_STRING, 0); }
-    public void RStick1() { VehicleAnimator.SetInteger(Rstickselection_STRING, 1); }
-    public void RStick2() { VehicleAnimator.SetInteger(Rstickselection_STRING, 2); }
-    public void RStick3() { VehicleAnimator.SetInteger(Rstickselection_STRING, 3); }
-    public void RStick4() { VehicleAnimator.SetInteger(Rstickselection_STRING, 4); }
-    public void RStick5() { VehicleAnimator.SetInteger(Rstickselection_STRING, 5); }
-    public void RStick6() { VehicleAnimator.SetInteger(Rstickselection_STRING, 6); }
-    public void RStick7() { VehicleAnimator.SetInteger(Rstickselection_STRING, 7); }
-    public void RStick8() { VehicleAnimator.SetInteger(Rstickselection_STRING, 8); }
-    public void RStick9() { VehicleAnimator.SetInteger(Rstickselection_STRING, 9); }
-    public void RStick10() { VehicleAnimator.SetInteger(Rstickselection_STRING, 10); }
-    public void RStick11() { VehicleAnimator.SetInteger(Rstickselection_STRING, 11); }
-    public void RStick12() { VehicleAnimator.SetInteger(Rstickselection_STRING, 12); }
-    public void RStick13() { VehicleAnimator.SetInteger(Rstickselection_STRING, 13); }
-    public void RStick14() { VehicleAnimator.SetInteger(Rstickselection_STRING, 14); }
-    public void RStick15() { VehicleAnimator.SetInteger(Rstickselection_STRING, 15); }
-
     public void RemoveOPtherCM()
     {
         NumActiveFlares--;

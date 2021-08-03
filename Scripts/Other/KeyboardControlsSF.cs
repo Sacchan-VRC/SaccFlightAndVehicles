@@ -4,9 +4,8 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-public class KeyboardControls : UdonSharpBehaviour
+public class KeyboardControlsSF : UdonSharpBehaviour
 {
-    [SerializeField] EngineController EngineControl;
     [SerializeField] private KeyCode Lfunc1key;
     [SerializeField] private UdonSharpBehaviour Lfunc1;
     [SerializeField] private KeyCode Lfunc2key;
@@ -39,14 +38,24 @@ public class KeyboardControls : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour Rfunc7;
     [SerializeField] private KeyCode Rfunc8key;
     [SerializeField] private UdonSharpBehaviour Rfunc8;
+    [Tooltip("EngineControl only required for the two booleans below")]
+    [SerializeField] EngineController EngineControl;
     [SerializeField] private bool DoVTOL;
     [SerializeField] private bool DoCruise;
     private float VTOLAngleDivider;
 
     private void Start()
     {
-        float vtolangledif = EngineControl.VTOLMaxAngle - EngineControl.VTOLMinAngle;
-        VTOLAngleDivider = EngineControl.VTOLAngleTurnRate / vtolangledif;
+        if (EngineControl != null)
+        {
+            float vtolangledif = EngineControl.VTOLMaxAngle - EngineControl.VTOLMinAngle;
+            VTOLAngleDivider = EngineControl.VTOLAngleTurnRate / vtolangledif;
+        }
+        else
+        {
+            DoVTOL = false;
+            DoCruise = false;
+        }
     }
     void Update()
     {

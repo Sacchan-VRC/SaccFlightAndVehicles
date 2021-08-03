@@ -62,10 +62,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
-        if (LeftDial)
-        { EngineControl.LStickSetAnimatorInt(); }
-        else
-        { EngineControl.RStickSetAnimatorInt(); }
     }
     public void DFUNC_Deselected()
     {
@@ -85,8 +81,10 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_O_ReSupply()
     {
-        EngineControl.ReSupplied++;
-        if (NumBomb != FullBombs) { EngineControl.ReSupplied++; }
+        if (NumBomb != FullBombs)
+        {
+            EngineControl.ReSupplied++;
+        }
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), NumBomb);
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
         BombPoint = 0;
@@ -177,7 +175,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             { EngineControl.LStickSelection = -1; }
             else
             { EngineControl.LStickSelection = DialPosition; }
-            EngineControl.LStickSetAnimatorInt();
         }
         else
         {
@@ -185,7 +182,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             { EngineControl.RStickSelection = -1; }
             else
             { EngineControl.RStickSelection = DialPosition; }
-            EngineControl.RStickSetAnimatorInt();
         }
     }
 }
