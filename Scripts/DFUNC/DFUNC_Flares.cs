@@ -18,7 +18,6 @@ public class DFUNC_Flares : UdonSharpBehaviour
     private float reloadspeed;
 
     private bool TriggerLastFrame;
-    private int FLARES_STRING = Animator.StringToHash("flares");
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void DFUNC_Selected()
@@ -40,7 +39,11 @@ public class DFUNC_Flares : UdonSharpBehaviour
         gameObject.SetActive(false);
         TriggerLastFrame = false;
     }
-    public void SFEXT_O_ReSupply()
+    public void SFEXT_G_Explode()
+    {
+        NumFlares = FullFlares;
+    }
+    public void SFEXT_G_ReSupply()
     {
         if (NumFlares != FullFlares) { EngineControl.ReSupplied++; }
         NumFlares = (int)Mathf.Min(NumFlares + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullFlares);
@@ -57,7 +60,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
         {
             if (!TriggerLastFrame)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlares");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlare");
             }
             TriggerLastFrame = true;
         }
@@ -69,19 +72,16 @@ public class DFUNC_Flares : UdonSharpBehaviour
         int d = FlareParticles.Length;
         for (int x = 0; x < d; x++)
         { FlareParticles[x].Play(); }
+        EngineControl.NumActiveFlares++;
+        EngineControl.SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
     }
     public void KeyboardInput()
     {
-        LaunchFlare();
-    }
-    public void AddFlare()
-    {
-        EngineControl.NumActiveFlares++;
-        EngineControl.SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
+        if (NumFlares > 0)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlare"); }
     }
     public void RemoveFlare()
     {
         EngineControl.NumActiveFlares--;
     }
-
 }

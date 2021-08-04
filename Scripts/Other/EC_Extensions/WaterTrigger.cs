@@ -15,7 +15,7 @@ public class WaterTrigger : UdonSharpBehaviour
     private bool InWater;
     private Collider ThisCollider;
     private bool Initilized;
-    private void Initialize()
+    public void SFEXT_L_ECStart()
     {
         Initilized = true;
         WaterLayer = LayerMask.NameToLayer("Water");
@@ -57,12 +57,10 @@ public class WaterTrigger : UdonSharpBehaviour
     //collider enabled and disabled so that it does ontriggerenter on enable
     private void OnEnable()
     {
-        if (!Initilized) { Initialize(); return; }//OnEnable runs before Start()
         ThisCollider.enabled = true;
     }
     private void OnDisable()
     {
-        if (!Initilized) { Initialize(); }
         ThisCollider.enabled = false;
         if (InWater) EngineControl.Health = -1;
         InWater = false;

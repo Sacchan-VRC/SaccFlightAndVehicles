@@ -313,12 +313,16 @@ public class EngineController : UdonSharpBehaviour
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
-        if (localPlayer == null) { InEditor = true; Piloting = true; }
+        if (localPlayer == null)
+        {
+            InEditor = true;
+            Piloting = true;
+            InVehicleOnly.SetActive(true);//for testing in editor without cyanemu
+        }
         else
         {
             InEditor = false;
             InVR = localPlayer.IsUserInVR();
-            InVehicleOnly.SetActive(true);
         }
 
         PlaneHitDetector = VehicleMainObj.GetComponent<HitDetector>();
@@ -579,20 +583,20 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 //collect inputs
-                int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as floats
-                int Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
-                int Af = Input.GetKey(KeyCode.A) ? -1 : 0;
-                int Df = Input.GetKey(KeyCode.D) ? 1 : 0;
-                int Qf = Input.GetKey(KeyCode.Q) ? -1 : 0;
-                int Ef = Input.GetKey(KeyCode.E) ? 1 : 0;
-                int upf = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
-                int downf = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
-                int leftf = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
-                int rightf = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
+                int Wi = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
+                int Si = Input.GetKey(KeyCode.S) ? -1 : 0;
+                int Ai = Input.GetKey(KeyCode.A) ? -1 : 0;
+                int Di = Input.GetKey(KeyCode.D) ? 1 : 0;
+                int Qi = Input.GetKey(KeyCode.Q) ? -1 : 0;
+                int Ei = Input.GetKey(KeyCode.E) ? 1 : 0;
+                int upi = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
+                int downi = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
+                int lefti = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
+                int righti = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
                 bool Shift = Input.GetKey(KeyCode.LeftShift);
                 bool Ctrl = Input.GetKey(KeyCode.LeftControl);
-                int Shiftf = Shift ? 1 : 0;
-                int LeftControlf = Ctrl ? 1 : 0;
+                int Shifti = Shift ? 1 : 0;
+                int LeftControli = Ctrl ? 1 : 0;
                 Vector2 LStickPos = new Vector2(0, 0);
                 Vector2 RStickPos = new Vector2(0, 0);
                 float LGrip = 0;
@@ -777,12 +781,12 @@ public class EngineController : UdonSharpBehaviour
                 if (HasAfterburner)
                 {
                     if (AfterburnerOn)
-                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * DeltaTime), 0, 1f); }
+                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
                     else
-                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * DeltaTime), 0, .8f); }
+                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, .8f); }
                 }
                 else
-                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shiftf - LeftControlf) * .5f * DeltaTime), 0, 1f); }
+                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
                 //VR Throttle
                 if (ThrottleGrip > 0.75)
                 {
@@ -889,8 +893,6 @@ public class EngineController : UdonSharpBehaviour
                                     ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
                                         + (Throttles.y * FuelConsumptionAB)) * DeltaTime, 0);
 
-                Debug.Log(((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
-                                                        + (Throttles.y * FuelConsumptionAB)));
 
                 if (Fuel < LowFuel) { ThrottleInput = ThrottleInput * (Fuel * LowFuelDivider); }//decrease max throttle as fuel runs out
 
@@ -977,16 +979,16 @@ public class EngineController : UdonSharpBehaviour
                         float GLimitStrength = Mathf.Clamp(-(Gs / GLimiter) + 1, 0, 1);
                         float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimiter) + 1, 0, 1);
                         float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
-                        RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wf + Sf + downf + upf, -1, 1) * Limits;
-                        RotationInputs.y = Mathf.Clamp(Qf + Ef + JoystickPosYaw.x, -1, 1) * Limits;
+                        RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
+                        RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits;
                     }
                     else//player is in full control
                     {
-                        RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wf + Sf + downf + upf, -1, 1);
-                        RotationInputs.y = Mathf.Clamp(Qf + Ef + JoystickPosYaw.x, -1, 1);
+                        RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wi + Si + downi + upi, -1, 1);
+                        RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1);
                     }
                     //roll isn't subject to flight limits
-                    RotationInputs.z = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRPitchRoll.x + Af + Df + leftf + rightf) * -1), -1, 1);
+                    RotationInputs.z = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
                 }
 
                 //ability to adjust input to be more precise at low amounts. 'exponant'
@@ -1369,18 +1371,19 @@ public class EngineController : UdonSharpBehaviour
     public void ResupplyPlane()
     {
         ReSupplied = 0;//used to know if other scripts resupplied
-        if (Fuel < FullFuel - 10 || Health != FullHealth)
+        if ((Fuel < FullFuel - 10 || Health != FullHealth))
         {
-            ReSupplied += 1;
+            ReSupplied += 1;//used to only play the sound if we're actually repairing/getting ammo/fuel
         }
-        if (IsOwner)
-        { SendEventToExtensions("SFEXT_O_ReSupply"); }
+        SendEventToExtensions("SFEXT_G_ReSupply");//extensions increase the ReSupplied value too
 
-        //only play the sound if we're actually repairing/getting ammo/fuel
         LastResupplyTime = Time.time;
 
-        Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
-        Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
+        if (IsOwner)
+        {
+            Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
+            Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
+        }
         VehicleAnimator.SetTrigger(RESUPPLY_STRING);
     }
     public void ResupplyPlane_FuelOnly()//not done and unused
@@ -1506,6 +1509,7 @@ public class EngineController : UdonSharpBehaviour
     {
         if (player.isLocal)
         {
+            VehicleRigidbody.velocity = CurrentVel;
             SetOwnerships();
             SendEventToExtensions("SFEXT_O_TakeOwnership");
         }
@@ -1889,7 +1893,7 @@ public class EngineController : UdonSharpBehaviour
     }
     public Vector2 UnpackThrottles(float Throttle)
     {
-        //x = throttle up to afterburner normalized, y = afterburner amount normalized
+        //x = throttle amount, y = afterburner amount
         return new Vector2(Mathf.Min(Throttle, ThrottleAfterburnerPoint) * ThrottleNormalizer,
         Mathf.Max((Mathf.Max(Throttle, ThrottleAfterburnerPoint) - ThrottleAfterburnerPoint) * ABNormalizer, 0));
     }

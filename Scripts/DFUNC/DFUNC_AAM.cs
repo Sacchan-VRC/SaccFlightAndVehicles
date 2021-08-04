@@ -103,7 +103,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         NumAAM = FullAAMs;
     }
-    public void SFEXT_O_ReSupply()
+    public void SFEXT_G_ReSupply()
     {
         if (NumAAM != FullAAMs) { EngineControl.ReSupplied++; }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);

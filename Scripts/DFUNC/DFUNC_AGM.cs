@@ -91,7 +91,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         NumAGM = FullAGMs;
         AGMAnimator.SetFloat(AGMS_STRING, 1);
     }
-    public void SFEXT_O_ReSupply()
+    public void SFEXT_G_ReSupply()
     {
         if (NumAGM != FullAGMs)
         {

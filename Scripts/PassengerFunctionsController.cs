@@ -7,7 +7,6 @@ using VRC.Udon;
 
 public class PassengerFunctionsController : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour[] ExtensionUdonBehaviours;
     public UdonSharpBehaviour[] Dial_Functions_L;
     public UdonSharpBehaviour[] Dial_Functions_R;
     [SerializeField] private Transform LStickDisplayHighlighter;
@@ -26,7 +25,7 @@ public class PassengerFunctionsController : UdonSharpBehaviour
     private Vector2 RStickCheckAngle;
     private VRCPlayerApi localPlayer;
     private bool InEditor = true;
-    private bool InVR;
+    private bool InVR = false;
     [System.NonSerializedAttribute] public bool IsOwner = false;//matching name to EngineControllers variable so it has an answer when queried
     [System.NonSerializedAttribute] public int RStickSelection = -1;
     [System.NonSerializedAttribute] public int LStickSelection = -1;
@@ -39,14 +38,16 @@ public class PassengerFunctionsController : UdonSharpBehaviour
     private bool RightDialOnlyOne;
     private bool LeftDialEmpty;
     private bool RightDialEmpty;
+    private bool DoFuncsL;
+    private bool DoFuncsR;
     public void SFEXT_L_ECStart()
     {
+        localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         {
             InEditor = false;
             InVR = localPlayer.IsUserInVR();
         }
-
 
         LStickNumFuncs = Dial_Functions_L.Length;
         RStickNumFuncs = Dial_Functions_R.Length;
@@ -70,6 +71,8 @@ public class PassengerFunctionsController : UdonSharpBehaviour
         if (RStickNumFuncs == 1) { RightDialOnlyOne = true; }
         if (LStickNumFuncs == 0) { LeftDialEmpty = true; }
         if (RStickNumFuncs == 0) { RightDialEmpty = true; }
+        if (LeftDialEmpty || LeftDialOnlyOne) DoFuncsL = false;
+        if (RightDialEmpty || RightDialOnlyOne) DoFuncsR = false;
         //work out angle to check against for function selection because straight up is the middle of a function
         Vector3 angle = new Vector3(0, 0, -1);
         if (!LeftDialEmpty) { angle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle; }
@@ -90,11 +93,13 @@ public class PassengerFunctionsController : UdonSharpBehaviour
     private void Update()
     {
 
-        Vector2 LStickPos = new Vector2(0, 0);
         Vector2 RStickPos = new Vector2(0, 0);
+        Vector2 LStickPos = new Vector2(0, 0);
         LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
         LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-        if (!LeftDialOnlyOne && !LeftDialEmpty)
+        RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+        RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+        if (DoFuncsL)
         {
             //LStick Selection wheel
             if (InVR && LStickPos.magnitude > .7f)
@@ -142,7 +147,7 @@ public class PassengerFunctionsController : UdonSharpBehaviour
             LStickSelectionLastFrame = LStickSelection;
         }
 
-        if (RightDialOnlyOne && !RightDialEmpty)
+        if (DoFuncsR)
         {
             //RStick Selection wheel
             if (InVR && RStickPos.magnitude > .7f)
@@ -208,8 +213,6 @@ public class PassengerFunctionsController : UdonSharpBehaviour
     {
         if (!InEditor)
         {
-            foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
-            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
             { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
@@ -218,11 +221,6 @@ public class PassengerFunctionsController : UdonSharpBehaviour
     }
     public void SendEventToExtensions_Gunner(string eventname)
     {
-        foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
-        {
-            if (EXT != null)
-            { EXT.SendCustomEvent(eventname); }
-        }
         foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
         {
             if (EXT != null)
@@ -248,6 +246,7 @@ public class PassengerFunctionsController : UdonSharpBehaviour
             RStickSelection = 0;
             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
         }
+        TakeOwnerShipOfExtensions();
         IsOwner = true;
     }
     private void OnDisable()
@@ -287,6 +286,10 @@ public class PassengerFunctionsController : UdonSharpBehaviour
         {
             SendEventToExtensions_Gunner("SFEXTP_O_PassengerExit");
         }
+    }
+    public void SFEXT_G_ReSupply()
+    {
+        SendEventToExtensions_Gunner("SFEXTP_G_ReSupply");
     }
     public void SFEXT_G_Explode()
     {

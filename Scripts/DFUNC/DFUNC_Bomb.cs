@@ -79,7 +79,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         BombAnimator.SetFloat(BOMBS_STRING, 1);
         BombPoint = 0;
     }
-    public void SFEXT_O_ReSupply()
+    public void SFEXT_G_ReSupply()
     {
         if (NumBomb != FullBombs)
         {

@@ -93,7 +93,7 @@ public class EventTestScript : UdonSharpBehaviour
         Ints[5] += 1;
         CompileString();
     }
-    public void SFEXT_O_ReSupply()
+    public void SFEXT_G_ReSupply()
     {
         Ints[6] += 1;
         CompileString();

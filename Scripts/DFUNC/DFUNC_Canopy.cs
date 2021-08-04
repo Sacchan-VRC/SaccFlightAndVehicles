@@ -83,7 +83,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         if (CanopyBroken)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyBreakOff"); }
         else if (!CanopyOpen)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
     }
     public void SFEXT_O_RespawnButton()
     {
@@ -95,7 +95,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         CanopyAnimator.SetBool(CANOPYBREAK_STRING, false);
         if (!CanopyOpen) CanopyOpening();
     }
-    public void SFEXT_O_ReSupply()
+    public void SFEXT_G_ReSupply()
     {
         if (EngineControl.Health == EngineControl.FullHealth)
         {

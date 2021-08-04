@@ -65,7 +65,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive");
+        if (func_active)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
         TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
@@ -79,25 +80,28 @@ public class DFUNC_Gun : UdonSharpBehaviour
         TriggerLastFrame = false;
         RequestSerialization();
         EnableToSyncVariables();
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive");
+        if (func_active) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
         gameObject.SetActive(false);
         GunDamageParticle.gameObject.SetActive(false);
         func_active = false;
     }
     public void SFEXT_P_PassengerEnter()
     {
+        Passenger = true;
         if (EngineControl.Passenger && func_active)
         { Set_Active(); }
     }
     public void SFEXT_P_PassengerExit()
     {
+        Passenger = false;
         gameObject.SetActive(false);
     }
-    public void SFEXT_O_ReSupply()
+    public void SFEXT_G_ReSupply()
     {
         EngineControl.ReSupplied++;
         if (GunAmmoInSeconds != FullGunAmmoInSeconds) { EngineControl.ReSupplied++; }
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+        GunAnimator.SetFloat(GUNAMMO_STRING, GunAmmoInSeconds * FullGunAmmoDivider);
     }
     public void Set_Active()
     {

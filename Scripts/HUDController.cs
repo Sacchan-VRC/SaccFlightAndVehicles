@@ -144,6 +144,7 @@ public class HUDController : UdonSharpBehaviour
         int StickSelection = EngineControl.LStickSelection;
         if (StickSelection != LStickSelectionLastFrame)
         {
+            LStickSelectionLastFrame = StickSelection;
             if (StickSelection < 0)
             { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
             else
@@ -151,10 +152,12 @@ public class HUDController : UdonSharpBehaviour
                 LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * StickSelection, 0);
             }
         }
+        LStickSelectionLastFrame = StickSelection;
 
         StickSelection = EngineControl.RStickSelection;
         if (StickSelection != RStickSelectionLastFrame)
         {
+            RStickSelectionLastFrame = StickSelection;
             if (StickSelection < 0)
             { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
             else

@@ -431,8 +431,8 @@ public class SoundController : UdonSharpBehaviour
         if (!PlaneWindNull)
         {
             PlaneWind.pitch = Mathf.Clamp(Doppler, -10, 10);
-            PlaneWind.volume = (((EngineControl.Speed / 20) * PlaneWindInitialVolume) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) * .125f, 0, 1) * .2f)) * silentint;
-        }
+            PlaneWind.volume = (Mathf.Min(((EngineControl.Speed / 20) * PlaneWindInitialVolume), 1) / 10f + (Mathf.Clamp(((EngineControl.Gs - 1) * PlaneWindInitialVolume) * .125f, 0, 1) * .2f)) * silentint;
+            }
 
         int x = 0;
         foreach (AudioSource snd in DopplerSounds)
@@ -568,16 +568,26 @@ public class SoundController : UdonSharpBehaviour
         {
             PlayTouchDownSound();
         }
-
     }
-    public void SFEXT_O_ReSupply()
+    public void SFEXT_G_ReSupply()
     {
-        if (!ReloadingNull)
+        SendCustomEventDelayedFrames("ResupplySound", 1);
+    }
+    public void ResupplySound()
+    {
+        if (EngineControl.ReSupplied > 0)
         {
-            Reloading.Play();
+            if (!ReloadingNull)
+            {
+                Reloading.Play();
+            }
         }
     }
     public void SFEXT_O_AfterburnerOn()
+    {
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayAfturburnersound");
+    }
+    public void PlayAfturburnersound()
     {
         if ((EngineControl.Piloting || EngineControl.Passenger) && (CanopyDown))
         {
