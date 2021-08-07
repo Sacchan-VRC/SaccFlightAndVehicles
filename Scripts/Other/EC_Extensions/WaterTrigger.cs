@@ -57,6 +57,7 @@ public class WaterTrigger : UdonSharpBehaviour
     //collider enabled and disabled so that it does ontriggerenter on enable
     private void OnEnable()
     {
+        if (!Initilized) { SFEXT_L_ECStart(); }//for test mode where onenable runs before ECStart
         ThisCollider.enabled = true;
     }
     private void OnDisable()

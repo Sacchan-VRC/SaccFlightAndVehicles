@@ -13,6 +13,8 @@ public class AAGunSeat : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private int ThisStationID;
     private bool firsttime = true;
+    private Transform Seat;
+    private Quaternion SeatStartRot;
     void Start()
     {
         Assert(AAGunControl != null, "Start: AAGunControl != null");
@@ -21,6 +23,9 @@ public class AAGunSeat : UdonSharpBehaviour
 
         if (AAGunControl.VehicleMainObj != null) { AAGunAnimator = AAGunControl.VehicleMainObj.GetComponent<Animator>(); }
         HUDControl = AAGunControl.HUDControl;
+
+        Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
+        SeatStartRot = Seat.localRotation;
 
         localPlayer = Networking.LocalPlayer;
     }
@@ -34,7 +39,9 @@ public class AAGunSeat : UdonSharpBehaviour
         AAGunControl.RotationSpeedY = 0;
         if (AAGunAnimator != null) AAGunAnimator.SetBool("inside", true);
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        if (AAGunControl.localPlayer != null) { AAGunControl.localPlayer.UseAttachedStation(); }
+        Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
+        AAGunControl.localPlayer.UseAttachedStation();
+        Seat.localRotation = SeatStartRot;
         if (AAGunControl.HUDControl != null) { AAGunControl.HUDControl.GUN_TargetSpeedLerper = 0; }
 
         if (AAGunControl.NumAAMTargets != 0) { AAGunControl.DoAAMTargeting = true; }

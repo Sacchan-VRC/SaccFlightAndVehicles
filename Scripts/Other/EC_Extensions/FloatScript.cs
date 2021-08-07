@@ -21,6 +21,7 @@ public class FloatScript : UdonSharpBehaviour
     [SerializeField] private float WaveScale = 1;
     [SerializeField] private float WaveSpeed = 1;
     [SerializeField] private bool DoOnLand;
+    [SerializeField] bool AutoAdjustForWeight = true;
 
     [Header("HoverBike Only")]
     [SerializeField] private bool HoverBike = false;
@@ -40,8 +41,22 @@ public class FloatScript : UdonSharpBehaviour
     float SuspDispToMeters;
     private VRCPlayerApi localPlayer;
     private bool InEditor = false;
+    private float RBMass;
     void Start()
     {
+        RBMass = VehicleRigidbody.mass;
+        if (AutoAdjustForWeight)
+        {
+            FloatForce *= RBMass;
+            WaterSidewaysDrag *= RBMass;
+            WaterForwardDrag *= RBMass;
+            WaterRotDrag *= RBMass;
+            WaterVelDrag *= RBMass;
+        }
+
+
+
+
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         { InEditor = true; }
@@ -90,7 +105,7 @@ public class FloatScript : UdonSharpBehaviour
         SuspensionCompression[currentfloatpoint] = 1;
         SuspensionCompressionLastFrame[currentfloatpoint] = 1;
 
-        float CompressionDifference = FloatPoints[currentfloatpoint].position.y - FloatPointHeightLastFrame[currentfloatpoint];
+        float CompressionDifference = (FloatPoints[currentfloatpoint].position.y - FloatPointHeightLastFrame[currentfloatpoint]) * RBMass;
         if (CompressionDifference < 0)
         { CompressionDifference *= -Compressing; }
         else
@@ -133,7 +148,7 @@ public class FloatScript : UdonSharpBehaviour
                 if (DoOnLand || hit.collider.isTrigger)
                 {
                     SuspensionCompression[currentfloatpoint] = Mathf.Clamp(((hit.distance / FloatRadius) * -1) + 1, 0, 1);
-                    float CompressionDifference = (SuspensionCompression[currentfloatpoint] - SuspensionCompressionLastFrame[currentfloatpoint]);
+                    float CompressionDifference = ((SuspensionCompression[currentfloatpoint] - SuspensionCompressionLastFrame[currentfloatpoint])) * RBMass;
                     if (CompressionDifference > 0)
                     { CompressionDifference *= Compressing; }
                     else
