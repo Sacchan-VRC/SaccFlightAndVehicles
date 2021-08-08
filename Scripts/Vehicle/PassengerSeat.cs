@@ -18,10 +18,6 @@ public class PassengerSeat : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private void Start()
     {
-        Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(PassengerOnly != null, "Start: LeaveButton != null");
-        Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
-
         localPlayer = Networking.LocalPlayer;
         PlaneMesh = EngineControl.PlaneMesh.transform;
         Planelayer = PlaneMesh.gameObject.layer;
@@ -133,12 +129,5 @@ public class PassengerSeat : UdonSharpBehaviour
             x++;
         }
         SeatInitialized = true;
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

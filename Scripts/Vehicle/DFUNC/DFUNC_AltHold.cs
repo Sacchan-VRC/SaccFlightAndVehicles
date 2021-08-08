@@ -7,6 +7,7 @@ using VRC.Udon;
 public class DFUNC_AltHold : UdonSharpBehaviour
 {
     [SerializeField] private EngineController EngineControl;
+    [SerializeField] private GameObject HudHold;
     [SerializeField] private GameObject Dial_Funcon;
     private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
@@ -44,8 +45,10 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         {
             if (!TriggerLastFrame)
             {
-                EngineControl.AltHold = !EngineControl.AltHold;
-                if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.AltHold);
+                bool althold = EngineControl.AltHold;
+                EngineControl.AltHold = !althold;
+                if (!Dial_FunconNULL) { Dial_Funcon.SetActive(althold); }
+                HudHold.SetActive(althold);
             }
             TriggerLastFrame = true;
         }
@@ -53,7 +56,9 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        EngineControl.AltHold = !EngineControl.AltHold;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.AltHold);
+        bool althold = EngineControl.AltHold;
+        EngineControl.AltHold = !althold;
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(althold); }
+        HudHold.SetActive(althold);
     }
 }

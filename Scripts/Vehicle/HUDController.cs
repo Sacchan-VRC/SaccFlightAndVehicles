@@ -19,8 +19,6 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Text HUDText_angleofattack;
     [SerializeField] private GameObject HudCrosshairGun;
     [SerializeField] private GameObject HudCrosshair;
-    [SerializeField] private GameObject HudHold;
-    [SerializeField] private GameObject HudLimit;
     [SerializeField] private GameObject HudAB;
     [SerializeField] private Transform DownIndicator;
     [SerializeField] private Transform ElevationIndicator;
@@ -54,27 +52,6 @@ public class HUDController : UdonSharpBehaviour
     private int RStickSelectionLastFrame = -1;
     private void Start()
     {
-        Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(HUDText_G != null, "Start: HUDText_G != null");
-        Assert(HUDText_mach != null, "Start: HUDText_mach != null");
-        Assert(HUDText_altitude != null, "Start: HUDText_altitude != null");
-        Assert(HUDText_knotstarget != null, "Start: HUDText_knotstarget != null");
-        Assert(HUDText_knots != null, "Start: HUDText_knots != null");
-        Assert(HUDText_knotsairspeed != null, "Start: HUDText_knotsairspeed != null");
-        Assert(HUDText_angleofattack != null, "Start: HUDText_angleofattack != null");
-        Assert(HudCrosshairGun != null, "Start: HudCrosshairGun != null");
-        Assert(HudCrosshair != null, "Start: HudCrosshair != null");
-        Assert(HudHold != null, "Start: HudHold != null");
-        Assert(HudLimit != null, "Start: HudLimit != null");
-        Assert(HudAB != null, "Start: HudAB != null");
-        Assert(DownIndicator != null, "Start: DownIndicator != null");
-        Assert(ElevationIndicator != null, "Start: ElevationIndicator != null");
-        Assert(HeadingIndicator != null, "Start: HeadingIndicator != null");
-        Assert(VelocityIndicator != null, "Start: VelocityIndicator != null");
-        Assert(LStickDisplayHighlighter != null, "Start: LStickDisplayHighlighter != null");
-        Assert(RStickDisplayHighlighter != null, "Start: RStickDisplayHighlighter != null");
-        Assert(PitchRoll != null, "Start: PitchRoll != null");
-        Assert(Yaw != null, "Start: Yaw != null");
         SwitchFunctionSoundNULL = SwitchFunctionSound == null;
 
         HUDAnimator = EngineControl.VehicleMainObj.GetComponent<Animator>();
@@ -129,20 +106,6 @@ public class HUDController : UdonSharpBehaviour
         //Down indicator
         DownIndicator.localRotation = Quaternion.Euler(new Vector3(0, 0, -VehicleEuler.z));
         /////////////////
-
-        //LIMITS indicator
-        if (EngineControl.FlightLimitsEnabled)
-        {
-            HudLimit.SetActive(true);
-        }
-        else { HudLimit.SetActive(false); }
-
-        //Alt. HOLD indicator
-        if (EngineControl.AltHold)
-        {
-            HudHold.SetActive(true);
-        }
-        else { HudHold.SetActive(false); }
 
         int StickSelection = EngineControl.LStickSelection;
         if (StickSelection != LStickSelectionLastFrame)
@@ -204,13 +167,5 @@ public class HUDController : UdonSharpBehaviour
         check += SmoothDeltaTime;
 
         HUDAnimator.SetFloat(FUEL_STRING, EngineControl.Fuel * FullFuelDivider);
-    }
-
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

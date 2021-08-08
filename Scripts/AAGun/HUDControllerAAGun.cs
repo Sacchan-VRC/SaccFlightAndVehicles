@@ -29,9 +29,6 @@ public class HUDControllerAAGun : UdonSharpBehaviour
     private Quaternion frontfacing = Quaternion.identity;
     private void Start()
     {
-        Assert(AAGunControl != null, "Start: AAGunControl != null");
-        Assert(ElevationIndicator != null, "Start: ElevationIndicator != null");
-        Assert(HeadingIndicator != null, "Start: HeadingIndicator != null");
         BulletSpeedDivider = 1f / BulletSpeed;
         AAMReloadBarDivider = 1f / AAGunControl.MissileReloadTime;
         MGReloadBarDivider = 1f / AAGunControl.MGAmmoSeconds;
@@ -134,14 +131,5 @@ public class HUDControllerAAGun : UdonSharpBehaviour
         VehicleStations = (VRC.SDK3.Components.VRCStation[])AAGunControl.VehicleMainObj.GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
         SeatedPlayers = new int[VehicleStations.Length];
         foreach (int i in SeatedPlayers) SeatedPlayers[i] = -1;
-    }
-
-
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

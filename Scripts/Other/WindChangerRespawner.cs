@@ -11,9 +11,6 @@ public class WindChangerRespawner : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private void Start()
     {
-        Assert(WindChangerObj != null, "Start: WindChangerObj != null");
-        Assert(RespawnPoint != null, "Start: RespawnPoint != null");
-
         localPlayer = Networking.LocalPlayer;
     }
     void Interact()
@@ -21,12 +18,5 @@ public class WindChangerRespawner : UdonSharpBehaviour
         Networking.SetOwner(localPlayer, WindChangerObj);
         WindChangerObj.transform.position = RespawnPoint.position;
         WindChangerObj.transform.rotation = RespawnPoint.rotation;
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

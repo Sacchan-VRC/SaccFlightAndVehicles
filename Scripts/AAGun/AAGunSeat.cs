@@ -17,10 +17,6 @@ public class AAGunSeat : UdonSharpBehaviour
     private Quaternion SeatStartRot;
     void Start()
     {
-        Assert(AAGunControl != null, "Start: AAGunControl != null");
-        Assert(HUDControl != null, "Start: HUDControl != null");
-        Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
-
         if (AAGunControl.VehicleMainObj != null) { AAGunAnimator = AAGunControl.VehicleMainObj.GetComponent<Animator>(); }
         HUDControl = AAGunControl.HUDControl;
 
@@ -95,12 +91,5 @@ public class AAGunSeat : UdonSharpBehaviour
             x++;
         }
         firsttime = false;
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

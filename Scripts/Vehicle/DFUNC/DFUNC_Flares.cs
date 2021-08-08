@@ -60,7 +60,8 @@ public class DFUNC_Flares : UdonSharpBehaviour
         {
             if (!TriggerLastFrame)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlare");
+                if (NumFlares > 0)
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlare"); }
             }
             TriggerLastFrame = true;
         }

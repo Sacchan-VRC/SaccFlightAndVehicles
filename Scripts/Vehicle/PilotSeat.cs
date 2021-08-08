@@ -17,9 +17,6 @@ public class PilotSeat : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private void Start()
     {
-        Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(SeatAdjuster != null, "Start: SeatAdjuster != null");
-
         localPlayer = Networking.LocalPlayer;
 
         Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
@@ -129,12 +126,5 @@ public class PilotSeat : UdonSharpBehaviour
             x++;
         }
         SeatInitialized = true;
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

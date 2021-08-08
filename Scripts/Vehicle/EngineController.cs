@@ -35,7 +35,6 @@ public class EngineController : UdonSharpBehaviour
     public bool VTOLOnly = false;
     public bool NoCanopy = false;
     public bool HasVTOLAngle = false;
-    public bool HasLimits = true;
     public bool HasAltHold = true;
     public bool HasCanopy = true;
     public bool HasCruise = true;
@@ -143,7 +142,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
     [System.NonSerializedAttribute] public int PilotID;
     [System.NonSerializedAttribute] public string PilotName;
-    [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
+    [System.NonSerializedAttribute] public bool FlightLimitsEnabled = false;
     [System.NonSerializedAttribute] public ConstantForce VehicleConstantForce;
     [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
     [System.NonSerializedAttribute] public Transform VehicleTransform;
@@ -279,6 +278,10 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool AfterburnerOn;
     [System.NonSerializedAttribute] public bool PitchDown;//air is hitting plane from the top
     private float GDamageToTake;
+    private Vector3 SpawnPos;
+    private Quaternion SpawnRot;
+
+
     [System.NonSerializedAttribute] public int NumActiveFlares;
     [System.NonSerializedAttribute] public int NumActiveChaff;
     [System.NonSerializedAttribute] public int NumActiveOtherCM;
@@ -314,6 +317,7 @@ public class EngineController : UdonSharpBehaviour
     //end of old Leavebutton stuff
     private void Start()
     {
+
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         {
@@ -330,6 +334,10 @@ public class EngineController : UdonSharpBehaviour
         VehicleTransform = VehicleMainObj.GetComponent<Transform>();
         VehicleRigidbody = VehicleMainObj.GetComponent<Rigidbody>();
         VehicleConstantForce = VehicleMainObj.GetComponent<ConstantForce>();
+        //delete me when ObjectSync.Respawn works in editor again
+        SpawnPos = VehicleTransform.position;
+        SpawnRot = VehicleTransform.rotation;
+        //
         WheelCollider[] wc = PlaneMesh.GetComponentsInChildren<WheelCollider>(true);
         if (wc.Length != 0) { HasWheelColliders = true; }
 
@@ -357,17 +365,6 @@ public class EngineController : UdonSharpBehaviour
                 wheel.suspensionSpring = SusiSpring;
             }
         }
-
-        Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
-        Assert(PlaneMesh != null, "Start: PlaneMesh != null");
-        Assert(CenterOfMass != null, "Start: CenterOfMass != null");
-        Assert(PitchMoment != null, "Start: PitchMoment != null");
-        Assert(YawMoment != null, "Start: YawMoment != null");
-        Assert(GroundDetector != null, "Start: GroundDetector != null");
-        Assert(GroundEffectEmpty != null, "Start: GroundEffectEmpty != null");
-        Assert(GunRecoilEmpty != null, "Start: GunRecoilEmpty != null");
-        Assert(KillsBoard != null, "Start: KillsBoard != null");
-
         Planelayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
         VehicleAnimator = VehicleMainObj.GetComponent<Animator>();
@@ -383,8 +380,6 @@ public class EngineController : UdonSharpBehaviour
         PitchThrustVecMultiStart = PitchThrustVecMulti;
         YawThrustVecMultiStart = YawThrustVecMulti;
         RollThrustVecMultiStart = RollThrustVecMulti;
-
-        if (!HasLimits) { FlightLimitsEnabled = false; }
 
         FindAAMTargets();
 
@@ -539,6 +534,7 @@ public class EngineController : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
                 }
             }
+            else { GDamageToTake = 0; }
 
             //synced variables because rigidbody values aren't accessable by non-owner players
             CurrentVel = VehicleRigidbody.velocity;
@@ -1246,7 +1242,6 @@ public class EngineController : UdonSharpBehaviour
         VTOLAngle = VTOLDefaultValue;
         VTOLAngleInput = VTOLDefaultValue;
         if (HasAfterburner) { SetAfterburnerOff(); }
-        if (HasLimits) { SetLimitsOn(); }
         Fuel = FullFuel;
         Atmosphere = 1;//planemoving optimization requires this to be here
         VehicleAnimator.SetInteger(Lstickselection_STRING, -1);
@@ -1260,6 +1255,7 @@ public class EngineController : UdonSharpBehaviour
         {
             VehicleRigidbody.velocity = Vector3.zero;
             VehicleRigidbody.drag = 9999;
+            VehicleRigidbody.angularDrag = 9999;
             Health = FullHealth;//turns off low health smoke
             Fuel = FullFuel;
             AoALiftPitch = 0;
@@ -1295,6 +1291,7 @@ public class EngineController : UdonSharpBehaviour
     {
         VehicleAnimator.SetTrigger("reappear");
         VehicleRigidbody.drag = 0;
+        VehicleRigidbody.angularDrag = 0;
     }
     public void NotDead()
     {
@@ -1310,6 +1307,7 @@ public class EngineController : UdonSharpBehaviour
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
         Health = FullHealth;
+        if (InEditor) { VehicleTransform.SetPositionAndRotation(SpawnPos, SpawnRot); }
         VehicleObjectSync.Respawn();//this works if done just locally;
         SendEventToExtensions("SFEXT_O_MoveToSpawn");
     }
@@ -1401,20 +1399,12 @@ public class EngineController : UdonSharpBehaviour
     public void SetLimitsOn()
     {
         FlightLimitsEnabled = true;
-
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_LimitsOn");
-        }
+        SendEventToExtensions("SFEXT_G_LimitsOn");
     }
     public void SetLimitsOff()
     {
         FlightLimitsEnabled = false;
-
-        if (IsOwner)
-        {
-            SendEventToExtensions("SFEXT_O_LimitsOff");
-        }
+        SendEventToExtensions("SFEXT_G_LimitsOff");
     }
     public void ToggleLimits()
     {
@@ -1448,10 +1438,9 @@ public class EngineController : UdonSharpBehaviour
     public void ResetStatus()//called globally when using respawn button
     {
         if (HasAfterburner) { SetAfterburnerOff(); }
-        if (HasLimits) { SetLimitsOn(); }
         //these two make it invincible and unable to be respawned again for 5s
         dead = true;
-
+        SendCustomEventDelayedSeconds("NotDead", InvincibleAfterSpawn);
 
         SendEventToExtensions("SFEXT_G_RespawnButton");
     }
@@ -1903,15 +1892,4 @@ public class EngineController : UdonSharpBehaviour
         Mathf.Max((Mathf.Max(Throttle, ThrottleAfterburnerPoint) - ThrottleAfterburnerPoint) * ABNormalizer, 0));
     }
     //these can be used for syncing weapon selection for bomb bay doors animation etc
-    public void RemoveOPtherCM()
-    {
-        NumActiveFlares--;
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
-    }
 }

@@ -83,24 +83,6 @@ public class SoundController : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private void Start()
     {
-        Assert(EngineControl != null, "Start: EngineControl != null");
-        Assert(PlaneInside != null, "Start: PlaneInside != null");
-        Assert(PlaneDistant != null, "Start: PlaneDistant != null");
-        Assert(ABOnInside != null, "Start: ABOnInside != null");
-        Assert(ABOnOutside != null, "Start: ABOnOutside != null");
-        Assert(PlaneWind != null, "Start: PlaneWind != null");
-        Assert(MenuSelect != null, "Start: MenuSelect != null");
-        Assert(Rolling != null, "Start: Rolling != null");
-        Assert(ReSupply != null, "Start: Reloading != null");
-        Assert(RadarLocked != null, "Start: RadarLocked != null");
-        Assert(MissileIncoming != null, "Start: MissileIncoming != null");
-        Assert(PlaneIdle.Length > 0, "Start: PlaneIdle.Length > 0");
-        Assert(Thrust.Length > 0, "Start: Thrust.Length > 0");
-        Assert(TouchDown.Length > 0, "Start: TouchDown.Length > 0");
-        Assert(SonicBoom.Length > 0, "Start: SonicBoom.Length > 0");
-        Assert(Explosion.Length > 0, "Start: Explosion.Length > 0");
-        Assert(BulletHit.Length > 0, "Start: BulletHit.Length > 0");
-
         PlaneInsideNull = (PlaneInside == null) ? true : false;
         PlaneDistantNull = (PlaneDistant == null) ? true : false;
         ABOnInsideNull = (ABOnOutside == null) ? true : false;
@@ -621,13 +603,6 @@ public class SoundController : UdonSharpBehaviour
             int rand = Random.Range(0, BulletHit.Length);
             BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
             BulletHit[rand].Play();
-        }
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }

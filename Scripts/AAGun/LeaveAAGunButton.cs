@@ -9,11 +9,6 @@ public class LeaveAAGunButton : UdonSharpBehaviour
     public AAGunController AAGunControl;
     public VRCStation Seat;
     private bool InSeat;//used to make the player exit the aagun if the button to leave it is disabled for any reason
-    private void Start()
-    {
-        Assert(AAGunControl != null, "Start: AAGunControl != null");
-        Assert(Seat != null, "Start: Seat != null");
-    }
     private void OnDisable()
     {
         if (InSeat)
@@ -39,12 +34,5 @@ public class LeaveAAGunButton : UdonSharpBehaviour
     {
         InSeat = false;
         if (Seat != null) { Seat.ExitStation(AAGunControl.localPlayer); }
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

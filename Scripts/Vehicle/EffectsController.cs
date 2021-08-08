@@ -49,9 +49,6 @@ public class EffectsController : UdonSharpBehaviour
 
     private void Start()
     {
-        Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
-        Assert(EngineControl != null, "Start: EngineControl != null");
-
         if (VehicleMainObj != null) VehicleMainObjNull = false;
         if (EngineControl != null) EngineControlNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
@@ -205,12 +202,5 @@ public class EffectsController : UdonSharpBehaviour
         if (!InEditor) { VehicleAnimator.SetBool(OCCUPIED_STRING, false); }
         DoEffects = 0f;//keep awake
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

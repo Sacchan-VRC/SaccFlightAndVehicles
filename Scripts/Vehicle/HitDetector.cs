@@ -13,10 +13,11 @@ public class HitDetector : UdonSharpBehaviour
     VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
     private UdonSharpBehaviour[] ExtensionUdonBehaviours;
     private Rigidbody VehicleRigid;
+    private float PredictedHEalth;
+    private float LastPlaneHitEvent;
 
     private void Start()
     {
-        Assert(EngineControl != null, "Start: EngineControl != null");
         if (Networking.LocalPlayer != null)
         { InEditor = false; }
 
@@ -27,7 +28,24 @@ public class HitDetector : UdonSharpBehaviour
     void OnParticleCollision(GameObject other)
     {
         if (other == null || EngineControl.dead) return;//avatars can't shoot you, and you can't get hurt when you're dead
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlaneHit");
+
+        //this is to prevent more events than necessary being sent
+        float tim = Time.time;
+        if (tim - LastHitTime < 3)
+        {
+            if (PredictedHEalth > 0)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlaneHit");
+                PredictedHEalth -= 10;
+                LastHitTime = tim;
+            }
+        }
+        else
+        {
+            PredictedHEalth = EngineControl.Health - 10;
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlaneHit");
+            LastHitTime = tim;
+        }
 
         GameObject EnemyObjs = other;
         HitDetector EnemyHitDetector = null;
@@ -51,12 +69,5 @@ public class HitDetector : UdonSharpBehaviour
     public void PlaneHit()
     {
         EngineControl.PlaneHit();
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
-        }
     }
 }

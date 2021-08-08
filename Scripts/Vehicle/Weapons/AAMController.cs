@@ -14,6 +14,8 @@ public class AAMController : UdonSharpBehaviour
     [SerializeField] private AudioSource[] ExplosionSounds;
     [SerializeField] private float ColliderActiveDistance = 45;
     [SerializeField] private float RotSpeed = 400;
+    [Tooltip("Missile tracks weaker if target's throttle is low, TargetLowThrottleTrack is throttle at which lowering throttle more doesn't do anything")]
+    [SerializeField] private float TargetLowThrottleTrack = .3f;
     [SerializeField] private float ProximityExplodeDistance = 20;
     private EngineController TargetEngineControl;
     private bool LockHack = true;
@@ -23,12 +25,14 @@ public class AAMController : UdonSharpBehaviour
     private bool Exploding = false;
     private CapsuleCollider AAMCollider;
     private bool Owner = false;
-    private bool TargetIsPlane = false;
+    private bool TargetIsVehicle = false;
     private bool MissileIncoming = false;
     private Rigidbody MissileRigid;
     private float TargDistlastframe = 999999999;
     private bool TargetLost = false;
     private float UnlockTime;
+    private float TargetABPoint;
+    private float TargetThrottleNormalizer;
     Vector3 TargetPosLastFrame;
     //public Transform testobj;
     void Start()
@@ -56,7 +60,9 @@ public class AAMController : UdonSharpBehaviour
                     { TargetEngineControl.MissilesIncomingHeat++; }
 
                     MissileIncoming = true;
-                    TargetIsPlane = true;
+                    TargetIsVehicle = true;
+                    TargetABPoint = TargetEngineControl.ThrottleAfterburnerPoint;
+                    TargetThrottleNormalizer = 1 / TargetABPoint;
                 }
             }
 
@@ -102,7 +108,9 @@ public class AAMController : UdonSharpBehaviour
             Vector3 Position = transform.position;
             Vector3 TargetPos = Target.position;
             float TargetDistance = Vector3.Distance(Position, TargetPos);
-            bool Dumb = Random.Range(0, 100) > EngineControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
+            bool Dumb = Random.Range(0, 100) > TargetEngineControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
+            float EngineTrack = Mathf.Max(TargetEngineControl.EngineOutput * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
+            if (EngineTrack > 1) { EngineTrack = 2; }//if AB on track 2x as well
             if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
             {
                 if ((!Dumb && TargetDistance < TargDistlastframe) || LockHack)
@@ -114,7 +122,7 @@ public class AAMController : UdonSharpBehaviour
                     var targetDirection = missileToTargetVector.normalized;
                     var rotationAxis = Vector3.Cross(missileForward, targetDirection);
                     var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
+                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * EngineTrack * DeltaTime, deltaAngle), Space.World);
                 }
                 else
                 {

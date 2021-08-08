@@ -90,15 +90,6 @@ public class AAGunController : UdonSharpBehaviour
             }
         }
 
-        Assert(Rotator != null, "Start: Rotator != null");
-        Assert(VehicleMainObj != null, "Start: VehicleMainObj != null");
-        Assert(AAGunSeat != null, "Start: AAGunSeatStation != null");
-        Assert(AAM != null, "Start: AAM != null");
-        Assert(AAMLocking != null, "Start: AAMLocking != null");
-        Assert(AAMLockedOn != null, "Start: AAMLockedOn != null");
-        Assert(JoyStick != null, "Start: JoyStick != null");
-
-
         if (InEditor) { DoAAMTargeting = true; }
 
         if (JoyStick != null) { JoyStickNull = false; }
@@ -621,13 +612,6 @@ public class AAGunController : UdonSharpBehaviour
                     Targets[j] = k;
                 }
             }
-        }
-    }
-    private void Assert(bool condition, string message)
-    {
-        if (!condition)
-        {
-            Debug.LogWarning("Assertion failed : '" + GetType() + " : " + message + "'", this);
         }
     }
 }
