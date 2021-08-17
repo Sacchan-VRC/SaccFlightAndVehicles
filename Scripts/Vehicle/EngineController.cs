@@ -120,8 +120,8 @@ public class EngineController : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     public float FuelConsumption = 2;
     public float FuelConsumptionABMulti = 3f;
-    public float RefuelTime;
-    public float RepairTime;
+    public float RefuelTime = 25;
+    public float RepairTime = 30;
     public float RespawnDelay = 10;
     public float InvincibleAfterSpawn = 2.5f;
     [Tooltip("Meters. 12192 = 40,000 feet")]
@@ -272,6 +272,8 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float RStickFuncDegrees;
     [System.NonSerializedAttribute] public int LStickNumFuncs;
     [System.NonSerializedAttribute] public int RStickNumFuncs;
+    [System.NonSerializedAttribute] public bool LStickDoDial;
+    [System.NonSerializedAttribute] public bool RStickDoDial;
     private bool VTolAngle90Plus;
     [System.NonSerializedAttribute] public bool[] LStickNULL;
     [System.NonSerializedAttribute] public bool[] RStickNULL;
@@ -297,8 +299,6 @@ public class EngineController : UdonSharpBehaviour
 
     private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
     private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
-    private int Lstickselection_STRING = Animator.StringToHash("Lstickselection");
-    private int Rstickselection_STRING = Animator.StringToHash("Rstickselection");
     private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
     private int RESUPPLY_STRING = Animator.StringToHash("resupply");
     private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
@@ -452,8 +452,10 @@ public class EngineController : UdonSharpBehaviour
 
         LStickNumFuncs = Dial_Functions_L.Length;
         RStickNumFuncs = Dial_Functions_R.Length;
-        LStickFuncDegrees = 360 / (float)LStickNumFuncs;
-        RStickFuncDegrees = 360 / (float)RStickNumFuncs;
+        LStickDoDial = LStickNumFuncs > 1;
+        RStickDoDial = RStickNumFuncs > 1;
+        LStickFuncDegrees = 360 / Mathf.Max((float)LStickNumFuncs, 1);
+        RStickFuncDegrees = 360 / Mathf.Max((float)RStickNumFuncs, 1);
         LStickNULL = new bool[LStickNumFuncs];
         RStickNULL = new bool[RStickNumFuncs];
         int u = 0;
@@ -487,16 +489,6 @@ public class EngineController : UdonSharpBehaviour
             PilotEnterPlaneGlobal(null);
         }
     }
-    public void TouchDown()
-    {
-        Taxiing = true;
-        SendEventToExtensions("SFEXT_G_TouchDown");
-    }
-    public void TakeOff()
-    {
-        Taxiing = false;
-        SendEventToExtensions("SFEXT_G_TakeOff");
-    }
     private void LateUpdate()
     {
         float DeltaTime = Time.deltaTime;
@@ -507,21 +499,19 @@ public class EngineController : UdonSharpBehaviour
         {
             if (DisableGroundDetector == 0 && DisableGroundDetector == 0 && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore))
             {//play a touchdown sound the frame we start taxiing
-                if (Landed == false)
+                if (!Landed)
                 {
                     Landed = true;
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TouchDown");
                 }
-                Taxiing = true;
             }
             else
             {
-                if (Landed == true)
+                if (Landed)
                 {
                     Landed = false;
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TakeOff");
                 }
-                Taxiing = false;
             }
 
             if (!dead)
@@ -625,7 +615,7 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 //LStick Selection wheel
-                if (InVR && LStickPos.magnitude > .7f)
+                if (InVR && LStickPos.magnitude > .7f && LStickDoDial)
                 {
                     float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
 
@@ -643,7 +633,7 @@ public class EngineController : UdonSharpBehaviour
                 }
 
                 //RStick Selection wheel
-                if (InVR && RStickPos.magnitude > .7f)
+                if (InVR && RStickPos.magnitude > .7f & RStickDoDial)
                 {
                     float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
 
@@ -1088,8 +1078,6 @@ public class EngineController : UdonSharpBehaviour
                 LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * DeltaTime);
                 LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
                 LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
-
-                //ExtraDrag = (GearDrag + FlapsDrag + (BrakeInput * AirbrakeStrength)) - 1;//combine these so we don't have to do as much in fixedupdate
             }
             else
             {
@@ -1244,12 +1232,11 @@ public class EngineController : UdonSharpBehaviour
         if (HasAfterburner) { SetAfterburnerOff(); }
         Fuel = FullFuel;
         Atmosphere = 1;//planemoving optimization requires this to be here
-        VehicleAnimator.SetInteger(Lstickselection_STRING, -1);
-        VehicleAnimator.SetInteger(Rstickselection_STRING, -1);
+
+        SendEventToExtensions("SFEXT_G_Explode");
 
         SendCustomEventDelayedSeconds("ReAppear", RespawnDelay);
         SendCustomEventDelayedSeconds("NotDead", RespawnDelay + InvincibleAfterSpawn);
-        SendEventToExtensions("SFEXT_G_Explode");
 
         if (IsOwner)
         {
@@ -1310,6 +1297,16 @@ public class EngineController : UdonSharpBehaviour
         if (InEditor) { VehicleTransform.SetPositionAndRotation(SpawnPos, SpawnRot); }
         VehicleObjectSync.Respawn();//this works if done just locally;
         SendEventToExtensions("SFEXT_O_MoveToSpawn");
+    }
+    public void TouchDown()
+    {
+        Taxiing = true;
+        SendEventToExtensions("SFEXT_G_TouchDown");
+    }
+    public void TakeOff()
+    {
+        Taxiing = false;
+        SendEventToExtensions("SFEXT_G_TakeOff");
     }
     public void IncreaseKills()
     {
@@ -1374,7 +1371,7 @@ public class EngineController : UdonSharpBehaviour
         ReSupplied = 0;//used to know if other scripts resupplied
         if ((Fuel < FullFuel - 10 || Health != FullHealth))
         {
-            ReSupplied += 1;//used to only play the sound if we're actually repairing/getting ammo/fuel
+            ReSupplied++;//used to only play the sound if we're actually repairing/getting ammo/fuel
         }
         SendEventToExtensions("SFEXT_G_ReSupply");//extensions increase the ReSupplied value too
 
@@ -1395,28 +1392,6 @@ public class EngineController : UdonSharpBehaviour
 
 
         Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
-    }
-    public void SetLimitsOn()
-    {
-        FlightLimitsEnabled = true;
-        SendEventToExtensions("SFEXT_G_LimitsOn");
-    }
-    public void SetLimitsOff()
-    {
-        FlightLimitsEnabled = false;
-        SendEventToExtensions("SFEXT_G_LimitsOff");
-    }
-    public void ToggleLimits()
-    {
-        if (!FlightLimitsEnabled)
-        {
-            if (VTOLAngle != VTOLDefaultValue) return;
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn");
-        }
-        else
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff");
-        }
     }
     public void RespawnStatusLocal()//called when using respawn button
     {
@@ -1568,6 +1543,11 @@ public class EngineController : UdonSharpBehaviour
 
         TakeOwnerShipOfExtensions();
         SendEventToExtensions("SFEXT_O_PilotEnter");
+
+        if (LStickNumFuncs == 1)
+        { Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected"); }
+        if (RStickNumFuncs == 1)
+        { Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected"); }
     }
     public void PilotEnterPlaneGlobal(VRCPlayerApi player)
     {
@@ -1578,7 +1558,7 @@ public class EngineController : UdonSharpBehaviour
         }
 
         VehicleAnimator.SetBool(OCCUPIED_STRING, true);
-        dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead respawn event
+        dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
         SendEventToExtensions("SFEXT_G_PilotEnter");
     }
     public void PilotExitPlane(VRCPlayerApi player)

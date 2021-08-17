@@ -73,6 +73,8 @@ public class HUDController : UdonSharpBehaviour
         maxGs = 0f;
         LStickSelectionLastFrame = -1;
         RStickSelectionLastFrame = -1;
+        LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
+        RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
     }
     private void LateUpdate()
     {

@@ -7,7 +7,6 @@ using VRC.Udon;
 public class DFUNCP_Rockets : UdonSharpBehaviour
 {
     [SerializeField] private EngineController EngineControl;
-    [SerializeField] private PassengerFunctionsController PassengerFunctionsControl;
     [SerializeField] private GameObject Rocket;
     [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
@@ -28,21 +27,24 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     private bool LeftDial = false;
     private int DialPosition = -999;
     private Vector3 AmmoBarScaleStart;
+    private VRCPlayerApi localPlayer;
+    private bool InVR;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXTP_L_ECStart()
     {
-        AmmoBarScaleStart = AmmoBar.localScale;
         FullRockets = NumRocket;
-        if (RocketHoldDelay < RocketDelay) { RocketHoldDelay = RocketDelay; }
-        FullRocketsDivider = 1f / (NumRocket > 0 ? NumRocket : 10000000);
         reloadspeed = FullRockets / FullReloadTimeSec;
+        FullRocketsDivider = 1f / (NumRocket > 0 ? NumRocket : 10000000);
+        AmmoBarScaleStart = AmmoBar.localScale;
+        if (RocketHoldDelay < RocketDelay) { RocketHoldDelay = RocketDelay; }
         VehicleTransform = EngineControl.VehicleMainObj.transform;
-    }
-    public void SFEXTP_O_UserExit()
-    {
-        gameObject.SetActive(false);
-        TriggerLastFrame = false;
+
+        localPlayer = Networking.LocalPlayer;
+        if (localPlayer != null)
+        {
+            InVR = localPlayer.IsUserInVR();
+        }
     }
     public void DFUNC_Selected()
     {
@@ -52,6 +54,17 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
         TriggerLastFrame = false;
+    }
+    public void SFEXTP_O_UserEnter()
+    {
+        if (!InVR)
+        {
+            DFUNC_Selected();
+        }
+    }
+    public void SFEXTP_O_UserExit()
+    {
+        DFUNC_Deselected();
     }
     public void SFEXTP_G_Explode()
     {
@@ -65,11 +78,8 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     }
     public void SFEXTP_G_ReSupply()
     {
-        if (NumRocket != FullRockets)
-        {
-            EngineControl.ReSupplied++;
-        }
-        NumRocket = (int)Mathf.Min(NumRocket + Mathf.Max(Mathf.Floor(reloadspeed), 1), NumRocket);
+        if (NumRocket != FullRockets) { EngineControl.ReSupplied++; }
+        NumRocket = (int)Mathf.Min(NumRocket + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullRockets);
         RocketPoint = 0;
         AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
     }

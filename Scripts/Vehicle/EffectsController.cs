@@ -40,7 +40,6 @@ public class EffectsController : UdonSharpBehaviour
     private int BOMB_STRING = Animator.StringToHash("bombs");
     private int AAMS_STRING = Animator.StringToHash("AAMs");
     private int AGMS_STRING = Animator.StringToHash("AGMs");
-    private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
     private int EXPLODE_STRING = Animator.StringToHash("explode");
     private int MISSILESINCOMING_STRING = Animator.StringToHash("missilesincoming");
     private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
@@ -160,7 +159,6 @@ public class EffectsController : UdonSharpBehaviour
         VehicleAnimator.SetFloat(BOMB_STRING, 1);
         VehicleAnimator.SetFloat(AAMS_STRING, 1);
         VehicleAnimator.SetFloat(AGMS_STRING, 1);
-        VehicleAnimator.SetTrigger(INSTANTGEARDOWN_STRING);
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
     public void SFEXT_G_PilotExit()
@@ -175,7 +173,6 @@ public class EffectsController : UdonSharpBehaviour
     public void SFEXT_O_ReAppear()
     {
         DoEffects = 6f; //wake up if was asleep
-        VehicleAnimator.SetTrigger(INSTANTGEARDOWN_STRING);
     }
     public void SFEXT_O_PlaneHit()
     {

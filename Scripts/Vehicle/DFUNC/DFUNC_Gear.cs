@@ -17,7 +17,6 @@ public class DFUNC_Gear : UdonSharpBehaviour
     private bool DragApplied = false;
     private bool DisableGroundDetector = false;
     private int GEARUP_STRING = Animator.StringToHash("gearup");
-    private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
@@ -59,7 +58,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        ToggleGear();
+        if (EngineControl.DisableGearToggle == 0) { ToggleGear(); }
     }
     private void Update()
     {

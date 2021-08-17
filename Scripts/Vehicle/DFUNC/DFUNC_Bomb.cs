@@ -81,13 +81,11 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if (NumBomb != FullBombs)
-        {
-            EngineControl.ReSupplied++;
-        }
-        NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), NumBomb);
+        if (NumBomb != FullBombs) { EngineControl.ReSupplied++; }
+        NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullBombs);
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
         BombPoint = 0;
+        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }
     private void Update()
     {
@@ -165,7 +163,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         }
         DialPosition = -999;
         Debug.LogWarning("DFUNC_Bomb: Can't find self in dial functions");
-        return;
     }
     public void KeyboardInput()
     {

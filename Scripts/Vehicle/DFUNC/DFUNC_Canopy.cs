@@ -15,6 +15,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     [Header("Meters/s")]
     [SerializeField] private float CanopyBreakSpeed = 50;
     [SerializeField] private float CanopyAutoCloseSpeed = 20;
+    [SerializeField] private float CanopyDragMulti = 1.2f;
     private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
@@ -31,6 +32,8 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     private bool CanopyBroken;
     private bool Selected;
     private float LastCanopyToggleTime = -999;
+    private bool DragApplied;
+    private bool CanopyTransitioning = false;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
@@ -74,8 +77,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void SFEXT_G_Explode()
     {
-        CanopyBroken = false;
-        CanopyAnimator.SetBool(CANOPYBREAK_STRING, false);
+        RepairCanopy();
         if (!CanopyOpen) CanopyOpening();
     }
     public void SFEXT_O_PlayerJoined()
@@ -177,25 +179,33 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
         CanopyOpen = true;
         CanopyAnimator.SetBool(CANOPYOPEN_STRING, true);
-        SoundControl.SendCustomEvent("SetCanopyDownFalse");
+        SoundControl.SendCustomEvent("DoorOpen");
         if (EngineControl.IsOwner)
         {
             EngineControl.SendEventToExtensions("SFEXT_O_CanopyOpened");
         }
+
+        if (!DragApplied) { EngineControl.ExtraDrag += CanopyDragMulti; DragApplied = true; }
     }
     public void CanopyClosing()
     {
         if (!CanopyOpen || CanopyBroken) { return; }//don't bother when not necessary (OnPlayerJoined() wasn't you)
         LastCanopyToggleTime = Time.time;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
         CanopyOpen = false;
         CanopyAnimator.SetBool(CANOPYOPEN_STRING, false);
-        SoundControl.SetProgramVariable("CanopyTransitioning", true);
-        SoundControl.SendCustomEventDelayedSeconds("SetCanopyDownTrue", CanopyCloseTime);
+        CanopyTransitioning = true;
+        SoundControl.SendCustomEventDelayedSeconds("DoorClose", CanopyCloseTime);
+        SendCustomEventDelayedSeconds("SetCanopyTransitioningFalse", CanopyCloseTime);
         if (EngineControl.IsOwner)
         {
             EngineControl.SendEventToExtensions("SFEXT_O_CanopyClosed");
         }
+        if (DragApplied) { EngineControl.ExtraDrag -= CanopyDragMulti; DragApplied = false; }
+    }
+    public void SetCanopyTransitioningFalse()
+    {
+        CanopyTransitioning = false;
     }
     public void CanopyBreakOff()
     {
@@ -204,15 +214,15 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         CanopyOpen = true;
         CanopyBroken = true;
         CanopyAnimator.SetBool(CANOPYBREAK_STRING, true);
-        SoundControl.SendCustomEvent("SetCanopyDownFalse");
         if (EngineControl.IsOwner)
         {
             EngineControl.SendEventToExtensions("SFEXT_O_CanopyBreak");
         }
+        if (!DragApplied) { EngineControl.ExtraDrag += CanopyDragMulti; DragApplied = true; }
     }
     public void ToggleCanopy()
     {
-        if ((Time.time - LastCanopyToggleTime) > CanopyCloseTime + .1f && !CanopyBroken && !(bool)SoundControl.GetProgramVariable("CanopyTransitioning") && !(!CanopyCanComeOff && EngineControl.Speed > CanopyAutoCloseSpeed))
+        if ((Time.time - LastCanopyToggleTime) > CanopyCloseTime + .1f && !CanopyBroken && !CanopyTransitioning && !(!CanopyCanComeOff && EngineControl.Speed > CanopyAutoCloseSpeed))
         {
             if (CanopyOpen)
             {

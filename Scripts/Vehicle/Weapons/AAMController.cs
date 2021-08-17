@@ -33,6 +33,7 @@ public class AAMController : UdonSharpBehaviour
     private float UnlockTime;
     private float TargetABPoint;
     private float TargetThrottleNormalizer;
+    private bool TargetEngineNULL = true;
     Vector3 TargetPosLastFrame;
     //public Transform testobj;
     void Start()
@@ -59,6 +60,7 @@ public class AAMController : UdonSharpBehaviour
                     if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
                     { TargetEngineControl.MissilesIncomingHeat++; }
 
+                    TargetEngineNULL = false;
                     MissileIncoming = true;
                     TargetIsVehicle = true;
                     TargetABPoint = TargetEngineControl.ThrottleAfterburnerPoint;
@@ -108,8 +110,18 @@ public class AAMController : UdonSharpBehaviour
             Vector3 Position = transform.position;
             Vector3 TargetPos = Target.position;
             float TargetDistance = Vector3.Distance(Position, TargetPos);
-            bool Dumb = Random.Range(0, 100) > TargetEngineControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
-            float EngineTrack = Mathf.Max(TargetEngineControl.EngineOutput * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
+            float EngineTrack;
+            bool Dumb;
+            if (!TargetEngineNULL)
+            {
+                Dumb = Random.Range(0, 100) > TargetEngineControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
+                EngineTrack = Mathf.Max(TargetEngineControl.EngineOutput * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
+            }
+            else
+            {
+                EngineTrack = 1;
+                Dumb = false;
+            }
             if (EngineTrack > 1) { EngineTrack = 2; }//if AB on track 2x as well
             if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
             {

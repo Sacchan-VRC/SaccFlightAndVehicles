@@ -63,7 +63,7 @@ public class WaterTrigger : UdonSharpBehaviour
     private void OnDisable()
     {
         ThisCollider.enabled = false;
-        if (InWater) EngineControl.Health = -1;
+        if (InWater) { EngineControl.Health = -1; }//just kill the vehicle if it's underwater and the player gets out
         InWater = false;
         NumTriggers = 0;
     }

@@ -9,6 +9,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     [SerializeField] EngineController EngineControl;
     [SerializeField] private Animator FlapsAnimator;
     [SerializeField] private GameObject Dial_Funcon;
+    [SerializeField] private string AnimatorBool = "flaps";
     [SerializeField] private bool DefaultFlapsOff = false;
     [SerializeField] private float FlapsDragMulti = 1.4f;
     [SerializeField] private float FlapsLiftMulti = 1.35f;
@@ -18,7 +19,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     private float StartMaxLift;
-    private int FLAPS_STRING = Animator.StringToHash("flaps");
+    private int FLAPS_STRING;
     private bool DragApplied;
     private bool LiftApplied;
     private bool MaxLiftApplied;
@@ -35,6 +36,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_L_ECStart()
     {
+        FLAPS_STRING = Animator.StringToHash(AnimatorBool);
         //to match how the old values worked
         FlapsDragMulti -= 1f;
         FlapsLiftMulti -= 1f;
@@ -51,8 +53,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
-        gameObject.SetActive(false);
-        TriggerLastFrame = false;
+        DFUNC_Deselected();
     }
     public void SFEXT_O_PassengerEnter()
     {

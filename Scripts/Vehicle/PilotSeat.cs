@@ -8,12 +8,10 @@ public class PilotSeat : UdonSharpBehaviour
 {
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private GameObject SeatAdjuster;
-    [SerializeField] private GameObject ThisPassengerOnly;
     private int ThisStationID;
     private bool SeatInitialized = false;
     private Transform Seat;
     private Quaternion SeatStartRot;
-    private Transform[] PilotOnlyScripts;
     private VRCPlayerApi localPlayer;
     private void Start()
     {

@@ -15,9 +15,15 @@ public class DFUNC_Gun : UdonSharpBehaviour
     [SerializeField] private GameObject HudCrosshair;
     [SerializeField] private float FullReloadTimeSec = 20;
     [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
+    [SerializeField] private bool DoAnimBool = false;
+    [SerializeField] private string AnimBoolName = "GunSelected";
+    [SerializeField] private bool AnimBoolStayTrueOnExit;
+    [SerializeField] private float GunRecoil = 150;
+    private float ToggleTime;
+    private bool AnimOn;
+    private int AnimBool_STRING;
     private bool UseLeftTrigger = false;
     private float FullGunAmmoInSeconds = 12;
-    private float GunRecoil;
     private Rigidbody VehicleRigidbody;
     private bool TriggerLastFrame;
     private bool GunRecoilEmptyNULL = true;
@@ -37,6 +43,9 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
+
+        AnimBool_STRING = Animator.StringToHash(AnimBoolName);
+
         reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
         FullGunAmmoInSeconds = GunAmmoInSeconds;
         AmmoBarScaleStart = AmmoBar.localScale;
@@ -51,6 +60,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         VehicleTransform = EngineControl.VehicleMainObj.transform;
         CenterOfMass = EngineControl.CenterOfMass;
         OutsidePlaneLayer = LayerMask.NameToLayer("Walkthrough");
+        GunRecoil *= VehicleRigidbody.mass;
 
         FindSelf();
 
@@ -65,12 +75,19 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         gameObject.SetActive(true);
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Active");
+
+        if (DoAnimBool && !AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
     }
     public void DFUNC_Deselected()
     {
         if (func_active)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
+        TargetIndicator.gameObject.SetActive(false);
         TriggerLastFrame = false;
+
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -84,9 +101,13 @@ public class DFUNC_Gun : UdonSharpBehaviour
         RequestSerialization();
         EnableToSyncVariables();
         if (func_active) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
-        gameObject.SetActive(false);
+        TargetIndicator.gameObject.SetActive(false);
         GunDamageParticle.gameObject.SetActive(false);
         func_active = false;
+        gameObject.SetActive(false);
+
+        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -101,7 +122,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        EngineControl.ReSupplied++;
         if (GunAmmoInSeconds != FullGunAmmoInSeconds) { EngineControl.ReSupplied++; }
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
         AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
@@ -152,7 +172,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         if (!func_active)//don't disable if the object happened to also be activated on this frame
         { gameObject.SetActive(false); }
     }
-    public void Update()
+    public void LateUpdate()
     {
         if (!Passenger && func_active)
         {
@@ -217,7 +237,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private int NumAAMTargets;
     private Vector3 AAMCurrentTargetDirection;
     private float AAMTargetObscuredDelay;
-    private bool AAMHasTarget;
+    private bool GUNHasTarget;
     private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
     //there's some unnecessary stuff in here because it doesn't need to do missile related stuff any more 
     {
@@ -317,7 +337,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         {
             if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < MaxTargetDistance)
             {
-                AAMHasTarget = true;
+                GUNHasTarget = true;
                 if (AAMCurrentTargetAngle < 70)//lock angle
                 {
                     AAMLockTimer += DeltaTime;
@@ -333,7 +353,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         {
             AAMTargetedTimer = 2f;
             AAMLockTimer = 0;
-            AAMHasTarget = false;
+            GUNHasTarget = false;
         }
         /*         Debug.Log(string.Concat("AAMTarget ", AAMTarget));
                 Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
@@ -360,7 +380,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private void Hud()
     {
         float SmoothDeltaTime = Time.smoothDeltaTime;
-        if (AAMHasTarget && func_active)//GUN or AAM
+        if (GUNHasTarget)
         {
             TargetIndicator.gameObject.SetActive(true);
             TargetIndicator.position = HUDControl.transform.position + AAMCurrentTargetDirection;
@@ -371,7 +391,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
 
         //GUN Lead Indicator
-        if (AAMHasTarget && func_active)
+        if (GUNHasTarget)
         {
             Vector3 HudControlPosition = HUDControl.transform.position;
             GUNLeadIndicator.gameObject.SetActive(true);
@@ -430,7 +450,18 @@ public class DFUNC_Gun : UdonSharpBehaviour
         }
         DialPosition = -999;
         Debug.LogWarning("DFUNC_Gun: Can't find self in dial functions");
-        return;
+    }
+    public void SetBoolOn()
+    {
+        ToggleTime = Time.time;
+        AnimOn = true;
+        GunAnimator.SetBool(AnimBool_STRING, AnimOn);
+    }
+    public void SetBoolOff()
+    {
+        ToggleTime = Time.time;
+        AnimOn = false;
+        GunAnimator.SetBool(AnimBool_STRING, AnimOn);
     }
     public void KeyboardInput()
     {

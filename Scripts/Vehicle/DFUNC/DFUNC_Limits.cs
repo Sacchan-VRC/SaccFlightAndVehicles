@@ -12,6 +12,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
     [SerializeField] private GameObject Dial_Funcon;
     private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
+    private bool HudLimitNULL = true;
     private bool TriggerLastFrame;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -27,7 +28,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         {
             if (!TriggerLastFrame)
             {
-                EngineControl.ToggleLimits();
+                ToggleLimits();
             }
             TriggerLastFrame = true;
         }
@@ -36,8 +37,8 @@ public class DFUNC_Limits : UdonSharpBehaviour
     public void SFEXT_L_ECStart()
     {
         Dial_FunconNULL = Dial_Funcon == null;
-        if (!DefaultLimitsOn) { EngineControl.SetLimitsOff(); }
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(EngineControl.FlightLimitsEnabled); }
+        HudLimitNULL = HudLimit == null;
+        if (!DefaultLimitsOn) { SetLimitsOff(); }
     }
     public void DFUNC_Selected()
     {
@@ -56,7 +57,32 @@ public class DFUNC_Limits : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         gameObject.SetActive(false);
-        if (DefaultLimitsOn) { EngineControl.SetLimitsOn(); }
+        if (DefaultLimitsOn)
+        {
+            SetLimitsOn();
+            //CANNOT recursively call a function
+            //EngineControl.SendEventToExtensions("SFEXT_G_LimitsOn");
+        }
+        else
+        {
+            SetLimitsOff();
+            //CANNOT recursively call a function
+            //EngineControl.SendEventToExtensions("SFEXT_G_LimitsOff");
+        }
+    }
+    public void SetLimitsOn()
+    {
+        EngineControl.FlightLimitsEnabled = true;
+        if (!HudLimitNULL) { HudLimit.SetActive(true); }
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+        HudLimit.SetActive(true);
+    }
+    public void SetLimitsOff()
+    {
+        EngineControl.FlightLimitsEnabled = false;
+        if (!HudLimitNULL) { HudLimit.SetActive(false); }
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        HudLimit.SetActive(false);
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -68,27 +94,30 @@ public class DFUNC_Limits : UdonSharpBehaviour
     }
     public void SFEXT_G_RespawnButton()
     {
-        if (DefaultLimitsOn) { EngineControl.SetLimitsOn(); }
+        if (DefaultLimitsOn) { SetLimitsOn(); }
+        else { SetLimitsOff(); }
     }
     public void SFEXT_O_PlayerJoined()
     {
         if (!EngineControl.FlightLimitsEnabled && DefaultLimitsOn)
-        { EngineControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff"); }
         else if (EngineControl.FlightLimitsEnabled && !DefaultLimitsOn)
-        { EngineControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn"); }
     }
     public void KeyboardInput()
     {
-        EngineControl.ToggleLimits();
+        ToggleLimits();
     }
-    public void SFEXT_G_LimitsOn()
+    public void ToggleLimits()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
-        HudLimit.SetActive(true);
-    }
-    public void SFEXT_G_LimitsOff()
-    {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
-        HudLimit.SetActive(false);
+        if (!EngineControl.FlightLimitsEnabled)
+        {
+            if (EngineControl.VTOLAngle != EngineControl.VTOLDefaultValue) return;
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn");
+        }
+        else
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff");
+        }
     }
 }

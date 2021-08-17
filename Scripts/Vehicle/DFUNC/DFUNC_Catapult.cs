@@ -38,10 +38,12 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private bool DisableTaxiRotation = false;
     private bool DisableGearToggle = false;
     private bool SetConstantForceZero = false;
+    private bool InEditor;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
+        InEditor = Networking.LocalPlayer == null;
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         VehicleTransform = EngineControl.VehicleMainObj.GetComponent<Transform>();
@@ -75,7 +77,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             Pilot = false;
             if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff"); }
         }
-        OnCatapult = false;
         Selected = false;
         TriggerLastFrame = false;
         if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
@@ -93,14 +94,15 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     {
         Launching = false;
         OnCatapult = false;
-        gameObject.SetActive(false);
         Pilot = false;
+        gameObject.SetActive(false);
         if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
         if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
         if (SetConstantForceZero) { EngineControl.SetConstantForceZero -= 1; SetConstantForceZero = false; }
     }
     public void SFEXT_O_Explode()
     {
+        OnCatapult = false;
         if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
         if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
         if (SetConstantForceZero) { EngineControl.SetConstantForceZero -= 1; SetConstantForceZero = false; }
@@ -132,7 +134,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (Pilot)
+        if (Pilot && !EngineControl.dead)
         {
             if (other != null)
             {
@@ -181,12 +183,10 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 FindCatapultAnimator(other.gameObject);
             }
         }
-
     }
-
     private void Update()
     {
-        if (Pilot && OnCatapult)
+        if ((Pilot && OnCatapult) || Launching)
         {
             if (!Launching && Selected)
             {
@@ -250,8 +250,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         EngineControl.dead = false;
         if (!EngineControl.Piloting)
         {
-            gameObject.SetActive(false);
-            Pilot = false;
+            SFEXT_O_PilotExit();
         }
     }
     public void KeyboardInput()
@@ -271,7 +270,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     {
         if (CatapultAnimator != null) { CatapultAnimator.SetTrigger("launch"); }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
-
         VehicleRigidbody.WakeUp();//i don't think it actually sleeps anyway but this might help other clients sync the launch faster idk
     }
 

@@ -20,13 +20,11 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private float CalibrateTimer = 0f;
     private float AwakeTimer = 0f;
-    private float scaleratio;
     void Start()
     {
         localPlayer = Networking.LocalPlayer;
         SeatOriginalPos = Seat.transform.localPosition;
         gameObject.SetActive(false); //object needs to be active at least once to make the functions work over network
-        scaleratio = transform.lossyScale.magnitude / Vector3.one.magnitude;
     }
 
     private void OnEnable()
@@ -446,42 +444,42 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
 
     public void MoveUp1cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * .01f * scaleratio);
+        Seat.position += Seat.up * .01f;
     }
     public void MoveDown1cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * -.01f * scaleratio);
+        Seat.position += Seat.up * -.01f;
     }
 
     public void MoveUp2cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * .02f * scaleratio);
+        Seat.position += Seat.up * .02f;
     }
     public void MoveDown2cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * -.02f * scaleratio);
+        Seat.position += Seat.up * -.02f;
     }
 
 
 
     public void MoveUp4cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * .04f * scaleratio);
+        Seat.position += Seat.up * .04f;
     }
     public void MoveDown4cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * -.04f * scaleratio);
+        Seat.position += Seat.up * -.04f;
     }
 
 
 
     public void MoveUp8cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * .08f * scaleratio);
+        Seat.position += Seat.up * .08f;
     }
     public void MoveDown8cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * -.08f * scaleratio);
+        Seat.position += Seat.up * -.08f;
     }
 
 
@@ -489,31 +487,31 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
 
     public void MoveUp16cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * .16f * scaleratio);
+        Seat.position += Seat.up * .16f;
     }
     public void MoveDown16cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * -.16f * scaleratio);
+        Seat.position += Seat.up * -.16f;
     }
 
 
     public void MoveUp32cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * .32f * scaleratio);
+        Seat.position += Seat.up * .32f;
     }
     public void MoveDown32cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * -.32f * scaleratio);
+        Seat.position += Seat.up * -.32f;
     }
 
 
     public void MoveUp64cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * .64f * scaleratio);
+        Seat.position += Seat.up * .64f;
     }
     public void MoveDown64cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.up * -.64f * scaleratio);
+        Seat.position += Seat.up * -.64f;
     }
 
 
@@ -529,42 +527,42 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
 
     public void MoveForward1cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * .01f * scaleratio);
+        Seat.position += Seat.forward * .01f;
     }
     public void MoveBack1cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * -.01f * scaleratio);
+        Seat.position += Seat.forward * -.01f;
     }
 
     public void MoveForward2cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * .02f * scaleratio);
+        Seat.position += Seat.forward * .02f;
     }
     public void MoveBack2cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * -.02f * scaleratio);
+        Seat.position += Seat.forward * -.02f;
     }
 
 
 
     public void MoveForward4cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * .04f * scaleratio);
+        Seat.position += Seat.forward * .04f;
     }
     public void MoveBack4cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * -.04f * scaleratio);
+        Seat.position += Seat.forward * -.04f;
     }
 
 
 
     public void MoveForward8cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * .08f * scaleratio);
+        Seat.position += Seat.forward * .08f;
     }
     public void MoveBack8cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * -.08f * scaleratio);
+        Seat.position += Seat.forward * -.08f;
     }
 
 
@@ -572,31 +570,31 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
 
     public void MoveForward16cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * .16f * scaleratio);
+        Seat.position += Seat.forward * .16f;
     }
     public void MoveBack16cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * -.16f * scaleratio);
+        Seat.position += Seat.forward * -.16f;
     }
 
 
     public void MoveForward32cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * .32f * scaleratio);
+        Seat.position += Seat.forward * .32f;
     }
     public void MoveBack32cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * -.32f * scaleratio);
+        Seat.position += Seat.forward * -.32f;
     }
 
 
     public void MoveForward64cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * .64f * scaleratio);
+        Seat.position += Seat.forward * .64f;
     }
     public void MoveBack64cm()
     {
-        Seat.position += Seat.TransformDirection(Vector3.forward * -.64f * scaleratio);
+        Seat.position += Seat.forward * -.64f;
     }
 
 

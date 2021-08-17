@@ -9,6 +9,7 @@ public class PassengerFunctionsController : UdonSharpBehaviour
 {
     public UdonSharpBehaviour[] Dial_Functions_L;
     public UdonSharpBehaviour[] Dial_Functions_R;
+    public UdonSharpBehaviour[] PassengerExtensions;
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
     private bool LStickDisplayHighlighterNULL;
@@ -217,6 +218,8 @@ public class PassengerFunctionsController : UdonSharpBehaviour
             { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
             { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            foreach (UdonSharpBehaviour EXT in PassengerExtensions)
+            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
         }
     }
     public void SendEventToExtensions_Gunner(string eventname)
@@ -227,6 +230,11 @@ public class PassengerFunctionsController : UdonSharpBehaviour
             { EXT.SendCustomEvent(eventname); }
         }
         foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+        {
+            if (EXT != null)
+            { EXT.SendCustomEvent(eventname); }
+        }
+        foreach (UdonSharpBehaviour EXT in PassengerExtensions)
         {
             if (EXT != null)
             { EXT.SendCustomEvent(eventname); }
@@ -314,5 +322,10 @@ public class PassengerFunctionsController : UdonSharpBehaviour
     public void SFEXT_G_PassengerExit()
     {
         SendEventToExtensions_Gunner("SFEXTP_G_PassengerExit");
+    }
+    public override void OnPlayerJoined(VRCPlayerApi player)
+    {
+        if (FunctionsActive)
+        { SendEventToExtensions_Gunner("SFEXTP_O_PlayerJoined"); }
     }
 }

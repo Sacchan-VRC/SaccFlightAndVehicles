@@ -9,7 +9,6 @@ public class RaceToggleButton : UdonSharpBehaviour
     public RacingTrigger[] RacingTriggers;
     public RaceCourseAndScoreboard[] Races;
     public int CurrentCourseSelection = -1;
-
     private void Start()
     {
         if (CurrentCourseSelection == -1) //-1 = all races disabled
@@ -21,17 +20,13 @@ public class RaceToggleButton : UdonSharpBehaviour
         }
         else
         {
-            foreach (RaceCourseAndScoreboard race in Races)
+            if (CurrentCourseSelection != -1)
             {
-                race.RaceObjects.gameObject.SetActive(false);
+                foreach (RacingTrigger RaceTrig in RacingTriggers)
+                { RaceTrig.gameObject.SetActive(true); }
             }
-            Races[CurrentCourseSelection].gameObject.SetActive(true);
-            Races[CurrentCourseSelection].GetComponent<RaceCourseAndScoreboard>().UpdateTimes();
         }
-        foreach (RacingTrigger RaceTrig in RacingTriggers)
-        {
-            RaceTrig.SetUpNewRace();
-        }
+        SetRace();
     }
     void Interact()
     {
@@ -39,6 +34,11 @@ public class RaceToggleButton : UdonSharpBehaviour
         if (CurrentCourseSelection == Races.Length - 1)
         { CurrentCourseSelection = -1; }
         else { CurrentCourseSelection++; }
+
+        SetRace();
+    }
+    void SetRace()
+    {
 
         if (CurrentCourseSelection != -1)//-1 = all races disabled
         {

@@ -42,8 +42,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         FullAAMs = NumAAM;
         reloadspeed = FullAAMs / FullReloadTimeSec;
-        NumAAMTargets = EngineControl.NumAAMTargets;
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
+        NumAAMTargets = EngineControl.NumAAMTargets;
         AAMTargets = EngineControl.AAMTargets;
         CenterOfMass = EngineControl.CenterOfMass;
         VehicleTransform = EngineControl.VehicleTransform;
@@ -120,6 +120,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         gameObject.SetActive(true);
         func_active = true;
+        AAMTargetIndicator.gameObject.SetActive(true);
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
     }
     public void DFUNC_Deselected()

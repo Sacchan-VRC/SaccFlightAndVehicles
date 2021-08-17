@@ -80,6 +80,13 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             }
         }
     }
+    public void SFEXTP_O_UserEnter()
+    {
+        if (!InVR)
+        {
+            DFUNC_Selected();
+        }
+    }
     public void SFEXTP_O_UserExit()
     {
         DFUNC_Deselected();
@@ -87,19 +94,26 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     public void SFEXTP_G_Explode()
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
-        Minigun.rotation = Quaternion.identity;
+        Minigun.localRotation = Quaternion.identity;
         GunRotation = Vector2.zero;
+        GunStopFiring();
+        func_active = false;
+        GunDamageParticle_Parent.gameObject.SetActive(false);
+        gameObject.SetActive(false);
     }
     public void SFEXTP_G_RespawnButton()
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
-        Minigun.rotation = Quaternion.identity;
+        Minigun.localRotation = Quaternion.identity;
         GunRotation = Vector2.zero;
     }
     public void SFEXTP_G_ReSupply()
     {
-        if (GunAmmoInSeconds != FullGunAmmoInSeconds) { EngineControl.ReSupplied++; }
-        GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+        if (func_active)
+        {
+            if (GunAmmoInSeconds != FullGunAmmoInSeconds) { EngineControl.ReSupplied++; }
+            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+        }
     }
     private void LateUpdate()
     {

@@ -15,16 +15,16 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private GameObject Dial_Funcon;
     [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
+    [SerializeField] private AudioSource AGMLock;
+    [SerializeField] private AudioSource AGMUnlock;
     private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] private int AGMUnlocking = 0;
     [System.NonSerializedAttribute] private float AGMUnlockTimer;
-    [System.NonSerializedAttribute] public float AGMRotDif;
-    [System.NonSerializedAttribute] public bool AGMUnlockNull;
-    [System.NonSerializedAttribute] public bool AGMTargetLockNull;
-    public AudioSource AGMLock;
-    public AudioSource AGMUnlock;
+    private float AGMRotDif;
+    private bool AGMUnlockNULL;
+    private bool AGMLockNULL;
     private bool TriggerLastFrame;
     private float TriggerTapTime;
     public GameObject AGM;
@@ -50,8 +50,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
-        AGMUnlockNull = (AGMUnlock == null) ? true : false;
-        AGMTargetLockNull = (AGMLock == null) ? true : false;
+        AGMUnlockNULL = AGMUnlock == null;
+        AGMLockNULL = AGMLock == null;
         FullAGMs = NumAGM;
         reloadspeed = FullAGMs / FullReloadTimeSec;
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
@@ -93,10 +93,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if (NumAGM != FullAGMs)
-        {
-            EngineControl.ReSupplied++;
-        }
+        if (NumAGM != FullAGMs) { EngineControl.ReSupplied++; }
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
@@ -150,7 +147,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 AGMUnlockTimer = 0;
                 AGMUnlocking = 0;
                 if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
-                if (!AGMUnlockNull)
+                if (!AGMUnlockNULL)
                 { AGMUnlock.Play(); }
             }
             if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
@@ -194,7 +191,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                         AGMLocked = true;
                                         AGMUnlocking = 0;
                                         RequestSerialization();
-                                        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+                                        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
                                     }
                                 }
                             }
@@ -205,13 +202,13 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                 {
                                     //enable for others so they sync the variable
                                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
-                                    if (!AGMUnlockNull)
+                                    if (!AGMLockNULL)
                                     { AGMLock.Play(); }
                                     AGMTarget = lockpoint.point;
                                     AGMLocked = true;
                                     AGMUnlocking = 0;
                                     RequestSerialization();
-                                    if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+                                    if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
                                 }
                             }
                         }
@@ -350,7 +347,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
         }
         DialPosition = -999;
         Debug.LogWarning("DFUNC_AGM: Can't find self in dial functions");
-        return;
     }
     public void KeyboardInput()
     {

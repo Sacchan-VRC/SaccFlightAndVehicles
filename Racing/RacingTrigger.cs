@@ -13,7 +13,7 @@ public class RacingTrigger : UdonSharpBehaviour
     public GameObject[] InstanceRecordDisallowedRaces;
     public Text TimeText_Cockpit;
     private RaceCourseAndScoreboard CurrentCourse;
-    private int CurrentCourseSelection = 0;
+    private int CurrentCourseSelection = -1;
     private int NextCheckpoint;
     private int FinalCheckpoint;
     private bool RaceOn;
@@ -36,8 +36,10 @@ public class RacingTrigger : UdonSharpBehaviour
     private float PlaneDistanceFromCheckPoint;
     private float PlaneDistanceFromCheckPointLastFrame;
     private Vector3 PlaneClosestPosInverseFromPlane;
-    private void Start()
+    private bool Initialized = false;
+    private void Initialize()
     {
+        Initialized = true;
         GameObject Objs = gameObject;
         //checking if a rigidbody is null in a while loop doesnt work in udon for some reason, use official vrchat workaround
         while (!Utilities.IsValid(PlaneRigidbody) && Objs.transform.parent != null)
@@ -231,6 +233,7 @@ public class RacingTrigger : UdonSharpBehaviour
     }
     public void SetUpNewRace()
     {
+        if (!Initialized) { Initialize(); }
         FinishedRace = false;//don't send time on disable unless race finished
         RaceOn = false;
         RaceTime = 0;
@@ -242,7 +245,6 @@ public class RacingTrigger : UdonSharpBehaviour
             return;
         }
         SetCourse();
-
     }
     void OnEnable()//Happens when you get in a plane, if a race is enabled
     {
@@ -328,7 +330,6 @@ public class RacingTrigger : UdonSharpBehaviour
         {
             if (race == Button.Races[ccs].gameObject)
             {
-                CurrentCourseSelection = -1;
                 return true;
             }
         }

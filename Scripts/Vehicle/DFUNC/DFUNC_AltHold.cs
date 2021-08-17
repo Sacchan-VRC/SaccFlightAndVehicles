@@ -11,6 +11,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     [SerializeField] private GameObject Dial_Funcon;
     private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
+    private bool HudHoldNULL = true;
     private bool TriggerLastFrame;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -31,7 +32,8 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     public void SFEXT_L_ECStart()
     {
         Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
+        HudHoldNULL = HudHold == null;
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
     }
     private void Update()
     {
@@ -48,7 +50,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
                 bool althold = EngineControl.AltHold;
                 EngineControl.AltHold = !althold;
                 if (!Dial_FunconNULL) { Dial_Funcon.SetActive(althold); }
-                HudHold.SetActive(althold);
+                if (!HudHoldNULL) { HudHold.SetActive(althold); }
             }
             TriggerLastFrame = true;
         }
@@ -58,7 +60,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     {
         bool althold = EngineControl.AltHold;
         EngineControl.AltHold = !althold;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(althold); }
-        HudHold.SetActive(althold);
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(!althold); }
+        if (!HudHoldNULL) { HudHold.SetActive(!althold); }
     }
 }
