@@ -76,7 +76,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void SetGearUp()
     {
-        if (!DisableGroundDetector) { EngineControl.DisableGroundDetector += 1; DisableGroundDetector = true; }
+        if (!DisableGroundDetector) { EngineControl.DisableGroundDetection += 1; DisableGroundDetector = true; }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
         GearUp = true;
         GearAnimator.SetBool(GEARUP_STRING, true);
@@ -89,7 +89,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void SetGearDown()
     {
-        if (DisableGroundDetector) { EngineControl.DisableGroundDetector -= 1; DisableGroundDetector = false; }
+        if (DisableGroundDetector) { EngineControl.DisableGroundDetection -= 1; DisableGroundDetector = false; }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
         GearUp = false;
         GearAnimator.SetBool(GEARUP_STRING, false);

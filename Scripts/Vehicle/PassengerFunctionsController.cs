@@ -27,7 +27,6 @@ public class PassengerFunctionsController : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private bool InEditor = true;
     private bool InVR = false;
-    [System.NonSerializedAttribute] public bool IsOwner = false;//matching name to EngineControllers variable so it has an answer when queried
     [System.NonSerializedAttribute] public int RStickSelection = -1;
     [System.NonSerializedAttribute] public int LStickSelection = -1;
     [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
@@ -72,8 +71,8 @@ public class PassengerFunctionsController : UdonSharpBehaviour
         if (RStickNumFuncs == 1) { RightDialOnlyOne = true; }
         if (LStickNumFuncs == 0) { LeftDialEmpty = true; }
         if (RStickNumFuncs == 0) { RightDialEmpty = true; }
-        if (LeftDialEmpty || LeftDialOnlyOne) DoFuncsL = false;
-        if (RightDialEmpty || RightDialOnlyOne) DoFuncsR = false;
+        if (LeftDialEmpty || LeftDialOnlyOne) { DoFuncsL = false; } else { DoFuncsL = true; }
+        if (RightDialEmpty || RightDialOnlyOne) { DoFuncsR = false; } else { DoFuncsR = true; }
         //work out angle to check against for function selection because straight up is the middle of a function
         Vector3 angle = new Vector3(0, 0, -1);
         if (!LeftDialEmpty) { angle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle; }
@@ -184,7 +183,7 @@ public class PassengerFunctionsController : UdonSharpBehaviour
                     else { CurrentSelectedFunctionR = null; }
                 }
             }
-            if (RStickSelection != LStickSelectionLastFrame)
+            if (RStickSelection != RStickSelectionLastFrame)
             {
                 if (LStickSelection < 0)
                 { if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); } }
@@ -255,7 +254,7 @@ public class PassengerFunctionsController : UdonSharpBehaviour
             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
         }
         TakeOwnerShipOfExtensions();
-        IsOwner = true;
+        FunctionsActive = true;
     }
     private void OnDisable()
     {
@@ -269,13 +268,15 @@ public class PassengerFunctionsController : UdonSharpBehaviour
         }
         LStickSelection = -1;
         RStickSelection = -1;
-        IsOwner = false;
     }
     public void SFEXT_P_PassengerEnter()
     {
-        if (gameObject.activeSelf)//only do this for the one in the seat that has activated it
+        SendCustomEventDelayedFrames(nameof(PassengerEnter_2), 2);
+    }
+    public void PassengerEnter_2()//this shouldn't be needed but it is. OnEnable seems to run late
+    {
+        if (FunctionsActive)//only do this for the one in the seat that has activated it
         {
-            FunctionsActive = true;
             SendEventToExtensions_Gunner("SFEXTP_O_UserEnter");
         }
         else

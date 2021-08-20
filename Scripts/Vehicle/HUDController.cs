@@ -13,7 +13,6 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Text HUDText_G;
     [SerializeField] private Text HUDText_mach;
     [SerializeField] private Text HUDText_altitude;
-    [SerializeField] private Text HUDText_knotstarget;
     [SerializeField] private Text HUDText_knots;
     [SerializeField] private Text HUDText_knotsairspeed;
     [SerializeField] private Text HUDText_angleofattack;
@@ -134,15 +133,6 @@ public class HUDController : UdonSharpBehaviour
                 RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * StickSelection, 0);
             }
         }
-
-
-        //Cruise Control target knots
-        if (EngineControl.Cruise)
-        {
-            HUDText_knotstarget.text = ((EngineControl.SetSpeed) * 1.9438445f).ToString("F0");
-        }
-        else { HUDText_knotstarget.text = string.Empty; }
-
 
 
         //updating numbers 3~ times a second

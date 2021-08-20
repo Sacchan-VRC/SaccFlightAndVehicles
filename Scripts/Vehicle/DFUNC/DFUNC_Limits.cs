@@ -14,28 +14,17 @@ public class DFUNC_Limits : UdonSharpBehaviour
     private bool Dial_FunconNULL = true;
     private bool HudLimitNULL = true;
     private bool TriggerLastFrame;
+    private bool Selected;
+    private bool InVR;
+    private bool Piloting;
+    [System.NonSerializedAttribute] public bool FlightLimitsEnabled = false;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
-    private void Update()
-    {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-        if (Trigger > 0.75)
-        {
-            if (!TriggerLastFrame)
-            {
-                ToggleLimits();
-            }
-            TriggerLastFrame = true;
-        }
-        else { TriggerLastFrame = false; }
-    }
     public void SFEXT_L_ECStart()
     {
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
+        if (localPlayer != null)
+        { InVR = localPlayer.IsUserInVR(); }
         Dial_FunconNULL = Dial_Funcon == null;
         HudLimitNULL = HudLimit == null;
         if (!DefaultLimitsOn) { SetLimitsOff(); }
@@ -43,16 +32,32 @@ public class DFUNC_Limits : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
+        Selected = true;
     }
     public void DFUNC_Deselected()
     {
-        gameObject.SetActive(false);
+        if (!FlightLimitsEnabled) { gameObject.SetActive(false); }
         TriggerLastFrame = false;
+        Selected = false;
     }
-    private void SFEXT_O_PilotExit()
+    public void SFEXT_O_PilotEnter()
     {
         gameObject.SetActive(false);
-        TriggerLastFrame = false;
+        Piloting = true;
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(FlightLimitsEnabled);
+        if (FlightLimitsEnabled)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetLimitsOn)); }
+    }
+    public void SFEXT_O_PilotExit()
+    {
+        gameObject.SetActive(false);
+        Selected = false;
+        Piloting = false;
+    }
+    public void SFEXT_G_TouchDown()
+    {
+        if (FlightLimitsEnabled)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetLimitsOff)); }
     }
     public void SFEXT_G_Explode()
     {
@@ -72,25 +77,26 @@ public class DFUNC_Limits : UdonSharpBehaviour
     }
     public void SetLimitsOn()
     {
-        EngineControl.FlightLimitsEnabled = true;
+        if (FlightLimitsEnabled) { return; }
+        if (Piloting) { gameObject.SetActive(true); }
+        FlightLimitsEnabled = true;
         if (!HudLimitNULL) { HudLimit.SetActive(true); }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
         HudLimit.SetActive(true);
     }
     public void SetLimitsOff()
     {
-        EngineControl.FlightLimitsEnabled = false;
+        if (!FlightLimitsEnabled) { return; }
+        if (Piloting) { gameObject.SetActive(false); }
+        FlightLimitsEnabled = false;
         if (!HudLimitNULL) { HudLimit.SetActive(false); }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
         HudLimit.SetActive(false);
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.FlightLimitsEnabled);
+        EngineControl.Limits = 1;
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(EngineControl.FlightLimitsEnabled);
+        if (!Dial_FunconNULL) Dial_Funcon.SetActive(FlightLimitsEnabled);
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -99,10 +105,35 @@ public class DFUNC_Limits : UdonSharpBehaviour
     }
     public void SFEXT_O_PlayerJoined()
     {
-        if (!EngineControl.FlightLimitsEnabled && DefaultLimitsOn)
+        if (!FlightLimitsEnabled && DefaultLimitsOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff"); }
-        else if (EngineControl.FlightLimitsEnabled && !DefaultLimitsOn)
+        else if (FlightLimitsEnabled && !DefaultLimitsOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn"); }
+    }
+    private void Update()
+    {
+        float Trigger;
+        if (UseLeftTrigger)
+        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+        else
+        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+        if (Trigger > 0.75)
+        {
+            if (!TriggerLastFrame)
+            {
+                ToggleLimits();
+            }
+            TriggerLastFrame = true;
+        }
+        else { TriggerLastFrame = false; }
+
+        if (FlightLimitsEnabled && Piloting)
+        {
+            float GLimitStrength = Mathf.Clamp(-(EngineControl.VertGs / EngineControl.GLimiter) + 1, 0, 1);
+            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(EngineControl.AngleOfAttack) / EngineControl.AoALimiter) + 1, 0, 1);
+            EngineControl.Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
+        }
     }
     public void KeyboardInput()
     {
@@ -110,9 +141,9 @@ public class DFUNC_Limits : UdonSharpBehaviour
     }
     public void ToggleLimits()
     {
-        if (!EngineControl.FlightLimitsEnabled)
+        if (!FlightLimitsEnabled)
         {
-            if (EngineControl.VTOLAngle != EngineControl.VTOLDefaultValue) return;
+            if (EngineControl.VTOLAngle != EngineControl.VTOLDefaultValue) { return; }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn");
         }
         else

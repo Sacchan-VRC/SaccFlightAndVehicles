@@ -7,6 +7,7 @@ using VRC.Udon;
 public class FloatScript : UdonSharpBehaviour
 {
     [SerializeField] private Rigidbody VehicleRigidbody;
+    [SerializeField] private EngineController EngineControl;
     [SerializeField] private Transform[] FloatPoints;
     [SerializeField] private LayerMask FloatLayers = 16;
     private Transform VehicleTransform;
@@ -29,9 +30,9 @@ public class FloatScript : UdonSharpBehaviour
 
     [Header("HoverBike Only")]
     [SerializeField] private bool HoverBike = false;
-    [SerializeField] private EngineController EngineControl;
     [SerializeField] private float HoverBikeTurningStrength = 1;
     [SerializeField] private float BackThrustStrength = 5;
+    private bool EngineControlNULL;
     private float[] FloatDepth;
     private float[] FloatDepthLastFrame;
     private float[] FloatLastRayHitHeight;
@@ -57,6 +58,8 @@ public class FloatScript : UdonSharpBehaviour
             WaterRotDrag *= RBMass;
             WaterVelDrag *= RBMass;
         }
+        EngineControlNULL = EngineControl == null;
+
         FPLength = FloatPoints.Length;
         FloatDiameter = FloatRadius * 2;
 
@@ -81,6 +84,8 @@ public class FloatScript : UdonSharpBehaviour
         {
             gameObject.SetActive(false);
         }
+        if (HoverBike)
+        { EngineControl.DisableGroundDetection++; }
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -152,7 +157,7 @@ public class FloatScript : UdonSharpBehaviour
             FloatDepth[currentfloatpoint] = 0;
             FloatDepthLastFrame[currentfloatpoint] = 0;
             FloatPointForce[currentfloatpoint] = Vector3.zero;
-            if (Vel.y > 0)//only reset water level if moving up, so things don't break if we go straight from air all the way to under the water
+            if (Vel.y > 0 || HitLandLast[currentfloatpoint])//only reset water level if moving up (or last hit was land), so things don't break if we go straight from air all the way to under the water
             { FloatLastRayHitHeight[currentfloatpoint] = -500000; }
             //Debug.Log(string.Concat(currentfloatpoint.ToString(), ": Air: floatpointforce: ", FloatPointForce[currentfloatpoint].ToString()));
         }
@@ -170,7 +175,10 @@ public class FloatScript : UdonSharpBehaviour
             }
             VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * depth * WaterRotDrag);
             VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * depth * WaterVelDrag);
+            if (!EngineControlNULL) { EngineControl.Floating = true; }
         }
+        else
+        { if (!EngineControlNULL) { EngineControl.Floating = false; } }
 
         Vector3 right = VehicleTransform.right;
         Vector3 forward = VehicleTransform.forward;

@@ -38,13 +38,11 @@ public class KeyboardControlsSF : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour Rfunc7;
     [SerializeField] private KeyCode Rfunc8key;
     [SerializeField] private UdonSharpBehaviour Rfunc8;
-    [Tooltip("EngineControl only required for the two booleans below")]
+    [Header("EngineControl only required for DoVTOL")]
     [SerializeField] EngineController EngineControl;
     [SerializeField] private bool DoVTOL;
-    [SerializeField] private bool DoCruise;
     private string KeyboardInput = "KeyboardInput";
     private float VTOLAngleDivider;
-
     private void Start()
     {
         if (EngineControl != null)
@@ -55,7 +53,6 @@ public class KeyboardControlsSF : UdonSharpBehaviour
         else
         {
             DoVTOL = false;
-            DoCruise = false;
         }
     }
     void Update()
@@ -69,14 +66,6 @@ public class KeyboardControlsSF : UdonSharpBehaviour
                 EngineControl.VTOLAngleInput = Mathf.Clamp(EngineControl.VTOLAngleInput + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime)), 0, 1);
             }
         }
-        if (DoCruise)
-        {
-            float DeltaTime = Time.deltaTime;
-            float equals = Input.GetKey(KeyCode.Equals) ? DeltaTime * 10 : 0;
-            float minus = Input.GetKey(KeyCode.Minus) ? DeltaTime * 10 : 0;
-            EngineControl.SetSpeed = Mathf.Max(EngineControl.SetSpeed + (equals - minus), 0);
-        }
-
 
         if (Input.GetKeyDown(Lfunc1key))
         {

@@ -7,6 +7,7 @@ using VRC.Udon;
 
 public class WindChanger : UdonSharpBehaviour
 {
+    [SerializeField] private EngineController[] VehicleEngines;
     [SerializeField] private GameObject WindMenu;
     [SerializeField] private Slider WindStrengthSlider;
     [SerializeField] private Text WindStr_text;
@@ -17,7 +18,6 @@ public class WindChanger : UdonSharpBehaviour
     [SerializeField] private Slider WindTurbulanceScaleSlider;
     [SerializeField] private Text WindTurbulanceScale_text;
     [SerializeField] private AudioSource WindApplySound;
-    [SerializeField] private EngineController[] VehicleEngines;
     /* [UdonSynced(UdonSyncMode.None)] */
     private float WindStrength;
     /* [UdonSynced(UdonSyncMode.None)] */

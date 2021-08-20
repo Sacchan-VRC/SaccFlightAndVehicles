@@ -21,10 +21,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     private bool TriggerLastFrame;
     private Transform VehicleTransform;
     private VRCPlayerApi localPlayer;
-    private float EjectZeroPoint;
-    [System.NonSerializedAttribute] public float EjectTimer = 1;
     private HUDController HUDControl;
-    [System.NonSerializedAttribute] public bool Ejected = false;
     private bool InVR;
     private int CANOPYOPEN_STRING = Animator.StringToHash("canopyopen");
     private int CANOPYBREAK_STRING = Animator.StringToHash("canopybroken");
@@ -65,11 +62,6 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         gameObject.SetActive(false);
         Selected = false;
         TriggerLastFrame = false;
-        if (Ejected)
-        {
-            localPlayer.SetVelocity(localPlayer.GetVelocity() + VehicleTransform.up * 25);
-            Ejected = false;
-        }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -128,35 +120,11 @@ public class DFUNC_Canopy : UdonSharpBehaviour
                 {
                     ToggleCanopy();
                 }
-
-                //ejection
-                if (InVR)
-                {
-                    Vector3 handposL = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                    handposL = VehicleTransform.InverseTransformDirection(handposL);
-                    Vector3 handposR = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
-                    handposR = VehicleTransform.InverseTransformDirection(handposR);
-
-                    if (!TriggerLastFrame && (handposL.y - handposR.y) < 0.20f)
-                    {
-                        EjectZeroPoint = handposL.y;
-                        EjectTimer = 0;
-                    }
-                    if (EjectZeroPoint - handposL.y > .5f && EjectTimer < 1)
-                    {
-                        Ejected = true;
-                        EngineControl.ExitStation();
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
-                    }
-                }
-
-                EjectTimer += Time.deltaTime;
                 TriggerLastFrame = true;
             }
             else
             {
                 TriggerLastFrame = false;
-                EjectTimer = 2;
             }
         }
 

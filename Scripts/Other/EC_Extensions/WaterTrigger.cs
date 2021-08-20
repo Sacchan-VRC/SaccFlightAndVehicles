@@ -43,15 +43,27 @@ public class WaterTrigger : UdonSharpBehaviour
         {
             NumTriggers += 1;
             InWater = true;
-            //playsplash
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEnterWater));
         }
+    }
+    public void SendEnterWater()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_G_EnterWater");
+    }
+    public void SendExitWater()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_G_ExitWater");
     }
     private void OnTriggerExit(Collider other)
     {
         if (other != null && other.gameObject.layer == WaterLayer)
         {
             NumTriggers -= 1;
-            if (NumTriggers == 0) { InWater = false; }
+            if (NumTriggers == 0)
+            {
+                InWater = false;
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendExitWater));
+            }
         }
     }
     //collider enabled and disabled so that it does ontriggerenter on enable

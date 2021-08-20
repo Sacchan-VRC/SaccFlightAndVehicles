@@ -27,8 +27,6 @@ public class PassengerSeat : UdonSharpBehaviour
     }
     private void Interact()
     {
-        EngineControl.PassengerEnterPlaneLocal();
-
         Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
         localPlayer.UseAttachedStation();
         Seat.localRotation = SeatStartRot;
@@ -36,12 +34,12 @@ public class PassengerSeat : UdonSharpBehaviour
         EngineControl.MySeat = ThisStationID;
         if (PassengerOnly != null) { PassengerOnly.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
+
+        EngineControl.PassengerEnterPlaneLocal();
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
         if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
-        EngineControl.PassengerEnterPlaneGlobal();
-
         //voice range change to allow talking inside cockpit (after VRC patch 1008)
         if (player != null)
         {
@@ -62,6 +60,7 @@ public class PassengerSeat : UdonSharpBehaviour
                 SetVoiceInside(player);
             }
         }
+        EngineControl.PassengerEnterPlaneGlobal();
     }
     public override void OnStationExited(VRCPlayerApi player)
     {

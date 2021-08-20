@@ -33,11 +33,7 @@ public class EngineController : UdonSharpBehaviour
     [SerializeField] private KeyCode AfterBurnerKey = KeyCode.T;
     public float ThrottleAfterburnerPoint = 0.8f;
     public bool VTOLOnly = false;
-    public bool NoCanopy = false;
     public bool HasVTOLAngle = false;
-    public bool HasAltHold = true;
-    public bool HasCanopy = true;
-    public bool HasCruise = true;
     [Header("Response:")]
     public float ThrottleStrength = 20f;
     public bool VerticalThrottle = false;
@@ -142,7 +138,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
     [System.NonSerializedAttribute] public int PilotID;
     [System.NonSerializedAttribute] public string PilotName;
-    [System.NonSerializedAttribute] public bool FlightLimitsEnabled = false;
     [System.NonSerializedAttribute] public ConstantForce VehicleConstantForce;
     [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
     [System.NonSerializedAttribute] public Transform VehicleTransform;
@@ -163,13 +158,13 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float ThrottleZeroPoint;
-    [System.NonSerializedAttribute] public float SetSpeed;
     [System.NonSerializedAttribute] public float ThrottleInput = 0f;
     private float roll = 0f;
     private float pitch = 0f;
     private float yaw = 0f;
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Taxiing = false;
+    [System.NonSerializedAttribute] public bool Floating = false;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
     [System.NonSerializedAttribute] public bool Piloting = false;
     [System.NonSerializedAttribute] public bool InEditor = true;
@@ -200,23 +195,6 @@ public class EngineController : UdonSharpBehaviour
     private float ReversingPitchStrengthZeroStart;
     private float ReversingYawStrengthZeroStart;
     private float ReversingRollStrengthZeroStart;
-    [System.NonSerializedAttribute] public bool Cruise;
-    private float CruiseProportional = .1f;
-    private float CruiseIntegral = .1f;
-    private float CruiseIntegrator;
-    private float CruiseIntegratorMax = 5;
-    private float CruiseIntegratorMin = -5;
-    private float Cruiselastframeerror;
-    private float AltHoldPitchProportional = 1f;
-    private float AltHoldPitchIntegral = 1f;
-    private float AltHoldPitchIntegrator;
-    //private float AltHoldPitchIntegratorMax = .1f;
-    //private float AltHoldPitchIntegratorMin = -.1f;
-    //private float AltHoldPitchDerivative = 4;
-    //private float AltHoldPitchDerivator;
-    private float AltHoldPitchlastframeerror;
-    private float AltHoldRollProportional = -.005f;
-    [System.NonSerializedAttribute] public bool AltHold;
     [System.NonSerializedAttribute] public float Speed;
     [System.NonSerializedAttribute] public float AirSpeed;
     [System.NonSerializedAttribute] public bool IsOwner = false;
@@ -239,7 +217,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Vector3 Spawnrotation;
     private int OutsidePlaneLayer;
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
-    bool Landed = false;
+    bool LandedOnWater = false;
     private float VelLiftStart;
     private HitDetector PlaneHitDetector;
     [System.NonSerializedAttribute] public float PilotExitTime;
@@ -270,6 +248,8 @@ public class EngineController : UdonSharpBehaviour
     private Vector2 LStickCheckAngle;
     [System.NonSerializedAttribute] public float LStickFuncDegrees;
     [System.NonSerializedAttribute] public float RStickFuncDegrees;
+    [System.NonSerializedAttribute] public float LStickFuncDegreesDivider;
+    [System.NonSerializedAttribute] public float RStickFuncDegreesDivider;
     [System.NonSerializedAttribute] public int LStickNumFuncs;
     [System.NonSerializedAttribute] public int RStickNumFuncs;
     [System.NonSerializedAttribute] public bool LStickDoDial;
@@ -289,10 +269,18 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int NumActiveOtherCM;
     //this stuff can be used by DFUNCs
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
-    [System.NonSerializedAttribute] public int SetConstantForceZero = 0;
+    [System.NonSerializedAttribute] public float Limits = 1;
+    [System.NonSerializedAttribute] public int OverrideConstantForce = 0;
+    [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
+    [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
     [System.NonSerializedAttribute] public int DisableGearToggle = 0;
     [System.NonSerializedAttribute] public int DisableTaxiRotation = 0;
-    [System.NonSerializedAttribute] public int DisableGroundDetector = 0;
+    [System.NonSerializedAttribute] public int DisableGroundDetection = 0;
+    [System.NonSerializedAttribute] public int ThrottleOverridden = 0;
+    [System.NonSerializedAttribute] public float ThrottleOverride;
+    [System.NonSerializedAttribute] public int JoystickOverridden = 0;
+    [System.NonSerializedAttribute] public Vector3 JoystickOverride;
+
 
 
     [System.NonSerializedAttribute] public int ReSupplied = 0;
@@ -430,8 +418,6 @@ public class EngineController : UdonSharpBehaviour
         VTOLAngleDivider = VTOLAngleTurnRate / vtolangledif;
         VTOLAngle = VTOLAngleInput = VTOLDefaultValue;
 
-        if (NoCanopy) { HasCanopy = false; }
-
         if (GroundEffectEmpty == null)
         {
             Debug.LogWarning("GroundEffectEmpty not found, using CenterOfMass instead");
@@ -456,6 +442,8 @@ public class EngineController : UdonSharpBehaviour
         RStickDoDial = RStickNumFuncs > 1;
         LStickFuncDegrees = 360 / Mathf.Max((float)LStickNumFuncs, 1);
         RStickFuncDegrees = 360 / Mathf.Max((float)RStickNumFuncs, 1);
+        LStickFuncDegreesDivider = 1 / LStickFuncDegrees;
+        RStickFuncDegreesDivider = 1 / RStickFuncDegrees;
         LStickNULL = new bool[LStickNumFuncs];
         RStickNULL = new bool[RStickNumFuncs];
         int u = 0;
@@ -497,20 +485,26 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)//works in editor or ingame
         {
-            if (DisableGroundDetector == 0 && DisableGroundDetector == 0 && Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore))
-            {//play a touchdown sound the frame we start taxiing
-                if (!Landed)
-                {
-                    Landed = true;
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TouchDown");
-                }
-            }
-            else
+            if (DisableGroundDetection == 0)
             {
-                if (Landed)
+                if (Floating)
                 {
-                    Landed = false;
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TakeOff");
+                    if (!LandedOnWater)
+                    {
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDownWater));
+                    }
+                }
+
+                if ((Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore)))
+                {
+                    if (!Taxiing)
+                    {
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDown));
+                    }
+                }
+                else
+                {
+                    CheckTakeOff();
                 }
             }
 
@@ -622,7 +616,7 @@ public class EngineController : UdonSharpBehaviour
                     //R stick value is manually synced using events because i don't want to use too many synced variables.
                     //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
                     stickdir = (stickdir - 180) * -1;
-                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / LStickFuncDegrees, LStickNumFuncs - 1));
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
                     if (!LStickNULL[newselection])
                     { LStickSelection = newselection; }
                     //doing this in DFUNC scripts that need it instead so that we send less events
@@ -640,7 +634,7 @@ public class EngineController : UdonSharpBehaviour
                     //R stick value is manually synced using events because i don't want to use too many synced variables.
                     //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
                     stickdir = (stickdir - 180) * -1;
-                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / RStickFuncDegrees, RStickNumFuncs - 1));
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
                     if (!RStickNULL[newselection])
                     { RStickSelection = newselection; }
                     //doing this in DFUNC scripts that need it instead so that we send less events
@@ -780,10 +774,10 @@ public class EngineController : UdonSharpBehaviour
                 {
                     Vector3 handdistance;
                     if (SwitchHandsJoyThrottle)
-                    { handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
-                    else { handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
+                    { handdistance = transform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
+                    else { handdistance = transform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
 
-                    handdistance = VehicleTransform.InverseTransformDirection(handdistance);
+                    handdistance = transform.InverseTransformDirection(handdistance);
                     float HandThrottleAxis;
                     if (VerticalThrottle)
                     {
@@ -821,17 +815,12 @@ public class EngineController : UdonSharpBehaviour
                     ThrottleGripLastFrame = false;
                 }
 
-                if (Taxiing)
+                if ((DisableTaxiRotation == 0) && (Taxiing))
                 {
                     AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
-                    Cruise = false;
-                    AltHold = false;
-                    if (DisableTaxiRotation == 0)
-                    {
-                        //rotate if trying to yaw
-                        Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
-                        VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
-                    }
+                                      //rotate if trying to yaw
+                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
+                    VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
 
                     StillWindMulti = Mathf.Min(Speed / 10, 1);
                     ThrustVecGrounded = 0;
@@ -851,19 +840,9 @@ public class EngineController : UdonSharpBehaviour
                         PlayerThrottle = 1;
                 }
                 //Cruise PI Controller
-                if (Cruise && !ThrottleGripLastFrame && !Shift && !Ctrl)
+                if (ThrottleOverridden > 0 && !ThrottleGripLastFrame && !Shift && !Ctrl)
                 {
-                    float error = (SetSpeed - AirSpeed);
-
-                    CruiseIntegrator += error * DeltaTime;
-                    CruiseIntegrator = Mathf.Clamp(CruiseIntegrator, CruiseIntegratorMin, CruiseIntegratorMax);
-
-                    //float Derivator = Mathf.Clamp(((error - lastframeerror) / DeltaTime),DerivMin, DerivMax);
-
-                    ThrottleInput = CruiseProportional * error;
-                    ThrottleInput += CruiseIntegral * CruiseIntegrator;
-                    //ThrottleInput += Derivative * Derivator; //works but spazzes out real bad
-                    ThrottleInput = PlayerThrottle = Mathf.Clamp(ThrottleInput, 0, 1);
+                    ThrottleInput = PlayerThrottle = ThrottleOverride;
                 }
                 else//if cruise control disabled, use inputs
                 {
@@ -895,51 +874,11 @@ public class EngineController : UdonSharpBehaviour
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
                     }
                 }
-                if (AltHold && !JoystickGripLastFrame)//alt hold enabled, and player not holding joystick
+                if (JoystickOverridden > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
                 {
-                    Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
-                    //Altitude hold PI Controller
-
-                    int upsidedown = Vector3.Dot(Vector3.up, VehicleTransform.up) > 0 ? 1 : -1;
-                    float error = CurrentVel.normalized.y - (localAngularVelocity.x * upsidedown * 2.5f);//(Vector3.Dot(VehicleRigidbody.velocity.normalized, Vector3.up));
-
-                    AltHoldPitchIntegrator += error * DeltaTime;
-                    //AltHoldPitchIntegrator = Mathf.Clamp(AltHoldPitchIntegrator, AltHoldPitchIntegratorMin, AltHoldPitchIntegratorMax);
-                    //AltHoldPitchDerivator = (error - AltHoldPitchlastframeerror) / DeltaTime;
-                    AltHoldPitchlastframeerror = error;
-                    RotationInputs.x = AltHoldPitchProportional * error;
-                    RotationInputs.x += AltHoldPitchIntegral * AltHoldPitchIntegrator;
-                    //RotationInputs.x += AltHoldPitchDerivative * AltHoldPitchDerivator; //works but spazzes out real bad
-                    RotationInputs.x = Mathf.Clamp(RotationInputs.x, -1, 1);
-                    AltHoldPitchlastframeerror = error;
-
-                    //Roll
-                    float ErrorRoll = VehicleTransform.localEulerAngles.z;
-                    if (ErrorRoll > 180) { ErrorRoll -= 360; }
-
-                    //lock upside down if rotated more than 90
-                    if (ErrorRoll > 90)
-                    {
-                        ErrorRoll -= 180;
-                        RotationInputs.x *= -1;
-                    }
-                    else if (ErrorRoll < -90)
-                    {
-                        ErrorRoll += 180;
-                        RotationInputs.x *= -1;
-                    }
-
-                    RotationInputs.z = Mathf.Clamp(AltHoldRollProportional * ErrorRoll, -1, 1);
-
-                    RotationInputs.y = 0;
-
-                    //flight limit internally enabled when alt hold is enabled
-                    float GLimitStrength = Mathf.Clamp(-(VertGs / GLimiter) + 1, 0, 1);
-                    float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimiter) + 1, 0, 1);
-                    float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
-                    RotationInputs.x *= Limits;
+                    RotationInputs = JoystickOverride;
                 }
-                else//alt hold disabled, player has control
+                else//joystick override disabled, player has control
                 {
                     if (!InVR)
                     {
@@ -961,20 +900,9 @@ public class EngineController : UdonSharpBehaviour
                             VRPitchRoll *= temp;
                         }
                     }
-                    //'-input' are used by effectscontroller, and multiplied by 'strength' for final values
-                    if (FlightLimitsEnabled && !Taxiing && AngleOfAttack < AoALimiter)//flight limits are enabled
-                    {
-                        float GLimitStrength = Mathf.Clamp(-(VertGs / GLimiter) + 1, 0, 1);
-                        float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(AngleOfAttack) / AoALimiter) + 1, 0, 1);
-                        float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
-                        RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
-                        RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits;
-                    }
-                    else//player is in full control
-                    {
-                        RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wi + Si + downi + upi, -1, 1);
-                        RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1);
-                    }
+
+                    RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
+                    RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits;
                     //roll isn't subject to flight limits
                     RotationInputs.z = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
                 }
@@ -1008,7 +936,7 @@ public class EngineController : UdonSharpBehaviour
                     pitch *= PitchDownStrMulti;
                 }
 
-                //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it. Heard it doesn't happen so bad if rigidbody weight is much higher.
+                //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it.
                 if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
                 {
                     if (VTOLAngle > VTOL90Degrees)
@@ -1084,11 +1012,14 @@ public class EngineController : UdonSharpBehaviour
                 VelLift = pitch = yaw = roll = 0;
             }
 
-            if ((PlaneMoving || Piloting) && SetConstantForceZero == 0)
+            if ((PlaneMoving || Piloting) && OverrideConstantForce == 0)
             {
                 //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                 //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
-                Vector3 FinalInputAcc;
+                Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Sideways
+                        (downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch),// Y Up
+                        0);//Z Forward
+
                 float GroundEffectAndVelLift = 0;
 
                 Vector2 Outputs = UnpackThrottles(EngineOutput);
@@ -1097,37 +1028,41 @@ public class EngineController : UdonSharpBehaviour
                 + Mathf.Max((Outputs.y), 0)//Afterburner throttle
                 * ThrottleStrengthAB);
 
+
                 if (VTOLenabled)
                 {
                     //float thrust = EngineOutput * ThrottleStrength * AfterburnerThrottle * AfterburnerThrustMulti * Atmosphere;
                     float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
-                                                                                 //rotate and scale Vector for VTOL thrust
+
+                    Vector3 VTOLInputAcc;                                                     //rotate and scale Vector for VTOL thrust
                     if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
                     {
-                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Thrust;
+                        VTOLInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Thrust;
                     }
                     else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
                     {
                         float downthrust = Thrust * VTOLThrottleStrengthMulti;
-                        FinalInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Mathf.Lerp(Thrust, Thrust * VTOLThrottleStrengthMulti, VTolAngle90Plus ? VTOLAngle90 : VTOLAngle);
+                        VTOLInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Mathf.Lerp(Thrust, Thrust * VTOLThrottleStrengthMulti, VTolAngle90Plus ? VTOLAngle90 : VTOLAngle);
                     }
                     //add ground effect to the VTOL thrust
-                    GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(FinalInputAcc), VTOLGroundEffectStrength, 1);
-                    FinalInputAcc *= GroundEffectAndVelLift;
+                    GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(VTOLInputAcc), VTOLGroundEffectStrength, 1);
+                    VTOLInputAcc *= GroundEffectAndVelLift;
 
                     //Add Airplane Ground Effect
                     GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
                     //add lift and thrust
-                    FinalInputAcc += new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                        ((downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
-                            0);
+
+                    FinalInputAcc += VTOLInputAcc;
+                    FinalInputAcc.y += GroundEffectAndVelLift;
+                    FinalInputAcc *= Atmosphere;
                 }
                 else//Simpler version for non-VTOL craft
                 {
                     GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
-                    FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw * Atmosphere,// X Sideways
-                        ((downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch) + GroundEffectAndVelLift) * Atmosphere,// Y Up
-                            Thrust);// Z Forward);
+
+                    FinalInputAcc.y += GroundEffectAndVelLift;
+                    FinalInputAcc.z += Thrust;
+                    FinalInputAcc *= Atmosphere;
                 }
 
                 float outputdif = (EngineOutput - EngineOutputLastFrame);
@@ -1152,8 +1087,8 @@ public class EngineController : UdonSharpBehaviour
             }
             else
             {
-                VehicleConstantForce.relativeForce = Vector3.zero;
-                VehicleConstantForce.relativeTorque = Vector3.zero;
+                VehicleConstantForce.relativeForce = CFRelativeForceOverride;
+                VehicleConstantForce.relativeTorque = CFRelativeTorqueOverride;
             }
 
             SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
@@ -1186,7 +1121,7 @@ public class EngineController : UdonSharpBehaviour
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, ((((AirFriction + SoundBarrier) * ExtraDrag)) * 90) * DeltaTime);
             //apply pitching using pitch moment
             VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);//deltatime is built into ForceMode.Force
-                                                                                                 //apply yawing using yaw moment
+            //apply yawing using yaw moment
             VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
             //calc Gs
             float gravity = 9.81f * DeltaTime;
@@ -1220,7 +1155,6 @@ public class EngineController : UdonSharpBehaviour
     public void Explode()//all the things players see happen when the vehicle explodes
     {
         dead = true;
-        Cruise = false;
         PlayerThrottle = 0;
         ThrottleInput = 0;
         EngineOutput = 0;
@@ -1300,13 +1234,30 @@ public class EngineController : UdonSharpBehaviour
     }
     public void TouchDown()
     {
+        Debug.Log("TouchDown");
         Taxiing = true;
         SendEventToExtensions("SFEXT_G_TouchDown");
     }
+    public void TouchDownWater()
+    {
+        Debug.Log("TouchDownWater");
+        LandedOnWater = true;
+        Taxiing = true;
+        SendEventToExtensions("SFEXT_G_TouchDownWater");
+    }
     public void TakeOff()
     {
+        Debug.Log("TakeOff");
         Taxiing = false;
         SendEventToExtensions("SFEXT_G_TakeOff");
+    }
+    public void CheckTakeOff()
+    {
+        if (!Floating && Taxiing)
+        {
+            LandedOnWater = false;
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
+        }
     }
     public void IncreaseKills()
     {
@@ -1691,7 +1642,7 @@ public class EngineController : UdonSharpBehaviour
                 Transform parent = AAMTargets[n].transform;
                 for (int x = 0; parent != null; x++)
                 {
-                    order[n] = float.Parse(order[n].ToString() + parent.transform.GetSiblingIndex().ToString());
+                    order[n] = float.Parse($"{(int)order[n]}{parent.transform.GetSiblingIndex()}");
                     parent = parent.transform.parent;
                 }
                 n++;

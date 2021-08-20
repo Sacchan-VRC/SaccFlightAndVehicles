@@ -21,6 +21,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private bool UseLeftTrigger;
     private bool func_active;
+    private bool Selected;
     private int NumBulletParticles;
     private float reloadspeed;
     private float FullGunAmmoInSeconds;
@@ -47,24 +48,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             InVR = localPlayer.IsUserInVR();
         }
     }
-    public void DFUNC_Selected()
-    {
-        GunDamageParticle_Parent.gameObject.SetActive(true);
-        func_active = true;
-        gameObject.SetActive(true);
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Activate");
-    }
-    public void DFUNC_Deselected()
-    {
-        if (func_active)
-        {
-            RequestSerialization();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Deactivate");
-            func_active = false;
-            GunDamageParticle_Parent.gameObject.SetActive(false);
-            gameObject.SetActive(false);
-        }
-    }
     public void Activate()
     {
         gameObject.SetActive(true);
@@ -72,24 +55,37 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     public void Deactivate()
     {
         gameObject.SetActive(false);
-        if (func_active)
+    }
+    public void DFUNC_Selected()
+    {
+        Selected = true;
+        gameObject.SetActive(true);
+    }
+    public void DFUNC_Deselected()
+    {
+        Selected = false;
+        if (firing)
         {
-            if (firing)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
         }
     }
     public void SFEXTP_O_UserEnter()
     {
-        if (!InVR)
-        {
-            DFUNC_Selected();
-        }
+        func_active = true;
+        if (!InVR) { DFUNC_Selected(); }
+        GunDamageParticle_Parent.gameObject.SetActive(true);
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Activate));
     }
     public void SFEXTP_O_UserExit()
     {
-        DFUNC_Deselected();
+        func_active = false;
+        Selected = false;
+        GunDamageParticle_Parent.gameObject.SetActive(false);
+        if (firing)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
+        }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Deactivate));
     }
     public void SFEXTP_G_Explode()
     {
@@ -97,7 +93,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
         Minigun.localRotation = Quaternion.identity;
         GunRotation = Vector2.zero;
         GunStopFiring();
-        func_active = false;
+        Selected = false;
         GunDamageParticle_Parent.gameObject.SetActive(false);
         gameObject.SetActive(false);
     }
@@ -109,7 +105,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     }
     public void SFEXTP_G_ReSupply()
     {
-        if (func_active)
+        if (Selected)
         {
             if (GunAmmoInSeconds != FullGunAmmoInSeconds) { EngineControl.ReSupplied++; }
             GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
@@ -117,9 +113,9 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     }
     private void LateUpdate()
     {
-        if (func_active)
+        float DeltaTime = Time.deltaTime;
+        if (Selected)
         {
-            float DeltaTime = Time.deltaTime;
             TimeSinceSerialization += DeltaTime;
             float Trigger;
             if (UseLeftTrigger)
@@ -130,7 +126,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             {
                 if (!firing)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStartFiring");
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStartFiring));
                     firing = true;
                 }
                 GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
@@ -141,7 +137,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             {
                 if (firing)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
                     firing = false;
                     TriggerLastFrame = false;
                 }
@@ -151,8 +147,18 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
                 TimeSinceSerialization = 0;
                 RequestSerialization();
             }
-
-
+        }
+        else
+        {
+            if (firing)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
+                firing = false;
+            }
+            TriggerLastFrame = false;
+        }
+        if (func_active)
+        {
             if (InVR)
             {
                 Vector3 lookpoint = ((Minigun.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position) * 500) + Minigun.position;
@@ -173,8 +179,10 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
         else
         {
             Quaternion newrot = (Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0)));
-            Minigun.rotation = Quaternion.Slerp(Minigun.rotation, newrot, 4 * Time.deltaTime);
+            Minigun.rotation = Quaternion.Slerp(Minigun.rotation, newrot, 4 * DeltaTime);
         }
+
+
         AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
     }
     public void GunStartFiring()

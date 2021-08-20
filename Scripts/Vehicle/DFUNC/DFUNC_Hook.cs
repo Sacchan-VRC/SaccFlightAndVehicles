@@ -29,6 +29,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [System.NonSerializedAttribute] private bool HookDown = false;
     private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
     private bool DisableGroundBrake;
+    private bool func_active;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
@@ -44,11 +45,13 @@ public class DFUNC_Hook : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
+        func_active = true;
     }
     public void DFUNC_Deselected()
     {
         if (!HookDown) { gameObject.SetActive(false); }
         TriggerLastFrame = false;
+        func_active = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -60,6 +63,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         gameObject.SetActive(false);
         TriggerLastFrame = false;
         Hooked = false;
+        func_active = false;
         if (DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake -= 1; DisableGroundBrake = false; }
         gameObject.SetActive(false);
     }
@@ -87,23 +91,25 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     private void Update()
     {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-        if (Trigger > 0.75)
+        if (func_active)
         {
-            if (!TriggerLastFrame)
-            {
-                ToggleHook();
-                Hooked = false;
-            }
-            TriggerLastFrame = true;
-        }
-        else { TriggerLastFrame = false; }
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
 
+            if (Trigger > 0.75)
+            {
+                if (!TriggerLastFrame)
+                {
+                    ToggleHook();
+                    Hooked = false;
+                }
+                TriggerLastFrame = true;
+            }
+            else { TriggerLastFrame = false; }
+        }
         //check for catching a cable with hook
         if (HookDown)
         {

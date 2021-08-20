@@ -37,7 +37,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     //these bools exist to make sure this script only ever adds/removes 1 from the value in enginecontroller
     private bool DisableTaxiRotation = false;
     private bool DisableGearToggle = false;
-    private bool SetConstantForceZero = false;
+    private bool OverrideConstantForce = false;
     private bool InEditor;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -98,14 +98,17 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         gameObject.SetActive(false);
         if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
         if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
-        if (SetConstantForceZero) { EngineControl.SetConstantForceZero -= 1; SetConstantForceZero = false; }
+        if (OverrideConstantForce) { EngineControl.OverrideConstantForce -= 1; OverrideConstantForce = false; }
     }
     public void SFEXT_O_Explode()
     {
         OnCatapult = false;
         if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
         if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
-        if (SetConstantForceZero) { EngineControl.SetConstantForceZero -= 1; SetConstantForceZero = false; }
+        if (OverrideConstantForce)
+        {
+            EngineControl.OverrideConstantForce -= 1; OverrideConstantForce = false;
+        }
     }
     private void EnableOneFrameToFindAnimator()
     {
@@ -122,7 +125,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             gameObject.SetActive(false);
         }
     }
-    private void FindCatapultAnimator(GameObject other)
+    private bool FindCatapultAnimator(GameObject other)
     {
         GameObject CatapultObjects = other.gameObject;
         CatapultAnimator = null;
@@ -131,6 +134,10 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             CatapultObjects = CatapultObjects.transform.parent.gameObject;
             CatapultAnimator = CatapultObjects.GetComponent<Animator>();
         }
+        if (CatapultAnimator != null)
+        { return true; }
+        else
+        { return false; }
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -142,7 +149,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 {
                     if (other.gameObject.layer == CatapultLayer)
                     {
-                        FindCatapultAnimator(other.gameObject);
+                        if (!FindCatapultAnimator(other.gameObject)) return; ;
                         CatapultTransform = other.transform;
                         //Hit detected, check if the plane is facing in the right direction..
                         if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
@@ -165,7 +172,13 @@ public class DFUNC_Catapult : UdonSharpBehaviour
 
                             if (!DisableGearToggle) { EngineControl.DisableGearToggle += 1; DisableGearToggle = true; }
                             if (!DisableTaxiRotation) { EngineControl.DisableTaxiRotation += 1; DisableTaxiRotation = true; }
-                            if (!SetConstantForceZero) { EngineControl.SetConstantForceZero += 1; SetConstantForceZero = true; }
+                            if (!OverrideConstantForce)
+                            {
+                                EngineControl.OverrideConstantForce += 1;
+                                EngineControl.CFRelativeForceOverride = Vector3.zero;
+                                EngineControl.CFRelativeTorqueOverride = Vector3.zero;
+                                OverrideConstantForce = true;
+                            }
                             //use dead to make plane invincible for x frames when entering the catapult to prevent taking G damage from stopping instantly
                             EngineControl.dead = true;
                             CatapultDeadTimer = 5;
@@ -227,7 +240,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 Launching = false;
                 if (DisableGearToggle) { EngineControl.DisableGearToggle -= 1; DisableGearToggle = false; }
                 if (DisableTaxiRotation) { EngineControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
-                if (SetConstantForceZero) { EngineControl.SetConstantForceZero -= 1; SetConstantForceZero = false; }
+                if (OverrideConstantForce) { EngineControl.OverrideConstantForce -= 1; OverrideConstantForce = false; }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff");
                 EngineControl.Taxiinglerper = 0;
                 VehicleRigidbody.velocity = (CatapultTransform.position - CatapultPosLastFrame) / DeltaTime;
