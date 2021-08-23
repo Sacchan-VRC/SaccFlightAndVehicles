@@ -157,7 +157,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_SmokeOn");
+            SendCustomEventDelayedFrames(nameof(SendSmokingOn), 1);
         }
     }
     public void SetSmokingOff()
@@ -169,8 +169,17 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_SmokeOff");
+            SendCustomEventDelayedFrames(nameof(SendSmokingOff), 1);
         }
+    }
+    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
+    public void SendSmokingOn()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_SmokeOn");
+    }
+    public void SendSmokingOff()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_SmokeOff");
     }
     public void ToggleSmoking()
     {

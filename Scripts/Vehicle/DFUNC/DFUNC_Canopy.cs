@@ -95,7 +95,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         {
             if (CanopyBroken)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "RepairCanopy");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RepairCanopy));
             }
         }
     }
@@ -103,6 +103,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     {
         CanopyBroken = false;
         CanopyAnimator.SetBool(CANOPYBREAK_STRING, false);
+        if (EngineControl.IsOwner) { SendCustomEventDelayedFrames(nameof(SendCanopyRepair), 1); }
     }
     private void Update()
     {
@@ -150,7 +151,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         SoundControl.SendCustomEvent("DoorOpen");
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_CanopyOpened");
+            SendCustomEventDelayedFrames(nameof(SendCanopyOpened), 1);
         }
 
         if (!DragApplied) { EngineControl.ExtraDrag += CanopyDragMulti; DragApplied = true; }
@@ -167,9 +168,26 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         SendCustomEventDelayedSeconds("SetCanopyTransitioningFalse", CanopyCloseTime);
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_CanopyClosed");
+            SendCustomEventDelayedFrames(nameof(SendCanopyClosed), 1);
         }
         if (DragApplied) { EngineControl.ExtraDrag -= CanopyDragMulti; DragApplied = false; }
+    }
+    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
+    public void SendCanopyClosed()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_CanopyClosed");
+    }
+    public void SendCanopyOpened()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_CanopyOpen");
+    }
+    public void SendCanopyBreak()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_CanopyBreak");
+    }
+    public void SendCanopyRepair()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_CanopyRepair");
     }
     public void SetCanopyTransitioningFalse()
     {
@@ -184,7 +202,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         CanopyAnimator.SetBool(CANOPYBREAK_STRING, true);
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_CanopyBreak");
+            SendCustomEventDelayedFrames(nameof(SendCanopyBreak), 1);
         }
         if (!DragApplied) { EngineControl.ExtraDrag += CanopyDragMulti; DragApplied = true; }
     }

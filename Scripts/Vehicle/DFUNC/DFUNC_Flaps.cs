@@ -117,7 +117,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_FlapsOff");
+            SendCustomEventDelayedFrames(nameof(SendFlapsOff), 1);
         }
     }
     public void SetFlapsOn()
@@ -132,10 +132,18 @@ public class DFUNC_Flaps : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_FlapsOn");
+            SendCustomEventDelayedFrames(nameof(SendFlapsOn), 1);
         }
     }
-
+    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
+    public void SendFlapsOn()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_FlapsOn");
+    }
+    public void SendFlapsOff()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_FlapsOff");
+    }
     public void ToggleFlaps()
     {
         if (!Flaps)

@@ -9,7 +9,9 @@ public class WaterTrigger : UdonSharpBehaviour
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private float WaterDamageSec = 10;
     [SerializeField] private float WaterSlowDown = 3;
+    [SerializeField] private float WaterSlowDownRot = 3;
     private Rigidbody VehicleRigidbody;
+    private bool CFOverridden;
     private int WaterLayer = 0;
     private int NumTriggers = 0;
     private bool InWater;
@@ -27,6 +29,7 @@ public class WaterTrigger : UdonSharpBehaviour
             if (!localPlayer.isMaster)
             { gameObject.SetActive(false); }
         }
+
     }
     private void Update()
     {
@@ -35,6 +38,7 @@ public class WaterTrigger : UdonSharpBehaviour
             float DeltaTime = Time.deltaTime;
             EngineControl.Health -= WaterDamageSec * DeltaTime;
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, WaterSlowDown * DeltaTime);
+            VehicleRigidbody.angularVelocity = Vector3.Lerp(VehicleRigidbody.angularVelocity, Vector3.zero, WaterSlowDownRot * DeltaTime);
         }
     }
     private void OnTriggerEnter(Collider other)
@@ -44,6 +48,11 @@ public class WaterTrigger : UdonSharpBehaviour
             NumTriggers += 1;
             InWater = true;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEnterWater));
+            if (!CFOverridden)
+            {
+                CFOverridden = true;
+                EngineControl.OverrideConstantForce++;
+            }
         }
     }
     public void SendEnterWater()
@@ -63,6 +72,11 @@ public class WaterTrigger : UdonSharpBehaviour
             {
                 InWater = false;
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendExitWater));
+                if (CFOverridden)
+                {
+                    CFOverridden = false;
+                    EngineControl.OverrideConstantForce--;
+                }
             }
         }
     }
@@ -78,6 +92,22 @@ public class WaterTrigger : UdonSharpBehaviour
         if (InWater) { EngineControl.Health = -1; }//just kill the vehicle if it's underwater and the player gets out
         InWater = false;
         NumTriggers = 0;
+    }
+    public void SFEXT_G_Explode()
+    {
+        if (CFOverridden)
+        {
+            CFOverridden = false;
+            EngineControl.OverrideConstantForce--;
+        }
+    }
+    public void SFEXT_G_RespawnButton()
+    {
+        if (CFOverridden)
+        {
+            CFOverridden = false;
+            EngineControl.OverrideConstantForce--;
+        }
     }
     public void SFEXT_O_TakeOwnership()
     {

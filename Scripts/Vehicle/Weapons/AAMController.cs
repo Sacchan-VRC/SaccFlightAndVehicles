@@ -34,15 +34,19 @@ public class AAMController : UdonSharpBehaviour
     private float TargetABPoint;
     private float TargetThrottleNormalizer;
     private bool TargetEngineNULL = true;
+    private GameObject[] AAMTargets;
+    private bool EngineControlNull;
     Vector3 TargetPosLastFrame;
     //public Transform testobj;
     void Start()
     {
         EngineControl = (EngineController)DFUNC_AAMControl.GetProgramVariable("EngineControl");
+        EngineControlNull = EngineControl == null;
+        AAMTargets = (GameObject[])DFUNC_AAMControl.GetProgramVariable("AAMTargets");
         int aamtarg = (int)DFUNC_AAMControl.GetProgramVariable("AAMTarget");
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
-        Target = EngineControl.AAMTargets[aamtarg].transform;
+        Target = AAMTargets[aamtarg].transform;
         if (Target == null)
         {
             TargetLost = true;
@@ -52,9 +56,9 @@ public class AAMController : UdonSharpBehaviour
         {
             TargDistlastframe = Vector3.Distance(transform.position, Target.position) + 1;//1 meter further so the number is different and missile knows we're already moving toward target
             TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
-            if (EngineControl.AAMTargets[aamtarg].transform.parent != null)
+            if (AAMTargets[aamtarg].transform.parent != null)
             {
-                TargetEngineControl = EngineControl.AAMTargets[aamtarg].transform.parent.GetComponent<EngineController>();
+                TargetEngineControl = AAMTargets[aamtarg].transform.parent.GetComponent<EngineController>();
                 if (TargetEngineControl != null)
                 {
                     if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
@@ -114,7 +118,7 @@ public class AAMController : UdonSharpBehaviour
             bool Dumb;
             if (!TargetEngineNULL)
             {
-                Dumb = Random.Range(0, 100) > TargetEngineControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
+                Dumb = Random.Range(0, 100) < TargetEngineControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
                 EngineTrack = Mathf.Max(TargetEngineControl.EngineOutput * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
             }
             else

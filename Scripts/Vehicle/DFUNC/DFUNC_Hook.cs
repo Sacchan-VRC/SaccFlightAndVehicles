@@ -183,7 +183,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_HookDown");
+            SendCustomEventDelayedFrames(nameof(SendHookDown), 1);
         }
     }
     public void SetHookUp()
@@ -194,8 +194,17 @@ public class DFUNC_Hook : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_HookUp");
+            SendCustomEventDelayedFrames(nameof(SendHookUp), 1);
         }
+    }
+    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
+    public void SendHookDown()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_HookDown");
+    }
+    public void SendHookUp()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_HookUp");
     }
     public void PlayCableSnap()
     {

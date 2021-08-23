@@ -1,6 +1,7 @@
 ﻿
 using UdonSharp;
 using UnityEngine;
+using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
@@ -13,6 +14,9 @@ public class DFUNC_Flares : UdonSharpBehaviour
     [SerializeField] private float FlareActiveTime = 4f;
     [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 15;
+    [SerializeField] private AudioSource FlareLaunch;
+    [SerializeField] private Text HUDText_flare_ammo;
+    private bool HUDText_flare_ammoNULL = true;
     private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;
@@ -33,11 +37,18 @@ public class DFUNC_Flares : UdonSharpBehaviour
     {
         FullFlares = NumFlares;
         reloadspeed = FullFlares / FullReloadTimeSec;
+        HUDText_flare_ammoNULL = HUDText_flare_ammo == null;
+        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
     public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
         TriggerLastFrame = false;
+    }
+    public void SFEXT_G_RespawnButton()
+    {
+        NumFlares = FullFlares;
+        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
     public void SFEXT_G_Explode()
     {
@@ -47,6 +58,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     {
         if (NumFlares != FullFlares) { EngineControl.ReSupplied++; }
         NumFlares = (int)Mathf.Min(NumFlares + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullFlares);
+        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
     private void Update()
     {
@@ -70,6 +82,8 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public void LaunchFlare()
     {
         NumFlares--;
+        FlareLaunch.Play();
+        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
         int d = FlareParticles.Length;
         for (int x = 0; x < d; x++)
         { FlareParticles[x].Play(); }

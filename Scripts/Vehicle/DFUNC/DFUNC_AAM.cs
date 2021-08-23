@@ -213,7 +213,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     //AAMTargeting
     [SerializeField] private UdonSharpBehaviour HUDControl;
     [SerializeField] private float AAMMaxTargetDistance = 6000;
-    private GameObject[] AAMTargets;
+    [System.NonSerializedAttribute] public GameObject[] AAMTargets;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     private int AAMTargetChecker = 0;
     private Transform CenterOfMass;
@@ -293,10 +293,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { AAMTargetChecker = 0; }
 
             //if target is currently in front of plane, lock onto it
-            if (AAMCurrentTargetEngineControlNull)
-            { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
-            else
-            { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HudControlPosition; }
+
+            AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition;
             float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
             //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
             //raycast to check if it's behind something

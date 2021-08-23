@@ -65,15 +65,22 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (DefaultLimitsOn)
         {
             SetLimitsOn();
-            //CANNOT recursively call a function
-            //EngineControl.SendEventToExtensions("SFEXT_G_LimitsOn");
+            SendCustomEventDelayedFrames(nameof(SendLimitsOn), 1);
         }
         else
         {
             SetLimitsOff();
-            //CANNOT recursively call a function
-            //EngineControl.SendEventToExtensions("SFEXT_G_LimitsOff");
+            SendCustomEventDelayedFrames(nameof(SendLimitsOff), 1);
         }
+    }
+    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
+    public void SendLimitsOn()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_G_LimitsOn");
+    }
+    public void SendLimitsOff()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_G_LimitsOff");
     }
     public void SetLimitsOn()
     {

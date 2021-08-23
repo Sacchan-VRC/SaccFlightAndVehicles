@@ -124,6 +124,7 @@ public class EngineController : UdonSharpBehaviour
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     [Tooltip("Meters. 19812 = 65,000 feet feet")]
     public float AtmosphereThinningEnd = 19812; //65,000 feet
+    public bool DisablePhysicsAndInputs;
     [System.NonSerializedAttribute] public float AllGs;
 
 
@@ -158,6 +159,7 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float ThrottleZeroPoint;
+    private float ThrottlePlayspaceLastFrame;
     [System.NonSerializedAttribute] public float ThrottleInput = 0f;
     private float roll = 0f;
     private float pitch = 0f;
@@ -485,6 +487,19 @@ public class EngineController : UdonSharpBehaviour
 
         if (IsOwner)//works in editor or ingame
         {
+            if (!dead)
+            {
+                //G/crash Damage
+                Health -= Mathf.Max((GDamageToTake) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
+                GDamageToTake = 0;
+                if (Health <= 0f)//plane is ded
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                }
+            }
+            else { GDamageToTake = 0; }
+
+
             if (DisableGroundDetection == 0)
             {
                 if (Floating)
@@ -508,17 +523,6 @@ public class EngineController : UdonSharpBehaviour
                 }
             }
 
-            if (!dead)
-            {
-                //G/crash Damage
-                Health -= Mathf.Max((GDamageToTake) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
-                GDamageToTake = 0;
-                if (Health <= 0f)//plane is ded
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-                }
-            }
-            else { GDamageToTake = 0; }
 
             //synced variables because rigidbody values aren't accessable by non-owner players
             CurrentVel = VehicleRigidbody.velocity;
@@ -526,7 +530,7 @@ public class EngineController : UdonSharpBehaviour
             if (Speed > .1f)//don't bother doing all this for planes that arent moving and it therefore wont even effect
             {
                 PlaneMoving = true;//check this bool later for more optimizations
-                WindAndAoA();//Planemoving is set true or false here
+                WindAndAoA();
             }
             else { PlaneMoving = false; }
 
@@ -564,328 +568,162 @@ public class EngineController : UdonSharpBehaviour
                     }
                 }
 
-                //collect inputs
-                int Wi = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
-                int Si = Input.GetKey(KeyCode.S) ? -1 : 0;
-                int Ai = Input.GetKey(KeyCode.A) ? -1 : 0;
-                int Di = Input.GetKey(KeyCode.D) ? 1 : 0;
-                int Qi = Input.GetKey(KeyCode.Q) ? -1 : 0;
-                int Ei = Input.GetKey(KeyCode.E) ? 1 : 0;
-                int upi = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
-                int downi = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
-                int lefti = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
-                int righti = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
-                bool Shift = Input.GetKey(KeyCode.LeftShift);
-                bool Ctrl = Input.GetKey(KeyCode.LeftControl);
-                int Shifti = Shift ? 1 : 0;
-                int LeftControli = Ctrl ? 1 : 0;
-                Vector2 LStickPos = new Vector2(0, 0);
-                Vector2 RStickPos = new Vector2(0, 0);
-                float LGrip = 0;
-                float RGrip = 0;
-                float LTrigger = 0;
-                float RTrigger = 0;
-                if (!InEditor)
+                if (!DisablePhysicsAndInputs)
                 {
-                    LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                    LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                    RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                    RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                    LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
-                    RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
-                    LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                    RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                }
-                //MouseX = Input.GetAxisRaw("Mouse X");
-                //MouseY = Input.GetAxisRaw("Mouse Y");
-                Vector3 JoystickPosYaw;
-                Vector3 JoystickPos;
-                Vector2 VRPitchRoll;
-
-                if (VTOLenabled)
-                {
-                    if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
-                    { SetVTOLValues(); }
-                }
-
-                //LStick Selection wheel
-                if (InVR && LStickPos.magnitude > .7f && LStickDoDial)
-                {
-                    float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
-
-                    //R stick value is manually synced using events because i don't want to use too many synced variables.
-                    //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
-                    stickdir = (stickdir - 180) * -1;
-                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
-                    if (!LStickNULL[newselection])
-                    { LStickSelection = newselection; }
-                    //doing this in DFUNC scripts that need it instead so that we send less events
-                    /*                     if (VehicleAnimator.GetInteger(Lstickselection_STRING) != LStickSelection)
-                                        {
-                                            LStickSetAnimatorInt();
-                                        } */
-                }
-
-                //RStick Selection wheel
-                if (InVR && RStickPos.magnitude > .7f & RStickDoDial)
-                {
-                    float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
-
-                    //R stick value is manually synced using events because i don't want to use too many synced variables.
-                    //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
-                    stickdir = (stickdir - 180) * -1;
-                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
-                    if (!RStickNULL[newselection])
-                    { RStickSelection = newselection; }
-                    //doing this in DFUNC scripts that need it instead so that we send less events
-                    /*                     if (VehicleAnimator.GetInteger(Rstickselection_STRING) != RStickSelection)
-                                        {
-                                            RStickSetAnimatorInt();
-                                        } */
-                }
-
-
-                if (LStickSelection != LStickSelectionLastFrame)
-                {
-                    //new function selected, send deselected to old one
-                    if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
+                    //collect inputs
+                    int Wi = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
+                    int Si = Input.GetKey(KeyCode.S) ? -1 : 0;
+                    int Ai = Input.GetKey(KeyCode.A) ? -1 : 0;
+                    int Di = Input.GetKey(KeyCode.D) ? 1 : 0;
+                    int Qi = Input.GetKey(KeyCode.Q) ? -1 : 0;
+                    int Ei = Input.GetKey(KeyCode.E) ? 1 : 0;
+                    int upi = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
+                    int downi = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
+                    int lefti = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
+                    int righti = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
+                    bool Shift = Input.GetKey(KeyCode.LeftShift);
+                    bool Ctrl = Input.GetKey(KeyCode.LeftControl);
+                    int Shifti = Shift ? 1 : 0;
+                    int LeftControli = Ctrl ? 1 : 0;
+                    Vector2 LStickPos = new Vector2(0, 0);
+                    Vector2 RStickPos = new Vector2(0, 0);
+                    float LGrip = 0;
+                    float RGrip = 0;
+                    float LTrigger = 0;
+                    float RTrigger = 0;
+                    if (!InEditor)
                     {
-                        Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
+                        LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                        LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                        RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                        RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                        LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
+                        RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
+                        LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                        RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                     }
-                    //get udonbehaviour for newly selected function and then send selected
-                    if (LStickSelection > -1)
+                    //MouseX = Input.GetAxisRaw("Mouse X");
+                    //MouseY = Input.GetAxisRaw("Mouse Y");
+                    Vector3 JoystickPosYaw;
+                    Vector3 JoystickPos;
+                    Vector2 VRPitchRoll;
+
+                    //LStick Selection wheel
+                    if (InVR && LStickPos.magnitude > .7f && LStickDoDial)
                     {
-                        if (Dial_Functions_L[LStickSelection] != null)
+                        float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
+
+                        //R stick value is manually synced using events because i don't want to use too many synced variables.
+                        //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
+                        stickdir = (stickdir - 180) * -1;
+                        int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
+                        if (!LStickNULL[newselection])
+                        { LStickSelection = newselection; }
+                        //doing this in DFUNC scripts that need it instead so that we send less events
+                        /*                     if (VehicleAnimator.GetInteger(Lstickselection_STRING) != LStickSelection)
+                                            {
+                                                LStickSetAnimatorInt();
+                                            } */
+                    }
+
+                    //RStick Selection wheel
+                    if (InVR && RStickPos.magnitude > .7f & RStickDoDial)
+                    {
+                        float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
+
+                        //R stick value is manually synced using events because i don't want to use too many synced variables.
+                        //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
+                        stickdir = (stickdir - 180) * -1;
+                        int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
+                        if (!RStickNULL[newselection])
+                        { RStickSelection = newselection; }
+                        //doing this in DFUNC scripts that need it instead so that we send less events
+                        /*                     if (VehicleAnimator.GetInteger(Rstickselection_STRING) != RStickSelection)
+                                            {
+                                                RStickSetAnimatorInt();
+                                            } */
+                    }
+
+
+                    if (LStickSelection != LStickSelectionLastFrame)
+                    {
+                        //new function selected, send deselected to old one
+                        if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
                         {
-                            Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
+                            Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                         }
-                        else { CurrentSelectedFunctionL = null; }
-                    }
-                }
-
-                if (RStickSelection != RStickSelectionLastFrame)
-                {
-                    //new function selected, send deselected to old one
-                    if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
-                    {
-                        Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
-                    }
-                    //get udonbehaviour for newly selected function and then send selected
-                    if (RStickSelection > -1)
-                    {
-                        if (Dial_Functions_R[RStickSelection] != null)
+                        //get udonbehaviour for newly selected function and then send selected
+                        if (LStickSelection > -1)
                         {
-                            Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
+                            if (Dial_Functions_L[LStickSelection] != null)
+                            {
+                                Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
+                            }
+                            else { CurrentSelectedFunctionL = null; }
                         }
-                        else { CurrentSelectedFunctionR = null; }
                     }
-                }
 
-                RStickSelectionLastFrame = RStickSelection;
-                LStickSelectionLastFrame = LStickSelection;
-
-                float ThrottleGrip;
-                float JoyStickGrip;
-                if (SwitchHandsJoyThrottle)
-                {
-                    JoyStickGrip = LGrip;
-                    ThrottleGrip = RGrip;
-                }
-                else
-                {
-                    ThrottleGrip = LGrip;
-                    JoyStickGrip = RGrip;
-                }
-                //VR Joystick                
-                if (JoyStickGrip > 0.75)
-                {
-                    Quaternion PlaneRotDif = VehicleTransform.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
-                    PlaneRotLastFrame = VehicleTransform.rotation;
-                    JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
-                    if (!JoystickGripLastFrame)//first frame you gripped joystick
+                    if (RStickSelection != RStickSelectionLastFrame)
                     {
-                        PlaneRotDif = Quaternion.identity;
+                        //new function selected, send deselected to old one
+                        if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
+                        {
+                            Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
+                        }
+                        //get udonbehaviour for newly selected function and then send selected
+                        if (RStickSelection > -1)
+                        {
+                            if (Dial_Functions_R[RStickSelection] != null)
+                            {
+                                Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
+                            }
+                            else { CurrentSelectedFunctionR = null; }
+                        }
+                    }
+
+                    RStickSelectionLastFrame = RStickSelection;
+                    LStickSelectionLastFrame = LStickSelection;
+
+                    float ThrottleGrip;
+                    float JoyStickGrip;
+                    if (SwitchHandsJoyThrottle)
+                    {
+                        JoyStickGrip = LGrip;
+                        ThrottleGrip = RGrip;
+                    }
+                    else
+                    {
+                        ThrottleGrip = LGrip;
+                        JoyStickGrip = RGrip;
+                    }
+                    //VR Joystick                
+                    if (JoyStickGrip > 0.75)
+                    {
+                        Quaternion PlaneRotDif = VehicleTransform.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
+                        PlaneRotLastFrame = VehicleTransform.rotation;
+                        JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
+                        if (!JoystickGripLastFrame)//first frame you gripped joystick
+                        {
+                            PlaneRotDif = Quaternion.identity;
+                            if (SwitchHandsJoyThrottle)
+                            { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the plane when it was pressed
+                            else
+                            { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }
+                        }
+                        //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
+                        Quaternion JoystickDifference;
                         if (SwitchHandsJoyThrottle)
-                        { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the plane when it was pressed
-                        else
-                        { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }
-                    }
-                    //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
-                    Quaternion JoystickDifference;
-                    if (SwitchHandsJoyThrottle)
-                    { JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
-                    else { JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
+                        { JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
+                        else { JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
 
-                    JoystickPosYaw = (JoystickDifference * VehicleTransform.forward);//angles to vector
-                    JoystickPosYaw.y = 0;
-                    JoystickPos = (JoystickDifference * VehicleTransform.up);
-                    VRPitchRoll = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;
+                        JoystickPosYaw = (JoystickDifference * VehicleTransform.forward);//angles to vector
+                        JoystickPosYaw.y = 0;
+                        JoystickPos = (JoystickDifference * VehicleTransform.up);
+                        VRPitchRoll = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;
 
-                    JoystickGripLastFrame = true;
-                    //making a circular joy stick square
-                    //pitch and roll
-                    if (Mathf.Abs(VRPitchRoll.x) > Mathf.Abs(VRPitchRoll.y))
-                    {
-                        if (Mathf.Abs(VRPitchRoll.x) > 0)
-                        {
-                            float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.x);
-                            VRPitchRoll *= temp;
-                        }
-                    }
-                    else if (Mathf.Abs(VRPitchRoll.y) > 0)
-                    {
-                        float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.y);
-                        VRPitchRoll *= temp;
-                    }
-                    //yaw
-                    if (Mathf.Abs(JoystickPosYaw.x) > Mathf.Abs(JoystickPosYaw.z))
-                    {
-                        if (Mathf.Abs(JoystickPosYaw.x) > 0)
-                        {
-                            float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.x);
-                            JoystickPosYaw *= temp;
-                        }
-                    }
-                    else if (Mathf.Abs(JoystickPosYaw.z) > 0)
-                    {
-                        float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.z);
-                        JoystickPosYaw *= temp;
-                    }
-
-                }
-                else
-                {
-                    JoystickPosYaw.x = 0;
-                    VRPitchRoll = Vector3.zero;
-                    JoystickGripLastFrame = false;
-                }
-
-                if (HasAfterburner)
-                {
-                    if (AfterburnerOn)
-                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
-                    else
-                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, .8f); }
-                }
-                else
-                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
-                //VR Throttle
-                if (ThrottleGrip > 0.75)
-                {
-                    Vector3 handdistance;
-                    if (SwitchHandsJoyThrottle)
-                    { handdistance = transform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
-                    else { handdistance = transform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
-
-                    handdistance = transform.InverseTransformDirection(handdistance);
-                    float HandThrottleAxis;
-                    if (VerticalThrottle)
-                    {
-                        HandThrottleAxis = handdistance.y;
-                    }
-                    else
-                    {
-                        HandThrottleAxis = handdistance.z;
-                    }
-
-                    if (!ThrottleGripLastFrame)
-                    {
-                        ThrottleZeroPoint = HandThrottleAxis;
-                        TempThrottle = PlayerThrottle;
-                        HandDistanceZLastFrame = 0;
-                    }
-                    float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
-                    ThrottleDifference *= ThrottleSensitivity;
-                    bool VTOLandAB_Disallowed = (!VTOLAllowAfterburner && VTOLAngle != 0);/*don't allow VTOL AB disabled planes, false if attemping to*/
-
-                    //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
-                    if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !VTOLandAB_Disallowed && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/&& !VTOLandAB_Disallowed) || !HasAfterburner))
-                    {
-                        PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
-                    }
-                    else
-                    {
-                        PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
-                    }
-                    HandDistanceZLastFrame = HandThrottleAxis;
-                    ThrottleGripLastFrame = true;
-                }
-                else
-                {
-                    ThrottleGripLastFrame = false;
-                }
-
-                if ((DisableTaxiRotation == 0) && (Taxiing))
-                {
-                    AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
-                                      //rotate if trying to yaw
-                    Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
-                    VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
-
-                    StillWindMulti = Mathf.Min(Speed / 10, 1);
-                    ThrustVecGrounded = 0;
-                }
-                else
-                {
-                    StillWindMulti = 1;
-                    ThrustVecGrounded = 1;
-                    Taxiinglerper = 0;
-                }
-                //keyboard control for afterburner
-                if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner && (VTOLAngle == 0 || VTOLAllowAfterburner))
-                {
-                    if (AfterburnerOn)
-                        PlayerThrottle = ThrottleAfterburnerPoint;
-                    else
-                        PlayerThrottle = 1;
-                }
-                //Cruise PI Controller
-                if (ThrottleOverridden > 0 && !ThrottleGripLastFrame && !Shift && !Ctrl)
-                {
-                    ThrottleInput = PlayerThrottle = ThrottleOverride;
-                }
-                else//if cruise control disabled, use inputs
-                {
-                    if (!InVR)
-                    {
-                        if (LTrigger > .05f)//axis throttle input for people who wish to use it //.05 deadzone so it doesn't take effect for keyboard users with something plugged in
-                        { ThrottleInput = LTrigger; }
-                        else { ThrottleInput = PlayerThrottle; }
-                    }
-                    else { ThrottleInput = PlayerThrottle; }
-                }
-
-                Vector2 Throttles = UnpackThrottles(ThrottleInput);
-                Fuel = Mathf.Max(Fuel -
-                                    ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
-                                        + (Throttles.y * FuelConsumptionAB)) * DeltaTime, 0);
-
-
-                if (Fuel < LowFuel) { ThrottleInput = ThrottleInput * (Fuel * LowFuelDivider); }//decrease max throttle as fuel runs out
-
-                if (HasAfterburner)
-                {
-                    if (ThrottleInput > ThrottleAfterburnerPoint && !AfterburnerOn)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
-                    }
-                    else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
-                    }
-                }
-                if (JoystickOverridden > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
-                {
-                    RotationInputs = JoystickOverride;
-                }
-                else//joystick override disabled, player has control
-                {
-                    if (!InVR)
-                    {
-                        //allow stick flight in desktop mode
-                        VRPitchRoll = LStickPos;
-                        JoystickPosYaw.x = RStickPos.x;
-                        //make stick input square
+                        JoystickGripLastFrame = true;
+                        //making a circular joy stick square
+                        //pitch and roll
                         if (Mathf.Abs(VRPitchRoll.x) > Mathf.Abs(VRPitchRoll.y))
                         {
                             if (Mathf.Abs(VRPitchRoll.x) > 0)
@@ -899,51 +737,226 @@ public class EngineController : UdonSharpBehaviour
                             float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.y);
                             VRPitchRoll *= temp;
                         }
+                        //yaw
+                        if (Mathf.Abs(JoystickPosYaw.x) > Mathf.Abs(JoystickPosYaw.z))
+                        {
+                            if (Mathf.Abs(JoystickPosYaw.x) > 0)
+                            {
+                                float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.x);
+                                JoystickPosYaw *= temp;
+                            }
+                        }
+                        else if (Mathf.Abs(JoystickPosYaw.z) > 0)
+                        {
+                            float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.z);
+                            JoystickPosYaw *= temp;
+                        }
+
+                    }
+                    else
+                    {
+                        JoystickPosYaw.x = 0;
+                        VRPitchRoll = Vector3.zero;
+                        JoystickGripLastFrame = false;
                     }
 
-                    RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
-                    RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits;
-                    //roll isn't subject to flight limits
-                    RotationInputs.z = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
-                }
-
-                //ability to adjust input to be more precise at low amounts. 'exponant'
-                /* RotationInputs.x = RotationInputs.x > 0 ? Mathf.Pow(RotationInputs.x, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.x), StickInputPower);
-                RotationInputs.y = RotationInputs.y > 0 ? Mathf.Pow(RotationInputs.y, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.y), StickInputPower);
-                RotationInputs.z = RotationInputs.z > 0 ? Mathf.Pow(RotationInputs.z, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.z), StickInputPower); */
-
-                //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
-                if ((Vector3.Dot(AirVel, VehicleTransform.forward) > 0))//normal, moving forward
-                {
-                    ReversingPitchStrength = 1;
-                    ReversingYawStrength = 1;
-                    ReversingRollStrength = 1;
-                }
-                else//moving backward. The 'Zero' values are set in start(). Explanation there.
-                {
-                    ReversingPitchStrength = ReversingPitchStrengthZero;
-                    ReversingYawStrength = ReversingYawStrengthZero;
-                    ReversingRollStrength = ReversingRollStrengthZero;
-                }
-
-                pitch = Mathf.Clamp(RotationInputs.x, -1, 1) * PitchStrength * ReversingPitchStrength;
-                yaw = Mathf.Clamp(-RotationInputs.y, -1, 1) * YawStrength * ReversingYawStrength;
-                roll = RotationInputs.z * RollStrength * ReversingRollStrength;
-
-
-                if (pitch > 0)
-                {
-                    pitch *= PitchDownStrMulti;
-                }
-
-                //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it.
-                if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
-                {
-                    if (VTOLAngle > VTOL90Degrees)
-                    { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
+                    if (HasAfterburner)
+                    {
+                        if (AfterburnerOn)
+                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
+                        else
+                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, .8f); }
+                    }
                     else
-                    { VehicleRigidbody.velocity = VehicleTransform.forward * .25f; }
+                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
+                    //VR Throttle
+                    if (ThrottleGrip > 0.75)
+                    {
+                        Vector3 handdistance;
+                        if (SwitchHandsJoyThrottle)
+                        { handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
+                        else { handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
+                        handdistance = VehicleTransform.InverseTransformDirection(handdistance);
+
+                        Vector3 PlaySpaceDistance = transform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin).position;
+                        PlaySpaceDistance = VehicleTransform.InverseTransformDirection(PlaySpaceDistance);
+
+                        float HandThrottleAxis;
+                        if (VerticalThrottle)
+                        {
+                            HandThrottleAxis = handdistance.y - (PlaySpaceDistance.y - ThrottlePlayspaceLastFrame);
+                            ThrottlePlayspaceLastFrame = PlaySpaceDistance.y;
+                        }
+                        else
+                        {
+                            HandThrottleAxis = handdistance.z - (PlaySpaceDistance.y - ThrottlePlayspaceLastFrame);
+                            ThrottlePlayspaceLastFrame = PlaySpaceDistance.z;
+                        }
+
+                        if (!ThrottleGripLastFrame)
+                        {
+                            ThrottleZeroPoint = HandThrottleAxis;
+                            TempThrottle = PlayerThrottle;
+                            HandDistanceZLastFrame = 0;
+                        }
+                        float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
+                        ThrottleDifference *= ThrottleSensitivity;
+                        bool VTOLandAB_Disallowed = (!VTOLAllowAfterburner && VTOLAngle != 0);/*don't allow VTOL AB disabled planes, false if attemping to*/
+
+                        //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
+                        if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !VTOLandAB_Disallowed && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/&& !VTOLandAB_Disallowed) || !HasAfterburner))
+                        {
+                            PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
+                        }
+                        else
+                        {
+                            PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
+                        }
+                        HandDistanceZLastFrame = HandThrottleAxis;
+                        ThrottleGripLastFrame = true;
+                    }
+                    else
+                    {
+                        ThrottleGripLastFrame = false;
+                    }
+
+                    if ((DisableTaxiRotation == 0) && (Taxiing))
+                    {
+                        AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
+                                          //rotate if trying to yaw
+                        Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
+                        VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
+
+                        StillWindMulti = Mathf.Min(Speed / 10, 1);
+                        ThrustVecGrounded = 0;
+                    }
+                    else
+                    {
+                        StillWindMulti = 1;
+                        ThrustVecGrounded = 1;
+                        Taxiinglerper = 0;
+                    }
+                    //keyboard control for afterburner
+                    if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner && (VTOLAngle == 0 || VTOLAllowAfterburner))
+                    {
+                        if (AfterburnerOn)
+                            PlayerThrottle = ThrottleAfterburnerPoint;
+                        else
+                            PlayerThrottle = 1;
+                    }
+                    //Cruise PI Controller
+                    if (ThrottleOverridden > 0 && !ThrottleGripLastFrame && !Shift && !Ctrl)
+                    {
+                        ThrottleInput = PlayerThrottle = ThrottleOverride;
+                    }
+                    else//if cruise control disabled, use inputs
+                    {
+                        if (!InVR)
+                        {
+                            if (LTrigger > .05f)//axis throttle input for people who wish to use it //.05 deadzone so it doesn't take effect for keyboard users with something plugged in
+                            { ThrottleInput = LTrigger; }
+                            else { ThrottleInput = PlayerThrottle; }
+                        }
+                        else { ThrottleInput = PlayerThrottle; }
+                    }
+
+                    Vector2 Throttles = UnpackThrottles(ThrottleInput);
+                    Fuel = Mathf.Max(Fuel -
+                                        ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
+                                            + (Throttles.y * FuelConsumptionAB)) * DeltaTime, 0);
+
+
+                    if (Fuel < LowFuel) { ThrottleInput = ThrottleInput * (Fuel * LowFuelDivider); }//decrease max throttle as fuel runs out
+
+                    if (HasAfterburner)
+                    {
+                        if (ThrottleInput > ThrottleAfterburnerPoint && !AfterburnerOn)
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
+                        }
+                        else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
+                        }
+                    }
+                    if (JoystickOverridden > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
+                    {
+                        RotationInputs = JoystickOverride;
+                    }
+                    else//joystick override disabled, player has control
+                    {
+                        if (!InVR)
+                        {
+                            //allow stick flight in desktop mode
+                            VRPitchRoll = LStickPos;
+                            JoystickPosYaw.x = RStickPos.x;
+                            //make stick input square
+                            if (Mathf.Abs(VRPitchRoll.x) > Mathf.Abs(VRPitchRoll.y))
+                            {
+                                if (Mathf.Abs(VRPitchRoll.x) > 0)
+                                {
+                                    float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.x);
+                                    VRPitchRoll *= temp;
+                                }
+                            }
+                            else if (Mathf.Abs(VRPitchRoll.y) > 0)
+                            {
+                                float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.y);
+                                VRPitchRoll *= temp;
+                            }
+                        }
+
+                        RotationInputs.x = Mathf.Clamp(/*(MouseY * mouseysens + Lstick.y + */VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
+                        RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits;
+                        //roll isn't subject to flight limits
+                        RotationInputs.z = Mathf.Clamp(((/*(MouseX * mousexsens) + */VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
+                    }
+
+                    //ability to adjust input to be more precise at low amounts. 'exponant'
+                    /* RotationInputs.x = RotationInputs.x > 0 ? Mathf.Pow(RotationInputs.x, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.x), StickInputPower);
+                    RotationInputs.y = RotationInputs.y > 0 ? Mathf.Pow(RotationInputs.y, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.y), StickInputPower);
+                    RotationInputs.z = RotationInputs.z > 0 ? Mathf.Pow(RotationInputs.z, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.z), StickInputPower); */
+
+                    //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
+                    if ((Vector3.Dot(AirVel, VehicleTransform.forward) > 0))//normal, moving forward
+                    {
+                        ReversingPitchStrength = 1;
+                        ReversingYawStrength = 1;
+                        ReversingRollStrength = 1;
+                    }
+                    else//moving backward. The 'Zero' values are set in start(). Explanation there.
+                    {
+                        ReversingPitchStrength = ReversingPitchStrengthZero;
+                        ReversingYawStrength = ReversingYawStrengthZero;
+                        ReversingRollStrength = ReversingRollStrengthZero;
+                    }
+
+                    pitch = Mathf.Clamp(RotationInputs.x, -1, 1) * PitchStrength * ReversingPitchStrength;
+                    yaw = Mathf.Clamp(-RotationInputs.y, -1, 1) * YawStrength * ReversingYawStrength;
+                    roll = RotationInputs.z * RollStrength * ReversingRollStrength;
+
+
+                    if (pitch > 0)
+                    {
+                        pitch *= PitchDownStrMulti;
+                    }
+
+                    //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it.
+                    if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
+                    {
+                        if (VTOLAngle > VTOL90Degrees)
+                        { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
+                        else
+                        { VehicleRigidbody.velocity = VehicleTransform.forward * .25f; }
+                    }
+
+                    if (VTOLenabled)
+                    {
+                        if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
+                        { SetVTOLValues(); }
+                    }
                 }
+
                 //Replacement for leavebutton
                 if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
                 {
@@ -955,140 +968,146 @@ public class EngineController : UdonSharpBehaviour
             {
                 Occupied = false;
                 //brake is always on if the plane is on the ground
-                if (Taxiing)
+                if (!DisablePhysicsAndInputs)
                 {
-                    StillWindMulti = Mathf.Min(Speed / 10, 1);
+                    if (Taxiing)
+                    {
+                        StillWindMulti = Mathf.Min(Speed * .1f, 1);
+                    }
+                    else { StillWindMulti = 1; }
                 }
-                else { StillWindMulti = 1; }
             }
 
-            //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
-            if (EngineOutput < ThrottleInput)
-            { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * DeltaTime); }
-            else
-            { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); }
-
-            float sidespeed = 0;
-            float downspeed = 0;
-            float SpeedLiftFactor = 0;
-
-            if (PlaneMoving)//optimization
+            if (!DisablePhysicsAndInputs)
             {
-                //used to create air resistance for updown and sideways if your movement direction is in those directions
-                //to add physics to plane's yaw and pitch, accel angvel towards velocity, and add force to the plane
-                //and add wind
-                sidespeed = Vector3.Dot(AirVel, VehicleTransform.right);
-                downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
+                //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
+                if (EngineOutput < ThrottleInput)
+                { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * DeltaTime); }
+                else
+                { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); }
 
-                PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
-                if (PitchDown)
+                float sidespeed = 0;
+                float downspeed = 0;
+                float SpeedLiftFactor = 0;
+
+                if (PlaneMoving)//optimization
                 {
-                    downspeed *= PitchDownLiftMulti;
-                    SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift * PitchDownLiftMulti);
+                    //used to create air resistance for updown and sideways if your movement direction is in those directions
+                    //to add physics to plane's yaw and pitch, accel angvel towards velocity, and add force to the plane
+                    //and add wind
+                    sidespeed = Vector3.Dot(AirVel, VehicleTransform.right);
+                    downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
+
+                    PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
+                    if (PitchDown)
+                    {
+                        downspeed *= PitchDownLiftMulti;
+                        SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift * PitchDownLiftMulti);
+                    }
+                    else
+                    {
+                        SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift);
+                    }
+                    rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
+
+                    //thrust vectoring airplanes have a minimum rotation control
+                    float minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
+                    pitch *= Mathf.Max(PitchThrustVecMulti * ThrustVecGrounded, minlifttemp);
+                    yaw *= Mathf.Max(YawThrustVecMulti * ThrustVecGrounded, minlifttemp);
+                    roll *= Mathf.Max(RollThrustVecMulti * ThrustVecGrounded, minlifttemp);
+
+                    //rotation inputs are done, now we can set the minimum lift/drag when at high aoa, this should be higher than 0 because if it's 0 you will have 0 drag when at 90 degree AoA.
+                    AoALiftPitch = Mathf.Clamp(AoALiftPitch, HighPitchAoaMinLift, 1);
+                    AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
+
+                    //Lerp the inputs for 'rotation response'
+                    LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * DeltaTime);
+                    LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
+                    LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
                 }
                 else
                 {
-                    SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift);
+                    VelLift = pitch = yaw = roll = 0;
                 }
-                rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
-                //thrust vectoring airplanes have a minimum rotation control
-                float minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
-                pitch *= Mathf.Max(PitchThrustVecMulti * ThrustVecGrounded, minlifttemp);
-                yaw *= Mathf.Max(YawThrustVecMulti * ThrustVecGrounded, minlifttemp);
-                roll *= Mathf.Max(RollThrustVecMulti * ThrustVecGrounded, minlifttemp);
-
-                //rotation inputs are done, now we can set the minimum lift/drag when at high aoa, this should be higher than 0 because if it's 0 you will have 0 drag when at 90 degree AoA.
-                AoALiftPitch = Mathf.Clamp(AoALiftPitch, HighPitchAoaMinLift, 1);
-                AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
-
-                //Lerp the inputs for 'rotation response'
-                LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * DeltaTime);
-                LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
-                LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
-            }
-            else
-            {
-                VelLift = pitch = yaw = roll = 0;
-            }
-
-            if ((PlaneMoving || Piloting) && OverrideConstantForce == 0)
-            {
-                //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
-                //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
-                Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Sideways
-                        (downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch),// Y Up
-                        0);//Z Forward
-
-                float GroundEffectAndVelLift = 0;
-
-                Vector2 Outputs = UnpackThrottles(EngineOutput);
-                float Thrust = (Mathf.Min(Outputs.x)//Throttle
-                * ThrottleStrength
-                + Mathf.Max((Outputs.y), 0)//Afterburner throttle
-                * ThrottleStrengthAB);
-
-
-                if (VTOLenabled)
+                if ((PlaneMoving || Piloting) && OverrideConstantForce == 0)
                 {
-                    //float thrust = EngineOutput * ThrottleStrength * AfterburnerThrottle * AfterburnerThrustMulti * Atmosphere;
-                    float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
+                    //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
+                    //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
+                    Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Sideways
+                            (downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch),// Y Up
+                            0);//Z Forward
 
-                    Vector3 VTOLInputAcc;                                                     //rotate and scale Vector for VTOL thrust
-                    if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
+                    float GroundEffectAndVelLift = 0;
+
+                    Vector2 Outputs = UnpackThrottles(EngineOutput);
+                    float Thrust = (Mathf.Min(Outputs.x)//Throttle
+                    * ThrottleStrength
+                    + Mathf.Max((Outputs.y), 0)//Afterburner throttle
+                    * ThrottleStrengthAB);
+
+
+                    if (VTOLenabled)
                     {
-                        VTOLInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Thrust;
+                        //float thrust = EngineOutput * ThrottleStrength * AfterburnerThrottle * AfterburnerThrustMulti * Atmosphere;
+                        float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
+
+                        Vector3 VTOLInputAcc;                                                     //rotate and scale Vector for VTOL thrust
+                        if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
+                        {
+                            VTOLInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Thrust;
+                        }
+                        else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
+                        {
+                            float downthrust = Thrust * VTOLThrottleStrengthMulti;
+                            VTOLInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Mathf.Lerp(Thrust, Thrust * VTOLThrottleStrengthMulti, VTolAngle90Plus ? VTOLAngle90 : VTOLAngle);
+                        }
+                        //add ground effect to the VTOL thrust
+                        GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(VTOLInputAcc), VTOLGroundEffectStrength, 1);
+                        VTOLInputAcc *= GroundEffectAndVelLift;
+
+                        //Add Airplane Ground Effect
+                        GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
+                        //add lift and thrust
+
+                        FinalInputAcc += VTOLInputAcc;
+                        FinalInputAcc.y += GroundEffectAndVelLift;
+                        FinalInputAcc *= Atmosphere;
                     }
-                    else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
+                    else//Simpler version for non-VTOL craft
                     {
-                        float downthrust = Thrust * VTOLThrottleStrengthMulti;
-                        VTOLInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Mathf.Lerp(Thrust, Thrust * VTOLThrottleStrengthMulti, VTolAngle90Plus ? VTOLAngle90 : VTOLAngle);
+                        GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
+
+                        FinalInputAcc.y += GroundEffectAndVelLift;
+                        FinalInputAcc.z += Thrust;
+                        FinalInputAcc *= Atmosphere;
                     }
-                    //add ground effect to the VTOL thrust
-                    GroundEffectAndVelLift = GroundEffect(true, GroundEffectEmpty.position, -VehicleTransform.TransformDirection(VTOLInputAcc), VTOLGroundEffectStrength, 1);
-                    VTOLInputAcc *= GroundEffectAndVelLift;
 
-                    //Add Airplane Ground Effect
-                    GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
-                    //add lift and thrust
+                    float outputdif = (EngineOutput - EngineOutputLastFrame);
+                    float ADVYaw = outputdif * AdverseYaw;
+                    float ADVRoll = outputdif * AdverseRoll;
+                    EngineOutputLastFrame = EngineOutput;
+                    //used to add rotation friction
+                    Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
-                    FinalInputAcc += VTOLInputAcc;
-                    FinalInputAcc.y += GroundEffectAndVelLift;
-                    FinalInputAcc *= Atmosphere;
+
+                    //roll + rotational frictions
+                    Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere) - (localAngularVelocity.x * PitchConstantFriction),// X Pitch
+                        (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere - (localAngularVelocity.y * YawConstantFriction),// Y Yaw
+                            ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere) - (localAngularVelocity.z * RollConstantFriction));// Z Roll
+
+                    //create values for use in fixedupdate (control input and straightening forces)
+                    Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
+                    Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
+
+                    VehicleConstantForce.relativeForce = FinalInputAcc;
+                    VehicleConstantForce.relativeTorque = FinalInputRot;
                 }
-                else//Simpler version for non-VTOL craft
+                else
                 {
-                    GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
-
-                    FinalInputAcc.y += GroundEffectAndVelLift;
-                    FinalInputAcc.z += Thrust;
-                    FinalInputAcc *= Atmosphere;
+                    VehicleConstantForce.relativeForce = CFRelativeForceOverride;
+                    VehicleConstantForce.relativeTorque = CFRelativeTorqueOverride;
                 }
-
-                float outputdif = (EngineOutput - EngineOutputLastFrame);
-                float ADVYaw = outputdif * AdverseYaw;
-                float ADVRoll = outputdif * AdverseRoll;
-                EngineOutputLastFrame = EngineOutput;
-                //used to add rotation friction
-                Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
-
-
-                //roll + rotational frictions
-                Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere) - (localAngularVelocity.x * PitchConstantFriction),// X Pitch
-                    (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere - (localAngularVelocity.y * YawConstantFriction),// Y Yaw
-                        ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw)) + ADVRoll * Atmosphere) - (localAngularVelocity.z * RollConstantFriction));// Z Roll
-
-                //create values for use in fixedupdate (control input and straightening forces)
-                Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
-                Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
-
-                VehicleConstantForce.relativeForce = FinalInputAcc;
-                VehicleConstantForce.relativeTorque = FinalInputRot;
-            }
-            else
-            {
-                VehicleConstantForce.relativeForce = CFRelativeForceOverride;
-                VehicleConstantForce.relativeTorque = CFRelativeTorqueOverride;
             }
 
             SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
@@ -1175,6 +1194,7 @@ public class EngineController : UdonSharpBehaviour
         if (IsOwner)
         {
             VehicleRigidbody.velocity = Vector3.zero;
+            VehicleRigidbody.angularVelocity = Vector3.zero;
             VehicleRigidbody.drag = 9999;
             VehicleRigidbody.angularDrag = 9999;
             Health = FullHealth;//turns off low health smoke
@@ -1356,6 +1376,7 @@ public class EngineController : UdonSharpBehaviour
         VTOLAngle = VTOLDefaultValue;
         VTOLAngleInput = VTOLDefaultValue;
         VehicleObjectSync.Respawn();//this works if done just locally
+        VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
 
 
         TakeOwnerShipOfExtensions();
@@ -1659,6 +1680,7 @@ public class EngineController : UdonSharpBehaviour
     }
     private void WindAndAoA()
     {
+        if (DisablePhysicsAndInputs) { return; }
         Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
         float TimeGustiness = Time.time * WindGustiness;
         float gustx = TimeGustiness + (VehicleTransform.position.x * WindTurbulanceScale);

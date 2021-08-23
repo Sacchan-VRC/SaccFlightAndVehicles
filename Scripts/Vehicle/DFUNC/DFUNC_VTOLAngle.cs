@@ -7,10 +7,8 @@ using VRC.Udon;
 public class DFUNC_VTOLAngle : UdonSharpBehaviour
 {
     [SerializeField] EngineController EngineControl;
-    [SerializeField] private GameObject Dial_Funcon;
     private bool UseLeftTrigger = false;
     private float VTOLDefault;
-    private bool Dial_FunconNULL = true;
     private Transform VehicleTransform;
     private VRCPlayerApi localPlayer;
     private bool TriggerLastFrame;
@@ -22,8 +20,6 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
     public void SFEXT_L_ECStart()
     {
         VTOLDefault = EngineControl.VTOLDefaultValue;
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         VehicleTransform = EngineControl.VehicleMainObj.GetComponent<Transform>();
         localPlayer = Networking.LocalPlayer;
         ThrottleSensitivity = EngineControl.ThrottleSensitivity;
@@ -65,9 +61,5 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
             TriggerLastFrame = true;
         }
         else { TriggerLastFrame = false; }
-        if (EngineControl.VTOLAngle != VTOLDefault)
-        { if (!Dial_FunconNULL) Dial_Funcon.SetActive(true); }
-        else
-        { if (!Dial_FunconNULL) Dial_Funcon.SetActive(false); }
     }
 }

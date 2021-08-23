@@ -41,8 +41,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
-        gameObject.SetActive(false);
-        TriggerLastFrame = false;
+        DFUNC_Deselected();
     }
     public void SFEXT_O_PassengerEnter()
     {
@@ -84,7 +83,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_GearUp");
+            SendCustomEventDelayedFrames(nameof(SendGearUp), 1);
         }
     }
     public void SetGearDown()
@@ -97,8 +96,17 @@ public class DFUNC_Gear : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            EngineControl.SendEventToExtensions("SFEXT_O_GearDown");
+            SendCustomEventDelayedFrames(nameof(SendGearDown), 1);
         }
+    }
+    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
+    public void SendGearUp()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_GearUp");
+    }
+    public void SendGearDown()
+    {
+        EngineControl.SendEventToExtensions("SFEXT_O_GearDown");
     }
     public void ToggleGear()
     {

@@ -16,9 +16,6 @@ public class HUDController : UdonSharpBehaviour
     [SerializeField] private Text HUDText_knots;
     [SerializeField] private Text HUDText_knotsairspeed;
     [SerializeField] private Text HUDText_angleofattack;
-    [SerializeField] private GameObject HudCrosshairGun;
-    [SerializeField] private GameObject HudCrosshair;
-    [SerializeField] private GameObject HudAB;
     [SerializeField] private Transform DownIndicator;
     [SerializeField] private Transform ElevationIndicator;
     [SerializeField] private Transform HeadingIndicator;

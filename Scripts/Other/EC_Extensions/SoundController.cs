@@ -27,10 +27,11 @@ public class SoundController : UdonSharpBehaviour
     public AudioSource RadarLocked;
     public AudioSource MissileIncoming;
     [SerializeField] private AudioSource EnterWater;
+    [SerializeField] private AudioSource EnterWaterOutside;
     [SerializeField] private AudioSource UnderWater;
     [SerializeField] private AudioSource[] DopplerSounds;
     public float TouchDownSoundSpeed = 35;
-    [SerializeField] private bool DefaultCanopyClosed;
+    public bool AllDoorsClosed = true;
     [System.NonSerializedAttribute] public bool PlaneIdleNull = true;
     [System.NonSerializedAttribute] public bool PlaneInsideNull = true;
     [System.NonSerializedAttribute] public bool PlaneDistantNull = true;
@@ -44,6 +45,9 @@ public class SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool BulletHitNull = true;
     [System.NonSerializedAttribute] public bool MissileIncomingNull = true;
     [System.NonSerializedAttribute] public bool RollingNull = true;
+    [System.NonSerializedAttribute] public bool EnterWaterNull = true;
+    [System.NonSerializedAttribute] public bool EnterWaterOutsideNull = true;
+    [System.NonSerializedAttribute] public bool UnderwaterNull = true;
     [System.NonSerializedAttribute] public bool ReSupplyNull = true;
     [System.NonSerializedAttribute] public bool RadarLockedNull = true;
     [System.NonSerializedAttribute] public bool AirbrakeNull = true;
@@ -87,13 +91,13 @@ public class SoundController : UdonSharpBehaviour
     private float MaxAudibleDistance;
     private bool TooFarToHear = false;
     private bool InEditor = true;
-    [System.NonSerializedAttribute] public bool AllDoorsClosed = false;
     private Transform CenterOfMass;
     private VRCPlayerApi localPlayer;
     private bool Piloting;
     private bool Passenger;
     private bool Initiatlized;
     private int DoorsOpen = 0;
+    private bool InWater;
     private void SFEXT_L_ECStart()
     {
         Initiatlized = true;
@@ -104,6 +108,9 @@ public class SoundController : UdonSharpBehaviour
         ABOnOutsideNull = ABOnOutside == null;
         PlaneWindNull = PlaneWind == null;
         RollingNull = Rolling == null;
+        UnderwaterNull = UnderWater == null;
+        EnterWaterNull = EnterWater == null;
+        EnterWaterOutsideNull = EnterWaterOutside == null;
         ReSupplyNull = ReSupply == null;
         RadarLockedNull = RadarLocked == null;
         MissileIncomingNull = MissileIncoming == null;
@@ -113,9 +120,6 @@ public class SoundController : UdonSharpBehaviour
         SonicBoomNull = SonicBoom.Length < 1;
         ExplosionNull = Explosion.Length < 1;
         BulletHitNull = BulletHit.Length < 1;
-
-        if (DefaultCanopyClosed)
-        { DoorClose(); }
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
@@ -284,7 +288,6 @@ public class SoundController : UdonSharpBehaviour
             {
                 if (EngineControl.Taxiing)
                 {
-                    if (!Rolling.isPlaying) { Rolling.Play(); }
                     Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min(EngineControl.Speed * RollingVolCurve, RollingMaxVol), 3f * DeltaTime);
                 }
                 else
@@ -431,11 +434,23 @@ public class SoundController : UdonSharpBehaviour
     }
     public void SFEXT_G_EnterWater()
     {
+        InWater = true;
         if (EngineControl.Piloting || EngineControl.Passenger)
         {
-            if (EnterWater != null) { EnterWater.Play(); }
-            if (UnderWater != null) { UnderWater.Play(); }
+            if (!EnterWaterNull) { EnterWater.Play(); }
+            if (!UnderwaterNull) { UnderWater.Play(); }
         }
+        else
+        {
+            if (!EnterWaterOutsideNull) { EnterWaterOutside.Play(); }
+        }
+
+        if (!ABOnInsideNull && ABOnInside.isPlaying)
+        { ABOnInside.Stop(); }
+
+        if (!ABOnOutsideNull && ABOnOutside.isPlaying)
+        { ABOnOutside.Stop(); }
+
 
         PlaneIdlePitch = 0;
         PlaneIdleVolume = 0;
@@ -472,7 +487,8 @@ public class SoundController : UdonSharpBehaviour
     }
     public void SFEXT_G_ExitWater()
     {
-        if (UnderWater != null) { if (UnderWater.isPlaying) UnderWater.Stop(); }
+        InWater = false;
+        if (!UnderwaterNull) { if (UnderWater.isPlaying) UnderWater.Stop(); }
         PlaneInsideTargetVolume = PlaneInsideInitialVolume;
         PlaneIdleTargetVolume = PlaneIdleInitialVolume;
         PlaneThrustTargetVolume = PlaneThrustInitialVolume;
@@ -484,9 +500,14 @@ public class SoundController : UdonSharpBehaviour
             DopplerSounds_TargetVolumes[x] = DopplerSounds_InitialVolumes[x];
         }
     }
+    public void SFEXT_G_RespawnButton()
+    {
+        InWater = false;
+        ResetSounds();
+    }
     public void SFEXT_G_Explode()
     {
-        //play sonic boom if it was going to play before it exploded
+        ResetSounds();
         if (playsonicboom && silent)
         {
             if (!SonicBoomNull)
@@ -506,6 +527,20 @@ public class SoundController : UdonSharpBehaviour
                 }
             }
         }
+        if (!ExplosionNull)
+        {
+            int rand = Random.Range(0, Explosion.Length);
+            if (Explosion[rand] != null)
+            {
+                Explosion[rand].Play();
+            }
+        }
+    }
+    public void ResetSounds()
+    {
+        InWater = false;
+        //play sonic boom if it was going to play before it exploded
+
         playsonicboom = false;
         silent = false;
         PlaneIdlePitch = 0;
@@ -515,14 +550,6 @@ public class SoundController : UdonSharpBehaviour
         LastFramePlaneIdlePitch = 0;
         LastFramePlaneThrustPitch = 0;
 
-        if (!ExplosionNull)
-        {
-            int rand = Random.Range(0, Explosion.Length);
-            if (Explosion[rand] != null)
-            {
-                Explosion[rand].Play();
-            }
-        }
 
         if (!PlaneDistantNull) { PlaneDistant.volume = 0; }
 
@@ -546,27 +573,32 @@ public class SoundController : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        PlaneWind.Play();
+        if (!PlaneWindNull) { PlaneWind.Play(); }
+        if (!RollingNull) { Rolling.Play(); if (!EngineControl.Taxiing) { Rolling.volume = 0; } }
         if (AllDoorsClosed) { EnterPlane(); }
+        if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
         Piloting = true;
     }
     public void SFEXT_O_PilotExit()
     {
-        PlaneWind.Stop();
+        if (!RollingNull) { PlaneWind.Stop(); }
+        if (!RollingNull) { Rolling.Stop(); }
         Piloting = false;
-        if (UnderWater != null) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
+        if (!UnderwaterNull) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
     }
     public void SFEXT_P_PassengerEnter()
     {
-        PlaneWind.Play();
+        if (!RollingNull) { Rolling.Play(); if (!EngineControl.Taxiing) { Rolling.volume = 0; } }
+        if (!PlaneWindNull) { PlaneWind.Play(); }
         if (AllDoorsClosed) { EnterPlane(); }
+        if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
         Passenger = true;
     }
     public void SFEXT_P_PassengerExit()
     {
-        PlaneWind.Stop();
+        if (!PlaneWindNull) PlaneWind.Stop();
+        if (!UnderwaterNull) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
         Passenger = false;
-        if (UnderWater != null) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
     }
     public void SFEXT_G_PilotEnter()//old WakeUp
     {
@@ -613,7 +645,7 @@ public class SoundController : UdonSharpBehaviour
         {
             if (Piloting || Passenger)
             { Exitplane(); }
-            if (EngineControl.IsOwner && AllDoorsClosed)//if AllDoorsClosed == true then a door is open and none were last frame, so send event
+            if (EngineControl.IsOwner && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
             { EngineControl.SendEventToExtensions("SFEXT_O_DoorsOpened"); }
             AllDoorsClosed = false;
         }
@@ -637,13 +669,13 @@ public class SoundController : UdonSharpBehaviour
             if (!thrust.isPlaying)
             { thrust.Play(); }
         }
-        if (PlaneDistant.isPlaying && !PlaneDistantNull)
+        if (!PlaneDistantNull && PlaneDistant.isPlaying)
         { PlaneDistant.Stop(); }
-        if (!PlaneWind.isPlaying && !PlaneWindNull)
+        if (!PlaneWindNull && !PlaneWind.isPlaying)
         { PlaneWind.Play(); }
-        if (!PlaneInside.isPlaying && !PlaneInsideNull)
+        if (!PlaneInsideNull && !PlaneInside.isPlaying)
         { PlaneInside.Play(); }
-        if (PlaneIdle[0].isPlaying && !PlaneIdleNull)
+        if (!PlaneIdleNull && PlaneIdle[0].isPlaying)
         {
             foreach (AudioSource idle in PlaneIdle)
             { idle.Stop(); }
@@ -680,7 +712,8 @@ public class SoundController : UdonSharpBehaviour
     }
     public void SFEXT_O_AfterburnerOn()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayAfturburnersound");
+        if (!InWater)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayAfturburnersound"); }
     }
     public void PlayAfturburnersound()
     {
@@ -697,7 +730,6 @@ public class SoundController : UdonSharpBehaviour
     }
     public void SFEXT_O_PlaneHit()
     {
-
         if (!BulletHitNull)
         {
             int rand = Random.Range(0, BulletHit.Length);

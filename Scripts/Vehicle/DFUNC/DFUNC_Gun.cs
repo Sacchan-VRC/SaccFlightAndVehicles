@@ -126,6 +126,11 @@ public class DFUNC_Gun : UdonSharpBehaviour
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
         AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
     }
+    public void SFEXT_G_RespawnButton()
+    {
+        GunAmmoInSeconds = FullGunAmmoInSeconds;
+        AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+    }
     public void Set_Active()
     {
         HudCrosshairGun.SetActive(true);

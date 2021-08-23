@@ -71,7 +71,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         TriggerLastFrame = false;
         if (Cruise)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetCruiseOff));
+            SetCruiseOff();
         }
     }
     public void SFEXT_G_Explode()
@@ -94,7 +94,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         SetSpeed = EngineControl.AirSpeed;
         Cruise = true;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
-        EngineControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
+        SendCustomEventDelayedFrames(nameof(SendCruiseOn), 1);
     }
     public void SetCruiseOff()
     {
@@ -109,14 +109,15 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         EngineControl.PlayerThrottle = EngineControl.ThrottleInput;
         Cruise = false;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
+        SendCustomEventDelayedFrames(nameof(SendCruiseOff), 1);
+    }
+    public void SendCruiseOff()
+    {
         EngineControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SendCruiseOn()
     {
-        if (Cruise)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetCruiseOn));
-        }
+        EngineControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
     }
     private void LateUpdate()
     {
@@ -141,7 +142,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                     {
                         if (!Cruise)
                         {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetCruiseOn));
+                            SetCruiseOn();
                         }
                         if (TriggerTapTime > .4f)//no double tap
                         {
@@ -149,7 +150,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                         }
                         else//double tap detected, turn off cruise
                         {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetCruiseOff));
+                            SetCruiseOff();
                         }
                         SpeedZeroPoint = handpos.z;
                         CruiseTemp = SetSpeed;
@@ -194,11 +195,11 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     {
         if (!Cruise)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetCruiseOn));
+            SetCruiseOn();
         }
         else
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetCruiseOff));
+            SetCruiseOff();
         }
     }
 }

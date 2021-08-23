@@ -10,9 +10,13 @@ public class EffectsController : UdonSharpBehaviour
     [SerializeField] private EngineController EngineControl;
     [SerializeField] private TrailRenderer[] Trails;
     [SerializeField] private float TrailGs = 4;
+    public Transform FrontWheel;
+    [SerializeField] private ParticleSystem SplashParticle;
+    [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
+    [SerializeField] private float PlaySplashSpeed = 7;
+    private bool SplashNULL;
     private bool TrailsOn;
     private bool HasTrails;
-    public Transform FrontWheel;
     private bool VehicleMainObjNull = true;
     private bool EngineControlNull = true;
     private bool JoyStickNull = true;
@@ -24,6 +28,8 @@ public class EffectsController : UdonSharpBehaviour
     private float brake;
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
+    private VRCPlayerApi localPlayer;
+    private bool InVR;
     private bool InEditor;
     private int OCCUPIED_STRING = Animator.StringToHash("occupied");
     private int PITCHINPUT_STRING = Animator.StringToHash("pitchinput");
@@ -56,11 +62,13 @@ public class EffectsController : UdonSharpBehaviour
         HasTrails = Trails.Length > 0;
 
         VehicleAnimator = VehicleMainObj.GetComponent<Animator>();
-        if (Networking.LocalPlayer == null)
+        localPlayer = Networking.LocalPlayer;
+        if (localPlayer == null)
         {
             InEditor = true;
             VehicleAnimator.SetBool(OCCUPIED_STRING, true);
         }
+        SplashNULL = SplashParticle == null;
     }
     private void Update()
     {
@@ -76,7 +84,7 @@ public class EffectsController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (EngineControl.IsOwner)
         {
-            if (EngineControl.InVR)
+            if (InVR)
             { OwnerRotationInputs = RotInputs; }//vr users use raw input
             else
             { OwnerRotationInputs = Vector3.MoveTowards(OwnerRotationInputs, RotInputs, 7 * DeltaTime); }//desktop users use value movetowards'd to prevent instant movement
@@ -170,6 +178,10 @@ public class EffectsController : UdonSharpBehaviour
     {
         DoEffects = 0f;
     }
+    public void SFEXT_O_PilotEnter()
+    {
+        InVR = localPlayer.IsUserInVR();
+    }
     public void SFEXT_O_ReAppear()
     {
         DoEffects = 6f; //wake up if was asleep
@@ -178,6 +190,10 @@ public class EffectsController : UdonSharpBehaviour
     {
         DoEffects = 0f;
         VehicleAnimator.SetTrigger(BULLETHIT_STRING);
+    }
+    public void SFEXT_G_EnterWater()
+    {
+        if (EngineControl.Speed > PlaySplashSpeed && !SplashNULL) { SplashParticle.Play(); }
     }
     public void SFEXT_G_RespawnButton()
     {
