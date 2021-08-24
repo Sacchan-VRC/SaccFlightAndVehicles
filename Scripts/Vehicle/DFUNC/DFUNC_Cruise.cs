@@ -94,7 +94,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         SetSpeed = EngineControl.AirSpeed;
         Cruise = true;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
-        SendCustomEventDelayedFrames(nameof(SendCruiseOn), 1);
+        EngineControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
     }
     public void SetCruiseOff()
     {
@@ -109,15 +109,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         EngineControl.PlayerThrottle = EngineControl.ThrottleInput;
         Cruise = false;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
-        SendCustomEventDelayedFrames(nameof(SendCruiseOff), 1);
-    }
-    public void SendCruiseOff()
-    {
         EngineControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
-    }
-    public void SendCruiseOn()
-    {
-        EngineControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
     }
     private void LateUpdate()
     {

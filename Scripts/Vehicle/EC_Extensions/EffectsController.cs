@@ -50,6 +50,8 @@ public class EffectsController : UdonSharpBehaviour
     private int MISSILESINCOMING_STRING = Animator.StringToHash("missilesincoming");
     private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
     private int BULLETHIT_STRING = Animator.StringToHash("bullethit");
+    private int ONGROUND_STRING = Animator.StringToHash("onground");
+    private int ONWATER_STRING = Animator.StringToHash("onwater");
 
 
     private void Start()
@@ -194,6 +196,19 @@ public class EffectsController : UdonSharpBehaviour
     public void SFEXT_G_EnterWater()
     {
         if (EngineControl.Speed > PlaySplashSpeed && !SplashNULL) { SplashParticle.Play(); }
+    }
+    public void SFEXT_G_TakeOff()
+    {
+        VehicleAnimator.SetBool(ONGROUND_STRING, false);
+        VehicleAnimator.SetBool(ONWATER_STRING, false);
+    }
+    public void SFEXT_G_TouchDown()
+    {
+        VehicleAnimator.SetBool(ONGROUND_STRING, true);
+    }
+    public void SFEXT_G_TouchDownWater()
+    {
+        VehicleAnimator.SetBool(ONWATER_STRING, true);
     }
     public void SFEXT_G_RespawnButton()
     {

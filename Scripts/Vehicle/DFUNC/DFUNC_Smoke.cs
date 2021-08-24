@@ -9,6 +9,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     [SerializeField] EngineController EngineControl;
     [SerializeField] private Material SmokeColorIndicatorMaterial;
     [SerializeField] private ParticleSystem[] DisplaySmoke;
+    [SerializeField] private GameObject SmokeOnIndicator;
     [SerializeField] private GameObject Dial_Funcon;
     private bool UseLeftTrigger = false;
     private Transform VehicleTransform;
@@ -152,34 +153,27 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         Smoking = true;
         gameObject.SetActive(true);
+        SmokeOnIndicator.SetActive(true);
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = true; }
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
         if (EngineControl.IsOwner)
         {
-            SendCustomEventDelayedFrames(nameof(SendSmokingOn), 1);
+            EngineControl.SendEventToExtensions("SFEXT_O_SmokeOn");
         }
     }
     public void SetSmokingOff()
     {
         Smoking = false;
         gameObject.SetActive(false);
+        SmokeOnIndicator.SetActive(false);
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = false; }
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         if (EngineControl.IsOwner)
         {
-            SendCustomEventDelayedFrames(nameof(SendSmokingOff), 1);
+            EngineControl.SendEventToExtensions("SFEXT_O_SmokeOff");
         }
-    }
-    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
-    public void SendSmokingOn()
-    {
-        EngineControl.SendEventToExtensions("SFEXT_O_SmokeOn");
-    }
-    public void SendSmokingOff()
-    {
-        EngineControl.SendEventToExtensions("SFEXT_O_SmokeOff");
     }
     public void ToggleSmoking()
     {
@@ -188,6 +182,13 @@ public class DFUNC_Smoke : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn");
         }
         else
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
+        }
+    }
+    public void SFEXT_O_TakeOwnership()
+    {
+        if (Smoking)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
         }

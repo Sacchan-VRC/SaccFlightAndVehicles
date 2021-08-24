@@ -128,7 +128,6 @@ public class EngineController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AllGs;
 
 
-    //best to remove synced variables if you aren't using them
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 CurrentVel = Vector3.zero;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
@@ -1804,6 +1803,7 @@ public class EngineController : UdonSharpBehaviour
             { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
         }
     }
+    [RecursiveMethod]
     public void SendEventToExtensions(string eventname)
     {
         foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
@@ -1840,9 +1840,8 @@ public class EngineController : UdonSharpBehaviour
     }
     public Vector2 UnpackThrottles(float Throttle)
     {
-        //x = throttle amount, y = afterburner amount
+        //x = throttle amount (0-1), y = afterburner amount (0-1)
         return new Vector2(Mathf.Min(Throttle, ThrottleAfterburnerPoint) * ThrottleNormalizer,
         Mathf.Max((Mathf.Max(Throttle, ThrottleAfterburnerPoint) - ThrottleAfterburnerPoint) * ABNormalizer, 0));
     }
-    //these can be used for syncing weapon selection for bomb bay doors animation etc
 }

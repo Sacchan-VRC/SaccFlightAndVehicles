@@ -31,6 +31,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public Transform AAMLaunchPoint;
     float TimeSinceSerialization;
     private bool func_active = false;
+    private bool Pilot = false;
+    private bool OthersEnabled = false;
     public AudioSource AAMTargeting;
     public AudioSource AAMTargetLock;
     private float reloadspeed;
@@ -62,6 +64,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
+        Pilot = true;
         HUDText_AAM_ammo.text = NumAAM.ToString("F0");
         //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
         var Target = AAMTargets[AAMTarget];
@@ -72,6 +75,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
+        Pilot = false;
         TriggerLastFrame = false;
         RequestSerialization();
         gameObject.SetActive(false);
@@ -93,10 +97,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (func_active)
         {
             DFUNC_Deselected();
-        }
-        else
-        {
-            DisableForOthers();
         }
     }
     public void SFEXT_G_ReSupply()
@@ -121,10 +121,11 @@ public class DFUNC_AAM : UdonSharpBehaviour
         gameObject.SetActive(true);
         func_active = true;
         AAMTargetIndicator.gameObject.SetActive(true);
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers));
     }
     public void DFUNC_Deselected()
     {
+        gameObject.SetActive(false);
         AAMTargeting.gameObject.SetActive(false);
         AAMTargetLock.gameObject.SetActive(false);
         AAMLockTimer = 0;
@@ -133,18 +134,26 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMTargetIndicator.localRotation = Quaternion.identity;
         AAMTargetIndicator.gameObject.SetActive(false);
         func_active = false;
-        gameObject.SetActive(false);
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DisableForOthers");
+        if (OthersEnabled)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
         TriggerLastFrame = false;
     }
     //synced variables recieved while object is disabled do not get set until the object is enabled
     public void EnableForOthers()
     {
-        gameObject.SetActive(true);
+        if (!Pilot)
+        {
+            gameObject.SetActive(true);
+        }
+        OthersEnabled = true;
     }
     public void DisableForOthers()
     {
-        gameObject.SetActive(false);
+        if (!Pilot)
+        {
+            gameObject.SetActive(false);
+        }
+        OthersEnabled = false;
     }
     void Update()
     {
@@ -160,7 +169,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             if (NumAAMTargets != 0)
             {
 
-                if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
+                if (AAMLockTimer > AAMLockTime && AAMHasTarget) { AAMLocked = true; }
                 else { AAMLocked = false; }
 
                 //firing AAM

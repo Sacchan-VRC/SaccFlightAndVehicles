@@ -30,6 +30,7 @@ public class FloatScript : UdonSharpBehaviour
 
     [Header("HoverBike Only")]
     [SerializeField] private bool HoverBike = false;
+    [SerializeField] private bool DisableGroundDetection = false;
     [SerializeField] private float HoverBikeTurningStrength = 1;
     [SerializeField] private float BackThrustStrength = 5;
     private bool EngineControlNULL;
@@ -84,7 +85,7 @@ public class FloatScript : UdonSharpBehaviour
         {
             gameObject.SetActive(false);
         }
-        if (HoverBike)
+        if (HoverBike || DisableGroundDetection)
         { EngineControl.DisableGroundDetection++; }
     }
     public void SFEXT_O_TakeOwnership()

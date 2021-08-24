@@ -17,6 +17,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     private bool DragApplied = false;
     private bool DisableGroundDetector = false;
     private int GEARUP_STRING = Animator.StringToHash("gearup");
+    private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
@@ -51,9 +52,10 @@ public class DFUNC_Gear : UdonSharpBehaviour
     {
         SetGearDown();
     }
-    public void SFEXT_O_RespawnButton()
+    public void SFEXT_G_RespawnButton()
     {
         SetGearDown();
+        GearAnimator.SetTrigger(INSTANTGEARDOWN_STRING);
     }
     public void KeyboardInput()
     {
@@ -75,6 +77,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void SetGearUp()
     {
+        Debug.Log("SetGearUp");
         if (!DisableGroundDetector) { EngineControl.DisableGroundDetection += 1; DisableGroundDetector = true; }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
         GearUp = true;
@@ -83,11 +86,12 @@ public class DFUNC_Gear : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            SendCustomEventDelayedFrames(nameof(SendGearUp), 1);
+            EngineControl.SendEventToExtensions("SFEXT_O_GearUp");
         }
     }
     public void SetGearDown()
     {
+        Debug.Log("SetGearDown");
         if (DisableGroundDetector) { EngineControl.DisableGroundDetection -= 1; DisableGroundDetector = false; }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
         GearUp = false;
@@ -96,17 +100,8 @@ public class DFUNC_Gear : UdonSharpBehaviour
 
         if (EngineControl.IsOwner)
         {
-            SendCustomEventDelayedFrames(nameof(SendGearDown), 1);
+            EngineControl.SendEventToExtensions("SFEXT_O_GearDown");
         }
-    }
-    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
-    public void SendGearUp()
-    {
-        EngineControl.SendEventToExtensions("SFEXT_O_GearUp");
-    }
-    public void SendGearDown()
-    {
-        EngineControl.SendEventToExtensions("SFEXT_O_GearDown");
     }
     public void ToggleGear()
     {

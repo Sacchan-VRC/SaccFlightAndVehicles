@@ -65,22 +65,13 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (DefaultLimitsOn)
         {
             SetLimitsOn();
-            SendCustomEventDelayedFrames(nameof(SendLimitsOn), 1);
+            EngineControl.SendEventToExtensions("SFEXT_G_LimitsOn");
         }
         else
         {
             SetLimitsOff();
-            SendCustomEventDelayedFrames(nameof(SendLimitsOff), 1);
+            EngineControl.SendEventToExtensions("SFEXT_G_LimitsOff");
         }
-    }
-    //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
-    public void SendLimitsOn()
-    {
-        EngineControl.SendEventToExtensions("SFEXT_G_LimitsOn");
-    }
-    public void SendLimitsOff()
-    {
-        EngineControl.SendEventToExtensions("SFEXT_G_LimitsOff");
     }
     public void SetLimitsOn()
     {

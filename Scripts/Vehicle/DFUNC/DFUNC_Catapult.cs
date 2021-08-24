@@ -223,7 +223,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             if (EngineControl.dead)
             {
                 CatapultDeadTimer -= 1;
-                if (CatapultDeadTimer == 0) EngineControl.dead = false;
+                if (CatapultDeadTimer == 0) { EngineControl.dead = false; }
             }
 
             VehicleTransform.rotation = PlaneCatapultRotDif * CatapultTransform.rotation;
