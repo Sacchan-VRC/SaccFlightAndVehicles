@@ -157,6 +157,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void GunStartFiring()
     {

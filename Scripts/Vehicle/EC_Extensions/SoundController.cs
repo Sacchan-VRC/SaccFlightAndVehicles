@@ -412,26 +412,6 @@ public class SoundController : UdonSharpBehaviour
             DopplerSounds[x].volume = DopplerSounds_TargetVolumes[x] * silentint;
         }
     }
-    private void Exitplane()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
-    {
-        if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
-        if (!RadarLockedNull) { RadarLocked.Stop(); }
-        if (!RollingNull) { Rolling.Stop(); }
-        if (!PlaneInsideNull) { PlaneInside.Stop(); }
-        if (!PlaneWindNull) { PlaneWind.Stop(); }
-        foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
-        foreach (AudioSource thrust in Thrust) { thrust.Play(); }
-        if (!PlaneDistantNull) PlaneDistant.Play();
-        InPlane = false;
-        if (!EngineControl.dead)
-        {
-            //these are set differently EngineController.Explode(), so we don't do them if we're dead
-            PlaneIdleVolume = PlaneIdleTargetVolume * .4f;
-            PlaneThrustVolume *= 6.666666f;
-            PlaneDistantVolume = PlaneThrustVolume;
-            if (!PlaneInsideNull) { PlaneIdlePitch = PlaneInside.pitch; }
-        }
-    }
     public void SFEXT_G_EnterWater()
     {
         InWater = true;
@@ -536,45 +516,9 @@ public class SoundController : UdonSharpBehaviour
             }
         }
     }
-    public void ResetSounds()
-    {
-        InWater = false;
-        //play sonic boom if it was going to play before it exploded
-
-        playsonicboom = false;
-        silent = false;
-        PlaneIdlePitch = 0;
-        PlaneIdleVolume = 0;
-        PlaneThrustVolume = 0;
-        PlaneDistantVolume = 0;
-        LastFramePlaneIdlePitch = 0;
-        LastFramePlaneThrustPitch = 0;
-
-
-        if (!PlaneDistantNull) { PlaneDistant.volume = 0; }
-
-        foreach (AudioSource thrust in Thrust)
-        {
-            thrust.pitch = 0;
-            thrust.volume = 0;
-        }
-        foreach (AudioSource idle in PlaneIdle)
-        {
-            idle.pitch = 0;
-            idle.volume = 0;
-        }
-    }
-    public void PlayTouchDownSound()
-    {
-        if (!TouchDownNull)
-        {
-            TouchDown[Random.Range(0, TouchDown.Length)].Play();
-        }
-    }
     public void SFEXT_O_PilotEnter()
     {
         if (!PlaneWindNull) { PlaneWind.Play(); }
-        if (!RollingNull) { Rolling.Play(); if (!EngineControl.Taxiing) { Rolling.volume = 0; } }
         if (AllDoorsClosed) { EnterPlane(); }
         if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
         Piloting = true;
@@ -582,13 +526,11 @@ public class SoundController : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         if (!RollingNull) { PlaneWind.Stop(); }
-        if (!RollingNull) { Rolling.Stop(); }
         Piloting = false;
         if (!UnderwaterNull) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
     }
     public void SFEXT_P_PassengerEnter()
     {
-        if (!RollingNull) { Rolling.Play(); if (!EngineControl.Taxiing) { Rolling.volume = 0; } }
         if (!PlaneWindNull) { PlaneWind.Play(); }
         if (AllDoorsClosed) { EnterPlane(); }
         if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
@@ -624,61 +566,13 @@ public class SoundController : UdonSharpBehaviour
         }
         soundsoff = false;
     }
-    //called form DFUNC_Canopy Delayed by canopy close time when playing the canopy animation
-    public void DoorClose()
+    public void SFEXT_O_PlaneHit()
     {
-        DoorsOpen -= 1;
-        if (DoorsOpen == 0)
+        if (!BulletHitNull)
         {
-            if (Piloting || Passenger)
-            { EnterPlane(); }
-            AllDoorsClosed = true;
-            if (EngineControl.IsOwner) { EngineControl.SendEventToExtensions("SFEXT_O_DoorsClosed"); }
-        }
-        if (DoorsOpen < 0) Debug.LogWarning("DoorsOpen is negative");
-        //Debug.Log("DoorClose");
-    }
-    public void DoorOpen()
-    {
-        DoorsOpen += 1;
-        if (DoorsOpen != 0)
-        {
-            if (Piloting || Passenger)
-            { Exitplane(); }
-            if (EngineControl.IsOwner && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
-            { EngineControl.SendEventToExtensions("SFEXT_O_DoorsOpened"); }
-            AllDoorsClosed = false;
-        }
-        //Debug.Log("DoorOpen");
-    }
-    private void EnterPlane()
-    {
-        //change stuff when you get in/canopy closes
-        if (!ABOnOutsideNull) { ABOnOutside.Stop(); }
-        PlaneThrustPitch = 0.8f;
-        if (!PlaneInsideNull && !PlaneIdleNull)
-        {
-            PlaneInside.pitch = PlaneIdle[0].pitch * .8f;
-            PlaneInside.volume = PlaneIdle[0].volume * .4f;//it'll lerp up from here
-        }
-        PlaneThrustVolume *= InVehicleThrustVolumeFactor;
-        InPlane = true;//set when we leave to see if we just left later
-
-        foreach (AudioSource thrust in Thrust)
-        {
-            if (!thrust.isPlaying)
-            { thrust.Play(); }
-        }
-        if (!PlaneDistantNull && PlaneDistant.isPlaying)
-        { PlaneDistant.Stop(); }
-        if (!PlaneWindNull && !PlaneWind.isPlaying)
-        { PlaneWind.Play(); }
-        if (!PlaneInsideNull && !PlaneInside.isPlaying)
-        { PlaneInside.Play(); }
-        if (!PlaneIdleNull && PlaneIdle[0].isPlaying)
-        {
-            foreach (AudioSource idle in PlaneIdle)
-            { idle.Stop(); }
+            int rand = Random.Range(0, BulletHit.Length);
+            BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
+            BulletHit[rand].Play();
         }
     }
     public void SFEXT_G_TouchDown()
@@ -700,6 +594,131 @@ public class SoundController : UdonSharpBehaviour
     {
         SendCustomEventDelayedFrames("ResupplySound", 1);
     }
+    public void SFEXT_O_AfterburnerOn()
+    {
+        if (!InWater)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayAfturburnersound"); }
+    }
+    public void ResetSounds()
+    {
+        InWater = false;
+        //play sonic boom if it was going to play before it exploded
+
+        playsonicboom = false;
+        silent = false;
+        PlaneIdlePitch = 0;
+        PlaneIdleVolume = 0;
+        PlaneThrustVolume = 0;
+        PlaneDistantVolume = 0;
+        LastFramePlaneIdlePitch = 0;
+        LastFramePlaneThrustPitch = 0;
+
+
+        if (!PlaneDistantNull) { PlaneDistant.volume = 0; }
+
+        foreach (AudioSource thrust in Thrust)
+        {
+            thrust.pitch = 0;
+            thrust.volume = 0;
+        }
+        foreach (AudioSource idle in PlaneIdle)
+        {
+            idle.pitch = 0;
+            idle.volume = 0;
+        }
+    }
+    public void PlayTouchDownSound()
+    {
+        if (!TouchDownNull)
+        {
+            TouchDown[Random.Range(0, TouchDown.Length)].Play();
+        }
+    }
+    //called form DFUNC_Canopy Delayed by canopy close time when playing the canopy animation, can be used to close any door
+    public void DoorClose()
+    {
+        DoorsOpen -= 1;
+        if (DoorsOpen == 0)
+        {
+            if (Piloting || Passenger)
+            { EnterPlane(); }
+            AllDoorsClosed = true;
+            if (EngineControl.IsOwner) { EngineControl.SendEventToExtensions("SFEXT_O_DoorsClosed"); }
+        }
+        if (DoorsOpen < 0) Debug.LogWarning("DoorsOpen is negative");
+        //Debug.Log("DoorClose");
+    }
+    public void DoorOpen()
+    {
+        DoorsOpen += 1;
+        if (DoorsOpen != 0)
+        {
+            if (AllDoorsClosed && (Piloting || Passenger))//only run exitplane if doors were closed before
+            { Exitplane(); }
+            if (EngineControl.IsOwner && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
+            { EngineControl.SendEventToExtensions("SFEXT_O_DoorsOpened"); }
+            AllDoorsClosed = false;
+        }
+        //Debug.Log("DoorOpen");
+    }
+    private void EnterPlane()
+    {
+        //change stuff when you get in/canopy closes
+        if (!ABOnOutsideNull) { ABOnOutside.Stop(); }
+        PlaneThrustPitch = 0.8f;
+        if (!PlaneInsideNull && !PlaneIdleNull)
+        {
+            PlaneInside.pitch = PlaneIdle[0].pitch * .8f;
+            PlaneInside.volume = PlaneIdle[0].volume * .4f;//it'll lerp up from here
+        }
+        PlaneThrustVolume *= InVehicleThrustVolumeFactor;
+        InPlane = true;//set when we leave to see if we just left later
+
+        if (!RollingNull)
+        {
+            Rolling.Play();
+            Rolling.volume = 0;
+        }
+
+        foreach (AudioSource thrust in Thrust)
+        {
+            if (!thrust.isPlaying)
+            { thrust.Play(); }
+        }
+        if (!PlaneDistantNull && PlaneDistant.isPlaying)
+        { PlaneDistant.Stop(); }
+        if (!PlaneWindNull && !PlaneWind.isPlaying)
+        { PlaneWind.Play(); }
+        if (!PlaneInsideNull && !PlaneInside.isPlaying)
+        { PlaneInside.Play(); }
+        if (!PlaneIdleNull && PlaneIdle[0].isPlaying)
+        {
+            foreach (AudioSource idle in PlaneIdle)
+            { idle.Stop(); }
+        }
+    }
+    private void Exitplane()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
+    {
+        InPlane = false;
+        if (!MissileIncomingNull) MissileIncoming.gameObject.SetActive(false);
+        if (!RadarLockedNull) { RadarLocked.Stop(); }
+        if (!RollingNull) { Rolling.Stop(); }
+        if (!PlaneInsideNull) { PlaneInside.Stop(); }
+        if (!PlaneWindNull) { PlaneWind.Stop(); }
+        foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
+        foreach (AudioSource thrust in Thrust) { thrust.Play(); }
+        if (!PlaneDistantNull) PlaneDistant.Play();
+        if (!RollingNull) { Rolling.Stop(); }
+
+        if (!EngineControl.dead)
+        {
+            //these are set differently EngineController.Explode(), so we don't do them if we're dead
+            PlaneIdleVolume = PlaneIdleTargetVolume * .4f;
+            PlaneThrustVolume *= 6.666666f;
+            PlaneDistantVolume = PlaneThrustVolume;
+            if (!PlaneInsideNull) { PlaneIdlePitch = PlaneInside.pitch; }
+        }
+    }
     public void ResupplySound()
     {
         if (EngineControl.ReSupplied > 0)
@@ -709,11 +728,6 @@ public class SoundController : UdonSharpBehaviour
                 ReSupply.Play();
             }
         }
-    }
-    public void SFEXT_O_AfterburnerOn()
-    {
-        if (!InWater)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayAfturburnersound"); }
     }
     public void PlayAfturburnersound()
     {
@@ -726,15 +740,6 @@ public class SoundController : UdonSharpBehaviour
         {
             if (!ABOnOutsideNull)
                 ABOnOutside.Play();
-        }
-    }
-    public void SFEXT_O_PlaneHit()
-    {
-        if (!BulletHitNull)
-        {
-            int rand = Random.Range(0, BulletHit.Length);
-            BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
-            BulletHit[rand].Play();
         }
     }
 }

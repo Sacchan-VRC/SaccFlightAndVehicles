@@ -518,7 +518,11 @@ public class EngineController : UdonSharpBehaviour
                 }
                 else
                 {
-                    CheckTakeOff();
+                    if (!Floating && Taxiing)
+                    {
+                        LandedOnWater = false;
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
+                    }
                 }
             }
 
@@ -783,13 +787,15 @@ public class EngineController : UdonSharpBehaviour
                         float HandThrottleAxis;
                         if (VerticalThrottle)
                         {
-                            HandThrottleAxis = handdistance.y - (PlaySpaceDistance.y - ThrottlePlayspaceLastFrame);
-                            ThrottlePlayspaceLastFrame = PlaySpaceDistance.y;
+                            HandThrottleAxis = handdistance.y;
+                            /*    - (PlaySpaceDistance.y - ThrottlePlayspaceLastFrame);
+                              ThrottlePlayspaceLastFrame = PlaySpaceDistance.y; */
                         }
                         else
                         {
-                            HandThrottleAxis = handdistance.z - (PlaySpaceDistance.y - ThrottlePlayspaceLastFrame);
-                            ThrottlePlayspaceLastFrame = PlaySpaceDistance.z;
+                            HandThrottleAxis = handdistance.z;
+                            /*     - (PlaySpaceDistance.y - ThrottlePlayspaceLastFrame);
+                               ThrottlePlayspaceLastFrame = PlaySpaceDistance.z; */
                         }
 
                         if (!ThrottleGripLastFrame)
@@ -1269,14 +1275,6 @@ public class EngineController : UdonSharpBehaviour
         Debug.Log("TakeOff");
         Taxiing = false;
         SendEventToExtensions("SFEXT_G_TakeOff");
-    }
-    public void CheckTakeOff()
-    {
-        if (!Floating && Taxiing)
-        {
-            LandedOnWater = false;
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
-        }
     }
     public void IncreaseKills()
     {

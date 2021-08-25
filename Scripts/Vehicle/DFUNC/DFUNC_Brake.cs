@@ -16,9 +16,14 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private bool HasAirBrake;
     [SerializeField] private float AirbrakeStrength = 4f;
     [SerializeField] private float GroundBrakeStrength = 6f;
+    [Tooltip("Water brake functionality requires that floatscript is being used")]
+    [SerializeField] private float WaterBrakeStrength = 1f;
+    [SerializeField] private bool NoPilotAlwaysGroundBrake = true;
     [SerializeField] private float GroundBrakeSpeed = 40f;
     //other functions can set this +1 to disable breaking
     [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
+    private float StartGroundBrakeStrength;
+    private float StartWaterBrakeStrength;
     private int BRAKE_STRING = Animator.StringToHash("brake");
     private bool Airbrake_sndNULL;
     private float AirbrakeLerper;
@@ -31,11 +36,16 @@ public class DFUNC_Brake : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_ECStart()
     {
+        StartGroundBrakeStrength = GroundBrakeStrength;
+        StartWaterBrakeStrength = WaterBrakeStrength;
+        GroundBrakeStrength = 1;
+        WaterBrakeStrength = 1;
+
         VehicleRigidbody = EngineControl.VehicleMainObj.GetComponent<Rigidbody>();
         HasAirBrake = AirbrakeStrength != 0;
         Airbrake_sndNULL = Airbrake_snd == null;
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
-        if (localPlayer!= null && !localPlayer.isMaster)
+        if (localPlayer != null && !localPlayer.isMaster)
         { gameObject.SetActive(false); }
         else
         { gameObject.SetActive(true); }
@@ -49,12 +59,30 @@ public class DFUNC_Brake : UdonSharpBehaviour
         BrakeInput = 0;
         Selected = false;
     }
+    public void SFEXT_O_PilotEnter()
+    {
+        if (!NoPilotAlwaysGroundBrake)
+        {
+            if (EngineControl.Taxiing)
+            {
+                GroundBrakeStrength = StartGroundBrakeStrength;
+                WaterBrakeStrength = 1;
+            }
+            else if (EngineControl.Floating)
+            {
+                GroundBrakeStrength = 1;
+                WaterBrakeStrength = StartWaterBrakeStrength;
+            }
+        }
+    }
     public void SFEXT_O_PilotExit()
     {
         BrakeInput = 0;
         EngineControl.ExtraDrag -= DragAdded;
         DragAdded = 0;
         Selected = false;
+        if (!NoPilotAlwaysGroundBrake)
+        { GroundBrakeStrength = 0; WaterBrakeStrength = 0; }
     }
     public void SFEXT_G_Explode()
     {
@@ -83,6 +111,16 @@ public class DFUNC_Brake : UdonSharpBehaviour
         BrakeAnimator.SetFloat(BRAKE_STRING, 0);
         AirbrakeLerper = 0;
         gameObject.SetActive(false);
+    }
+    public void SFEXT_G_TouchDownWater()
+    {
+        WaterBrakeStrength = StartWaterBrakeStrength;
+        GroundBrakeStrength = 1;
+    }
+    public void SFEXT_G_TouchDown()
+    {
+        WaterBrakeStrength = 1;
+        GroundBrakeStrength = StartGroundBrakeStrength;
     }
     private void Update()
     {
@@ -152,7 +190,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                 {
                     if (Speed > GroundBrakeStrength * DeltaTime)
                     {
-                        VehicleRigidbody.velocity += -CurrentVel.normalized * GroundBrakeStrength * DeltaTime;
+                        VehicleRigidbody.velocity += -CurrentVel.normalized * GroundBrakeStrength * WaterBrakeStrength * DeltaTime;
                     }
                     else VehicleRigidbody.velocity = Vector3.zero;
                 }
