@@ -13,27 +13,30 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     [SerializeField] private bool DefaultFlapsOff = false;
     [SerializeField] private float FlapsDragMulti = 1.4f;
     [SerializeField] private float FlapsLiftMulti = 1.35f;
-    [SerializeField] private float FlapsMaxLiftMulti = 1;
+    [SerializeField] private float FlapsExtraMaxLift = 0;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private bool Flaps = true;
+    private bool Flaps = false;
     private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
-    private float StartMaxLift;
     private int FLAPS_STRING;
     private bool DragApplied;
     private bool LiftApplied;
     private bool MaxLiftApplied;
+    private bool InVR;
+    private bool Selected;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
+        Selected = true;
     }
     public void DFUNC_Deselected()
     {
-        gameObject.SetActive(false);
+        if (!Flaps) { gameObject.SetActive(false); }
         TriggerLastFrame = false;
+        Selected = false;
     }
     public void SFEXT_L_EntityStart()
     {
@@ -43,7 +46,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         FlapsDragMulti -= 1f;
         FlapsLiftMulti -= 1f;
 
-        StartMaxLift = SAVControl.MaxLift;
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
         if (DefaultFlapsOff) { SetFlapsOff(); }
@@ -51,6 +53,9 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
+        if (Flaps)
+        { gameObject.SetActive(true); }
+        InVR = Networking.LocalPlayer.IsUserInVR();//move to start when they fix the bug
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
     }
     public void SFEXT_O_PilotExit()
@@ -77,29 +82,31 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     private void Update()
     {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-        if (Trigger > 0.75)
+        if (Selected)
         {
-            if (!TriggerLastFrame) ToggleFlaps();
-            TriggerLastFrame = true;
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            if (Trigger > 0.75)
+            {
+                if (!TriggerLastFrame) { ToggleFlaps(); }
+                TriggerLastFrame = true;
+            }
+            else { TriggerLastFrame = false; }
         }
-        else { TriggerLastFrame = false; }
-
         if (Flaps)
         {
             if (SAVControl.PitchDown)//flaps on, but plane's angle of attack is negative so they have no helpful effect
             {
                 if (LiftApplied) { SAVControl.ExtraLift -= FlapsLiftMulti; LiftApplied = false; }
-                if (MaxLiftApplied) { SAVControl.MaxLift = StartMaxLift; MaxLiftApplied = false; }
+                if (MaxLiftApplied) { SAVControl.MaxLift -= FlapsExtraMaxLift; MaxLiftApplied = false; }
             }
             else//flaps on positive angle of attack, flaps are useful
             {
                 if (!LiftApplied) { SAVControl.ExtraLift += FlapsLiftMulti; LiftApplied = true; }
-                if (!MaxLiftApplied) { SAVControl.MaxLift *= FlapsMaxLiftMulti; MaxLiftApplied = true; }
+                if (!MaxLiftApplied) { SAVControl.MaxLift += FlapsExtraMaxLift; MaxLiftApplied = true; }
             }
         }
     }
@@ -115,10 +122,11 @@ public class DFUNC_Flaps : UdonSharpBehaviour
 
         if (DragApplied) { SAVControl.ExtraDrag -= FlapsDragMulti; DragApplied = false; }
         if (LiftApplied) { SAVControl.ExtraLift -= FlapsLiftMulti; LiftApplied = false; }
-        if (MaxLiftApplied) { SAVControl.MaxLift = StartMaxLift; MaxLiftApplied = false; }
+        if (MaxLiftApplied) { SAVControl.MaxLift -= FlapsExtraMaxLift; MaxLiftApplied = false; }
 
         if (SAVControl.IsOwner)
         {
+            gameObject.SetActive(false);//for desktop Users
             EntityControl.SendEventToExtensions("SFEXT_O_FlapsOff");
         }
     }
@@ -130,13 +138,16 @@ public class DFUNC_Flaps : UdonSharpBehaviour
 
         if (!DragApplied) { SAVControl.ExtraDrag += FlapsDragMulti; DragApplied = true; }
         if (!LiftApplied) { SAVControl.ExtraLift += FlapsLiftMulti; LiftApplied = true; }
-        if (!MaxLiftApplied) { SAVControl.MaxLift *= FlapsMaxLiftMulti; MaxLiftApplied = true; }
+        if (!MaxLiftApplied) { SAVControl.MaxLift += FlapsExtraMaxLift; MaxLiftApplied = true; }
 
         if (SAVControl.IsOwner)
         {
+            gameObject.SetActive(true);//for desktop Users
             EntityControl.SendEventToExtensions("SFEXT_O_FlapsOn");
         }
     }
+    public void SFEXT_O_LoseOwnership()
+    { gameObject.SetActive(false); }
     public void ToggleFlaps()
     {
         if (!Flaps)

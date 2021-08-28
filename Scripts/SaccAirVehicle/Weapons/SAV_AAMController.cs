@@ -17,7 +17,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     [Tooltip("Missile tracks weaker if target's throttle is low, TargetLowThrottleTrack is throttle at which lowering throttle more doesn't do anything")]
     [SerializeField] private float TargetLowThrottleTrack = .3f;
     [SerializeField] private float ProximityExplodeDistance = 20;
-    private SaccAirVehicle TargetEngineControl;
+    [SerializeField] private ParticleSystem DamageParticles;
+    private SaccAirVehicle TargetSAVControl;
     private bool LockHack = true;
     private float Lifetime = 0;
     private Transform Target;
@@ -33,8 +34,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     private float UnlockTime;
     private float TargetABPoint;
     private float TargetThrottleNormalizer;
-    private bool TargetEngineNULL = true;
-    private bool EngineControlNull;
+    private bool TargetSAVNULL = true;
+    private bool SAVControlNull;
     Vector3 TargetPosLastFrame;
 
     private Transform VehicleCenterOfMass;
@@ -67,16 +68,16 @@ public class SAV_AAMController : UdonSharpBehaviour
             TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
             if (Target.parent != null)
             {
-                TargetEngineControl = Target.parent.GetComponent<SaccAirVehicle>();
-                if (TargetEngineControl != null)
+                TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
+                if (TargetSAVControl != null)
                 {
-                    if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                    { TargetEngineControl.MissilesIncomingHeat++; }
-
-                    TargetEngineNULL = false;
+                    if (TargetSAVControl.Piloting || TargetSAVControl.Passenger)
+                    { TargetSAVControl.MissilesIncomingHeat++; }
+                    TargetSAVControl.VehicleAnimator.SetInteger("missilesincoming", TargetSAVControl.MissilesIncomingHeat);
+                    TargetSAVNULL = false;
                     MissileIncoming = true;
                     TargetIsVehicle = true;
-                    TargetABPoint = TargetEngineControl.ThrottleAfterburnerPoint;
+                    TargetABPoint = TargetSAVControl.ThrottleAfterburnerPoint;
                     TargetThrottleNormalizer = 1 / TargetABPoint;
                 }
             }
@@ -126,10 +127,10 @@ public class SAV_AAMController : UdonSharpBehaviour
             float TargetDistance = Vector3.Distance(Position, TargetPos);
             float EngineTrack;
             bool Dumb;
-            if (!TargetEngineNULL)
+            if (!TargetSAVNULL)
             {
-                Dumb = Random.Range(0, 100) < TargetEngineControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
-                EngineTrack = Mathf.Max(TargetEngineControl.EngineOutput * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
+                Dumb = Random.Range(0, 100) < TargetSAVControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
+                EngineTrack = Mathf.Max(TargetSAVControl.EngineOutput * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
             }
             else
             {
@@ -165,8 +166,8 @@ public class SAV_AAMController : UdonSharpBehaviour
                 if (MissileIncoming)
                 {
                     //just flew past the target, stop missile warning sound
-                    if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-                    { TargetEngineControl.MissilesIncomingHeat -= 1; }
+                    if (TargetSAVControl.Piloting || TargetSAVControl.Passenger)
+                    { TargetSAVControl.MissilesIncomingHeat -= 1; }
                     MissileIncoming = false;
                 }
             }
@@ -193,15 +194,16 @@ public class SAV_AAMController : UdonSharpBehaviour
         }
         if (MissileIncoming)
         {
-            if (TargetEngineControl.Piloting || TargetEngineControl.Passenger)
-            { TargetEngineControl.MissilesIncomingHeat -= 1; }
+            if (TargetSAVControl.Piloting || TargetSAVControl.Passenger)
+            { TargetSAVControl.MissilesIncomingHeat--; }
+            TargetSAVControl.VehicleAnimator.SetInteger("missilesincoming", TargetSAVControl.MissilesIncomingHeat);
             MissileIncoming = false;
         }
-        if (TargetEngineControl != null)
+        if (TargetSAVControl != null)
         {
             //damage particles inherit the velocity of the missile, so this should help them hit the target plane
             //this is why kinematic is set 2 frames later in the explode animation.
-            MissileRigid.velocity = TargetEngineControl.CurrentVel;
+            MissileRigid.velocity = TargetSAVControl.CurrentVel;
         }
         else
         {
@@ -209,23 +211,16 @@ public class SAV_AAMController : UdonSharpBehaviour
         }
 
         //would rather do it like this but udon wont let me
-        /*             if (TargetEngineControl != null)
-                    {
-                        //damage particles take the velocity of the target plane so they can hit it any speed
-                        var vel = DamageParticles.velocityOverLifetime;
-                        vel.enabled = true;
-                        vel.space = ParticleSystemSimulationSpace.World;
-
-                        AnimationCurve velcurvex = new AnimationCurve();
-                        AnimationCurve velcurvey = new AnimationCurve();
-                        AnimationCurve velcurvez = new AnimationCurve();
-                        velcurvex.AddKey(0.0f, TargetEngineControl.CurrentVel.x);
-                        velcurvey.AddKey(0.0f, TargetEngineControl.CurrentVel.y);
-                        velcurvez.AddKey(0.0f, TargetEngineControl.CurrentVel.z);
-                        vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvex);
-                        vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvey);
-                        vel.x = new ParticleSystem.MinMaxCurve(1.0f, velcurvez);
-                    } */
+        if (TargetSAVControl != null)
+        {
+            //damage particles take the velocity of the target plane so they can hit it any speed
+            var vel = DamageParticles.velocityOverLifetime;
+            vel.enabled = true;
+            vel.space = ParticleSystemSimulationSpace.World;
+            vel.x = TargetSAVControl.CurrentVel.x;
+            vel.y = TargetSAVControl.CurrentVel.y;
+            vel.z = TargetSAVControl.CurrentVel.z;
+        }
         AAMCollider.enabled = false;
         Animator AGMani = GetComponent<Animator>();
         if (InEditor)

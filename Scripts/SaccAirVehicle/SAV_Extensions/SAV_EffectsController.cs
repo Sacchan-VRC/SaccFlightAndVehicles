@@ -105,7 +105,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
         }
-        if (SAVControl.Occupied == true)
+        if (SAVControl.Occupied)
         {
             DoEffects = 0f;
             if (!FrontWheelNull)
@@ -160,7 +160,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
         //("mach10", EngineControl.Speed / 343 / 10)
         VehicleAnimator.SetFloat(MACH10_STRING, SAVControl.Speed * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
         //("Gs", vapor ? EngineControl.Gs / 50 : 0)
-        VehicleAnimator.SetFloat(GS_STRING, vapor ? (SAVControl.VertGs * 0.01f) + 0.5f : 0.5f);
+        VehicleAnimator.SetFloat(GS_STRING, vapor ? (SAVControl.VertGs * 0.005f) + 0.5f : 0.5f);
     }
     public void EffectsResetStatus()//called from enginecontroller.Explode();
     {

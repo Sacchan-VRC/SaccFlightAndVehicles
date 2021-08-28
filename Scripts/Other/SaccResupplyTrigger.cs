@@ -6,11 +6,11 @@ using VRC.Udon;
 
 public class SaccResupplyTrigger : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SendEventTo;
+    [SerializeField] private SaccEntity SendEventTo;
     [SerializeField] private float ResupplyInitialDelay = 1;
     [SerializeField] private float ResupplyDelay = 1;
     [SerializeField] private int ResupplyLayer = 27;
-    [SerializeField] private string ResupplyEventName = "ResupplyPlane";
+    [SerializeField] private string EventName = "SFEXT_O_ReSupply";
     private float LastResupplyTime = 0;
     private int NumTriggers = 0;
     private bool InResupplyZone;
@@ -27,7 +27,7 @@ public class SaccResupplyTrigger : UdonSharpBehaviour
             if (Time.time - LastResupplyTime > ResupplyDelay)
             {
                 LastResupplyTime = Time.time;
-                SendEventTo.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, ResupplyEventName);
+                SendEventTo.SendEventToExtensions(EventName);
             }
         }
     }

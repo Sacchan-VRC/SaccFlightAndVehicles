@@ -40,9 +40,10 @@ public class SaccAAGunController : UdonSharpBehaviour
     public LayerMask AAMTargetsLayer;
     public float PlaneHitBoxLayer = 17;//walkthrough
     [SerializeField] private GameObject SeatAdjuster;
+    [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
     [System.NonSerializedAttribute] public Animator AAGunAnimator;
     [System.NonSerializedAttribute] public bool dead;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool firing;
+    [System.NonSerializedAttribute] public bool firing;
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Manning;//like Piloting in the plane
     [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
@@ -81,11 +82,9 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float InputYKeyb;
     [System.NonSerializedAttribute] public float LastHealthUpdate = 0;
     [System.NonSerializedAttribute] public Transform CenterOfMass;
-    private void Start()
-    {
-        if (FullHealth == 0)//check if it's been initialized
-        { gameObject.SetActive(false); }//to stop crashes
-    }
+    private float LastSerialization;
+    private float SerializationInterval = .35f;
+    private bool Occupied;
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
@@ -119,11 +118,11 @@ public class SaccAAGunController : UdonSharpBehaviour
     }
     void LateUpdate()
     {
-        float DeltaTime = Time.deltaTime;
         if (IsOwner)
         {
             if (Manning)
             {
+                float DeltaTime = Time.deltaTime;
                 //get inputs
                 int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
                 int Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
@@ -193,23 +192,28 @@ public class SaccAAGunController : UdonSharpBehaviour
                 RotationSpeedY += -(RotationSpeedY * TurnFriction * DeltaTime) + InputY * DeltaTime;
 
                 //rotate turret
-                float temprot = Rotator.transform.localRotation.eulerAngles.x;
-                temprot += RotationSpeedX;
-                if (temprot > 180) { temprot -= 360; }
-                if (temprot > DownAngleMax || temprot < -UpAngleMax) RotationSpeedX = 0;
-                temprot = Mathf.Clamp(temprot, -UpAngleMax, DownAngleMax);//limit angles
-                Rotator.transform.localRotation = Quaternion.Euler(new Vector3(temprot, Rotator.transform.localRotation.eulerAngles.y + (RotationSpeedY), 0));
-
+                float NewX = Rotator.transform.localRotation.eulerAngles.x;
+                NewX += RotationSpeedX;
+                if (NewX > 180) { NewX -= 360; }
+                if (NewX > DownAngleMax || NewX < -UpAngleMax) RotationSpeedX = 0;
+                NewX = Mathf.Clamp(NewX, -UpAngleMax, DownAngleMax);//limit angles
+                float NewY = Rotator.transform.localRotation.eulerAngles.y + (RotationSpeedY);
+                Rotator.transform.localRotation = Quaternion.Euler(new Vector3(NewX, NewY, 0));
+                //syncedvars
+                GunRotation.x = NewX;
+                GunRotation.y = NewY;
                 //Firing the gun
                 if ((RTrigger >= 0.75 || Input.GetKey(KeyCode.Space)) && MGAmmoSeconds > 0)
                 {
-                    firing = true;
+                    if (!firing)
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(StartFiring)); }
                     MGAmmoSeconds -= DeltaTime;
                     MGAmmoRecharge = MGAmmoSeconds - MGReloadDelay;
                 }
                 else//recharge the ammo
                 {
-                    firing = false;
+                    if (firing)
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(StopFiring)); }
                     MGAmmoRecharge = Mathf.Min(MGAmmoRecharge + (DeltaTime * MGReloadSpeed), MGAmmoFull);
                     MGAmmoSeconds = Mathf.Max(MGAmmoRecharge, MGAmmoSeconds);
                 }
@@ -229,7 +233,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                                 if (InEditor)
                                 { LaunchAAM(); }
                                 else
-                                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM"); }
+                                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAAM)); }
                                 if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                             }
                         }
@@ -248,7 +252,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                     if (InEditor)
                     { ReloadAAM(); }
                     else
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ReloadAAM"); }
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReloadAAM)); }
                 }
                 //HP Repair
                 if (Health == FullHealth)
@@ -260,34 +264,46 @@ public class SaccAAGunController : UdonSharpBehaviour
                     if (InEditor)
                     { HPRepair(); }
                     else
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "HPRepair"); }
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(HPRepair)); }
+                }
+                //Sounds
+                if (AAMLockTimer > 0 && !AAMLocked && NumAAM > 0)
+                {
+                    AAMLocking.gameObject.SetActive(true);
+                    AAMLockedOn.gameObject.SetActive(false);
+                }
+                else if (AAMLocked)
+                {
+                    AAMLocking.gameObject.SetActive(false);
+                    AAMLockedOn.gameObject.SetActive(true);
+                }
+                else
+                {
+                    AAMLocking.gameObject.SetActive(false);
+                    AAMLockedOn.gameObject.SetActive(false);
+                }
+                if (Time.time - LastSerialization > SerializationInterval)
+                {
+                    RequestSerialization();
+                    LastSerialization = Time.time;
                 }
             }
         }
-        if (firing)
+        else if (Occupied)
         {
-            AAGunAnimator.SetBool("firing", true);
+            Quaternion newrot = Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0));
+            Rotator.transform.localRotation = Quaternion.Slerp(Rotator.transform.localRotation, newrot, 4 * Time.deltaTime);
         }
-        else
-        {
-            AAGunAnimator.SetBool("firing", false);
-        }
-        //Sounds
-        if (AAMLockTimer > 0 && !AAMLocked && NumAAM > 0)
-        {
-            AAMLocking.gameObject.SetActive(true);
-            AAMLockedOn.gameObject.SetActive(false);
-        }
-        else if (AAMLocked)
-        {
-            AAMLocking.gameObject.SetActive(false);
-            AAMLockedOn.gameObject.SetActive(true);
-        }
-        else
-        {
-            AAMLocking.gameObject.SetActive(false);
-            AAMLockedOn.gameObject.SetActive(false);
-        }
+    }
+    public void StartFiring()
+    {
+        AAGunAnimator.SetBool("firing", true);
+        firing = true;
+    }
+    public void StopFiring()
+    {
+        AAGunAnimator.SetBool("firing", false);
+        firing = false;
     }
     private void FixedUpdate()
     {
@@ -340,7 +356,7 @@ public class SaccAAGunController : UdonSharpBehaviour
             Health -= 10;
             if (Health <= 0)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
             }
         }
     }
@@ -397,6 +413,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
                     AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
+                    LastSerialization -= SerializationInterval * .4f;//make it sync faster, maybe too fast if you change targets really quickly
                     if (HUDControl != null)
                     {
                         HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
@@ -437,7 +454,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                 if (AAMCurrentTargetAngle < Lock_Angle && NumAAM > 0)
                 {
                     AAMLockTimer += DeltaTime;
-                    //dont give enemy radar lock if you're out of missiles (planes can do this though)
+                    //dont give enemy radar lock if you're out of missiles (planes do do this though)
                     if (!AAMCurrentTargetEngineControlNull)
                     {
                         //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
@@ -448,7 +465,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                             if (InEditor)
                             { Targeted(); }
                             else
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Targeted"); }
+                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Targeted)); }
                         }
                     }
                 }
@@ -552,6 +569,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     }
     public void SFEXT_G_PilotEnter()
     {
+        Occupied = true;
         //Reload based on the amount of time passed while no one was inside
         float TimeSinceLast = (Time.time - LastHealthUpdate);
         LastHealthUpdate = Time.time;
@@ -568,22 +586,37 @@ public class SaccAAGunController : UdonSharpBehaviour
     }
     public void SFEXT_G_PilotExit()
     {
+        Occupied = false;
         LastHealthUpdate = Time.time;
+        if (firing)
+        { StopFiring(); }
     }
     public void SFEXT_O_PilotExit()
     {
         Manning = false;
-        firing = false;
         AAMLockTimer = 0;
         AAMHasTarget = false;
-        DoAAMTargeting = false;
+        AAMLocking.gameObject.SetActive(false);
+        AAMLockedOn.gameObject.SetActive(false);
         AAGunAnimator.SetBool("inside", false);
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
     }
+    public void NotOccupied() { Occupied = false; }
     public void SFEXT_O_TakeOwnership()
     {
-        firing = false;
+        SendCustomEventDelayedFrames(nameof(CheckOwnership), 1);
         IsOwner = true;
+    }
+    //if took ownership after someone timed out while in vehicle, turn off this stuff
+    public void CheckOwnership()
+    {
+        if (!Manning)//if we took ownership by getting in, don't do this
+        {
+            if (Occupied)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(NotOccupied)); }
+            if (firing)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(StopFiring)); }
+        }
     }
     public void SFEXT_O_LoseOwnership()
     {

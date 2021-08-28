@@ -70,11 +70,11 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         Pilot = true;
         HUDText_AAM_ammo.text = NumAAM.ToString("F0");
-        //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
+        //Make sure SAVeControl.AAMCurrentTargetSAVControl is correct
         var Target = AAMTargets[AAMTarget];
         if (Target && Target.transform.parent)
         {
-            AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
+            AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
         }
     }
     public void SFEXT_O_PilotExit()
@@ -229,9 +229,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [System.NonSerializedAttribute] public GameObject[] AAMTargets;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     private int AAMTargetChecker = 0;
-    [SerializeField] public Transform CenterOfMass;
+    [System.NonSerializedAttribute] public Transform CenterOfMass;
     private Transform VehicleTransform;
-    private SaccAirVehicle AAMCurrentTargetEngineControl;
+    private SaccAirVehicle AAMCurrentTargetSAVControl;
     private int OutsidePlaneLayer;
     private Vector3 AAMCurrentTargetDirection;
     private float AAMTargetedTimer = 2;
@@ -253,18 +253,18 @@ public class DFUNC_AAM : UdonSharpBehaviour
             Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
             float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
             float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-            bool AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
+            bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
 
             if (TargetChecker.activeInHierarchy)
             {
-                SaccAirVehicle NextTargetEngineControl = null;
+                SaccAirVehicle NextTargetSAVontrol = null;
 
                 if (TargetCheckerParent)
                 {
-                    NextTargetEngineControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
+                    NextTargetSAVontrol = TargetCheckerParent.GetComponent<SaccAirVehicle>();
                 }
-                //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
-                if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.EntityControl.dead)))
+                //if target SAVontroller is null then it's a dummy target (or hierarchy isn't set up properly)
+                if ((!NextTargetSAVontrol || (!NextTargetSAVontrol.Taxiing && !NextTargetSAVontrol.EntityControl.dead)))
                 {
                     RaycastHit hitnext;
                     //raycast to check if it's behind something
@@ -282,17 +282,17 @@ public class DFUNC_AAM : UdonSharpBehaviour
                             && NextTargetAngle < Lock_Angle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
-                                        || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                        || ((!AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                                             || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                     {
                         //found new target
                         AAMCurrentTargetAngle = NextTargetAngle;
                         AAMTarget = AAMTargetChecker;
                         AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                        AAMCurrentTargetEngineControl = NextTargetEngineControl;
+                        AAMCurrentTargetSAVControl = NextTargetSAVontrol;
                         AAMLockTimer = 0;
                         AAMTargetedTimer = .9f;//send targeted .1s after targeting so it can't get spammed too fast (and doesnt send if you instantly target something else)
-                        AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
+                        AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
                     }
                 }
             }
@@ -309,7 +309,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
             AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition;
             float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
-            //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
+            //check if target is active, and if it's SaccAirVehicle is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
             //raycast to check if it's behind something
             RaycastHit hitcurrent;
             bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
@@ -323,7 +323,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 && (AAMTargetObscuredDelay < .25f)
                     && AAMCurrentTargetDistance < AAMMaxTargetDistance
                         && AAMTargets[AAMTarget].activeInHierarchy
-                            && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.EntityControl.dead)))
+                            && (AAMCurrentTargetSAVControlNull || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
             {
                 if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                 {
@@ -332,14 +332,14 @@ public class DFUNC_AAM : UdonSharpBehaviour
                     {
                         AAMLockTimer += DeltaTime;
                         //give enemy radar lock even if you're out of missiles
-                        if (!AAMCurrentTargetEngineControlNull)
+                        if (!AAMCurrentTargetSAVControlNull)
                         {
                             //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
                             AAMTargetedTimer += DeltaTime;
                             if (AAMTargetedTimer > 1)
                             {
                                 AAMTargetedTimer = 0;
-                                AAMCurrentTargetEngineControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetTargeted");
+                                AAMCurrentTargetSAVControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetTargeted");
                             }
                         }
                     }

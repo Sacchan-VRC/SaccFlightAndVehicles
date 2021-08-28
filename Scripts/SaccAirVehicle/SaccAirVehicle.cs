@@ -194,6 +194,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private float LowFuelDivider;
     private float LastResupplyTime = 5;//can't resupply for the first 10 seconds after joining, fixes potential null ref if sending something to PlaneAnimator on first frame
     [System.NonSerializedAttribute] public float FullGunAmmo;
+    //use these for whatever, Only MissilesIncomingHeat is used by the prefab
     [System.NonSerializedAttribute] public int MissilesIncomingHeat = 0;
     [System.NonSerializedAttribute] public int MissilesIncomingRadar = 0;
     [System.NonSerializedAttribute] public int MissilesIncomingOther = 0;
@@ -219,7 +220,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private float ABNormalizer;
     private float EngineOutputLastFrame;
     float VTOLAngle90;
-    bool PlaneMoving = false;
     bool HasWheelColliders = false;
     private float vtolangledif;
     Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
@@ -288,6 +288,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 VehicleRigidbody.angularDrag = 0;
                 IsOwner = true;
             }
+            else { VehicleRigidbody.angularDrag = .5f; }
         }
 
         //delete me when ObjectSync.Respawn works in editor again
@@ -453,19 +454,18 @@ public class SaccAirVehicle : UdonSharpBehaviour
             //synced variables because rigidbody values aren't accessable by non-owner players
             CurrentVel = VehicleRigidbody.velocity;
             Speed = CurrentVel.magnitude;
+            bool PlaneMoving = false;
             if (Speed > .1f)//don't bother doing all this for planes that arent moving and it therefore wont even effect
             {
                 PlaneMoving = true;//check this bool later for more optimizations
                 WindAndAoA();
             }
-            else { PlaneMoving = false; }
 
             if (Piloting)
             {
-                Occupied = true;
                 //gotta do these this if we're piloting but it didn't get done(specifically, hovering extremely slowly in a VTOL craft will cause control issues we don't)
                 if (!PlaneMoving)
-                { WindAndAoA(); }
+                { WindAndAoA(); PlaneMoving = true; }
                 if (RepeatingWorld)
                 {
                     if (CenterOfMass.position.z > RepeatingWorldDistance)
@@ -817,7 +817,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
             else
             {
-                Occupied = false;
                 //brake is always on if the plane is on the ground
                 if (!DisablePhysicsAndInputs)
                 {
@@ -881,7 +880,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     VelLift = pitch = yaw = roll = 0;
                 }
 
-                if ((PlaneMoving || Piloting) && OverrideConstantForce == 0)
+                if ((PlaneMoving) && OverrideConstantForce == 0)
                 {
                     //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                     //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
@@ -1106,14 +1105,18 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
         }
         else if (AfterburnerOn)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
         }
     }
-    public void ResupplyPlane()
+    public void SFEXT_O_ReSupply()
+    {
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply));
+    }
+    public void ReSupply()
     {
         ReSupplied = 0;//used to know if other scripts resupplied
         if ((Fuel < FullFuel - 10 || Health != FullHealth))
@@ -1131,33 +1134,30 @@ public class SaccAirVehicle : UdonSharpBehaviour
         }
         VehicleAnimator.SetTrigger(RESUPPLY_STRING);
     }
-    public void ResupplyPlane_FuelOnly()//not done and unused
-    {
-        ReSupplied = 0;//used to know if other scripts resupplied
-        if (IsOwner)
-        { EntityControl.SendEventToExtensions("SFEXT_O_ReFuel"); }
-
-
-        Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
-    }
     public void SFEXT_O_RespawnButton()//called when using respawn button
     {
-        Atmosphere = 1;//planemoving optimization requires this to be here
-                       //synced variables
-        Health = FullHealth;
-        Fuel = FullFuel;
-        VTOLAngle = VTOLDefaultValue;
-        VTOLAngleInput = VTOLDefaultValue;
-        VehicleObjectSync.Respawn();//this works if done just locally
-        VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
+        if (!Occupied && !EntityControl.dead)
+        {
+            Networking.SetOwner(localPlayer, EntityControl.gameObject);
+            EntityControl.TakeOwnerShipOfExtensions();
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResetStatus");
+            IsOwner = true;
+            Atmosphere = 1;//planemoving optimization requires this to be here
+                           //synced variables
+            Health = FullHealth;
+            Fuel = FullFuel;
+            VTOLAngle = VTOLDefaultValue;
+            VTOLAngleInput = VTOLDefaultValue;
+            VehicleObjectSync.Respawn();//this works if done just locally
+            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this}
+        }
     }
     public void ResetStatus()//called globally when using respawn button
     {
         if (HasAfterburner) { SetAfterburnerOff(); }
         //these two make it invincible and unable to be respawned again for 5s
         EntityControl.dead = true;
-        SendCustomEventDelayedSeconds("NotDead", InvincibleAfterSpawn);
-
+        SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
         EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
     }
     public void SFEXT_G_BulletHit()
@@ -1205,7 +1205,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         if (!InEditor)
         {
             if (localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
-            //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
+                                                          //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
         }
 
         EngineOutput = 0;
@@ -1229,11 +1229,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SFEXT_G_PilotEnter()
     {
+        Occupied = true;
         VehicleAnimator.SetBool(OCCUPIED_STRING, true);
         EntityControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
     }
     public void SFEXT_G_PilotExit()
     {
+        Occupied = false;
         SetAfterburnerOff();
     }
     public void SFEXT_O_PilotExit()
@@ -1386,6 +1388,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
             ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
             ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
         }
+    }
+    public void SetTargeted()
+    {
+        VehicleAnimator.SetTrigger("radarlocked");
     }
     public Vector2 UnpackThrottles(float Throttle)
     {

@@ -62,7 +62,10 @@ public class SaccEntity : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
-        { InEditor = false; }
+        {
+            InEditor = false;
+            if (localPlayer.isMaster) { IsOwner = true; }
+        }
         else
         {
             IsOwner = true;
@@ -313,7 +316,6 @@ public class SaccEntity : UdonSharpBehaviour
     }
     public void PilotExitPlane(VRCPlayerApi player)
     {
-        Piloting = false;
         PilotName = string.Empty;
         PilotID = -1;
         PilotExitTime = Time.time;
@@ -321,11 +323,14 @@ public class SaccEntity : UdonSharpBehaviour
         RStickSelection = -1;
         LStickSelectionLastFrame = -1;
         RStickSelectionLastFrame = -1;
-        if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
-        if (PilotOnly != null) { PilotOnly.SetActive(false); }
         SendEventToExtensions("SFEXT_G_PilotExit");
         if (player.isLocal)
-        { SendEventToExtensions("SFEXT_O_PilotExit"); }
+        {
+            Piloting = false;
+            if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
+            if (PilotOnly != null) { PilotOnly.SetActive(false); }
+            { SendEventToExtensions("SFEXT_O_PilotExit"); }
+        }
     }
     public void PassengerEnterPlaneLocal()
     {
@@ -338,13 +343,6 @@ public class SaccEntity : UdonSharpBehaviour
         Passenger = false;
         if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
         SendEventToExtensions("SFEXT_P_PassengerExit");
-    }
-    public void RespawnStatusLocal()//called when using respawn button
-    {
-        Networking.SetOwner(localPlayer, gameObject);
-
-        TakeOwnerShipOfExtensions();
-        SendEventToExtensions("SFEXT_O_RespawnButton");
     }
     public void PassengerEnterPlaneGlobal()
     {
@@ -363,6 +361,14 @@ public class SaccEntity : UdonSharpBehaviour
         //planes will be fully synced when they explode or are respawned anyway.
         if (IsOwner)
         { SendEventToExtensions("SFEXT_O_PlayerJoined"); }
+    }
+    public override void OnPickup()
+    {
+        SendEventToExtensions("SFEXT_O_PickedUp");
+    }
+    public override void OnDrop()
+    {
+        SendEventToExtensions("SFEXT_O_Dropped");
     }
     private void FindAAMTargets()
     {

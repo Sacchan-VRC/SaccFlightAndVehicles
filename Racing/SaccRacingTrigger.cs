@@ -167,6 +167,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
                     }
                     CurrentCourse.BestTime = RaceTime;
                     CurrentCourse.UpdateInstanceRecord();
+                    CurrentCourse.RequestSerialization();
                 }
                 RaceTime = 0;
             }
@@ -191,7 +192,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
                 ProgressCheckPointAnims();
                 if (NextCheckpoint == FinalCheckpoint)
                 {
-                    DoSubFrameTimeCheck = true;//in case the course only has check points
+                    DoSubFrameTimeCheck = true;//in case the course only has 2 checkpoints
                 }
                 else
                 {

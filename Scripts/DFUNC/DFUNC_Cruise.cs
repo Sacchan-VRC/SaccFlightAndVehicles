@@ -30,6 +30,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     private bool func_active;
     private bool Piloting;
     private bool InVR;
+    private bool CruiseThrottleOverridden;
     [System.NonSerializedAttribute] public float SetSpeed;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -78,11 +79,13 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void SFEXT_G_Explode()
     {
-        Cruise = false;
+        if (Cruise)
+        { SetCruiseOff(); }
     }
     public void SFEXT_G_TouchDown()
     {
-        Cruise = false;
+        if (Cruise)
+        { SetCruiseOff(); }
     }
     public void SetCruiseOn()
     {
@@ -92,7 +95,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
             gameObject.SetActive(true);
             func_active = true;
         }
-        SAVControl.ThrottleOverridden += 1;
+        if (!CruiseThrottleOverridden) { SAVControl.ThrottleOverridden += 1; CruiseThrottleOverridden = true; }
         SetSpeed = SAVControl.AirSpeed;
         Cruise = true;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
@@ -107,7 +110,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
             if (!InVR)
             { gameObject.SetActive(true); }
         }
-        SAVControl.ThrottleOverridden -= 1;
+        if (CruiseThrottleOverridden) { SAVControl.ThrottleOverridden -= 1; CruiseThrottleOverridden = false; }
         SAVControl.PlayerThrottle = SAVControl.ThrottleInput;
         Cruise = false;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
@@ -136,7 +139,8 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                     {
                         if (!Cruise)
                         {
-                            SetCruiseOn();
+                            if (!SAVControl.Taxiing)
+                            { SetCruiseOn(); }
                         }
                         if (TriggerTapTime > .4f)//no double tap
                         {
@@ -170,7 +174,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
 
                 //float Derivator = Mathf.Clamp(((error - lastframeerror) / DeltaTime),DerivMin, DerivMax);
 
-                SAVControl.ThrottleOverride = (CruiseProportional * error) + (CruiseIntegral * CruiseIntegrator);
+                SAVControl.ThrottleOverride = Mathf.Clamp((CruiseProportional * error) + (CruiseIntegral * CruiseIntegrator), 0, 1);
                 //ThrottleInput += Derivative * Derivator; //works but spazzes out real bad
 
                 TriggerTapTime += DeltaTime;
@@ -180,7 +184,6 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         //Cruise Control target knots
         if (Cruise)
         {
-
             if (!HUDText_knotstargetNULL) { HUDText_knotstarget.text = ((SetSpeed) * 1.9438445f).ToString("F0"); }
         }
         else { if (!HUDText_knotstargetNULL) { HUDText_knotstarget.text = string.Empty; } }

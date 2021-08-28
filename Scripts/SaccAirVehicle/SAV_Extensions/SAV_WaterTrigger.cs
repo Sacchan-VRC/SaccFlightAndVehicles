@@ -57,14 +57,6 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
             }
         }
     }
-    public void SendEnterWater()
-    {
-        EntityControl.SendEventToExtensions("SFEXT_G_EnterWater");
-    }
-    public void SendExitWater()
-    {
-        EntityControl.SendEventToExtensions("SFEXT_G_ExitWater");
-    }
     private void OnTriggerExit(Collider other)
     {
         if (other != null && other.gameObject.layer == WaterLayer)
@@ -81,6 +73,14 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
                 }
             }
         }
+    }
+    public void SendEnterWater()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_EnterWater");
+    }
+    public void SendExitWater()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_ExitWater");
     }
     //collider enabled and disabled so that it does ontriggerenter on enable
     private void OnEnable()
@@ -109,6 +109,10 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         {
             CFOverridden = false;
             EngineControl.OverrideConstantForce--;
+        }
+        if (InWater)
+        {
+            EntityControl.SendEventToExtensions("SFEXT_G_ExitWater");
         }
     }
     public void SFEXT_O_TakeOwnership()

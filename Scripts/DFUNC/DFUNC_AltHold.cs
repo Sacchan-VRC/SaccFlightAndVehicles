@@ -100,32 +100,37 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         SAVControl.JoystickOverridden -= 1;
         SAVControl.JoystickOverride = Vector3.zero;
         RotationInputs = Vector3.zero;
+        AltHoldPitchIntegrator = 0;
         if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOff"); }
     }
     private void Update()
     {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-        if (Trigger > 0.75)
+        if (Selected)
         {
-            if (!TriggerLastFrame)
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+            if (Trigger > 0.75)
             {
-                if (AltHold)
+                if (!TriggerLastFrame)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DeactivateAltHold));
+                    if (AltHold)
+                    {
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DeactivateAltHold));
+                    }
+                    else
+                    {
+                        if (!SAVControl.Taxiing)
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold)); }
+                    }
                 }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
-                }
+                TriggerLastFrame = true;
             }
-            TriggerLastFrame = true;
+            else { TriggerLastFrame = false; }
         }
-        else { TriggerLastFrame = false; }
 
         if (AltHold && Piloting)
         {

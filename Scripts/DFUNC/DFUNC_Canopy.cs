@@ -86,6 +86,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void SFEXT_G_RespawnButton()
     {
+        Debug.Log("SFEXT_G_RespawnButton");
         CanopyBroken = false;
         CanopyAnimator.SetBool(CANOPYBREAK_STRING, false);
         if (!CanopyOpen) CanopyOpening();
