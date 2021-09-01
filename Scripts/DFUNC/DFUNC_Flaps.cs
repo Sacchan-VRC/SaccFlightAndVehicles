@@ -27,8 +27,10 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private bool DragApplied;
     private bool LiftApplied;
     private bool MaxLiftApplied;
-    private bool InVR;
+    private bool InVR = false;
     private bool Selected;
+    private bool InEditor = true;
+    private VRCPlayerApi localPlayer;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void DFUNC_Selected()
@@ -44,6 +46,8 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_L_EntityStart()
     {
+        localPlayer = Networking.LocalPlayer;
+        if (localPlayer != null) { InEditor = false; }
         EntityControl = SAVControl.EntityControl;
         FLAPS_STRING = Animator.StringToHash(AnimatorBool);
         //to match how the old values worked
@@ -57,9 +61,8 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (Flaps)
-        { gameObject.SetActive(true); }
-        InVR = Networking.LocalPlayer.IsUserInVR();//move to start when they fix the bug
+        if (Flaps) { gameObject.SetActive(true); }
+        if (!InEditor) { InVR = Networking.LocalPlayer.IsUserInVR(); }//move to start when they fix the bug
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
     }
     public void SFEXT_O_PilotExit()

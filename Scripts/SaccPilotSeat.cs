@@ -52,7 +52,7 @@ public class SaccPilotSeat : UdonSharpBehaviour
                     }
                 }
             }
-            else if (EntityControl.Piloting || EntityControl.Passenger)
+            else if (EntityControl.InVehicle)
             {
                 SetVoiceInside(player);
             }

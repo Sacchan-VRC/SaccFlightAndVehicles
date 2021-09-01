@@ -359,6 +359,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             InEditor = true;
             Piloting = true;
             IsOwner = true;
+            Occupied = true;
         }
         else
         {
@@ -1239,7 +1240,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SFEXT_G_BulletHit()
     {
-        if (InEditor || IsOwner)
+        if (IsOwner)
         {
             Health -= 10;
         }

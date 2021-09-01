@@ -185,7 +185,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        InVR = localPlayer.IsUserInVR();
+        if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
     }
     public void SFEXT_O_ReAppear()
     {

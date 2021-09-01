@@ -49,6 +49,7 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool dead = false;
     [System.NonSerializedAttribute] public bool Piloting = false;
     [System.NonSerializedAttribute] public bool Passenger = false;
+    [System.NonSerializedAttribute] public bool InVehicle = false;
     [System.NonSerializedAttribute] public bool InVR = false;
     private bool IsOwner;
 
@@ -75,6 +76,7 @@ public class SaccEntity : UdonSharpBehaviour
         {
             IsOwner = true;
             Piloting = true;
+            InVehicle = true;
         }
 
         VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
@@ -264,10 +266,9 @@ public class SaccEntity : UdonSharpBehaviour
 
         }
 
-
-        if (Passenger || Piloting)
+        if (InVehicle && !InEditor)
         {
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetButtonDown("Oculus_CrossPlatform_Button4"))
+            if (Input.GetKeyDown(KeyCode.Return) || (InVR && Input.GetButtonDown("Oculus_CrossPlatform_Button4")))
             { ExitStation(); }
         }
     }
@@ -295,6 +296,7 @@ public class SaccEntity : UdonSharpBehaviour
     public void PilotEnterPlaneLocal()//called from PilotSeat
     {
         Piloting = true;
+        InVehicle = true;
         if (LStickNumFuncs == 1)
         { Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected"); }
         if (RStickNumFuncs == 1)
@@ -332,6 +334,7 @@ public class SaccEntity : UdonSharpBehaviour
         if (player.isLocal)
         {
             Piloting = false;
+            InVehicle = false;
             if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
             if (PilotOnly != null) { PilotOnly.SetActive(false); }
             { SendEventToExtensions("SFEXT_O_PilotExit"); }
@@ -340,12 +343,14 @@ public class SaccEntity : UdonSharpBehaviour
     public void PassengerEnterPlaneLocal()
     {
         Passenger = true;
+        InVehicle = true;
         if (InVehicleOnly != null) { InVehicleOnly.SetActive(true); }
         SendEventToExtensions("SFEXT_P_PassengerEnter");
     }
     public void PassengerExitPlaneLocal()
     {
         Passenger = false;
+        InVehicle = false;
         if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
         SendEventToExtensions("SFEXT_P_PassengerExit");
     }
