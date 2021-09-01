@@ -7,9 +7,11 @@ using VRC.Udon;
 public class DFUNC_Smoke : UdonSharpBehaviour
 {
     [SerializeField] SaccAirVehicle SAVControl;
+    [Tooltip("Material to change the color value of to match smoke color")]
     [SerializeField] private Material SmokeColorIndicatorMaterial;
     [SerializeField] private ParticleSystem[] DisplaySmoke;
     [SerializeField] private GameObject SmokeOnIndicator;
+    [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;

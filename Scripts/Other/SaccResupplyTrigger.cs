@@ -6,10 +6,15 @@ using VRC.Udon;
 
 public class SaccResupplyTrigger : UdonSharpBehaviour
 {
+    [Tooltip("Object to send event to")]
     [SerializeField] private SaccEntity SendEventTo;
+    [Tooltip("Delay after entering a respply zone before the event is first sent")]
     [SerializeField] private float ResupplyInitialDelay = 1;
+    [Tooltip("Delay between resupplies")]
     [SerializeField] private float ResupplyDelay = 1;
+    [Tooltip("Layer to check for resupply triggers on")]
     [SerializeField] private int ResupplyLayer = 27;
+    [Tooltip("Name of event sent by this trigger")]
     [SerializeField] private string EventName = "SFEXT_O_ReSupply";
     private float LastResupplyTime = 0;
     private int NumTriggers = 0;

@@ -8,6 +8,7 @@ public class SaccFlight : UdonSharpBehaviour
 {
     private VRCPlayerApi localPlayer;
     public float ThrustStrength = .33f;
+    [Tooltip("Strength of extra thrust applied when trying to thrust in direction going against movement")]
     public float BackThrustStrength = .5f;
     private float controllertriggerR;
     private float controllertriggerL;

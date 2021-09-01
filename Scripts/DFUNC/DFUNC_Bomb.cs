@@ -10,12 +10,15 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private Animator BombAnimator;
     [SerializeField] private GameObject Bomb;
-    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
+    [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
     [SerializeField] private Text HUDText_Bomb_ammo;
     [SerializeField] private int NumBomb = 4;
+    [Tooltip("Delay between bomb drops when holding the trigger")]
     [SerializeField] private float BombHoldDelay = 0.5f;
+    [Tooltip("Minimum delay between bomb drops")]
     [SerializeField] private float BombDelay = 0f;
+    [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
     [SerializeField] private Transform[] BombLaunchPoints;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
@@ -31,6 +34,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private float reloadspeed;
     private bool LeftDial = false;
     private int DialPosition = -999;
+    private VRCPlayerApi localPlayer;
+    private bool IsOwner;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -43,6 +48,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         VehicleTransform = SAVControl.EntityControl.transform;
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
         EntityControl = SAVControl.EntityControl;
+        localPlayer = Networking.LocalPlayer;
 
         FindSelf();
 
@@ -125,6 +131,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void LaunchBomb()
     {
+        IsOwner = localPlayer.IsOwner(gameObject);
         if (NumBomb > 0) { NumBomb--; }
         BombAnimator.SetTrigger(BOMBLAUNCHED_STRING);
         if (Bomb != null)

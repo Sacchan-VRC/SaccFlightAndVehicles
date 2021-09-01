@@ -7,8 +7,10 @@ using VRC.Udon;
 public class DFUNC_Brake : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;
+    [Tooltip("Looping sound to play while brake is active")]
     [SerializeField] private AudioSource Airbrake_snd;
     [SerializeField] private Animator BrakeAnimator;
+    [Tooltip("Because you have to hold the break, and the keyboardcontrols script can only send events, this option is here.")]
     [SerializeField] private KeyCode KeyboardControl = KeyCode.B;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] private float BrakeInput;

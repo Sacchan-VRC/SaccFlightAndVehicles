@@ -7,14 +7,17 @@ using UnityEngine.UI;
 
 public class SAAG_HUDController : UdonSharpBehaviour
 {
+    [Tooltip("Transform of the pilot seat's target eye position, HUDContrller is automatically moved to this position in Start() to ensure perfect alignment")]
+    [SerializeField] private Transform PilotSeatAdjusterTarget;
     public SaccAAGunController AAGunControl;
     public Transform ElevationIndicator;
     public Transform HeadingIndicator;
     public Transform AAMTargetIndicator;
     public Transform GUNLeadIndicator;
     public Transform AAMReloadBar;
-    public Transform MGReloadBar;
+    public Transform MGAmmoBar;
     public Text HUDText_AAM_ammo;
+    [Tooltip("Local distance projected forward for objects that move dynamically, only adjust if the hud is moved forward in order to make it appear smaller")]
     public float distance_from_head = 1.333f;
     [System.NonSerializedAttribute] public Vector3 GUN_TargetDirOld;
     [System.NonSerializedAttribute] public float GUN_TargetSpeedLerper;
@@ -32,6 +35,7 @@ public class SAAG_HUDController : UdonSharpBehaviour
         BulletSpeedDivider = 1f / BulletSpeed;
         AAMReloadBarDivider = 1f / AAGunControl.MissileReloadTime;
         MGReloadBarDivider = 1f / AAGunControl.MGAmmoSeconds;
+        if (PilotSeatAdjusterTarget != null) { transform.position = PilotSeatAdjusterTarget.position; }
 
         Rotator = AAGunControl.Rotator.transform;
     }
@@ -65,7 +69,7 @@ public class SAAG_HUDController : UdonSharpBehaviour
         /////////////////
 
         //MG Reload bar
-        MGReloadBar.localScale = new Vector3(AAGunControl.MGAmmoSeconds * MGReloadBarDivider, .3f, 0);
+        MGAmmoBar.localScale = new Vector3(AAGunControl.MGAmmoSeconds * MGReloadBarDivider, .3f, 0);
         /////////////////
 
         //GUN Lead Indicator
@@ -73,10 +77,10 @@ public class SAAG_HUDController : UdonSharpBehaviour
         {
             GUNLeadIndicator.gameObject.SetActive(true);
             Vector3 TargetDir;
-            if (AAGunControl.AAMCurrentTargetEngineControl == null)//target is a dummy target
+            if (AAGunControl.AAMCurrentTargetSAVControl == null)//target is a dummy target
             { TargetDir = AAGunControl.AAMTargets[AAGunControl.AAMTarget].transform.position - transform.position; }
             else
-            { TargetDir = AAGunControl.AAMCurrentTargetEngineControl.CenterOfMass.position - transform.position; }
+            { TargetDir = AAGunControl.AAMCurrentTargetSAVControl.CenterOfMass.position - transform.position; }
             GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;

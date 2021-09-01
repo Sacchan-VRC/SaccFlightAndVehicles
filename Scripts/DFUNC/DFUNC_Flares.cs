@@ -9,10 +9,12 @@ public class DFUNC_Flares : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private int NumFlares = 60;
-    [Tooltip("How long a flare has an effect for")]
+    [Tooltip("Speed to launch flare particles at")]
+    [SerializeField] private float FlareLaunchSpeed = 100;
     [SerializeField] private ParticleSystem[] FlareParticles;
+    [Tooltip("How long a flare has an effect for")]
     [SerializeField] private float FlareActiveTime = 4f;
-    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
+    [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 15;
     [SerializeField] private AudioSource FlareLaunch;
     [SerializeField] private Text HUDText_flare_ammo;
@@ -20,7 +22,6 @@ public class DFUNC_Flares : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;
-
     private bool TriggerLastFrame;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -86,7 +87,13 @@ public class DFUNC_Flares : UdonSharpBehaviour
         if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
         int d = FlareParticles.Length;
         for (int x = 0; x < d; x++)
-        { FlareParticles[x].Play(); }
+        {
+            //this is to make flare particles inherit the velocity of the aircraft they were launched from (inherit doesn't work because non-owners don't have access to rigidbody velocity.)
+            var emitParams = new ParticleSystem.EmitParams();
+            Vector3 curspd = SAVControl.CurrentVel;
+            emitParams.velocity = curspd + (FlareParticles[x].transform.forward * FlareLaunchSpeed);
+            FlareParticles[x].Emit(emitParams, 1);
+        }
         SAVControl.NumActiveFlares++;
         SAVControl.SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
     }

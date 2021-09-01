@@ -7,8 +7,10 @@ using VRC.Udon;
 public class DFUNC_Gear : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;
+    [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private Animator GearAnimator;
+    [Tooltip("Multiply drag by this amount while gear is down")]
     [SerializeField] private float LandingGearDragMulti = 1.3f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
@@ -17,6 +19,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool GearUp = false;
     private bool DragApplied = false;
     private bool DisableGroundDetector = false;
+    [System.NonSerializedAttribute] public int DisableGearToggle = 0;
     private int GEARUP_STRING = Animator.StringToHash("gearup");
     private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -61,7 +64,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        if (SAVControl.DisableGearToggle == 0) { ToggleGear(); }
+        if (DisableGearToggle == 0) { ToggleGear(); }
     }
     private void Update()
     {
@@ -72,7 +75,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
         if (Trigger > 0.75)
         {
-            if (!TriggerLastFrame && SAVControl.DisableGearToggle == 0) { ToggleGear(); }
+            if (!TriggerLastFrame && DisableGearToggle == 0) { ToggleGear(); }
             TriggerLastFrame = true;
         }
         else { TriggerLastFrame = false; }

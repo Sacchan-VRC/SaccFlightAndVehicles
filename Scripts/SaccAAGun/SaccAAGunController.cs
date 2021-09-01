@@ -6,40 +6,55 @@ using VRC.Udon;
 
 public class SaccAAGunController : UdonSharpBehaviour
 {
-    public SaccEntity EntityControl;
+    [SerializeField] private SaccEntity EntityControl;
+    [Tooltip("The part of the AAGun that aims")]
     public GameObject Rotator;
-    public SAAG_HUDController HUDControl;
-    public VRCStation AAGunSeat;
-    public GameObject AAM;
-    public AudioSource AAMLocking;
-    public AudioSource AAMLockedOn;
-    public Transform JoyStick;
+    [SerializeField] private SAAG_HUDController HUDControl;
+    [SerializeField] private VRCStation AAGunSeat;
+    [Tooltip("Missile object to be duplicated and enabled when a missile is fired")]
+    [SerializeField] private GameObject AAM;
+    [Tooltip("Sound that plays when targeting an enemy")]
+    [SerializeField] private AudioSource AAMLocking;
+    [Tooltip("Sound that plays when locked onto a target")]
+    [SerializeField] private AudioSource AAMLockedOn;
+    [Tooltip("Joystick object that moves around in response to rotation inputs")]
+    [SerializeField] private Transform JoyStick;
     [SerializeField] private float RespawnDelay = 20;
     [SerializeField] private float InvincibleAfterSpawn = 1;
     public float Health = 100f;
-    public float TurnSpeedMulti = 5;
-    public float TurnFriction = 4;
-    public float UpAngleMax = 89;
-    public float DownAngleMax = 35;
-    public float TurningResponseDesktop = 3f;
-    public float HPRepairDelay = 5f;
-    public float HPRepairAmount = 5f;
+    [SerializeField] private float TurnSpeedMulti = 5;
+    [SerializeField] private float TurnFriction = 4;
+    [SerializeField] private float UpAngleMax = 89;
+    [SerializeField] private float DownAngleMax = 35;
+    [SerializeField] private float TurningResponseDesktop = 3f;
+    [SerializeField] private float HPRepairDelay = 5f;
+    [SerializeField] private float HPRepairAmount = 5f;
     public float MissileReloadTime = 10;
+    [Tooltip("How long gun can fire for before running out of ammo in seconds")]
     public float MGAmmoSeconds = 4;
-    public float MGReloadSpeed = 1;
-    public float MGReloadDelay = 2;
+    [Tooltip("How fast ammo reloads")]
+    [SerializeField] private float MGReloadSpeed = 1;
+    [Tooltip("How long after stopping firing before ammo starts recharging")]
+    [SerializeField] private float MGReloadDelay = 2;
+    public int NumAAM = 4;
+    [SerializeField] private float AAMMaxTargetDistance = 6000;
+    [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
+    [SerializeField] private float AAMLockAngle = 20;
+    [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
+    [SerializeField] private float AAMLockTime = 1.5f;
+    [Tooltip("Minimum time between missile launches")]
+    [SerializeField] private float AAMLaunchDelay = .5f;
+    [Tooltip("Point missile is launched from, flips on local X each time fired")]
+    [SerializeField] private Transform AAMLaunchPoint;
+    [Tooltip("Layer to spherecast to find all triggers on to use as AAM targets")]
+    [SerializeField] private LayerMask AAMTargetsLayer;
+    [Tooltip("Tick this to disable target tracking, prediction, and missiles (WW2 flak?)")]
+    [SerializeField] private bool DisableAAMTargeting;
+    [Tooltip("Layer vehicles to shoot at are on (for raycast to check for line of sight)")]
+    [SerializeField] private float PlaneHitBoxLayer = 17;//walkthrough
     private float MGAmmoRecharge = 0;
     [System.NonSerializedAttribute] public float MGAmmoFull = 4;
-    private float FullMGDivider;
-    public int NumAAM = 4;
-    public float AAMMaxTargetDistance = 6000;
-    public float AAMLockAngle = 20;
-    public float AAMLockTime = 1.5f;
-    public float AAMLaunchDelay = .5f;
-    public Transform AAMLaunchPoint;
-    public LayerMask AAMTargetsLayer;
-    public float PlaneHitBoxLayer = 17;//walkthrough
-    [SerializeField] private GameObject SeatAdjuster;
+    private float FullMGDivider;[SerializeField] private GameObject SeatAdjuster;
     [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
     [System.NonSerializedAttribute] public Animator AAGunAnimator;
     [System.NonSerializedAttribute] public bool dead;
@@ -62,7 +77,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AAMLockTimer = 0;
     private float AAMLastFiredTime;
     [System.NonSerializedAttribute] public Vector3 AAMCurrentTargetDirection;
-    [System.NonSerializedAttribute] public SaccAirVehicle AAMCurrentTargetEngineControl;
+    [System.NonSerializedAttribute] public SaccAirVehicle AAMCurrentTargetSAVControl;
     private float AAMTargetObscuredDelay;
     [System.NonSerializedAttribute] public bool InVR;
     Quaternion AAGunRotLastFrame;
@@ -72,7 +87,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     private float FullAAMsDivider;
     private float FullHealthDivider;
     private bool LTriggerLastFrame;
-    [System.NonSerializedAttribute] public bool DoAAMTargeting;
+    [System.NonSerializedAttribute] public bool DoAAMTargeting = false;
     [System.NonSerializedAttribute] public int FullAAMs;
     [System.NonSerializedAttribute] public float AAMReloadTimer;
     [System.NonSerializedAttribute] public float HealthUpTimer;
@@ -85,10 +100,11 @@ public class SaccAAGunController : UdonSharpBehaviour
     private float LastSerialization;
     private float SerializationInterval = .35f;
     private bool Occupied;
+    private bool HUDControlNULL;
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
-        if (localPlayer == null) { InEditor = true; Manning = true; IsOwner = true; DoAAMTargeting = true; }
+        if (localPlayer == null) { InEditor = true; Manning = true; IsOwner = true; }
         else
         {
             InEditor = false;
@@ -96,6 +112,7 @@ public class SaccAAGunController : UdonSharpBehaviour
             IsOwner = localPlayer.isMaster;
         }
         CenterOfMass = EntityControl.CenterOfMass;
+        HUDControlNULL = HUDControl == null;
 
         if (JoyStick != null) { JoyStickNull = false; }
 
@@ -112,7 +129,7 @@ public class SaccAAGunController : UdonSharpBehaviour
 
         AAMTargets = EntityControl.AAMTargets;
         NumAAMTargets = EntityControl.NumAAMTargets;
-        if (NumAAMTargets != 0) { DoAAMTargeting = true; }
+        if (NumAAMTargets != 0 && !DisableAAMTargeting) { DoAAMTargeting = true; }
 
         gameObject.SetActive(true);
     }
@@ -375,18 +392,18 @@ public class SaccAAGunController : UdonSharpBehaviour
         Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
         float NextTargetAngle = Vector3.Angle(Rotator.transform.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(HudControlPosition, TargetCheckerTransform.position);
-        bool AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
+        bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
 
         if (TargetChecker.activeInHierarchy)
         {
-            SaccAirVehicle NextTargetEngineControl = null;
+            SaccAirVehicle NextTargetSAVControl = null;
 
             if (TargetCheckerParent)
             {
-                NextTargetEngineControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
+                NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
             }
-            //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
-            if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.EntityControl.dead)))
+            //if target SaccAirVehicle is null then it's a dummy target (or hierarchy isn't set up properly)
+            if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
             {
                 RaycastHit hitnext;
                 //raycast to check if it's behind something
@@ -397,22 +414,22 @@ public class SaccAAGunController : UdonSharpBehaviour
                 Debug.Log(string.Concat("InAngle ", NextTargetAngle < Lock_Angle));
                 Debug.Log(string.Concat("BelowMaxDist ", NextTargetDistance < AAMMaxTargetDistance));
                 Debug.Log(string.Concat("LowerAngle ", NextTargetAngle < AAMCurrentTargetAngle));
-                Debug.Log(string.Concat("CurrentTargTaxiing ", !AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)); */
+                Debug.Log(string.Concat("CurrentTargTaxiing ", !AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)); */
                 if ((LineOfSightNext
                     && hitnext.collider.gameObject.layer == PlaneHitBoxLayer
                         && NextTargetAngle < Lock_Angle
                             && NextTargetDistance < AAMMaxTargetDistance
                                 && NextTargetAngle < AAMCurrentTargetAngle)
-                                    || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing) || !AAMTargets[AAMTarget].activeInHierarchy)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                    || ((!AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing) || !AAMTargets[AAMTarget].activeInHierarchy)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                 {
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;
                     AAMTarget = AAMTargetChecker;
                     AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                    AAMCurrentTargetEngineControl = NextTargetEngineControl;
+                    AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
-                    AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
+                    AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
                     LastSerialization -= SerializationInterval * .4f;//make it sync faster, maybe too fast if you change targets really quickly
                     if (HUDControl != null)
                     {
@@ -435,7 +452,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         //if target is currently in front of plane, lock onto it
         AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition;
         float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
-        //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
+        //check if target is active, and if it's SaccairVehicle is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
         //raycast to check if it's behind something
         RaycastHit hitcurrent;
         bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
@@ -445,7 +462,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         else
         { AAMTargetObscuredDelay = 0; }
         if (AAMTargets[AAMTarget].activeInHierarchy
-                && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.EntityControl.dead)))
+                && (AAMCurrentTargetSAVControlNull || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
         {
             if ((AAMTargetObscuredDelay < .25f)
                         && AAMCurrentTargetDistance < AAMMaxTargetDistance)
@@ -455,17 +472,14 @@ public class SaccAAGunController : UdonSharpBehaviour
                 {
                     AAMLockTimer += DeltaTime;
                     //dont give enemy radar lock if you're out of missiles (planes do do this though)
-                    if (!AAMCurrentTargetEngineControlNull)
+                    if (!AAMCurrentTargetSAVControlNull)
                     {
                         //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
                         AAMTargetedTimer += DeltaTime;
                         if (AAMTargetedTimer > 1)
                         {
                             AAMTargetedTimer = 0;
-                            if (InEditor)
-                            { Targeted(); }
-                            else
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Targeted)); }
+                            AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted");
                         }
                     }
                 }
@@ -554,13 +568,13 @@ public class SaccAAGunController : UdonSharpBehaviour
         RotationSpeedY = 0;
         if (AAGunAnimator != null) AAGunAnimator.SetBool("inside", true);
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        if (HUDControl != null) { HUDControl.GUN_TargetSpeedLerper = 0; }
+        if (!HUDControlNULL) { HUDControl.GUN_TargetSpeedLerper = 0; }
 
-        //Make sure EngineControl.AAMCurrentTargetEngineControl is correct
+        //Make sure SAVControl.AAMCurrentTargetSAVControl is correct
         var Target = AAMTargets[AAMTarget];
         if (Target && Target.transform.parent)
         {
-            AAMCurrentTargetEngineControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
+            AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
         }
         if (localPlayer != null && localPlayer.IsUserInVR())
         {

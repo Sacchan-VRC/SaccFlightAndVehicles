@@ -9,7 +9,12 @@ public class DFUNC_Limits : UdonSharpBehaviour
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private GameObject HudLimit;
     [SerializeField] private bool DefaultLimitsOn = true;
+    [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
+    [Tooltip("Try to stop pilot pulling this many Gs")]
+    [SerializeField] private float GLimiter = 12f;
+    [Tooltip("Try to stop pilot pulling this much AoA")]
+    [SerializeField] private float AoALimiter = 15f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
@@ -130,8 +135,8 @@ public class DFUNC_Limits : UdonSharpBehaviour
 
         if (FlightLimitsEnabled && Piloting)
         {
-            float GLimitStrength = Mathf.Clamp(-(SAVControl.VertGs / SAVControl.GLimiter) + 1, 0, 1);
-            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(SAVControl.AngleOfAttack) / SAVControl.AoALimiter) + 1, 0, 1);
+            float GLimitStrength = Mathf.Clamp(-(SAVControl.VertGs / GLimiter) + 1, 0, 1);
+            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(SAVControl.AngleOfAttack) / AoALimiter) + 1, 0, 1);
             SAVControl.Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
         }
     }

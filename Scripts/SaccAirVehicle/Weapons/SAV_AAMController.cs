@@ -25,7 +25,6 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool ColliderActive = false;
     private bool Exploding = false;
     private CapsuleCollider AAMCollider;
-    private bool Owner = false;
     private bool TargetIsVehicle = false;
     private bool MissileIncoming = false;
     private Rigidbody MissileRigid;
@@ -47,7 +46,9 @@ public class SAV_AAMController : UdonSharpBehaviour
     void Start()
     {
         //whatever script is launching the missiles must contain all of these variables
-        IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner");
+        if (EntityControl.InEditor) { IsOwner = true; }
+        else
+        { IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner"); }
         InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
         GameObject[] AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
         int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
@@ -84,7 +85,6 @@ public class SAV_AAMController : UdonSharpBehaviour
 
             if (InEditor || IsOwner)
             {
-                Owner = true;
                 LockHack = false;
             }
         }
@@ -167,7 +167,10 @@ public class SAV_AAMController : UdonSharpBehaviour
                 {
                     //just flew past the target, stop missile warning sound
                     if (TargetSAVControl.Piloting || TargetSAVControl.Passenger)
-                    { TargetSAVControl.MissilesIncomingHeat -= 1; }
+                    {
+                        TargetSAVControl.MissilesIncomingHeat -= 1;
+                        TargetSAVControl.VehicleAnimator.SetInteger("missilesincoming", TargetSAVControl.MissilesIncomingHeat);
+                    }
                     MissileIncoming = false;
                 }
             }
@@ -223,18 +226,9 @@ public class SAV_AAMController : UdonSharpBehaviour
         }
         AAMCollider.enabled = false;
         Animator AGMani = GetComponent<Animator>();
-        if (InEditor)
-        {
-            AGMani.SetTrigger("explodeowner");
-        }
-        else
-        {
-            if (Owner)
-            {
-                AGMani.SetTrigger("explodeowner");
-            }
-            else AGMani.SetTrigger("explode");
-        }
+        if (IsOwner)
+        { AGMani.SetTrigger("explodeowner"); }
+        else { AGMani.SetTrigger("explode"); }
         Lifetime = MaxLifetime - 10;//10 seconds to finish exploding
     }
 }

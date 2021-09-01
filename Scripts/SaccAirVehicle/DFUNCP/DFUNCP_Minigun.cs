@@ -9,12 +9,16 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private Transform VehicleTransform;
     [SerializeField] private Transform Minigun;
+    [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
     [SerializeField] private Transform GunDamageParticle_Parent;
     [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
+    [Tooltip("How long it takes to fully reload from empty in seconds")]
     [SerializeField] private float FullReloadTimeSec = 20;
     [SerializeField] private string AnimatorFiringStringName;
     [SerializeField] private Animator GunAnimator;
+    [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
+    private bool AmmoBarNULL = true;
     private bool TriggerLastFrame;
     [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
     private bool InVR;
@@ -37,7 +41,8 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     {
         FullGunAmmoInSeconds = GunAmmoInSeconds;
         reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
-        AmmoBarScaleStart = AmmoBar.localScale;
+        AmmoBarNULL = AmmoBar == null;
+        if (!AmmoBarNULL) { AmmoBarScaleStart = AmmoBar.localScale; }
         FullGunAmmoInSeconds = GunAmmoInSeconds;
         FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
         GUNFIRING_STRING = Animator.StringToHash(AnimatorFiringStringName);
@@ -66,6 +71,14 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
         Selected = false;
         if (firing)
         {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
+        }
+    }
+    private void OnDisable()
+    {
+        if (firing)
+        {
+            firing = false;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
         }
     }
@@ -183,7 +196,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
         }
 
 
-        AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+        if (!AmmoBarNULL) AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
     }
     public void GunStartFiring()
     {

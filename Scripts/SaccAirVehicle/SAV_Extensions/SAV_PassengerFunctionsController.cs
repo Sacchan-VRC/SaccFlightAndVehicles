@@ -7,10 +7,15 @@ using VRC.Udon;
 
 public class SAV_PassengerFunctionsController : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour[] Dial_Functions_L;
-    public UdonSharpBehaviour[] Dial_Functions_R;
+    [Tooltip("Put all scripts used by this vehicle that use the event system into this list (excluding DFUNCs)")]
     public UdonSharpBehaviour[] PassengerExtensions;
+    [Tooltip("Function dial scripts that you wish to be on the left dial")]
+    public UdonSharpBehaviour[] Dial_Functions_L;
+    [Tooltip("Function dial scripts that you wish to be on the right dial")]
+    public UdonSharpBehaviour[] Dial_Functions_R;
+    [Tooltip("Object that points toward the currently selected function on the left stick")]
     [SerializeField] private Transform LStickDisplayHighlighter;
+    [Tooltip("Object that points toward the currently selected function on the right stick")]
     [SerializeField] private Transform RStickDisplayHighlighter;
     private bool LStickDisplayHighlighterNULL;
     private bool RStickDisplayHighlighterNULL;

@@ -9,6 +9,10 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private GameObject HudHold;
     [SerializeField] private GameObject Dial_Funcon;
+    [Tooltip("Limit Gs that can be pulled by the altitude hold auto pilot")]
+    [SerializeField] private float GLimiter = 12f;
+    [Tooltip("Limit AoA that can be pulled by the altitude hold auto pilot")]
+    [SerializeField] private float AoALimiter = 15f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
@@ -172,8 +176,8 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             RotationInputs.y = 0;
 
             //flight limit internally enabled when alt hold is enabled
-            float GLimitStrength = Mathf.Clamp(-(SAVControl.VertGs / SAVControl.GLimiter) + 1, 0, 1);
-            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(SAVControl.AngleOfAttack) / SAVControl.AoALimiter) + 1, 0, 1);
+            float GLimitStrength = Mathf.Clamp(-(SAVControl.VertGs / GLimiter) + 1, 0, 1);
+            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(SAVControl.AngleOfAttack) / AoALimiter) + 1, 0, 1);
             float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
             RotationInputs.x *= Limits;
 

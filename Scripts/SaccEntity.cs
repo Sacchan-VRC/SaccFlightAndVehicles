@@ -6,17 +6,22 @@ using VRC.Udon;
 
 public class SaccEntity : UdonSharpBehaviour
 {
-    [Tooltip("Always put EngineController in first slot as it must be inistalized before things that rely on it")]
+    [Tooltip("Put all scripts used by this vehicle that use the event system into this list (excluding DFUNCs)")]
     public UdonSharpBehaviour[] ExtensionUdonBehaviours;
+    [Tooltip("Function dial scripts that you wish to be on the left dial")]
     public UdonSharpBehaviour[] Dial_Functions_L;
+    [Tooltip("Function dial scripts that you wish to be on the right dial")]
     public UdonSharpBehaviour[] Dial_Functions_R;
+    [Tooltip("Layer to spherecast to find all triggers on to use as AAM targets")]
     public LayerMask AAMTargetsLayer = 1 << 25;//layer 25
+    [Tooltip("Object that is enabled when entering vehicle in any seat")]
     public GameObject InVehicleOnly;
+    [Tooltip("Object that is enabled when entering vehicle in pilot seat")]
     public GameObject PilotOnly;
     [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
     public Transform CenterOfMass;
     [System.NonSerializedAttribute] public float LastHitTime = -100;
-    private bool InEditor = true;
+    [System.NonSerializedAttribute] public bool InEditor = true;
     VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
     private VRCPlayerApi localPlayer;
     [System.NonSerializedAttribute] public int PilotID;
@@ -369,6 +374,10 @@ public class SaccEntity : UdonSharpBehaviour
     public override void OnDrop()
     {
         SendEventToExtensions("SFEXT_O_Dropped");
+    }
+    public override void OnPickupUseDown()
+    {
+        SendEventToExtensions("SFEXT_O_PickUpUseDown");
     }
     private void FindAAMTargets()
     {

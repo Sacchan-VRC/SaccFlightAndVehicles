@@ -7,7 +7,9 @@ using VRC.Udon;
 
 public class SaccRaceCourseAndScoreboard : UdonSharpBehaviour
 {
+    [Tooltip("All checkpoint objects for this race in order, animations are sent to them as they are passed")]
     public GameObject[] RaceCheckpoints;
+    [Tooltip("Parent of all objects related to this race, including scoreboard and checkpoints")]
     public GameObject RaceObjects;
     public Text TimeText;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public string InstanceRecord = "Instance Record : None";

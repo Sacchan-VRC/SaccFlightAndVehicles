@@ -8,21 +8,24 @@ public class SAV_EffectsController : UdonSharpBehaviour
 {
     [SerializeField] private GameObject VehicleMainObj;
     [SerializeField] private SaccAirVehicle SAVControl;
+    [Tooltip("Wing trails, emit when pulling Gs")]
     [SerializeField] private TrailRenderer[] Trails;
+    [Tooltip("How many Gs do you have to pull before the trails appear?")]
     [SerializeField] private float TrailGs = 4;
+    [Tooltip("Transform of mesh of the front wheel so it can be rotated when taxiing")]
     public Transform FrontWheel;
+    [Tooltip("Particle system that plays when vehicle enters water")]
     [SerializeField] private ParticleSystem SplashParticle;
     [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
     [SerializeField] private float PlaySplashSpeed = 7;
     private bool SplashNULL;
     private bool TrailsOn;
     private bool HasTrails;
-    private bool VehicleMainObjNull = true;
     private bool EngineControlNull = true;
     private bool JoyStickNull = true;
     [System.NonSerializedAttribute] public bool FrontWheelNull = true;
     private bool vapor;
-    private float Gs_trail = 1000; //ensures it wont cause effects at first frame
+    private float Gs_trail = 1000;//ensures trails wont emit at first frame
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
     [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
     private float brake;
@@ -52,11 +55,11 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private int BULLETHIT_STRING = Animator.StringToHash("bullethit");
     private int ONGROUND_STRING = Animator.StringToHash("onground");
     private int ONWATER_STRING = Animator.StringToHash("onwater");
+    private int LOCKEDAAM_STRING = Animator.StringToHash("locked_aam");
 
 
     private void Start()
     {
-        if (VehicleMainObj != null) VehicleMainObjNull = false;
         if (SAVControl != null) EngineControlNull = false;
         if (FrontWheel != null) FrontWheelNull = false;
 
@@ -230,5 +233,15 @@ public class SAV_EffectsController : UdonSharpBehaviour
         if (!InEditor) { VehicleAnimator.SetBool(OCCUPIED_STRING, false); }
         DoEffects = 0f;//keep awake
         if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
+    }
+    public void SFEXT_L_AAMTargeted()//sent locally by the person who's locking onto this plane
+    {
+        //broadcast to tell the occupants
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayLockedAAM));
+    }
+    public void PlayLockedAAM()
+    {
+        if (SAVControl.Piloting || SAVControl.Passenger)
+        { VehicleAnimator.SetTrigger(LOCKEDAAM_STRING); }
     }
 }

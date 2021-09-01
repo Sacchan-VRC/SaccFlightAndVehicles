@@ -7,6 +7,7 @@ using VRC.Udon;
 
 public class SAV_WindChanger : UdonSharpBehaviour
 {
+    [Tooltip("List of SaccAirVehicles to be effected by this WindChnager")]
     [SerializeField] private SaccAirVehicle[] VehicleEngines;
     [SerializeField] private GameObject WindMenu;
     [SerializeField] private Slider WindStrengthSlider;

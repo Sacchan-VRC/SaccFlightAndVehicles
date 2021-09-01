@@ -7,20 +7,21 @@ using VRC.Udon;
 public class SaccEntitySendEvent : UdonSharpBehaviour
 {
     public SaccEntity EntityControl;
+    [Tooltip("Name of event to send to the SaccEntity")]
     [SerializeField] private string EventName;
     private bool Global = false;
     private void Interact()
     {
         if (Global)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EventGlobal));
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Event));
         }
         else
         {
-            EntityControl.SendEventToExtensions(EventName);
+            Event();
         }
     }
-    public void EventGlobal()
+    public void Event()
     {
         EntityControl.SendEventToExtensions(EventName);
     }

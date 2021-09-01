@@ -7,9 +7,15 @@ using VRC.Udon;
 public class DFUNC_Catapult : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;
+    [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
+    [Tooltip("Oneshot sound played when attaching to catapult")]
     [SerializeField] private AudioSource CatapultLock;
+    [Tooltip("Maximum angular difference between vehicle and catapult allowed when attaching")]
     [SerializeField] private float MaxAttachAngle = 15;
+    [Tooltip("Needed to disable Gear toggling while attached to catapult")]
+    [SerializeField] private UdonSharpBehaviour GearFunc;
+    private bool GearFuncNULL;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] private bool CatapultLaunchNull;
@@ -52,6 +58,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         VehicleAnimator = SAVControl.EntityControl.GetComponent<Animator>();
         EntityControl = SAVControl.EntityControl;
         CatapultLockNull = (CatapultLock == null) ? true : false;
+        GearFuncNULL = GearFuncNULL == null;
     }
     public void DFUNC_Selected()
     {
@@ -66,10 +73,15 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     {
         gameObject.SetActive(true);
         Pilot = true;
-        if (DisableGearToggle) { SAVControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+        if (DisableGearToggle && !GearFuncNULL)
+        {
+            int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
+            disablegear--;
+            GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
+            DisableGearToggle = false;
+        }
         if (DisableTaxiRotation) { SAVControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
         TriggerLastFrame = false;
-        OnCatapult = false;
     }
     public void SFEXT_O_PilotExit()
     {
@@ -77,11 +89,17 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         {
             gameObject.SetActive(false);
             Pilot = false;
-            if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff"); }
+            if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
         }
         Selected = false;
         TriggerLastFrame = false;
-        if (DisableGearToggle) { SAVControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+        if (DisableGearToggle && !GearFuncNULL)
+        {
+            int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
+            disablegear--;
+            GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
+            DisableGearToggle = false;
+        }
         if (DisableTaxiRotation) { SAVControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
     }
     public void SFEXT_O_PassengerEnter()
@@ -90,7 +108,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void SFEXT_O_TakeOwnership()
     {
-        if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff"); }
+        if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
     }
     public void SFEXT_O_LoseOwnership()
     {
@@ -98,14 +116,26 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         OnCatapult = false;
         Pilot = false;
         gameObject.SetActive(false);
-        if (DisableGearToggle) { SAVControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+        if (DisableGearToggle && !GearFuncNULL)
+        {
+            int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
+            disablegear--;
+            GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
+            DisableGearToggle = false;
+        }
         if (DisableTaxiRotation) { SAVControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
         if (OverrideConstantForce) { SAVControl.OverrideConstantForce -= 1; OverrideConstantForce = false; }
     }
     public void SFEXT_O_Explode()
     {
         OnCatapult = false;
-        if (DisableGearToggle) { SAVControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+        if (DisableGearToggle && !GearFuncNULL)
+        {
+            int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
+            disablegear--;
+            GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
+            DisableGearToggle = false;
+        }
         if (DisableTaxiRotation) { SAVControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
         if (OverrideConstantForce)
         {
@@ -123,23 +153,19 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private void DisableThisObjNonOnwer()
     {
         if (!SAVControl.IsOwner)
-        {
-            gameObject.SetActive(false);
-        }
+        { gameObject.SetActive(false); }
     }
     private bool FindCatapultAnimator(GameObject other)
     {
         GameObject CatapultObjects = other.gameObject;
         CatapultAnimator = null;
+        CatapultAnimator = other.GetComponent<Animator>();
         while (!Utilities.IsValid(CatapultAnimator) && CatapultObjects.transform.parent != null)
         {
             CatapultObjects = CatapultObjects.transform.parent.gameObject;
             CatapultAnimator = CatapultObjects.GetComponent<Animator>();
         }
-        if (CatapultAnimator != null)
-        { return true; }
-        else
-        { return false; }
+        return (CatapultAnimator != null);
     }
     private void OnTriggerEnter(Collider other)
     {
@@ -151,7 +177,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 {
                     if (other.gameObject.layer == CatapultLayer)
                     {
-                        if (!FindCatapultAnimator(other.gameObject)) return; ;
+                        if (!FindCatapultAnimator(other.gameObject)) { return; }
                         CatapultTransform = other.transform;
                         //Hit detected, check if the plane is facing in the right direction..
                         if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
@@ -172,7 +198,13 @@ public class DFUNC_Catapult : UdonSharpBehaviour
 
                             PlaneCatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(VehicleTransform.rotation);
 
-                            if (!DisableGearToggle) { SAVControl.DisableGearToggle += 1; DisableGearToggle = true; }
+                            if (!DisableGearToggle && !GearFuncNULL)
+                            {
+                                int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
+                                disablegear++;
+                                GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
+                                DisableGearToggle = true;
+                            }
                             if (!DisableTaxiRotation) { SAVControl.DisableTaxiRotation += 1; DisableTaxiRotation = true; }
                             if (!OverrideConstantForce)
                             {
@@ -185,7 +217,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                             EntityControl.dead = true;
                             CatapultDeadTimer = 5;
 
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockIn");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockIn));
                         }
                     }
                 }
@@ -215,7 +247,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                     if (!TriggerLastFrame)
                     {
                         Launching = true;
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PreLaunchCatapult");
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PreLaunchCatapult));
                         EntityControl.SendEventToExtensions("SFEXT_O_LaunchFromCatapult");
                     }
                     TriggerLastFrame = true;
@@ -240,10 +272,16 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 float DeltaTime = Time.deltaTime;
                 TriggerLastFrame = false;
                 Launching = false;
-                if (DisableGearToggle) { SAVControl.DisableGearToggle -= 1; DisableGearToggle = false; }
+                if (DisableGearToggle && !GearFuncNULL)
+                {
+                    int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
+                    disablegear--;
+                    GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
+                    DisableGearToggle = false;
+                }
                 if (DisableTaxiRotation) { SAVControl.DisableTaxiRotation -= 1; DisableTaxiRotation = false; }
                 if (OverrideConstantForce) { SAVControl.OverrideConstantForce -= 1; OverrideConstantForce = false; }
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CatapultLockOff");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff));
                 SAVControl.Taxiinglerper = 0;
                 VehicleRigidbody.velocity = (CatapultTransform.position - CatapultPosLastFrame) / DeltaTime;
                 Vector3 CatapultRotDifEULER = CatapultRotDif.eulerAngles;
@@ -254,7 +292,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 Vector3 CatapultRotDifrad = (CatapultRotDifEULER * Mathf.Deg2Rad) / DeltaTime;
                 VehicleRigidbody.angularVelocity = CatapultRotDifrad;
                 EntityControl.dead = true;
-                SendCustomEventDelayedFrames("deadfalse", 5);
+                SendCustomEventDelayedFrames(nameof(deadfalse), 5);
             }
             CatapultRotLastFrame = CatapultTransform.rotation;
             CatapultPosLastFrame = CatapultTransform.position;
@@ -273,13 +311,13 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         if (OnCatapult && !Launching)
         {
             Launching = true;
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PreLaunchCatapult");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PreLaunchCatapult));
         }
     }
     public void PreLaunchCatapult()
     {
         if (!SAVControl.IsOwner) { EnableOneFrameToFindAnimator(); }
-        SendCustomEventDelayedFrames("LaunchCatapult", 3);
+        SendCustomEventDelayedFrames(nameof(LaunchCatapult), 3);
     }
     public void LaunchCatapult()
     {

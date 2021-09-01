@@ -8,6 +8,7 @@ public class SaccRaceToggleButton : UdonSharpBehaviour
 {
     public SaccRacingTrigger[] RacingTriggers;
     public SaccRaceCourseAndScoreboard[] Races;
+    [Tooltip("Can be used to set a default course -1 = none")]
     public int CurrentCourseSelection = -1;
     private void Start()
     {

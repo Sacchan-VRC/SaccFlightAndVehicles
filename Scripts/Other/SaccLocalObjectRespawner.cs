@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class SaccLocalObjectRespawner : UdonSharpBehaviour
 {
-    public GameObject WindChangerObj;
+    public GameObject ObjectToRespawn;
     public Transform RespawnPoint;
     private VRCPlayerApi localPlayer;
     private void Start()
@@ -15,8 +15,8 @@ public class SaccLocalObjectRespawner : UdonSharpBehaviour
     }
     void Interact()
     {
-        Networking.SetOwner(localPlayer, WindChangerObj);
-        WindChangerObj.transform.position = RespawnPoint.position;
-        WindChangerObj.transform.rotation = RespawnPoint.rotation;
+        Networking.SetOwner(localPlayer, ObjectToRespawn);
+        ObjectToRespawn.transform.position = RespawnPoint.position;
+        ObjectToRespawn.transform.rotation = RespawnPoint.rotation;
     }
 }

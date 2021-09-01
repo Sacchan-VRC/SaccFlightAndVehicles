@@ -8,6 +8,7 @@ public class SaccPassengerSeat : UdonSharpBehaviour
 {
     public SaccEntity EntityControl;
     public GameObject SeatAdjuster;
+    [Tooltip("Object that is enabled only for passenger that uses this seat. Not required.")]
     public GameObject PassengerOnly;
     private int ThisStationID;
     private bool SeatInitialized = false;

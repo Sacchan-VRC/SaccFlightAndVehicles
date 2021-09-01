@@ -6,7 +6,8 @@ using VRC.Udon;
 
 public class SaccTarget : UdonSharpBehaviour
 {
-    public float HitPoints = 100f;
+    public float HitPoints = 30f;
+    [Tooltip("Other UdonBehaviours that will recieve the event 'Explode'")]
     public UdonSharpBehaviour[] ExplodeOther;
     private Animator TargetAnimator;
     private float FullHealth;

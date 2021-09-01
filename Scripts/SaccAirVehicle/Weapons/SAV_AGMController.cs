@@ -6,9 +6,8 @@ using VRC.Udon;
 
 public class SAV_AGMController : UdonSharpBehaviour
 {
-    [SerializeField] private DFUNC_AGM DFUNC_AGMControl;
+    [SerializeField] private UdonSharpBehaviour AGMLauncherControl;
     public SaccEntity EntityControl;
-    private SaccAirVehicle SAVControl;
     [SerializeField] private float MaxLifetime = 20;
     [SerializeField] private AudioSource[] ExplosionSounds;
     [SerializeField] private float ColliderActiveDistance = 30;
@@ -19,13 +18,17 @@ public class SAV_AGMController : UdonSharpBehaviour
     private float Lifetime = 0;
     private bool ColliderActive = false;
     private bool Exploding = false;
+    private bool IsOwner = false;
     private CapsuleCollider AGMCollider;
     private void Start()
     {
-        CenterOfMass = SAVControl.CenterOfMass;
-        SAVControl = DFUNC_AGMControl.SAVControl;
-        Target = DFUNC_AGMControl.AGMTarget;
+        CenterOfMass = EntityControl.CenterOfMass;
+        Target = (Vector3)AGMLauncherControl.GetProgramVariable("AGMTarget");
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
+
+        if (EntityControl.InEditor) { IsOwner = true; }
+        else
+        { IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner"); }
     }
     void LateUpdate()
     {
@@ -75,18 +78,9 @@ public class SAV_AGMController : UdonSharpBehaviour
         }
         AGMCollider.enabled = false;
         Animator AGMani = gameObject.GetComponent<Animator>();
-        if (SAVControl.InEditor)
-        {
-            AGMani.SetTrigger("explodeowner");
-        }
-        else
-        {
-            if (SAVControl.localPlayer.IsOwner(SAVControl.gameObject))
-            {
-                AGMani.SetTrigger("explodeowner");
-            }
-            else AGMani.SetTrigger("explode");
-        }
-        Lifetime = MaxLifetime - 10;
+        if (IsOwner)
+        { AGMani.SetTrigger("explodeowner"); }
+        else { AGMani.SetTrigger("explode"); }
+        Lifetime = MaxLifetime - 10;//10 seconds to finish exploding
     }
 }

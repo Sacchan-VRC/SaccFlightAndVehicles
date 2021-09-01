@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class SAV_BombController : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle EngineControl;
+    [SerializeField] private UdonSharpBehaviour BombLauncherControl;
     public SaccEntity EntityControl;
     [SerializeField] private float MaxLifetime = 40;
     [SerializeField] private AudioSource[] ExplosionSounds;
@@ -23,14 +23,18 @@ public class SAV_BombController : UdonSharpBehaviour
     private float Lifetime = 0;
     private CapsuleCollider BombCollider;
     private Transform CenterOfMass;
+    private bool IsOwner;
 
     private void Start()
     {
-        CenterOfMass = EngineControl.CenterOfMass;
+        CenterOfMass = EntityControl.CenterOfMass;
         BombCollider = GetComponent<CapsuleCollider>();
         BombRigid = GetComponent<Rigidbody>();
         BombConstant = GetComponent<ConstantForce>();
         transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
+        if (EntityControl.InEditor) { IsOwner = true; }
+        else
+        { IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner"); }
     }
 
     void LateUpdate()
@@ -75,18 +79,9 @@ public class SAV_BombController : UdonSharpBehaviour
         }
         BombCollider.enabled = false;
         Animator Bombani = GetComponent<Animator>();
-        if (EngineControl.InEditor)
-        {
-            Bombani.SetTrigger("explodeowner");
-        }
-        else
-        {
-            if (EngineControl.localPlayer.IsOwner(EngineControl.gameObject))
-            {
-                Bombani.SetTrigger("explodeowner");
-            }
-            else Bombani.SetTrigger("explode");
-        }
-        Lifetime = MaxLifetime - 10;
+        if (IsOwner)
+        { Bombani.SetTrigger("explodeowner"); }
+        else { Bombani.SetTrigger("explode"); }
+        Lifetime = MaxLifetime - 10;//10 seconds to finish exploding
     }
 }

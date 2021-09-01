@@ -7,9 +7,13 @@ using UnityEngine.UI;
 
 public class SaccViewScreenController : UdonSharpBehaviour
 {
+    [Tooltip("Layer to spherecast to find all triggers on to use as follow targets")]
     public LayerMask AAMTargetsLayer;
+    [Tooltip("If enabled, disable when player is this many meters away from this gameobject")]
     public float DisableDistance = 15;
+    [Tooltip("Camera that follows the planes")]
     public Camera PlaneCamera;
+    [Tooltip("Screen that is enabled when turned on")]
     public GameObject ViewScreen;
     public Text ChannelNumberText;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];

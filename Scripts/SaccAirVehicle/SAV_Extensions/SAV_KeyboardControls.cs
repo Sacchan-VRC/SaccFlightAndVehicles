@@ -1,4 +1,4 @@
-﻿
+﻿/* Please make your own version of this script if you're making something greatly modified */
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;

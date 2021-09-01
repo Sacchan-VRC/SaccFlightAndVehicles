@@ -9,9 +9,12 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     [SerializeField] private Animator BoolAnimator;
     [SerializeField] private string AnimBoolName = "AnimBool";
     [SerializeField] private bool OnDefault = false;
+    [Tooltip("Set toggle to its default when exiting?")]
     [SerializeField] private bool PilotExitTurnOff = true;
     [SerializeField] private float ToggleMinDelay;
+    [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
+    [Tooltip("Send Events to sound script for opening a door?")]
     [SerializeField] private bool OpensDoor = false;
     [Header("Door Only:")]
     [SerializeField] private SAV_SoundController SoundControl;

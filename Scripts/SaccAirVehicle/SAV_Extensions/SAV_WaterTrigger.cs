@@ -6,9 +6,12 @@ using VRC.Udon;
 
 public class SAV_WaterTrigger : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle EngineControl;
+    [SerializeField] private SaccAirVehicle SAVControl;
+    [Tooltip("Damage applied to vehicle per second while vehicle is underwater")]
     [SerializeField] private float WaterDamageSec = 10;
+    [Tooltip("Strength of force slowing down the vehicle when it's underwater")]
     [SerializeField] private float WaterSlowDown = 3;
+    [Tooltip("Strength of force slowing down the vehicle's rotation when it's underwater")]
     [SerializeField] private float WaterSlowDownRot = 3;
     private SaccEntity EntityControl;
     private Rigidbody VehicleRigidbody;
@@ -22,8 +25,8 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
     {
         Initilized = true;
         WaterLayer = LayerMask.NameToLayer("Water");
-        VehicleRigidbody = EngineControl.EntityControl.GetComponent<Rigidbody>();
-        EntityControl = EngineControl.EntityControl;
+        VehicleRigidbody = SAVControl.EntityControl.GetComponent<Rigidbody>();
+        EntityControl = SAVControl.EntityControl;
         ThisCollider = gameObject.GetComponent<Collider>();
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
@@ -38,7 +41,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         if (InWater)
         {
             float DeltaTime = Time.deltaTime;
-            EngineControl.Health -= WaterDamageSec * DeltaTime;
+            SAVControl.Health -= WaterDamageSec * DeltaTime;
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, WaterSlowDown * DeltaTime);
             VehicleRigidbody.angularVelocity = Vector3.Lerp(VehicleRigidbody.angularVelocity, Vector3.zero, WaterSlowDownRot * DeltaTime);
         }
@@ -53,7 +56,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
             if (!CFOverridden)
             {
                 CFOverridden = true;
-                EngineControl.OverrideConstantForce++;
+                SAVControl.OverrideConstantForce++;
             }
         }
     }
@@ -69,7 +72,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
                 if (CFOverridden)
                 {
                     CFOverridden = false;
-                    EngineControl.OverrideConstantForce--;
+                    SAVControl.OverrideConstantForce--;
                 }
             }
         }
@@ -91,7 +94,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
     private void OnDisable()
     {
         ThisCollider.enabled = false;
-        if (InWater) { EngineControl.Health = -1; }//just kill the vehicle if it's underwater and the player gets out
+        if (InWater && WaterDamageSec > 0) { SAVControl.Health = -1; }//just kill the vehicle if it's underwater and the player gets out
         InWater = false;
         NumTriggers = 0;
     }
@@ -100,7 +103,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         if (CFOverridden)
         {
             CFOverridden = false;
-            EngineControl.OverrideConstantForce--;
+            SAVControl.OverrideConstantForce--;
         }
     }
     public void SFEXT_G_RespawnButton()
@@ -108,7 +111,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         if (CFOverridden)
         {
             CFOverridden = false;
-            EngineControl.OverrideConstantForce--;
+            SAVControl.OverrideConstantForce--;
         }
         if (InWater)
         {

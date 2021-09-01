@@ -7,6 +7,7 @@ using UnityEngine.UI;
 
 public class SAV_HUDController : UdonSharpBehaviour
 {
+    [Tooltip("Transform of the pilot seat's target eye position, HUDContrller is automatically moved to this position in Start() to ensure perfect alignment")]
     [SerializeField] private Transform PilotSeatAdjusterTarget;
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private Animator HUDAnimator;
@@ -16,21 +17,23 @@ public class SAV_HUDController : UdonSharpBehaviour
     [SerializeField] private Text HUDText_knots;
     [SerializeField] private Text HUDText_knotsairspeed;
     [SerializeField] private Text HUDText_angleofattack;
+    [Tooltip("Hud element that points toward the gruond")]
     [SerializeField] private Transform DownIndicator;
+    [Tooltip("Hud element that shows pitch angle")]
     [SerializeField] private Transform ElevationIndicator;
+    [Tooltip("Hud element that shows yaw angle")]
     [SerializeField] private Transform HeadingIndicator;
+    [Tooltip("Hud element that shows vehicle's direction of movement")]
     [SerializeField] private Transform VelocityIndicator;
-    [SerializeField] private float BulletSpeed = 1050;
-    [SerializeField] private Transform PitchRoll;
-    [SerializeField] private Transform Yaw;
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
+    [Tooltip("Oneshot sound played each time function selection changes")]
     [SerializeField] private AudioSource SwitchFunctionSound;
     private SaccEntity EntityControl;
     private bool SwitchFunctionSoundNULL;
+    [Tooltip("Local distance projected forward for objects that move dynamically, only adjust if the hud is moved forward in order to make it appear smaller")]
     public float distance_from_head = 1.333f;
     private float maxGs = 0f;
-    private Vector3 InputsZeroPos;
     private Vector3 startingpos;
     private float check = 0;
     private int showvel;
@@ -53,7 +56,6 @@ public class SAV_HUDController : UdonSharpBehaviour
 
         HUDAnimator = SAVControl.EntityControl.GetComponent<Animator>();
         EntityControl = SAVControl.EntityControl;
-        InputsZeroPos = PitchRoll.localPosition;
         VehicleTransform = SAVControl.EntityControl.transform;
 
         float fuel = SAVControl.Fuel;

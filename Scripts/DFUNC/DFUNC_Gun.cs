@@ -8,17 +8,25 @@ public class DFUNC_Gun : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private Animator GunAnimator;
+    [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
+    [Tooltip("Position at which recoil forces are added, not required for recoil to work. Only use this if you want the vehicle to rotate when shooting")]
     [SerializeField] private Transform GunRecoilEmpty;
+    [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
     [SerializeField] private Transform GunDamageParticle;
+    [Tooltip("Crosshair to switch to when gun is selected")]
     [SerializeField] private GameObject HudCrosshairGun;
+    [Tooltip("Vehicle's normal crosshair")]
     [SerializeField] private GameObject HudCrosshair;
+    [Tooltip("How long it takes to fully reload from empty in seconds")]
     [SerializeField] private float FullReloadTimeSec = 20;
     [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
+    [SerializeField] private float GunRecoil = 150;
+    [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
     [SerializeField] private bool DoAnimBool = false;
     [SerializeField] private string AnimBoolName = "GunSelected";
+    [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
-    [SerializeField] private float GunRecoil = 150;
     private SaccEntity EntityControl;
     private float ToggleTime;
     private bool AnimOn;
@@ -52,7 +60,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
         VehicleRigidbody = SAVControl.EntityControl.GetComponent<Rigidbody>();
         EntityControl = SAVControl.EntityControl;
-        GunRecoil = SAVControl.GunRecoil;
         GunRecoilEmptyNULL = GunRecoilEmpty == null;
         FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
         AAMTargets = EntityControl.AAMTargets;
@@ -206,7 +213,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 }
                 else
                 {
-                    VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in the same range as above*/, GunRecoilEmpty.position, ForceMode.Force);
+                    VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in a similar range as above*/, GunRecoilEmpty.position, ForceMode.Force);
                 }
                 TriggerLastFrame = true;
             }

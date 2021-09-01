@@ -8,6 +8,7 @@ using VRC.Udon;
 public class DFUNC_Cruise : UdonSharpBehaviour
 {
     [SerializeField] SaccAirVehicle SAVControl;
+    [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private Text HUDText_knotstarget;
     private SaccEntity EntityControl;

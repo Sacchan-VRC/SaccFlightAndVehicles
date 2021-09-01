@@ -8,13 +8,17 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private GameObject Rocket;
-    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
+    [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
     [SerializeField] private int NumRocket = 4;
+    [Tooltip("How often rocket fires if the trigger is held down")]
     [SerializeField] private float RocketHoldDelay = 0.5f;
+    [Tooltip("Minimum time between firing rockets")]
     [SerializeField] private float RocketDelay = 0f;
     [SerializeField] private Transform[] RocketLaunchPoints;
+    [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
+    private bool AmmoBarNULL = true;
     private bool UseLeftTrigger = false;
     private float Trigger;
     private bool TriggerLastFrame;
@@ -29,6 +33,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     private Vector3 AmmoBarScaleStart;
     private VRCPlayerApi localPlayer;
     private bool InVR;
+    private bool IsOwner;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXTP_L_EntityStart()
@@ -36,7 +41,8 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         FullRockets = NumRocket;
         reloadspeed = FullRockets / FullReloadTimeSec;
         FullRocketsDivider = 1f / (NumRocket > 0 ? NumRocket : 10000000);
-        AmmoBarScaleStart = AmmoBar.localScale;
+        AmmoBarNULL = AmmoBar = null;
+        if (!AmmoBarNULL) { AmmoBarScaleStart = AmmoBar.localScale; }
         if (RocketHoldDelay < RocketDelay) { RocketHoldDelay = RocketDelay; }
         VehicleTransform = SAVControl.EntityControl.transform;
 
@@ -81,7 +87,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         if (NumRocket != FullRockets) { SAVControl.ReSupplied++; }
         NumRocket = (int)Mathf.Min(NumRocket + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullRockets);
         RocketPoint = 0;
-        AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+        if (!AmmoBarNULL) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     private void Update()
     {
@@ -115,9 +121,9 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     }
     public void LaunchRocket()
     {
+        IsOwner = localPlayer.IsOwner(gameObject);
         if (NumRocket > 0) { NumRocket--; }
-
-        AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+        if (!AmmoBarNULL) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
         if (Rocket != null)
         {
             GameObject NewRocket = VRCInstantiate(Rocket);

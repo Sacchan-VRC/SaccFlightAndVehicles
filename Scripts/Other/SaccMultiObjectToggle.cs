@@ -6,8 +6,8 @@ using VRC.Udon;
 
 public class SaccMultiObjectToggle : UdonSharpBehaviour
 {
-    private int current = 0;
     public GameObject[] ToggleObjs;
+    private int current = 0;
     private void Interact()//entering the plane
     {
         current++;

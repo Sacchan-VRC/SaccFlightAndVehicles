@@ -9,16 +9,17 @@ public class DFUNC_AAM : UdonSharpBehaviour
 {
     [SerializeField] public SaccAirVehicle SAVControl;
     [SerializeField] private Animator AAMAnimator;
-    [SerializeField] private int NumAAM = 0;
-    [SerializeField] private float Lock_Angle = 15;
+    [SerializeField] private int NumAAM = 6;
+    [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
+    [SerializeField] private float AAMLockAngle = 15;
+    [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     [SerializeField] private float AAMLockTime = 1.5f;
-    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
+    [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 10;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private int FullAAMs;
     private int NumAAMTargets;
-    private float AAMLockAngle = 15;
     private float AAMLockTimer = 0;
     private bool AAMHasTarget = false;
     private bool AAMLocked = false;
@@ -41,6 +42,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private float reloadspeed;
     private bool LeftDial = false;
     private int DialPosition = -999;
+    private VRCPlayerApi localPlayer;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -54,6 +56,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         CenterOfMass = SAVControl.EntityControl.CenterOfMass;
         VehicleTransform = SAVControl.VehicleTransform;
         OutsidePlaneLayer = SAVControl.PlaneMesh.gameObject.layer;
+        localPlayer = Networking.LocalPlayer;
 
         //HUD
         if (HUDControl != null)
@@ -225,6 +228,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
     //AAMTargeting
     [SerializeField] private UdonSharpBehaviour HUDControl;
+    [Tooltip("Max distance an enemy can be targeted at")]
     [SerializeField] private float AAMMaxTargetDistance = 6000;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
@@ -279,7 +283,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
                     if ((LineOfSightNext
                         && hitnext.collider.gameObject.layer == OutsidePlaneLayer //did raycast hit an object on the layer planes are on?
-                            && NextTargetAngle < Lock_Angle
+                            && NextTargetAngle < AAMLockAngle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
                                         || ((!AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
@@ -328,7 +332,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                 {
                     AAMHasTarget = true;
-                    if (AAMCurrentTargetAngle < Lock_Angle && NumAAM > 0)
+                    if (AAMCurrentTargetAngle < AAMLockAngle && NumAAM > 0)
                     {
                         AAMLockTimer += DeltaTime;
                         //give enemy radar lock even if you're out of missiles
@@ -339,7 +343,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                             if (AAMTargetedTimer > 1)
                             {
                                 AAMTargetedTimer = 0;
-                                AAMCurrentTargetSAVControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetTargeted");
+                                AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted");
                             }
                         }
                     }
@@ -375,6 +379,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
     //hud stuff
     [SerializeField] private Text HUDText_AAM_ammo;
+    [Tooltip("Hud element to highlight current target")]
     [SerializeField] private Transform AAMTargetIndicator;
     private float distance_from_head;
     private void Hud()
@@ -399,7 +404,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void LaunchAAM()
     {
-        IsOwner = SAVControl.IsOwner;
+        IsOwner = localPlayer.IsOwner(gameObject);
         InEditor = SAVControl.InEditor;
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         AAMAnimator.SetTrigger(AAMLAUNCHED_STRING);

@@ -6,115 +6,197 @@ using VRC.Udon;
 
 public class SaccAirVehicle : UdonSharpBehaviour
 {
+    [Tooltip("Base object reference")]
     public SaccEntity EntityControl;
+    [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
     public Transform PlaneMesh;
+    [Tooltip("Layer to set the colliders to when entering vehicle")]
     public int OnboardPlaneLayer = 19;
+    [Tooltip("Position used to raycast from in order to calculate ground effect")]
     public Transform GroundEffectEmpty;
+    [Tooltip("Position pitching forces are applied at")]
     public Transform PitchMoment;
+    [Tooltip("Position yawing forces are applied at")]
     public Transform YawMoment;
+    [Tooltip("Position traced down from to detect whether the vehicle is currently on the ground. Trace distance is 44cm. Place between the back wheels around 20cm above the height where the wheels touch the ground")]
     public Transform GroundDetector;
+    [Tooltip("HP of the plane, bullets do 10 damage per hit")]
     [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
-    public Transform GunRecoilEmpty;
-    public float GunRecoil = 150;
+    [Tooltip("Teleport the vehicle to the oposite side of the map when flying too far in one direction?")]
     public bool RepeatingWorld = true;
+    [Tooltip("Distance you can travel away from world origin before being teleported to the other side of the map. Not recommended to increase, floating point innacuracy and game freezing issues may occur if larger than default")]
     public float RepeatingWorldDistance = 20000;
+    [Tooltip("Use the left hand to control the joystick and the right hand to control the throttle?")]
     [SerializeField] private bool SwitchHandsJoyThrottle = false;
     public bool HasAfterburner = true;
     [SerializeField] private KeyCode AfterBurnerKey = KeyCode.T;
+    [Tooltip("Point in the throttle at which afterburner enables, .8 = 80%")]
     public float ThrottleAfterburnerPoint = 0.8f;
+    [Tooltip("Disable Thrust/VTOL rotation values transition calculations and assume VTOL mode always (for helicopters)")]
     public bool VTOLOnly = false;
-    public bool HasVTOLAngle = false;
     [Header("Response:")]
+    [Tooltip("Vehicle thrust at max throttle without afterburner")]
     public float ThrottleStrength = 20f;
+    [Tooltip("Make VR Throttle motion controls use the Y axis instead of the Z axis for adjustment (Helicopter collective)")]
     public bool VerticalThrottle = false;
+    [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
     public float ThrottleSensitivity = 6f;
+    [Tooltip("How much more thrust the vehicle has when in full afterburner")]
     public float AfterburnerThrustMulti = 1.5f;
+    [Tooltip("How quickly the vehicle throttles up after throttle is increased (Lerp)")]
     public float AccelerationResponse = 4.5f;
+    [Tooltip("How quickly the vehicle throttles down relative to how fast it throttles up after throttle is decreased")]
     public float EngineSpoolDownSpeedMulti = .5f;
+    [Tooltip("How much the plane slows down (Speed lerped towards 0)")]
     public float AirFriction = 0.0004f;
+    [Tooltip("Pitch force multiplier, (gets stronger with airspeed)")]
     public float PitchStrength = 5f;
+    [Tooltip("Pitch rotation force (as multiple of PitchStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
     public float PitchThrustVecMulti = 0f;
+    [Tooltip("Force that stops vehicle from pitching, (gets stronger with airspeed)")]
     public float PitchFriction = 24f;
+    [Tooltip("Force that stops vehicle from pitching, (doesn't get stronger with airspeed)")]
     public float PitchConstantFriction = 0f;
+    [Tooltip("How quickly the vehicle responds to changes in joystick's pitch (Lerp)")]
     public float PitchResponse = 20f;
+    [Tooltip("If the vehicle is moving backwards, Pitch strength is multiplied by this. No effect if PitchThrustVecMulti is above 0")]
     public float ReversingPitchStrengthMulti = 2;
+    [Tooltip("Yaw force multiplier, (gets stronger with airspeed)")]
     public float YawStrength = 3f;
+    [Tooltip("Yaw rotation force (as multiple of YawStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
     public float YawThrustVecMulti = 0f;
+    [Tooltip("Force that stops vehicle from yawing, (gets stronger with airspeed)")]
     public float YawFriction = 15f;
+    [Tooltip("Force that stops vehicle from yawing, (doesn't get stronger with airspeed)")]
     public float YawConstantFriction = 0f;
+    [Tooltip("How quickly the vehicle responds to changes in joystick's yaw (Lerp)")]
     public float YawResponse = 20f;
+    [Tooltip("If the vehicle is moving backwards, Yaw strength is multiplied by this. No effect if YawThrustVecMulti is above 0")]
     public float ReversingYawStrengthMulti = 2.4f;
+    [Tooltip("Yaw force multiplier, (gets stronger with airspeed)")]
     public float RollStrength = 450f;
+    [Tooltip("Roll rotation force (as multiple of RollStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
     public float RollThrustVecMulti = 0f;
+    [Tooltip("Force that stops vehicle from rolling, (gets stronger with airspeed)")]
     public float RollFriction = 90f;
+    [Tooltip("Force that stops vehicle from rolling, (doesn't get stronger with airspeed)")]
     public float RollConstantFriction = 0f;
+    [Tooltip("How quickly the vehicle responds to changes in joystick's roll (Lerp)")]
     public float RollResponse = 20f;
+    [Tooltip("If the vehicle is moving backwards, Roll strength is multiplied by this. No effect if RollThrustVecMulti is above 0")]
     public float ReversingRollStrengthMulti = 1.6f;//reversing = AoA > 90
+    [Tooltip("Make pitching down a different strength than pitching up")]
     public float PitchDownStrMulti = .8f;
+    [Tooltip("When angle of attack is negative (air is hitting the top of the plane) multiply lift by this number (useful for making vehicles weak at flying upside down)")]
     public float PitchDownLiftMulti = .8f;
+    [Tooltip("Adjust the rotation of Unity's inbuilt Inertia Tensor Rotation, which is a function of rigidbodies. If set to 0, the plane will be very stable and feel boring to fly.")]
     public float InertiaTensorRotationMulti = 1;
+    [Tooltip("Inverts Z axis of the Inertia Tensor Rotation, causing the direction of the yawing experienced after rolling to invert")]
     public bool InvertITRYaw = false;
+    [Tooltip("Yawing added to the vehicle with changes in throttle")]
     public float AdverseYaw = 0;
+    [Tooltip("Rolling added to the vehicle with changes in throttle")]
     public float AdverseRoll = 0;
+    [Tooltip("Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear. (Meters/second)")]
     public float RotMultiMaxSpeed = 220f;
-    //public float StickInputPower = 1.7f;
+    [Tooltip("How much the the vehicle's nose is pulled toward the direction of movement on the pitch axis")]
     public float VelStraightenStrPitch = 0.035f;
+    [Tooltip("How much the the vehicle's nose is pulled toward the direction of movement on the yaw axis")]
     public float VelStraightenStrYaw = 0.045f;
+    [Tooltip("Angle of attack above which the plane will lose control")]
     public float MaxAngleOfAttackPitch = 25f;
+    [Tooltip("Angle of attack above which the plane will lose control")]
     public float MaxAngleOfAttackYaw = 40f;
+    [Tooltip("Shape of the angle of attack lift curve. 1= linear, high number = curve more vertical at the beginning, See this to understand (the 2 in the input represents this value, ignore everything outside the 0-1 range in the graph): https://www.wolframalpha.com/input/?i=-%28%281-x%29%5E2%29%2B1")]
     public float AoaCurveStrength = 2f;//1 = linear, >1 = convex, <1 = concave
+    [Tooltip("The angle of attack curve is augmented by being MAX'd(taking the higher value) with a linear curve that is multiplied by this number. Use this value to decide how much control the plane has when beyond it's 'max' angle of attack. See AoALiftCurve.png. Pitch AoA and Yaw AoA are calculated seperately, control is reduced based on the worse value.")]
     public float HighPitchAoaMinControl = 0.2f;
+    [Tooltip("See above")]
     public float HighYawAoaMinControl = 0.2f;
+    [Tooltip("When the plane is is at a high angle of attack you can give it a minimum amount of lift/drag, so that it doesn't just lose all air resistance.")]
     public float HighPitchAoaMinLift = 0.2f;
+    [Tooltip("See above")]
     public float HighYawAoaMinLift = 0.2f;
+    [Tooltip("Degrees per second the vehicle rotates on the ground. Uses simple object rotation with a lerp, no real physics to it.")]
     public float TaxiRotationSpeed = 35f;
+    [Tooltip("How lerped the taxi movement rotation is")]
     public float TaxiRotationResponse = 2.5f;
+    [Tooltip("Adjust how steep the lift curve is. Higher = more lift")]
     public float Lift = 0.00015f;
+    [Tooltip("How much angle of attack on yaw turns the vehicle. Yaw steering strength in air")]
     public float SidewaysLift = .17f;
+    [Tooltip("Maximum value for lift, as it's exponential it's wise to stop it at some point?")]
     public float MaxLift = 10f;
+    [Tooltip("Push the vehicle up based on speed. Used to counter the fact that without it, the plane's nose will droop down due to gravity. Slower planes need a higher value.")]
     public float VelLift = 1f;
+    [Tooltip("Maximum Vel Lift, to stop the nose being pushed up. Technically should probably be 9.81 to counter gravity exactly")]
     public float VelLiftMax = 10f;
+    [Tooltip("Vehicle will take damage if experiences more Gs that this (Internally Gs are calculated in all directions, the HUD shows only vertical Gs so it will differ slightly")]
     public float MaxGs = 40f;
+    [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
     public float GDamage = 10f;
+    [Tooltip("Length of the trace that looks for the ground to calculate ground effect")]
     public float GroundEffectMaxDistance = 7;
+    [Tooltip("Multiply the force of the ground effect")]
     public float GroundEffectStrength = 4;
+    [Tooltip("Limit the force that can be applied by ground effect")]
     public float GroundEffectLiftMax = 9999999;
-    public float GLimiter = 12f;
-    public float AoALimiter = 15f;
     [Header("Response VTOL:")]
+    [Tooltip("Degrees per second which the angle of the thrusters on the vehicle rotate toward desired angle")]
     public float VTOLAngleTurnRate = 90f;
+    [Tooltip("Position between VTOL Min Angle and VTOL Max Angle that the plane is at by default. 0 = min, 1 = max.")]
     public float VTOLDefaultValue = 0;
+    [Tooltip("Allow after burner whilst VTOL is engaged, (VTOL angle is not 0), VTOL Min Angle must be 0 for afterburner to work if this is unticked.")]
     public bool VTOLAllowAfterburner = false;
+    [Tooltip("Multiply throttle strength by this value whilst vehicle is in VTOL mode, at VTOL angle of 90 degrees, this value is used, between 0 and 90 degrees the value is linearly transitioned towards this value, above 90 degrees it remains at this value")]
     public float VTOLThrottleStrengthMulti = .7f;
+    [Tooltip("Minimum angle of thrust direction, 0 = straight backwards, 90 = straight down, 180 = straight forwards")]
     public float VTOLMinAngle = 0;
+    [Tooltip("Maximum angle of thrust direction, 0 = straight backwards, 90 = straight down, 180 = straight forwards")]
     public float VTOLMaxAngle = 90;
+    [Tooltip("Amount of Thrust Vectoring the plane has whilst in VTOL mode. (Remember thrust vectoring is as a multiple of the normal rotation values, so best to keep below 1, usually below .4)\nLeave at 1 and adjust Pitch Strength etc for helicopters")]
     public float VTOLPitchThrustVecMulti = .3f;
+    [Tooltip("See above")]
     public float VTOLYawThrustVecMulti = .3f;
+    [Tooltip("See above")]
     public float VTOLRollThrustVecMulti = .07f;
+    [Tooltip("Speed at which the VTOL Thrust Vec Multi values will stop taking affect, scaled linearly up to this speed. Doesn't have any effect if vehicle is VTOLOnly.")]
     public float VTOLLoseControlSpeed = 120;
+    [Tooltip("Strength of ground effect that doesn't depend on speed, and points in the direction of the thrust. Uses GroundEffectEmpty and GroundEffectMaxDistance. Only enabled if the vehicle has VTOL")]
     public float VTOLGroundEffectStrength = 4;
     [Header("Other:")]
-    [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders")]
+    [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders suspension values")]
     [SerializeField] private bool AutoAdjustValuesToMass = true;
+    [Tooltip("Zero height of the calculation of atmosphere thickness and HUD altitude display")]
     public float SeaLevel = -10f;
+    [Tooltip("Wind speed on each axis")]
     public Vector3 Wind;
     public float WindGustStrength = 15;
+    [Tooltip("How often wind gust changes strength")]
     public float WindGustiness = 0.03f;
+    [Tooltip("Scale of world space gust cells, smaller number = larger cells")]
     public float WindTurbulanceScale = 0.0001f;
+    [Tooltip("Extra drag added when airspeed approaches the speed of sound")]
     public float SoundBarrierStrength = 0.0003f;
-    public float SoundBarrierWidth = 20f;
+    [Tooltip("Within how many meters per second of the speed of sound does the vehicle have to be before they experience extra drag. Extra drag is scaled linearly up to the speed of sound, and dowan after it")]
     [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
+    public float SoundBarrierWidth = 20f;
+    [Tooltip("Fuel consumed per second at max throttle, scales with throttle")]
     public float FuelConsumption = 2;
+    [Tooltip("Multiply FuelConsumption by this number when at full afterburner Scales with afterburner level")]
     public float FuelConsumptionABMulti = 3f;
+    [Tooltip("Number of resupply ticks it takes to refuel fully from zero")]
     public float RefuelTime = 25;
+    [Tooltip("Number of resupply ticks it takes to repair fully from zero")]
     public float RepairTime = 30;
+    [Tooltip("Time until vehicle reappears after exploding")]
     public float RespawnDelay = 10;
+    [Tooltip("Time after reappearing the plane is invincible for")]
     public float InvincibleAfterSpawn = 2.5f;
-    [Tooltip("Meters. 12192 = 40,000 feet")]
+    [Tooltip("Altitude above 'Sea Level' at which the atmosphere starts thinning, In meters. 12192 = 40,000~ feet")]
     public float AtmosphereThinningStart = 12192f; //40,000 feet
-    [Tooltip("Meters. 19812 = 65,000 feet feet")]
+    [Tooltip("Altitude above 'Sea Level' at which the atmosphere reaches zero thickness. In meters. 19812 = 65,000~ feet")]
     public float AtmosphereThinningEnd = 19812; //65,000 feet
-    public bool DisablePhysicsAndInputs;
     [System.NonSerializedAttribute] public float AllGs;
 
 
@@ -223,7 +305,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float vtolangledif;
     Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
-    private bool GunRecoilEmptyNULL = true;
     [System.NonSerializedAttribute] public float ThrottleStrengthAB;
     [System.NonSerializedAttribute] public float FuelConsumptionAB;
     private bool VTolAngle90Plus;
@@ -240,10 +321,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
     //this stuff can be used by DFUNCs
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
     [System.NonSerializedAttribute] public float Limits = 1;
+    [System.NonSerializedAttribute] public int DisablePhysicsAndInputs = 0;
     [System.NonSerializedAttribute] public int OverrideConstantForce = 0;
     [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
     [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
-    [System.NonSerializedAttribute] public int DisableGearToggle = 0;
     [System.NonSerializedAttribute] public int DisableTaxiRotation = 0;
     [System.NonSerializedAttribute] public int DisableGroundDetection = 0;
     [System.NonSerializedAttribute] public int ThrottleOverridden = 0;
@@ -372,7 +453,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         }
 
 
-        if (VTOLOnly || HasVTOLAngle) { VTOLenabled = true; }
+        if (VTOLOnly) { VTOLenabled = true; }
         VTOL90Degrees = Mathf.Min(90 / VTOLMaxAngle, 1);
 
         if (!HasAfterburner) { ThrottleAfterburnerPoint = 1; }
@@ -394,10 +475,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
         VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
 
-        if (GunRecoilEmpty != null)
-        {
-            GunRecoilEmptyNULL = false;
-        }
         LowFuel = 200;//FullFuel * .13888888f;//to match the old default settings
         LowFuelDivider = 1 / LowFuel;
 
@@ -417,7 +494,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 GDamageToTake = 0;
                 if (Health <= 0f)//plane is ded
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                 }
             }
             else { GDamageToTake = 0; }
@@ -494,7 +571,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
                 }
 
-                if (!DisablePhysicsAndInputs)
+                if (DisablePhysicsAndInputs == 0)
                 {
                     //collect inputs
                     int Wi = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
@@ -818,7 +895,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             else
             {
                 //brake is always on if the plane is on the ground
-                if (!DisablePhysicsAndInputs)
+                if (DisablePhysicsAndInputs == 0)
                 {
                     if (Taxiing)
                     {
@@ -828,7 +905,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 }
             }
 
-            if (!DisablePhysicsAndInputs)
+            if (DisablePhysicsAndInputs == 0)
             {
                 //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
                 if (EngineOutput < ThrottleInput)
@@ -902,8 +979,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         //float thrust = EngineOutput * ThrottleStrength * AfterburnerThrottle * AfterburnerThrustMulti * Atmosphere;
                         float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
 
-                        Vector3 VTOLInputAcc;                                                     //rotate and scale Vector for VTOL thrust
-                        if (VTOLOnly)//just use regular thrust strength if vtol only, as there should be no transition to plane flight
+                        Vector3 VTOLInputAcc;//rotate and scale Vector for VTOL thrust
+                        if (VTOLOnly)//just use regular thrust strength if vtol only, no transition to plane flight
                         {
                             VTOLInputAcc = Vector3.RotateTowards(Vector3.forward, VTOL180, VTOLAngle2 * Mathf.Deg2Rad, 0) * Thrust;
                         }
@@ -1290,7 +1367,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     private void WindAndAoA()
     {
-        if (DisablePhysicsAndInputs) { return; }
+        if (DisablePhysicsAndInputs != 0) { return; }
         Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
         float TimeGustiness = Time.time * WindGustiness;
         float gustx = TimeGustiness + (VehicleTransform.position.x * WindTurbulanceScale);
@@ -1388,10 +1465,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
             ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
             ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
         }
-    }
-    public void SetTargeted()
-    {
-        VehicleAnimator.SetTrigger("radarlocked");
     }
     public Vector2 UnpackThrottles(float Throttle)
     {

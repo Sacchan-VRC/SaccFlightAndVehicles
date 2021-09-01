@@ -44,7 +44,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 12
+      Data: 13
     - Name: 
       Entry: 7
       Data: 
@@ -188,7 +188,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FlareParticles
+      Data: FlareLaunchSpeed
     - Name: $v
       Entry: 7
       Data: 12|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -200,7 +200,7 @@ MonoBehaviour:
       Data: 14|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: UnityEngine.ParticleSystem[], UnityEngine.ParticleSystemModule
+      Data: System.Single, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -212,13 +212,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineParticleSystemArray
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: FlareParticles
+      Data: FlareLaunchSpeed
     - Name: symbolUniqueName
       Entry: 1
-      Data: FlareParticles
+      Data: FlareLaunchSpeed
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -236,7 +236,7 @@ MonoBehaviour:
       Data: 16|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: How long a flare has an effect for
+      Data: Speed to launch flare particles at
     - Name: 
       Entry: 8
       Data: 
@@ -266,7 +266,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FlareActiveTime
+      Data: FlareParticles
     - Name: $v
       Entry: 7
       Data: 18|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -278,7 +278,7 @@ MonoBehaviour:
       Data: 20|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: System.Single, mscorlib
+      Data: UnityEngine.ParticleSystem[], UnityEngine.ParticleSystemModule
     - Name: 
       Entry: 8
       Data: 
@@ -290,13 +290,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: UnityEngineParticleSystemArray
     - Name: symbolOriginalName
       Entry: 1
-      Data: FlareActiveTime
+      Data: FlareParticles
     - Name: symbolUniqueName
       Entry: 1
-      Data: FlareActiveTime
+      Data: FlareParticles
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -335,7 +335,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FullReloadTimeSec
+      Data: FlareActiveTime
     - Name: $v
       Entry: 7
       Data: 23|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -344,7 +344,7 @@ MonoBehaviour:
       Data: 24|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 20
+      Data: 14
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -356,10 +356,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: FullReloadTimeSec
+      Data: FlareActiveTime
     - Name: symbolUniqueName
       Entry: 1
-      Data: FullReloadTimeSec
+      Data: FlareActiveTime
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -377,8 +377,7 @@ MonoBehaviour:
       Data: 26|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: How long it takes to fully reload from 0 in seconds. Can be inaccurate
-        because it can only reload by integers per resupply
+      Data: How long a flare has an effect for
     - Name: 
       Entry: 8
       Data: 
@@ -408,7 +407,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FlareLaunch
+      Data: FullReloadTimeSec
     - Name: $v
       Entry: 7
       Data: 28|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -416,14 +415,8 @@ MonoBehaviour:
       Entry: 7
       Data: 29|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 30|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: UnityEngine.AudioSource, UnityEngine.AudioModule
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 14
     - Name: declarationType
       Entry: 3
       Data: 1
@@ -432,13 +425,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineAudioSource
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: FlareLaunch
+      Data: FullReloadTimeSec
     - Name: symbolUniqueName
       Entry: 1
-      Data: FlareLaunch
+      Data: FullReloadTimeSec
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -447,10 +440,20 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 31|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 30|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 31|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
+    - Name: tooltip
+      Entry: 1
+      Data: How long it takes to fully reload from 0 in seconds. Can be inaccurate
+        because it can only reload by integers per resupply
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 7
       Data: 32|UnityEngine.SerializeField, UnityEngine.CoreModule
@@ -477,7 +480,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HUDText_flare_ammo
+      Data: FlareLaunch
     - Name: $v
       Entry: 7
       Data: 33|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -489,7 +492,7 @@ MonoBehaviour:
       Data: 35|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: UnityEngine.UI.Text, UnityEngine.UI
+      Data: UnityEngine.AudioSource, UnityEngine.AudioModule
     - Name: 
       Entry: 8
       Data: 
@@ -501,13 +504,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineUIText
+      Data: UnityEngineAudioSource
     - Name: symbolOriginalName
       Entry: 1
-      Data: HUDText_flare_ammo
+      Data: FlareLaunch
     - Name: symbolUniqueName
       Entry: 1
-      Data: HUDText_flare_ammo
+      Data: FlareLaunch
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -546,7 +549,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HUDText_flare_ammoNULL
+      Data: HUDText_flare_ammo
     - Name: $v
       Entry: 7
       Data: 38|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -556,6 +559,75 @@ MonoBehaviour:
     - Name: internalType
       Entry: 7
       Data: 40|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: UnityEngine.UI.Text, UnityEngine.UI
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: declarationType
+      Entry: 3
+      Data: 1
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: UnityEngineUIText
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: HUDText_flare_ammo
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: HUDText_flare_ammo
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 41|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 42|UnityEngine.SerializeField, UnityEngine.CoreModule
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: HUDText_flare_ammoNULL
+    - Name: $v
+      Entry: 7
+      Data: 43|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 44|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 7
+      Data: 45|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
       Data: System.Boolean, mscorlib
@@ -585,7 +657,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 41|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 46|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -612,13 +684,13 @@ MonoBehaviour:
       Data: UseLeftTrigger
     - Name: $v
       Entry: 7
-      Data: 42|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 47|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 43|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 48|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 45
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -642,7 +714,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 44|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 49|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -669,10 +741,10 @@ MonoBehaviour:
       Data: FullFlares
     - Name: $v
       Entry: 7
-      Data: 45|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 50|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 46|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 51|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 9
@@ -699,7 +771,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 47|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 52|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -726,13 +798,13 @@ MonoBehaviour:
       Data: reloadspeed
     - Name: $v
       Entry: 7
-      Data: 48|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 53|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 49|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 54|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 20
+      Data: 14
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -756,7 +828,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 50|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 55|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -783,13 +855,13 @@ MonoBehaviour:
       Data: TriggerLastFrame
     - Name: $v
       Entry: 7
-      Data: 51|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 56|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 52|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 57|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 40
+      Data: 45
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -813,7 +885,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 53|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 58|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0

@@ -9,11 +9,13 @@ public class DFUNC_AGM : UdonSharpBehaviour
 {
     [SerializeField] public SaccAirVehicle SAVControl;
     [SerializeField] private Animator AGMAnimator;
+    [Tooltip("Camera script that is used to see the target")]
     [SerializeField] private Camera AtGCam;
     [SerializeField] private Text HUDText_AGM_ammo;
+    [Tooltip("Screen that displays target, that is enabled when selected")]
     [SerializeField] private GameObject AtGScreen;
     [SerializeField] private GameObject Dial_Funcon;
-    [Tooltip("How long it takes to fully reload from 0 in seconds. Can be inaccurate because it can only reload by integers per resupply")]
+    [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
     [SerializeField] private AudioSource AGMLock;
     [SerializeField] private AudioSource AGMUnlock;

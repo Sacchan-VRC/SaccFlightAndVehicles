@@ -8,30 +8,43 @@ public class SAV_FloatScript : UdonSharpBehaviour
 {
     [SerializeField] private Rigidbody VehicleRigidbody;
     [SerializeField] private SaccAirVehicle SAVControl;
+    [Tooltip("Transforms at which floating forces are calculate, recomd using 4 in a rectangle centered around the center of mass")]
     [SerializeField] private Transform[] FloatPoints;
+    [Tooltip("Layers to raycast against to check for 'water'")]
     [SerializeField] private LayerMask FloatLayers = 16;
     private Transform VehicleTransform;
+    [Tooltip("Multiplier for the forces pushing up")]
     [SerializeField] private float FloatForce;
+    [Tooltip("Value that the floating forces are multiplied by while vehicle is moving down in water. Higher = more stable floating")]
     [SerializeField] private float Compressing;
+    [Tooltip("Physical siez of the simulated spherical float")]
     [SerializeField] private float FloatRadius = .5f;
+    [Tooltip("Strength of drag force applied by perpendicular movement in water (applied at floats)")]
     [SerializeField] private float WaterSidewaysDrag = .1f;
+    [Tooltip("Strength of drag force applied by forward movement in water (applied at floats)")]
     [SerializeField] private float WaterForwardDrag = .1f;
+    [Tooltip("Strength of force slowing rotation in water")]
     [SerializeField] private float WaterRotDrag = .1f;
+    [Tooltip("Strength of drag force slowing down the vehicle (applied at center of mass, causes no rotation)")]
     [SerializeField] private float WaterVelDrag = .1f;
     [SerializeField] private float WaveHeight = .2f;
     [Tooltip("Size of wave noise pattern. Smaller Number = bigger pattern")]
     [SerializeField] private float WaveScale = 1;
     [Tooltip("How fast waves scroll across the sea")]
     [SerializeField] private float WaveSpeed = 1;
-    [Tooltip("Try to float on the last (use this for hoverbikes)")]
+    [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
     [SerializeField] private bool DoOnLand;
-    [Tooltip("Automatically set multiple the relevent values by rigidbody weight, allowing the vehicle to be any weight without changing it's behaviour")]
+    [Tooltip("Automatically multiply the relevent values by rigidbody weight on Start(), allowing the vehicle to be any weight without changing it's physics")]
     [SerializeField] bool AutoAdjustForWeight = true;
 
     [Header("HoverBike Only")]
+    [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     [SerializeField] private bool HoverBike = false;
+    [Tooltip("Disable ground detection on attached vehicle (disable 'taxiing' movement)")]
     [SerializeField] private bool DisableGroundDetection = false;
+    [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the rolling-into-a-turn extra turning ability")]
     [SerializeField] private float HoverBikeTurningStrength = 1;
+    [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifintg-at-90-degrees extra turning ability")]
     [SerializeField] private float BackThrustStrength = 5;
     private bool SAVControlNULL;
     private float[] FloatDepth;

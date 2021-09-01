@@ -8,13 +8,19 @@ public class DFUNC_Canopy : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;
     [SerializeField] private UdonSharpBehaviour SoundControl;
+    [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private Animator CanopyAnimator;
+    [Tooltip("The length of the canopy close animation, or how long to wait before telling the sound controller to change the sounds to inside vehicle sounds when closing")]
     [SerializeField] private float CanopyCloseTime = 1.8f;
+    [Tooltip("The canopy can break off? Requires animation setup")]
     [SerializeField] private bool CanopyCanComeOff = true;
     [Header("Meters/s")]
+    [Tooltip("Speed at which canopy will break off if it's still open")]
     [SerializeField] private float CanopyBreakSpeed = 50;
+    [Tooltip("Speed at which canopy will close itself (useful for noobs/lazy people)")]
     [SerializeField] private float CanopyAutoCloseSpeed = 20;
+    [Tooltip("Extra drag applied to vehicle while canopy is open")]
     [SerializeField] private float CanopyDragMulti = 1.2f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;

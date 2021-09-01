@@ -7,30 +7,53 @@ using VRC.Udon;
 public class SAV_SoundController : UdonSharpBehaviour
 {
     public SaccAirVehicle SAVControl;
+    [Tooltip("Vehicle engine's 'Idle' sound, plays all the time vehicle is occupied, and pitches up with engine's output")]
     public AudioSource[] PlaneIdle;
+    [Tooltip("Same as PlaneIdle but only plays when inside the vehicle with all doors closed")]
     public AudioSource PlaneInside;
-    public AudioSource PlaneDistant;
+    [Tooltip("Vehicle engine's sound for when it's closeby, increases volume with engine's output")]
     public AudioSource[] Thrust;
+    [Tooltip("Vehicle engine's sound for when it's distant, increases volume with engine's output")]
+    public AudioSource PlaneDistant;
+    [Tooltip("One shot sound that plays when afterburner is toggled on, and you're inside the vehicle with all doors closed")]
     public AudioSource ABOnInside;
+    [Tooltip("One shot sound that plays when afterburner is toggled on, and you're outside the vehicle")]
     public AudioSource ABOnOutside;
+    [Tooltip("One shot sounds, a random one is played when vehicle touches the ground")]
     public AudioSource[] TouchDown;
-    public AudioSource PlaneWind;
-    public AudioSource[] SonicBoom;
-    public AudioSource[] Explosion;
-    public AudioSource[] BulletHit;
-    public AudioSource Rolling;
-    [SerializeField] private float RollingMaxVol = 1;
-    [SerializeField] private float RollingVolCurve = .03f;
-    [Tooltip("If ticked, will lerp Rolling volume on touchdown. useful for seaplanes")]
-    [SerializeField] private bool Rolling_Seaplane;
-    public AudioSource ReSupply;
-    public AudioSource RadarLocked;
-    public AudioSource MissileIncoming;
-    public AudioSource EnterWater;
-    public AudioSource EnterWaterOutside;
-    public AudioSource UnderWater;
-    public AudioSource[] DopplerSounds;
+    [Tooltip("Vehicle has to be moving faster than this to play the touchdown sound. Meters/s")]
     public float TouchDownSoundSpeed = 35;
+    [Tooltip("'Wind' sound that gets louder with AoA and various other factors")]
+    public AudioSource PlaneWind;
+    [Tooltip("Sounds that can be played when vehicle causes a sonic boom")]
+    public AudioSource[] SonicBoom;
+    [Tooltip("Sounds that can be played when vehicle explodes")]
+    public AudioSource[] Explosion;
+    [Tooltip("Sounds that can be played when vehicle gets hit by something")]
+    public AudioSource[] BulletHit;
+    [Tooltip("Sounds played when vehicle is rolling along the ground. Also works for seaplanes")]
+    public AudioSource Rolling;
+    [Tooltip("Maximum volume rolling sound reaches when moving forward quickly")]
+    [SerializeField] private float RollingMaxVol = 1;
+    [Tooltip("How quickly the rolling sound reaches max volume as speed increases")]
+    [SerializeField] private float RollingVolCurve = .03f;
+    [Tooltip("If ticked, will lerp Rolling volume on touchdown. For seaplanes water touchdown")]
+    [SerializeField] private bool Rolling_Seaplane;
+    [Tooltip("Oneshot sound sound played each time vehicle recieves a resupply event")]
+    public AudioSource ReSupply;
+    [Tooltip("Looping Sound that plays when vehicle is being targeted by a missile")]
+    public AudioSource RadarLocked;
+    [Tooltip("Looping Sound sound that plays when a missile is flying towards the vehicle")]
+    public AudioSource MissileIncoming;
+    [Tooltip("Sound that plays when vehicle enters water and player is inside the vehicle")]
+    public AudioSource EnterWater;
+    [Tooltip("Oneshot sound that plays when vehicle enters water and player is outside of the vehicle")]
+    public AudioSource EnterWaterOutside;
+    [Tooltip("Looping Sound that plays while vehicle is underwater and player is inside")]
+    public AudioSource UnderWater;
+    [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
+    public AudioSource[] DopplerSounds;
+    [Tooltip("Only untick this if you have no door/acnopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
     public bool AllDoorsClosed = true;
     [System.NonSerializedAttribute] public bool PlaneIdleNull = true;
     [System.NonSerializedAttribute] public bool PlaneInsideNull = true;

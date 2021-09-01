@@ -10,8 +10,11 @@ using VRC.Udon;
 public class SaccSeatAdjuster : UdonSharpBehaviour
 {
     public Transform Seat;
+    [Tooltip("Height to move the eyes of the player to when they enter the seat")]
     public Transform TargetHeight;
+    [Tooltip("Match Z coordinate to TargetHeight as well as Y")]
     public bool CalibrateFowardBack = true;
+    [Tooltip("Place an object in this to test if it works if changing the code (Not really needed with CyanEmu)")]
     public Transform PositionTest;
     private Vector3 TargetRelative;
     private Vector3 SeatOriginalPos;

@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_VTOLAngle : UdonSharpBehaviour
 {
-    [SerializeField] SaccAirVehicle SAVControl;
+    [SerializeField] private SaccAirVehicle SAVControl;
     private bool UseLeftTrigger = false;
     private float VTOLDefault;
     private Transform VehicleTransform;
@@ -23,6 +23,7 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
         VehicleTransform = SAVControl.EntityControl.GetComponent<Transform>();
         localPlayer = Networking.LocalPlayer;
         ThrottleSensitivity = SAVControl.ThrottleSensitivity;
+        SAVControl.VTOLenabled = true;
     }
     public void DFUNC_Selected()
     {
