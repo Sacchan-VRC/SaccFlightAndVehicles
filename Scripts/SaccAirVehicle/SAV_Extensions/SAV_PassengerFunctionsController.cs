@@ -17,6 +17,9 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     [SerializeField] private Transform LStickDisplayHighlighter;
     [Tooltip("Object that points toward the currently selected function on the right stick")]
     [SerializeField] private Transform RStickDisplayHighlighter;
+    [Tooltip("Oneshot sound played when switching functions")]
+    [SerializeField] private AudioSource SwitchFunctionSound;
+    private bool SwitchFunctionSoundNULL;
     private bool LStickDisplayHighlighterNULL;
     private bool RStickDisplayHighlighterNULL;
     private UdonSharpBehaviour CurrentSelectedFunctionL;
@@ -89,6 +92,7 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
         RStickCheckAngle.x = angle.x;
         RStickCheckAngle.y = angle.z;
 
+        SwitchFunctionSoundNULL = SwitchFunctionSound == null;
         LStickDisplayHighlighterNULL = LStickDisplayHighlighter == null;
         RStickDisplayHighlighterNULL = RStickDisplayHighlighter == null;
 
@@ -111,17 +115,10 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             {
                 float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
 
-                //R stick value is manually synced using events because i don't want to use too many synced variables.
-                //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
                 stickdir = (stickdir - 180) * -1;
                 int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / LStickFuncDegrees, LStickNumFuncs - 1));
                 if (!LStickNULL[newselection])
                 { LStickSelection = newselection; }
-                //doing this in DFUNC scripts that need it instead so that we send less events
-                /*             if (VehicleAnimator.GetInteger(Lstickselection_STRING) != LStickSelection)
-                            {
-                                LStickSetAnimatorInt();
-                            } */
             }
             if (LStickSelection != LStickSelectionLastFrame)
             {
@@ -139,9 +136,8 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
                     }
                     else { CurrentSelectedFunctionL = null; }
                 }
-            }
-            if (LStickSelection != LStickSelectionLastFrame)
-            {
+
+                if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
                 if (LStickSelection < 0)
                 { if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); } }
                 else
@@ -159,17 +155,10 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             {
                 float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
 
-                //R stick value is manually synced using events because i don't want to use too many synced variables.
-                //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
                 stickdir = (stickdir - 180) * -1;
                 int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / RStickFuncDegrees, RStickNumFuncs - 1));
                 if (!RStickNULL[newselection])
                 { RStickSelection = newselection; }
-                //doing this in DFUNC scripts that need it instead so that we send less events
-                /*             if (VehicleAnimator.GetInteger(Rstickselection_STRING) != RStickSelection)
-                            {
-                                RStickSetAnimatorInt();
-                            } */
             }
             if (RStickSelection != RStickSelectionLastFrame)
             {
@@ -187,9 +176,8 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
                     }
                     else { CurrentSelectedFunctionR = null; }
                 }
-            }
-            if (RStickSelection != RStickSelectionLastFrame)
-            {
+
+                if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
                 if (LStickSelection < 0)
                 { if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); } }
                 else

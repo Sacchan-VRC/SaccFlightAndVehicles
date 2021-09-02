@@ -45,7 +45,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 92
+      Data: 93
     - Name: 
       Entry: 7
       Data: 
@@ -3400,7 +3400,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: InPlane
+      Data: PlaneIdlePitch
     - Name: $v
       Entry: 7
       Data: 210|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3409,7 +3409,7 @@ MonoBehaviour:
       Data: 211|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 73
+      Data: 38
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -3418,13 +3418,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: InPlane
+      Data: PlaneIdlePitch
     - Name: symbolUniqueName
       Entry: 1
-      Data: InPlane
+      Data: PlaneIdlePitch
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3437,68 +3437,10 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: PlaneIdlePitch
-    - Name: $v
-      Entry: 7
-      Data: 213|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 214|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 38
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: PlaneIdlePitch
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: PlaneIdlePitch
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 215|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
-        mscorlib
-    - Name: 
-      Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 216|System.NonSerializedAttribute, mscorlib
+      Data: 213|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -3525,10 +3467,10 @@ MonoBehaviour:
       Data: PlaneIdleVolume
     - Name: $v
       Entry: 7
-      Data: 217|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 214|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 218|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 215|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 38
@@ -3555,14 +3497,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 219|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 216|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 220|System.NonSerializedAttribute, mscorlib
+      Data: 217|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -3589,10 +3531,10 @@ MonoBehaviour:
       Data: PlaneDistantVolume
     - Name: $v
       Entry: 7
-      Data: 221|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 218|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 222|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 219|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 38
@@ -3619,14 +3561,14 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 223|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 220|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 224|System.NonSerializedAttribute, mscorlib
+      Data: 221|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -3651,6 +3593,64 @@ MonoBehaviour:
     - Name: $k
       Entry: 1
       Data: PlaneThrustPitch
+    - Name: $v
+      Entry: 7
+      Data: 222|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 223|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 38
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: PlaneThrustPitch
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: PlaneThrustPitch
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 224|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: PlaneThrustVolume
     - Name: $v
       Entry: 7
       Data: 225|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3671,10 +3671,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneThrustPitch
+      Data: PlaneThrustVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneThrustPitch
+      Data: PlaneThrustVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3687,68 +3687,10 @@ MonoBehaviour:
         mscorlib
     - Name: 
       Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: PlaneThrustVolume
-    - Name: $v
-      Entry: 7
-      Data: 228|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 229|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 38
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: PlaneThrustVolume
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: PlaneThrustVolume
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 230|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
-        mscorlib
-    - Name: 
-      Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 231|System.NonSerializedAttribute, mscorlib
+      Data: 228|System.NonSerializedAttribute, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -3773,6 +3715,64 @@ MonoBehaviour:
     - Name: $k
       Entry: 1
       Data: LastFramePlaneIdlePitch
+    - Name: $v
+      Entry: 7
+      Data: 229|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 230|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 38
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemSingle
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: LastFramePlaneIdlePitch
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: LastFramePlaneIdlePitch
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 231|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: StartPlaneThrustPitch
     - Name: $v
       Entry: 7
       Data: 232|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3793,10 +3793,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: LastFramePlaneIdlePitch
+      Data: StartPlaneThrustPitch
     - Name: symbolUniqueName
       Entry: 1
-      Data: LastFramePlaneIdlePitch
+      Data: StartPlaneThrustPitch
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3830,7 +3830,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: LastFramePlaneThrustPitch
+      Data: PlaneInsideInitialVolume
     - Name: $v
       Entry: 7
       Data: 235|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3851,10 +3851,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: LastFramePlaneThrustPitch
+      Data: PlaneInsideInitialVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: LastFramePlaneThrustPitch
+      Data: PlaneInsideInitialVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3888,7 +3888,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneInsideInitialVolume
+      Data: PlaneIdleInitialVolume
     - Name: $v
       Entry: 7
       Data: 238|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3909,10 +3909,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneInsideInitialVolume
+      Data: PlaneIdleInitialVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneInsideInitialVolume
+      Data: PlaneIdleInitialVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -3946,7 +3946,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneIdleInitialVolume
+      Data: PlaneThrustInitialVolume
     - Name: $v
       Entry: 7
       Data: 241|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -3967,10 +3967,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneIdleInitialVolume
+      Data: PlaneThrustInitialVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneIdleInitialVolume
+      Data: PlaneThrustInitialVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4004,7 +4004,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneThrustInitialVolume
+      Data: PlaneDistantInitialVolume
     - Name: $v
       Entry: 7
       Data: 244|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4025,10 +4025,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneThrustInitialVolume
+      Data: PlaneDistantInitialVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneThrustInitialVolume
+      Data: PlaneDistantInitialVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4062,7 +4062,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneDistantInitialVolume
+      Data: PlaneWindInitialVolume
     - Name: $v
       Entry: 7
       Data: 247|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4083,10 +4083,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneDistantInitialVolume
+      Data: PlaneWindInitialVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneDistantInitialVolume
+      Data: PlaneWindInitialVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4120,7 +4120,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneWindInitialVolume
+      Data: DopplerSounds_InitialVolumes
     - Name: $v
       Entry: 7
       Data: 250|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4128,8 +4128,14 @@ MonoBehaviour:
       Entry: 7
       Data: 251|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 38
+      Entry: 7
+      Data: 252|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: System.Single[], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4138,13 +4144,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemSingleArray
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneWindInitialVolume
+      Data: DopplerSounds_InitialVolumes
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneWindInitialVolume
+      Data: DopplerSounds_InitialVolumes
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4153,7 +4159,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 252|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 253|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
@@ -4178,22 +4184,16 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DopplerSounds_InitialVolumes
+      Data: PlaneInsideTargetVolume
     - Name: $v
       Entry: 7
-      Data: 253|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 254|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 254|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 255|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 255|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: System.Single[], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 38
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4202,13 +4202,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingleArray
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: DopplerSounds_InitialVolumes
+      Data: PlaneInsideTargetVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: DopplerSounds_InitialVolumes
+      Data: PlaneInsideTargetVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4242,7 +4242,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneInsideTargetVolume
+      Data: PlaneIdleTargetVolume
     - Name: $v
       Entry: 7
       Data: 257|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4263,10 +4263,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneInsideTargetVolume
+      Data: PlaneIdleTargetVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneInsideTargetVolume
+      Data: PlaneIdleTargetVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4300,7 +4300,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneIdleTargetVolume
+      Data: PlaneThrustTargetVolume
     - Name: $v
       Entry: 7
       Data: 260|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4321,10 +4321,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneIdleTargetVolume
+      Data: PlaneThrustTargetVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneIdleTargetVolume
+      Data: PlaneThrustTargetVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4358,7 +4358,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneThrustTargetVolume
+      Data: PlaneDistantTargetVolume
     - Name: $v
       Entry: 7
       Data: 263|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4379,10 +4379,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneThrustTargetVolume
+      Data: PlaneDistantTargetVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneThrustTargetVolume
+      Data: PlaneDistantTargetVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4416,7 +4416,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneDistantTargetVolume
+      Data: PlaneWindTargetVolume
     - Name: $v
       Entry: 7
       Data: 266|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4437,10 +4437,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneDistantTargetVolume
+      Data: PlaneWindTargetVolume
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneDistantTargetVolume
+      Data: PlaneWindTargetVolume
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4474,7 +4474,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneWindTargetVolume
+      Data: DopplerSounds_TargetVolumes
     - Name: $v
       Entry: 7
       Data: 269|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4483,7 +4483,7 @@ MonoBehaviour:
       Data: 270|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 38
+      Data: 252
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -4492,13 +4492,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemSingleArray
     - Name: symbolOriginalName
       Entry: 1
-      Data: PlaneWindTargetVolume
+      Data: DopplerSounds_TargetVolumes
     - Name: symbolUniqueName
       Entry: 1
-      Data: PlaneWindTargetVolume
+      Data: DopplerSounds_TargetVolumes
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4532,7 +4532,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DopplerSounds_TargetVolumes
+      Data: InVehicleThrustVolumeFactor
     - Name: $v
       Entry: 7
       Data: 272|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4541,22 +4541,22 @@ MonoBehaviour:
       Data: 273|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 255
+      Data: 38
     - Name: declarationType
       Entry: 3
-      Data: 2
+      Data: 258
     - Name: syncMode
       Entry: 3
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingleArray
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: DopplerSounds_TargetVolumes
+      Data: InVehicleThrustVolumeFactor
     - Name: symbolUniqueName
       Entry: 1
-      Data: DopplerSounds_TargetVolumes
+      Data: InVehicleThrustVolumeFactor
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -4590,7 +4590,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: InVehicleThrustVolumeFactor
+      Data: InVehicleThrustVolumeFactorReverse
     - Name: $v
       Entry: 7
       Data: 275|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -4602,7 +4602,7 @@ MonoBehaviour:
       Data: 38
     - Name: declarationType
       Entry: 3
-      Data: 258
+      Data: 2
     - Name: syncMode
       Entry: 3
       Data: 0
@@ -4611,10 +4611,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: InVehicleThrustVolumeFactor
+      Data: InVehicleThrustVolumeFactorReverse
     - Name: symbolUniqueName
       Entry: 1
-      Data: InVehicleThrustVolumeFactor
+      Data: InVehicleThrustVolumeFactorReverse
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -5682,7 +5682,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DoorsOpen
+      Data: InVehicle
     - Name: $v
       Entry: 7
       Data: 337|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -5691,7 +5691,7 @@ MonoBehaviour:
       Data: 338|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 288
+      Data: 73
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -5700,13 +5700,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt32
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: DoorsOpen
+      Data: InVehicle
     - Name: symbolUniqueName
       Entry: 1
-      Data: DoorsOpen
+      Data: InVehicle
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -5740,7 +5740,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: InWater
+      Data: DoorsOpen
     - Name: $v
       Entry: 7
       Data: 340|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -5749,7 +5749,7 @@ MonoBehaviour:
       Data: 341|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 73
+      Data: 288
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -5758,13 +5758,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: InWater
+      Data: DoorsOpen
     - Name: symbolUniqueName
       Entry: 1
-      Data: InWater
+      Data: DoorsOpen
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -5798,13 +5798,71 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Initiatlized
+      Data: InWater
     - Name: $v
       Entry: 7
       Data: 343|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
       Data: 344|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+    - Name: internalType
+      Entry: 9
+      Data: 73
+    - Name: declarationType
+      Entry: 3
+      Data: 2
+    - Name: syncMode
+      Entry: 3
+      Data: 0
+    - Name: symbolResolvedTypeName
+      Entry: 1
+      Data: SystemBoolean
+    - Name: symbolOriginalName
+      Entry: 1
+      Data: InWater
+    - Name: symbolUniqueName
+      Entry: 1
+      Data: InWater
+    - Name: symbolDefaultValue
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 345|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Initiatlized
+    - Name: $v
+      Entry: 7
+      Data: 346|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: fieldSymbol
+      Entry: 7
+      Data: 347|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
       Data: 73
@@ -5831,7 +5889,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 345|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 348|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12

@@ -41,7 +41,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         FullRockets = NumRocket;
         reloadspeed = FullRockets / FullReloadTimeSec;
         FullRocketsDivider = 1f / (NumRocket > 0 ? NumRocket : 10000000);
-        AmmoBarNULL = AmmoBar = null;
+        AmmoBarNULL = AmmoBar == null;
         if (!AmmoBarNULL) { AmmoBarScaleStart = AmmoBar.localScale; }
         if (RocketHoldDelay < RocketDelay) { RocketHoldDelay = RocketDelay; }
         VehicleTransform = SAVControl.EntityControl.transform;

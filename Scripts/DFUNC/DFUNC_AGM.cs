@@ -10,8 +10,11 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] public SaccAirVehicle SAVControl;
     [SerializeField] private Animator AGMAnimator;
     [Tooltip("Camera script that is used to see the target")]
-    [SerializeField] private Camera AtGCam;
+    public GameObject AGM;
+    public int NumAGM = 4;
     [SerializeField] private Text HUDText_AGM_ammo;
+    [Tooltip("Camera that renders onto the AtGScreen")]
+    [SerializeField] private Camera AtGCam;
     [Tooltip("Screen that displays target, that is enabled when selected")]
     [SerializeField] private GameObject AtGScreen;
     [SerializeField] private GameObject Dial_Funcon;
@@ -30,8 +33,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private bool AGMLockNULL;
     private bool TriggerLastFrame;
     private float TriggerTapTime;
-    public GameObject AGM;
-    public int NumAGM = 4;
     [System.NonSerializedAttribute] public int FullAGMs;
     public Transform AGMLaunchPoint;
     public LayerMask AGMTargetsLayer;

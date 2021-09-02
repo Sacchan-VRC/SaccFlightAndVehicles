@@ -20,6 +20,11 @@ public class SaccEntity : UdonSharpBehaviour
     public GameObject PilotOnly;
     [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
     public Transform CenterOfMass;
+    [Tooltip("Oneshot sound played each time function selection changes")]
+    [SerializeField] private AudioSource SwitchFunctionSound;
+    private bool SwitchFunctionSoundNULL;
+    [SerializeField] private Transform LStickDisplayHighlighter;
+    [SerializeField] private Transform RStickDisplayHighlighter;
     [System.NonSerializedAttribute] public float LastHitTime = -100;
     [System.NonSerializedAttribute] public bool InEditor = true;
     VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
@@ -62,6 +67,7 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public SaccEntity LastAttacker;
     [System.NonSerializedAttribute] public float PilotExitTime;
     [System.NonSerializedAttribute] public float PilotEnterTime;
+    [System.NonSerializedAttribute] public bool Holding;
     private bool FindSeatsDone = false;
     //end of old Leavebutton stuff
     private void Start()
@@ -90,6 +96,8 @@ public class SaccEntity : UdonSharpBehaviour
 
 
         //Dial Stuff
+        SwitchFunctionSoundNULL = SwitchFunctionSound == null;
+
         LStickNumFuncs = Dial_Functions_L.Length;
         RStickNumFuncs = Dial_Functions_R.Length;
         LStickDoDial = LStickNumFuncs > 1;
@@ -126,8 +134,8 @@ public class SaccEntity : UdonSharpBehaviour
         //if in edit mode without cyanemu
         if (InEditor)
         {
-            PilotEnterPlaneLocal();
-            PilotEnterPlaneGlobal(null);
+            PilotEnterVehicleLocal();
+            PilotEnterVehicleGlobal(null);
         }
     }
     void OnParticleCollision(GameObject other)
@@ -135,7 +143,7 @@ public class SaccEntity : UdonSharpBehaviour
         if (other == null || dead) { return; }//avatars can't shoot you, and you can't get hurt when you're dead
 
         //this is to prevent more events than necessary being sent
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlaneHit");
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(VehicleHit));
 
 
         //Try to find the saccentity that shot at us
@@ -162,7 +170,7 @@ public class SaccEntity : UdonSharpBehaviour
             { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
         }
     }
-    public void PlaneHit()
+    public void VehicleHit()
     {
         SendEventToExtensions("SFEXT_G_BulletHit");
     }
@@ -184,86 +192,83 @@ public class SaccEntity : UdonSharpBehaviour
                 RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
             }
 
-
-
             //LStick Selection wheel
-            if (InVR && LStickPos.magnitude > .7f && LStickDoDial)
+            if (LStickDoDial)
             {
-                float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
+                if (InVR && LStickPos.magnitude > .7f)
+                {
+                    float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
 
-                //R stick value is manually synced using events because i don't want to use too many synced variables.
-                //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
-                stickdir = (stickdir - 180) * -1;
-                int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
-                if (!LStickNULL[newselection])
-                { LStickSelection = newselection; }
-                //doing this in DFUNC scripts that need it instead so that we send less events
-                /*                     if (VehicleAnimator.GetInteger(Lstickselection_STRING) != LStickSelection)
-                                    {
-                                        LStickSetAnimatorInt();
-                                    } */
+                    stickdir = (stickdir - 180) * -1;
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
+                    if (!LStickNULL[newselection])
+                    { LStickSelection = newselection; }
+                }
+                if (LStickSelection != LStickSelectionLastFrame)
+                {
+                    //new function selected, send deselected to old one
+                    if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
+                    {
+                        Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
+                    }
+                    //get udonbehaviour for newly selected function and then send selected
+                    if (LStickSelection > -1)
+                    {
+                        if (Dial_Functions_L[LStickSelection] != null)
+                        {
+                            Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
+                        }
+                        else { CurrentSelectedFunctionL = null; }
+                    }
+                    if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
+                    if (LStickSelection < 0)
+                    { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
+                    else
+                    {
+                        LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * LStickSelection, 0);
+                    }
+                    LStickSelectionLastFrame = LStickSelection;
+                }
             }
 
             //RStick Selection wheel
-            if (InVR && RStickPos.magnitude > .7f & RStickDoDial)
+            if (RStickDoDial)
             {
-                float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
-
-                //R stick value is manually synced using events because i don't want to use too many synced variables.
-                //the value can be used in the animator to open bomb bay doors when bombs are selected, etc.
-                stickdir = (stickdir - 180) * -1;
-                int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
-                if (!RStickNULL[newselection])
-                { RStickSelection = newselection; }
-                //doing this in DFUNC scripts that need it instead so that we send less events
-                /*                     if (VehicleAnimator.GetInteger(Rstickselection_STRING) != RStickSelection)
-                                    {
-                                        RStickSetAnimatorInt();
-                                    } */
-            }
-
-
-            if (LStickSelection != LStickSelectionLastFrame)
-            {
-                //new function selected, send deselected to old one
-                if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
+                if (InVR && RStickPos.magnitude > .7f)
                 {
-                    Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
+                    float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
+
+                    stickdir = (stickdir - 180) * -1;
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
+                    if (!RStickNULL[newselection])
+                    { RStickSelection = newselection; }
                 }
-                //get udonbehaviour for newly selected function and then send selected
-                if (LStickSelection > -1)
+                if (RStickSelection != RStickSelectionLastFrame)
                 {
-                    if (Dial_Functions_L[LStickSelection] != null)
+                    //new function selected, send deselected to old one
+                    if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
                     {
-                        Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
+                        Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
-                    else { CurrentSelectedFunctionL = null; }
-                }
-            }
-
-            if (RStickSelection != RStickSelectionLastFrame)
-            {
-                //new function selected, send deselected to old one
-                if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
-                {
-                    Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
-                }
-                //get udonbehaviour for newly selected function and then send selected
-                if (RStickSelection > -1)
-                {
-                    if (Dial_Functions_R[RStickSelection] != null)
+                    //get udonbehaviour for newly selected function and then send selected
+                    if (RStickSelection > -1)
                     {
-                        Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
+                        if (Dial_Functions_R[RStickSelection] != null)
+                        {
+                            Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
+                        }
+                        else { CurrentSelectedFunctionR = null; }
                     }
-                    else { CurrentSelectedFunctionR = null; }
+                    if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
+                    if (RStickSelection < 0)
+                    { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
+                    else
+                    {
+                        RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * RStickSelection, 0);
+                    }
+                    RStickSelectionLastFrame = RStickSelection;
                 }
             }
-
-            RStickSelectionLastFrame = RStickSelection;
-            LStickSelectionLastFrame = LStickSelection;
-
-
-
         }
 
         if (InVehicle && !InEditor)
@@ -287,13 +292,10 @@ public class SaccEntity : UdonSharpBehaviour
                 IsOwner = false;
                 SendEventToExtensions("SFEXT_O_LoseOwnership");
             }
-            else
-            {
-                SendEventToExtensions("SFEXT_O_OwnershipTransfer");
-            }
         }
+        SendEventToExtensions("SFEXT_L_OwnershipTransfer");
     }
-    public void PilotEnterPlaneLocal()//called from PilotSeat
+    public void PilotEnterVehicleLocal()//called from PilotSeat
     {
         Piloting = true;
         InVehicle = true;
@@ -301,6 +303,8 @@ public class SaccEntity : UdonSharpBehaviour
         { Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected"); }
         if (RStickNumFuncs == 1)
         { Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected"); }
+        LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
+        RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
 
         if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
         //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
@@ -311,7 +315,7 @@ public class SaccEntity : UdonSharpBehaviour
         TakeOwnerShipOfExtensions();
         SendEventToExtensions("SFEXT_O_PilotEnter");
     }
-    public void PilotEnterPlaneGlobal(VRCPlayerApi player)
+    public void PilotEnterVehicleGlobal(VRCPlayerApi player)
     {
         if (player != null)
         {
@@ -321,7 +325,7 @@ public class SaccEntity : UdonSharpBehaviour
             SendEventToExtensions("SFEXT_G_PilotEnter");
         }
     }
-    public void PilotExitPlane(VRCPlayerApi player)
+    public void PilotExitVehicle(VRCPlayerApi player)
     {
         PilotName = string.Empty;
         PilotID = -1;
@@ -340,44 +344,43 @@ public class SaccEntity : UdonSharpBehaviour
             { SendEventToExtensions("SFEXT_O_PilotExit"); }
         }
     }
-    public void PassengerEnterPlaneLocal()
+    public void PassengerEnterVehicleLocal()
     {
         Passenger = true;
         InVehicle = true;
         if (InVehicleOnly != null) { InVehicleOnly.SetActive(true); }
         SendEventToExtensions("SFEXT_P_PassengerEnter");
     }
-    public void PassengerExitPlaneLocal()
+    public void PassengerExitVehicleLocal()
     {
         Passenger = false;
         InVehicle = false;
         if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
         SendEventToExtensions("SFEXT_P_PassengerExit");
     }
-    public void PassengerEnterPlaneGlobal()
+    public void PassengerEnterVehicleGlobal()
     {
         SendEventToExtensions("SFEXT_G_PassengerEnter");
     }
-    public void PassengerExitPlaneGlobal()
+    public void PassengerExitVehicleGlobal()
     {
         SendEventToExtensions("SFEXT_G_PassengerExit");
     }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
-        //Owner sends events to sync the plane so late joiners don't see it flying with it's canopy open and stuff
+        //Owner sends events to sync the vehicle so late joiners don't see it flying with it's canopy open and stuff
         //only change things that aren't in the default state
-        //only change effects which are very visible, this is just so that it looks alright for late joiners, not to sync everything perfectly.
-        //syncing everything perfectly would probably require too many events to be sent.
-        //planes will be fully synced when they explode or are respawned anyway.
         if (IsOwner)
         { SendEventToExtensions("SFEXT_O_PlayerJoined"); }
     }
     public override void OnPickup()
     {
+        Holding = true;
         SendEventToExtensions("SFEXT_O_PickedUp");
     }
     public override void OnDrop()
     {
+        Holding = false;
         SendEventToExtensions("SFEXT_O_Dropped");
     }
     public override void OnPickupUseDown()
@@ -390,7 +393,7 @@ public class SaccEntity : UdonSharpBehaviour
         Collider[] aamtargs = Physics.OverlapSphere(transform.position, 1000000, AAMTargetsLayer, QueryTriggerInteraction.Collide);
         int n = 0;
 
-        //work out which index in the aamtargs array is our own plane by finding which one has this script as it's parent
+        //work out which index in the aamtargs array is our own vehicle by finding which one has this script as it's parent
         //allows for each team to have a different layer for AAMTargets
         int self = -1;
         n = 0;
@@ -402,7 +405,7 @@ public class SaccEntity : UdonSharpBehaviour
             }
             n++;
         }
-        //populate AAMTargets list excluding our own plane
+        //populate AAMTargets list excluding our own vehicle
         n = 0;
         int foundself = 0;
         foreach (Collider target in aamtargs)
@@ -418,7 +421,7 @@ public class SaccEntity : UdonSharpBehaviour
         {
             if (foundself != 0)
             {
-                NumAAMTargets = Mathf.Clamp(aamtargs.Length - 1, 0, 999);//one less because it found our own plane
+                NumAAMTargets = Mathf.Clamp(aamtargs.Length - 1, 0, 999);//one less because it found our own vehicle
             }
             else
             {

@@ -25,12 +25,7 @@ public class SAV_HUDController : UdonSharpBehaviour
     [SerializeField] private Transform HeadingIndicator;
     [Tooltip("Hud element that shows vehicle's direction of movement")]
     [SerializeField] private Transform VelocityIndicator;
-    [SerializeField] private Transform LStickDisplayHighlighter;
-    [SerializeField] private Transform RStickDisplayHighlighter;
-    [Tooltip("Oneshot sound played each time function selection changes")]
-    [SerializeField] private AudioSource SwitchFunctionSound;
     private SaccEntity EntityControl;
-    private bool SwitchFunctionSoundNULL;
     [Tooltip("Local distance projected forward for objects that move dynamically, only adjust if the hud is moved forward in order to make it appear smaller")]
     public float distance_from_head = 1.333f;
     private float maxGs = 0f;
@@ -48,11 +43,8 @@ public class SAV_HUDController : UdonSharpBehaviour
     private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     VRCPlayerApi localPlayer;
-    private int LStickSelectionLastFrame = -1;
-    private int RStickSelectionLastFrame = -1;
     private void Start()
     {
-        SwitchFunctionSoundNULL = SwitchFunctionSound == null;
 
         HUDAnimator = SAVControl.EntityControl.GetComponent<Animator>();
         EntityControl = SAVControl.EntityControl;
@@ -71,10 +63,6 @@ public class SAV_HUDController : UdonSharpBehaviour
     private void OnEnable()
     {
         maxGs = 0f;
-        LStickSelectionLastFrame = -1;
-        RStickSelectionLastFrame = -1;
-        LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
-        RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
     }
     private void LateUpdate()
     {
@@ -108,33 +96,6 @@ public class SAV_HUDController : UdonSharpBehaviour
         //Down indicator
         DownIndicator.localRotation = Quaternion.Euler(new Vector3(0, 0, -VehicleEuler.z));
         /////////////////
-
-        int StickSelection = EntityControl.LStickSelection;
-        if (StickSelection != LStickSelectionLastFrame)
-        {
-            if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
-            LStickSelectionLastFrame = StickSelection;
-            if (StickSelection < 0)
-            { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
-            else
-            {
-                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * StickSelection, 0);
-            }
-        }
-        LStickSelectionLastFrame = StickSelection;
-        StickSelection = EntityControl.RStickSelection;
-        if (StickSelection != RStickSelectionLastFrame)
-        {
-            if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
-            RStickSelectionLastFrame = StickSelection;
-            if (StickSelection < 0)
-            { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
-            else
-            {
-                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * StickSelection, 0);
-            }
-        }
-
 
         //updating numbers 3~ times a second
         if (check > .3)//update text

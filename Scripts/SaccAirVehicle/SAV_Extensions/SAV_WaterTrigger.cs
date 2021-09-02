@@ -126,4 +126,8 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
     }
+    public void SFEXT_L_OwnershipTransfer()
+    {
+        SendExitWater();
+    }
 }

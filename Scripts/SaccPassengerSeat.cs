@@ -32,7 +32,7 @@ public class SaccPassengerSeat : UdonSharpBehaviour
         if (PassengerOnly != null) { PassengerOnly.SetActive(true); }
         if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
 
-        EntityControl.PassengerEnterPlaneLocal();
+        EntityControl.PassengerEnterVehicleLocal();
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
@@ -57,7 +57,7 @@ public class SaccPassengerSeat : UdonSharpBehaviour
                 SetVoiceInside(player);
             }
         }
-        EntityControl.PassengerEnterPlaneGlobal();
+        EntityControl.PassengerEnterVehicleGlobal();
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
@@ -75,7 +75,7 @@ public class SaccPassengerSeat : UdonSharpBehaviour
     public void PlayerExitPlane(VRCPlayerApi player)
     {
         if (!SeatInitialized) { InitializeSeat(); }
-        EntityControl.PassengerExitPlaneGlobal();
+        EntityControl.PassengerExitVehicleGlobal();
 
         EntityControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)
@@ -84,7 +84,7 @@ public class SaccPassengerSeat : UdonSharpBehaviour
             if (player.isLocal)
             {
                 EntityControl.MySeat = -1;
-                EntityControl.PassengerExitPlaneLocal();
+                EntityControl.PassengerExitVehicleLocal();
                 //undo voice distances of all players inside the vehicle
                 foreach (int crew in EntityControl.SeatedPlayers)
                 {

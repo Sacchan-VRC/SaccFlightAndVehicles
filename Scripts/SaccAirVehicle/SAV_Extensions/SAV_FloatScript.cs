@@ -14,26 +14,26 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [SerializeField] private LayerMask FloatLayers = 16;
     private Transform VehicleTransform;
     [Tooltip("Multiplier for the forces pushing up")]
-    [SerializeField] private float FloatForce;
+    [SerializeField] private float FloatForce = 5;
     [Tooltip("Value that the floating forces are multiplied by while vehicle is moving down in water. Higher = more stable floating")]
-    [SerializeField] private float Compressing;
+    [SerializeField] private float Compressing = 25;
     [Tooltip("Physical siez of the simulated spherical float")]
-    [SerializeField] private float FloatRadius = .5f;
+    [SerializeField] private float FloatRadius = .6f;
     [Tooltip("Strength of drag force applied by perpendicular movement in water (applied at floats)")]
-    [SerializeField] private float WaterSidewaysDrag = .1f;
+    [SerializeField] private float WaterSidewaysDrag = 1f;
     [Tooltip("Strength of drag force applied by forward movement in water (applied at floats)")]
-    [SerializeField] private float WaterForwardDrag = .1f;
+    [SerializeField] private float WaterForwardDrag = .05f;
     [Tooltip("Strength of force slowing rotation in water")]
-    [SerializeField] private float WaterRotDrag = .1f;
+    [SerializeField] private float WaterRotDrag = 5;
     [Tooltip("Strength of drag force slowing down the vehicle (applied at center of mass, causes no rotation)")]
-    [SerializeField] private float WaterVelDrag = .1f;
-    [SerializeField] private float WaveHeight = .2f;
+    [SerializeField] private float WaterVelDrag = 0f;
+    [SerializeField] private float WaveHeight = .6f;
     [Tooltip("Size of wave noise pattern. Smaller Number = bigger pattern")]
-    [SerializeField] private float WaveScale = 1;
+    [SerializeField] private float WaveScale = .04f;
     [Tooltip("How fast waves scroll across the sea")]
-    [SerializeField] private float WaveSpeed = 1;
+    [SerializeField] private float WaveSpeed = 12;
     [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
-    [SerializeField] private bool DoOnLand;
+    [SerializeField] private bool DoOnLand = false;
     [Tooltip("Automatically multiply the relevent values by rigidbody weight on Start(), allowing the vehicle to be any weight without changing it's physics")]
     [SerializeField] bool AutoAdjustForWeight = true;
 
@@ -83,14 +83,15 @@ public class SAV_FloatScript : UdonSharpBehaviour
 
         VehicleTransform = VehicleRigidbody.transform;
 
-        FloatDepth = new float[FloatPoints.Length];
-        FloatDepthLastFrame = new float[FloatPoints.Length];
-        FloatLastRayHitHeight = new float[FloatPoints.Length];
-        FloatTouchWaterPoint = new float[FloatPoints.Length];
-        FloatPointForce = new Vector3[FloatPoints.Length];
-        FloatLocalPos = new Vector3[FloatPoints.Length];
-        HitLandLast = new bool[FloatPoints.Length];
-        for (int i = 0; i != FloatPoints.Length; i++)
+        int numfloats = FloatPoints.Length;
+        FloatDepth = new float[numfloats];
+        FloatDepthLastFrame = new float[numfloats];
+        FloatLastRayHitHeight = new float[numfloats];
+        FloatTouchWaterPoint = new float[numfloats];
+        FloatPointForce = new Vector3[numfloats];
+        FloatLocalPos = new Vector3[numfloats];
+        HitLandLast = new bool[numfloats];
+        for (int i = 0; i != numfloats; i++)
         {
             FloatLocalPos[i] = FloatPoints[i].localPosition;
         }

@@ -25,7 +25,7 @@ public class SaccPilotSeat : UdonSharpBehaviour
         if (!SeatInitialized) { InitializeSeat(); }
         EntityControl.MySeat = ThisStationID;
 
-        EntityControl.PilotEnterPlaneLocal();
+        EntityControl.PilotEnterVehicleLocal();
 
         Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
         localPlayer.UseAttachedStation();
@@ -38,7 +38,7 @@ public class SaccPilotSeat : UdonSharpBehaviour
         if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because EntityControl might not have initialized
         if (player != null)
         {
-            EntityControl.PilotEnterPlaneGlobal(player);
+            EntityControl.PilotEnterVehicleGlobal(player);
             //voice range change to allow talking inside cockpit (after VRC patch 1008)
             EntityControl.SeatedPlayers[ThisStationID] = player.playerId;
             if (player.isLocal)
@@ -77,7 +77,7 @@ public class SaccPilotSeat : UdonSharpBehaviour
         EntityControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)
         {
-            EntityControl.PilotExitPlane(player);
+            EntityControl.PilotExitVehicle(player);
             SetVoiceOutside(player);
             if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
             if (player.isLocal)

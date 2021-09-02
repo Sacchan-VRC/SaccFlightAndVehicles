@@ -35,7 +35,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private bool LeftDial = false;
     private int DialPosition = -999;
     private VRCPlayerApi localPlayer;
-    private bool IsOwner;
+    [System.NonSerializedAttribute] public bool IsOwner;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()

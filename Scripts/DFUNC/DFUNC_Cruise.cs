@@ -191,7 +191,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        if (!Cruise)
+        if (!Cruise && !SAVControl.Taxiing)
         {
             SetCruiseOn();
         }

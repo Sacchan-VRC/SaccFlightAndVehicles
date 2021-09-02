@@ -192,7 +192,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         }
         else
         {
-            if (SAVControl.VTOLAngle != SAVControl.VTOLDefaultValue) { return; }
+            if (SAVControl.VTOLAngle != SAVControl.VTOLDefaultValue || SAVControl.Taxiing) { return; }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
             gameObject.SetActive(true);
         }
