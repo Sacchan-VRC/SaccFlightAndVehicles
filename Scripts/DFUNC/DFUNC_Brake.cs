@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_Brake : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [Tooltip("Looping sound to play while brake is active")]
     [SerializeField] private AudioSource Airbrake_snd;
     [SerializeField] private Animator BrakeAnimator;
@@ -24,6 +24,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     [SerializeField] private float GroundBrakeSpeed = 40f;
     //other functions can set this +1 to disable breaking
     [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
+    private SaccEntity EntityControl;
     private float StartGroundBrakeStrength;
     private float StartWaterBrakeStrength;
     private int BRAKE_STRING = Animator.StringToHash("brake");
@@ -43,7 +44,8 @@ public class DFUNC_Brake : UdonSharpBehaviour
         GroundBrakeStrength = 1;
         WaterBrakeStrength = 1;
 
-        VehicleRigidbody = SAVControl.EntityControl.GetComponent<Rigidbody>();
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         HasAirBrake = AirbrakeStrength != 0;
         Airbrake_sndNULL = Airbrake_snd == null;
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
@@ -65,12 +67,12 @@ public class DFUNC_Brake : UdonSharpBehaviour
     {
         if (!NoPilotAlwaysGroundBrake)
         {
-            if (SAVControl.Taxiing)
+            if ((bool)SAVControl.GetProgramVariable("Taxiing"))
             {
                 GroundBrakeStrength = StartGroundBrakeStrength;
                 WaterBrakeStrength = 1;
             }
-            else if (SAVControl.Floating)
+            else if ((bool)SAVControl.GetProgramVariable("Floating"))
             {
                 GroundBrakeStrength = 1;
                 WaterBrakeStrength = StartWaterBrakeStrength;
@@ -80,7 +82,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         BrakeInput = 0;
-        SAVControl.ExtraDrag -= DragAdded;
+        SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - DragAdded);
         DragAdded = 0;
         Selected = false;
         if (!NoPilotAlwaysGroundBrake)
@@ -102,7 +104,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     }
     public void EnableForAnimation()
     {
-        if (!SAVControl.IsOwner)
+        if (!(bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             gameObject.SetActive(true);
             NonLocalActiveDelay = 3;
@@ -127,11 +129,11 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private void Update()
     {
         float DeltaTime = Time.deltaTime;
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
-            float Speed = SAVControl.Speed;
-            Vector3 CurrentVel = SAVControl.CurrentVel;
-            if (SAVControl.Piloting)
+            float Speed = (float)SAVControl.GetProgramVariable("Speed");
+            Vector3 CurrentVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+            if ((bool)SAVControl.GetProgramVariable("Piloting"))
             {
                 float KeyboardBrakeInput = 0;
                 float VRBrakeInput = 0;
@@ -154,27 +156,30 @@ public class DFUNC_Brake : UdonSharpBehaviour
 
                 BrakeInput = Mathf.Max(VRBrakeInput, KeyboardBrakeInput);
 
-                if (SAVControl.Taxiing && BrakeInput > 0 && Speed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
+                Rigidbody gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody");
+                if (gdhr != null)
                 {
-                    if (Speed > BrakeInput * GroundBrakeStrength * DeltaTime)
+                    float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
+                    if ((bool)SAVControl.GetProgramVariable("Taxiing") && BrakeInput > 0 && RBSpeed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
                     {
-                        VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
+                        VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), BrakeInput * GroundBrakeStrength * DeltaTime);
                     }
-                    else
+                }
+                else
+                {
+                    if ((bool)SAVControl.GetProgramVariable("Taxiing") && BrakeInput > 0 && Speed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
                     {
-                        VehicleRigidbody.velocity = Vector3.zero;
+                        VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, BrakeInput * GroundBrakeStrength * DeltaTime);
+                        // VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
                     }
                 }
                 //remove the drag added last frame to add the new value for this frame
-                SAVControl.ExtraDrag -= DragAdded;
+                SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - DragAdded);
                 DragAdded = AirbrakeStrength * BrakeInput;
-                SAVControl.ExtraDrag += DragAdded;
+                SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + DragAdded);
 
                 //send events to other users to tell them to enable the function so they can see the animation
-                if (BrakeInput > .1f)
-                { Braking = true; }
-                else
-                { Braking = false; }
+                Braking = BrakeInput > .1f;
                 if (Braking && !BrakingLastFrame)
                 {
                     if (!Airbrake_sndNULL && !Airbrake_snd.isPlaying) { Airbrake_snd.Play(); }
@@ -188,13 +193,23 @@ public class DFUNC_Brake : UdonSharpBehaviour
             }
             else
             {
-                if (SAVControl.Taxiing)
+                Rigidbody gdhr = null;
+                { gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody"); }
+                if (gdhr != null)
                 {
-                    if (Speed > GroundBrakeStrength * DeltaTime)
+                    float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
+                    if ((bool)SAVControl.GetProgramVariable("Taxiing") && RBSpeed < GroundBrakeSpeed && DisableGroundBrake == 0)
                     {
-                        VehicleRigidbody.velocity += -CurrentVel.normalized * GroundBrakeStrength * WaterBrakeStrength * DeltaTime;
+                        VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), GroundBrakeStrength * DeltaTime);
                     }
-                    else VehicleRigidbody.velocity = Vector3.zero;
+                }
+                else
+                {
+                    if ((bool)SAVControl.GetProgramVariable("Taxiing") && Speed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                    {
+                        VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, BrakeInput * GroundBrakeStrength * DeltaTime);
+                        // VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
+                    }
                 }
             }
         }
@@ -211,6 +226,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, BrakeInput, 1.3f * DeltaTime);
         BrakeAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper);
         Airbrake_snd.pitch = BrakeInput * .2f + .9f;
-        Airbrake_snd.volume = AirbrakeLerper * SAVControl.rotlift;
+        Airbrake_snd.volume = AirbrakeLerper * (float)SAVControl.GetProgramVariable("rotlift");
     }
 }

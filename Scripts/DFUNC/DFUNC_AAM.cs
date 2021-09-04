@@ -7,7 +7,7 @@ using VRC.Udon;
 
 public class DFUNC_AAM : UdonSharpBehaviour
 {
-    [SerializeField] public SaccAirVehicle SAVControl;
+    [SerializeField] public UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator AAMAnimator;
     [SerializeField] private int NumAAM = 6;
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
@@ -50,12 +50,12 @@ public class DFUNC_AAM : UdonSharpBehaviour
         FullAAMs = NumAAM;
         reloadspeed = FullAAMs / FullReloadTimeSec;
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         NumAAMTargets = EntityControl.NumAAMTargets;
         AAMTargets = EntityControl.AAMTargets;
-        CenterOfMass = SAVControl.EntityControl.CenterOfMass;
-        VehicleTransform = SAVControl.VehicleTransform;
-        OutsidePlaneLayer = SAVControl.PlaneMesh.gameObject.layer;
+        CenterOfMass = (Transform)EntityControl.CenterOfMass;
+        VehicleTransform = EntityControl.transform;
+        OutsidePlaneLayer = (int)SAVControl.GetProgramVariable("OutsidePlaneLayer");
         localPlayer = Networking.LocalPlayer;
 
         //HUD
@@ -108,7 +108,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if (NumAAM != FullAAMs) { SAVControl.ReSupplied++; }
+        if (NumAAM != FullAAMs)
+        { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
         AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
         HUDText_AAM_ammo.text = NumAAM.ToString("F0");
@@ -184,12 +185,12 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 {
                     if (!TriggerLastFrame)
                     {
-                        if (AAMLocked && !SAVControl.Taxiing && Time.time - AAMLastFiredTime > AAMLaunchDelay)
+                        if (AAMLocked && !(bool)SAVControl.GetProgramVariable("Taxiing") && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                         {
                             AAMLastFiredTime = Time.time;
                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
                             if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
-                            if (SAVControl.IsOwner)
+                            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                             { EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch"); }
                         }
                     }
@@ -323,7 +324,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             else
             { AAMTargetObscuredDelay = 0; }
 
-            if (!SAVControl.Taxiing
+            if (!(bool)SAVControl.GetProgramVariable("Taxiing")
                 && (AAMTargetObscuredDelay < .25f)
                     && AAMCurrentTargetDistance < AAMMaxTargetDistance
                         && AAMTargets[AAMTarget].activeInHierarchy
@@ -405,7 +406,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void LaunchAAM()
     {
         IsOwner = localPlayer.IsOwner(gameObject);
-        InEditor = SAVControl.InEditor;
+        InEditor = (bool)SAVControl.GetProgramVariable("InEditor");
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         AAMAnimator.SetTrigger(AAMLAUNCHED_STRING);
         if (AAM != null)
@@ -426,7 +427,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             }
             NewAAM.SetActive(true);
-            NewAAM.GetComponent<Rigidbody>().velocity = SAVControl.CurrentVel;
+            NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
         AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
         HUDText_AAM_ammo.text = NumAAM.ToString("F0");

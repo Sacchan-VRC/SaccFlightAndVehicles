@@ -17,7 +17,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     [Tooltip("Send Events to sound script for opening a door?")]
     [SerializeField] private bool OpensDoor = false;
     [Header("Door Only:")]
-    [SerializeField] private SAV_SoundController SoundControl;
+    [SerializeField] private UdonSharpBehaviour SoundControl;
     [SerializeField] private float DoorCloseTime = 2;
     private bool Dial_FunconNULL = true;
     private bool AnimOn = false;
@@ -37,6 +37,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         {
             SetBoolOn();
         }
+        Dial_Funcon.SetActive(AnimOn);
     }
     public void SFEXT_O_PlayerJoined()
     {
@@ -104,7 +105,6 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         }
         else { TriggerLastFrame = false; }
     }
-
     public void SetBoolOn()
     {
         if (AnimOn) { return; }
@@ -113,7 +113,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         BoolAnimator.SetBool(AnimBool_STRING, AnimOn);
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
         if (OpensDoor)
-        { SoundControl.DoorOpen(); }
+        { SoundControl.SendCustomEvent("DoorOpen"); }
     }
     public void SetBoolOff()
     {

@@ -69,16 +69,9 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         Selected = false;
+        TriggerLastFrame = false;
         if (firing)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
-        }
-    }
-    private void OnDisable()
-    {
-        if (firing)
-        {
-            firing = false;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
         }
     }
@@ -93,9 +86,11 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     {
         func_active = false;
         Selected = false;
+        TriggerLastFrame = false;
         GunDamageParticle_Parent.gameObject.SetActive(false);
         if (firing)
         {
+            firing = false;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
         }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Deactivate));
@@ -197,6 +192,22 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
 
 
         if (!AmmoBarNULL) AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+    }
+    private void OnDisable()
+    {
+        if (func_active)
+        {
+            if (firing)
+            {
+                SendCustomEventDelayedFrames(nameof(Disable_Stopfiring), 1);//because lateupdate runs for one more frame after this for some reason
+            }
+        }
+    }
+    public void Disable_Stopfiring()
+    {
+        firing = false;
+        TriggerLastFrame = false;
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
     }
     public void GunStartFiring()
     {

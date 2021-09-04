@@ -104,7 +104,6 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
         }
         else { TriggerLastFrame = false; }
     }
-
     public void SetBoolOn()
     {
         if (AnimOn) { return; }

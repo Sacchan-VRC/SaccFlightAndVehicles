@@ -7,7 +7,7 @@ using VRC.Udon;
 
 public class DFUNC_AGM : UdonSharpBehaviour
 {
-    [SerializeField] public SaccAirVehicle SAVControl;
+    [SerializeField] public UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator AGMAnimator;
     [Tooltip("Camera script that is used to see the target")]
     public GameObject AGM;
@@ -59,13 +59,13 @@ public class DFUNC_AGM : UdonSharpBehaviour
         FullAGMs = NumAGM;
         reloadspeed = FullAGMs / FullReloadTimeSec;
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
-        localPlayer = SAVControl.localPlayer;
-        InEditor = SAVControl.InEditor;
-        VehicleTransform = SAVControl.VehicleTransform;
+        localPlayer = Networking.LocalPlayer;
+        InEditor = localPlayer == null;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleTransform = EntityControl.transform;
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
-        EntityControl = SAVControl.EntityControl;
 
         FindSelf();
 
@@ -74,7 +74,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         AGMLocked = false;
-        InVR = SAVControl.InVR;
+        InVR = localPlayer.IsUserInVR();
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
     public void SFEXT_P_PassengerEnter()
@@ -98,7 +98,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if (NumAGM != FullAGMs) { SAVControl.ReSupplied++; }
+        if (NumAGM != FullAGMs)
+        { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
@@ -129,7 +130,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void DisableForOthers()
     {
-        if (!SAVControl.Piloting)
+        if (!(bool)SAVControl.GetProgramVariable("Piloting"))
         { gameObject.SetActive(false); }
     }
     private void Update()
@@ -163,10 +164,10 @@ public class DFUNC_AGM : UdonSharpBehaviour
                     {//double tap detected
                         if (AGMLocked)
                         {//locked on, launch missile
-                            if (NumAGM > 0 && !SAVControl.Taxiing)
+                            if (NumAGM > 0 && !(bool)SAVControl.GetProgramVariable("Taxiing"))
                             {
                                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAGM");
-                                if (SAVControl.IsOwner)
+                                if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                                 { EntityControl.SendEventToExtensions("SFEXT_O_AGMLaunch"); }
                             }
                             AGMUnlocking = 0;
@@ -288,7 +289,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
             {
                 AtGScreen.SetActive(true);
                 AtGCam.gameObject.SetActive(true);
-                AtGCam.transform.LookAt(AGMTarget, SAVControl.EntityControl.transform.up);
+                AtGCam.transform.LookAt(AGMTarget, EntityControl.transform.up);
 
                 RaycastHit camhit;
                 Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
@@ -322,7 +323,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.transform.rotation);
             }
             NewAGM.SetActive(true);
-            NewAGM.GetComponent<Rigidbody>().velocity = SAVControl.CurrentVel;
+            NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");

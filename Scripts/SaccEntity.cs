@@ -68,7 +68,6 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PilotExitTime;
     [System.NonSerializedAttribute] public float PilotEnterTime;
     [System.NonSerializedAttribute] public bool Holding;
-    private bool FindSeatsDone = false;
     //end of old Leavebutton stuff
     private void Start()
     {
@@ -89,6 +88,12 @@ public class SaccEntity : UdonSharpBehaviour
         if (CenterOfMass == null)
         { CenterOfMass = gameObject.transform; }
 
+        VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
+        SeatedPlayers = new int[VehicleStations.Length];
+        for (int i = 0; i != SeatedPlayers.Length; i++)
+        {
+            SeatedPlayers[i] = -1;
+        }
         FindAAMTargets();
 
         TellDFUNCsLR();
@@ -521,16 +526,5 @@ public class SaccEntity : UdonSharpBehaviour
     public void ExitStation()
     {
         VehicleStations[MySeat].ExitStation(localPlayer);
-    }
-    public void FindSeats()
-    {
-        if (FindSeatsDone) { return; }
-        VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
-        SeatedPlayers = new int[VehicleStations.Length];
-        for (int i = 0; i != SeatedPlayers.Length; i++)
-        {
-            SeatedPlayers[i] = -1;
-        }
-        FindSeatsDone = true;
     }
 }

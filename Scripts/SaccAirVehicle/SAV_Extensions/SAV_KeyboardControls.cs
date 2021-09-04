@@ -38,17 +38,17 @@ public class SAV_KeyboardControls : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour Rfunc7;
     [SerializeField] private KeyCode Rfunc8key;
     [SerializeField] private UdonSharpBehaviour Rfunc8;
-    [Header("EngineControl only required for DoVTOL")]
-    [SerializeField] SaccAirVehicle EngineControl;
+    [Header("SAVControl only required for DoVTOL")]
+    [SerializeField] UdonSharpBehaviour SAVControl;
     [SerializeField] private bool DoVTOL;
     private string KeyboardInput = "KeyboardInput";
     private float VTOLAngleDivider;
     private void Start()
     {
-        if (EngineControl != null)
+        if (SAVControl != null)
         {
-            float vtolangledif = EngineControl.VTOLMaxAngle - EngineControl.VTOLMinAngle;
-            VTOLAngleDivider = EngineControl.VTOLAngleTurnRate / vtolangledif;
+            float vtolangledif = (float)SAVControl.GetProgramVariable("VTOLMaxAngle") - (float)SAVControl.GetProgramVariable("VTOLMinAngle");
+            VTOLAngleDivider = (float)SAVControl.GetProgramVariable("VTOLAngleTurnRate") / vtolangledif;
         }
         else
         {
@@ -63,7 +63,7 @@ public class SAV_KeyboardControls : UdonSharpBehaviour
             float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
             if (pgup + pgdn != 0)
             {
-                EngineControl.VTOLAngleInput = Mathf.Clamp(EngineControl.VTOLAngleInput + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime)), 0, 1);
+                SAVControl.SetProgramVariable("VTOLAngleInput", Mathf.Clamp((float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime)), 0, 1));
             }
         }
 

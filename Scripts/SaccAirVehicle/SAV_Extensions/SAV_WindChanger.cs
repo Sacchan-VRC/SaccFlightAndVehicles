@@ -8,7 +8,7 @@ using VRC.Udon;
 public class SAV_WindChanger : UdonSharpBehaviour
 {
     [Tooltip("List of SaccAirVehicles to be effected by this WindChnager")]
-    [SerializeField] private SaccAirVehicle[] VehicleEngines;
+    [SerializeField] private UdonSharpBehaviour[] VehicleEngines;
     [SerializeField] private GameObject WindMenu;
     [SerializeField] private Slider WindStrengthSlider;
     [SerializeField] private Text WindStr_text;
@@ -80,14 +80,14 @@ public class SAV_WindChanger : UdonSharpBehaviour
     {
         WindApplySound.Play();
         Vector3 NewWindDir = (gameObject.transform.rotation * Vector3.forward) * WindStrength;
-        foreach (SaccAirVehicle vehicle in VehicleEngines)
+        foreach (UdonSharpBehaviour vehicle in VehicleEngines)
         {
             if (vehicle != null)
             {
-                vehicle.Wind = NewWindDir;
-                vehicle.WindGustStrength = WindGustStrength;
-                vehicle.WindGustiness = WindGustiness;
-                vehicle.WindTurbulanceScale = WindTurbulanceScale;
+                vehicle.SetProgramVariable("Wind", NewWindDir);
+                vehicle.SetProgramVariable("WindGustStrength", WindGustStrength);
+                vehicle.SetProgramVariable("WindGustiness", WindGustiness);
+                vehicle.SetProgramVariable("WindTurbulanceScale", WindTurbulanceScale);
             }
         }
     }

@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_Limits : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private GameObject HudLimit;
     [SerializeField] private bool DefaultLimitsOn = true;
     [Tooltip("Object enabled when function is active (used on MFD)")]
@@ -31,7 +31,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         { InVR = localPlayer.IsUserInVR(); }
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         Dial_FunconNULL = Dial_Funcon == null;
         HudLimitNULL = HudLimit == null;
         if (!DefaultLimitsOn) { SetLimitsOff(); }
@@ -49,7 +49,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        gameObject.SetActive(false);
+        if (FlightLimitsEnabled) { gameObject.SetActive(true); }
         Piloting = true;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(FlightLimitsEnabled);
         if (FlightLimitsEnabled)
@@ -97,7 +97,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (!HudLimitNULL) { HudLimit.SetActive(false); }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
         HudLimit.SetActive(false);
-        SAVControl.Limits = 1;
+        SAVControl.SetProgramVariable("Limits", 1f);
     }
     public void SFEXT_O_PassengerEnter()
     {
@@ -135,9 +135,9 @@ public class DFUNC_Limits : UdonSharpBehaviour
 
         if (FlightLimitsEnabled && Piloting)
         {
-            float GLimitStrength = Mathf.Clamp(-(SAVControl.VertGs / GLimiter) + 1, 0, 1);
-            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(SAVControl.AngleOfAttack) / AoALimiter) + 1, 0, 1);
-            SAVControl.Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
+            float GLimitStrength = Mathf.Clamp(-((float)SAVControl.GetProgramVariable("VertGs") / GLimiter) + 1, 0, 1);
+            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack")) / AoALimiter) + 1, 0, 1);
+            SAVControl.SetProgramVariable("Limits", Mathf.Min(GLimitStrength, AoALimitStrength));
         }
     }
     public void KeyboardInput()
@@ -148,7 +148,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
     {
         if (!FlightLimitsEnabled)
         {
-            if (SAVControl.VTOLAngle != SAVControl.VTOLDefaultValue) { return; }
+            if ((float)SAVControl.GetProgramVariable("VTOLAngle") != (float)SAVControl.GetProgramVariable("VTOLDefaultValue")) { return; }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOn");
         }
         else

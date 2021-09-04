@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_AltHold : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private GameObject HudHold;
     [SerializeField] private GameObject Dial_Funcon;
     [Tooltip("Limit Gs that can be pulled by the altitude hold auto pilot")]
@@ -39,9 +39,9 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         { InVR = localPlayer.IsUserInVR(); }
         Dial_FunconNULL = Dial_Funcon == null;
         HudHoldNULL = HudHold == null;
-        VehicleRigidbody = SAVControl.VehicleRigidbody;
-        VehicleTransform = SAVControl.VehicleTransform;
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
+        VehicleTransform = EntityControl.transform;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
     }
     public void DFUNC_Selected()
@@ -89,7 +89,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     {
         if (AltHold) { return; }
         AltHold = true;
-        SAVControl.JoystickOverridden += 1;
+        SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") + 1);
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(AltHold); }
         if (!HudHoldNULL) { HudHold.SetActive(AltHold); }
         if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOn"); }
@@ -101,8 +101,8 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         AltHold = false;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(AltHold); }
         if (!HudHoldNULL) { HudHold.SetActive(AltHold); }
-        SAVControl.JoystickOverridden -= 1;
-        SAVControl.JoystickOverride = Vector3.zero;
+        SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") - 1);
+        SAVControl.SetProgramVariable("JoystickOverride", Vector3.zero);
         RotationInputs = Vector3.zero;
         AltHoldPitchIntegrator = 0;
         if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOff"); }
@@ -127,7 +127,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
                     }
                     else
                     {
-                        if (!SAVControl.Taxiing)
+                        if (!(bool)SAVControl.GetProgramVariable("Taxiing"))
                         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold)); }
                     }
                 }
@@ -143,7 +143,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             //Altitude hold PI Controller
 
             int upsidedown = Vector3.Dot(Vector3.up, VehicleTransform.up) > 0 ? 1 : -1;
-            float error = SAVControl.CurrentVel.normalized.y - (localAngularVelocity.x * upsidedown * 2.5f);
+            float error = ((Vector3)SAVControl.GetProgramVariable("CurrentVel")).normalized.y - (localAngularVelocity.x * upsidedown * 2.5f);
 
             AltHoldPitchIntegrator += error * DeltaTime;
             //AltHoldPitchIntegrator = Mathf.Clamp(AltHoldPitchIntegrator, AltHoldPitchIntegratorMin, AltHoldPitchIntegratorMax);
@@ -176,12 +176,12 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             RotationInputs.y = 0;
 
             //flight limit internally enabled when alt hold is enabled
-            float GLimitStrength = Mathf.Clamp(-(SAVControl.VertGs / GLimiter) + 1, 0, 1);
-            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs(SAVControl.AngleOfAttack) / AoALimiter) + 1, 0, 1);
+            float GLimitStrength = Mathf.Clamp(-((float)(SAVControl.GetProgramVariable("VertGs")) / GLimiter) + 1, 0, 1);
+            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack")) / AoALimiter) + 1, 0, 1);
             float Limits = Mathf.Min(GLimitStrength, AoALimitStrength);
             RotationInputs.x *= Limits;
 
-            SAVControl.JoystickOverride = RotationInputs;
+            SAVControl.SetProgramVariable("JoystickOverride", RotationInputs);
         }
     }
     public void KeyboardInput()
@@ -192,7 +192,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         }
         else
         {
-            if (SAVControl.VTOLAngle != SAVControl.VTOLDefaultValue || SAVControl.Taxiing) { return; }
+            if ((float)SAVControl.GetProgramVariable("VTOLAngle") != (float)SAVControl.GetProgramVariable("VTOLDefaultValue") || (bool)SAVControl.GetProgramVariable("Taxiing")) { return; }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
             gameObject.SetActive(true);
         }

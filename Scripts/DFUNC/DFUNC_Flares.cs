@@ -7,7 +7,7 @@ using VRC.Udon;
 
 public class DFUNC_Flares : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private int NumFlares = 60;
     [Tooltip("Speed to launch flare particles at")]
     [SerializeField] private float FlareLaunchSpeed = 100;
@@ -57,7 +57,8 @@ public class DFUNC_Flares : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if (NumFlares != FullFlares) { SAVControl.ReSupplied++; }
+        if (NumFlares != FullFlares)
+        { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumFlares = (int)Mathf.Min(NumFlares + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullFlares);
         if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
@@ -90,11 +91,11 @@ public class DFUNC_Flares : UdonSharpBehaviour
         {
             //this is to make flare particles inherit the velocity of the aircraft they were launched from (inherit doesn't work because non-owners don't have access to rigidbody velocity.)
             var emitParams = new ParticleSystem.EmitParams();
-            Vector3 curspd = SAVControl.CurrentVel;
+            Vector3 curspd = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
             emitParams.velocity = curspd + (FlareParticles[x].transform.forward * FlareLaunchSpeed);
             FlareParticles[x].Emit(emitParams, 1);
         }
-        SAVControl.NumActiveFlares++;
+        { SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") + 1); }
         SAVControl.SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
     }
     public void KeyboardInput()
@@ -104,6 +105,6 @@ public class DFUNC_Flares : UdonSharpBehaviour
     }
     public void RemoveFlare()
     {
-        SAVControl.NumActiveFlares--;
+        { SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") - 1); }
     }
 }

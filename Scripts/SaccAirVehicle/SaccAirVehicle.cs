@@ -20,16 +20,19 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public Transform YawMoment;
     [Tooltip("Position traced down from to detect whether the vehicle is currently on the ground. Trace distance is 44cm. Place between the back wheels around 20cm above the height where the wheels touch the ground")]
     public Transform GroundDetector;
+    [Tooltip("Distance traced down from the ground detector's position to see if the ground is there, in order to determine if the vehicle is grounded")]
+    public float GroundDetectorRayDistance = .44f;
     [Tooltip("HP of the plane, bullets do 10 damage per hit")]
+    public LayerMask GroundDetectorLayers = 2049;
     [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
     [Tooltip("Teleport the vehicle to the oposite side of the map when flying too far in one direction?")]
     public bool RepeatingWorld = true;
     [Tooltip("Distance you can travel away from world origin before being teleported to the other side of the map. Not recommended to increase, floating point innacuracy and game freezing issues may occur if larger than default")]
     public float RepeatingWorldDistance = 20000;
     [Tooltip("Use the left hand to control the joystick and the right hand to control the throttle?")]
-    [SerializeField] private bool SwitchHandsJoyThrottle = false;
+    public bool SwitchHandsJoyThrottle = false;
     public bool HasAfterburner = true;
-    [SerializeField] private KeyCode AfterBurnerKey = KeyCode.T;
+    public KeyCode AfterBurnerKey = KeyCode.T;
     [Tooltip("Point in the throttle at which afterburner enables, .8 = 80%")]
     public float ThrottleAfterburnerPoint = 0.8f;
     [Tooltip("Disable Thrust/VTOL rotation values transition calculations and assume VTOL mode always (for helicopters)")]
@@ -282,9 +285,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int MissilesIncomingOther = 0;
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] public Vector3 Spawnrotation;
-    private int OutsidePlaneLayer;
+    [System.NonSerializedAttribute] public int OutsidePlaneLayer;
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
-    bool LandedOnWater = false;
+    [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
+    bool FloatingLastFrame = false;
+    bool GroundedLastFrame = false;
     private float VelLiftStart;
     private int Planelayer;
     private float VelLiftMaxStart;
@@ -348,7 +353,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_L_EntityStart()
     {
         VehicleGameObj = EntityControl.gameObject;
-        VehicleTransform = EntityControl.GetComponent<Transform>();
+        VehicleTransform = EntityControl.transform;
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         VehicleConstantForce = EntityControl.GetComponent<ConstantForce>();
 
@@ -387,10 +392,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
             ThrottleStrength *= RBMass;
             PitchStrength *= RBMass;
             PitchFriction *= RBMass;
+            PitchConstantFriction *= RBMass;
             YawStrength *= RBMass;
             YawFriction *= RBMass;
+            YawConstantFriction *= RBMass;
             RollStrength *= RBMass;
             RollFriction *= RBMass;
+            RollConstantFriction *= RBMass;
             Lift *= RBMass;
             MaxLift *= RBMass;
             VelLiftMax *= RBMass;
@@ -501,33 +509,32 @@ public class SaccAirVehicle : UdonSharpBehaviour
             else { GDamageToTake = 0; }
 
 
+            if (Floating)
+            {
+                if (!FloatingLastFrame)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDownWater));
+                }
+            }
+            else
+            { FloatingLastFrame = false; }
             if (DisableGroundDetection == 0)
             {
-                if (Floating)
+                RaycastHit GDHit;
+                if ((Physics.Raycast(GroundDetector.position, -GroundDetector.up, out GDHit, GroundDetectorRayDistance, GroundDetectorLayers, QueryTriggerInteraction.Ignore)))
                 {
-                    if (!LandedOnWater)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDownWater));
-                    }
-                }
-
-                if ((Physics.Raycast(GroundDetector.position, -GroundDetector.up, .44f, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore)))
-                {
-                    if (!Taxiing)
+                    GDHitRigidbody = GDHit.collider.attachedRigidbody;
+                    if (!GroundedLastFrame)
                     {
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDown));
                     }
                 }
                 else
                 {
-                    if (!Floating && Taxiing)
-                    {
-                        LandedOnWater = false;
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
-                    }
+                    GroundedLastFrame = false;
                 }
             }
-
+            CheckForTakeoff();
 
             //synced variables because rigidbody values aren't accessable by non-owner players
             CurrentVel = VehicleRigidbody.velocity;
@@ -1142,13 +1149,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void TouchDown()
     {
         //Debug.Log("TouchDown");
+        GroundedLastFrame = true;
         Taxiing = true;
         EntityControl.SendEventToExtensions("SFEXT_G_TouchDown");
     }
     public void TouchDownWater()
     {
         //Debug.Log("TouchDownWater");
-        LandedOnWater = true;
+        FloatingLastFrame = true;
         Taxiing = true;
         EntityControl.SendEventToExtensions("SFEXT_G_TouchDownWater");
     }
@@ -1157,6 +1165,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
         //Debug.Log("TakeOff");
         Taxiing = false;
         EntityControl.SendEventToExtensions("SFEXT_G_TakeOff");
+    }
+    public void CheckForTakeoff()
+    {
+        if (Taxiing && !GroundedLastFrame && !FloatingLastFrame)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
+        }
     }
     public void SetAfterburnerOn()
     {

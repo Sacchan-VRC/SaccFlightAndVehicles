@@ -7,7 +7,7 @@ using VRC.Udon;
 
 public class DFUNC_Bomb : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator BombAnimator;
     [SerializeField] private GameObject Bomb;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
@@ -44,10 +44,10 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         if (BombHoldDelay < BombDelay) { BombHoldDelay = BombDelay; }
         FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
         reloadspeed = FullBombs / FullReloadTimeSec;
-        BombAnimator = SAVControl.EntityControl.GetComponent<Animator>();
-        VehicleTransform = SAVControl.EntityControl.transform;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        BombAnimator = EntityControl.GetComponent<Animator>();
+        VehicleTransform = EntityControl.transform;
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
-        EntityControl = SAVControl.EntityControl;
         localPlayer = Networking.LocalPlayer;
 
         FindSelf();
@@ -89,7 +89,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if (NumBomb != FullBombs) { SAVControl.ReSupplied++; }
+        if (NumBomb != FullBombs)
+        { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullBombs);
         BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
         BombPoint = 0;
@@ -106,21 +107,21 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         {
             if (!TriggerLastFrame)
             {
-                if (NumBomb > 0 && !SAVControl.Taxiing && ((Time.time - LastBombDropTime) > BombDelay))
+                if (NumBomb > 0 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((Time.time - LastBombDropTime) > BombDelay))
                 {
                     LastBombDropTime = Time.time;
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
-                    if (SAVControl.IsOwner)
+                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                     { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                 }
             }
             else//launch every BombHoldDelay
-                if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !SAVControl.Taxiing)
+                if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !(bool)SAVControl.GetProgramVariable("Taxiing"))
             {
                 {
                     LastBombDropTime = Time.time;
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
-                    if (SAVControl.IsOwner)
+                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                     { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                 }
             }
@@ -140,7 +141,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
 
             NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, VehicleTransform.rotation);
             NewBomb.SetActive(true);
-            NewBomb.GetComponent<Rigidbody>().velocity = SAVControl.CurrentVel;
+            NewBomb.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
             BombPoint++;
             if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
         }

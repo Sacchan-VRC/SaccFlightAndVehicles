@@ -7,7 +7,7 @@ using VRC.Udon;
 public class SAV_KillTracker : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     public SaccScoreboard_Kills KillsBoard;
     private bool InEditor;
     private VRCPlayerApi localPlayer;
@@ -22,7 +22,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     {
         //our killer increases their kills
         float time = Time.time;
-        if (EntityControl.LastAttacker != null && (SAVControl.Occupied || (time - EntityControl.LastHitTime < 5 && !SAVControl.Taxiing && ((time - EntityControl.PilotExitTime) < 5))))
+        if (EntityControl.LastAttacker != null && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - EntityControl.LastHitTime < 5 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((time - EntityControl.PilotExitTime) < 5))))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
             EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotKill");
@@ -32,7 +32,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     }
     public void SFEXT_O_GotKill()
     {
-        if (KillsBoard != null && SAVControl.Piloting)
+        if (KillsBoard != null && (bool)SAVControl.GetProgramVariable("Piloting"))
         {
             KillsBoard.MyKills++;
             if (KillsBoard.MyKills > KillsBoard.MyBestKills)

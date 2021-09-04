@@ -9,7 +9,7 @@ public class SAV_HUDController : UdonSharpBehaviour
 {
     [Tooltip("Transform of the pilot seat's target eye position, HUDContrller is automatically moved to this position in Start() to ensure perfect alignment")]
     [SerializeField] private Transform PilotSeatAdjusterTarget;
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator HUDAnimator;
     [SerializeField] private Text HUDText_G;
     [SerializeField] private Text HUDText_mach;
@@ -46,11 +46,11 @@ public class SAV_HUDController : UdonSharpBehaviour
     private void Start()
     {
 
-        HUDAnimator = SAVControl.EntityControl.GetComponent<Animator>();
-        EntityControl = SAVControl.EntityControl;
-        VehicleTransform = SAVControl.EntityControl.transform;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        HUDAnimator = EntityControl.GetComponent<Animator>();
+        VehicleTransform = EntityControl.transform;
 
-        float fuel = SAVControl.Fuel;
+        float fuel = (float)SAVControl.GetProgramVariable("Fuel");
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
 
         if (PilotSeatAdjusterTarget != null) { transform.position = PilotSeatAdjusterTarget.position; }
@@ -70,13 +70,13 @@ public class SAV_HUDController : UdonSharpBehaviour
 
         //Velocity indicator
         Vector3 tempvel;
-        if (SAVControl.CurrentVel.magnitude < 2)
+        if (((Vector3)SAVControl.GetProgramVariable("CurrentVel")).magnitude < 2)
         {
             tempvel = -Vector3.up * 2;//straight down instead of spazzing out when moving very slow
         }
         else
         {
-            tempvel = SAVControl.CurrentVel;
+            tempvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
 
         VelocityIndicator.position = transform.position + tempvel;
@@ -85,7 +85,7 @@ public class SAV_HUDController : UdonSharpBehaviour
 
 
         //Heading indicator
-        Vector3 VehicleEuler = SAVControl.EntityControl.transform.rotation.eulerAngles;
+        Vector3 VehicleEuler = EntityControl.transform.rotation.eulerAngles;
         HeadingIndicator.localRotation = Quaternion.Euler(new Vector3(0, -VehicleEuler.y, 0));
         /////////////////
 
@@ -100,26 +100,26 @@ public class SAV_HUDController : UdonSharpBehaviour
         //updating numbers 3~ times a second
         if (check > .3)//update text
         {
-            if (Mathf.Abs(maxGs) < Mathf.Abs(SAVControl.VertGs))
-            { maxGs = SAVControl.VertGs; }
-            HUDText_G.text = string.Concat(SAVControl.VertGs.ToString("F1"), "\n", maxGs.ToString("F1"));
-            HUDText_mach.text = ((SAVControl.Speed) / 343f).ToString("F2");
-            HUDText_altitude.text = string.Concat((SAVControl.CurrentVel.y * 60 * 3.28084f).ToString("F0"), "\n", ((SAVControl.CenterOfMass.position.y + -SAVControl.SeaLevel) * 3.28084f).ToString("F0"));
-            HUDText_knots.text = ((SAVControl.Speed) * 1.9438445f).ToString("F0");
-            HUDText_knotsairspeed.text = ((SAVControl.AirSpeed) * 1.9438445f).ToString("F0");
+            if (Mathf.Abs(maxGs) < Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs")))
+            { maxGs = (float)SAVControl.GetProgramVariable("VertGs"); }
+            HUDText_G.text = string.Concat(((float)SAVControl.GetProgramVariable("VertGs")).ToString("F1"), "\n", maxGs.ToString("F1"));
+            HUDText_mach.text = (((float)SAVControl.GetProgramVariable("Speed")) / 343f).ToString("F2");
+            HUDText_altitude.text = string.Concat((((Vector3)SAVControl.GetProgramVariable("CurrentVel")).y * 60 * 3.28084f).ToString("F0"), "\n", ((((Transform)SAVControl.GetProgramVariable("CenterOfMass")).position.y + -(float)SAVControl.GetProgramVariable("SeaLevel")) * 3.28084f).ToString("F0"));
+            HUDText_knots.text = (((float)SAVControl.GetProgramVariable("Speed")) * 1.9438445f).ToString("F0");
+            HUDText_knotsairspeed.text = (((float)SAVControl.GetProgramVariable("AirSpeed")) * 1.9438445f).ToString("F0");
 
-            if (SAVControl.Speed < 2)
+            if ((float)SAVControl.GetProgramVariable("Speed") < 2)
             {
                 HUDText_angleofattack.text = System.String.Empty;
             }
             else
             {
-                HUDText_angleofattack.text = SAVControl.AngleOfAttack.ToString("F0");
+                HUDText_angleofattack.text = ((float)SAVControl.GetProgramVariable("AngleOfAttack")).ToString("F0");
             }
             check = 0;
         }
         check += SmoothDeltaTime;
 
-        HUDAnimator.SetFloat(FUEL_STRING, SAVControl.Fuel * FullFuelDivider);
+        HUDAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
     }
 }

@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_Smoke : UdonSharpBehaviour
 {
-    [SerializeField] SaccAirVehicle SAVControl;
+    [SerializeField] UdonSharpBehaviour SAVControl;
     [Tooltip("Material to change the color value of to match smoke color")]
     [SerializeField] private Material SmokeColorIndicatorMaterial;
     [SerializeField] private ParticleSystem[] DisplaySmoke;
@@ -36,8 +36,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
-        VehicleTransform = SAVControl.EntityControl.transform;
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleTransform = EntityControl.transform;
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
         NumSmokes = DisplaySmoke.Length;
@@ -116,7 +116,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                     {
                         //VR Set Smoke
 
-                        Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -SAVControl.ThrottleSensitivity;
+                        Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -(float)SAVControl.GetProgramVariable("ThrottleSensitivity");
                         SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
                         SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
                         SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
@@ -161,7 +161,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = true; }
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_SmokeOn");
         }
@@ -174,7 +174,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = false; }
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_SmokeOff");
         }
@@ -199,7 +199,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             if (Smoking)
             {

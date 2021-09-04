@@ -7,7 +7,7 @@ using VRC.Udon;
 
 public class DFUNC_Cruise : UdonSharpBehaviour
 {
-    [SerializeField] SaccAirVehicle SAVControl;
+    [SerializeField] UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private Text HUDText_knotstarget;
@@ -40,8 +40,8 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         { InVR = localPlayer.IsUserInVR(); }
-        VehicleTransform = SAVControl.EntityControl.transform;
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleTransform = EntityControl.transform;
         HUDText_knotstargetNULL = HUDText_knotstarget == null;
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
@@ -96,8 +96,12 @@ public class DFUNC_Cruise : UdonSharpBehaviour
             gameObject.SetActive(true);
             func_active = true;
         }
-        if (!CruiseThrottleOverridden) { SAVControl.ThrottleOverridden += 1; CruiseThrottleOverridden = true; }
-        SetSpeed = SAVControl.AirSpeed;
+        if (!CruiseThrottleOverridden)
+        {
+            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
+            CruiseThrottleOverridden = true;
+        }
+        SetSpeed = (float)SAVControl.GetProgramVariable("AirSpeed");
         Cruise = true;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
@@ -111,8 +115,12 @@ public class DFUNC_Cruise : UdonSharpBehaviour
             if (!InVR)
             { gameObject.SetActive(true); }
         }
-        if (CruiseThrottleOverridden) { SAVControl.ThrottleOverridden -= 1; CruiseThrottleOverridden = false; }
-        SAVControl.PlayerThrottle = SAVControl.ThrottleInput;
+        if (CruiseThrottleOverridden)
+        {
+            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
+            CruiseThrottleOverridden = false;
+        }
+        SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
         Cruise = false;
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
@@ -140,7 +148,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                     {
                         if (!Cruise)
                         {
-                            if (!SAVControl.Taxiing)
+                            if (!(bool)SAVControl.GetProgramVariable("Taxiing"))
                             { SetCruiseOn(); }
                         }
                         if (TriggerTapTime > .4f)//no double tap
@@ -168,14 +176,14 @@ public class DFUNC_Cruise : UdonSharpBehaviour
 
             if (func_active)
             {
-                float error = (SetSpeed - SAVControl.AirSpeed);
+                float error = (SetSpeed - (float)SAVControl.GetProgramVariable("AirSpeed"));
 
                 CruiseIntegrator += error * DeltaTime;
                 CruiseIntegrator = Mathf.Clamp(CruiseIntegrator, CruiseIntegratorMin, CruiseIntegratorMax);
 
                 //float Derivator = Mathf.Clamp(((error - lastframeerror) / DeltaTime),DerivMin, DerivMax);
 
-                SAVControl.ThrottleOverride = Mathf.Clamp((CruiseProportional * error) + (CruiseIntegral * CruiseIntegrator), 0, 1);
+                SAVControl.SetProgramVariable("ThrottleOverride", Mathf.Clamp((CruiseProportional * error) + (CruiseIntegral * CruiseIntegrator), 0, 1));
                 //ThrottleInput += Derivative * Derivator; //works but spazzes out real bad
 
                 TriggerTapTime += DeltaTime;
@@ -191,7 +199,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        if (!Cruise && !SAVControl.Taxiing)
+        if (!Cruise && !(bool)SAVControl.GetProgramVariable("Taxiing"))
         {
             SetCruiseOn();
         }

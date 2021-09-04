@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_Flaps : UdonSharpBehaviour
 {
-    [SerializeField] SaccAirVehicle SAVControl;
+    [SerializeField] UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator FlapsAnimator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
@@ -48,7 +48,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null) { InEditor = false; }
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         FLAPS_STRING = Animator.StringToHash(AnimatorBool);
         //to match how the old values worked
         FlapsDragMulti -= 1f;
@@ -105,15 +105,31 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         }
         if (Flaps)
         {
-            if (SAVControl.PitchDown)//flaps on, but plane's angle of attack is negative so they have no helpful effect
+            if ((bool)SAVControl.GetProgramVariable("PitchDown"))//flaps on, but plane's angle of attack is negative so they have no helpful effect
             {
-                if (LiftApplied) { SAVControl.ExtraLift -= FlapsLiftMulti; LiftApplied = false; }
-                if (MaxLiftApplied) { SAVControl.MaxLift -= FlapsExtraMaxLift; MaxLiftApplied = false; }
+                if (LiftApplied)
+                {
+                    SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") - FlapsLiftMulti);
+                    LiftApplied = false;
+                }
+                if (MaxLiftApplied)
+                {
+                    SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") - FlapsExtraMaxLift);
+                    MaxLiftApplied = false;
+                }
             }
             else//flaps on positive angle of attack, flaps are useful
             {
-                if (!LiftApplied) { SAVControl.ExtraLift += FlapsLiftMulti; LiftApplied = true; }
-                if (!MaxLiftApplied) { SAVControl.MaxLift += FlapsExtraMaxLift; MaxLiftApplied = true; }
+                if (!LiftApplied)
+                {
+                    SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") + FlapsLiftMulti);
+                    LiftApplied = true;
+                }
+                if (!MaxLiftApplied)
+                {
+                    SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") + FlapsExtraMaxLift);
+                    MaxLiftApplied = true;
+                }
             }
         }
     }
@@ -127,13 +143,25 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         Flaps = false;
         FlapsAnimator.SetBool(FLAPS_STRING, false);
 
-        if (DragApplied) { SAVControl.ExtraDrag -= FlapsDragMulti; DragApplied = false; }
-        if (LiftApplied) { SAVControl.ExtraLift -= FlapsLiftMulti; LiftApplied = false; }
-        if (MaxLiftApplied) { SAVControl.MaxLift -= FlapsExtraMaxLift; MaxLiftApplied = false; }
-
-        if (SAVControl.IsOwner)
+        if (DragApplied)
         {
-            gameObject.SetActive(false);//for desktop Users
+            SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - FlapsDragMulti);
+            DragApplied = false;
+        }
+        if (LiftApplied)
+        {
+            SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") - FlapsLiftMulti);
+            LiftApplied = false;
+        }
+        if (MaxLiftApplied)
+        {
+            SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") - FlapsExtraMaxLift);
+            MaxLiftApplied = false;
+        }
+
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+        {
+            if (!InVR) { gameObject.SetActive(false); }//for desktop Users
             EntityControl.SendEventToExtensions("SFEXT_O_FlapsOff");
         }
     }
@@ -143,11 +171,23 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         FlapsAnimator.SetBool(FLAPS_STRING, true);
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
 
-        if (!DragApplied) { SAVControl.ExtraDrag += FlapsDragMulti; DragApplied = true; }
-        if (!LiftApplied) { SAVControl.ExtraLift += FlapsLiftMulti; LiftApplied = true; }
-        if (!MaxLiftApplied) { SAVControl.MaxLift += FlapsExtraMaxLift; MaxLiftApplied = true; }
+        if (!DragApplied)
+        {
+            SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + FlapsDragMulti);
+            DragApplied = true;
+        }
+        if (!LiftApplied)
+        {
+            SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") + FlapsLiftMulti);
+            LiftApplied = true;
+        }
+        if (!MaxLiftApplied)
+        {
+            SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") + FlapsExtraMaxLift);
+            MaxLiftApplied = true;
+        }
 
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             gameObject.SetActive(true);//for desktop Users
             EntityControl.SendEventToExtensions("SFEXT_O_FlapsOn");

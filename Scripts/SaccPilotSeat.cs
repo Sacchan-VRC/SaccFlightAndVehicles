@@ -112,7 +112,6 @@ public class SaccPilotSeat : UdonSharpBehaviour
     }
     private void InitializeSeat()
     {
-        EntityControl.FindSeats();
         int x = 0;
         foreach (VRCStation station in EntityControl.VehicleStations)
         {

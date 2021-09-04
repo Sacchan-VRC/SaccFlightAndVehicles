@@ -24,6 +24,7 @@ public class SaccPassengerSeat : UdonSharpBehaviour
     }
     private void Interact()
     {
+        if (!SeatInitialized) { InitializeSeat(); }
         Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
         localPlayer.UseAttachedStation();
         Seat.localRotation = SeatStartRot;
@@ -114,7 +115,6 @@ public class SaccPassengerSeat : UdonSharpBehaviour
     }
     private void InitializeSeat()
     {
-        EntityControl.FindSeats();
         int x = 0;
         foreach (VRCStation station in EntityControl.VehicleStations)
         {

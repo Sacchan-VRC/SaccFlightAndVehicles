@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_Hook : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private AudioSource CableSnap;
@@ -41,10 +41,10 @@ public class DFUNC_Hook : UdonSharpBehaviour
     {
         Dial_FunconNULL = Dial_Funcon == null;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(HookDown);
-        VehicleTransform = SAVControl.EntityControl.transform;
-        VehicleAnimator = SAVControl.EntityControl.GetComponent<Animator>();
-        VehicleRigidbody = SAVControl.EntityControl.GetComponent<Rigidbody>();
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleTransform = EntityControl.transform;
+        VehicleAnimator = EntityControl.GetComponent<Animator>();
+        VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         SetHookUp();
         BreakFunctionNULL = BrakeFunction == null;
     }
@@ -128,7 +128,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
             }
         }
         //slow down if hooked and on the ground
-        if (Hooked && SAVControl.Taxiing)
+        if (Hooked && (bool)SAVControl.GetProgramVariable("Taxiing"))
         {
             if (!DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake += 1; DisableGroundBrake = true; }
             if (Vector3.Distance(VehicleTransform.position, HookedLoc) > HookedCableSnapDistance)//real planes take around 80-90 meters to stop on a carrier
@@ -137,7 +137,8 @@ public class DFUNC_Hook : UdonSharpBehaviour
                 float HookedDelta = (Time.time - HookedTime);
                 if (HookedDelta < 2)
                 {
-                    SAVControl.Health -= ((-HookedDelta + 2) / 2) * SAVControl.FullHealth;
+                    SAVControl.SetProgramVariable("Health", (float)SAVControl.GetProgramVariable("Health") - (((-HookedDelta + 2) / 2) * (float)SAVControl.GetProgramVariable("FullHealth")));
+                    //SAVControl.Health -= ((-HookedDelta + 2) / 2) * SAVControl.FullHealth;
                 }
                 Hooked = false;
                 //if you catch a cable but go airborne before snapping it, keep your hook out and then land somewhere else
@@ -148,9 +149,9 @@ public class DFUNC_Hook : UdonSharpBehaviour
                 { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap"); }
             }
             float DeltaTime = Time.deltaTime;
-            if (SAVControl.Speed > HookedBrakeStrength * DeltaTime)
+            if ((float)SAVControl.GetProgramVariable("Speed") > HookedBrakeStrength * DeltaTime)
             {
-                VehicleRigidbody.velocity += -SAVControl.CurrentVel.normalized * HookedBrakeStrength * DeltaTime;
+                VehicleRigidbody.velocity += -((Vector3)SAVControl.GetProgramVariable("CurrentVel")).normalized * HookedBrakeStrength * DeltaTime;
             }
             else
             {
@@ -170,13 +171,13 @@ public class DFUNC_Hook : UdonSharpBehaviour
         {
             if (!HookDown)
             {
-                if (SAVControl.Piloting && !SAVControl.InVR) { gameObject.SetActive(true); }
+                if ((bool)SAVControl.GetProgramVariable("Piloting") && !(bool)SAVControl.GetProgramVariable("InVR")) { gameObject.SetActive(true); }
                 if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown");
             }
             else
             {
-                if (SAVControl.Piloting && !SAVControl.InVR) { gameObject.SetActive(false); }
+                if ((bool)SAVControl.GetProgramVariable("Piloting") && !(bool)SAVControl.GetProgramVariable("InVR")) { gameObject.SetActive(false); }
                 if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookUp");
             }
@@ -187,7 +188,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         HookDown = true;
         VehicleAnimator.SetBool(HOOKDOWN_STRING, true);
 
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_HookDown");
         }
@@ -198,7 +199,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         VehicleAnimator.SetBool(HOOKDOWN_STRING, false);
         Hooked = false;
 
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_HookUp");
         }

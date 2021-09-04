@@ -7,7 +7,7 @@ using VRC.Udon;
 public class SAV_FloatScript : UdonSharpBehaviour
 {
     [SerializeField] private Rigidbody VehicleRigidbody;
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [Tooltip("Transforms at which floating forces are calculate, recomd using 4 in a rectangle centered around the center of mass")]
     [SerializeField] private Transform[] FloatPoints;
     [Tooltip("Layers to raycast against to check for 'water'")]
@@ -100,7 +100,10 @@ public class SAV_FloatScript : UdonSharpBehaviour
             gameObject.SetActive(false);
         }
         if (HoverBike || DisableGroundDetection)
-        { SAVControl.DisableGroundDetection++; }
+        {
+            SAVControl.SetProgramVariable("DisableGroundDetection", (int)SAVControl.GetProgramVariable("DisableGroundDetection") + 1);
+            SAVControl.SetProgramVariable("Taxiing", false);
+        }
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -190,10 +193,10 @@ public class SAV_FloatScript : UdonSharpBehaviour
             }
             VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * depth * WaterRotDrag);
             VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * depth * WaterVelDrag);
-            if (!SAVControlNULL) { SAVControl.Floating = true; }
+            if (!SAVControlNULL && !HoverBike) { SAVControl.SetProgramVariable("Floating", true); }
         }
         else
-        { if (!SAVControlNULL) { SAVControl.Floating = false; } }
+        { if (!SAVControlNULL && !HoverBike) { SAVControl.SetProgramVariable("Floating", false); } }
 
         Vector3 right = VehicleTransform.right;
         Vector3 forward = VehicleTransform.forward;
@@ -216,7 +219,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
             }
             float BackThrustAmount = -((Vector3.Dot(Vel, forward)) * BackThrustStrength);
             if (BackThrustAmount > 0)
-            { VehicleRigidbody.AddForce(forward * BackThrustAmount * depth * SAVControl.ThrottleInput); }
+            { VehicleRigidbody.AddForce(forward * BackThrustAmount * depth * (float)SAVControl.GetProgramVariable("ThrottleInput")); }
             VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * depth, ForceMode.Force);
         }
         else

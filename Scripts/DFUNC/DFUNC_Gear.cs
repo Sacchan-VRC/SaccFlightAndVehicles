@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_Gear : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
     [SerializeField] private Animator GearAnimator;
@@ -26,7 +26,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         LandingGearDragMulti -= 1;//to match how the old values worked
         SetGearDown();
         Dial_FunconNULL = Dial_Funcon == null;
@@ -83,13 +83,22 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public void SetGearUp()
     {
         //Debug.Log("SetGearUp");
-        if (!DisableGroundDetector) { SAVControl.DisableGroundDetection += 1; DisableGroundDetector = true; }
+        if (!DisableGroundDetector)
+        {
+            SAVControl.SetProgramVariable("DisableGroundDetection", (int)SAVControl.GetProgramVariable("DisableGroundDetection") + 1);
+            SAVControl.SetProgramVariable("Taxiing", false);
+            DisableGroundDetector = true;
+        }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
         GearUp = true;
         GearAnimator.SetBool(GEARUP_STRING, true);
-        if (DragApplied) { SAVControl.ExtraDrag -= LandingGearDragMulti; DragApplied = false; }
+        if (DragApplied)
+        {
+            SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - LandingGearDragMulti);
+            DragApplied = false;
+        }
 
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_GearUp");
         }
@@ -97,13 +106,21 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public void SetGearDown()
     {
         //Debug.Log("SetGearDown");
-        if (DisableGroundDetector) { SAVControl.DisableGroundDetection -= 1; DisableGroundDetector = false; }
+        if (DisableGroundDetector)
+        {
+            SAVControl.SetProgramVariable("DisableGroundDetection", (int)SAVControl.GetProgramVariable("DisableGroundDetection") - 1);
+            DisableGroundDetector = false;
+        }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
         GearUp = false;
         GearAnimator.SetBool(GEARUP_STRING, false);
-        if (!DragApplied) { SAVControl.ExtraDrag += LandingGearDragMulti; DragApplied = true; }
+        if (!DragApplied)
+        {
+            SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + LandingGearDragMulti);
+            DragApplied = true;
+        }
 
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_GearDown");
         }

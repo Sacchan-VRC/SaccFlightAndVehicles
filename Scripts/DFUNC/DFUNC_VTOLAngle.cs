@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_VTOLAngle : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private float VTOLDefault;
     private Transform VehicleTransform;
@@ -19,11 +19,11 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        VTOLDefault = SAVControl.VTOLDefaultValue;
-        VehicleTransform = SAVControl.EntityControl.GetComponent<Transform>();
+        VTOLDefault = (float)SAVControl.GetProgramVariable("VTOLDefaultValue");
+        VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Transform>();
         localPlayer = Networking.LocalPlayer;
-        ThrottleSensitivity = SAVControl.ThrottleSensitivity;
-        SAVControl.VTOLenabled = true;
+        ThrottleSensitivity = (float)SAVControl.GetProgramVariable("ThrottleSensitivity");
+        SAVControl.SetProgramVariable("VTOLenabled", true);
     }
     public void DFUNC_Selected()
     {
@@ -54,10 +54,10 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
             if (!TriggerLastFrame)
             {
                 VTOLZeroPoint = handpos.z;
-                VTOLTemp = SAVControl.VTOLAngle;
+                VTOLTemp = (float)SAVControl.GetProgramVariable("VTOLAngle");
             }
             float VTOLAngleDifference = (VTOLZeroPoint - handpos.z) * -ThrottleSensitivity;
-            SAVControl.VTOLAngleInput = Mathf.Clamp(VTOLTemp + VTOLAngleDifference, 0, 1);
+            SAVControl.SetProgramVariable("VTOLAngleInput", Mathf.Clamp(VTOLTemp + VTOLAngleDifference, 0, 1));
 
             TriggerLastFrame = true;
         }

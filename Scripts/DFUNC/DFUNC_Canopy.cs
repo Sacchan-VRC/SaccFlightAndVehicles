@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_Canopy : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private UdonSharpBehaviour SoundControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
@@ -43,8 +43,8 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
-        VehicleTransform = SAVControl.EntityControl.transform;
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleTransform = EntityControl.transform;
         Dial_FunconNULL = Dial_Funcon == null;
         //crashes if not sent delayed because the order of events sent by SendCustomEvent are not maintained, (SaccEntity.SendEventToExtensions())
         SendCustomEventDelayedFrames(nameof(CanopyOpening), 1);
@@ -62,7 +62,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     {
         gameObject.SetActive(true);
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(CanopyOpen);
-        InVR = SAVControl.InVR;
+        InVR = localPlayer.IsUserInVR();
     }
     public void SFEXT_O_PilotExit()
     {
@@ -99,7 +99,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if (SAVControl.Health == SAVControl.FullHealth)
+        if ((float)SAVControl.GetProgramVariable("Health") == (float)SAVControl.GetProgramVariable("FullHealth"))
         {
             if (CanopyBroken)
             {
@@ -111,7 +111,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     {
         CanopyBroken = false;
         CanopyAnimator.SetBool(CANOPYBREAK_STRING, false);
-        if (SAVControl.IsOwner) { SendCustomEventDelayedFrames(nameof(SendCanopyRepair), 1); }
+        if ((bool)SAVControl.GetProgramVariable("IsOwner")) { SendCustomEventDelayedFrames(nameof(SendCanopyRepair), 1); }
     }
     private void Update()
     {
@@ -139,11 +139,11 @@ public class DFUNC_Canopy : UdonSharpBehaviour
 
         if (!CanopyBroken && CanopyOpen && !EntityControl.dead)
         {
-            if (CanopyCanComeOff && SAVControl.AirSpeed > 100)
+            if (CanopyCanComeOff && (float)SAVControl.GetProgramVariable("AirSpeed") > 100)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyBreakOff");
             }
-            else if (SAVControl.AirSpeed > CanopyAutoCloseSpeed && (Time.time - LastCanopyToggleTime) > CanopyCloseTime + .1f)//.1f is extra delay to match the animator because it's using write defaults off
+            else if ((float)SAVControl.GetProgramVariable("AirSpeed") > CanopyAutoCloseSpeed && (Time.time - LastCanopyToggleTime) > CanopyCloseTime + .1f)//.1f is extra delay to match the animator because it's using write defaults off
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
             }
@@ -157,12 +157,16 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         CanopyOpen = true;
         CanopyAnimator.SetBool(CANOPYOPEN_STRING, true);
         SoundControl.SendCustomEvent("DoorOpen");
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             SendCustomEventDelayedFrames(nameof(SendCanopyOpened), 1);
         }
 
-        if (!DragApplied) { SAVControl.ExtraDrag += CanopyDragMulti; DragApplied = true; }
+        if (!DragApplied)
+        {
+            SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + CanopyDragMulti);
+            DragApplied = true;
+        }
     }
     public void CanopyClosing()
     {
@@ -174,11 +178,15 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         CanopyTransitioning = true;
         SoundControl.SendCustomEventDelayedSeconds("DoorClose", CanopyCloseTime);
         SendCustomEventDelayedSeconds("SetCanopyTransitioningFalse", CanopyCloseTime);
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             SendCustomEventDelayedFrames(nameof(SendCanopyClosed), 1);
         }
-        if (DragApplied) { SAVControl.ExtraDrag -= CanopyDragMulti; DragApplied = false; }
+        if (DragApplied)
+        {
+            SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - CanopyDragMulti);
+            DragApplied = false;
+        }
     }
     //these events have to be used with a frame delay because if you call them from an event that was called by the same SendEventToExtensions function, the previous call stops.
     public void SendCanopyClosed()
@@ -208,15 +216,19 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         CanopyOpen = true;
         CanopyBroken = true;
         CanopyAnimator.SetBool(CANOPYBREAK_STRING, true);
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             SendCustomEventDelayedFrames(nameof(SendCanopyBreak), 1);
         }
-        if (!DragApplied) { SAVControl.ExtraDrag += CanopyDragMulti; DragApplied = true; }
+        if (!DragApplied)
+        {
+            SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + CanopyDragMulti);
+            DragApplied = true;
+        }
     }
     public void ToggleCanopy()
     {
-        if ((Time.time - LastCanopyToggleTime) > CanopyCloseTime + .1f && !CanopyBroken && !CanopyTransitioning && !(!CanopyCanComeOff && SAVControl.Speed > CanopyAutoCloseSpeed))
+        if ((Time.time - LastCanopyToggleTime) > CanopyCloseTime + .1f && !CanopyBroken && !CanopyTransitioning && !(!CanopyCanComeOff && (float)SAVControl.GetProgramVariable("Speed") > CanopyAutoCloseSpeed))
         {
             if (CanopyOpen)
             {

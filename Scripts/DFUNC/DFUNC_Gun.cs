@@ -6,7 +6,7 @@ using VRC.Udon;
 
 public class DFUNC_Gun : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator GunAnimator;
     [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
@@ -58,14 +58,14 @@ public class DFUNC_Gun : UdonSharpBehaviour
         FullGunAmmoInSeconds = GunAmmoInSeconds;
         AmmoBarScaleStart = AmmoBar.localScale;
 
-        VehicleRigidbody = SAVControl.EntityControl.GetComponent<Rigidbody>();
-        EntityControl = SAVControl.EntityControl;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         GunRecoilEmptyNULL = GunRecoilEmpty == null;
         FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
         AAMTargets = EntityControl.AAMTargets;
         NumAAMTargets = EntityControl.NumAAMTargets;
-        VehicleTransform = SAVControl.EntityControl.transform;
-        CenterOfMass = SAVControl.EntityControl.CenterOfMass;
+        VehicleTransform = EntityControl.transform;
+        CenterOfMass = EntityControl.CenterOfMass;
         OutsidePlaneLayer = LayerMask.NameToLayer("Walkthrough");
         GunRecoil *= VehicleRigidbody.mass;
 
@@ -119,7 +119,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_P_PassengerEnter()
     {
         Passenger = true;
-        if (SAVControl.Passenger && func_active)
+        if ((bool)SAVControl.GetProgramVariable("Passenger") && func_active)
         { Set_Active(); }
     }
     public void SFEXT_P_PassengerExit()
@@ -129,7 +129,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.ReSupplied++; }
+        if (GunAmmoInSeconds != FullGunAmmoInSeconds)
+        { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
         AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
     }
@@ -143,7 +144,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         HudCrosshairGun.SetActive(true);
         HudCrosshair.SetActive(false);
         func_active = true;
-        if (SAVControl.Passenger)
+        if ((bool)SAVControl.GetProgramVariable("Passenger"))
         { gameObject.SetActive(true); }
     }
     public void Set_Inactive()
@@ -203,7 +204,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStartFiring");
                     firing = true;
-                    if (SAVControl.IsOwner)
+                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                     { EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
                 }
                 GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
@@ -224,7 +225,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
                     firing = false;
                     TriggerLastFrame = false;
-                    if (SAVControl.IsOwner)
+                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                     { EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
                 }
             }
@@ -343,7 +344,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         else
         { AAMTargetObscuredDelay = 0; }
 
-        if (!SAVControl.Taxiing
+        if (!(bool)SAVControl.GetProgramVariable("Taxiing")
             && (AAMTargetObscuredDelay < .25f)
                 && AAMCurrentTargetDistance < MaxTargetDistance
                     && AAMTargets[AAMTarget].activeInHierarchy
@@ -417,7 +418,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-            float BulletPlusPlaneSpeed = (SAVControl.CurrentVel + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .25f)).magnitude;
+            float BulletPlusPlaneSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .25f)).magnitude;
             Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
             //GUN_TargetDirOld is around 4 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
             //multiplying the result by .25(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
