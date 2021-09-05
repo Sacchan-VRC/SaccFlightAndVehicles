@@ -54,6 +54,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         NumFlares = FullFlares;
+        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
     public void SFEXT_G_ReSupply()
     {

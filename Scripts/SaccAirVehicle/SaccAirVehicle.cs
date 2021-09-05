@@ -404,6 +404,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VelLiftMax *= RBMass;
             VelStraightenStrPitch *= RBMass;
             VelStraightenStrYaw *= RBMass;
+            AdverseRoll *= RBMass;
+            AdverseYaw *= RBMass;
             foreach (WheelCollider wheel in wc)
             {
                 JointSpring SusiSpring = wheel.suspensionSpring;
@@ -532,6 +534,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 else
                 {
                     GroundedLastFrame = false;
+                    GDHitRigidbody = null;
                 }
             }
             CheckForTakeoff();
@@ -1263,7 +1266,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_P_PassengerEnter()
     {
         Passenger = true;
-
         VehicleAnimator.SetBool(LOCALPASSENGER_STRING, true);
         SetPlaneLayerInside();
     }
@@ -1297,8 +1299,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         //setting this as a workaround because it doesnt work reliably in Start()
         if (!InEditor)
         {
-            if (localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
-                                                          //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
+            InVR = localPlayer.IsUserInVR();//move me to start when they fix the bug
+                                            //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
         }
 
         EngineOutput = 0;
@@ -1306,6 +1308,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         PlayerThrottle = 0;
         VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
         VTOLAngleInput = VTOLAngle;
+        GDHitRigidbody = null;
 
         Piloting = true;
         if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions

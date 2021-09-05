@@ -353,6 +353,7 @@ public class SaccEntity : UdonSharpBehaviour
     {
         Passenger = true;
         InVehicle = true;
+        if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
         if (InVehicleOnly != null) { InVehicleOnly.SetActive(true); }
         SendEventToExtensions("SFEXT_P_PassengerEnter");
     }

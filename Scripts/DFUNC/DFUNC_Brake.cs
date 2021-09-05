@@ -137,40 +137,43 @@ public class DFUNC_Brake : UdonSharpBehaviour
             {
                 float KeyboardBrakeInput = 0;
                 float VRBrakeInput = 0;
-
-                if (Selected)
+                if ((bool)SAVControl.GetProgramVariable("Taxiing"))
                 {
-                    float Trigger;
-                    if (UseLeftTrigger)
-                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                    else
-                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-                    VRBrakeInput = Trigger;
-                }
-
-                if (Input.GetKey(KeyboardControl))
-                {
-                    KeyboardBrakeInput = 1;
-                }
-
-                BrakeInput = Mathf.Max(VRBrakeInput, KeyboardBrakeInput);
-
-                Rigidbody gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody");
-                if (gdhr != null)
-                {
-                    float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
-                    if ((bool)SAVControl.GetProgramVariable("Taxiing") && BrakeInput > 0 && RBSpeed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
+                    if (Selected)
                     {
-                        VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), BrakeInput * GroundBrakeStrength * DeltaTime);
+                        float Trigger;
+                        if (UseLeftTrigger)
+                        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                        else
+                        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+                        VRBrakeInput = Trigger;
                     }
-                }
-                else
-                {
-                    if ((bool)SAVControl.GetProgramVariable("Taxiing") && BrakeInput > 0 && Speed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
+
+                    if (Input.GetKey(KeyboardControl))
                     {
-                        VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, BrakeInput * GroundBrakeStrength * DeltaTime);
-                        // VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
+                        KeyboardBrakeInput = 1;
+                    }
+                    BrakeInput = Mathf.Max(VRBrakeInput, KeyboardBrakeInput);
+
+                    //ground brake checks if vehicle is on top of a rigidbody, and if it is, brakes towards its speed rather than zero
+                    //does not work if owner of vehicle does not own the rigidbody 
+                    Rigidbody gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody");
+                    if (gdhr != null)
+                    {
+                        float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
+                        if (BrakeInput > 0 && RBSpeed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
+                        {
+                            VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), BrakeInput * GroundBrakeStrength * DeltaTime);
+                        }
+                    }
+                    else
+                    {
+                        if (BrakeInput > 0 && Speed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
+                        {
+                            VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, BrakeInput * GroundBrakeStrength * DeltaTime);
+                            // VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
+                        }
                     }
                 }
                 //remove the drag added last frame to add the new value for this frame
@@ -193,6 +196,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
             }
             else
             {
+                //outside of vehicle, ground brake always max
                 Rigidbody gdhr = null;
                 { gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody"); }
                 if (gdhr != null)
