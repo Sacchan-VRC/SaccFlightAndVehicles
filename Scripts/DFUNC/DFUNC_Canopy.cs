@@ -38,11 +38,13 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     private float LastCanopyToggleTime = -999;
     private bool DragApplied;
     private bool CanopyTransitioning = false;
+    private bool InEditor = true;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
+        InEditor = localPlayer == null;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         Dial_FunconNULL = Dial_Funcon == null;
@@ -61,8 +63,8 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         gameObject.SetActive(true);
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(CanopyOpen);
-        InVR = localPlayer.IsUserInVR();
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(CanopyOpen); }
+        if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
     }
     public void SFEXT_O_PilotExit()
     {
@@ -72,12 +74,12 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void SFEXT_P_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(CanopyOpen);
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(CanopyOpen); }
     }
     public void SFEXT_G_Explode()
     {
         RepairCanopy();
-        if (!CanopyOpen) CanopyOpening();
+        if (!CanopyOpen) { CanopyOpening(); }
     }
     public void SFEXT_O_PlayerJoined()
     {
@@ -92,7 +94,6 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void SFEXT_G_RespawnButton()
     {
-        Debug.Log("SFEXT_G_RespawnButton");
         CanopyBroken = false;
         CanopyAnimator.SetBool(CANOPYBREAK_STRING, false);
         if (!CanopyOpen) CanopyOpening();

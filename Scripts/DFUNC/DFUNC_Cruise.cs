@@ -52,7 +52,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
-        gameObject.SetActive(false);
+        if (!Cruise) { gameObject.SetActive(false); }
         TriggerTapTime = 1;
         TriggerLastFrame = false;
     }
@@ -88,42 +88,10 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         if (Cruise)
         { SetCruiseOff(); }
     }
-    public void SetCruiseOn()
+    public void SFEXT_O_EnterVTOL()
     {
-        if (Cruise) { return; }
-        if (Piloting)
-        {
-            gameObject.SetActive(true);
-            func_active = true;
-        }
-        if (!CruiseThrottleOverridden)
-        {
-            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
-            CruiseThrottleOverridden = true;
-        }
-        SetSpeed = (float)SAVControl.GetProgramVariable("AirSpeed");
-        Cruise = true;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
-        EntityControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
-    }
-    public void SetCruiseOff()
-    {
-        if (!Cruise) { return; }
-        if (Piloting)
-        {
-            func_active = false;
-            if (!InVR)
-            { gameObject.SetActive(true); }
-        }
-        if (CruiseThrottleOverridden)
-        {
-            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
-            CruiseThrottleOverridden = false;
-        }
-        SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
-        Cruise = false;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
-        EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
+        if (Cruise)
+        { SetCruiseOff(); }
     }
     private void LateUpdate()
     {
@@ -169,6 +137,29 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                 }
                 else { TriggerLastFrame = false; }
             }
+            else
+            {
+                bool ShiftCtrl = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.LeftControl);
+                if (ShiftCtrl)
+                {
+                    if (CruiseThrottleOverridden)
+                    {
+                        SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
+                        CruiseThrottleOverridden = false;
+                    }
+                }
+                else
+                {
+                    if (Cruise)
+                    {
+                        if (!CruiseThrottleOverridden)
+                        {
+                            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
+                            CruiseThrottleOverridden = true;
+                        }
+                    }
+                }
+            }
             float DeltaTime = Time.deltaTime;
             float equals = Input.GetKey(KeyCode.Equals) ? DeltaTime * 10 : 0;
             float minus = Input.GetKey(KeyCode.Minus) ? DeltaTime * 10 : 0;
@@ -199,13 +190,50 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        if (!Cruise && !(bool)SAVControl.GetProgramVariable("Taxiing"))
+        if (!Cruise)
         {
-            SetCruiseOn();
+            if (!(bool)SAVControl.GetProgramVariable("Taxiing") && !(bool)SAVControl.GetProgramVariable("InVTOL"))
+            { SetCruiseOn(); }
         }
         else
         {
             SetCruiseOff();
         }
+    }
+    public void SetCruiseOn()
+    {
+        if (Cruise) { return; }
+        if (Piloting)
+        {
+            func_active = true;
+            if (!InVR)
+            { gameObject.SetActive(true); }
+        }
+        if (!CruiseThrottleOverridden)
+        {
+            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
+            CruiseThrottleOverridden = true;
+        }
+        SetSpeed = (float)SAVControl.GetProgramVariable("AirSpeed");
+        Cruise = true;
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
+        EntityControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
+    }
+    public void SetCruiseOff()
+    {
+        if (!Cruise) { return; }
+        if (Piloting)
+        {
+            func_active = false;
+        }
+        if (CruiseThrottleOverridden)
+        {
+            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
+            CruiseThrottleOverridden = false;
+        }
+        SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
+        Cruise = false;
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
+        EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
     }
 }

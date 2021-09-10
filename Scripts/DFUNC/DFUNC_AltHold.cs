@@ -78,6 +78,11 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         if (AltHold)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DeactivateAltHold)); }
     }
+    public void SFEXT_O_EnterVTOL()
+    {
+        if (AltHold)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DeactivateAltHold)); }
+    }
     public void SFEXT_O_PlayerJoined()
     {
         if (AltHold)
@@ -192,7 +197,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         }
         else
         {
-            if ((float)SAVControl.GetProgramVariable("VTOLAngle") != (float)SAVControl.GetProgramVariable("VTOLDefaultValue") || (bool)SAVControl.GetProgramVariable("Taxiing")) { return; }
+            if ((bool)SAVControl.GetProgramVariable("InVTOL") || (bool)SAVControl.GetProgramVariable("Taxiing")) { return; }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
             gameObject.SetActive(true);
         }

@@ -6,14 +6,11 @@ using VRC.Udon;
 
 public class SAV_EffectsController : UdonSharpBehaviour
 {
-    [SerializeField] private GameObject VehicleMainObj;
     [SerializeField] private SaccAirVehicle SAVControl;
     [Tooltip("Wing trails, emit when pulling Gs")]
     [SerializeField] private TrailRenderer[] Trails;
     [Tooltip("How many Gs do you have to pull before the trails appear?")]
     [SerializeField] private float TrailGs = 4;
-    [Tooltip("Transform of mesh of the front wheel so it can be rotated when taxiing")]
-    public Transform FrontWheel;
     [Tooltip("Particle system that plays when vehicle enters water")]
     [SerializeField] private ParticleSystem SplashParticle;
     [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
@@ -61,12 +58,11 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private void Start()
     {
         if (SAVControl != null) EngineControlNull = false;
-        if (FrontWheel != null) FrontWheelNull = false;
 
         FullHealthDivider = 1f / SAVControl.Health;
         HasTrails = Trails.Length > 0;
 
-        VehicleAnimator = VehicleMainObj.GetComponent<Animator>();
+        VehicleAnimator = SAVControl.EntityControl.GetComponent<Animator>();
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         {
@@ -111,14 +107,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
         if (SAVControl.Occupied)
         {
             DoEffects = 0f;
-            if (!FrontWheelNull)
-            {
-                if (SAVControl.Taxiing)
-                {
-                    FrontWheel.localRotation = Quaternion.Euler(new Vector3(0, -RotInputs.y * 80 * (-Mathf.Min((SAVControl.Speed / 10), 1) + 1), 0));
-                }
-                else FrontWheel.localRotation = Quaternion.identity;
-            }
         }
         else { DoEffects += DeltaTime; }
 
@@ -172,7 +160,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
         VehicleAnimator.SetFloat(BOMB_STRING, 1);
         VehicleAnimator.SetFloat(AAMS_STRING, 1);
         VehicleAnimator.SetFloat(AGMS_STRING, 1);
-        if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
     public void SFEXT_G_PilotExit()
     {
@@ -232,7 +219,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
         VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);
         if (!InEditor) { VehicleAnimator.SetBool(OCCUPIED_STRING, false); }
         DoEffects = 0f;//keep awake
-        if (!FrontWheelNull) FrontWheel.localRotation = Quaternion.identity;
     }
     public void SFEXT_L_AAMTargeted()//sent locally by the person who's locking onto this plane
     {

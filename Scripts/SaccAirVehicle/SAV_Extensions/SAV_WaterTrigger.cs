@@ -21,6 +21,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
     private bool InWater;
     private Collider ThisCollider;
     private bool Initilized;
+    private bool DisableTaxiRotation;
     public void SFEXT_L_EntityStart()
     {
         Initilized = true;
@@ -80,10 +81,20 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
     public void SendEnterWater()
     {
         EntityControl.SendEventToExtensions("SFEXT_G_EnterWater");
+        if (!DisableTaxiRotation)
+        {
+            SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") + 1);
+            DisableTaxiRotation = true;
+        }
     }
     public void SendExitWater()
     {
         EntityControl.SendEventToExtensions("SFEXT_G_ExitWater");
+        if (DisableTaxiRotation)
+        {
+            SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1);
+            DisableTaxiRotation = false;
+        }
     }
     //collider enabled and disabled so that it does ontriggerenter on enable
     private void OnEnable()
@@ -116,7 +127,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         }
         if (InWater)
         {
-            EntityControl.SendEventToExtensions("SFEXT_G_ExitWater");
+            SendExitWater();
         }
     }
     public void SFEXT_O_TakeOwnership()

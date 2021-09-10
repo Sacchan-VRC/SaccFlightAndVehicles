@@ -39,7 +39,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
 
     [Header("HoverBike Only")]
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
-    [SerializeField] private bool HoverBike = false;
+    public bool HoverBike = false;
     [Tooltip("Disable ground detection on attached vehicle (disable 'taxiing' movement)")]
     [SerializeField] private bool DisableGroundDetection = false;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the rolling-into-a-turn extra turning ability")]

@@ -13,7 +13,9 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     [SerializeField] private AudioSource CatapultLock;
     [Tooltip("Maximum angular difference between vehicle and catapult allowed when attaching")]
     [SerializeField] private float MaxAttachAngle = 15;
-    [Tooltip("Needed to disable Gear toggling while attached to catapult")]
+    [Tooltip("Layer to check for catapult triggers on")]
+    [SerializeField] private int CatapultLayer = 24;
+    [Tooltip("Reference to the landing gear function so we can tell it to be disabled when on a catapult")]
     [SerializeField] private UdonSharpBehaviour GearFunc;
     private bool GearFuncNULL;
     private SaccEntity EntityControl;
@@ -25,7 +27,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private bool OnCatapult;
     private bool Launching = false;
     private bool Pilot = false;
-    private int CatapultLayer = 24;
     private Transform VehicleTransform;
     private Transform CatapultTransform;
     private int CatapultDeadTimer;
@@ -315,7 +316,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                     OverrideConstantForce = false;
                 }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff));
-                SAVControl.SetProgramVariable("Taxiinglerper", 0);
+                SAVControl.SetProgramVariable("Taxiinglerper", 0f);
                 VehicleRigidbody.velocity = (CatapultTransform.position - CatapultPosLastFrame) / DeltaTime;
                 Vector3 CatapultRotDifEULER = CatapultRotDif.eulerAngles;
                 //.eulerangles is dumb (convert 0 - 360 to -180 - 180)

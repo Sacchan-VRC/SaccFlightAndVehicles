@@ -405,8 +405,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void LaunchAAM()
     {
-        IsOwner = localPlayer.IsOwner(gameObject);
         InEditor = (bool)SAVControl.GetProgramVariable("InEditor");
+        if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         AAMAnimator.SetTrigger(AAMLAUNCHED_STRING);
         if (AAM != null)

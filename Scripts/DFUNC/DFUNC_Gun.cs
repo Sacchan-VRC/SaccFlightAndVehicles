@@ -244,7 +244,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private int AAMTargetChecker;
     [SerializeField] private UdonSharpBehaviour HUDControl;
     private Transform CenterOfMass;
-    private SaccAirVehicle AAMCurrentTargetEngineControl;
+    private SaccAirVehicle AAMCurrentTargetSAVControl;
     private int OutsidePlaneLayer;
     [SerializeField] private float MaxTargetDistance = 6000;
     private float AAMLockTimer;
@@ -269,18 +269,18 @@ public class DFUNC_Gun : UdonSharpBehaviour
         Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
         float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-        bool AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
+        bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
 
         if (TargetChecker.activeInHierarchy)
         {
-            SaccAirVehicle NextTargetEngineControl = null;
+            SaccAirVehicle NextTargetSAVControl = null;
 
             if (TargetCheckerParent)
             {
-                NextTargetEngineControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
+                NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
             }
             //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
-            if ((!NextTargetEngineControl || (!NextTargetEngineControl.Taxiing && !NextTargetEngineControl.EntityControl.dead)))
+            if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
             {
                 RaycastHit hitnext;
                 //raycast to check if it's behind something
@@ -298,17 +298,17 @@ public class DFUNC_Gun : UdonSharpBehaviour
                         && NextTargetAngle < 70//lock angle
                             && NextTargetAngle < AAMCurrentTargetAngle)
                                 && NextTargetDistance < MaxTargetDistance
-                                    || ((!AAMCurrentTargetEngineControlNull && AAMCurrentTargetEngineControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                    || ((!AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                                         || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                 {
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;
                     AAMTarget = AAMTargetChecker;
                     AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                    AAMCurrentTargetEngineControl = NextTargetEngineControl;
+                    AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
-                    AAMCurrentTargetEngineControlNull = AAMCurrentTargetEngineControl == null ? true : false;
+                    AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
                     if (HUDControl != null)
                     {
                         RelativeTargetVelLastFrame = Vector3.zero;
@@ -329,10 +329,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
         { AAMTargetChecker = 0; }
 
         //if target is currently in front of plane, lock onto it
-        if (AAMCurrentTargetEngineControlNull)
+        if (AAMCurrentTargetSAVControlNull)
         { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
         else
-        { AAMCurrentTargetDirection = AAMCurrentTargetEngineControl.CenterOfMass.position - HudControlPosition; }
+        { AAMCurrentTargetDirection = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }
         float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
         //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
         //raycast to check if it's behind something
@@ -348,7 +348,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             && (AAMTargetObscuredDelay < .25f)
                 && AAMCurrentTargetDistance < MaxTargetDistance
                     && AAMTargets[AAMTarget].activeInHierarchy
-                        && (AAMCurrentTargetEngineControlNull || (!AAMCurrentTargetEngineControl.Taxiing && !AAMCurrentTargetEngineControl.EntityControl.dead)))
+                        && (AAMCurrentTargetSAVControlNull || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
         {
             if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < MaxTargetDistance)
             {
@@ -411,10 +411,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
             Vector3 HudControlPosition = HUDControl.transform.position;
             GUNLeadIndicator.gameObject.SetActive(true);
             Vector3 TargetDir;
-            if (AAMCurrentTargetEngineControl == null)//target is a dummy target
+            if (AAMCurrentTargetSAVControl == null)//target is a dummy target
             { TargetDir = AAMTargets[AAMTarget].transform.position - HudControlPosition; }
             else
-            { TargetDir = AAMCurrentTargetEngineControl.CenterOfMass.position - HudControlPosition; }
+            { TargetDir = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }
             GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
 
             Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;

@@ -74,7 +74,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         AGMLocked = false;
-        InVR = localPlayer.IsUserInVR();
+        if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
     public void SFEXT_P_PassengerEnter()

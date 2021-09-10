@@ -43,8 +43,6 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource ReSupply;
     [Tooltip("Looping Sound that plays when vehicle is being targeted by a missile")]
     public AudioSource RadarLocked;
-    [Tooltip("Looping Sound sound that plays when a missile is flying towards the vehicle")]
-    public AudioSource MissileIncoming;
     [Tooltip("Sound that plays when vehicle enters water and player is inside the vehicle")]
     public AudioSource EnterWater;
     [Tooltip("Oneshot sound that plays when vehicle enters water and player is outside of the vehicle")]
@@ -53,7 +51,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource UnderWater;
     [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
     public AudioSource[] DopplerSounds;
-    [Tooltip("Only untick this if you have no door/acnopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
+    [Tooltip("Only untick this if you have no door/canopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
     public bool AllDoorsClosed = true;
     [System.NonSerializedAttribute] public bool PlaneIdleNull = true;
     [System.NonSerializedAttribute] public bool PlaneInsideNull = true;
@@ -66,7 +64,6 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool SonicBoomNull = true;
     [System.NonSerializedAttribute] public bool ExplosionNull = true;
     [System.NonSerializedAttribute] public bool BulletHitNull = true;
-    [System.NonSerializedAttribute] public bool MissileIncomingNull = true;
     [System.NonSerializedAttribute] public bool RollingNull = true;
     [System.NonSerializedAttribute] public bool EnterWaterNull = true;
     [System.NonSerializedAttribute] public bool EnterWaterOutsideNull = true;
@@ -75,7 +72,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool RadarLockedNull = true;
     [System.NonSerializedAttribute] public bool AirbrakeNull = true;
     private SaccEntity EntityControl;
-    public Transform testcamera;
+    //public Transform testcamera;
     private bool SuperSonic = false;
     private float IdleDoppleTemp;
     [System.NonSerializedAttribute] public float Doppler = 1;
@@ -139,7 +136,6 @@ public class SAV_SoundController : UdonSharpBehaviour
         EnterWaterOutsideNull = EnterWaterOutside == null;
         ReSupplyNull = ReSupply == null;
         RadarLockedNull = RadarLocked == null;
-        MissileIncomingNull = MissileIncoming == null;
         PlaneIdleNull = PlaneIdle.Length < 1;
         PlaneThrustNull = Thrust.Length < 1;
         TouchDownNull = TouchDown.Length < 1;
@@ -256,10 +252,10 @@ public class SAV_SoundController : UdonSharpBehaviour
                     TooFarToHear = false;
                 }
             }
-            else if ((testcamera != null))//editor and testcamera is set
+            /* else if ((testcamera != null))//editor and testcamera is set
             {
                 ThisFrameDist = Vector3.Distance(testcamera.transform.position, CenterOfMass.position);
-            }
+            } */
 
             relativespeed = (ThisFrameDist - LastFrameDist);
             float doppletemp = (343 * (SmoothDeltaTime * 5)) + relativespeed;

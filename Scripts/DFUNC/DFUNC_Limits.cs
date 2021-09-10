@@ -66,6 +66,11 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (FlightLimitsEnabled)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetLimitsOff)); }
     }
+    public void SFEXT_O_EnterVTOL()
+    {
+        if (FlightLimitsEnabled)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetLimitsOff)); }
+    }
     public void SFEXT_G_Explode()
     {
         gameObject.SetActive(false);

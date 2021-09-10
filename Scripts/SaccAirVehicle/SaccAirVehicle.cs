@@ -182,8 +182,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("Extra drag added when airspeed approaches the speed of sound")]
     public float SoundBarrierStrength = 0.0003f;
     [Tooltip("Within how many meters per second of the speed of sound does the vehicle have to be before they experience extra drag. Extra drag is scaled linearly up to the speed of sound, and dowan after it")]
-    [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     public float SoundBarrierWidth = 20f;
+    [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
     [Tooltip("Fuel consumed per second at max throttle, scales with throttle")]
     public float FuelConsumption = 2;
     [Tooltip("Multiply FuelConsumption by this number when at full afterburner Scales with afterburner level")]
@@ -288,6 +288,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int OutsidePlaneLayer;
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
     [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
+    [System.NonSerializedAttribute] public bool UsingManualSync;
     bool FloatingLastFrame = false;
     bool GroundedLastFrame = false;
     private float VelLiftStart;
@@ -299,6 +300,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private float PitchThrustVecMultiStart;
     private float YawThrustVecMultiStart;
     private float RollThrustVecMultiStart;
+    [System.NonSerializedAttribute] public bool InVTOL;
     [System.NonSerializedAttribute] public bool VTOLenabled;
     [System.NonSerializedAttribute] public float VTOLAngleInput;
     private float VTOL90Degrees;//1=(90 degrees OR maxVTOLAngle if it's lower than 90) used for transition thrust values 
@@ -357,6 +359,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         VehicleConstantForce = EntityControl.GetComponent<ConstantForce>();
 
+        SpawnPos = VehicleTransform.position;
+        SpawnRot = VehicleTransform.rotation;
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
@@ -372,16 +376,17 @@ public class SaccAirVehicle : UdonSharpBehaviour
             InVR = localPlayer.IsUserInVR();
             if (localPlayer.isMaster)
             {
-                VehicleRigidbody.angularDrag = 0;
+                VehicleRigidbody.WakeUp();
+                VehicleRigidbody.constraints = RigidbodyConstraints.None;
                 IsOwner = true;
             }
-            else { VehicleRigidbody.angularDrag = .5f; }
+            else
+            {
+                VehicleRigidbody.Sleep();
+                VehicleRigidbody.constraints = RigidbodyConstraints.FreezePosition;
+            }
         }
 
-        //delete me when ObjectSync.Respawn works in editor again
-        SpawnPos = VehicleTransform.position;
-        SpawnRot = VehicleTransform.rotation;
-        //
         WheelCollider[] wc = PlaneMesh.GetComponentsInChildren<WheelCollider>(true);
         if (wc.Length != 0) { HasWheelColliders = true; }
 
@@ -399,11 +404,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
             RollStrength *= RBMass;
             RollFriction *= RBMass;
             RollConstantFriction *= RBMass;
+            VelStraightenStrPitch *= RBMass;
+            VelStraightenStrYaw *= RBMass;
             Lift *= RBMass;
             MaxLift *= RBMass;
             VelLiftMax *= RBMass;
-            VelStraightenStrPitch *= RBMass;
-            VelStraightenStrYaw *= RBMass;
             AdverseRoll *= RBMass;
             AdverseYaw *= RBMass;
             foreach (WheelCollider wheel in wc)
@@ -485,6 +490,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
         }
 
         VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
+        if (VehicleObjectSync == null)
+        {
+            UsingManualSync = true;
+        }
 
         LowFuel = 200;//FullFuel * .13888888f;//to match the old default settings
         LowFuelDivider = 1 / LowFuel;
@@ -506,10 +515,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 if (Health <= 0f)//plane is ded
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+
                 }
             }
             else { GDamageToTake = 0; }
-
 
             if (Floating)
             {
@@ -537,7 +546,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     GDHitRigidbody = null;
                 }
             }
-            CheckForTakeoff();
+            if (Taxiing && !GroundedLastFrame && !FloatingLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
+            }
 
             //synced variables because rigidbody values aren't accessable by non-owner players
             CurrentVel = VehicleRigidbody.velocity;
@@ -598,9 +610,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     bool Shift = Input.GetKey(KeyCode.LeftShift);
                     bool Ctrl = Input.GetKey(KeyCode.LeftControl);
                     int Shifti = Shift ? 1 : 0;
+                    int LeftControli = Ctrl ? 1 : 0;
                     float LGrip = 0;
                     float RGrip = 0;
-                    int LeftControli = Ctrl ? 1 : 0;
                     if (!InEditor)
                     {
                         LGrip = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
@@ -750,7 +762,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         ThrottleGripLastFrame = false;
                     }
 
-                    if ((DisableTaxiRotation == 0) && (Taxiing))
+                    if (DisableTaxiRotation == 0 && Taxiing)
                     {
                         AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                                           //rotate if trying to yaw
@@ -774,8 +786,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         else
                             PlayerThrottle = 1;
                     }
-                    //Cruise PI Controller
-                    if (ThrottleOverridden > 0 && !ThrottleGripLastFrame && !Shift && !Ctrl)
+                    if (ThrottleOverridden > 0 && !ThrottleGripLastFrame)
                     {
                         ThrottleInput = PlayerThrottle = ThrottleOverride;
                     }
@@ -899,7 +910,18 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     if (VTOLenabled)
                     {
                         if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
-                        { SetVTOLValues(); }
+                        {
+                            SetVTOLValues();
+                            if (!InVTOL)
+                            { EntityControl.SendEventToExtensions("SFEXT_O_EnterVTOL"); }
+                            InVTOL = true;
+                        }
+                        else
+                        {
+                            if (InVTOL)
+                            { EntityControl.SendEventToExtensions("SFEXT_O_ExitVTOL"); }
+                            InVTOL = false;
+                        }
                     }
                 }
             }
@@ -1145,8 +1167,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
         Health = FullHealth;
-        if (InEditor) { VehicleTransform.SetPositionAndRotation(SpawnPos, SpawnRot); }
-        VehicleObjectSync.Respawn();//this works if done just locally;
+        if (InEditor || UsingManualSync)
+        {
+            VehicleTransform.SetPositionAndRotation(SpawnPos, SpawnRot);
+        }
+        else
+        {
+            VehicleObjectSync.Respawn();
+        }
         EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
     }
     public void TouchDown()
@@ -1168,13 +1196,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         //Debug.Log("TakeOff");
         Taxiing = false;
         EntityControl.SendEventToExtensions("SFEXT_G_TakeOff");
-    }
-    public void CheckForTakeoff()
-    {
-        if (Taxiing && !GroundedLastFrame && !FloatingLastFrame)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
-        }
     }
     public void SetAfterburnerOn()
     {
@@ -1244,8 +1265,16 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Fuel = FullFuel;
             VTOLAngle = VTOLDefaultValue;
             VTOLAngleInput = VTOLDefaultValue;
-            VehicleObjectSync.Respawn();//this works if done just locally
-            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this}
+            if (InEditor || UsingManualSync)
+            {
+                VehicleTransform.SetPositionAndRotation(SpawnPos, SpawnRot);
+                VehicleRigidbody.velocity = Vector3.zero;
+            }
+            else
+            {
+                VehicleObjectSync.Respawn();
+            }
+            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
         }
     }
     public void ResetStatus()//called globally when using respawn button
@@ -1285,14 +1314,16 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         IsOwner = true;
         VehicleRigidbody.velocity = CurrentVel;
-        VehicleRigidbody.angularDrag = 0;
+        VehicleRigidbody.WakeUp();
+        VehicleRigidbody.constraints = RigidbodyConstraints.None;
     }
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
         //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody,
         //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
-        VehicleRigidbody.angularDrag = .5f;
+        VehicleRigidbody.Sleep();
+        VehicleRigidbody.constraints = RigidbodyConstraints.FreezePosition;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -1444,7 +1475,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         VTOLAngle = Mathf.MoveTowards(VTOLAngle, VTOLAngleInput, VTOLAngleDivider * Time.smoothDeltaTime);
         float SpeedForVTOL = (Mathf.Min(Speed / VTOLLoseControlSpeed, 1));
-        if (VTOLAngle > 0 && SpeedForVTOL != 1 || VTOLOnly)
+        if ((VTOLAngle > 0 && SpeedForVTOL != 1 || VTOLOnly))
         {
             if (VTOLOnly)
             {

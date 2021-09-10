@@ -11,7 +11,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     [SerializeField] private float MaxLifetime = 12;
     [Tooltip("Strength of the effect of countermeasures on the missile")]
     [SerializeField] private float FlareEffect = 1;
-    [SerializeField] private string AlarmINTName = "missilesincoming";
+    [SerializeField] private string AnimINTName = "missilesincoming";
     [SerializeField] private AudioSource[] ExplosionSounds;
     [SerializeField] private float ColliderActiveDistance = 45;
     [SerializeField] private float RotSpeed = 400;
@@ -75,7 +75,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                 {
                     if (TargetSAVControl.Piloting || TargetSAVControl.Passenger)
                     { TargetSAVControl.MissilesIncomingHeat++; }
-                    TargetSAVControl.VehicleAnimator.SetInteger(AlarmINTName, TargetSAVControl.MissilesIncomingHeat);
+                    TargetSAVControl.VehicleAnimator.SetInteger(AnimINTName, TargetSAVControl.MissilesIncomingHeat);
                     TargetSAVNULL = false;
                     MissileIncoming = true;
                     TargetIsVehicle = true;

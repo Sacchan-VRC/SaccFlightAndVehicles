@@ -16,7 +16,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [Tooltip("Distance from the initial snag point that the cable will 'snap' and the vehicle will be released (and damaged) if it hasnt stopped")]
     [SerializeField] private float HookedCableSnapDistance = 120f;
     [Tooltip("If this vehicle has a brake function, need a reference to it to disable it when this function is braking the vehicle")]
-    [SerializeField] private DFUNC_Brake BrakeFunction;
+    [SerializeField] private UdonSharpBehaviour BrakeFunction;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool CableSnapNull;
@@ -70,7 +70,11 @@ public class DFUNC_Hook : UdonSharpBehaviour
         TriggerLastFrame = false;
         Hooked = false;
         func_active = false;
-        if (DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake -= 1; DisableGroundBrake = false; }
+        if (DisableGroundBrake && !BreakFunctionNULL)
+        {
+            BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") - 1);
+            DisableGroundBrake = false;
+        }
         gameObject.SetActive(false);
     }
     public void SFEXT_G_Explode()
@@ -130,7 +134,11 @@ public class DFUNC_Hook : UdonSharpBehaviour
         //slow down if hooked and on the ground
         if (Hooked && (bool)SAVControl.GetProgramVariable("Taxiing"))
         {
-            if (!DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake += 1; DisableGroundBrake = true; }
+            if (!DisableGroundBrake && !BreakFunctionNULL)
+            {
+                BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") + 1);
+                DisableGroundBrake = true;
+            }
             if (Vector3.Distance(VehicleTransform.position, HookedLoc) > HookedCableSnapDistance)//real planes take around 80-90 meters to stop on a carrier
             {
                 //if you go further than HookedBrakeMaxDistance you snap the cable and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
@@ -161,7 +169,11 @@ public class DFUNC_Hook : UdonSharpBehaviour
         }
         else
         {
-            if (DisableGroundBrake && !BreakFunctionNULL) { BrakeFunction.DisableGroundBrake -= 1; DisableGroundBrake = false; }
+            if (DisableGroundBrake && !BreakFunctionNULL)
+            {
+                BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") - 1);
+                DisableGroundBrake = false;
+            }
         }
     }
 

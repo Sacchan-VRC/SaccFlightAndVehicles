@@ -137,25 +137,25 @@ public class DFUNC_Brake : UdonSharpBehaviour
             {
                 float KeyboardBrakeInput = 0;
                 float VRBrakeInput = 0;
+
+                if (Selected)
+                {
+                    float Trigger;
+                    if (UseLeftTrigger)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+                    VRBrakeInput = Trigger;
+                }
+
+                if (Input.GetKey(KeyboardControl))
+                {
+                    KeyboardBrakeInput = 1;
+                }
+                BrakeInput = Mathf.Max(VRBrakeInput, KeyboardBrakeInput);
                 if ((bool)SAVControl.GetProgramVariable("Taxiing"))
                 {
-                    if (Selected)
-                    {
-                        float Trigger;
-                        if (UseLeftTrigger)
-                        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                        else
-                        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-                        VRBrakeInput = Trigger;
-                    }
-
-                    if (Input.GetKey(KeyboardControl))
-                    {
-                        KeyboardBrakeInput = 1;
-                    }
-                    BrakeInput = Mathf.Max(VRBrakeInput, KeyboardBrakeInput);
-
                     //ground brake checks if vehicle is on top of a rigidbody, and if it is, brakes towards its speed rather than zero
                     //does not work if owner of vehicle does not own the rigidbody 
                     Rigidbody gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody");
