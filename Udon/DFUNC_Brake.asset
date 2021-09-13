@@ -17,7 +17,7 @@ MonoBehaviour:
   udonAssembly: 
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 132bb26003371974598a256f0964f12d, type: 3}
-  behaviourSyncMode: 0
+  behaviourSyncMode: 2
   behaviourIDHeapVarName: __refl_const_intnl_udonTypeID
   compileErrors: []
   hasInteractEvent: 0
@@ -429,7 +429,7 @@ MonoBehaviour:
       Data: 2
     - Name: syncMode
       Entry: 3
-      Data: 1
+      Data: 2
     - Name: symbolResolvedTypeName
       Entry: 1
       Data: SystemSingle
@@ -1287,7 +1287,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AirbrakeLerper
+      Data: Braking
     - Name: $v
       Entry: 7
       Data: 83|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1296,7 +1296,7 @@ MonoBehaviour:
       Data: 84|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 30
+      Data: 26
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1305,13 +1305,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: AirbrakeLerper
+      Data: Braking
     - Name: symbolUniqueName
       Entry: 1
-      Data: AirbrakeLerper
+      Data: Braking
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1344,7 +1344,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Braking
+      Data: BrakingLastFrame
     - Name: $v
       Entry: 7
       Data: 86|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1365,10 +1365,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: Braking
+      Data: BrakingLastFrame
     - Name: symbolUniqueName
       Entry: 1
-      Data: Braking
+      Data: BrakingLastFrame
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1401,7 +1401,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: BrakingLastFrame
+      Data: DragAdded
     - Name: $v
       Entry: 7
       Data: 89|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1410,7 +1410,7 @@ MonoBehaviour:
       Data: 90|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 26
+      Data: 30
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1419,13 +1419,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: BrakingLastFrame
+      Data: DragAdded
     - Name: symbolUniqueName
       Entry: 1
-      Data: BrakingLastFrame
+      Data: DragAdded
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1458,7 +1458,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DragAdded
+      Data: AirbrakeLerper
     - Name: $v
       Entry: 7
       Data: 92|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1479,10 +1479,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: DragAdded
+      Data: AirbrakeLerper
     - Name: symbolUniqueName
       Entry: 1
-      Data: DragAdded
+      Data: AirbrakeLerper
     - Name: symbolDefaultValue
       Entry: 6
       Data: 

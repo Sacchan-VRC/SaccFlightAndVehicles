@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Gun : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
@@ -36,16 +37,26 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private Rigidbody VehicleRigidbody;
     private bool TriggerLastFrame;
     private bool GunRecoilEmptyNULL = true;
-    private float TimeSinceSerialization = 0;
-    private bool firing;
+    [UdonSynced, FieldChangeCallback(nameof(Firing))]
+    private bool _firing;
+    public bool Firing
+    {
+        set
+        {
+            _firing = value;
+            GunAnimator.SetBool(GUNFIRING_STRING, value);
+        }
+        get => _firing;
+    }
     private int GUNFIRING_STRING = Animator.StringToHash("gunfiring");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     private bool Passenger;
     private float FullGunAmmoDivider;
-    private bool func_active = false;
+    private bool Selected = false;
     private float reloadspeed;
     private bool Initialized = false;
     private bool LeftDial = false;
+    private bool Piloting = false;
     private int DialPosition = -999;
     private Vector3 AmmoBarScaleStart;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -80,17 +91,16 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        gameObject.SetActive(true);
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Active");
-
+        Selected = true;
         if (DoAnimBool && !AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
     }
     public void DFUNC_Deselected()
     {
-        if (func_active)
+        if (Selected)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
-        TargetIndicator.gameObject.SetActive(false);
+        Selected = false;
         TriggerLastFrame = false;
 
         if (DoAnimBool && AnimOn)
@@ -99,33 +109,26 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         GunDamageParticle.gameObject.SetActive(true);
-        EnableToSyncVariables();
+        Piloting = true;
     }
     public void SFEXT_O_PilotExit()
     {
-        firing = false;
+        Piloting = false;
         TriggerLastFrame = false;
         RequestSerialization();
-        EnableToSyncVariables();
-        if (func_active) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
-        TargetIndicator.gameObject.SetActive(false);
+        if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
+        Selected = false;
         GunDamageParticle.gameObject.SetActive(false);
-        func_active = false;
-        gameObject.SetActive(false);
-
         if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_P_PassengerEnter()
     {
         Passenger = true;
-        if ((bool)SAVControl.GetProgramVariable("Passenger") && func_active)
-        { Set_Active(); }
     }
     public void SFEXT_P_PassengerExit()
     {
         Passenger = false;
-        gameObject.SetActive(false);
     }
     public void SFEXT_G_ReSupply()
     {
@@ -143,9 +146,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         HudCrosshairGun.SetActive(true);
         HudCrosshair.SetActive(false);
-        func_active = true;
-        if ((bool)SAVControl.GetProgramVariable("Passenger"))
-        { gameObject.SetActive(true); }
+        gameObject.SetActive(true);
     }
     public void Set_Inactive()
     {
@@ -154,12 +155,12 @@ public class DFUNC_Gun : UdonSharpBehaviour
         TargetIndicator.gameObject.SetActive(false);
         GUNLeadIndicator.gameObject.SetActive(false);
         GunAnimator.SetBool(GUNFIRING_STRING, false);
-        func_active = false;
+        Firing = false;
         gameObject.SetActive(false);
     }
     public void SFEXT_O_TakeOwnership()
     {
-        if (firing)//if someone times out, tell weapon to stop firing if you take ownership.
+        if (_firing)//if someone times out, tell weapon to stop firing if you take ownership.
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
     }
     public void SFEXT_G_Explode()
@@ -168,31 +169,11 @@ public class DFUNC_Gun : UdonSharpBehaviour
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
-    public void GunStartFiring()
-    {
-        GunAnimator.SetBool(GUNFIRING_STRING, true);
-    }
-    public void GunStopFiring()
-    {
-        GunAnimator.SetBool(GUNFIRING_STRING, false);
-    }
-    //synced variables recieved while object is disabled do not get set until the object is enabled, 1 frame is fine.
-    public void EnableToSyncVariables()
-    {
-        gameObject.SetActive(true);
-        SendCustomEventDelayedFrames("DisableSelf", 1);
-    }
-    public void DisableSelf()
-    {
-        if (!func_active)//don't disable if the object happened to also be activated on this frame
-        { gameObject.SetActive(false); }
-    }
     public void LateUpdate()
     {
-        if (!Passenger && func_active)
+        if (Piloting && Selected)
         {
             float DeltaTime = Time.deltaTime;
-            TimeSinceSerialization += DeltaTime;
             float Trigger;
             if (UseLeftTrigger)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
@@ -200,10 +181,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
             if ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
             {
-                if (!firing)
+                if (!_firing)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStartFiring");
-                    firing = true;
+                    Firing = true;
+                    RequestSerialization();
                     if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                     { EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
                 }
@@ -220,19 +201,14 @@ public class DFUNC_Gun : UdonSharpBehaviour
             }
             else
             {
-                if (firing)
+                if (_firing)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "GunStopFiring");
-                    firing = false;
+                    Firing = false;
+                    RequestSerialization();
                     TriggerLastFrame = false;
                     if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                     { EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
                 }
-            }
-            if (TimeSinceSerialization > 1f)
-            {
-                TimeSinceSerialization = 0;
-                RequestSerialization();
             }
             Hud();
         }
@@ -254,7 +230,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private float AAMTargetObscuredDelay;
     private bool GUNHasTarget;
     private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
-    //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
+                              //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
     {
         float DeltaTime = Time.fixedDeltaTime;
         var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;

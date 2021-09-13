@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SaccResupplyTrigger : UdonSharpBehaviour
 {
     [Tooltip("Object to send event to")]

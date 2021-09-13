@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Cruise : UdonSharpBehaviour
 {
     [SerializeField] UdonSharpBehaviour SAVControl;
@@ -29,6 +30,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     private float CruiseIntegratorMin = -5;
     private float Cruiselastframeerror;
     private bool func_active;
+    private bool Selected;
     private bool Piloting;
     private bool InVR;
     private bool CruiseThrottleOverridden;
@@ -49,12 +51,14 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
+        Selected = true;
     }
     public void DFUNC_Deselected()
     {
         if (!Cruise) { gameObject.SetActive(false); }
         TriggerTapTime = 1;
         TriggerLastFrame = false;
+        Selected = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -73,6 +77,8 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         Piloting = false;
         TriggerTapTime = 1;
         TriggerLastFrame = false;
+        Selected = false;
+        func_active = false;
         if (Cruise)
         {
             SetCruiseOff();
@@ -99,43 +105,46 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         {
             if (InVR)
             {
-                float Trigger;
-                if (UseLeftTrigger)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-                if (Trigger > 0.75)
+                if (Selected)
                 {
-                    //for setting speed in VR
-                    Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                    handpos = VehicleTransform.InverseTransformDirection(handpos);
+                    float Trigger;
+                    if (UseLeftTrigger)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
 
-                    //enable and disable
-                    if (!TriggerLastFrame)
+                    if (Trigger > 0.75)
                     {
-                        if (!Cruise)
-                        {
-                            if (!(bool)SAVControl.GetProgramVariable("Taxiing"))
-                            { SetCruiseOn(); }
-                        }
-                        if (TriggerTapTime > .4f)//no double tap
-                        {
-                            TriggerTapTime = 0;
-                        }
-                        else//double tap detected, turn off cruise
-                        {
-                            SetCruiseOff();
-                        }
-                        SpeedZeroPoint = handpos.z;
-                        CruiseTemp = SetSpeed;
-                    }
-                    float SpeedDifference = (SpeedZeroPoint - handpos.z) * 250;
-                    SetSpeed = Mathf.Floor(Mathf.Clamp(CruiseTemp + SpeedDifference, 0, 2000));
+                        //for setting speed in VR
+                        Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                        handpos = VehicleTransform.InverseTransformDirection(handpos);
 
-                    TriggerLastFrame = true;
+                        //enable and disable
+                        if (!TriggerLastFrame)
+                        {
+                            if (!Cruise)
+                            {
+                                if (!(bool)SAVControl.GetProgramVariable("Taxiing"))
+                                { SetCruiseOn(); }
+                            }
+                            if (TriggerTapTime > .4f)//no double tap
+                            {
+                                TriggerTapTime = 0;
+                            }
+                            else//double tap detected, turn off cruise
+                            {
+                                SetCruiseOff();
+                            }
+                            SpeedZeroPoint = handpos.z;
+                            CruiseTemp = SetSpeed;
+                        }
+                        float SpeedDifference = (SpeedZeroPoint - handpos.z) * 250;
+                        SetSpeed = Mathf.Clamp(CruiseTemp + SpeedDifference, 0, 2000);
+
+                        TriggerLastFrame = true;
+                    }
+                    else { TriggerLastFrame = false; }
                 }
-                else { TriggerLastFrame = false; }
             }
             else
             {

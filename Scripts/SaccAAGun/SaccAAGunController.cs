@@ -4,6 +4,8 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+
+[UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
 public class SaccAAGunController : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
@@ -54,8 +56,9 @@ public class SaccAAGunController : UdonSharpBehaviour
     [SerializeField] private float PlaneHitBoxLayer = 17;//walkthrough
     private float MGAmmoRecharge = 0;
     [System.NonSerializedAttribute] public float MGAmmoFull = 4;
-    private float FullMGDivider;[SerializeField] private GameObject SeatAdjuster;
-    [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
+    private float FullMGDivider;
+    [SerializeField] private GameObject SeatAdjuster;
+    [UdonSynced(UdonSyncMode.Linear)] private Vector2 GunRotation;
     [System.NonSerializedAttribute] public Animator AAGunAnimator;
     [System.NonSerializedAttribute] public bool dead;
     [System.NonSerializedAttribute] public bool firing;
@@ -308,8 +311,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         }
         else if (Occupied)
         {
-            Quaternion newrot = Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0));
-            Rotator.transform.localRotation = Quaternion.Slerp(Rotator.transform.localRotation, newrot, 4 * Time.deltaTime);
+            Rotator.transform.localRotation = Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0));
         }
     }
     public void StartFiring()

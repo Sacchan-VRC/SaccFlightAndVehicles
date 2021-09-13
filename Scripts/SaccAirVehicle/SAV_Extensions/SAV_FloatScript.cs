@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SAV_FloatScript : UdonSharpBehaviour
 {
     [SerializeField] private Rigidbody VehicleRigidbody;
@@ -43,9 +44,9 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [Tooltip("Disable ground detection on attached vehicle (disable 'taxiing' movement)")]
     [SerializeField] private bool DisableGroundDetection = false;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the rolling-into-a-turn extra turning ability")]
-    [SerializeField] private float HoverBikeTurningStrength = 1;
+    [SerializeField] private float HoverBikeTurningStrength = 20;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifintg-at-90-degrees extra turning ability")]
-    [SerializeField] private float BackThrustStrength = 5;
+    [SerializeField] private float BackThrustStrength = 15;
     private bool SAVControlNULL;
     private float[] FloatDepth;
     private float[] FloatDepthLastFrame;
@@ -71,6 +72,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
             WaterForwardDrag *= RBMass;
             WaterRotDrag *= RBMass;
             WaterVelDrag *= RBMass;
+            BackThrustStrength *= RBMass;
         }
         SAVControlNULL = SAVControl == null;
 

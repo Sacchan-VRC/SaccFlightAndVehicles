@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_AGM : UdonSharpBehaviour
 {
     [SerializeField] public UdonSharpBehaviour SAVControl;

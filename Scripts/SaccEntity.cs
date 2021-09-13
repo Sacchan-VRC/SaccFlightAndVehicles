@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SaccEntity : UdonSharpBehaviour
 {
     [Tooltip("Put all scripts used by this vehicle that use the event system into this list (excluding DFUNCs)")]

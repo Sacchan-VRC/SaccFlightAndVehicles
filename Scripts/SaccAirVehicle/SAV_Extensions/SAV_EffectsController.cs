@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SAV_EffectsController : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;
@@ -30,7 +31,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private Vector3 OwnerRotationInputs;
     private VRCPlayerApi localPlayer;
     private bool InVR;
-    private bool InEditor;
+    private bool InEditor = true;
     private int OCCUPIED_STRING = Animator.StringToHash("occupied");
     private int PITCHINPUT_STRING = Animator.StringToHash("pitchinput");
     private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
@@ -66,9 +67,9 @@ public class SAV_EffectsController : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         {
-            InEditor = true;
             VehicleAnimator.SetBool(OCCUPIED_STRING, true);
         }
+        else { InEditor = false; }
         SplashNULL = SplashParticle == null;
     }
     private void Update()

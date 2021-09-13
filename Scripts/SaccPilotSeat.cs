@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SaccPilotSeat : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;

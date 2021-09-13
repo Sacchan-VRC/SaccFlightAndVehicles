@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SaccViewScreenButton : UdonSharpBehaviour
 {
     public SaccViewScreenController ViewScreenControl;
@@ -19,7 +20,10 @@ public class SaccViewScreenButton : UdonSharpBehaviour
         else
         {
             if (!ViewScreenControl.InEditor)
-            { Networking.SetOwner(ViewScreenControl.localPlayer, ViewScreenControl.gameObject); }
+            {
+                Networking.SetOwner(ViewScreenControl.localPlayer, ViewScreenControl.gameObject);
+                ViewScreenControl.RequestSerialization();
+            }
 
             ViewScreenControl.AAMTarget++;
             if (ViewScreenControl.AAMTarget > ViewScreenControl.NumAAMTargets - 1)

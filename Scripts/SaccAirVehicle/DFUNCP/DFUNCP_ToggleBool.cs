@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNCP_ToggleBool : UdonSharpBehaviour
 {
     [SerializeField] private Animator BoolAnimator;

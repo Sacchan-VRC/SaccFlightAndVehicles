@@ -5,6 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 using UnityEngine.UI;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SaccViewScreenController : UdonSharpBehaviour
 {
     [Tooltip("Layer to spherecast to find all triggers on to use as follow targets")]

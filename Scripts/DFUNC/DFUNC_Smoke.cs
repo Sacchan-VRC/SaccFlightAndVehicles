@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
 public class DFUNC_Smoke : UdonSharpBehaviour
 {
     [SerializeField] UdonSharpBehaviour SAVControl;
@@ -30,12 +31,14 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private Vector3 TempSmokeCol = Vector3.zero;
     private bool Pilot;
     private bool InPlane;
+    private bool InEditor;
     private int NumSmokes;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
+        InEditor = localPlayer == null;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         Dial_FunconNULL = Dial_Funcon == null;
@@ -66,13 +69,19 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         Pilot = false;
+        InPlane = true;
         TriggerLastFrame = false;
+        gameObject.SetActive(false);
         if (Smoking) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
     }
-    public void SFEXT_O_PassengerEnter()
+    public void SFEXT_P_PassengerEnter()
     {
         InPlane = true;
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(Smoking);
+    }
+    public void SFEXT_P_PassengerExit()
+    {
+        InPlane = false;
     }
     public void SFEXT_G_Explode()
     {
@@ -169,7 +178,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void SetSmokingOff()
     {
         Smoking = false;
-        gameObject.SetActive(false);
+        if (!Pilot)
+        { gameObject.SetActive(false); }
         SmokeOnIndicator.SetActive(false);
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = false; }

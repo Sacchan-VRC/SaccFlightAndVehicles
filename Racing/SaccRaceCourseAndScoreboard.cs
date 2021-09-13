@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SaccRaceCourseAndScoreboard : UdonSharpBehaviour
 {
     [Tooltip("All checkpoint objects for this race in order, animations are sent to them as they are passed")]
@@ -45,5 +46,8 @@ public class SaccRaceCourseAndScoreboard : UdonSharpBehaviour
     {
         TimeText.text = string.Concat(InstanceRecord, "\n", MyRecord, "\n", MyLastTime);
     }
-
+    public override void OnPlayerJoined(VRCPlayerApi player)
+    {
+        RequestSerialization();
+    }
 }

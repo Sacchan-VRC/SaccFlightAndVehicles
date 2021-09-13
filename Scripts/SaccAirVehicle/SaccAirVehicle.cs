@@ -284,7 +284,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int MissilesIncomingRadar = 0;
     [System.NonSerializedAttribute] public int MissilesIncomingOther = 0;
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
-    [System.NonSerializedAttribute] public Vector3 Spawnrotation;
+    [System.NonSerializedAttribute] public Quaternion Spawnrotation;
     [System.NonSerializedAttribute] public int OutsidePlaneLayer;
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
     [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
@@ -318,8 +318,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool AfterburnerOn;
     [System.NonSerializedAttribute] public bool PitchDown;//air is hitting plane from the top
     private float GDamageToTake;
-    private Vector3 SpawnPos;
-    private Quaternion SpawnRot;
 
 
     [System.NonSerializedAttribute] public int NumActiveFlares;
@@ -359,8 +357,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         VehicleConstantForce = EntityControl.GetComponent<ConstantForce>();
 
-        SpawnPos = VehicleTransform.position;
-        SpawnRot = VehicleTransform.rotation;
+        Spawnposition = VehicleTransform.position;
+        Spawnrotation = VehicleTransform.rotation;
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
@@ -434,10 +432,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         PitchThrustVecMultiStart = PitchThrustVecMulti;
         YawThrustVecMultiStart = YawThrustVecMulti;
         RollThrustVecMultiStart = RollThrustVecMulti;
-
-        //these two are only used in editor
-        Spawnposition = VehicleTransform.position;
-        Spawnrotation = VehicleTransform.rotation.eulerAngles;
 
         CenterOfMass = EntityControl.CenterOfMass;
         VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
@@ -705,7 +699,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         if (AfterburnerOn)
                         { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
                         else
-                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, .8f); }
+                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint); }
                     }
                     else
                     { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
@@ -1169,7 +1163,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Health = FullHealth;
         if (InEditor || UsingManualSync)
         {
-            VehicleTransform.SetPositionAndRotation(SpawnPos, SpawnRot);
+            VehicleTransform.SetPositionAndRotation(Spawnposition, Spawnrotation);
         }
         else
         {
@@ -1267,7 +1261,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VTOLAngleInput = VTOLDefaultValue;
             if (InEditor || UsingManualSync)
             {
-                VehicleTransform.SetPositionAndRotation(SpawnPos, SpawnRot);
+                VehicleTransform.SetPositionAndRotation(Spawnposition, Spawnrotation);
                 VehicleRigidbody.velocity = Vector3.zero;
             }
             else

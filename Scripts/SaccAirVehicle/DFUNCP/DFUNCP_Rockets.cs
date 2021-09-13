@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNCP_Rockets : UdonSharpBehaviour
 {
     [SerializeField] private SaccAirVehicle SAVControl;

@@ -5,10 +5,11 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SAV_WindChanger : UdonSharpBehaviour
 {
     [Tooltip("List of SaccAirVehicles to be effected by this WindChnager")]
-    [SerializeField] private UdonSharpBehaviour[] VehicleEngines;
+    [SerializeField] private UdonSharpBehaviour[] SaccAirVehicles;
     [SerializeField] private GameObject WindMenu;
     [SerializeField] private Slider WindStrengthSlider;
     [SerializeField] private Text WindStr_text;
@@ -80,7 +81,7 @@ public class SAV_WindChanger : UdonSharpBehaviour
     {
         WindApplySound.Play();
         Vector3 NewWindDir = (gameObject.transform.rotation * Vector3.forward) * WindStrength;
-        foreach (UdonSharpBehaviour vehicle in VehicleEngines)
+        foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
         {
             if (vehicle != null)
             {

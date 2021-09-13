@@ -6,7 +6,7 @@ using VRC.Udon;
 
 
 //this script moves a seat to a position suitable for using a vehicle for any avatar, synced with other players, without the need for synced variables 
-
+[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SaccSeatAdjuster : UdonSharpBehaviour
 {
     public Transform Seat;
