@@ -16,10 +16,10 @@ public class SAV_AAMController : UdonSharpBehaviour
     [SerializeField] private AudioSource[] ExplosionSounds;
     [SerializeField] private float ColliderActiveDistance = 45;
     [SerializeField] private float RotSpeed = 400;
-    [Tooltip("Missile tracks weaker if target's throttle is low, TargetLowThrottleTrack is throttle at which lowering throttle more doesn't do anything")]
+    [Tooltip("Missile tracks weaker if target's throttle is low, this value is the throttle at which lowering throttle more doesn't do anything")]
     [SerializeField] private float TargetLowThrottleTrack = .3f;
+    [Tooltip("When passing target, if within this range, explode")]
     [SerializeField] private float ProximityExplodeDistance = 20;
-    [SerializeField] private ParticleSystem DamageParticles;
     private SaccAirVehicle TargetSAVControl;
     private bool LockHack = true;
     private float Lifetime = 0;
@@ -43,8 +43,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool IsOwner;
     private bool InEditor;
     private bool Initialized = false;
-
-    //public Transform testobj;
+    private bool HitTarget = false;
     void Start()
     {
         //whatever script is launching the missiles must contain all of these variables
@@ -95,7 +94,6 @@ public class SAV_AAMController : UdonSharpBehaviour
     void FixedUpdate()
     {
         float DeltaTime = Time.fixedDeltaTime;
-        //Debug.Log(GetComponent<Rigidbody>().velocity.magnitude);
         if (!ColliderActive && Initialized)
         {
             if (Vector3.Distance(transform.position, VehicleCenterOfMass.position) > ColliderActiveDistance)
@@ -111,8 +109,6 @@ public class SAV_AAMController : UdonSharpBehaviour
                 LockHack = false;
             }
         }
-
-
         if (Lifetime > MaxLifetime)
         {
             if (Exploding)//missile exploded 10 seconds ago
@@ -184,11 +180,25 @@ public class SAV_AAMController : UdonSharpBehaviour
     {
         if (!Exploding)
         {
+            if (IsOwner)
+            {
+                HitTarget = true;
+                SaccEntity TargetEntity = other.gameObject.GetComponent<SaccEntity>();
+                if (TargetEntity != null)
+                {
+                    TargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_MissileHit100");
+                }
+            }
             Explode();
         }
     }
     private void Explode()
     {
+        if (MissileRigid != null)
+        {
+            MissileRigid.constraints = RigidbodyConstraints.FreezePosition;
+            MissileRigid.velocity = Vector3.zero;
+        }
         Exploding = true;
         TargetLost = true;
         if (ExplosionSounds.Length > 0)
@@ -204,33 +214,30 @@ public class SAV_AAMController : UdonSharpBehaviour
             TargetSAVControl.VehicleAnimator.SetInteger("missilesincoming", TargetSAVControl.MissilesIncomingHeat);
             MissileIncoming = false;
         }
-        if (TargetSAVControl != null)
-        {
-            //damage particles inherit the velocity of the missile, so this should help them hit the target plane
-            //this is why kinematic is set 2 frames later in the explode animation.
-            MissileRigid.velocity = TargetSAVControl.CurrentVel;
-        }
-        else
-        {
-            MissileRigid.velocity = Vector3.zero;
-        }
 
-        //would rather do it like this but udon wont let me
-        if (TargetSAVControl != null)
-        {
-            //damage particles take the velocity of the target plane so they can hit it any speed
-            var vel = DamageParticles.velocityOverLifetime;
-            vel.enabled = true;
-            vel.space = ParticleSystemSimulationSpace.World;
-            vel.x = TargetSAVControl.CurrentVel.x;
-            vel.y = TargetSAVControl.CurrentVel.y;
-            vel.z = TargetSAVControl.CurrentVel.z;
-        }
         AAMCollider.enabled = false;
-        Animator AGMani = GetComponent<Animator>();
+        Animator AAMani = GetComponent<Animator>();
+        float DamageDist = 999f;
+        if (!SAVControlNull) { DamageDist = Vector3.Distance(transform.position, TargetSAVControl.CenterOfMass.position) / ProximityExplodeDistance; }
         if (IsOwner)
-        { AGMani.SetTrigger("explodeowner"); }
-        else { AGMani.SetTrigger("explode"); }
+        {
+            if (DamageDist < 1 && !HitTarget)
+            {
+                if (DamageDist > .66666f)
+                {
+                    TargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_MissileHit25");
+                }
+                else if (DamageDist > .33333f)
+                {
+                    TargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_MissileHit50");
+                }
+                else
+                {
+                    TargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_MissileHit75");
+                }
+            }
+        }
+        AAMani.SetTrigger("explode");
         Lifetime = MaxLifetime - 10;//10 seconds to finish exploding
     }
 }

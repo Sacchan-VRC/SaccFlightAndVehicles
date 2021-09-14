@@ -21,11 +21,13 @@ public class SAV_AGMController : UdonSharpBehaviour
     private bool Exploding = false;
     private bool IsOwner = false;
     private CapsuleCollider AGMCollider;
+    private Rigidbody AGMRigid;
     private void Start()
     {
         CenterOfMass = EntityControl.CenterOfMass;
         Target = (Vector3)AGMLauncherControl.GetProgramVariable("AGMTarget");
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
+        AGMRigid = gameObject.GetComponent<Rigidbody>();
 
         if (EntityControl.InEditor) { IsOwner = true; }
         else
@@ -70,6 +72,8 @@ public class SAV_AGMController : UdonSharpBehaviour
     }
     private void Explode()
     {
+        if (AGMRigid != null)
+        { AGMRigid.constraints = RigidbodyConstraints.FreezePosition; }
         Exploding = true;
         if (ExplosionSounds.Length > 0)
         {

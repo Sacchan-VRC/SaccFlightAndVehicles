@@ -32,6 +32,8 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource[] Explosion;
     [Tooltip("Sounds that can be played when vehicle gets hit by something")]
     public AudioSource[] BulletHit;
+    [Tooltip("Sound that plays when vehicle is hit by a missile")]
+    public AudioSource[] MissileHit;
     [Tooltip("Sounds played when vehicle is rolling along the ground. Also works for seaplanes")]
     public AudioSource Rolling;
     [Tooltip("Maximum volume rolling sound reaches when moving forward quickly")]
@@ -71,7 +73,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool UnderwaterNull = true;
     [System.NonSerializedAttribute] public bool ReSupplyNull = true;
     [System.NonSerializedAttribute] public bool RadarLockedNull = true;
-    [System.NonSerializedAttribute] public bool AirbrakeNull = true;
+    [System.NonSerializedAttribute] public bool MissileHitNULL = true;
     private SaccEntity EntityControl;
     //public Transform testcamera;
     private bool SuperSonic = false;
@@ -137,6 +139,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         EnterWaterOutsideNull = EnterWaterOutside == null;
         ReSupplyNull = ReSupply == null;
         RadarLockedNull = RadarLocked == null;
+        MissileHitNULL = MissileHit.Length < 1;
         PlaneIdleNull = PlaneIdle.Length < 1;
         PlaneThrustNull = Thrust.Length < 1;
         TouchDownNull = TouchDown.Length < 1;
@@ -327,7 +330,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                     PlaneWind.volume = (Mathf.Min((((float)SAVControl.GetProgramVariable("Speed") / 20) * PlaneWindTargetVolume), 1) / 10f + (Mathf.Clamp((((float)SAVControl.GetProgramVariable("VertGs") - 1) * PlaneWindTargetVolume) * .125f, 0, 1) * .2f)) * silentint;
                 }
             }
-            else/*  if (InEditor) */ //enable here and disable 'Piloting' above for testing //you're a passenger and no one is flying
+            else//you're a passenger and no one is flying
             {
                 if (!PlaneInsideNull)
                 {
@@ -603,6 +606,20 @@ public class SAV_SoundController : UdonSharpBehaviour
     {
         if (!InWater)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayAfturburnersound"); }
+    }
+    public void SFEXT_G_MissileHit25()
+    { if (InVehicle && !MissileHitNULL) { PlayMissileHit(); } }
+    public void SFEXT_G_MissileHit50()
+    { if (InVehicle && !MissileHitNULL) { PlayMissileHit(); } }
+    public void SFEXT_G_MissileHit75()
+    { if (InVehicle && !MissileHitNULL) { PlayMissileHit(); } }
+    public void SFEXT_G_MissileHit100()
+    { if (InVehicle && !MissileHitNULL) { PlayMissileHit(); } }
+    public void PlayMissileHit()
+    {
+        int rand = Random.Range(0, MissileHit.Length);
+        MissileHit[rand].pitch = Random.Range(.8f, 1.2f);
+        MissileHit[rand].Play();
     }
     public void ResetSounds()
     {

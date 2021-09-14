@@ -25,26 +25,16 @@ public class SaccTarget : UdonSharpBehaviour
 
         if (HitPoints <= 10f)//hit does 10 damage, so we're dead
         {
-            if (localPlayer == null)//editor
-            {
-                Explode();
-            }
-            else//ingame
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
         }
         else
         {
-            if (localPlayer == null)//editor
-            {
-                TargetTakeDamage();
-            }
-            else//ingame
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargetTakeDamage");
-            }
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargetTakeDamage");
         }
+    }
+    private void OnCollisionEnter(Collision other)
+    {
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
     }
     public void TargetTakeDamage()
     {

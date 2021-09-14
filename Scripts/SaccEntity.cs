@@ -13,6 +13,10 @@ public class SaccEntity : UdonSharpBehaviour
     public UdonSharpBehaviour[] Dial_Functions_L;
     [Tooltip("Function dial scripts that you wish to be on the right dial")]
     public UdonSharpBehaviour[] Dial_Functions_R;
+    [Tooltip("Should there be a function at the top middle of the function dial? Or a divider? Useful for adjusting function positions with an odd number of functions")]
+    [SerializeField] private bool LeftDialDivideStraightUp = false;
+    [Tooltip("See above")]
+    [SerializeField] private bool RightDialDivideStraightUp = false;
     [Tooltip("Layer to spherecast to find all triggers on to use as AAM targets")]
     public LayerMask AAMTargetsLayer = 1 << 25;//layer 25
     [Tooltip("Object that is enabled when entering vehicle in any seat")]
@@ -26,7 +30,6 @@ public class SaccEntity : UdonSharpBehaviour
     private bool SwitchFunctionSoundNULL;
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
-    [System.NonSerializedAttribute] public float LastHitTime = -100;
     [System.NonSerializedAttribute] public bool InEditor = true;
     VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
     private VRCPlayerApi localPlayer;
@@ -38,6 +41,7 @@ public class SaccEntity : UdonSharpBehaviour
     private Vector2 LStickCheckAngle;
     private UdonSharpBehaviour CurrentSelectedFunctionL;
     private UdonSharpBehaviour CurrentSelectedFunctionR;
+    [System.NonSerializedAttribute] public GameObject LastHitParticle;
     [System.NonSerializedAttribute] public float LStickFuncDegrees;
     [System.NonSerializedAttribute] public float RStickFuncDegrees;
     [System.NonSerializedAttribute] public float LStickFuncDegreesDivider;
@@ -128,14 +132,36 @@ public class SaccEntity : UdonSharpBehaviour
         }
         //work out angle to check against for function selection because straight up is the middle of a function
         Vector3 angle = new Vector3(0, 0, -1);
-        if (LStickNumFuncs > 0) { angle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle; }
-        LStickCheckAngle.x = angle.x;
-        LStickCheckAngle.y = angle.z;
+        if (LStickNumFuncs > 1)
+        {
+            if (LeftDialDivideStraightUp)
+            {
+                LStickCheckAngle.x = 0;
+                LStickCheckAngle.y = 1;
+            }
+            else
+            {
+                angle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle;
+                LStickCheckAngle.x = angle.x;
+                LStickCheckAngle.y = angle.z;
+            }
+        }
 
         angle = new Vector3(0, 0, -1);
-        if (RStickNumFuncs > 0) { angle = Quaternion.Euler(0, -((360 / RStickNumFuncs) / 2), 0) * angle; }
-        RStickCheckAngle.x = angle.x;
-        RStickCheckAngle.y = angle.z;
+        if (RStickNumFuncs > 1)
+        {
+            if (RightDialDivideStraightUp)
+            {
+                RStickCheckAngle.x = 0;
+                RStickCheckAngle.y = 1;
+            }
+            else
+            {
+                angle = Quaternion.Euler(0, -((360 / RStickNumFuncs) / 2), 0) * angle;
+                RStickCheckAngle.x = angle.x;
+                RStickCheckAngle.y = angle.z;
+            }
+        }
 
         //if in edit mode without cyanemu
         if (InEditor)
@@ -146,11 +172,9 @@ public class SaccEntity : UdonSharpBehaviour
     }
     void OnParticleCollision(GameObject other)
     {
-        if (other == null || dead) { return; }//avatars can't shoot you, and you can't get hurt when you're dead
-
-        //this is to prevent more events than necessary being sent
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(VehicleHit));
-
+        if (other == null || dead) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
+        LastHitParticle = other;
+        SendEventToExtensions("SFEXT_L_BulletHit");
 
         //Try to find the saccentity that shot at us
         GameObject EnemyObjs = other;
@@ -175,10 +199,6 @@ public class SaccEntity : UdonSharpBehaviour
             if (EnemyUdonBehaviour != null)
             { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
         }
-    }
-    public void VehicleHit()
-    {
-        SendEventToExtensions("SFEXT_G_BulletHit");
     }
     private void Update()
     {
@@ -212,9 +232,11 @@ public class SaccEntity : UdonSharpBehaviour
                 }
                 if (LStickSelection != LStickSelectionLastFrame)
                 {
+                    bool triggerlast = true;
                     //new function selected, send deselected to old one
                     if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
                     {
+                        triggerlast = (bool)Dial_Functions_L[LStickSelectionLastFrame].GetProgramVariable("TriggerLastFrame");
                         Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
                     //get udonbehaviour for newly selected function and then send selected
@@ -223,6 +245,10 @@ public class SaccEntity : UdonSharpBehaviour
                         if (Dial_Functions_L[LStickSelection] != null)
                         {
                             Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
+                            if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
+                            {
+                                Dial_Functions_L[LStickSelectionLastFrame].SetProgramVariable("TriggerLastFrame", triggerlast);
+                            }
                         }
                         else { CurrentSelectedFunctionL = null; }
                     }
@@ -231,7 +257,14 @@ public class SaccEntity : UdonSharpBehaviour
                     { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
                     else
                     {
-                        LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * LStickSelection, 0);
+                        if (LeftDialDivideStraightUp)
+                        {
+                            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, (LStickFuncDegrees * .5f) + (LStickFuncDegrees * LStickSelection), 0);
+                        }
+                        else
+                        {
+                            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * LStickSelection, 0);
+                        }
                     }
                     LStickSelectionLastFrame = LStickSelection;
                 }
@@ -251,9 +284,11 @@ public class SaccEntity : UdonSharpBehaviour
                 }
                 if (RStickSelection != RStickSelectionLastFrame)
                 {
+                    bool triggerlast = true;
                     //new function selected, send deselected to old one
                     if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
                     {
+                        triggerlast = (bool)Dial_Functions_R[RStickSelectionLastFrame].GetProgramVariable("TriggerLastFrame");
                         Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
                     //get udonbehaviour for newly selected function and then send selected
@@ -262,6 +297,10 @@ public class SaccEntity : UdonSharpBehaviour
                         if (Dial_Functions_R[RStickSelection] != null)
                         {
                             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
+                            if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
+                            {
+                                Dial_Functions_R[RStickSelectionLastFrame].SetProgramVariable("TriggerLastFrame", triggerlast);
+                            }
                         }
                         else { CurrentSelectedFunctionR = null; }
                     }
@@ -270,7 +309,14 @@ public class SaccEntity : UdonSharpBehaviour
                     { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
                     else
                     {
-                        RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * RStickSelection, 0);
+                        if (RightDialDivideStraightUp)
+                        {
+                            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, (RStickFuncDegrees + .5f) + (RStickFuncDegrees * RStickSelection), 0);
+                        }
+                        else
+                        {
+                            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * RStickSelection, 0);
+                        }
                     }
                     RStickSelectionLastFrame = RStickSelection;
                 }
@@ -283,7 +329,6 @@ public class SaccEntity : UdonSharpBehaviour
             { ExitStation(); }
         }
     }
-
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
         if (player.isLocal)
@@ -306,9 +351,15 @@ public class SaccEntity : UdonSharpBehaviour
         Piloting = true;
         InVehicle = true;
         if (LStickNumFuncs == 1)
-        { Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected"); }
+        {
+            Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected");
+            Dial_Functions_L[0].SetProgramVariable("TriggerLastFrame", true);//prevent
+        }
         if (RStickNumFuncs == 1)
-        { Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected"); }
+        {
+            Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected");
+            Dial_Functions_R[0].SetProgramVariable("TriggerLastFrame", true);
+        }
         LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
         RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
 

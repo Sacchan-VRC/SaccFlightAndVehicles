@@ -130,8 +130,8 @@ public class SaccSyncScript : UdonSharpBehaviour
 
             L_UpdateTime = Networking.GetServerTimeInMilliseconds();
             Ping = (float)(L_UpdateTime - O_UpdateTime) * .001f;
-            Acceleration = O_CurVel - O_LastCurVel;
-            if (Vector3.Dot(Acceleration, LastAcceleration) < 0)
+            Acceleration = (O_CurVel - O_LastCurVel) * (1 + Ping);
+            if (Vector3.Dot(Acceleration, LastAcceleration) < 0)//if direction of acceleration changed by more than 180 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             {
                 Acceleration = Vector3.zero;
             }

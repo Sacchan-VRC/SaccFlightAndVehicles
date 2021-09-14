@@ -49,6 +49,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         Dial_FunconNULL = Dial_Funcon == null;
+        CanopyDragMulti -= 1;
         //crashes if not sent delayed because the order of events sent by SendCustomEvent are not maintained, (SaccEntity.SendEventToExtensions())
         SendCustomEventDelayedFrames(nameof(CanopyOpening), 1);
     }

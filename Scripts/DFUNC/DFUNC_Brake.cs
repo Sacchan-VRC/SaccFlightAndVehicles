@@ -84,6 +84,8 @@ public class DFUNC_Brake : UdonSharpBehaviour
     {
         BrakeInput = 0;
         Selected = false;
+        SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - DragAdded);
+        DragAdded = 0;
         if (!NoPilotAlwaysGroundBrake)
         { GroundBrakeStrength = 0; WaterBrakeStrength = 0; }
     }

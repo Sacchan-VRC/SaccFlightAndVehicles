@@ -183,7 +183,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float SoundBarrierStrength = 0.0003f;
     [Tooltip("Within how many meters per second of the speed of sound does the vehicle have to be before they experience extra drag. Extra drag is scaled linearly up to the speed of sound, and dowan after it")]
     public float SoundBarrierWidth = 20f;
-    [UdonSynced(UdonSyncMode.None)] public float Fuel = 7200;
+    [UdonSynced(UdonSyncMode.None)] public float Fuel = 900;
+    [Tooltip("Amount of fuel at which throttle will start reducing")]
+    public float LowFuel = 125;
     [Tooltip("Fuel consumed per second at max throttle, scales with throttle")]
     public float FuelConsumption = 2;
     [Tooltip("Multiply FuelConsumption by this number when at full afterburner Scales with afterburner level")]
@@ -196,6 +198,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float RespawnDelay = 10;
     [Tooltip("Time after reappearing the plane is invincible for")]
     public float InvincibleAfterSpawn = 2.5f;
+    [Tooltip("Damage taken when hit by a bullet")]
+    public float BulletDamageTaken = 10f;
+    [Tooltip("Locally destroy target if prediction thinks you killed them, should only ever cause problems if you have a system that repairs vehicles during a fight")]
+    public bool PredictDamage = true;
+    [Tooltip("Multiply how much damage is done by missiles")]
+    public float MissileDamageTakenMultiplier = 1f;
+    [Tooltip("Strength of force that pushes the vehicle when exploding")]
+    [SerializeField] private float MissilePushForce = 1f;
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere starts thinning, In meters. 12192 = 40,000~ feet")]
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere reaches zero thickness. In meters. 19812 = 65,000~ feet")]
@@ -275,7 +285,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private int ThrustVecGrounded;
     private float SoundBarrier;
     [System.NonSerializedAttribute] public float FullFuel;
-    private float LowFuel;
     private float LowFuelDivider;
     private float LastResupplyTime = 5;//can't resupply for the first 10 seconds after joining, fixes potential null ref if sending something to PlaneAnimator on first frame
     [System.NonSerializedAttribute] public float FullGunAmmo;
@@ -318,6 +327,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool AfterburnerOn;
     [System.NonSerializedAttribute] public bool PitchDown;//air is hitting plane from the top
     private float GDamageToTake;
+    [System.NonSerializedAttribute] public float LastHitTime = -100;
+    [System.NonSerializedAttribute] public float PredictedHealth;
+    [System.NonSerializedAttribute] public SaccEntity LastAttacker;
 
 
     [System.NonSerializedAttribute] public int NumActiveFlares;
@@ -489,7 +501,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
             UsingManualSync = true;
         }
 
-        LowFuel = 200;//FullFuel * .13888888f;//to match the old default settings
         LowFuelDivider = 1 / LowFuel;
 
         //thrust is lerped towards VTOLThrottleStrengthMulti by VTOLAngle, unless VTOLMaxAngle is greater than 90 degrees, then it's lerped by 90=1
@@ -1141,6 +1152,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
             EntityControl.ExitStation();
         }
     }
+    public void SFEXT_L_Destroy()
+    {
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+    }
     public void ReAppear()
     {
         VehicleAnimator.SetTrigger("reappear");
@@ -1214,7 +1229,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     private void ToggleAfterburner()
     {
-        if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
+        if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint && Fuel > LowFuel)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
         }
@@ -1279,12 +1294,130 @@ public class SaccAirVehicle : UdonSharpBehaviour
         SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
         EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
     }
+    public void SendBulletHit()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void SFEXT_L_BulletHit()
+    {
+        if (PredictDamage)
+        {
+            if (Time.time - LastHitTime > 2)
+            {
+                PredictedHealth = Health - BulletDamageTaken;
+                if (PredictedHealth <= 0)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                }
+            }
+            else
+            {
+                PredictedHealth -= BulletDamageTaken;
+                if (PredictedHealth <= 0)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                }
+            }
+            LastHitTime = Time.time;
+        }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBulletHit));
+    }
     public void SFEXT_G_BulletHit()
     {
         if (IsOwner)
         {
-            Health -= 10;
+            Health -= BulletDamageTaken;
+            if (PredictDamage && Health <= 0)
+            { Health = 0.1f; }//the attacker calls the explode function in this case
         }
+    }
+    public void SFEXT_L_MissileHit25()
+    {
+        if (PredictDamage)
+        { MissileDamagePrediction(.25f); }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit25));
+    }
+    public void SendMissileHit25()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_MissileHit25");
+    }
+    public void SFEXT_G_MissileHit25()
+    {
+        if (IsOwner)
+        { TakeMissileDamage(.25f); }
+    }
+    public void SFEXT_L_MissileHit50()
+    {
+        if (PredictDamage)
+        { MissileDamagePrediction(.50f); }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit50));
+    }
+    public void SendMissileHit50()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_MissileHit50");
+    }
+    public void SFEXT_G_MissileHit50()
+    {
+        if (IsOwner)
+        { TakeMissileDamage(.5f); }
+    }
+    public void SFEXT_L_MissileHit75()
+    {
+        if (PredictDamage)
+        { MissileDamagePrediction(.75f); }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit75));
+    }
+    public void SendMissileHit75()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_MissileHit75");
+    }
+    public void SFEXT_G_MissileHit75()
+    {
+        if (IsOwner)
+        { TakeMissileDamage(.75f); }
+    }
+    public void SFEXT_L_MissileHit100()
+    {
+        if (PredictDamage)
+        { MissileDamagePrediction(1f); }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit100));
+    }
+    public void SendMissileHit100()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_MissileHit100");
+    }
+    public void SFEXT_G_MissileHit100()
+    {
+        if (IsOwner)
+        { TakeMissileDamage(1f); }
+    }
+    public void TakeMissileDamage(float damage)
+    {
+        Health -= ((FullHealth * damage) * MissileDamageTakenMultiplier);
+        if (PredictDamage && Health <= 0)
+        { Health = 0.1f; }//the attacker calls the explode function in this case
+        Vector3 explosionforce = new Vector3(Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce)) * damage;
+        VehicleRigidbody.AddTorque(explosionforce, ForceMode.VelocityChange);
+    }
+    private void MissileDamagePrediction(float Damage)
+    {
+        if (Time.time - LastHitTime > 2)
+        {
+            PredictedHealth = Health - ((FullHealth * Damage) * MissileDamageTakenMultiplier);
+            if (PredictedHealth <= 0)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+            }
+        }
+        else
+        {
+            PredictedHealth -= ((FullHealth * Damage) * MissileDamageTakenMultiplier);
+            if (PredictedHealth <= 0)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+            }
+        }
+        LastHitTime = Time.time;
     }
     public void SFEXT_P_PassengerEnter()
     {
