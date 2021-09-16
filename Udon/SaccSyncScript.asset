@@ -43,7 +43,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 39
+      Data: 38
     - Name: 
       Entry: 7
       Data: 
@@ -814,7 +814,7 @@ MonoBehaviour:
       Data: 55|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: System.Int16, mscorlib
+      Data: System.UInt16, mscorlib
     - Name: 
       Entry: 8
       Data: 
@@ -826,7 +826,7 @@ MonoBehaviour:
       Data: 1
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt16
+      Data: SystemUInt16
     - Name: symbolOriginalName
       Entry: 1
       Data: O_RotationX
@@ -889,7 +889,7 @@ MonoBehaviour:
       Data: 1
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt16
+      Data: SystemUInt16
     - Name: symbolOriginalName
       Entry: 1
       Data: O_RotationY
@@ -952,7 +952,7 @@ MonoBehaviour:
       Data: 1
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt16
+      Data: SystemUInt16
     - Name: symbolOriginalName
       Entry: 1
       Data: O_RotationZ
@@ -2281,7 +2281,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: CurrentSmoothFrame
+      Data: SmoothingTimeDivider
     - Name: $v
       Entry: 7
       Data: 135|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2290,7 +2290,7 @@ MonoBehaviour:
       Data: 136|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 38
+      Data: 14
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -2299,13 +2299,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt32
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: CurrentSmoothFrame
+      Data: SmoothingTimeDivider
     - Name: symbolUniqueName
       Entry: 1
-      Data: CurrentSmoothFrame
+      Data: SmoothingTimeDivider
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2339,7 +2339,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: SmoothFrameDivider
+      Data: UpdateTime
     - Name: $v
       Entry: 7
       Data: 138|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -2360,10 +2360,10 @@ MonoBehaviour:
       Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: SmoothFrameDivider
+      Data: UpdateTime
     - Name: symbolUniqueName
       Entry: 1
-      Data: SmoothFrameDivider
+      Data: UpdateTime
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -2373,64 +2373,6 @@ MonoBehaviour:
     - Name: fieldAttributes
       Entry: 7
       Data: 140|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: UpdateTime
-    - Name: $v
-      Entry: 7
-      Data: 141|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
-    - Name: fieldSymbol
-      Entry: 7
-      Data: 142|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
-    - Name: internalType
-      Entry: 9
-      Data: 14
-    - Name: declarationType
-      Entry: 3
-      Data: 2
-    - Name: syncMode
-      Entry: 3
-      Data: 0
-    - Name: symbolResolvedTypeName
-      Entry: 1
-      Data: SystemSingle
-    - Name: symbolOriginalName
-      Entry: 1
-      Data: UpdateTime
-    - Name: symbolUniqueName
-      Entry: 1
-      Data: UpdateTime
-    - Name: symbolDefaultValue
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 143|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12

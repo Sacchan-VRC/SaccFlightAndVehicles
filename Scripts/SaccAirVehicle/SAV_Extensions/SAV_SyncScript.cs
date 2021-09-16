@@ -19,11 +19,14 @@ public class SaccSyncScript : UdonSharpBehaviour
     [SerializeField] private float IdleMaxUpdateDelay = 3f;
     private VRCPlayerApi localPlayer;
     private float nextUpdateTime = 0;
-    [UdonSynced(UdonSyncMode.None)] private int O_UpdateTime;
+    //[UdonSynced(UdonSyncMode.None)] private int O_UpdateTime;
+    private int StartupTimeMS;
+    private double StartupTime;
+    [UdonSynced(UdonSyncMode.None)] private double O_UpdateTime;
     [UdonSynced(UdonSyncMode.None)] private Vector3 O_Position = Vector3.zero;
-    [UdonSynced(UdonSyncMode.None)] private short O_RotationX;
-    [UdonSynced(UdonSyncMode.None)] private short O_RotationY;
-    [UdonSynced(UdonSyncMode.None)] private short O_RotationZ;
+    [UdonSynced(UdonSyncMode.None)] private ushort O_RotationX;
+    [UdonSynced(UdonSyncMode.None)] private ushort O_RotationY;
+    [UdonSynced(UdonSyncMode.None)] private ushort O_RotationZ;
     [UdonSynced(UdonSyncMode.None)] private Vector3 O_CurVel = Vector3.zero;
     private Vector3 O_Rotation;
     private Quaternion O_Rotation_Q = Quaternion.identity;
@@ -36,10 +39,10 @@ public class SaccSyncScript : UdonSharpBehaviour
     private Quaternion RotationLerper = Quaternion.identity;
     private float Ping;
     private float LastPing;
-    private int L_UpdateTime;
-    private int L_LastUpdateTime;
-    private int O_LastUpdateTime;
-    private int O_LastUpdateTime2;
+    private double L_UpdateTime;
+    private double L_LastUpdateTime;
+    private double O_LastUpdateTime;
+    private double O_LastUpdateTime2;
     //make everyone think they're the owner for the first frame so that don't set the position to 0,0,0 before SFEXT_L_EntityStart runs
     private bool IsOwner = true;
     private Vector3 lerpedCurVel;
@@ -47,8 +50,7 @@ public class SaccSyncScript : UdonSharpBehaviour
     private Vector3 LastAcceleration;
     private Vector3 O_LastPosition;
     private Vector3 O_LastPosition2;
-    private int CurrentSmoothFrame;
-    private float SmoothFrameDivider;
+    private float SmoothingTimeDivider;
     private float UpdateTime;
 
     private void Start()
@@ -65,8 +67,9 @@ public class SaccSyncScript : UdonSharpBehaviour
         else { IsOwner = true; }//play mode in editor
         nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
 
-        SmoothFrameDivider = 1f / (float)SmoothingTime;
-
+        SmoothingTimeDivider = 1f / (float)SmoothingTime;
+        StartupTimeMS = Networking.GetServerTimeInMilliseconds();
+        StartupTime = Time.realtimeSinceStartup;
         gameObject.SetActive(true);
     }
     public void SFEXT_O_TakeOwnership()
@@ -90,11 +93,11 @@ public class SaccSyncScript : UdonSharpBehaviour
                         O_Position = VehicleTransform.position;
                         O_Rotation_Q = VehicleTransform.rotation;
                         Vector3 rot = VehicleTransform.rotation.eulerAngles * 182.0444444444444f;//convert 360 to 65536
-                        O_RotationX = (short)Mathf.Floor(Mathf.Max(0, rot.x));//i don't know why but it can crash thinking it's below 0 so Max to 0
-                        O_RotationY = (short)Mathf.Floor(Mathf.Max(0, rot.y));
-                        O_RotationZ = (short)Mathf.Floor(Mathf.Max(0, rot.z));
+                        O_RotationX = (ushort)Mathf.Floor(Mathf.Max(0, rot.x));//i don't know why but it can crash thinking it's below 0 so Max to 0
+                        O_RotationY = (ushort)Mathf.Floor(Mathf.Max(0, rot.y));
+                        O_RotationZ = (ushort)Mathf.Floor(Mathf.Max(0, rot.z));
                         O_CurVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
-                        O_UpdateTime = Networking.GetServerTimeInMilliseconds();
+                        O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
                         RequestSerialization();
                         UpdateTime = Time.time;
                     }
@@ -104,7 +107,7 @@ public class SaccSyncScript : UdonSharpBehaviour
         }
         else//extrapolate and interpolate based on data
         {
-            float TimeSinceUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_UpdateTime) * .001f);
+            float TimeSinceUpdate = (float)((((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime)) - L_UpdateTime);
             Vector3 PredictedPosition = O_Position
                  + ((O_CurVel + Acceleration) * Ping)
                  + ((O_CurVel + Acceleration) * TimeSinceUpdate);
@@ -113,7 +116,7 @@ public class SaccSyncScript : UdonSharpBehaviour
                 * O_Rotation_Q);
             if (TimeSinceUpdate < updateInterval)
             {
-                float TimeSincePreviousUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_LastUpdateTime) * .001f);
+                float TimeSincePreviousUpdate = (float)((((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime)) - L_LastUpdateTime);
                 Vector3 OldPredictedPosition = O_LastPosition2
                      + ((O_LastCurVel2 + LastAcceleration) * LastPing)
                      + ((O_LastCurVel2 + LastAcceleration) * TimeSincePreviousUpdate);
@@ -121,16 +124,17 @@ public class SaccSyncScript : UdonSharpBehaviour
                 Quaternion OldPredictedRotation =
                 (Quaternion.SlerpUnclamped(Quaternion.identity, LastCurAngMom, LastPing + TimeSincePreviousUpdate)
                 * O_LastRotation2);
-                RotationLerper = Quaternion.Slerp(RotationLerper, Quaternion.Slerp(OldPredictedRotation, PredictedRotation, (float)TimeSinceUpdate * SmoothFrameDivider), Time.smoothDeltaTime * SmoothFrameDivider);
+                RotationLerper = Quaternion.Slerp(RotationLerper,
+                 Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),
+                  Time.smoothDeltaTime * SmoothingTimeDivider);
 
                 VehicleTransform.SetPositionAndRotation(
-                    Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothFrameDivider),
+                    Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider),
                      RotationLerper);
-                CurrentSmoothFrame++;
             }
             else
             {
-                RotationLerper = Quaternion.Slerp(RotationLerper, PredictedRotation, Time.smoothDeltaTime * SmoothFrameDivider);
+                RotationLerper = Quaternion.Slerp(RotationLerper, PredictedRotation, Time.smoothDeltaTime * SmoothingTimeDivider);
                 VehicleTransform.SetPositionAndRotation(PredictedPosition, RotationLerper);
             }
         }
@@ -143,11 +147,11 @@ public class SaccSyncScript : UdonSharpBehaviour
             LastPing = Ping;
             L_LastUpdateTime = L_UpdateTime;
             LastCurAngMom = CurAngMom;
-            float updatedelta = (O_UpdateTime - O_LastUpdateTime) * .001f;
+            float updatedelta = (float)(O_UpdateTime - O_LastUpdateTime) * .001f;
             float speednormalizer = 1 / updatedelta;
 
-            L_UpdateTime = Networking.GetServerTimeInMilliseconds();
-            Ping = (float)(L_UpdateTime - O_UpdateTime) * .001f;
+            L_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
+            Ping = (float)(L_UpdateTime - O_UpdateTime);
             Acceleration = (O_CurVel - O_LastCurVel) * (1 + Ping);
             if (Vector3.Dot(Acceleration, LastAcceleration) < 0)//if direction of acceleration changed by more than 180 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             { Acceleration = Vector3.zero; }
@@ -175,7 +179,6 @@ public class SaccSyncScript : UdonSharpBehaviour
             O_LastRotation = O_Rotation_Q;
             O_LastPosition = O_Position;
             O_LastCurVel = O_CurVel;
-            CurrentSmoothFrame = 1;
         }
     }
 }
