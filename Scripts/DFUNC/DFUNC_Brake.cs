@@ -50,7 +50,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
         HasAirBrake = AirbrakeStrength != 0;
         Airbrake_sndNULL = Airbrake_snd == null;
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
-        if (localPlayer != null && !localPlayer.isMaster)
+        if (localPlayer != null && !localPlayer.isInstanceOwner)
         { gameObject.SetActive(false); }
         else
         { gameObject.SetActive(true); }

@@ -112,7 +112,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         {
             InEditor = false;
             InVR = localPlayer.IsUserInVR();
-            IsOwner = localPlayer.isMaster;
+            IsOwner = localPlayer.isInstanceOwner;
         }
         CenterOfMass = EntityControl.CenterOfMass;
         HUDControlNULL = HUDControl == null;

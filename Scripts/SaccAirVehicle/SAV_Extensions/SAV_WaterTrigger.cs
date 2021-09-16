@@ -33,7 +33,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         {
-            if (!localPlayer.isMaster)
+            if (!localPlayer.isInstanceOwner)
             { gameObject.SetActive(false); }
         }
 

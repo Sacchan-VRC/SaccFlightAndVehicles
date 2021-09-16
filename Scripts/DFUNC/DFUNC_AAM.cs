@@ -17,6 +17,14 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private float AAMLockTime = 1.5f;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 10;
+    [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
+    [SerializeField] private bool DoAnimBool = false;
+    [SerializeField] private string AnimBoolName = "AAMSelected";
+    [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
+    [SerializeField] private bool AnimBoolStayTrueOnExit;
+    private float boolToggleTime;
+    private bool AnimOn = false;
+    private int AnimBool_STRING;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private int FullAAMs;
@@ -59,6 +67,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         OutsidePlaneLayer = (int)SAVControl.GetProgramVariable("OutsidePlaneLayer");
         localPlayer = Networking.LocalPlayer;
 
+        AnimBool_STRING = Animator.StringToHash(AnimBoolName);
         //HUD
         if (HUDControl != null)
         {
@@ -94,6 +103,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMTargeting.gameObject.SetActive(false);
         AAMTargetLock.gameObject.SetActive(false);
         AAMTargetIndicator.localRotation = Quaternion.identity;
+
+        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -106,6 +118,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
         {
             DFUNC_Deselected();
         }
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void SFEXT_G_ReSupply()
     {
@@ -119,6 +133,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         NumAAM = FullAAMs;
         AAMAnimator.SetFloat(AAMS_STRING, 1);
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void SFEXT_G_TouchDown()
     {
@@ -131,6 +147,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
         func_active = true;
         AAMTargetIndicator.gameObject.SetActive(true);
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers));
+
+        if (DoAnimBool && !AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
     }
     public void DFUNC_Deselected()
     {
@@ -146,6 +165,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (OthersEnabled)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
         TriggerLastFrame = false;
+
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     //synced variables recieved while object is disabled do not get set until the object is enabled
     public void EnableForOthers()
@@ -189,7 +211,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         if (AAMLocked && !(bool)SAVControl.GetProgramVariable("Taxiing") && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                         {
                             AAMLastFiredTime = Time.time;
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAAM");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAAM));
                             if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                             if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                             { EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch"); }
@@ -457,6 +479,18 @@ public class DFUNC_AAM : UdonSharpBehaviour
         }
         DialPosition = -999;
         Debug.LogWarning("DFUNC_AAM: Can't find self in dial functions");
+    }
+    public void SetBoolOn()
+    {
+        boolToggleTime = Time.time;
+        AnimOn = true;
+        AAMAnimator.SetBool(AnimBool_STRING, AnimOn);
+    }
+    public void SetBoolOff()
+    {
+        boolToggleTime = Time.time;
+        AnimOn = false;
+        AAMAnimator.SetBool(AnimBool_STRING, AnimOn);
     }
     public void KeyboardInput()
     {

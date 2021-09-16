@@ -20,7 +20,9 @@ public class SAV_AAMController : UdonSharpBehaviour
     [SerializeField] private float TargetLowThrottleTrack = .3f;
     [Tooltip("When passing target, if within this range, explode")]
     [SerializeField] private float ProximityExplodeDistance = 20;
-    private SaccAirVehicle TargetSAVControl;
+    private UdonSharpBehaviour TargetSAVControl;
+    private Animator TargetAnimator;
+    SaccEntity TargetEntityControl;
     private bool LockHack = true;
     private float Lifetime = 0;
     private Transform Target;
@@ -73,13 +75,17 @@ public class SAV_AAMController : UdonSharpBehaviour
                 TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
                 if (TargetSAVControl != null)
                 {
-                    if (TargetSAVControl.Piloting || TargetSAVControl.Passenger)
-                    { TargetSAVControl.MissilesIncomingHeat++; }
-                    TargetSAVControl.VehicleAnimator.SetInteger(AnimINTName, TargetSAVControl.MissilesIncomingHeat);
+                    if ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger"))
+                    {
+                        TargetSAVControl.SetProgramVariable("MissilesIncomingHeat", (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat") + 1);
+                    }
+                    TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
+                    TargetAnimator = (Animator)TargetSAVControl.GetProgramVariable("VehicleAnimator");
+                    TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
                     TargetSAVNULL = false;
                     MissileIncoming = true;
                     TargetIsVehicle = true;
-                    TargetABPoint = TargetSAVControl.ThrottleAfterburnerPoint;
+                    TargetABPoint = (float)TargetSAVControl.GetProgramVariable("ThrottleAfterburnerPoint");
                     TargetThrottleNormalizer = 1 / TargetABPoint;
                 }
             }
@@ -127,8 +133,8 @@ public class SAV_AAMController : UdonSharpBehaviour
             bool Dumb;
             if (!TargetSAVNULL)
             {
-                Dumb = Random.Range(0, 100) < TargetSAVControl.NumActiveFlares * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
-                EngineTrack = Mathf.Max(TargetSAVControl.EngineOutput * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
+                Dumb = Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
+                EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
             }
             else
             {
@@ -164,10 +170,10 @@ public class SAV_AAMController : UdonSharpBehaviour
                 if (MissileIncoming)
                 {
                     //just flew past the target, stop missile warning sound
-                    if (TargetSAVControl.Piloting || TargetSAVControl.Passenger)
+                    if ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger"))
                     {
-                        TargetSAVControl.MissilesIncomingHeat -= 1;
-                        TargetSAVControl.VehicleAnimator.SetInteger("missilesincoming", TargetSAVControl.MissilesIncomingHeat);
+                        TargetSAVControl.SetProgramVariable("MissilesIncomingHeat", (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat") - 1);
+                        TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
                     }
                     MissileIncoming = false;
                 }
@@ -186,7 +192,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                 SaccEntity TargetEntity = other.gameObject.GetComponent<SaccEntity>();
                 if (TargetEntity != null)
                 {
-                    TargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_MissileHit100");
+                    TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit100");
                 }
             }
             Explode();
@@ -209,31 +215,37 @@ public class SAV_AAMController : UdonSharpBehaviour
         }
         if (MissileIncoming)
         {
-            if (TargetSAVControl.Piloting || TargetSAVControl.Passenger)
-            { TargetSAVControl.MissilesIncomingHeat--; }
-            TargetSAVControl.VehicleAnimator.SetInteger("missilesincoming", TargetSAVControl.MissilesIncomingHeat);
+            if ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger"))
+            {
+                TargetSAVControl.SetProgramVariable("MissilesIncomingHeat", (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat") - 1);
+            }
+            TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
             MissileIncoming = false;
         }
 
         AAMCollider.enabled = false;
         Animator AAMani = GetComponent<Animator>();
         float DamageDist = 999f;
-        if (!SAVControlNull) { DamageDist = Vector3.Distance(transform.position, TargetSAVControl.CenterOfMass.position) / ProximityExplodeDistance; }
+        if (!SAVControlNull)
+        {
+            TargetEntityControl.LastAttacker = EntityControl;
+            DamageDist = Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position) / ProximityExplodeDistance;
+        }
         if (IsOwner)
         {
             if (DamageDist < 1 && !HitTarget)
             {
                 if (DamageDist > .66666f)
                 {
-                    TargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_MissileHit25");
+                    TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit25");
                 }
                 else if (DamageDist > .33333f)
                 {
-                    TargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_MissileHit50");
+                    TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit50");
                 }
                 else
                 {
-                    TargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_MissileHit75");
+                    TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit75");
                 }
             }
         }

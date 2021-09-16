@@ -21,6 +21,13 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     [SerializeField] private float BombDelay = 0f;
     [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
     [SerializeField] private Transform[] BombLaunchPoints;
+    [SerializeField] private bool DoAnimBool = false;
+    [SerializeField] private string AnimBoolName = "BombSelected";
+    [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
+    [SerializeField] private bool AnimBoolStayTrueOnExit;
+    private float boolToggleTime;
+    private bool AnimOn = false;
+    private int AnimBool_STRING;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private float Trigger;
@@ -54,6 +61,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         FindSelf();
 
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
+        AnimBool_STRING = Animator.StringToHash(AnimBoolName);
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -63,6 +71,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
         TriggerLastFrame = false;
+        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -71,22 +81,30 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         gameObject.SetActive(true);
+        if (DoAnimBool && !AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
     }
     public void DFUNC_Deselected()
     {
         gameObject.SetActive(false);
         TriggerLastFrame = false;
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_G_Explode()
     {
         BombPoint = 0;
         NumBomb = FullBombs;
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_G_RespawnButton()
     {
         NumBomb = FullBombs;
         BombAnimator.SetFloat(BOMBS_STRING, 1);
         BombPoint = 0;
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_G_ReSupply()
     {
@@ -174,6 +192,18 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         }
         DialPosition = -999;
         Debug.LogWarning("DFUNC_Bomb: Can't find self in dial functions");
+    }
+    public void SetBoolOn()
+    {
+        boolToggleTime = Time.time;
+        AnimOn = true;
+        BombAnimator.SetBool(AnimBool_STRING, AnimOn);
+    }
+    public void SetBoolOff()
+    {
+        boolToggleTime = Time.time;
+        AnimOn = false;
+        BombAnimator.SetBool(AnimBool_STRING, AnimOn);
     }
     public void KeyboardInput()
     {

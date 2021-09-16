@@ -35,9 +35,6 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [SerializeField] private float WaveSpeed = 12;
     [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
     [SerializeField] private bool DoOnLand = false;
-    [Tooltip("Automatically multiply the relevent values by rigidbody weight on Start(), allowing the vehicle to be any weight without changing it's physics")]
-    [SerializeField] bool AutoAdjustForWeight = true;
-
     [Header("HoverBike Only")]
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     public bool HoverBike = false;
@@ -59,21 +56,10 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float depth;
     private VRCPlayerApi localPlayer;
     private bool InEditor = false;
-    private float RBMass = 1;
     private float FloatDiameter;
     private int FPLength;
     void Start()
     {
-        if (AutoAdjustForWeight)
-        {
-            RBMass = VehicleRigidbody.mass;
-            FloatForce *= RBMass;
-            WaterSidewaysDrag *= RBMass;
-            WaterForwardDrag *= RBMass;
-            WaterRotDrag *= RBMass;
-            WaterVelDrag *= RBMass;
-            BackThrustStrength *= RBMass;
-        }
         SAVControlNULL = SAVControl == null;
 
         FPLength = FloatPoints.Length;
@@ -97,7 +83,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         {
             FloatLocalPos[i] = FloatPoints[i].localPosition;
         }
-        if (HoverBike || (!InEditor && !localPlayer.isMaster))
+        if (HoverBike || (!InEditor && !localPlayer.isInstanceOwner))
         {
             gameObject.SetActive(false);
         }
@@ -158,7 +144,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
             if (DoOnLand || !HitLandLast[currentfloatpoint])
             {
                 FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat;
-                float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint])) * RBMass;
+                float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]));
                 if (CompressionDifference > 0)
                 { CompressionDifference *= Compressing; }
                 else
@@ -191,7 +177,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         {//apply last calculated floating force for each floatpoint to respective floatpoints
             for (int i = 0; i != FloatPoints.Length; i++)
             {
-                VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.Force);
+                VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.Acceleration);
             }
             VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * depth * WaterRotDrag);
             VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * depth * WaterVelDrag);
@@ -222,13 +208,13 @@ public class SAV_FloatScript : UdonSharpBehaviour
             float BackThrustAmount = -((Vector3.Dot(Vel, forward)) * BackThrustStrength);
             if (BackThrustAmount > 0)
             { VehicleRigidbody.AddForce(forward * BackThrustAmount * depth * (float)SAVControl.GetProgramVariable("ThrottleInput")); }
-            VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * depth, ForceMode.Force);
+            VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * depth, ForceMode.Acceleration);
         }
         else
         {
-            VehicleRigidbody.AddForceAtPosition(right * -sidespeed * WaterSidewaysDrag * depth, FloatPoints[currentfloatpoint].position, ForceMode.Force);
+            VehicleRigidbody.AddForceAtPosition(right * -sidespeed * WaterSidewaysDrag * depth, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
         }
-        VehicleRigidbody.AddForceAtPosition(forward * -forwardspeed * WaterForwardDrag * depth, FloatPoints[currentfloatpoint].position, ForceMode.Force);
+        VehicleRigidbody.AddForceAtPosition(forward * -forwardspeed * WaterForwardDrag * depth, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
 
         currentfloatpoint++;
         if (currentfloatpoint == FPLength) { currentfloatpoint = 0; }

@@ -31,7 +31,6 @@ public class SaccEntity : UdonSharpBehaviour
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
     [System.NonSerializedAttribute] public bool InEditor = true;
-    VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
     private VRCPlayerApi localPlayer;
     [System.NonSerializedAttribute] public int PilotID;
     [System.NonSerializedAttribute] public string PilotName;
@@ -80,7 +79,7 @@ public class SaccEntity : UdonSharpBehaviour
         if (localPlayer != null)
         {
             InEditor = false;
-            if (localPlayer.isMaster) { IsOwner = true; }
+            if (localPlayer.isInstanceOwner) { IsOwner = true; }
         }
         else
         {
@@ -89,7 +88,6 @@ public class SaccEntity : UdonSharpBehaviour
             InVehicle = true;
         }
 
-        VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
         if (CenterOfMass == null)
         { CenterOfMass = gameObject.transform; }
 
@@ -137,7 +135,7 @@ public class SaccEntity : UdonSharpBehaviour
             if (LeftDialDivideStraightUp)
             {
                 LStickCheckAngle.x = 0;
-                LStickCheckAngle.y = 1;
+                LStickCheckAngle.y = -1;
             }
             else
             {
@@ -153,7 +151,7 @@ public class SaccEntity : UdonSharpBehaviour
             if (RightDialDivideStraightUp)
             {
                 RStickCheckAngle.x = 0;
-                RStickCheckAngle.y = 1;
+                RStickCheckAngle.y = -1;
             }
             else
             {
@@ -225,7 +223,7 @@ public class SaccEntity : UdonSharpBehaviour
                 {
                     float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
 
-                    stickdir = (stickdir - 180) * -1;
+                    stickdir = -(stickdir - 180);
                     int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
                     if (!LStickNULL[newselection])
                     { LStickSelection = newselection; }
@@ -257,14 +255,7 @@ public class SaccEntity : UdonSharpBehaviour
                     { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
                     else
                     {
-                        if (LeftDialDivideStraightUp)
-                        {
-                            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, (LStickFuncDegrees * .5f) + (LStickFuncDegrees * LStickSelection), 0);
-                        }
-                        else
-                        {
-                            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * LStickSelection, 0);
-                        }
+                        LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * LStickSelection, 0);
                     }
                     LStickSelectionLastFrame = LStickSelection;
                 }
@@ -277,7 +268,7 @@ public class SaccEntity : UdonSharpBehaviour
                 {
                     float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
 
-                    stickdir = (stickdir - 180) * -1;
+                    stickdir = -(stickdir - 180);
                     int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
                     if (!RStickNULL[newselection])
                     { RStickSelection = newselection; }
@@ -309,14 +300,7 @@ public class SaccEntity : UdonSharpBehaviour
                     { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
                     else
                     {
-                        if (RightDialDivideStraightUp)
-                        {
-                            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, (RStickFuncDegrees + .5f) + (RStickFuncDegrees * RStickSelection), 0);
-                        }
-                        else
-                        {
-                            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * RStickSelection, 0);
-                        }
+                        RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * RStickSelection, 0);
                     }
                     RStickSelectionLastFrame = RStickSelection;
                 }

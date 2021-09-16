@@ -23,6 +23,13 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private float FullReloadTimeSec = 8;
     [SerializeField] private AudioSource AGMLock;
     [SerializeField] private AudioSource AGMUnlock;
+    [SerializeField] private bool DoAnimBool = false;
+    [SerializeField] private string AnimBoolName = "AGMSelected";
+    [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
+    [SerializeField] private bool AnimBoolStayTrueOnExit;
+    private float boolToggleTime;
+    private bool AnimOn = false;
+    private int AnimBool_STRING;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool Dial_FunconNULL = true;
@@ -71,6 +78,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         FindSelf();
 
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
+        AnimBool_STRING = Animator.StringToHash(AnimBoolName);
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -91,11 +99,15 @@ public class DFUNC_AGM : UdonSharpBehaviour
         gameObject.SetActive(false);
         func_active = false;
         TriggerLastFrame = false;
+        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_G_RespawnButton()
     {
         NumAGM = FullAGMs;
         AGMAnimator.SetFloat(AGMS_STRING, 1);
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_G_ReSupply()
     {
@@ -110,11 +122,15 @@ public class DFUNC_AGM : UdonSharpBehaviour
         NumAGM = FullAGMs;
         if (func_active)
         { DFUNC_Deselected(); }
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void DFUNC_Selected()
     {
         func_active = true;
         gameObject.SetActive(true);
+        if (DoAnimBool && !AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
     }
     public void DFUNC_Deselected()
     {
@@ -123,6 +139,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
         AtGCam.gameObject.SetActive(false);
         gameObject.SetActive(false);
         TriggerLastFrame = false;
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     //synced variables recieved while object is disabled do not get set until the object is enabled, 1 frame is fine.
     public void EnableForOthers()
@@ -354,6 +372,18 @@ public class DFUNC_AGM : UdonSharpBehaviour
         }
         DialPosition = -999;
         Debug.LogWarning("DFUNC_AGM: Can't find self in dial functions");
+    }
+    public void SetBoolOn()
+    {
+        boolToggleTime = Time.time;
+        AnimOn = true;
+        AGMAnimator.SetBool(AnimBool_STRING, AnimOn);
+    }
+    public void SetBoolOff()
+    {
+        boolToggleTime = Time.time;
+        AnimOn = false;
+        AGMAnimator.SetBool(AnimBool_STRING, AnimOn);
     }
     public void KeyboardInput()
     {

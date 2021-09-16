@@ -29,7 +29,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
     private SaccEntity EntityControl;
-    private float ToggleTime;
+    private float boolToggleTime;
     private bool AnimOn;
     private int AnimBool_STRING;
     private bool UseLeftTrigger = false;
@@ -37,8 +37,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private Rigidbody VehicleRigidbody;
     private bool TriggerLastFrame;
     private bool GunRecoilEmptyNULL = true;
-    [UdonSynced, FieldChangeCallback(nameof(Firing))]
-    private bool _firing;
+    [UdonSynced, FieldChangeCallback(nameof(Firing))] private bool _firing;
     public bool Firing
     {
         set
@@ -91,20 +90,19 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Active");
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active));
         Selected = true;
         if (DoAnimBool && !AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
     }
     public void DFUNC_Deselected()
     {
         if (Selected)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
         Selected = false;
         TriggerLastFrame = false;
-
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -116,11 +114,11 @@ public class DFUNC_Gun : UdonSharpBehaviour
         Piloting = false;
         TriggerLastFrame = false;
         RequestSerialization();
-        if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
+        if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
         Selected = false;
         GunDamageParticle.gameObject.SetActive(false);
         if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -141,6 +139,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
         AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+        if (DoAnimBool && AnimOn)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void Set_Active()
     {
@@ -161,13 +161,13 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_O_TakeOwnership()
     {
         if (_firing)//if someone times out, tell weapon to stop firing if you take ownership.
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Set_Inactive"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
     }
     public void SFEXT_G_Explode()
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void LateUpdate()
     {
@@ -444,13 +444,13 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void SetBoolOn()
     {
-        ToggleTime = Time.time;
+        boolToggleTime = Time.time;
         AnimOn = true;
         GunAnimator.SetBool(AnimBool_STRING, AnimOn);
     }
     public void SetBoolOff()
     {
-        ToggleTime = Time.time;
+        boolToggleTime = Time.time;
         AnimOn = false;
         GunAnimator.SetBool(AnimBool_STRING, AnimOn);
     }

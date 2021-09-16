@@ -214,7 +214,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
 
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 CurrentVel = Vector3.zero;
+    [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public bool Occupied = false; //this is true if someone is sitting in pilot seat
@@ -384,7 +384,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             InEditor = false;
             InVR = localPlayer.IsUserInVR();
-            if (localPlayer.isMaster)
+            if (localPlayer.isInstanceOwner)
             {
                 VehicleRigidbody.WakeUp();
                 VehicleRigidbody.constraints = RigidbodyConstraints.None;
@@ -1084,6 +1084,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
             //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
             //AirSpeed = AirVel.magnitude;
         }
+        if (Piloting)
+        { Debug.Log(string.Concat("ExtraDrag: ", ExtraDrag.ToString())); }
     }
     private void FixedUpdate()
     {
