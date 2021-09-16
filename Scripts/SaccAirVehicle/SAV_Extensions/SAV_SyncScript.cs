@@ -52,7 +52,6 @@ public class SaccSyncScript : UdonSharpBehaviour
     private Vector3 O_LastPosition2;
     private float SmoothingTimeDivider;
     private float UpdateTime;
-
     private void Start()
     {
         gameObject.SetActive(false);
@@ -93,9 +92,11 @@ public class SaccSyncScript : UdonSharpBehaviour
                         O_Position = VehicleTransform.position;
                         O_Rotation_Q = VehicleTransform.rotation;
                         Vector3 rot = VehicleTransform.rotation.eulerAngles * 182.0444444444444f;//convert 360 to 65536
+
                         O_RotationX = (ushort)Mathf.Floor(Mathf.Max(0, rot.x));//i don't know why but it can crash thinking it's below 0 so Max to 0
                         O_RotationY = (ushort)Mathf.Floor(Mathf.Max(0, rot.y));
                         O_RotationZ = (ushort)Mathf.Floor(Mathf.Max(0, rot.z));
+
                         O_CurVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
                         O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
                         RequestSerialization();
@@ -147,7 +148,7 @@ public class SaccSyncScript : UdonSharpBehaviour
             LastPing = Ping;
             L_LastUpdateTime = L_UpdateTime;
             LastCurAngMom = CurAngMom;
-            float updatedelta = (float)(O_UpdateTime - O_LastUpdateTime) * .001f;
+            float updatedelta = (float)(O_UpdateTime - O_LastUpdateTime);
             float speednormalizer = 1 / updatedelta;
 
             L_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);

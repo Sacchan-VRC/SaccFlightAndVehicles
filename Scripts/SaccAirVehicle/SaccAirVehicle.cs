@@ -1083,9 +1083,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
             rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//so passengers can hear the airbrake
             //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
             //AirSpeed = AirVel.magnitude;
-        }
+        }/* 
         if (Piloting)
-        { Debug.Log(string.Concat("ExtraDrag: ", ExtraDrag.ToString())); }
+        { Debug.Log(string.Concat("ExtraDrag: ", ExtraDrag.ToString())); } */
     }
     private void FixedUpdate()
     {
