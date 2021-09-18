@@ -23,6 +23,8 @@ public class SaccEntity : UdonSharpBehaviour
     public GameObject InVehicleOnly;
     [Tooltip("Object that is enabled when entering vehicle in pilot seat")]
     public GameObject PilotOnly;
+    [Tooltip("Object that is enabled when holding this object")]
+    public GameObject HoldingOnly;
     [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
     public Transform CenterOfMass;
     [Tooltip("Oneshot sound played each time function selection changes")]
@@ -56,7 +58,7 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
     [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
     [System.NonSerializedAttribute] public bool dead = false;
-    [System.NonSerializedAttribute] public bool Piloting = false;
+    [System.NonSerializedAttribute] public bool Using = false;
     [System.NonSerializedAttribute] public bool Passenger = false;
     [System.NonSerializedAttribute] public bool InVehicle = false;
     [System.NonSerializedAttribute] public bool InVR = false;
@@ -72,6 +74,8 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PilotExitTime;
     [System.NonSerializedAttribute] public float PilotEnterTime;
     [System.NonSerializedAttribute] public bool Holding;
+    [System.NonSerializedAttribute] public bool LStickDisplayHighlighterNULL;
+    [System.NonSerializedAttribute] public bool RStickDisplayHighlighterNULL;
     //end of old Leavebutton stuff
     private void Start()
     {
@@ -84,7 +88,7 @@ public class SaccEntity : UdonSharpBehaviour
         else
         {
             IsOwner = true;
-            Piloting = true;
+            Using = true;
             InVehicle = true;
         }
 
@@ -105,6 +109,9 @@ public class SaccEntity : UdonSharpBehaviour
 
         //Dial Stuff
         SwitchFunctionSoundNULL = SwitchFunctionSound == null;
+
+        LStickDisplayHighlighterNULL = LStickDisplayHighlighter == null;
+        RStickDisplayHighlighterNULL = RStickDisplayHighlighter == null;
 
         LStickNumFuncs = Dial_Functions_L.Length;
         RStickNumFuncs = Dial_Functions_R.Length;
@@ -200,7 +207,7 @@ public class SaccEntity : UdonSharpBehaviour
     }
     private void Update()
     {
-        if (Piloting)
+        if (Using)
         {
             Vector2 LStickPos = new Vector2(0, 0);
             Vector2 RStickPos = new Vector2(0, 0);
@@ -251,11 +258,14 @@ public class SaccEntity : UdonSharpBehaviour
                         else { CurrentSelectedFunctionL = null; }
                     }
                     if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
-                    if (LStickSelection < 0)
-                    { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
-                    else
+                    if (!LStickDisplayHighlighterNULL)
                     {
-                        LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * LStickSelection, 0);
+                        if (LStickSelection < 0)
+                        { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+                        else
+                        {
+                            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -LStickFuncDegrees * LStickSelection);
+                        }
                     }
                     LStickSelectionLastFrame = LStickSelection;
                 }
@@ -296,11 +306,14 @@ public class SaccEntity : UdonSharpBehaviour
                         else { CurrentSelectedFunctionR = null; }
                     }
                     if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
-                    if (RStickSelection < 0)
-                    { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); }
-                    else
+                    if (!RStickDisplayHighlighterNULL)
                     {
-                        RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * RStickSelection, 0);
+                        if (RStickSelection < 0)
+                        { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+                        else
+                        {
+                            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -RStickFuncDegrees * RStickSelection);
+                        }
                     }
                     RStickSelectionLastFrame = RStickSelection;
                 }
@@ -332,7 +345,7 @@ public class SaccEntity : UdonSharpBehaviour
     }
     public void PilotEnterVehicleLocal()//called from PilotSeat
     {
-        Piloting = true;
+        Using = true;
         InVehicle = true;
         if (LStickNumFuncs == 1)
         {
@@ -344,8 +357,10 @@ public class SaccEntity : UdonSharpBehaviour
             Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected");
             Dial_Functions_R[0].SetProgramVariable("TriggerLastFrame", true);
         }
-        LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
-        RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180);
+        if (!LStickDisplayHighlighterNULL)
+        { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+        if (!RStickDisplayHighlighterNULL)
+        { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
 
         if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
         //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
@@ -378,7 +393,7 @@ public class SaccEntity : UdonSharpBehaviour
         SendEventToExtensions("SFEXT_G_PilotExit");
         if (player.isLocal)
         {
-            Piloting = false;
+            Using = false;
             InVehicle = false;
             if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
             if (PilotOnly != null) { PilotOnly.SetActive(false); }
@@ -418,11 +433,15 @@ public class SaccEntity : UdonSharpBehaviour
     public override void OnPickup()
     {
         Holding = true;
+        Using = true;
+        HoldingOnly.SetActive(true);
         SendEventToExtensions("SFEXT_O_PickedUp");
     }
     public override void OnDrop()
     {
         Holding = false;
+        Using = true;
+        HoldingOnly.SetActive(false);
         SendEventToExtensions("SFEXT_O_Dropped");
     }
     public override void OnPickupUseDown()

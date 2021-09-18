@@ -207,7 +207,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
             }
             float BackThrustAmount = -((Vector3.Dot(Vel, forward)) * BackThrustStrength);
             if (BackThrustAmount > 0)
-            { VehicleRigidbody.AddForce(forward * BackThrustAmount * depth * (float)SAVControl.GetProgramVariable("ThrottleInput")); }
+            { VehicleRigidbody.AddForce(forward * BackThrustAmount * depth * (float)SAVControl.GetProgramVariable("ThrottleInput"), ForceMode.Acceleration); }
             VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * depth, ForceMode.Acceleration);
         }
         else

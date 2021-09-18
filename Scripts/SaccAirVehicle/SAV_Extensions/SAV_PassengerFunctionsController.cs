@@ -140,10 +140,10 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
 
                 if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
                 if (LStickSelection < 0)
-                { if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); } }
+                { if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
                 else
                 {
-                    if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, LStickFuncDegrees * LStickSelection, 0); }
+                    if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, LStickFuncDegrees * LStickSelection); }
                 }
             }
             LStickSelectionLastFrame = LStickSelection;
@@ -180,10 +180,10 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
 
                 if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
                 if (LStickSelection < 0)
-                { if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, 180); } }
+                { if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
                 else
                 {
-                    if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, RStickFuncDegrees * RStickSelection, 0); }
+                    if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, RStickFuncDegrees * RStickSelection); }
                 }
             }
             RStickSelectionLastFrame = RStickSelection;
@@ -247,6 +247,8 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             RStickSelection = 0;
             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
         }
+        if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+        if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
         TakeOwnerShipOfExtensions();
         FunctionsActive = true;
     }

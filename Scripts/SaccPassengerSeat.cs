@@ -13,22 +13,15 @@ public class SaccPassengerSeat : UdonSharpBehaviour
     public GameObject PassengerOnly;
     private int ThisStationID;
     private bool SeatInitialized = false;
-    private Transform Seat;
-    private Quaternion SeatStartRot;
     private VRCPlayerApi localPlayer;
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
-
-        Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
-        SeatStartRot = Seat.localRotation;
     }
     private void Interact()
     {
         if (!SeatInitialized) { InitializeSeat(); }
-        Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle
         localPlayer.UseAttachedStation();
-        Seat.localRotation = SeatStartRot;
 
         EntityControl.MySeat = ThisStationID;
         if (PassengerOnly != null) { PassengerOnly.SetActive(true); }

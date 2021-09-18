@@ -24,9 +24,9 @@ public class SaccSyncScript : UdonSharpBehaviour
     private double StartupTime;
     [UdonSynced(UdonSyncMode.None)] private double O_UpdateTime;
     [UdonSynced(UdonSyncMode.None)] private Vector3 O_Position = Vector3.zero;
-    [UdonSynced(UdonSyncMode.None)] private ushort O_RotationX;
-    [UdonSynced(UdonSyncMode.None)] private ushort O_RotationY;
-    [UdonSynced(UdonSyncMode.None)] private ushort O_RotationZ;
+    [UdonSynced(UdonSyncMode.None)] private short O_RotationX;
+    [UdonSynced(UdonSyncMode.None)] private short O_RotationY;
+    [UdonSynced(UdonSyncMode.None)] private short O_RotationZ;
     [UdonSynced(UdonSyncMode.None)] private Vector3 O_CurVel = Vector3.zero;
     private Vector3 O_Rotation;
     private Quaternion O_Rotation_Q = Quaternion.identity;
@@ -71,6 +71,12 @@ public class SaccSyncScript : UdonSharpBehaviour
         StartupTime = Time.realtimeSinceStartup;
         gameObject.SetActive(true);
     }
+    public void SFEXT_O_Explode()
+    {
+        O_CurVel = Vector3.zero;
+        O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
+        RequestSerialization();//prevent users from predicting you're moving while dead
+    }
     public void SFEXT_O_TakeOwnership()
     {
         IsOwner = true;
@@ -91,11 +97,16 @@ public class SaccSyncScript : UdonSharpBehaviour
                     {
                         O_Position = VehicleTransform.position;
                         O_Rotation_Q = VehicleTransform.rotation;
-                        Vector3 rot = VehicleTransform.rotation.eulerAngles * 182.0444444444444f;//convert 360 to 65536
+                        Vector3 rot = VehicleTransform.rotation.eulerAngles;
 
-                        O_RotationX = (ushort)Mathf.Floor(Mathf.Max(0, rot.x));//i don't know why but it can crash thinking it's below 0 so Max to 0
-                        O_RotationY = (ushort)Mathf.Floor(Mathf.Max(0, rot.y));
-                        O_RotationZ = (ushort)Mathf.Floor(Mathf.Max(0, rot.z));
+                        rot = new Vector3(rot.x > 180 ? rot.x - 360 : rot.x,
+                         rot.y > 180 ? rot.y - 360 : rot.y,
+                          rot.z > 180 ? rot.z - 360 : rot.z)
+                          * 182.0444444444444f;//convert 360 to 65536
+
+                        O_RotationX = (short)Mathf.Min(short.MinValue, Mathf.Floor(rot.x));
+                        O_RotationY = (short)Mathf.Min(short.MinValue, Mathf.Floor(rot.y));
+                        O_RotationZ = (short)Mathf.Min(short.MinValue, Mathf.Floor(rot.z));
 
                         O_CurVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
                         O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
@@ -142,7 +153,7 @@ public class SaccSyncScript : UdonSharpBehaviour
     }
     public override void OnDeserialization()
     {
-        if (O_UpdateTime != O_LastUpdateTime)//only do anything if OnDeserialization was for this script
+        if (O_UpdateTime != O_LastUpdateTime && !IsOwner)//only do anything if OnDeserialization was for this script
         {
             LastAcceleration = Acceleration;
             LastPing = Ping;
@@ -157,11 +168,7 @@ public class SaccSyncScript : UdonSharpBehaviour
             if (Vector3.Dot(Acceleration, LastAcceleration) < 0)//if direction of acceleration changed by more than 180 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             { Acceleration = Vector3.zero; }
 
-            Vector3 recievedRotation = new Vector3(O_RotationX, O_RotationY, O_RotationZ) * .0054931640625f;//65536 to 360
-
-            O_Rotation = new Vector3(recievedRotation.x > 180 ? recievedRotation.x - 360 : recievedRotation.x,
-             recievedRotation.y > 180 ? recievedRotation.y - 360 : recievedRotation.y,
-              recievedRotation.z > 180 ? recievedRotation.z - 360 : recievedRotation.z);
+            O_Rotation = new Vector3(O_RotationX, O_RotationY, O_RotationZ) * .0054931640625f;//65536 to 360
 
             O_Rotation_Q = Quaternion.Euler(O_Rotation);
             //rotate Acceleration by the difference in rotation of plane plane between last and this update to make it match the angle for the next frame better

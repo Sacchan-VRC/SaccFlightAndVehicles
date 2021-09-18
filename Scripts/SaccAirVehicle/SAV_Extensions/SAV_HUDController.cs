@@ -43,6 +43,7 @@ public class SAV_HUDController : UdonSharpBehaviour
     private float RStickFuncDegrees;
     private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
+    private Vector3 VelLerper;
     VRCPlayerApi localPlayer;
     private void Start()
     {
@@ -80,7 +81,15 @@ public class SAV_HUDController : UdonSharpBehaviour
             tempvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
 
-        VelocityIndicator.position = transform.position + tempvel;
+        VelLerper = Vector3.Lerp(VelLerper, tempvel, 7f * Time.smoothDeltaTime);
+        if ((bool)SAVControl.GetProgramVariable("Piloting"))
+        {
+            VelocityIndicator.position = transform.position + tempvel;
+        }
+        else
+        {
+            VelocityIndicator.position = transform.position + VelLerper;
+        }
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
         /////////////////
 

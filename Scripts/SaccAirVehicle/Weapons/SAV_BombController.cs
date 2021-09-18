@@ -9,13 +9,19 @@ public class SAV_BombController : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour BombLauncherControl;
     public SaccEntity EntityControl;
+    [Tooltip("Bomb will explode after this time")]
     [SerializeField] private float MaxLifetime = 40;
+    [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
-    [SerializeField] private bool isRocket;
+    [Tooltip("Spawn bomb at a random angle up to this number")]
     [SerializeField] private float AngleRandomization = 1;
+    [Tooltip("Distance from plane to enable the missile's collider, to prevent bomb from colliding with own plane")]
     [SerializeField] private float ColliderActiveDistance = 30;
+    [Tooltip("How much the bomb's nose is pushed towards direction of movement")]
     [SerializeField] private float StraightenFactor = .1f;
+    [Tooltip("Amount of drag bomb has when moving horizontally/vertically")]
     [SerializeField] private float AirPhysicsStrength = .1f;
+    [Tooltip("Used for making rockets, should probably disable air physics and angle randomization when making rockets.")]
     [SerializeField] private float ForwardThrust = 0f;
     private ConstantForce BombConstant;
     private Rigidbody BombRigid;

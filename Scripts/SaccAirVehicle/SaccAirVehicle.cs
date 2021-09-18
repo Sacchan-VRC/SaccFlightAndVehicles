@@ -124,6 +124,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float TaxiRotationSpeed = 35f;
     [Tooltip("How lerped the taxi movement rotation is")]
     public float TaxiRotationResponse = 2.5f;
+    [Tooltip("Make taxiing more realistic by not allowing vehicle to rotate on the spot")]
+    public bool DisallowTaxiRotationWhileStill = false;
+    [Tooltip("When the above is ticked, This is the speed at which the plane will reach its full turning speed. Meters/second.")]
+    public float TaxiFullTurningSpeed = 20f;
     [Tooltip("Adjust how steep the lift curve is. Higher = more lift")]
     public float Lift = 0.00015f;
     [Tooltip("How much angle of attack on yaw turns the vehicle. Yaw steering strength in air")]
@@ -319,6 +323,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private float EngineOutputLastFrame;
     float VTOLAngle90;
     bool HasWheelColliders = false;
+    private float TaxiFullTurningSpeedDivider;
     private float vtolangledif;
     Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
     [System.NonSerializedAttribute] public float ThrottleStrengthAB;
@@ -489,6 +494,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
         VTOLAngleDivider = VTOLAngleTurnRate / vtolangledif;
         VTOLAngle = VTOLAngleInput = VTOLDefaultValue;
 
+        if (GroundDetectorRayDistance == 0)
+        { DisableGroundDetection++; }
+
         if (GroundEffectEmpty == null)
         {
             Debug.LogWarning("GroundEffectEmpty not found, using CenterOfMass instead");
@@ -505,6 +513,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
         //thrust is lerped towards VTOLThrottleStrengthMulti by VTOLAngle, unless VTOLMaxAngle is greater than 90 degrees, then it's lerped by 90=1
         VTolAngle90Plus = VTOLMaxAngle > 90;
+
+        if (DisallowTaxiRotationWhileStill)
+        {
+            TaxiFullTurningSpeedDivider = 1 / TaxiFullTurningSpeed;
+        }
     }
     private void LateUpdate()
     {
@@ -649,6 +662,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
                         if (!JoystickGripLastFrame)//first frame you gripped joystick
                         {
+                            EntityControl.SendEventToExtensions("SFEXT_O_JoystickGrabbed");
                             PlaneRotDif = Quaternion.identity;
                             if (SwitchHandsJoyThrottle)
                             { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the plane when it was pressed
@@ -702,6 +716,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     {
                         JoystickPosYaw.x = 0;
                         VRPitchRoll = Vector3.zero;
+                        if (JoystickGripLastFrame)//first frame you gripped joystick
+                        { EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped"); }
                         JoystickGripLastFrame = false;
                     }
 
@@ -742,6 +758,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
                         if (!ThrottleGripLastFrame)
                         {
+                            EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
                             ThrottleZeroPoint = HandThrottleAxis;
                             TempThrottle = PlayerThrottle;
                             HandDistanceZLastFrame = 0;
@@ -764,6 +781,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
                     else
                     {
+                        if (ThrottleGripLastFrame)
+                        {
+                            EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                        }
                         ThrottleGripLastFrame = false;
                     }
 
@@ -771,10 +792,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     {
                         AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                                           //rotate if trying to yaw
-                        Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime, TaxiRotationResponse * DeltaTime);
+                        float TaxiingStillMulti = 1;
+                        if (DisallowTaxiRotationWhileStill)
+                        { TaxiingStillMulti = Mathf.Min(Speed * TaxiFullTurningSpeedDivider, 1); }
+                        Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
                         VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
 
-                        StillWindMulti = Mathf.Min(Speed / 10, 1);
+                        StillWindMulti = Mathf.Min(Speed * .1f, 1);
                         ThrustVecGrounded = 0;
                     }
                     else
@@ -1081,8 +1105,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
             rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//so passengers can hear the airbrake
-            //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
-            //AirSpeed = AirVel.magnitude;
+                                                             //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
+                                                             //AirSpeed = AirVel.magnitude;
         }/* 
         if (Piloting)
         { Debug.Log(string.Concat("ExtraDrag: ", ExtraDrag.ToString())); } */
@@ -1097,7 +1121,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, ((((AirFriction + SoundBarrier) * ExtraDrag)) * 90) * DeltaTime);
             //apply pitching using pitch moment
             VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);//deltatime is built into ForceMode.Force
-            //apply yawing using yaw moment
+                                                                                                 //apply yawing using yaw moment
             VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
             //calc Gs
             float gravity = 9.81f * DeltaTime;
@@ -1154,9 +1178,16 @@ public class SaccAirVehicle : UdonSharpBehaviour
             EntityControl.ExitStation();
         }
     }
-    public void SFEXT_L_Destroy()
+    public void SFEXT_O_PlayerJoined()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+        if (GroundedLastFrame)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDown));
+        }
+        if (FloatingLastFrame)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDownWater));
+        }
     }
     public void ReAppear()
     {
@@ -1173,7 +1204,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         PlayerThrottle = 0;//for editor test mode
         EngineOutput = 0;//^
-        //these could get set after death by lag, probably
+                         //these could get set after death by lag, probably
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
@@ -1191,6 +1222,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void TouchDown()
     {
         //Debug.Log("TouchDown");
+        if (GroundedLastFrame) { return; }
         GroundedLastFrame = true;
         Taxiing = true;
         EntityControl.SendEventToExtensions("SFEXT_G_TouchDown");
@@ -1198,6 +1230,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void TouchDownWater()
     {
         //Debug.Log("TouchDownWater");
+        if (FloatingLastFrame) { return; }
         FloatingLastFrame = true;
         Taxiing = true;
         EntityControl.SendEventToExtensions("SFEXT_G_TouchDownWater");
@@ -1206,6 +1239,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         //Debug.Log("TakeOff");
         Taxiing = false;
+        FloatingLastFrame = false;
+        GroundedLastFrame = false;
         EntityControl.SendEventToExtensions("SFEXT_G_TakeOff");
     }
     public void SetAfterburnerOn()
@@ -1329,8 +1364,20 @@ public class SaccAirVehicle : UdonSharpBehaviour
         if (IsOwner)
         {
             Health -= BulletDamageTaken;
-            if (PredictDamage && Health <= 0)
-            { Health = 0.1f; }//the attacker calls the explode function in this case
+            if (PredictDamage && Health <= 0)//the attacker calls the explode function in this case
+            {
+                Health = 0.1f;
+                //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
+                SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself
+            }
+        }
+    }
+    public void CheckLaggyKilled()
+    {
+        //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
+        if (Health == 0.1f)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
         }
     }
     public void SFEXT_L_MissileHit25()
@@ -1566,7 +1613,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         AoALiftPitch = -AoALiftPitch + 1;
         AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), AoaCurveStrength) + 1;//give it a curve
 
-        float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / 90);//linear version to 90 for high aoa
+        float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) * 0.0111111111f/* same as divide by 90 */, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) * 0.0111111111f/* same as divide by 90 */);//linear version to 90 for high aoa
         AoALiftPitchMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighPitchAoaMinControl, 0, 1);
         AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
 
@@ -1574,7 +1621,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         AoALiftYaw = -AoALiftYaw + 1;
         AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
 
-        float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / 90, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) / 90);//linear version to 90 for high aoa
+        float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) * 0.0111111111f/* same as divide by 90 */, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) * 0.0111111111f/* same as divide by 90 */);//linear version to 90 for high aoa
         AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighYawAoaMinControl, 0, 1);
         AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
 

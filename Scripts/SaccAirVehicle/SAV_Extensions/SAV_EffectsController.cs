@@ -179,10 +179,15 @@ public class SAV_EffectsController : UdonSharpBehaviour
     {
         DoEffects = 6f; //wake up if was asleep
     }
-    public void SFEXT_O_PlaneHit()
+    public void SFEXT_L_BulletHit()
+    {
+        VehicleAnimator.SetTrigger(BULLETHIT_STRING);
+        if (DoEffects > 0)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(WakeUp)); }
+    }
+    public void WakeUp()
     {
         DoEffects = 0f;
-        VehicleAnimator.SetTrigger(BULLETHIT_STRING);
     }
     public void SFEXT_G_EnterWater()
     {

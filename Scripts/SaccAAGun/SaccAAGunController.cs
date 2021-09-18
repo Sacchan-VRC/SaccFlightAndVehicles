@@ -54,6 +54,11 @@ public class SaccAAGunController : UdonSharpBehaviour
     [SerializeField] private bool DisableAAMTargeting;
     [Tooltip("Layer vehicles to shoot at are on (for raycast to check for line of sight)")]
     [SerializeField] private float PlaneHitBoxLayer = 17;//walkthrough
+    [Tooltip("Multiplies how much damage is taken from bullets")]
+    [SerializeField] private float BulletDamageTaken = 10f;
+    [SerializeField] private bool PredictDamage = true;
+    [SerializeField] private float PredictedHealth;
+    [SerializeField] private float LastHitTime;
     private float MGAmmoRecharge = 0;
     [System.NonSerializedAttribute] public float MGAmmoFull = 4;
     private float FullMGDivider;
@@ -250,10 +255,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                             if (AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                             {
                                 AAMLastFiredTime = Time.time;
-                                if (InEditor)
-                                { LaunchAAM(); }
-                                else
-                                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAAM)); }
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAAM));
                                 if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                             }
                         }
@@ -358,7 +360,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     {
         AAGunAnimator.SetTrigger("reappear");
         dead = false;
-        if (localPlayer == null || IsOwner)
+        if (IsOwner)
         {
             Health = FullHealth;
         }
@@ -368,15 +370,58 @@ public class SaccAAGunController : UdonSharpBehaviour
         Health = FullHealth;
         EntityControl.dead = false;
     }
+    public void SendBulletHit()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void SFEXT_L_BulletHit()
+    {
+        if (PredictDamage)
+        {
+            if (Time.time - LastHitTime > 2)
+            {
+                PredictedHealth = Health - BulletDamageTaken;
+                if (PredictedHealth <= 0)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                }
+            }
+            else
+            {
+                PredictedHealth -= BulletDamageTaken;
+                if (PredictedHealth <= 0)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                }
+            }
+            LastHitTime = Time.time;
+        }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBulletHit));
+    }
     public void SFEXT_G_BulletHit()
     {
-        if (InEditor || IsOwner)
+        if (IsOwner)
         {
-            Health -= 10;
+            Health -= BulletDamageTaken;
             if (Health <= 0)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                if (PredictDamage)//the attacker calls the explode function in this case
+                {
+                    Health = 0.1f;
+                    //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
+                    SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself}
+                }
+                else
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode)); }
             }
+        }
+    }
+    public void CheckLaggyKilled()
+    {
+        //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
+        if (Health == 0.1f)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
         }
     }
     private void AAMTargeting(float Lock_Angle)

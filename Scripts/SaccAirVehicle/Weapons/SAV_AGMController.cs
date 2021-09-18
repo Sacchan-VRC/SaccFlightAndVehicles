@@ -9,10 +9,15 @@ public class SAV_AGMController : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour AGMLauncherControl;
     public SaccEntity EntityControl;
+    [Tooltip("Missile will explode after this time")]
     [SerializeField] private float MaxLifetime = 20;
+    [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
+    [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from colliding with own plane")]
     [SerializeField] private float ColliderActiveDistance = 30;
-    [SerializeField] private float LockAngle;
+    [Tooltip("Max angle able to track target at")]
+    [SerializeField] private float LockAngle = 90;
+    [Tooltip("Maximum speed missile can rotate")]
     [SerializeField] private float RotSpeed = 15;
     private Transform CenterOfMass;
     private Vector3 Target;
@@ -44,7 +49,7 @@ public class SAV_AGMController : UdonSharpBehaviour
                 ColliderActive = true;
             }
         }
-        if (Vector3.Angle(transform.forward, (Target - transform.position)) < (LockAngle))
+        if (Vector3.Angle(transform.forward, (Target - transform.position)) < LockAngle)
         {
             var missileToTargetVector = Target - transform.position;
             var missileForward = transform.forward;

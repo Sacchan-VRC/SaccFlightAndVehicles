@@ -98,7 +98,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
             FlareParticles[x].Emit(emitParams, 1);
         }
         { SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") + 1); }
-        SAVControl.SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
+        SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
     }
     public void KeyboardInput()
     {

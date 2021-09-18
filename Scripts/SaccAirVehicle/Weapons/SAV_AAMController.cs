@@ -9,12 +9,17 @@ public class SAV_AAMController : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour AAMLauncherControl;
     public SaccEntity EntityControl;
+    [Tooltip("Missile will explode after this time")]
     [SerializeField] private float MaxLifetime = 12;
     [Tooltip("Strength of the effect of countermeasures on the missile")]
     [SerializeField] private float FlareEffect = 1;
+    [Tooltip("Name of integer to +1 on the target plane while chasing it")]
     [SerializeField] private string AnimINTName = "missilesincoming";
+    [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
+    [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from collider with own plane")]
     [SerializeField] private float ColliderActiveDistance = 45;
+    [Tooltip("Maximum speed missile can rotate")]
     [SerializeField] private float RotSpeed = 400;
     [Tooltip("Missile tracks weaker if target's throttle is low, this value is the throttle at which lowering throttle more doesn't do anything")]
     [SerializeField] private float TargetLowThrottleTrack = .3f;
@@ -226,12 +231,12 @@ public class SAV_AAMController : UdonSharpBehaviour
         AAMCollider.enabled = false;
         Animator AAMani = GetComponent<Animator>();
         float DamageDist = 999f;
-        if (!SAVControlNull)
+        if (!TargetSAVNULL)
         {
             TargetEntityControl.LastAttacker = EntityControl;
             DamageDist = Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position) / ProximityExplodeDistance;
         }
-        if (IsOwner)
+        if (IsOwner && !TargetSAVNULL)
         {
             if (DamageDist < 1 && !HitTarget)
             {

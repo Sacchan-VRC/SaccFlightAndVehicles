@@ -91,6 +91,10 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
         }
     }
+    public void SFEXT_O_JoyStickDropped()
+    {
+        AltHoldPitchIntegrator = 0;
+    }
     public void ActivateAltHold()
     {
         if (AltHold) { return; }

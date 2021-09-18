@@ -8,9 +8,11 @@ using VRC.Udon;
 public class DFUNC_ToggleBool : UdonSharpBehaviour
 {
     [SerializeField] private Animator BoolAnimator;
-    [SerializeField] private string AnimBoolName = "AnimBool";
+    [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing\n If this is enabled, the only other setting that doesn anything here is Dial_Funcon")]
+    [SerializeField] private UdonSharpBehaviour MasterToggle;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
+    [SerializeField] private string AnimBoolName = "AnimBool";
     public bool OnDefault = false;
     [Tooltip("Set toggle to its default when exiting?")]
     [SerializeField] private bool PilotExitTurnOff = true;
@@ -20,8 +22,6 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     [Header("Door Only:")]
     [SerializeField] private UdonSharpBehaviour SoundControl;
     [SerializeField] private float DoorCloseTime = 2;
-    [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing")]
-    [SerializeField] private UdonSharpBehaviour MasterToggle;
     private bool Dial_FunconNULL = true;
     private bool AnimOn = false;
     private float ToggleTime;
@@ -34,6 +34,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
+        Dial_FunconNULL = Dial_Funcon == null;
         if (MasterToggle != null)
         {
             IsSecondary = true;
@@ -48,7 +49,6 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         {
             if (OpensDoor && (ToggleMinDelay < DoorCloseTime)) { ToggleMinDelay = DoorCloseTime; }
             AnimBool_STRING = Animator.StringToHash(AnimBoolName);
-            Dial_FunconNULL = Dial_Funcon == null;
             if (OnDefault)
             {
                 SetBoolOn();

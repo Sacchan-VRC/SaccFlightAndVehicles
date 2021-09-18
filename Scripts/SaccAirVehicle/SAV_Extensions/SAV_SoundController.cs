@@ -521,36 +521,33 @@ public class SAV_SoundController : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (AllDoorsClosed) { SetSoundsInside(); }
-        if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
         Piloting = true;
         InVehicle = true;
+        if (AllDoorsClosed) { SetSoundsInside(); }
+        if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
     }
     public void SFEXT_O_PilotExit()
     {
-        if (!RollingNull) { PlaneWind.Stop(); }
         Piloting = false;
         InVehicle = false;
+        if (!PlaneWindNull) { PlaneWind.Stop(); }
         if (!UnderwaterNull) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
         if (AllDoorsClosed)
-        {
-            SetSoundsOutside();
-        }
+        { SetSoundsOutside(); }
     }
     public void SFEXT_P_PassengerEnter()
     {
-        if (!PlaneWindNull) { PlaneWind.Play(); PlaneWind.volume = 0; }
-        if (AllDoorsClosed) { SetSoundsInside(); }
-        if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
         Passenger = true;
         InVehicle = true;
+        if (AllDoorsClosed) { SetSoundsInside(); }
+        if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
     }
     public void SFEXT_P_PassengerExit()
     {
-        if (!PlaneWindNull) PlaneWind.Stop();
-        if (!UnderwaterNull) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
         Passenger = false;
         InVehicle = false;
+        if (!PlaneWindNull) PlaneWind.Stop();
+        if (!UnderwaterNull) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
         if (AllDoorsClosed)
         { SetSoundsOutside(); }
     }
@@ -566,14 +563,17 @@ public class SAV_SoundController : UdonSharpBehaviour
             if (!thrust.isPlaying)
             { thrust.Play(); }
         }
-        if (!PlaneIdleNull && !PlaneIdle[0].isPlaying)
+        if (!InVehicle || !AllDoorsClosed)
         {
-            foreach (AudioSource idle in PlaneIdle)
-            { idle.Play(); }
-        }
-        if (!PlaneDistantNull && !PlaneDistant.isPlaying)
-        {
-            { PlaneDistant.Play(); }
+            if (!PlaneIdleNull && !PlaneIdle[0].isPlaying)
+            {
+                foreach (AudioSource idle in PlaneIdle)
+                { idle.Play(); }
+            }
+            if (!PlaneDistantNull && !PlaneDistant.isPlaying)
+            {
+                { PlaneDistant.Play(); }
+            }
         }
         soundsoff = false;
     }
@@ -692,8 +692,6 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
         PlaneThrustVolume *= InVehicleThrustVolumeFactor;
 
-        if (!PlaneWindNull) { PlaneWind.Play(); }
-
         if (!RollingNull)
         {
             Rolling.Play();
@@ -708,7 +706,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (!PlaneDistantNull && PlaneDistant.isPlaying)
         { PlaneDistant.Stop(); }
         if (!PlaneWindNull && !PlaneWind.isPlaying)
-        { PlaneWind.Play(); }
+        { PlaneWind.volume = 0; PlaneWind.Play(); }
         if (!PlaneInsideNull && !PlaneInside.isPlaying)
         { PlaneInside.Play(); }
         if (!PlaneIdleNull && PlaneIdle[0].isPlaying)
@@ -728,14 +726,11 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
             foreach (AudioSource thrust in Thrust) { thrust.Play(); }
-            if (!PlaneDistantNull) PlaneDistant.Play();
+            if (!PlaneDistantNull) { PlaneDistant.Play(); }
             PlaneIdleVolume = PlaneIdleTargetVolume * .4f;
             PlaneThrustVolume *= PlaneThrustTargetVolume * InVehicleThrustVolumeFactorReverse;
             PlaneDistantVolume = PlaneThrustVolume;
-            if (!PlaneInsideNull)
-            {
-                PlaneIdlePitch = PlaneInside.pitch;
-            }
+            if (!PlaneInsideNull) { PlaneIdlePitch = PlaneInside.pitch; }
         }
     }
     public void ResupplySound()
