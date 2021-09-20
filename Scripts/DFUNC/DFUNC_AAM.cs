@@ -22,6 +22,16 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private string AnimBoolName = "AAMSelected";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
+    [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private short _AAMFire;
+    public short AAMFire
+    {
+        set
+        {
+            _AAMFire = value;
+            LaunchAAM();
+        }
+        get => _AAMFire;
+    }
     private float boolToggleTime;
     private bool AnimOn = false;
     private int AnimBool_STRING;
@@ -90,6 +100,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
             AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
         }
     }
+    public void SFEXT_G_PilotExit()
+    {
+        if (OthersEnabled)
+        { DisableForOthers(); }
+        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
+        { SetBoolOff(); }
+    }
     public void SFEXT_O_PilotExit()
     {
         Pilot = false;
@@ -103,9 +120,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMTargeting.gameObject.SetActive(false);
         AAMTargetLock.gameObject.SetActive(false);
         AAMTargetIndicator.localRotation = Quaternion.identity;
-
-        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -119,7 +133,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             DFUNC_Deselected();
         }
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+        { SetBoolOff(); }
     }
     public void SFEXT_G_ReSupply()
     {
@@ -134,7 +148,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         NumAAM = FullAAMs;
         AAMAnimator.SetFloat(AAMS_STRING, 1);
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+        { SetBoolOff(); }
     }
     public void SFEXT_G_TouchDown()
     {
@@ -147,7 +161,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
         gameObject.SetActive(true);
         func_active = true;
         AAMTargetIndicator.gameObject.SetActive(true);
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers));
+        if (!OthersEnabled)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
 
         if (DoAnimBool && !AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -212,7 +227,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         if (AAMLocked && !(bool)SAVControl.GetProgramVariable("Taxiing") && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                         {
                             AAMLastFiredTime = Time.time;
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchAAM));
+                            AAMFire++;//launch AAM using set
+                            RequestSerialization();
                             if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
                             if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                             { EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch"); }

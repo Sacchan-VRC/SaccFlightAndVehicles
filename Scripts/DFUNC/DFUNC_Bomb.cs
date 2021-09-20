@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Bomb : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
@@ -25,6 +25,16 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     [SerializeField] private string AnimBoolName = "BombSelected";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
+    [UdonSynced, FieldChangeCallback(nameof(BombFire))] private short _BombFire;
+    public short BombFire
+    {
+        set
+        {
+            _BombFire = value;
+            LaunchBomb();
+        }
+        get => _BombFire;
+    }
     private float boolToggleTime;
     private bool AnimOn = false;
     private int AnimBool_STRING;
@@ -41,6 +51,9 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private Transform VehicleTransform;
     private float reloadspeed;
     private bool LeftDial = false;
+    private bool Piloting = false;
+    private bool OthersEnabled = false;
+    private bool func_active = false;
     private int DialPosition = -999;
     private VRCPlayerApi localPlayer;
     [System.NonSerializedAttribute] public bool IsOwner;
@@ -65,14 +78,21 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
+        Piloting = true;
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
+    }
+    public void SFEXT_G_PilotExit()
+    {
+        if (OthersEnabled) { DisableForOthers(); }
+        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
+        { SetBoolOff(); }
     }
     public void SFEXT_O_PilotExit()
     {
+        func_active = false;
+        Piloting = false;
         gameObject.SetActive(false);
         TriggerLastFrame = false;
-        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -80,24 +100,28 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        func_active = true;
         TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
         if (DoAnimBool && !AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
+        if (!OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
     }
     public void DFUNC_Deselected()
     {
+        func_active = false;
         gameObject.SetActive(false);
         TriggerLastFrame = false;
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+        if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
     }
     public void SFEXT_G_Explode()
     {
         BombPoint = 0;
         NumBomb = FullBombs;
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SetBoolOff(); }
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -105,7 +129,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         BombAnimator.SetFloat(BOMBS_STRING, 1);
         BombPoint = 0;
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SetBoolOff(); }
     }
     public void SFEXT_G_ReSupply()
     {
@@ -116,39 +140,56 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         BombPoint = 0;
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }
+    public void EnableForOthers()
+    {
+        if (!Piloting)
+        { gameObject.SetActive(true); }
+        OthersEnabled = true;
+    }
+    public void DisableForOthers()
+    {
+        if (!Piloting)
+        { gameObject.SetActive(false); }
+        OthersEnabled = false;
+    }
     private void Update()
     {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-        if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
+        if (func_active)
         {
-            if (!TriggerLastFrame)
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
             {
-                if (NumBomb > 0 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((Time.time - LastBombDropTime) > BombDelay))
+                if (!TriggerLastFrame)
                 {
-                    LastBombDropTime = Time.time;
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
-                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
-                    { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+                    if (NumBomb > 0 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((Time.time - LastBombDropTime) > BombDelay))
+                    {
+                        LastBombDropTime = Time.time;
+                        BombFire++;
+                        RequestSerialization();
+                        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                        { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+                    }
                 }
-            }
-            else//launch every BombHoldDelay
-                if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !(bool)SAVControl.GetProgramVariable("Taxiing"))
-            {
+                else//launch every BombHoldDelay
+                    if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !(bool)SAVControl.GetProgramVariable("Taxiing"))
                 {
-                    LastBombDropTime = Time.time;
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchBomb");
-                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
-                    { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+                    {
+                        LastBombDropTime = Time.time;
+                        BombFire++;
+                        RequestSerialization();
+                        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                        { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+                    }
                 }
-            }
 
-            TriggerLastFrame = true;
+                TriggerLastFrame = true;
+            }
+            else { TriggerLastFrame = false; }
         }
-        else { TriggerLastFrame = false; }
     }
     public void LaunchBomb()
     {

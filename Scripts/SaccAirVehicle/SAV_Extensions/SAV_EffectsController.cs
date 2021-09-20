@@ -19,7 +19,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private bool SplashNULL;
     private bool TrailsOn;
     private bool HasTrails;
-    private bool EngineControlNull = true;
     private bool JoyStickNull = true;
     [System.NonSerializedAttribute] public bool FrontWheelNull = true;
     private bool vapor;
@@ -58,8 +57,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
 
     private void Start()
     {
-        if (SAVControl != null) EngineControlNull = false;
-
         FullHealthDivider = 1f / SAVControl.Health;
         HasTrails = Trails.Length > 0;
 

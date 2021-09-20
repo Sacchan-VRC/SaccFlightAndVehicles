@@ -110,6 +110,11 @@ public class DFUNC_Gun : UdonSharpBehaviour
         GunDamageParticle.gameObject.SetActive(true);
         Piloting = true;
     }
+    public void SFEXT_G_PilotExit()
+    {
+        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
+        { SetBoolOff(); }
+    }
     public void SFEXT_O_PilotExit()
     {
         Piloting = false;
@@ -118,8 +123,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
         if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
         Selected = false;
         GunDamageParticle.gameObject.SetActive(false);
-        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -141,7 +144,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         GunAmmoInSeconds = FullGunAmmoInSeconds;
         AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+        { SetBoolOff(); }
     }
     public void Set_Active()
     {
@@ -168,7 +171,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+        { SetBoolOff(); }
     }
     public void LateUpdate()
     {

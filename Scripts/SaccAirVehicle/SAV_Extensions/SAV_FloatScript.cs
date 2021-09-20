@@ -16,9 +16,13 @@ public class SAV_FloatScript : UdonSharpBehaviour
     private Transform VehicleTransform;
     [Tooltip("Multiplier for the forces pushing up")]
     [SerializeField] private float FloatForce = 5;
+    [Tooltip("Max possible value to increase force by based on depth. Prevent objects from moving way too fast if dragged to the bottom of the water")]
+    [SerializeField] private float MaxDepthForce = 25;
     [Tooltip("Value that the floating forces are multiplied by while vehicle is moving down in water. Higher = more stable floating")]
     [SerializeField] private float Compressing = 25;
-    [Tooltip("Physical siez of the simulated spherical float")]
+    [Tooltip("Prevent extra force from compression becoming too high if the object is teleported deep underwater")]
+    [SerializeField] private float MaxCompressingForce = 25;
+    [Tooltip("Physical size of the simulated spherical float in meters")]
     [SerializeField] private float FloatRadius = .6f;
     [Tooltip("Strength of drag force applied by perpendicular movement in water (applied at floats)")]
     [SerializeField] private float WaterSidewaysDrag = 1f;
@@ -35,9 +39,9 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [SerializeField] private float WaveSpeed = 12;
     [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
     [SerializeField] private bool DoOnLand = false;
-    [Header("HoverBike Only")]
     [Tooltip("If a player takes ownership of the vehicle while its floats are below the water, the new owner will not know they are below the water and it will fall through the water. Move the vehicle up by this amount to prevent this from happening.")]
     public float MoveUpOnTakeOwnerShip = 2f;
+    [Header("HoverBike Only")]
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     public bool HoverBike = false;
     [Tooltip("Disable ground detection on attached vehicle (disable 'taxiing' movement)")]
@@ -152,13 +156,13 @@ public class SAV_FloatScript : UdonSharpBehaviour
                 FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat;
                 float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]));
                 if (CompressionDifference > 0)
-                { CompressionDifference *= Compressing; }
+                { CompressionDifference = Mathf.Min(CompressionDifference * Compressing, MaxCompressingForce); }
                 else
                 {
                     CompressionDifference = 0;
                 }
                 FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
-                FloatPointForce[currentfloatpoint] = Vector3.up * (((FloatDepth[currentfloatpoint] * FloatForce) + CompressionDifference));
+                FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], MaxDepthForce) * FloatForce) + CompressionDifference));
                 //Debug.Log(string.Concat(currentfloatpoint.ToString(), ": floating: CompressonDif: ", CompressionDifference.ToString()));
                 //Debug.Log(string.Concat(currentfloatpoint.ToString(), ": floating: floatpointforce: ", FloatPointForce[currentfloatpoint].ToString()));
             }
@@ -179,14 +183,15 @@ public class SAV_FloatScript : UdonSharpBehaviour
         {
             depth += FloatDepth[i];
         }
+        float DepthMaxd = Mathf.Min(depth, MaxDepthForce);
         if (depth > 0)
         {//apply last calculated floating force for each floatpoint to respective floatpoints
             for (int i = 0; i != FloatPoints.Length; i++)
             {
                 VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.Acceleration);
             }
-            VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * depth * WaterRotDrag);
-            VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * depth * WaterVelDrag);
+            VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * DepthMaxd * WaterRotDrag);
+            VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * DepthMaxd * WaterVelDrag);
             if (!SAVControlNULL && !HoverBike) { SAVControl.SetProgramVariable("Floating", true); }
         }
         else
@@ -213,14 +218,14 @@ public class SAV_FloatScript : UdonSharpBehaviour
             }
             float BackThrustAmount = -((Vector3.Dot(Vel, forward)) * BackThrustStrength);
             if (BackThrustAmount > 0)
-            { VehicleRigidbody.AddForce(forward * BackThrustAmount * depth * (float)SAVControl.GetProgramVariable("ThrottleInput"), ForceMode.Acceleration); }
-            VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * depth, ForceMode.Acceleration);
+            { VehicleRigidbody.AddForce(forward * BackThrustAmount * DepthMaxd * (float)SAVControl.GetProgramVariable("ThrottleInput"), ForceMode.Acceleration); }
+            VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * DepthMaxd, ForceMode.Acceleration);
         }
         else
         {
-            VehicleRigidbody.AddForceAtPosition(right * -sidespeed * WaterSidewaysDrag * depth, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
+            VehicleRigidbody.AddForceAtPosition(right * -sidespeed * WaterSidewaysDrag * DepthMaxd, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
         }
-        VehicleRigidbody.AddForceAtPosition(forward * -forwardspeed * WaterForwardDrag * depth, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
+        VehicleRigidbody.AddForceAtPosition(forward * -forwardspeed * WaterForwardDrag * DepthMaxd, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
 
         currentfloatpoint++;
         if (currentfloatpoint == FPLength) { currentfloatpoint = 0; }

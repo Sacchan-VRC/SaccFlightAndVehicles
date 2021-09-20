@@ -197,7 +197,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                 SaccEntity TargetEntity = other.gameObject.GetComponent<SaccEntity>();
                 if (TargetEntity != null)
                 {
-                    TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit100");
+                    TargetEntity.SendEventToExtensions("SFEXT_L_MissileHit100");
                 }
             }
             Explode();

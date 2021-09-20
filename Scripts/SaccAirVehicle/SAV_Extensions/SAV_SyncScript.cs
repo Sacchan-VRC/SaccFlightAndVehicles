@@ -5,7 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-public class SaccSyncScript : UdonSharpBehaviour
+public class SAV_SyncScript : UdonSharpBehaviour
 {
     // whispers to Zwei, "it's okay"
     [SerializeField] private UdonSharpBehaviour SAVControl;
@@ -72,12 +72,6 @@ public class SaccSyncScript : UdonSharpBehaviour
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
         StartupTime = Time.realtimeSinceStartup;
         gameObject.SetActive(true);
-    }
-    public void SFEXT_O_Explode()
-    {
-        O_CurVel = Vector3.zero;
-        O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
-        RequestSerialization();//prevent users from predicting you're moving while dead
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -170,7 +164,7 @@ public class SaccSyncScript : UdonSharpBehaviour
 
             L_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
             Ping = (float)(L_UpdateTime - O_UpdateTime);
-            //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so send based on position
+            //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
             Vector3 CurrentVelocity;
             if (O_CurVel.sqrMagnitude == 0)
             { CurrentVelocity = (O_Position - O_LastPosition) * speednormalizer; }
@@ -181,9 +175,6 @@ public class SaccSyncScript : UdonSharpBehaviour
             { Acceleration = Vector3.zero; }
 
             O_Rotation = new Vector3(O_RotationX, O_RotationY, O_RotationZ) * .0054931640625f;//65536 to 360
-
-
-
 
             O_Rotation_Q = Quaternion.Euler(O_Rotation);
             //rotate Acceleration by the difference in rotation of plane plane between last and this update to make it match the angle for the next frame better

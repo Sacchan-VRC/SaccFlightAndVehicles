@@ -306,10 +306,10 @@ public class SaccEntity : UdonSharpBehaviour
             }
         }
 
-        if (InVehicle && !InEditor)
+        if (InVehicle)
         {
             if (Input.GetKeyDown(KeyCode.Return) || (InVR && Input.GetButtonDown("Oculus_CrossPlatform_Button4")))
-            { ExitStation(); }
+            { if (!InEditor) ExitStation(); }
         }
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)

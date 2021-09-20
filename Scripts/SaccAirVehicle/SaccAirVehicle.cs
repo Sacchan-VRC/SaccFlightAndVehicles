@@ -1378,10 +1378,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
         }
     }
+    //Add .001 to each value of damage taken to prevent float comparison bullshit
     public void SFEXT_L_MissileHit25()
     {
         if (PredictDamage)
-        { MissileDamagePrediction(.25f); }
+        { MissileDamagePrediction(.251f); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit25));
     }
     public void SendMissileHit25()
@@ -1391,12 +1392,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_G_MissileHit25()
     {
         if (IsOwner)
-        { TakeMissileDamage(.25f); }
+        { TakeMissileDamage(.251f); }
     }
     public void SFEXT_L_MissileHit50()
     {
         if (PredictDamage)
-        { MissileDamagePrediction(.50f); }
+        { MissileDamagePrediction(.501f); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit50));
     }
     public void SendMissileHit50()
@@ -1406,12 +1407,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_G_MissileHit50()
     {
         if (IsOwner)
-        { TakeMissileDamage(.5f); }
+        { TakeMissileDamage(.501f); }
     }
     public void SFEXT_L_MissileHit75()
     {
         if (PredictDamage)
-        { MissileDamagePrediction(.75f); }
+        { MissileDamagePrediction(.751f); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit75));
     }
     public void SendMissileHit75()
@@ -1421,12 +1422,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_G_MissileHit75()
     {
         if (IsOwner)
-        { TakeMissileDamage(.75f); }
+        { TakeMissileDamage(.751f); }
     }
     public void SFEXT_L_MissileHit100()
     {
         if (PredictDamage)
-        { MissileDamagePrediction(1f); }
+        { MissileDamagePrediction(1.001f); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit100));
     }
     public void SendMissileHit100()
@@ -1436,7 +1437,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_G_MissileHit100()
     {
         if (IsOwner)
-        { TakeMissileDamage(1f); }
+        { TakeMissileDamage(1.001f); }
     }
     public void TakeMissileDamage(float damage)
     {

@@ -8,6 +8,10 @@ using VRC.Udon;
 public class SaccTarget : UdonSharpBehaviour
 {
     public float HitPoints = 30f;
+    [Tooltip("Particle collisions will do tih smuch damage")]
+    public float DamageFromBullet = 10f;
+    [Tooltip("Direct hits from missiles or any rigidbody will do this much damage")]
+    public float DamageFromCollision = 30f;
     [Tooltip("Other UdonBehaviours that will recieve the event 'Explode'")]
     public UdonSharpBehaviour[] ExplodeOther;
     private Animator TargetAnimator;
@@ -22,24 +26,23 @@ public class SaccTarget : UdonSharpBehaviour
     void OnParticleCollision(GameObject other)//hit by bullet
     {
         if (other == null) return;
-
-        if (HitPoints <= 10f)//hit does 10 damage, so we're dead
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
-        }
+        if (HitPoints <= DamageFromBullet)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode)); }
         else
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "TargetTakeDamage");
-        }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TargetTakeDamage)); }
     }
     private void OnCollisionEnter(Collision other)
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+        if (other == null) return;
+        if (HitPoints <= DamageFromCollision)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode)); }
+        else
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TargetTakeDamageCollision)); }
     }
     public void TargetTakeDamage()
-    {
-        HitPoints -= 10;
-    }
+    { HitPoints -= DamageFromBullet; }
+    public void TargetTakeDamageCollision()
+    { HitPoints -= DamageFromCollision; }
     public void Explode()
     {
         TargetAnimator.SetTrigger("explode");
@@ -48,7 +51,7 @@ public class SaccTarget : UdonSharpBehaviour
         {
             if (Exploder != null)
             {
-                Exploder.SendCustomEvent("Explode");
+                Exploder.SendCustomEvent(nameof(Explode));
             }
         }
     }

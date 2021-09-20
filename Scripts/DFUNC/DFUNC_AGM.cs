@@ -27,6 +27,16 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private string AnimBoolName = "AGMSelected";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
+    [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private short _AGMFire;
+    public short AGMFire
+    {
+        set
+        {
+            _AGMFire = value;
+            LaunchAGM();
+        }
+        get => _AGMFire;
+    }
     private float boolToggleTime;
     private bool AnimOn = false;
     private int AnimBool_STRING;
@@ -58,6 +68,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private int AGMS_STRING = Animator.StringToHash("AGMs");
     private bool LeftDial = false;
     private int DialPosition = -999;
+    private bool OthersEnabled;
+    private bool Piloting;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -83,6 +95,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         AGMLocked = false;
+        Piloting = true;
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
@@ -90,24 +103,28 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         HUDText_AGM_ammo.text = NumAGM.ToString("F0");
     }
+    public void SFEXT_G_PilotExit()
+    {
+        if (OthersEnabled) { DisableForOthers(); }
+        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
+        { SetBoolOff(); }
+    }
     public void SFEXT_O_PilotExit()
     {
-        if (AGMLocked) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DisableForOthers"); }
         AGMLocked = false;
         AtGScreen.SetActive(false);
         AtGCam.gameObject.SetActive(false);
         gameObject.SetActive(false);
         func_active = false;
+        Piloting = false;
         TriggerLastFrame = false;
-        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
     }
     public void SFEXT_G_RespawnButton()
     {
         NumAGM = FullAGMs;
         AGMAnimator.SetFloat(AGMS_STRING, 1);
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SetBoolOff(); }
     }
     public void SFEXT_G_ReSupply()
     {
@@ -123,7 +140,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         if (func_active)
         { DFUNC_Deselected(); }
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SetBoolOff(); }
     }
     public void DFUNC_Selected()
     {
@@ -131,7 +148,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
         func_active = true;
         gameObject.SetActive(true);
         if (DoAnimBool && !AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
+        if (!OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
     }
     public void DFUNC_Deselected()
     {
@@ -141,17 +159,20 @@ public class DFUNC_AGM : UdonSharpBehaviour
         gameObject.SetActive(false);
         TriggerLastFrame = false;
         if (DoAnimBool && AnimOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+        if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
     }
-    //synced variables recieved while object is disabled do not get set until the object is enabled, 1 frame is fine.
     public void EnableForOthers()
     {
-        gameObject.SetActive(true);
+        if (!Piloting)
+        { gameObject.SetActive(true); }
+        OthersEnabled = true;
     }
     public void DisableForOthers()
     {
-        if (!(bool)SAVControl.GetProgramVariable("Piloting"))
+        if (!Piloting)
         { gameObject.SetActive(false); }
+        OthersEnabled = false;
     }
     private void Update()
     {
@@ -168,7 +189,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
             if (AGMUnlockTimer > 0.4f && AGMLocked == true)
             {
                 //disable for others because they no longer need to sync
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "DisableForOthers");
                 AGMLocked = false;
                 AGMUnlockTimer = 0;
                 AGMUnlocking = 0;
@@ -186,7 +206,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
                         {//locked on, launch missile
                             if (NumAGM > 0 && !(bool)SAVControl.GetProgramVariable("Taxiing"))
                             {
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchAGM");
+                                AGMFire++;//launch AGM using set
+                                RequestSerialization();
                                 if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                                 { EntityControl.SendEventToExtensions("SFEXT_O_AGMLaunch"); }
                             }
@@ -211,7 +232,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                     if (angle < targetangle)
                                     {
                                         //enable for others so they sync the variable
-                                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
                                         targetangle = angle;
                                         AGMTarget = target.collider.transform.position;
                                         AGMLocked = true;
@@ -227,7 +247,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                 if (lockpoint.point != null)
                                 {
                                     //enable for others so they sync the variable
-                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForOthers");
                                     if (!AGMLockNULL)
                                     { AGMLock.Play(); }
                                     AGMTarget = lockpoint.point;

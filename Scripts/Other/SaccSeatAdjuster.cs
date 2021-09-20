@@ -55,7 +55,7 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
         {
             if (localPlayer == null)//find test object relative position for editor testing
             {
-                TargetRelative = TargetHeight.InverseTransformPoint(PositionTest.position);
+                if (PositionTest) { TargetRelative = TargetHeight.InverseTransformPoint(PositionTest.position); }
             }
             else//find head relative position ingame
             {
