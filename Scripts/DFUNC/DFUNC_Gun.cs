@@ -90,6 +90,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active));
         Selected = true;
         if (DoAnimBool && !AnimOn)
@@ -245,7 +246,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
         float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-        bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
+        bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
 
         if (TargetChecker.activeInHierarchy)
         {
@@ -284,7 +285,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
-                    AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
+                    AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
                     if (HUDControl != null)
                     {
                         RelativeTargetVelLastFrame = Vector3.zero;

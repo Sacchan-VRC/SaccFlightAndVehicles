@@ -236,8 +236,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private float LerpedYaw;
     [System.NonSerializedAttribute] public bool ThrottleGripLastFrame = false;
     [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
-    [System.NonSerializedAttribute] public bool LTriggerLastFrame = false;
-    [System.NonSerializedAttribute] public bool RTriggerLastFrame = false;
     Quaternion JoystickZeroPoint;
     Quaternion PlaneRotLastFrame;
     [System.NonSerializedAttribute] public float PlayerThrottle;
@@ -1557,8 +1555,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Taxiinglerper = 0;
         ThrottleGripLastFrame = false;
         JoystickGripLastFrame = false;
-        LTriggerLastFrame = false;
-        RTriggerLastFrame = false;
         DoAAMTargeting = false;
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;

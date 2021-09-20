@@ -143,6 +143,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
         func_active = true;
         AAMTargetIndicator.gameObject.SetActive(true);
@@ -281,7 +282,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
             float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
             float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-            bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
+            bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
 
             if (TargetChecker.activeInHierarchy)
             {
@@ -320,7 +321,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         AAMCurrentTargetSAVControl = NextTargetSAVontrol;
                         AAMLockTimer = 0;
                         AAMTargetedTimer = .9f;//send targeted .1s after targeting so it can't get spammed too fast (and doesnt send if you instantly target something else)
-                        AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
+                        AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
                     }
                 }
             }

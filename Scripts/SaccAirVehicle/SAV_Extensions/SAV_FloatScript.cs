@@ -36,6 +36,8 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
     [SerializeField] private bool DoOnLand = false;
     [Header("HoverBike Only")]
+    [Tooltip("If a player takes ownership of the vehicle while its floats are below the water, the new owner will not know they are below the water and it will fall through the water. Move the vehicle up by this amount to prevent this from happening.")]
+    public float MoveUpOnTakeOwnerShip = 2f;
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     public bool HoverBike = false;
     [Tooltip("Disable ground detection on attached vehicle (disable 'taxiing' movement)")]
@@ -96,6 +98,10 @@ public class SAV_FloatScript : UdonSharpBehaviour
     public void SFEXT_O_TakeOwnership()
     {
         if (!HoverBike) { gameObject.SetActive(true); }
+
+        Vector3 vehpos = VehicleTransform.position;
+        vehpos.y += MoveUpOnTakeOwnerShip;
+        VehicleTransform.position = vehpos;
     }
     public void SFEXT_O_LoseOwnership()
     {

@@ -51,6 +51,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
         func_active = true;
     }

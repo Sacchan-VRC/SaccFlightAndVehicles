@@ -13,7 +13,7 @@ public class SaccViewScreenController : UdonSharpBehaviour
     [Tooltip("If enabled, disable when player is this many meters away from this gameobject")]
     public float DisableDistance = 15;
     [Tooltip("Camera that follows the planes")]
-    public Camera PlaneCamera;
+    public Transform PlaneCamera;
     [Tooltip("Screen that is enabled when turned on")]
     public GameObject ViewScreen;
     public Text ChannelNumberText;
@@ -73,7 +73,7 @@ public class SaccViewScreenController : UdonSharpBehaviour
         }
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (!Disabled)
         {
@@ -84,7 +84,7 @@ public class SaccViewScreenController : UdonSharpBehaviour
                 {
                     TargetEntity = AAMTargets[AAMTarget].GetComponent<SaccEntity>();
                     TargetCoM = TargetEntity.CenterOfMass;
-                    PlaneCamera.transform.rotation = TargetEntity.transform.rotation;
+                    PlaneCamera.rotation = TargetEntity.transform.rotation;
                 }
             }
             currenttarget = AAMTarget;
@@ -98,9 +98,6 @@ public class SaccViewScreenController : UdonSharpBehaviour
                     Disabled = true;
                 }
             }
-            //        if (TargetEngine.EffectsControl.LargeEffectsOnly)
-            //        { TargetEngine.EffectsControl.Effects(); }//this is skipped in effectscontroller as an optimization if plane is distant, but the camera can see it close up, so do it here.
-
             var VehicleTrans = TargetEntity.transform;
             Quaternion NewRot;
             Vector3 NewPos = VehicleTrans.TransformDirection(new Vector3(0, 14, 0));
@@ -117,11 +114,16 @@ public class SaccViewScreenController : UdonSharpBehaviour
                 NewRot = VehicleTrans.rotation;
             }
 
-            PlaneCamera.transform.position = NewPos;
-            PlaneCamera.transform.rotation = Quaternion.Slerp(PlaneCamera.transform.rotation, NewRot, 8f * Time.deltaTime);
+            PlaneCamera.position = NewPos;
+            PlaneCamera.rotation = Quaternion.Slerp(PlaneCamera.rotation, NewRot, 8f * Time.deltaTime);
 
             ChannelNumberText.text = string.Concat((AAMTarget + 1).ToString(), "\n", TargetEntity.PilotName);
         }
+    }
+    public override void OnPlayerJoined(VRCPlayerApi player)
+    {
+        if (localPlayer.IsOwner(gameObject))
+        { RequestSerialization(); }
     }
 
     void SortTargets(GameObject[] Targets, float[] order)

@@ -21,8 +21,6 @@ public class SaccEntity : UdonSharpBehaviour
     public LayerMask AAMTargetsLayer = 1 << 25;//layer 25
     [Tooltip("Object that is enabled when entering vehicle in any seat")]
     public GameObject InVehicleOnly;
-    [Tooltip("Object that is enabled when entering vehicle in pilot seat")]
-    public GameObject PilotOnly;
     [Tooltip("Object that is enabled when holding this object")]
     public GameObject HoldingOnly;
     [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
@@ -237,11 +235,9 @@ public class SaccEntity : UdonSharpBehaviour
                 }
                 if (LStickSelection != LStickSelectionLastFrame)
                 {
-                    bool triggerlast = true;
                     //new function selected, send deselected to old one
                     if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
                     {
-                        triggerlast = (bool)Dial_Functions_L[LStickSelectionLastFrame].GetProgramVariable("TriggerLastFrame");
                         Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
                     //get udonbehaviour for newly selected function and then send selected
@@ -250,10 +246,6 @@ public class SaccEntity : UdonSharpBehaviour
                         if (Dial_Functions_L[LStickSelection] != null)
                         {
                             Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
-                            if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
-                            {
-                                Dial_Functions_L[LStickSelectionLastFrame].SetProgramVariable("TriggerLastFrame", triggerlast);
-                            }
                         }
                         else { CurrentSelectedFunctionL = null; }
                     }
@@ -285,11 +277,9 @@ public class SaccEntity : UdonSharpBehaviour
                 }
                 if (RStickSelection != RStickSelectionLastFrame)
                 {
-                    bool triggerlast = true;
                     //new function selected, send deselected to old one
                     if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
                     {
-                        triggerlast = (bool)Dial_Functions_R[RStickSelectionLastFrame].GetProgramVariable("TriggerLastFrame");
                         Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
                     //get udonbehaviour for newly selected function and then send selected
@@ -298,10 +288,6 @@ public class SaccEntity : UdonSharpBehaviour
                         if (Dial_Functions_R[RStickSelection] != null)
                         {
                             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
-                            if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
-                            {
-                                Dial_Functions_R[RStickSelectionLastFrame].SetProgramVariable("TriggerLastFrame", triggerlast);
-                            }
                         }
                         else { CurrentSelectedFunctionR = null; }
                     }
@@ -365,7 +351,6 @@ public class SaccEntity : UdonSharpBehaviour
         if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
         //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
         if (InVehicleOnly != null) { InVehicleOnly.SetActive(true); }
-        if (PilotOnly != null) { PilotOnly.SetActive(true); }
 
         Networking.SetOwner(localPlayer, gameObject);
         TakeOwnerShipOfExtensions();
@@ -396,7 +381,6 @@ public class SaccEntity : UdonSharpBehaviour
             Using = false;
             InVehicle = false;
             if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
-            if (PilotOnly != null) { PilotOnly.SetActive(false); }
             { SendEventToExtensions("SFEXT_O_PilotExit"); }
         }
     }

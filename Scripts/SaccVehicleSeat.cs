@@ -5,41 +5,47 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
-public class SaccPassengerSeat : UdonSharpBehaviour
+public class SaccPilotSeat : UdonSharpBehaviour
 {
-    public SaccEntity EntityControl;
-    public GameObject SeatAdjuster;
-    [Tooltip("Object that is enabled only for passenger that uses this seat. Not required.")]
-    public GameObject PassengerOnly;
+    [SerializeField] private SaccEntity EntityControl;
+    [Tooltip("Gameobject with script that runs when you enter the seat to edjust your view position")]
+    [SerializeField] private GameObject SeatAdjuster;
+    [SerializeField] private bool IsPilotSeat = false;
+    [Tooltip("Object that is enabled only when sitting in this seat")]
+    [SerializeField] private GameObject ThisSeatOnly;
     private int ThisStationID;
     private bool SeatInitialized = false;
     private VRCPlayerApi localPlayer;
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
+
     }
-    private void Interact()
+    private void Interact()//entering the plane
     {
         if (!SeatInitialized) { InitializeSeat(); }
-        localPlayer.UseAttachedStation();
-
         EntityControl.MySeat = ThisStationID;
-        if (PassengerOnly != null) { PassengerOnly.SetActive(true); }
-        if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
 
-        EntityControl.PassengerEnterVehicleLocal();
+        if (IsPilotSeat)
+        { EntityControl.PilotEnterVehicleLocal(); }
+        else
+        { EntityControl.PassengerEnterVehicleLocal(); }
+        if (ThisSeatOnly != null) { ThisSeatOnly.SetActive(true); }
+        localPlayer.UseAttachedStation();
+        if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
-        if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because hudcontrol might not have initialized
-        //voice range change to allow talking inside cockpit (after VRC patch 1008)
+        if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because EntityControl might not have initialized
         if (player != null)
         {
+            if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
+            //voice range change to allow talking inside cockpit (after VRC patch 1008)
             EntityControl.SeatedPlayers[ThisStationID] = player.playerId;
             if (player.isLocal)
             {
                 foreach (int crew in EntityControl.SeatedPlayers)
-                {
+                {//get get a fresh VRCPlayerAPI every time to prevent players who left leaving a broken one behind and causing crashes
                     VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
                     if (guy != null)
                     {
@@ -52,7 +58,6 @@ public class SaccPassengerSeat : UdonSharpBehaviour
                 SetVoiceInside(player);
             }
         }
-        EntityControl.PassengerEnterVehicleGlobal();
     }
     public override void OnStationExited(VRCPlayerApi player)
     {
@@ -70,16 +75,17 @@ public class SaccPassengerSeat : UdonSharpBehaviour
     public void PlayerExitPlane(VRCPlayerApi player)
     {
         if (!SeatInitialized) { InitializeSeat(); }
-        EntityControl.PassengerExitVehicleGlobal();
-
         EntityControl.SeatedPlayers[ThisStationID] = -1;
+        if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
         if (player != null)
         {
+            if (IsPilotSeat) { EntityControl.PilotExitVehicle(player); }
             SetVoiceOutside(player);
             if (player.isLocal)
             {
                 EntityControl.MySeat = -1;
-                EntityControl.PassengerExitVehicleLocal();
+                if (!IsPilotSeat)
+                { EntityControl.PassengerExitVehicleLocal(); }
                 //undo voice distances of all players inside the vehicle
                 foreach (int crew in EntityControl.SeatedPlayers)
                 {
@@ -89,12 +95,10 @@ public class SaccPassengerSeat : UdonSharpBehaviour
                         SetVoiceOutside(guy);
                     }
                 }
-                if (PassengerOnly != null) { PassengerOnly.SetActive(false); }
-                if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
+                if (ThisSeatOnly != null) { ThisSeatOnly.SetActive(false); }
             }
         }
     }
-
     private void SetVoiceInside(VRCPlayerApi Player)
     {
         Player.SetVoiceDistanceNear(999999);
@@ -115,6 +119,8 @@ public class SaccPassengerSeat : UdonSharpBehaviour
             if (station.gameObject == gameObject)
             {
                 ThisStationID = x;
+                if (IsPilotSeat) { EntityControl.PilotSeat = x; }
+                break;
             }
             x++;
         }

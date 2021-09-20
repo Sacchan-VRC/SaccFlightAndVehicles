@@ -55,6 +55,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         Selected = true;
     }
     public void DFUNC_Deselected()

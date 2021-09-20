@@ -18,7 +18,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     [SerializeField] private int CatapultLayer = 24;
     [Tooltip("Reference to the landing gear function so we can tell it to be disabled when on a catapult")]
     [SerializeField] private UdonSharpBehaviour GearFunc;
-    private bool GearFuncNULL;
+    private bool GearFuncNULL = true;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] private bool CatapultLaunchNull;
@@ -27,7 +27,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private bool Selected;
     private bool OnCatapult;
     private bool Launching = false;
-    private bool Pilot = false;
+    private bool Piloting = false;
     private Transform VehicleTransform;
     private Transform CatapultTransform;
     private int CatapultDeadTimer;
@@ -48,6 +48,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private bool DisableGearToggle = false;
     private bool OverrideConstantForce = false;
     private bool InEditor;
+    private bool IsOwner;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -64,6 +65,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         Selected = true;
     }
     public void DFUNC_Deselected()
@@ -74,19 +76,8 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         gameObject.SetActive(true);
-        Pilot = true;
-        if (DisableGearToggle && !GearFuncNULL)
-        {
-            int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
-            disablegear--;
-            GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
-            DisableGearToggle = false;
-        }
-        if (DisableTaxiRotation)
-        {
-            SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1);
-            DisableTaxiRotation = false;
-        }
+        Piloting = true;
+        DisableOverrides();
         TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotExit()
@@ -94,23 +85,12 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         if (!Launching)
         {
             gameObject.SetActive(false);
-            Pilot = false;
+            Piloting = false;
             if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
         }
         Selected = false;
         TriggerLastFrame = false;
-        if (DisableGearToggle && !GearFuncNULL)
-        {
-            int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
-            disablegear--;
-            GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
-            DisableGearToggle = false;
-        }
-        if (DisableTaxiRotation)
-        {
-            SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1);
-            DisableTaxiRotation = false;
-        }
+        DisableOverrides();
     }
     public void SFEXT_O_PassengerEnter()
     {
@@ -118,56 +98,26 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void SFEXT_O_TakeOwnership()
     {
+        IsOwner = true;
         if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
     }
     public void SFEXT_O_LoseOwnership()
     {
+        IsOwner = false;
         Launching = false;
         OnCatapult = false;
-        Pilot = false;
+        Piloting = false;
         gameObject.SetActive(false);
-        if (DisableGearToggle && !GearFuncNULL)
-        {
-            int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
-            disablegear--;
-            GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
-            DisableGearToggle = false;
-        }
-        if (DisableTaxiRotation)
-        {
-            SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1);
-            DisableTaxiRotation = false;
-        }
-        if (OverrideConstantForce)
-        {
-            SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") - 1);
-            OverrideConstantForce = false;
-        }
+        DisableOverrides();
     }
     public void SFEXT_O_Explode()
     {
         OnCatapult = false;
-        if (DisableGearToggle && !GearFuncNULL)
-        {
-            int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
-            disablegear--;
-            GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
-            DisableGearToggle = false;
-        }
-        if (DisableTaxiRotation)
-        {
-            SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1);
-            DisableTaxiRotation = false;
-        }
-        if (OverrideConstantForce)
-        {
-            SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") - 1);
-            OverrideConstantForce = false;
-        }
+        DisableOverrides();
     }
     private void EnableOneFrameToFindAnimator()
     {
-        if (!(bool)SAVControl.GetProgramVariable("IsOwner"))
+        if (!IsOwner)
         {
             gameObject.SetActive(true);
             SendCustomEventDelayedFrames("DisableThisObjNonOnwer", 1);
@@ -175,7 +125,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     private void DisableThisObjNonOnwer()
     {
-        if (!(bool)SAVControl.GetProgramVariable("IsOwner"))
+        if (!IsOwner)
         { gameObject.SetActive(false); }
     }
     private bool FindCatapultAnimator(GameObject other)
@@ -192,7 +142,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (Pilot && !EntityControl.dead)
+        if (Piloting && !EntityControl.dead)
         {
             if (other != null)
             {
@@ -223,9 +173,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
 
                             if (!DisableGearToggle && !GearFuncNULL)
                             {
-                                int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
-                                disablegear++;
-                                GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
+                                GearFunc.SetProgramVariable("DisableGearToggle", (int)GearFunc.GetProgramVariable("DisableGearToggle") + 1);
                                 DisableGearToggle = true;
                             }
                             if (!DisableTaxiRotation)
@@ -260,7 +208,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     private void Update()
     {
-        if ((Pilot && OnCatapult) || Launching)
+        if ((Piloting && OnCatapult) || Launching)
         {
             if (!Launching && Selected)
             {
@@ -299,23 +247,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 float DeltaTime = Time.deltaTime;
                 TriggerLastFrame = false;
                 Launching = false;
-                if (DisableGearToggle && !GearFuncNULL)
-                {
-                    int disablegear = (int)GearFunc.GetProgramVariable("DisableGearToggle");
-                    disablegear--;
-                    GearFunc.SetProgramVariable("DisableGearToggle", disablegear);
-                    DisableGearToggle = false;
-                }
-                if (DisableTaxiRotation)
-                {
-                    SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1);
-                    DisableTaxiRotation = false;
-                }
-                if (OverrideConstantForce)
-                {
-                    SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") - 1);
-                    OverrideConstantForce = false;
-                }
+                DisableOverrides();
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff));
                 SAVControl.SetProgramVariable("Taxiinglerper", 0f);
                 VehicleRigidbody.velocity = (CatapultTransform.position - CatapultPosLastFrame) / DeltaTime;
@@ -333,10 +265,28 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             CatapultPosLastFrame = CatapultTransform.position;
         }
     }
+    private void DisableOverrides()
+    {
+        if (DisableGearToggle && !GearFuncNULL)
+        {
+            GearFunc.SetProgramVariable("DisableGearToggle", (int)GearFunc.GetProgramVariable("DisableGearToggle") - 1);
+            DisableGearToggle = false;
+        }
+        if (DisableTaxiRotation)
+        {
+            SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1);
+            DisableTaxiRotation = false;
+        }
+        if (OverrideConstantForce)
+        {
+            SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") - 1);
+            OverrideConstantForce = false;
+        }
+    }
     public void deadfalse()
     {
         EntityControl.dead = false;
-        if (!(bool)SAVControl.GetProgramVariable("Piloting"))
+        if (!Piloting)
         {
             SFEXT_O_PilotExit();
         }
@@ -351,7 +301,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void PreLaunchCatapult()
     {
-        if (!(bool)SAVControl.GetProgramVariable("IsOwner")) { EnableOneFrameToFindAnimator(); }
+        if (!IsOwner) { EnableOneFrameToFindAnimator(); }
         SendCustomEventDelayedFrames(nameof(LaunchCatapult), 3);
     }
     public void LaunchCatapult()

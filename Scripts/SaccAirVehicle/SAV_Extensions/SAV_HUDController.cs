@@ -81,13 +81,13 @@ public class SAV_HUDController : UdonSharpBehaviour
             tempvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
 
-        VelLerper = Vector3.Lerp(VelLerper, tempvel, 7f * Time.smoothDeltaTime);
         if ((bool)SAVControl.GetProgramVariable("Piloting"))
         {
             VelocityIndicator.position = transform.position + tempvel;
         }
         else
         {
+            VelLerper = Vector3.Lerp(VelLerper, tempvel, 35f * Time.smoothDeltaTime);
             VelocityIndicator.position = transform.position + VelLerper;
         }
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
