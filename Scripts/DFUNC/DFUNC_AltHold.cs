@@ -16,8 +16,6 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     [SerializeField] private float AoALimiter = 15f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private bool Dial_FunconNULL = true;
-    private bool HudHoldNULL = true;
     private bool TriggerLastFrame;
     private bool AltHold;
     private Rigidbody VehicleRigidbody;
@@ -38,12 +36,10 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         { InVR = localPlayer.IsUserInVR(); }
-        Dial_FunconNULL = Dial_Funcon == null;
-        HudHoldNULL = HudHold == null;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
         VehicleTransform = EntityControl.transform;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
     }
     public void DFUNC_Selected()
     {
@@ -61,11 +57,11 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
         Piloting = true;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(AltHold);
+        if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(AltHold);
+        if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
     }
     public void SFEXT_O_PilotExit()
     {
@@ -101,8 +97,8 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         if (AltHold) { return; }
         AltHold = true;
         SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") + 1);
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(AltHold); }
-        if (!HudHoldNULL) { HudHold.SetActive(AltHold); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(AltHold); }
+        if (HudHold) { HudHold.SetActive(AltHold); }
         if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOn"); }
     }
     public void DeactivateAltHold()
@@ -110,8 +106,8 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         if (!AltHold) { return; }
         if (!InVR || !Selected) { gameObject.SetActive(false); }
         AltHold = false;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(AltHold); }
-        if (!HudHoldNULL) { HudHold.SetActive(AltHold); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(AltHold); }
+        if (HudHold) { HudHold.SetActive(AltHold); }
         SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") - 1);
         SAVControl.SetProgramVariable("JoystickOverride", Vector3.zero);
         RotationInputs = Vector3.zero;

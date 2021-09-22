@@ -77,7 +77,7 @@ public class SAV_BombController : UdonSharpBehaviour
     }
     private void Explode()
     {
-        if (BombRigid != null)
+        if (BombRigid)
         {
             BombRigid.constraints = RigidbodyConstraints.FreezePosition;
             BombRigid.velocity = Vector3.zero;

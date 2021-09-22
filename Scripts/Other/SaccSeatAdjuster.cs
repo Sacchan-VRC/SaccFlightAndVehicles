@@ -20,12 +20,14 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
     private Vector3 SeatOriginalPos;
     private bool CalibratedY = false;
     private bool CalibratedZ = false;
+    private bool InEditor = true;
     private VRCPlayerApi localPlayer;
     private float CalibrateTimer = 0f;
     private float AwakeTimer = 0f;
     void Start()
     {
         localPlayer = Networking.LocalPlayer;
+        InEditor = localPlayer == null;
         SeatOriginalPos = Seat.transform.localPosition;
         gameObject.SetActive(false); //object needs to be active at least once to make the functions work over network
     }
@@ -33,14 +35,7 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
     private void OnEnable()
     {
         //set seat back to it's original position
-        if (localPlayer == null)
-        {
-            ResetSeat();
-        }
-        else
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResetSeat");
-        }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResetSeat");
 
         CalibratedZ = false;
         CalibratedY = false;
@@ -53,23 +48,21 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
         CalibrateTimer += Time.deltaTime;
         if (CalibrateTimer > .3f)//do it about 3 times a second so we don't send too many broadcasts
         {
-            if (localPlayer == null)//find test object relative position for editor testing
-            {
-                if (PositionTest) { TargetRelative = TargetHeight.InverseTransformPoint(PositionTest.position); }
-            }
-            else//find head relative position ingame
+            if (!InEditor)//find head relative position ingame
             {
                 TargetRelative = TargetHeight.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position);
             }
+            else//find test object relative position for editor testing
+            {
+                if (PositionTest) { TargetRelative = TargetHeight.InverseTransformPoint(PositionTest.position); }
+            }
 
             CalibrateY();
-            if (CalibrateFowardBack == true) { CalibrateZ(); }
+            if (CalibrateFowardBack) { CalibrateZ(); }
             else { CalibratedZ = true; }
 
             if (CalibratedY && CalibratedZ)
-            {
-                gameObject.SetActive(false);
-            }
+            { gameObject.SetActive(false); }
             CalibrateTimer = 0;
         }
     }
@@ -84,170 +77,72 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
             if (TargetRelative.y < -.64)
             {
                 //Debug.Log("u64");
-                if (localPlayer == null)//editor
-                {
-                    MoveUp64cm();
-                }
-                else//ingame
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp64cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp64cm");
             }
             else if (TargetRelative.y < -.32)
             {
                 //Debug.Log("u32");
-                if (localPlayer == null)//editor
-                {
-                    MoveUp32cm();
-                }
-                else//ingame
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp32cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp32cm");
             }
             else if (TargetRelative.y < -.16)
             {
                 //Debug.Log("u16");
-                if (localPlayer == null)
-                {
-                    MoveUp16cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp16cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp16cm");
             }
             else if (TargetRelative.y < -.08)
             {
                 //Debug.Log("u8");
-                if (localPlayer == null)
-                {
-                    MoveUp8cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp8cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp8cm");
             }
             else if (TargetRelative.y < -.04)
             {
                 //Debug.Log("u4");
-                if (localPlayer == null)
-                {
-                    MoveUp4cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp4cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp4cm");
             }
             else if (TargetRelative.y < -.02)
             {
-                //Debug.Log("u2");
-                if (localPlayer == null)
-                {
-                    MoveUp2cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp2cm");
-                }
+                //Debug.Log("u2");     
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp2cm");
             }
             else if (TargetRelative.y < -.01)
             {
                 //Debug.Log("u1");
-                if (localPlayer == null)
-                {
-                    MoveUp1cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp1cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveUp1cm");
             }
             else if (TargetRelative.y > .64)
             {
                 //Debug.Log("d64");
-                if (localPlayer == null)
-                {
-                    MoveDown64cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown64cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown64cm");
             }
             else if (TargetRelative.y > .32)
             {
                 //Debug.Log("d32");
-                if (localPlayer == null)
-                {
-                    MoveDown32cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown32cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown32cm");
             }
             else if (TargetRelative.y > .16)
             {
                 //Debug.Log("d16");
-                if (localPlayer == null)
-                {
-                    MoveDown16cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown16cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown16cm");
             }
             else if (TargetRelative.y > .08)
             {
                 //Debug.Log("d8");
-                if (localPlayer == null)
-                {
-                    MoveDown8cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown8cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown8cm");
             }
             else if (TargetRelative.y > .04)
             {
                 //Debug.Log("d4");
-                if (localPlayer == null)
-                {
-                    MoveDown4cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown4cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown4cm");
             }
             else if (TargetRelative.y > .02)
             {
                 //Debug.Log("d2");
-                if (localPlayer == null)
-                {
-                    MoveDown2cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown2cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown2cm");
             }
             else if (TargetRelative.y > .01)
             {
                 //Debug.Log("d1");
-                if (localPlayer == null)
-                {
-                    MoveDown1cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown1cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveDown1cm");
             }
             else if (AwakeTimer > 1)//avatar 3.0 avatars have a weird delay when sitting so just wait a second to make sure we're calibrated
             {
@@ -264,170 +159,72 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
             if (TargetRelative.z < -.64)
             {
                 //Debug.Log("f64");
-                if (localPlayer == null)//editor
-                {
-                    MoveForward64cm();
-                }
-                else//ingame
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward64cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward64cm");
             }
             else if (TargetRelative.z < -.32)
             {
                 //Debug.Log("f32");
-                if (localPlayer == null)//editor
-                {
-                    MoveForward32cm();
-                }
-                else//ingame
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward32cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward32cm");
             }
             else if (TargetRelative.z < -.16)
             {
                 //Debug.Log("f16");
-                if (localPlayer == null)
-                {
-                    MoveForward16cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward16cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward16cm");
             }
             else if (TargetRelative.z < -.08)
             {
                 //Debug.Log("f8");
-                if (localPlayer == null)
-                {
-                    MoveForward8cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward8cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward8cm");
             }
             else if (TargetRelative.z < -.04)
             {
                 //Debug.Log("f4");
-                if (localPlayer == null)
-                {
-                    MoveForward4cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward4cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward4cm");
             }
             else if (TargetRelative.z < -.02)
             {
                 //Debug.Log("f2");
-                if (localPlayer == null)
-                {
-                    MoveForward2cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward2cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward2cm");
             }
             else if (TargetRelative.z < -.01)
             {
                 //Debug.Log("f1");
-                if (localPlayer == null)
-                {
-                    MoveForward1cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward1cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveForward1cm");
             }
             else if (TargetRelative.z > .64)
             {
                 //Debug.Log("b64");
-                if (localPlayer == null)
-                {
-                    MoveBack64cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack64cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack64cm");
             }
             else if (TargetRelative.z > .32)
             {
                 //Debug.Log("b32");
-                if (localPlayer == null)
-                {
-                    MoveBack32cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack32cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack32cm");
             }
             else if (TargetRelative.z > .16)
             {
                 //Debug.Log("b16");
-                if (localPlayer == null)
-                {
-                    MoveBack16cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack16cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack16cm");
             }
             else if (TargetRelative.z > .08)
             {
                 //Debug.Log("b8");
-                if (localPlayer == null)
-                {
-                    MoveBack8cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack8cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack8cm");
             }
             else if (TargetRelative.z > .04)
             {
                 //Debug.Log("b4");
-                if (localPlayer == null)
-                {
-                    MoveBack4cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack4cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack4cm");
             }
             else if (TargetRelative.z > .02)
             {
                 //Debug.Log("b2");
-                if (localPlayer == null)
-                {
-                    MoveBack2cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack2cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack2cm");
             }
             else if (TargetRelative.z > .01)
             {
                 //Debug.Log("b1");
-                if (localPlayer == null)
-                {
-                    MoveBack1cm();
-                }
-                else
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack1cm");
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "MoveBack1cm");
             }
             else if (AwakeTimer > 1)//avatar 3.0 avatars have a weird delay when sitting so just wait a second to make sure we're calibrated
             {

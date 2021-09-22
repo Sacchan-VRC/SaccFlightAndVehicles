@@ -22,7 +22,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool Flaps = false;
-    private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     private int FLAPS_STRING;
     private bool DragApplied;
@@ -56,8 +55,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         FlapsDragMulti -= 1f;
         FlapsLiftMulti -= 1f;
 
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
+        if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
         if (DefaultFlapsOff) { SetFlapsOff(); }
         else { SetFlapsOn(); }
     }
@@ -65,7 +63,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     {
         if (Flaps) { gameObject.SetActive(true); }
         if (!InEditor) { InVR = Networking.LocalPlayer.IsUserInVR(); }//move to start when they fix the bug
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
+        if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
     }
     public void SFEXT_O_PilotExit()
     {
@@ -73,7 +71,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Flaps);
+        if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
     }
     public void SFEXT_G_Explode()
     {
@@ -141,7 +139,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SetFlapsOff()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
+        if (Dial_Funcon) Dial_Funcon.SetActive(false);
         Flaps = false;
         FlapsAnimator.SetBool(FLAPS_STRING, false);
 
@@ -171,7 +169,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     {
         Flaps = true;
         FlapsAnimator.SetBool(FLAPS_STRING, true);
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
+        if (Dial_Funcon) Dial_Funcon.SetActive(true);
 
         if (!DragApplied)
         {

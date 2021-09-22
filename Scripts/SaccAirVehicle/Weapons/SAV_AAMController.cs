@@ -41,8 +41,6 @@ public class SAV_AAMController : UdonSharpBehaviour
     private float UnlockTime;
     private float TargetABPoint;
     private float TargetThrottleNormalizer;
-    private bool TargetSAVNULL = true;
-    private bool SAVControlNull;
     Vector3 TargetPosLastFrame;
 
     private Transform VehicleCenterOfMass;
@@ -65,7 +63,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
         Target = AAMTargets[aamtarg].transform;
-        if (Target == null)
+        if (!Target)
         {
             TargetLost = true;
             Debug.LogWarning("AAM spawned without target");
@@ -74,10 +72,10 @@ public class SAV_AAMController : UdonSharpBehaviour
         {
             TargDistlastframe = Vector3.Distance(transform.position, Target.position) + 1;//1 meter further so the number is different and missile knows we're already moving toward target
             TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
-            if (Target.parent != null)
+            if (Target.parent)
             {
                 TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
-                if (TargetSAVControl != null)
+                if (TargetSAVControl)
                 {
                     if ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger"))
                     {
@@ -86,7 +84,6 @@ public class SAV_AAMController : UdonSharpBehaviour
                     TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
                     TargetAnimator = (Animator)TargetSAVControl.GetProgramVariable("VehicleAnimator");
                     TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
-                    TargetSAVNULL = false;
                     MissileIncoming = true;
                     TargetABPoint = (float)TargetSAVControl.GetProgramVariable("ThrottleAfterburnerPoint");
                     TargetThrottleNormalizer = 1 / TargetABPoint;
@@ -134,7 +131,7 @@ public class SAV_AAMController : UdonSharpBehaviour
             float TargetDistance = Vector3.Distance(Position, TargetPos);
             float EngineTrack;
             bool Dumb;
-            if (!TargetSAVNULL)
+            if (TargetSAVControl)
             {
                 Dumb = Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
                 EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
@@ -193,7 +190,7 @@ public class SAV_AAMController : UdonSharpBehaviour
             {
                 HitTarget = true;
                 SaccEntity TargetEntity = other.gameObject.GetComponent<SaccEntity>();
-                if (TargetEntity != null)
+                if (TargetEntity)
                 {
                     TargetEntity.SendEventToExtensions("SFEXT_L_MissileHit100");
                 }
@@ -203,7 +200,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     }
     private void Explode()
     {
-        if (MissileRigid != null)
+        if (MissileRigid)
         {
             MissileRigid.constraints = RigidbodyConstraints.FreezePosition;
             MissileRigid.velocity = Vector3.zero;
@@ -229,12 +226,12 @@ public class SAV_AAMController : UdonSharpBehaviour
         AAMCollider.enabled = false;
         Animator AAMani = GetComponent<Animator>();
         float DamageDist = 999f;
-        if (!TargetSAVNULL)
+        if (TargetSAVControl)
         {
             TargetEntityControl.LastAttacker = EntityControl;
             DamageDist = Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position) / ProximityExplodeDistance;
         }
-        if (IsOwner && !TargetSAVNULL)
+        if (IsOwner && TargetEntityControl)
         {
             if (DamageDist < 1 && !HitTarget)
             {

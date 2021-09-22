@@ -35,7 +35,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     private float FullGunAmmoInSeconds = 12;
     private Rigidbody VehicleRigidbody;
-    private bool GunRecoilEmptyNULL = true;
     [UdonSynced, FieldChangeCallback(nameof(Firing))] private bool _firing;
     public bool Firing
     {
@@ -67,7 +66,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
-        GunRecoilEmptyNULL = GunRecoilEmpty == null;
         FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
         AAMTargets = EntityControl.AAMTargets;
         NumAAMTargets = EntityControl.NumAAMTargets;
@@ -79,7 +77,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         FindSelf();
 
         //HUD
-        if (HUDControl != null)
+        if (HUDControl)
         {
             distance_from_head = (float)HUDControl.GetProgramVariable("distance_from_head");
         }
@@ -179,9 +177,9 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     { EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
                 }
                 GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
-                if (GunRecoilEmptyNULL)
+                if (!GunRecoilEmpty)
                 {
-                    VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime);
+                    VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime, ForceMode.Force);
                 }
                 else
                 {
@@ -232,7 +230,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
         Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
         float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-        bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
 
         if (TargetChecker.activeInHierarchy)
         {
@@ -261,7 +258,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                         && NextTargetAngle < 70//lock angle
                             && NextTargetAngle < AAMCurrentTargetAngle)
                                 && NextTargetDistance < MaxTargetDistance
-                                    || ((!AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                    || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                                         || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                 {
                     //found new target
@@ -270,8 +267,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                     AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
-                    AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
-                    if (HUDControl != null)
+                    if (HUDControl)
                     {
                         RelativeTargetVelLastFrame = Vector3.zero;
                         GUN_TargetSpeedLerper = 0f;
@@ -291,7 +287,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         { AAMTargetChecker = 0; }
 
         //if target is currently in front of plane, lock onto it
-        if (AAMCurrentTargetSAVControlNull)
+        if (!AAMCurrentTargetSAVControl)
         { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
         else
         { AAMCurrentTargetDirection = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }
@@ -310,7 +306,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             && (AAMTargetObscuredDelay < .25f)
                 && AAMCurrentTargetDistance < MaxTargetDistance
                     && AAMTargets[AAMTarget].activeInHierarchy
-                        && (AAMCurrentTargetSAVControlNull || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
+                        && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
         {
             if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < MaxTargetDistance)
             {
@@ -371,7 +367,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             Vector3 HudControlPosition = HUDControl.transform.position;
             GUNLeadIndicator.gameObject.SetActive(true);
             Vector3 TargetDir;
-            if (AAMCurrentTargetSAVControl == null)//target is a dummy target
+            if (!AAMCurrentTargetSAVControl)//target is a dummy target
             { TargetDir = AAMTargets[AAMTarget].transform.position - HudControlPosition; }
             else
             { TargetDir = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }

@@ -79,7 +79,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
         AnimBool_STRING = Animator.StringToHash(AnimBoolName);
         //HUD
-        if (HUDControl != null)
+        if (HUDControl)
         {
             distance_from_head = (float)HUDControl.GetProgramVariable("distance_from_head");
         }
@@ -298,7 +298,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
             Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
             float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
             float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-            bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
 
             if (TargetChecker.activeInHierarchy)
             {
@@ -327,7 +326,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                             && NextTargetAngle < AAMLockAngle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
-                                        || ((!AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                        || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                                             || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                     {
                         //found new target
@@ -337,7 +336,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         AAMCurrentTargetSAVControl = NextTargetSAVontrol;
                         AAMLockTimer = 0;
                         AAMTargetedTimer = .9f;//send targeted .1s after targeting so it can't get spammed too fast (and doesnt send if you instantly target something else)
-                        AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
                     }
                 }
             }
@@ -368,7 +366,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 && (AAMTargetObscuredDelay < .25f)
                     && AAMCurrentTargetDistance < AAMMaxTargetDistance
                         && AAMTargets[AAMTarget].activeInHierarchy
-                            && (AAMCurrentTargetSAVControlNull || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
+                            && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
             {
                 if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                 {
@@ -377,7 +375,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                     {
                         AAMLockTimer += DeltaTime;
                         //give enemy radar lock even if you're out of missiles
-                        if (!AAMCurrentTargetSAVControlNull)
+                        if (AAMCurrentTargetSAVControl)
                         {
                             //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
                             AAMTargetedTimer += DeltaTime;
@@ -449,7 +447,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         AAMAnimator.SetTrigger(AAMLAUNCHED_STRING);
-        if (AAM != null)
+        if (AAM)
         {
             GameObject NewAAM = VRCInstantiate(AAM);
             if (!(NumAAM % 2 == 0))

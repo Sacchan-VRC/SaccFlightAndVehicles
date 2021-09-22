@@ -18,11 +18,8 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     [SerializeField] private int CatapultLayer = 24;
     [Tooltip("Reference to the landing gear function so we can tell it to be disabled when on a catapult")]
     [SerializeField] private UdonSharpBehaviour GearFunc;
-    private bool GearFuncNULL = true;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    [System.NonSerializedAttribute] private bool CatapultLaunchNull;
-    private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     private bool Selected;
     private bool OnCatapult;
@@ -33,7 +30,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private int CatapultDeadTimer;
     private Rigidbody VehicleRigidbody;
     private float InVehicleThrustVolumeFactor;
-    [System.NonSerializedAttribute] public bool CatapultLockNull;
     private Animator VehicleAnimator;
     private int ONCATAPULT_STRING = Animator.StringToHash("oncatapult");
     private float PlaneCatapultBackDistance;
@@ -53,14 +49,11 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     public void SFEXT_L_EntityStart()
     {
         InEditor = Networking.LocalPlayer == null;
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         VehicleAnimator = EntityControl.GetComponent<Animator>();
-        CatapultLockNull = (CatapultLock == null) ? true : false;
-        GearFuncNULL = GearFunc == null;
     }
     public void DFUNC_Selected()
     {
@@ -93,7 +86,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(OnCatapult);
+        if (Dial_Funcon) Dial_Funcon.SetActive(OnCatapult);
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -116,7 +109,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void SFEXT_G_RespawnButton()
     {
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
     }
     private void EnableOneFrameToFindAnimator()
     {
@@ -136,18 +129,18 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         GameObject CatapultObjects = other.gameObject;
         CatapultAnimator = null;
         CatapultAnimator = other.GetComponent<Animator>();
-        while (!Utilities.IsValid(CatapultAnimator) && CatapultObjects.transform.parent != null)
+        while (!Utilities.IsValid(CatapultAnimator) && CatapultObjects.transform.parent)
         {
             CatapultObjects = CatapultObjects.transform.parent.gameObject;
             CatapultAnimator = CatapultObjects.GetComponent<Animator>();
         }
-        return (CatapultAnimator != null);
+        return (Utilities.IsValid(CatapultAnimator));
     }
     private void OnTriggerEnter(Collider other)
     {
         if (Piloting && !EntityControl.dead)
         {
-            if (other != null)
+            if (other)
             {
                 if (!OnCatapult)
                 {
@@ -174,7 +167,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
 
                             PlaneCatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(VehicleTransform.rotation);
 
-                            if (!DisableGearToggle && !GearFuncNULL)
+                            if (!DisableGearToggle && GearFunc)
                             {
                                 GearFunc.SetProgramVariable("DisableGearToggle", (int)GearFunc.GetProgramVariable("DisableGearToggle") + 1);
                                 DisableGearToggle = true;
@@ -203,7 +196,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         }
         else//should only ever be true after EnableOneFrameToFindAnimator is called via network event
         {
-            if (other != null)
+            if (other)
             {
                 FindCatapultAnimator(other.gameObject);
             }
@@ -270,7 +263,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     private void DisableOverrides()
     {
-        if (DisableGearToggle && !GearFuncNULL)
+        if (DisableGearToggle && GearFunc)
         {
             GearFunc.SetProgramVariable("DisableGearToggle", (int)GearFunc.GetProgramVariable("DisableGearToggle") - 1);
             DisableGearToggle = false;
@@ -309,8 +302,8 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void LaunchCatapult()
     {
-        if (CatapultAnimator != null) { CatapultAnimator.SetTrigger("launch"); }
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        CatapultAnimator.SetTrigger("launch");
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         VehicleRigidbody.WakeUp();//i don't think it actually sleeps anyway but this might help other clients sync the launch faster idk
     }
 
@@ -319,8 +312,8 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         OnCatapult = true;
         VehicleAnimator.SetBool(ONCATAPULT_STRING, true);
         VehicleRigidbody.Sleep();//don't think this actually helps
-        if (!CatapultLockNull) { CatapultLock.Play(); }
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
+        if (CatapultLock) { CatapultLock.Play(); }
+        if (Dial_Funcon) Dial_Funcon.SetActive(true);
     }
     public void CatapultLockOff()
     {

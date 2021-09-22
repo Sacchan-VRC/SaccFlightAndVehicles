@@ -17,7 +17,6 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private Transform VehicleTransform;
-    private bool Dial_FunconNULL = true;
     private VRCPlayerApi localPlayer;
     private bool TriggerLastFrame;
     private float SmokeHoldTime;
@@ -41,8 +40,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         InEditor = localPlayer == null;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
+        if (Dial_Funcon) Dial_Funcon.SetActive(false);
         NumSmokes = DisplaySmoke.Length;
         if (NumSmokes > 0) DisplaySmokeNull = false;
         DisplaySmokeem = new ParticleSystem.EmissionModule[NumSmokes];
@@ -65,7 +63,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         Pilot = true;
         InPlane = true;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Smoking);
+        if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
     }
     public void SFEXT_O_PilotExit()
     {
@@ -78,7 +76,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void SFEXT_P_PassengerEnter()
     {
         InPlane = true;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Smoking);
+        if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
     }
     public void SFEXT_P_PassengerExit()
     {
@@ -170,7 +168,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         SmokeOnIndicator.SetActive(true);
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = true; }
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(true);
+        if (Dial_Funcon) Dial_Funcon.SetActive(true);
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_SmokeOn");
@@ -184,7 +182,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         SmokeOnIndicator.SetActive(false);
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = false; }
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
+        if (Dial_Funcon) Dial_Funcon.SetActive(false);
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_SmokeOff");

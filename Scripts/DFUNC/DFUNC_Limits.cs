@@ -18,8 +18,6 @@ public class DFUNC_Limits : UdonSharpBehaviour
     [SerializeField] private float AoALimiter = 15f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private bool Dial_FunconNULL = true;
-    private bool HudLimitNULL = true;
     private bool TriggerLastFrame;
     private bool InVR;
     private bool Piloting;
@@ -32,8 +30,6 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (localPlayer != null)
         { InVR = localPlayer.IsUserInVR(); }
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-        Dial_FunconNULL = Dial_Funcon == null;
-        HudLimitNULL = HudLimit == null;
         if (!DefaultLimitsOn) { SetLimitsOff(); }
     }
     public void DFUNC_Selected()
@@ -50,7 +46,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
     {
         if (FlightLimitsEnabled) { gameObject.SetActive(true); }
         Piloting = true;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(FlightLimitsEnabled);
+        if (Dial_Funcon) Dial_Funcon.SetActive(FlightLimitsEnabled);
         if (FlightLimitsEnabled)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetLimitsOn)); }
     }
@@ -88,8 +84,8 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (FlightLimitsEnabled) { return; }
         if (Piloting) { gameObject.SetActive(true); }
         FlightLimitsEnabled = true;
-        if (!HudLimitNULL) { HudLimit.SetActive(true); }
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+        if (HudLimit) { HudLimit.SetActive(true); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         HudLimit.SetActive(true);
     }
     public void SetLimitsOff()
@@ -97,14 +93,14 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (!FlightLimitsEnabled) { return; }
         if (Piloting) { gameObject.SetActive(false); }
         FlightLimitsEnabled = false;
-        if (!HudLimitNULL) { HudLimit.SetActive(false); }
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        if (HudLimit) { HudLimit.SetActive(false); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         HudLimit.SetActive(false);
         SAVControl.SetProgramVariable("Limits", 1f);
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(FlightLimitsEnabled);
+        if (Dial_Funcon) Dial_Funcon.SetActive(FlightLimitsEnabled);
     }
     public void SFEXT_G_RespawnButton()
     {

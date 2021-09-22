@@ -39,7 +39,7 @@ public class SaccResupplyTrigger : UdonSharpBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other != null && other.gameObject.layer == ResupplyLayer)
+        if (other && other.gameObject.layer == ResupplyLayer)
         {
             float tim = Time.time;
             if (NumTriggers == 0) { LastResupplyTime = Mathf.Min((tim + ResupplyDelay) - ResupplyInitialDelay, tim); }
@@ -49,7 +49,7 @@ public class SaccResupplyTrigger : UdonSharpBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other != null && other.gameObject.layer == ResupplyLayer)
+        if (other && other.gameObject.layer == ResupplyLayer)
         {
             NumTriggers -= 1;
             if (NumTriggers == 0) { InResupplyZone = false; }

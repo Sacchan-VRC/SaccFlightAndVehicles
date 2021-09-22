@@ -14,8 +14,6 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     [SerializeField] private Text HUDText_knotstarget;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private bool Dial_FunconNULL = true;
-    private bool HUDText_knotstargetNULL = true;
     private bool TriggerLastFrame;
     private Transform VehicleTransform;
     private VRCPlayerApi localPlayer;
@@ -44,9 +42,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         { InVR = localPlayer.IsUserInVR(); }
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
-        HUDText_knotstargetNULL = HUDText_knotstarget == null;
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
+        if (Dial_Funcon) Dial_Funcon.SetActive(false);
     }
     public void DFUNC_Selected()
     {
@@ -63,14 +59,14 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Cruise);
+        if (Dial_Funcon) Dial_Funcon.SetActive(Cruise);
         Piloting = true;
-        if (!HUDText_knotstargetNULL) { HUDText_knotstarget.text = string.Empty; }
+        if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; }
     }
     public void SFEXT_P_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(Cruise);
-        if (!HUDText_knotstargetNULL) { HUDText_knotstarget.text = string.Empty; }
+        if (Dial_Funcon) Dial_Funcon.SetActive(Cruise);
+        if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; }
     }
     public void SFEXT_O_PilotExit()
     {
@@ -194,9 +190,9 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         //Cruise Control target knots
         if (Cruise)
         {
-            if (!HUDText_knotstargetNULL) { HUDText_knotstarget.text = ((SetSpeed) * 1.9438445f).ToString("F0"); }
+            if (HUDText_knotstarget) { HUDText_knotstarget.text = ((SetSpeed) * 1.9438445f).ToString("F0"); }
         }
-        else { if (!HUDText_knotstargetNULL) { HUDText_knotstarget.text = string.Empty; } }
+        else { if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; } }
     }
     public void KeyboardInput()
     {
@@ -226,7 +222,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         }
         SetSpeed = (float)SAVControl.GetProgramVariable("AirSpeed");
         Cruise = true;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(Cruise); }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
     }
     public void SetCruiseOff()
@@ -243,7 +239,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         }
         SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
         Cruise = false;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(Cruise); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(Cruise); }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
     }
 }

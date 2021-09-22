@@ -20,10 +20,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour BrakeFunction;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    [System.NonSerializedAttribute] public bool CableSnapNull;
-    private bool BreakFunctionNULL;
     public LayerMask HookCableLayer;
-    private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     [System.NonSerializedAttribute] private bool Hooked = false;
     [System.NonSerializedAttribute] private float HookedTime = 0f;
@@ -40,14 +37,12 @@ public class DFUNC_Hook : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(HookDown);
+        if (Dial_Funcon) Dial_Funcon.SetActive(HookDown);
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         VehicleAnimator = EntityControl.GetComponent<Animator>();
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         SetHookUp();
-        BreakFunctionNULL = BrakeFunction == null;
     }
     public void DFUNC_Selected()
     {
@@ -63,7 +58,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(HookDown);
+        if (Dial_Funcon) Dial_Funcon.SetActive(HookDown);
         if (HookDown) { gameObject.SetActive(true); }
     }
     public void SFEXT_O_PilotExit()
@@ -72,7 +67,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         TriggerLastFrame = false;
         Hooked = false;
         func_active = false;
-        if (DisableGroundBrake && !BreakFunctionNULL)
+        if (DisableGroundBrake && BrakeFunction)
         {
             BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") - 1);
             DisableGroundBrake = false;
@@ -90,7 +85,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(HookDown);
+        if (Dial_Funcon) Dial_Funcon.SetActive(HookDown);
     }
     public void KeyboardInput()
     {
@@ -136,7 +131,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         //slow down if hooked and on the ground
         if (Hooked && (bool)SAVControl.GetProgramVariable("Taxiing"))
         {
-            if (!DisableGroundBrake && !BreakFunctionNULL)
+            if (!DisableGroundBrake && BrakeFunction)
             {
                 BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") + 1);
                 DisableGroundBrake = true;
@@ -171,7 +166,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         }
         else
         {
-            if (DisableGroundBrake && !BreakFunctionNULL)
+            if (DisableGroundBrake && BrakeFunction)
             {
                 BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") - 1);
                 DisableGroundBrake = false;
@@ -181,18 +176,18 @@ public class DFUNC_Hook : UdonSharpBehaviour
 
     public void ToggleHook()
     {
-        if (HookDetector != null)
+        if (HookDetector)
         {
             if (!HookDown)
             {
                 if ((bool)SAVControl.GetProgramVariable("Piloting") && !(bool)SAVControl.GetProgramVariable("InVR")) { gameObject.SetActive(true); }
-                if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+                if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown");
             }
             else
             {
                 if ((bool)SAVControl.GetProgramVariable("Piloting") && !(bool)SAVControl.GetProgramVariable("InVR")) { gameObject.SetActive(false); }
-                if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+                if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookUp");
             }
         }
@@ -220,6 +215,6 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void PlayCableSnap()
     {
-        if (!CableSnapNull) { CableSnap.Play(); }
+        if (CableSnap) { CableSnap.Play(); }
     }
 }

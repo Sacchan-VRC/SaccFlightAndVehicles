@@ -46,7 +46,7 @@ public class SAV_KeyboardControls : UdonSharpBehaviour
     private float VTOLAngleDivider;
     private void Start()
     {
-        if (SAVControl != null)
+        if (SAVControl)
         {
             float vtolangledif = (float)SAVControl.GetProgramVariable("VTOLMaxAngle") - (float)SAVControl.GetProgramVariable("VTOLMinAngle");
             VTOLAngleDivider = (float)SAVControl.GetProgramVariable("VTOLAngleTurnRate") / vtolangledif;
@@ -70,69 +70,69 @@ public class SAV_KeyboardControls : UdonSharpBehaviour
 
         if (Input.GetKeyDown(Lfunc1key))
         {
-            if (Lfunc1 != null) Lfunc1.SendCustomEvent(KeyboardInput);
+            if (Lfunc1) Lfunc1.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Lfunc2key))
         {
-            if (Lfunc2 != null) Lfunc2.SendCustomEvent(KeyboardInput);
+            if (Lfunc2) Lfunc2.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Lfunc3key))
         {
-            if (Lfunc3 != null) Lfunc3.SendCustomEvent(KeyboardInput);
+            if (Lfunc3) Lfunc3.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Lfunc4key))
         {
-            if (Lfunc4 != null) Lfunc4.SendCustomEvent(KeyboardInput);
+            if (Lfunc4) Lfunc4.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Lfunc5key))
         {
-            if (Lfunc5 != null) Lfunc5.SendCustomEvent(KeyboardInput);
+            if (Lfunc5) Lfunc5.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Lfunc6key))
         {
-            if (Lfunc6 != null) Lfunc6.SendCustomEvent(KeyboardInput);
+            if (Lfunc6) Lfunc6.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Lfunc7key))
         {
-            if (Lfunc7 != null) Lfunc7.SendCustomEvent(KeyboardInput);
+            if (Lfunc7) Lfunc7.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Lfunc8key))
         {
-            if (Lfunc8 != null) Lfunc8.SendCustomEvent(KeyboardInput);
+            if (Lfunc8) Lfunc8.SendCustomEvent(KeyboardInput);
         }
 
 
         if (Input.GetKeyDown(Rfunc1key))
         {
-            if (Rfunc1 != null) Rfunc1.SendCustomEvent(KeyboardInput);
+            if (Rfunc1) Rfunc1.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Rfunc2key))
         {
-            if (Rfunc2 != null) Rfunc2.SendCustomEvent(KeyboardInput);
+            if (Rfunc2) Rfunc2.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Rfunc3key))
         {
-            if (Rfunc3 != null) Rfunc3.SendCustomEvent(KeyboardInput);
+            if (Rfunc3) Rfunc3.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Rfunc4key))
         {
-            if (Rfunc4 != null) Rfunc4.SendCustomEvent(KeyboardInput);
+            if (Rfunc4) Rfunc4.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Rfunc5key))
         {
-            if (Rfunc5 != null) Rfunc5.SendCustomEvent(KeyboardInput);
+            if (Rfunc5) Rfunc5.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Rfunc6key))
         {
-            if (Rfunc6 != null) Rfunc6.SendCustomEvent(KeyboardInput);
+            if (Rfunc6) Rfunc6.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Rfunc7key))
         {
-            if (Rfunc7 != null) Rfunc7.SendCustomEvent(KeyboardInput);
+            if (Rfunc7) Rfunc7.SendCustomEvent(KeyboardInput);
         }
         if (Input.GetKeyDown(Rfunc8key))
         {
-            if (Rfunc8 != null) Rfunc8.SendCustomEvent(KeyboardInput);
+            if (Rfunc8) Rfunc8.SendCustomEvent(KeyboardInput);
         }
     }
 }

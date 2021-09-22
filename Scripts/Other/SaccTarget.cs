@@ -25,7 +25,7 @@ public class SaccTarget : UdonSharpBehaviour
     }
     void OnParticleCollision(GameObject other)//hit by bullet
     {
-        if (other == null) return;
+        if (!other) return;
         if (HitPoints <= DamageFromBullet)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode)); }
         else
@@ -49,7 +49,7 @@ public class SaccTarget : UdonSharpBehaviour
         HitPoints = FullHealth;
         foreach (UdonSharpBehaviour Exploder in ExplodeOther)
         {
-            if (Exploder != null)
+            if (Exploder)
             {
                 Exploder.SendCustomEvent(nameof(Explode));
             }

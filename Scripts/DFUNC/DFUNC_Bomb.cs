@@ -196,7 +196,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         IsOwner = localPlayer.IsOwner(gameObject);
         if (NumBomb > 0) { NumBomb--; }
         BombAnimator.SetTrigger(BOMBLAUNCHED_STRING);
-        if (Bomb != null)
+        if (Bomb)
         {
             GameObject NewBomb = VRCInstantiate(Bomb);
 

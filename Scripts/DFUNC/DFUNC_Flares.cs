@@ -19,7 +19,6 @@ public class DFUNC_Flares : UdonSharpBehaviour
     [SerializeField] private float FullReloadTimeSec = 15;
     [SerializeField] private AudioSource FlareLaunch;
     [SerializeField] private Text HUDText_flare_ammo;
-    private bool HUDText_flare_ammoNULL = true;
     private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;
@@ -40,8 +39,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     {
         FullFlares = NumFlares;
         reloadspeed = FullFlares / FullReloadTimeSec;
-        HUDText_flare_ammoNULL = HUDText_flare_ammo == null;
-        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
+        if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
     public void SFEXT_O_PilotExit()
     {
@@ -51,19 +49,19 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public void SFEXT_G_RespawnButton()
     {
         NumFlares = FullFlares;
-        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
+        if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
     public void SFEXT_G_Explode()
     {
         NumFlares = FullFlares;
-        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
+        if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
     public void SFEXT_G_ReSupply()
     {
         if (NumFlares != FullFlares)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumFlares = (int)Mathf.Min(NumFlares + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullFlares);
-        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
+        if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
     private void Update()
     {
@@ -88,7 +86,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     {
         NumFlares--;
         FlareLaunch.Play();
-        if (!HUDText_flare_ammoNULL) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
+        if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
         int d = FlareParticles.Length;
         for (int x = 0; x < d; x++)
         {

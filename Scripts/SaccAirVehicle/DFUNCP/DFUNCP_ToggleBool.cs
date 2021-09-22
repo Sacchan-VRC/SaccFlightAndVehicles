@@ -10,7 +10,7 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
     [SerializeField] private Animator BoolAnimator;
     [SerializeField] private string AnimBoolName = "AnimBool";
     [Tooltip("Object enabled when function is enabled (used on MFD)")]
-    [SerializeField] private GameObject Dial_Funcon;
+    [SerializeField] private GameObject[] Dial_Funcon;
     public bool OnDefault = false;
     [Tooltip("Set toggle to its default when exiting?")]
     [SerializeField] private bool PilotExitTurnOff = true;
@@ -22,37 +22,34 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
     [SerializeField] private float DoorCloseTime = 2;
     [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing")]
     [SerializeField] private UdonSharpBehaviour MasterToggle;
-    private bool Dial_FunconNULL = true;
     private bool AnimOn = false;
     private float ToggleTime;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private int AnimBool_STRING;
     private bool sound_DoorOpen;
+    private bool Dial_FunconNULL;
     private bool IsSecondary = false;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXTP_L_EntityStart()
     {
-        if (MasterToggle != null)
+        Dial_FunconNULL = Dial_Funcon.Length > 0;
+        if (MasterToggle)//this object is slave
         {
             IsSecondary = true;
             ToggleMinDelay = (float)MasterToggle.GetProgramVariable("ToggleMinDelay");
-            if (!Dial_FunconNULL)
-            {
-                if ((bool)MasterToggle.GetProgramVariable("OnDefault"))
-                    Dial_Funcon.SetActive(false);
-            }
         }
-        else
+        else//this object is master
         {
             if (OpensDoor && (ToggleMinDelay < DoorCloseTime)) { ToggleMinDelay = DoorCloseTime; }
             AnimBool_STRING = Animator.StringToHash(AnimBoolName);
-            Dial_FunconNULL = Dial_Funcon == null;
             if (OnDefault)
             {
                 SetBoolOn();
             }
+            foreach (GameObject funcon in Dial_Funcon)
+            { funcon.SetActive(OnDefault); }
         }
     }
     public void SFEXTP_O_PlayerJoined()
@@ -106,12 +103,10 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
                 if ((bool)MasterToggle.GetProgramVariable("AnimOn"))
                 {
                     MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff");
-                    if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
                 }
                 else
                 {
                     MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn");
-                    if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
                 }
             }
         }
@@ -144,12 +139,10 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
                         if ((bool)MasterToggle.GetProgramVariable("AnimOn"))
                         {
                             MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff");
-                            if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
                         }
                         else
                         {
                             MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn");
-                            if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
                         }
                     }
                 }
@@ -174,7 +167,8 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
         ToggleTime = Time.time;
         AnimOn = true;
         BoolAnimator.SetBool(AnimBool_STRING, AnimOn);
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+        foreach (GameObject funcon in Dial_Funcon)
+        { funcon.SetActive(true); }
         if (OpensDoor)
         { SoundControl.SendCustomEvent("DoorOpen"); }
     }
@@ -184,7 +178,8 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
         ToggleTime = Time.time;
         AnimOn = false;
         BoolAnimator.SetBool(AnimBool_STRING, AnimOn);
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        foreach (GameObject funcon in Dial_Funcon)
+        { funcon.SetActive(false); }
         if (OpensDoor)
         { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); }
     }

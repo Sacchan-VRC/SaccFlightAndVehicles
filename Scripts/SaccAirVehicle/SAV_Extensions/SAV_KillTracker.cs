@@ -23,7 +23,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     {
         //our killer increases their kills
         float time = Time.time;
-        if (EntityControl.LastAttacker != null && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 5 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((time - EntityControl.PilotExitTime) < 5))))
+        if (EntityControl.LastAttacker && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 5 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((time - EntityControl.PilotExitTime) < 5))))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
             EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotKill");
@@ -33,7 +33,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     }
     public void SFEXT_O_GotKill()
     {
-        if (KillsBoard != null && (bool)SAVControl.GetProgramVariable("Piloting"))
+        if (KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))
         {
             KillsBoard.MyKills++;
             if (KillsBoard.MyKills > KillsBoard.MyBestKills)

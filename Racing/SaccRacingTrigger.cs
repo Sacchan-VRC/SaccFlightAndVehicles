@@ -43,7 +43,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
         Initialized = true;
         GameObject Objs = gameObject;
         //checking if a rigidbody is null in a while loop doesnt work in udon for some reason, use official vrchat workaround
-        while (!Utilities.IsValid(PlaneRigidbody) && Objs.transform.parent != null)
+        while (!Utilities.IsValid(PlaneRigidbody) && Objs.transform.parent)
         {
             Objs = Objs.transform.parent.gameObject;
             PlaneRigidbody = Objs.GetComponent<Rigidbody>();
@@ -120,7 +120,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
     }
     void OnTriggerEnter(Collider other)
     {
-        if (CurrentCourseSelection != -1 && (other != null && other.gameObject == CurrentCourse.RaceCheckpoints[NextCheckpoint]))
+        if (CurrentCourseSelection != -1 && (other && other.gameObject == CurrentCourse.RaceCheckpoints[NextCheckpoint]))
         {
             if (NextCheckpoint == FinalCheckpoint)//end of the race
             {
@@ -145,7 +145,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
                 NextCheckpoint = 0;
                 FinishedRace = true;
 
-                if (CurrentCheckPointAnimator != null)
+                if (Utilities.IsValid(CurrentCheckPointAnimator))
                 { CurrentCheckPointAnimator.SetBool("Current", false); }
                 StartCheckPointAnims();
 
@@ -255,7 +255,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
     }
     void OnDisable()
     {
-        if (CurrentCourse != null)
+        if (CurrentCourse)
         {
             if (CurrentCourseSelection != -1 && FinishedRace)
             {
@@ -269,12 +269,12 @@ public class SaccRacingTrigger : UdonSharpBehaviour
                     CurrentCourse.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "UpdateTimes");
                 }
             }
-            if (CurrentCheckPointAnimator != null)
+            if (Utilities.IsValid(CurrentCheckPointAnimator))
             {
                 CurrentCheckPointAnimator.SetBool("Current", false);
                 CurrentCheckPointAnimator.SetTrigger("Reset");
             }
-            if (NextCheckPointAnimator != null)
+            if (Utilities.IsValid(NextCheckPointAnimator))
             {
                 NextCheckPointAnimator.SetBool("Next", false);
                 NextCheckPointAnimator.SetTrigger("Reset");
@@ -283,10 +283,10 @@ public class SaccRacingTrigger : UdonSharpBehaviour
     }
     void ProgressCheckPointAnims()
     {
-        if (CurrentCheckPointAnimator != null)
+        if (Utilities.IsValid(CurrentCheckPointAnimator))
         { CurrentCheckPointAnimator.SetBool("Current", false); }
 
-        if (NextCheckPointAnimator != null)
+        if (Utilities.IsValid(NextCheckPointAnimator))
         {
             NextCheckPointAnimator.SetBool("Next", false);
             NextCheckPointAnimator.SetBool("Current", true);
@@ -295,7 +295,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
         if (NextCheckpoint + 1 < CurrentCourse.RaceCheckpoints.Length)
         {
             NextCheckPointAnimator = CurrentCourse.RaceCheckpoints[NextCheckpoint + 1].GetComponent<Animator>();
-            if (NextCheckPointAnimator != null)
+            if (Utilities.IsValid(NextCheckPointAnimator))
             {
                 NextCheckPointAnimator.SetBool("Next", true);
             }
@@ -304,12 +304,12 @@ public class SaccRacingTrigger : UdonSharpBehaviour
     void StartCheckPointAnims()
     {
         if (CurrentCourseSelection == -1) { return; }
-        if (CurrentCourse != null)
+        if (CurrentCourse)
         {
             if (CurrentCourse.RaceCheckpoints.Length > 0)
             {
                 CurrentCheckPointAnimator = CurrentCourse.RaceCheckpoints[0].GetComponent<Animator>();
-                if (CurrentCheckPointAnimator != null)
+                if (Utilities.IsValid(CurrentCheckPointAnimator))
                 {
                     CurrentCheckPointAnimator.SetBool("Current", true);
                 }
@@ -317,7 +317,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
             if (CurrentCourse.RaceCheckpoints.Length > 1)
             {
                 NextCheckPointAnimator = CurrentCourse.RaceCheckpoints[1].GetComponent<Animator>();
-                if (NextCheckPointAnimator != null)
+                if (Utilities.IsValid(NextCheckPointAnimator))
                 {
                     NextCheckPointAnimator.SetBool("Next", true);
                 }

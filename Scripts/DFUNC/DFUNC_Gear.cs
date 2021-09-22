@@ -15,7 +15,6 @@ public class DFUNC_Gear : UdonSharpBehaviour
     [SerializeField] private float LandingGearDragMulti = 1.3f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     [System.NonSerializedAttribute] public bool GearUp = false;
     private bool DragApplied = false;
@@ -31,8 +30,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         LandingGearDragMulti -= 1;//to match how the old values worked
         SetGearDown();
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(!GearUp); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
         IsOwner = Networking.LocalPlayer.isInstanceOwner;
     }
     public void DFUNC_Selected()
@@ -47,7 +45,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!GearUp);
+        if (Dial_Funcon) Dial_Funcon.SetActive(!GearUp);
     }
     public void SFEXT_O_PilotExit()
     {
@@ -55,7 +53,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void SFEXT_O_PassengerEnter()
     {
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!GearUp);
+        if (Dial_Funcon) Dial_Funcon.SetActive(!GearUp);
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -102,7 +100,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
             SAVControl.SetProgramVariable("GDHitRigidbody", null);
             DisableGroundDetector = true;
         }
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         GearUp = true;
         GearAnimator.SetBool(GEARUP_STRING, true);
         if (DragApplied)
@@ -124,7 +122,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
             SAVControl.SetProgramVariable("DisableGroundDetection", (int)SAVControl.GetProgramVariable("DisableGroundDetection") - 1);
             DisableGroundDetector = false;
         }
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         GearUp = false;
         GearAnimator.SetBool(GEARUP_STRING, false);
         if (!DragApplied)

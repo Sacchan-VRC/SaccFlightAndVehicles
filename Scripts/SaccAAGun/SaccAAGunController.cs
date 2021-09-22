@@ -100,7 +100,6 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AAMReloadTimer;
     [System.NonSerializedAttribute] public float HealthUpTimer;
     [System.NonSerializedAttribute] public float HPRepairTimer;
-    private bool JoyStickNull = true;
     [System.NonSerializedAttribute] public float InputXKeyb;
     [System.NonSerializedAttribute] public float InputYKeyb;
     [System.NonSerializedAttribute] public float LastHealthUpdate = 0;
@@ -108,7 +107,6 @@ public class SaccAAGunController : UdonSharpBehaviour
     private float LastSerialization;
     private float SerializationInterval = .35f;
     private bool Occupied;
-    private bool HUDControlNULL;
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
@@ -120,9 +118,6 @@ public class SaccAAGunController : UdonSharpBehaviour
             IsOwner = localPlayer.isInstanceOwner;
         }
         CenterOfMass = EntityControl.CenterOfMass;
-        HUDControlNULL = HUDControl == null;
-
-        if (JoyStick != null) { JoyStickNull = false; }
 
         AAGunAnimator = EntityControl.GetComponent<Animator>();
         FullHealth = Health;
@@ -206,7 +201,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                 float InputX = Mathf.Clamp((VRPitchYawInput.x + InputXKeyb), -1, 1);
                 float InputY = Mathf.Clamp((VRPitchYawInput.y + InputYKeyb), -1, 1);
                 //joystick model movement
-                if (!JoyStickNull)
+                if (JoyStick)
                 {
                     JoyStick.localRotation = Quaternion.Euler(new Vector3(InputX * 25f, InputY * 25f, 0));
                 }
@@ -337,7 +332,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     {
         if (Manning && !InEditor)
         {
-            if (AAGunSeat != null) { AAGunSeat.ExitStation(localPlayer); }
+            if (AAGunSeat) { AAGunSeat.ExitStation(localPlayer); }
         }
         dead = true;
         firing = false;
@@ -439,7 +434,6 @@ public class SaccAAGunController : UdonSharpBehaviour
         Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
         float NextTargetAngle = Vector3.Angle(Rotator.transform.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(HudControlPosition, TargetCheckerTransform.position);
-        bool AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
 
         if (TargetChecker.activeInHierarchy)
         {
@@ -467,7 +461,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                         && NextTargetAngle < Lock_Angle
                             && NextTargetDistance < AAMMaxTargetDistance
                                 && NextTargetAngle < AAMCurrentTargetAngle)
-                                    || ((!AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing) || !AAMTargets[AAMTarget].activeInHierarchy)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                    || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing) || !AAMTargets[AAMTarget].activeInHierarchy)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                 {
                     //found new target
                     AAMCurrentTargetAngle = NextTargetAngle;
@@ -476,9 +470,8 @@ public class SaccAAGunController : UdonSharpBehaviour
                     AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
-                    AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null ? true : false;
                     LastSerialization -= SerializationInterval * .4f;//make it sync faster, maybe too fast if you change targets really quickly
-                    if (HUDControl != null)
+                    if (HUDControl)
                     {
                         HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
                         HUDControl.GUN_TargetSpeedLerper = 0f;
@@ -509,7 +502,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         else
         { AAMTargetObscuredDelay = 0; }
         if (AAMTargets[AAMTarget].activeInHierarchy
-                && (AAMCurrentTargetSAVControlNull || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
+                && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
         {
             if ((AAMTargetObscuredDelay < .25f)
                         && AAMCurrentTargetDistance < AAMMaxTargetDistance)
@@ -519,7 +512,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                 {
                     AAMLockTimer += DeltaTime;
                     //dont give enemy radar lock if you're out of missiles (planes do do this though)
-                    if (!AAMCurrentTargetSAVControlNull)
+                    if (AAMCurrentTargetSAVControl)
                     {
                         //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
                         AAMTargetedTimer += DeltaTime;
@@ -560,9 +553,9 @@ public class SaccAAGunController : UdonSharpBehaviour
     public void Targeted()
     {
         SaccAirVehicle TargetEngine = null;
-        if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
+        if (AAMTargets[AAMTarget] && AAMTargets[AAMTarget].transform.parent)
             TargetEngine = AAMTargets[AAMTarget].transform.parent.GetComponent<SaccAirVehicle>();
-        if (TargetEngine != null)
+        if (TargetEngine)
         {
             if (TargetEngine.Piloting || TargetEngine.Passenger)
             { TargetEngine.VehicleAnimator.SetTrigger("radarlocked"); }
@@ -613,9 +606,9 @@ public class SaccAAGunController : UdonSharpBehaviour
         Manning = true;
         RotationSpeedX = 0;
         RotationSpeedY = 0;
-        if (AAGunAnimator != null) AAGunAnimator.SetBool("inside", true);
-        if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
-        if (!HUDControlNULL) { HUDControl.GUN_TargetSpeedLerper = 0; }
+        if (AAGunAnimator) AAGunAnimator.SetBool("inside", true);
+        if (SeatAdjuster) { SeatAdjuster.SetActive(true); }
+        if (HUDControl) { HUDControl.GUN_TargetSpeedLerper = 0; }
 
         //Make sure SAVControl.AAMCurrentTargetSAVControl is correct
         var Target = AAMTargets[AAMTarget];
@@ -660,7 +653,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         AAMLocking.gameObject.SetActive(false);
         AAMLockedOn.gameObject.SetActive(false);
         AAGunAnimator.SetBool("inside", false);
-        if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
+        if (SeatAdjuster) { SeatAdjuster.SetActive(false); }
     }
     public void NotOccupied() { Occupied = false; }
     public void SFEXT_O_TakeOwnership()

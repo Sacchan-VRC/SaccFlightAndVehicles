@@ -42,13 +42,10 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private int AnimBool_STRING;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private bool Dial_FunconNULL = true;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] private int AGMUnlocking = 0;
     [System.NonSerializedAttribute] private float AGMUnlockTimer;
     private float AGMRotDif;
-    private bool AGMUnlockNULL;
-    private bool AGMLockNULL;
     private bool TriggerLastFrame;
     private float TriggerTapTime;
     [System.NonSerializedAttribute] public int FullAGMs;
@@ -74,8 +71,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        AGMUnlockNULL = AGMUnlock == null;
-        AGMLockNULL = AGMLock == null;
         FullAGMs = NumAGM;
         reloadspeed = FullAGMs / FullReloadTimeSec;
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
@@ -84,8 +79,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
-        Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
+        if (Dial_Funcon) Dial_Funcon.SetActive(false);
 
         FindSelf();
 
@@ -192,8 +186,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 AGMLocked = false;
                 AGMUnlockTimer = 0;
                 AGMUnlocking = 0;
-                if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
-                if (!AGMUnlockNULL)
+                if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+                if (AGMUnlock)
                 { AGMUnlock.Play(); }
             }
             if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
@@ -216,7 +210,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                     }
                     else if (!AGMLocked)
                     {//lock onto a target
-                        if (AtGCam != null)
+                        if (AtGCam)
                         {
                             //check for agmtargets to lock to
                             float targetangle = 999;
@@ -237,24 +231,21 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                         AGMLocked = true;
                                         AGMUnlocking = 0;
                                         RequestSerialization();
-                                        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+                                        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
                                     }
                                 }
                             }
                             else
                             {//didn't find one, lock onto raycast point
                                 Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
-                                if (lockpoint.point != null)
-                                {
-                                    //enable for others so they sync the variable
-                                    if (!AGMLockNULL)
-                                    { AGMLock.Play(); }
-                                    AGMTarget = lockpoint.point;
-                                    AGMLocked = true;
-                                    AGMUnlocking = 0;
-                                    RequestSerialization();
-                                    if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
-                                }
+                                //enable for others so they sync the variable
+                                if (AGMLock)
+                                { AGMLock.Play(); }
+                                AGMTarget = lockpoint.point;
+                                AGMLocked = true;
+                                AGMUnlocking = 0;
+                                RequestSerialization();
+                                if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
                             }
                         }
                     }
@@ -286,7 +277,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 float ZoomLevel = AtGCam.fieldOfView / 90;
                 AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, ZoomLevel * 220f * DeltaTime);
 
-                if (AtGCam != null)
+                if (AtGCam)
                 {
                     AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamLastFrame * Vector3.forward);
                     // AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotSlerper * Vector3.forward);
@@ -311,12 +302,9 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 {
                     RaycastHit camhit;
                     Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
-                    if (camhit.point != null)
-                    {
-                        //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
-                        float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
-                    }
+                    //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
+                    float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
+                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
                 }
                 else
                 {
@@ -332,11 +320,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
 
                 RaycastHit camhit;
                 Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
-                if (camhit.point != null)
-                {
-                    //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
-                    AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * SmoothDeltaTime), 0.3f);
-                }
+                //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
+                AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * SmoothDeltaTime), 0.3f);
             }
         }
     }
@@ -345,7 +330,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         if (NumAGM > 0) { NumAGM--; }
         AGMAnimator.SetTrigger(AGMLAUNCHED_STRING);
-        if (AGM != null)
+        if (AGM)
         {
             GameObject NewAGM = VRCInstantiate(AGM);
             if (!(NumAGM % 2 == 0))

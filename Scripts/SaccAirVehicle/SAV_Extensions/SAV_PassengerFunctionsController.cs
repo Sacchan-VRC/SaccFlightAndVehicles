@@ -122,14 +122,14 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             if (LStickSelection != LStickSelectionLastFrame)
             {
                 //new function selected, send deselected to old one
-                if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
+                if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame])
                 {
                     Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                 }
                 //get udonbehaviour for newly selected function and then send selected
                 if (LStickSelection > -1)
                 {
-                    if (Dial_Functions_L[LStickSelection] != null)
+                    if (Dial_Functions_L[LStickSelection])
                     {
                         Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                     }
@@ -161,14 +161,14 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             if (RStickSelection != RStickSelectionLastFrame)
             {
                 //new function selected, send deselected to old one
-                if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
+                if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame])
                 {
                     Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                 }
                 //get udonbehaviour for newly selected function and then send selected
                 if (RStickSelection > -1)
                 {
-                    if (Dial_Functions_R[RStickSelection] != null)
+                    if (Dial_Functions_R[RStickSelection])
                     {
                         Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                     }
@@ -190,12 +190,12 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     {
         foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent("DFUNC_LeftDial"); }
         }
         foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent("DFUNC_RightDial"); }
         }
     }
@@ -204,28 +204,28 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
         if (!InEditor)
         {
             foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
-            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
-            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             foreach (UdonSharpBehaviour EXT in PassengerExtensions)
-            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
         }
     }
     public void SendEventToExtensions_Gunner(string eventname)
     {
         foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent(eventname); }
         }
         foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent(eventname); }
         }
         foreach (UdonSharpBehaviour EXT in PassengerExtensions)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent(eventname); }
         }
     }

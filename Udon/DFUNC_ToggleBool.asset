@@ -210,7 +210,7 @@ MonoBehaviour:
       Data: 15|System.RuntimeType, mscorlib
     - Name: 
       Entry: 1
-      Data: UnityEngine.GameObject, UnityEngine.CoreModule
+      Data: UnityEngine.GameObject[], UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -222,7 +222,7 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: UnityEngineGameObject
+      Data: UnityEngineGameObjectArray
     - Name: symbolOriginalName
       Entry: 1
       Data: Dial_Funcon
@@ -756,7 +756,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Dial_FunconNULL
+      Data: AnimOn
     - Name: $v
       Entry: 7
       Data: 52|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -777,10 +777,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: Dial_FunconNULL
+      Data: AnimOn
     - Name: symbolUniqueName
       Entry: 1
-      Data: Dial_FunconNULL
+      Data: AnimOn
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -813,7 +813,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AnimOn
+      Data: ToggleTime
     - Name: $v
       Entry: 7
       Data: 55|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -822,7 +822,7 @@ MonoBehaviour:
       Data: 56|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 26
+      Data: 35
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -831,13 +831,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: SystemSingle
     - Name: symbolOriginalName
       Entry: 1
-      Data: AnimOn
+      Data: ToggleTime
     - Name: symbolUniqueName
       Entry: 1
-      Data: AnimOn
+      Data: ToggleTime
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -870,7 +870,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: ToggleTime
+      Data: UseLeftTrigger
     - Name: $v
       Entry: 7
       Data: 58|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -879,7 +879,7 @@ MonoBehaviour:
       Data: 59|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
       Entry: 9
-      Data: 35
+      Data: 26
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -888,13 +888,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemSingle
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: ToggleTime
+      Data: UseLeftTrigger
     - Name: symbolUniqueName
       Entry: 1
-      Data: ToggleTime
+      Data: UseLeftTrigger
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -927,7 +927,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: UseLeftTrigger
+      Data: TriggerLastFrame
     - Name: $v
       Entry: 7
       Data: 61|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -948,10 +948,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: UseLeftTrigger
+      Data: TriggerLastFrame
     - Name: symbolUniqueName
       Entry: 1
-      Data: UseLeftTrigger
+      Data: TriggerLastFrame
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -984,7 +984,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: TriggerLastFrame
+      Data: AnimBool_STRING
     - Name: $v
       Entry: 7
       Data: 64|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -992,8 +992,14 @@ MonoBehaviour:
       Entry: 7
       Data: 65|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 9
-      Data: 26
+      Entry: 7
+      Data: 66|System.RuntimeType, mscorlib
+    - Name: 
+      Entry: 1
+      Data: System.Int32, mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1002,13 +1008,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemBoolean
+      Data: SystemInt32
     - Name: symbolOriginalName
       Entry: 1
-      Data: TriggerLastFrame
+      Data: AnimBool_STRING
     - Name: symbolUniqueName
       Entry: 1
-      Data: TriggerLastFrame
+      Data: AnimBool_STRING
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1017,7 +1023,7 @@ MonoBehaviour:
       Data: 
     - Name: fieldAttributes
       Entry: 7
-      Data: 66|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
+      Data: 67|System.Collections.Generic.List`1[[System.Attribute, mscorlib]], mscorlib
     - Name: 
       Entry: 12
       Data: 0
@@ -1041,22 +1047,16 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: AnimBool_STRING
+      Data: sound_DoorOpen
     - Name: $v
       Entry: 7
-      Data: 67|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 68|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: fieldSymbol
       Entry: 7
-      Data: 68|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
+      Data: 69|UdonSharp.Compiler.SymbolDefinition, UdonSharp.Editor
     - Name: internalType
-      Entry: 7
-      Data: 69|System.RuntimeType, mscorlib
-    - Name: 
-      Entry: 1
-      Data: System.Int32, mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
+      Entry: 9
+      Data: 26
     - Name: declarationType
       Entry: 3
       Data: 2
@@ -1065,13 +1065,13 @@ MonoBehaviour:
       Data: 0
     - Name: symbolResolvedTypeName
       Entry: 1
-      Data: SystemInt32
+      Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: AnimBool_STRING
+      Data: sound_DoorOpen
     - Name: symbolUniqueName
       Entry: 1
-      Data: AnimBool_STRING
+      Data: sound_DoorOpen
     - Name: symbolDefaultValue
       Entry: 6
       Data: 
@@ -1104,7 +1104,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: sound_DoorOpen
+      Data: Dial_FunconNULL
     - Name: $v
       Entry: 7
       Data: 71|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
@@ -1125,10 +1125,10 @@ MonoBehaviour:
       Data: SystemBoolean
     - Name: symbolOriginalName
       Entry: 1
-      Data: sound_DoorOpen
+      Data: Dial_FunconNULL
     - Name: symbolUniqueName
       Entry: 1
-      Data: sound_DoorOpen
+      Data: Dial_FunconNULL
     - Name: symbolDefaultValue
       Entry: 6
       Data: 

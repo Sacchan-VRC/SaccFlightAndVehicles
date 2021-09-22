@@ -27,7 +27,6 @@ public class SaccEntity : UdonSharpBehaviour
     public Transform CenterOfMass;
     [Tooltip("Oneshot sound played each time function selection changes")]
     [SerializeField] private AudioSource SwitchFunctionSound;
-    private bool SwitchFunctionSoundNULL;
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
     [System.NonSerializedAttribute] public bool InEditor = true;
@@ -70,8 +69,6 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PilotExitTime;
     [System.NonSerializedAttribute] public float PilotEnterTime;
     [System.NonSerializedAttribute] public bool Holding;
-    [System.NonSerializedAttribute] public bool LStickDisplayHighlighterNULL;
-    [System.NonSerializedAttribute] public bool RStickDisplayHighlighterNULL;
     //end of old Leavebutton stuff
     private void Start()
     {
@@ -88,7 +85,7 @@ public class SaccEntity : UdonSharpBehaviour
             InVehicle = true;
         }
 
-        if (CenterOfMass == null)
+        if (!CenterOfMass)
         { CenterOfMass = gameObject.transform; }
 
         VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
@@ -104,11 +101,6 @@ public class SaccEntity : UdonSharpBehaviour
 
 
         //Dial Stuff
-        SwitchFunctionSoundNULL = SwitchFunctionSound == null;
-
-        LStickDisplayHighlighterNULL = LStickDisplayHighlighter == null;
-        RStickDisplayHighlighterNULL = RStickDisplayHighlighter == null;
-
         LStickNumFuncs = Dial_Functions_L.Length;
         RStickNumFuncs = Dial_Functions_R.Length;
         LStickDoDial = LStickNumFuncs > 1;
@@ -173,7 +165,7 @@ public class SaccEntity : UdonSharpBehaviour
     }
     void OnParticleCollision(GameObject other)
     {
-        if (other == null || dead) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
+        if (!other || dead) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
         LastHitParticle = other;
         SendEventToExtensions("SFEXT_L_BulletHit");
 
@@ -181,23 +173,23 @@ public class SaccEntity : UdonSharpBehaviour
         GameObject EnemyObjs = other;
         SaccEntity EnemyEntityControl = null;
         //search up the hierarchy to find the saccentity directly
-        while (EnemyEntityControl == null && EnemyObjs.transform.parent != null)
+        while (!EnemyEntityControl && EnemyObjs.transform.parent)
         {
             EnemyObjs = EnemyObjs.transform.parent.gameObject;
             EnemyEntityControl = EnemyObjs.GetComponent<SaccEntity>();
         }
         LastAttacker = EnemyEntityControl;
         //if failed to find it, search up the hierarchy for an udonsharpbehaviour with a reference to the saccentity (for instantiated missiles etc)
-        if (EnemyEntityControl == null)
+        if (!EnemyEntityControl)
         {
             EnemyObjs = other;
             UdonBehaviour EnemyUdonBehaviour = null;
-            while (EnemyUdonBehaviour == null && EnemyObjs.transform.parent != null)
+            while (!EnemyUdonBehaviour && EnemyObjs.transform.parent)
             {
                 EnemyObjs = EnemyObjs.transform.parent.gameObject;
                 EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
             }
-            if (EnemyUdonBehaviour != null)
+            if (EnemyUdonBehaviour)
             { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
         }
     }
@@ -246,8 +238,8 @@ public class SaccEntity : UdonSharpBehaviour
                             Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
-                    if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
-                    if (!LStickDisplayHighlighterNULL)
+                    if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (LStickDisplayHighlighter)
                     {
                         if (LStickSelection < 0)
                         { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
@@ -275,20 +267,20 @@ public class SaccEntity : UdonSharpBehaviour
                 if (RStickSelection != RStickSelectionLastFrame)
                 {
                     //new function selected, send deselected to old one
-                    if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame] != null)
+                    if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame])
                     {
                         Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
                     //get udonbehaviour for newly selected function and then send selected
                     if (RStickSelection > -1)
                     {
-                        if (Dial_Functions_R[RStickSelection] != null)
+                        if (Dial_Functions_R[RStickSelection])
                         {
                             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
-                    if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
-                    if (!RStickDisplayHighlighterNULL)
+                    if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (RStickDisplayHighlighter)
                     {
                         if (RStickSelection < 0)
                         { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
@@ -339,14 +331,14 @@ public class SaccEntity : UdonSharpBehaviour
             Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected");
             Dial_Functions_R[0].SetProgramVariable("TriggerLastFrame", true);
         }
-        if (!LStickDisplayHighlighterNULL)
+        if (LStickDisplayHighlighter)
         { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
-        if (!RStickDisplayHighlighterNULL)
+        if (RStickDisplayHighlighter)
         { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
 
         if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
         //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
-        if (InVehicleOnly != null) { InVehicleOnly.SetActive(true); }
+        if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
 
         Networking.SetOwner(localPlayer, gameObject);
         TakeOwnerShipOfExtensions();
@@ -376,7 +368,7 @@ public class SaccEntity : UdonSharpBehaviour
         {
             Using = false;
             InVehicle = false;
-            if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
+            if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
             { SendEventToExtensions("SFEXT_O_PilotExit"); }
         }
     }
@@ -385,14 +377,14 @@ public class SaccEntity : UdonSharpBehaviour
         Passenger = true;
         InVehicle = true;
         if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
-        if (InVehicleOnly != null) { InVehicleOnly.SetActive(true); }
+        if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
         SendEventToExtensions("SFEXT_P_PassengerEnter");
     }
     public void PassengerExitVehicleLocal()
     {
         Passenger = false;
         InVehicle = false;
-        if (InVehicleOnly != null) { InVehicleOnly.SetActive(false); }
+        if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
         SendEventToExtensions("SFEXT_P_PassengerExit");
     }
     public void PassengerEnterVehicleGlobal()
@@ -440,7 +432,7 @@ public class SaccEntity : UdonSharpBehaviour
         n = 0;
         foreach (Collider target in aamtargs)
         {
-            if (target.transform.parent != null && target.transform.parent == transform)
+            if (target.transform.parent && target.transform.parent == transform)
             {
                 self = n;
             }
@@ -477,10 +469,10 @@ public class SaccEntity : UdonSharpBehaviour
             n = 0;
             //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure they're the in the same order on all clients 
             float[] order = new float[NumAAMTargets];
-            for (int i = 0; AAMTargets[n] != null; i++)
+            for (int i = 0; AAMTargets[n]; i++)
             {
                 Transform parent = AAMTargets[n].transform;
-                for (int x = 0; parent != null; x++)
+                for (int x = 0; parent; x++)
                 {
                     order[n] = float.Parse($"{(int)order[n]}{parent.transform.GetSiblingIndex()}");
                     parent = parent.transform.parent;
@@ -519,12 +511,12 @@ public class SaccEntity : UdonSharpBehaviour
     {
         foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent("DFUNC_LeftDial"); }
         }
         foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent("DFUNC_RightDial"); }
         }
     }
@@ -533,11 +525,11 @@ public class SaccEntity : UdonSharpBehaviour
         if (!InEditor)
         {
             foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
-            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
-            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
-            { if (EXT != null) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+            { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
         }
     }
     [RecursiveMethod]
@@ -545,17 +537,17 @@ public class SaccEntity : UdonSharpBehaviour
     {
         foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent(eventname); }
         }
         foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent(eventname); }
         }
         foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
         {
-            if (EXT != null)
+            if (EXT)
             { EXT.SendCustomEvent(eventname); }
         }
     }

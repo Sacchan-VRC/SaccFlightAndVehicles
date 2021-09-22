@@ -40,13 +40,13 @@ public class SaccViewScreenController : UdonSharpBehaviour
         {
             SaccEntity TargetEntityStart = null;
             GameObject TargObjs = target.collider.gameObject;
-            while (TargetEntityStart == null && TargObjs.transform.parent != null)
+            while (!TargetEntityStart && TargObjs.transform.parent)
             {
                 TargObjs = TargObjs.transform.parent.gameObject;
                 TargetEntityStart = TargObjs.GetComponent<SaccEntity>();
             }
 
-            if (TargetEntityStart != null)
+            if (TargetEntityStart)
             {
                 AAMTargets[n] = TargetEntityStart.gameObject;
                 n++;
@@ -56,10 +56,10 @@ public class SaccViewScreenController : UdonSharpBehaviour
         n = 0;
         //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure it's the same among clients 
         float[] order = new float[NumAAMTargets];
-        for (int i = 0; AAMTargets[n] != null; i++)
+        for (int i = 0; AAMTargets[n]; i++)
         {
             Transform parent = AAMTargets[n].transform;
-            for (int x = 0; parent != null; x++)
+            for (int x = 0; parent; x++)
             {
                 order[n] = float.Parse($"{(int)order[n]}{parent.transform.GetSiblingIndex()}");
                 parent = parent.transform.parent;
@@ -80,7 +80,7 @@ public class SaccViewScreenController : UdonSharpBehaviour
             //check for change in target
             if (currenttarget != AAMTarget)
             {
-                if (AAMTargets[AAMTarget] != null && AAMTargets[AAMTarget].transform.parent != null)
+                if (AAMTargets[AAMTarget] && AAMTargets[AAMTarget].transform.parent)
                 {
                     TargetEntity = AAMTargets[AAMTarget].GetComponent<SaccEntity>();
                     TargetCoM = TargetEntity.CenterOfMass;

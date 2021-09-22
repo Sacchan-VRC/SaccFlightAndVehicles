@@ -29,7 +29,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private float StartGroundBrakeStrength;
     private float StartWaterBrakeStrength;
     private int BRAKE_STRING = Animator.StringToHash("brake");
-    private bool Airbrake_sndNULL;
     private bool Braking;
     private bool BrakingLastFrame;
     private float DragAdded = 0;
@@ -48,7 +47,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         HasAirBrake = AirbrakeStrength != 0;
-        Airbrake_sndNULL = Airbrake_snd == null;
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null && !localPlayer.isInstanceOwner)
         { gameObject.SetActive(false); }
@@ -162,7 +160,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                     //ground brake checks if vehicle is on top of a rigidbody, and if it is, brakes towards its speed rather than zero
                     //does not work if owner of vehicle does not own the rigidbody 
                     Rigidbody gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody");
-                    if (gdhr != null)
+                    if (gdhr)
                     {
                         float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
                         if (BrakeInput > 0 && RBSpeed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
@@ -188,12 +186,12 @@ public class DFUNC_Brake : UdonSharpBehaviour
                 Braking = BrakeInput > .1f;
                 if (Braking && !BrakingLastFrame)
                 {
-                    if (!Airbrake_sndNULL && !Airbrake_snd.isPlaying) { Airbrake_snd.Play(); }
+                    if (Airbrake_snd && !Airbrake_snd.isPlaying) { Airbrake_snd.Play(); }
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForAnimation");
                 }
                 if (AirbrakeLerper < .03 && BrakeInput < .03)
                 {
-                    if (!Airbrake_sndNULL && Airbrake_snd.isPlaying) { Airbrake_snd.Stop(); }
+                    if (Airbrake_snd && Airbrake_snd.isPlaying) { Airbrake_snd.Stop(); }
                 }
                 BrakingLastFrame = Braking;
             }
@@ -202,7 +200,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                 //outside of vehicle, ground brake always max
                 Rigidbody gdhr = null;
                 { gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody"); }
-                if (gdhr != null)
+                if (gdhr)
                 {
                     float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
                     if ((bool)SAVControl.GetProgramVariable("Taxiing") && RBSpeed < GroundBrakeSpeed && DisableGroundBrake == 0)

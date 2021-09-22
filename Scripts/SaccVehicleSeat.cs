@@ -30,9 +30,9 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         { EntityControl.PilotEnterVehicleLocal(); }
         else
         { EntityControl.PassengerEnterVehicleLocal(); }
-        if (ThisSeatOnly != null) { ThisSeatOnly.SetActive(true); }
+        if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
         localPlayer.UseAttachedStation();
-        if (SeatAdjuster != null) { SeatAdjuster.SetActive(true); }
+        if (SeatAdjuster) { SeatAdjuster.SetActive(true); }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
@@ -76,7 +76,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     {
         if (!SeatInitialized) { InitializeSeat(); }
         EntityControl.SeatedPlayers[ThisStationID] = -1;
-        if (SeatAdjuster != null) { SeatAdjuster.SetActive(false); }
+        if (SeatAdjuster) { SeatAdjuster.SetActive(false); }
         if (player != null)
         {
             if (IsPilotSeat) { EntityControl.PilotExitVehicle(player); }
@@ -95,7 +95,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                         SetVoiceOutside(guy);
                     }
                 }
-                if (ThisSeatOnly != null) { ThisSeatOnly.SetActive(false); }
+                if (ThisSeatOnly) { ThisSeatOnly.SetActive(false); }
             }
         }
     }

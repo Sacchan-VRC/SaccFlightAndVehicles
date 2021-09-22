@@ -1534,7 +1534,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SetPlaneLayerInside()
     {
-        if (PlaneMesh != null)
+        if (PlaneMesh)
         {
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
             foreach (Transform child in children)
@@ -1545,7 +1545,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SetPlaneLayerOutside()
     {
-        if (PlaneMesh != null)
+        if (PlaneMesh)
         {
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
             foreach (Transform child in children)

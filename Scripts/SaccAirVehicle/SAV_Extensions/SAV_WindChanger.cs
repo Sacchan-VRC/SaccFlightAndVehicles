@@ -83,7 +83,7 @@ public class SAV_WindChanger : UdonSharpBehaviour
         Vector3 NewWindDir = (gameObject.transform.rotation * Vector3.forward) * WindStrength;
         foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
         {
-            if (vehicle != null)
+            if (vehicle)
             {
                 vehicle.SetProgramVariable("Wind", NewWindDir);
                 vehicle.SetProgramVariable("WindGustStrength", WindGustStrength);

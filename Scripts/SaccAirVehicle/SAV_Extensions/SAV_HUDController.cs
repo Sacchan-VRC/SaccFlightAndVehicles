@@ -55,7 +55,7 @@ public class SAV_HUDController : UdonSharpBehaviour
         float fuel = (float)SAVControl.GetProgramVariable("Fuel");
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
 
-        if (PilotSeatAdjusterTarget != null) { transform.position = PilotSeatAdjusterTarget.position; }
+        if (PilotSeatAdjusterTarget) { transform.position = PilotSeatAdjusterTarget.position; }
 
         RStickFuncDegrees = EntityControl.RStickFuncDegrees;
         LStickFuncDegrees = EntityControl.LStickFuncDegrees;

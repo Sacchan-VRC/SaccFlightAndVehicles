@@ -62,22 +62,11 @@ public class SAV_SoundController : UdonSharpBehaviour
     [Tooltip("Only untick this if you have no door/canopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
     public bool AllDoorsClosed = true;
     [System.NonSerializedAttribute] public bool PlaneIdleNull = true;
-    [System.NonSerializedAttribute] public bool PlaneInsideNull = true;
-    [System.NonSerializedAttribute] public bool PlaneDistantNull = true;
     [System.NonSerializedAttribute] public bool ThrustNull = true;
-    [System.NonSerializedAttribute] public bool ABOnInsideNull = true;
-    [System.NonSerializedAttribute] public bool ABOnOutsideNull = true;
     [System.NonSerializedAttribute] public bool TouchDownNull = true;
-    [System.NonSerializedAttribute] public bool PlaneWindNull = true;
     [System.NonSerializedAttribute] public bool SonicBoomNull = true;
     [System.NonSerializedAttribute] public bool ExplosionNull = true;
     [System.NonSerializedAttribute] public bool BulletHitNull = true;
-    [System.NonSerializedAttribute] public bool RollingNull = true;
-    [System.NonSerializedAttribute] public bool EnterWaterNull = true;
-    [System.NonSerializedAttribute] public bool EnterWaterOutsideNull = true;
-    [System.NonSerializedAttribute] public bool UnderwaterNull = true;
-    [System.NonSerializedAttribute] public bool ReSupplyNull = true;
-    [System.NonSerializedAttribute] public bool RadarLockedNull = true;
     [System.NonSerializedAttribute] public bool MissileHitNULL = true;
     private SaccEntity EntityControl;
     //public Transform testcamera;
@@ -132,17 +121,6 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (Initiatlized) { return; }
         Initiatlized = true;
 
-        PlaneInsideNull = PlaneInside == null;
-        PlaneDistantNull = PlaneDistant == null;
-        ABOnInsideNull = ABOnOutside == null;
-        ABOnOutsideNull = ABOnOutside == null;
-        PlaneWindNull = PlaneWind == null;
-        RollingNull = Rolling == null;
-        UnderwaterNull = UnderWater == null;
-        EnterWaterNull = EnterWater == null;
-        EnterWaterOutsideNull = EnterWaterOutside == null;
-        ReSupplyNull = ReSupply == null;
-        RadarLockedNull = RadarLocked == null;
         MissileHitNULL = MissileHit.Length < 1;
         PlaneIdleNull = PlaneIdle.Length < 1;
         ThrustNull = Thrust.Length < 1;
@@ -159,7 +137,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         { InEditor = false; }
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         CenterOfMass = EntityControl.CenterOfMass;
-        if (!PlaneInsideNull)
+        if (PlaneInside)
         {
             PlaneInsideInitialVolume = PlaneInsideTargetVolume = PlaneInside.volume;
         }
@@ -184,7 +162,7 @@ public class SAV_SoundController : UdonSharpBehaviour
             }
         }
 
-        if (!PlaneDistantNull)
+        if (PlaneDistant)
         {
             PlaneDistantInitialVolume = PlaneDistantTargetVolume = PlaneDistant.volume;
             PlaneDistant.volume = 0f;
@@ -197,13 +175,13 @@ public class SAV_SoundController : UdonSharpBehaviour
             if (MaxAudibleDistance < Explosion[0].maxDistance)
             { MaxAudibleDistance = Explosion[0].maxDistance; }
         }
-        if (!PlaneDistantNull)
+        if (PlaneDistant)
         {
             if (MaxAudibleDistance < PlaneDistant.maxDistance)
             { MaxAudibleDistance = PlaneDistant.maxDistance + 50; }
         }
 
-        if (!PlaneWindNull) { PlaneWindInitialVolume = PlaneWindTargetVolume = PlaneWind.volume; PlaneWind.volume = 0f; }
+        if (PlaneWind) { PlaneWindInitialVolume = PlaneWindTargetVolume = PlaneWind.volume; PlaneWind.volume = 0f; }
 
         dopplecounter = Random.Range(0, 5);
 
@@ -226,9 +204,9 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             if (!soundsoff)//disable all the sounds that always play, re-enabled in pilotseat
             {
-                if (!PlaneDistantNull) { PlaneDistant.Stop(); }
-                if (!PlaneWindNull) { PlaneWind.Stop(); }
-                if (!PlaneInsideNull) { PlaneInside.Stop(); }
+                if (PlaneDistant) { PlaneDistant.Stop(); }
+                if (PlaneWind) { PlaneWind.Stop(); }
+                if (PlaneInside) { PlaneInside.Stop(); }
                 if (!ThrustNull)
                 {
                     foreach (AudioSource thrust in Thrust)
@@ -314,7 +292,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         //Piloting = true in editor play mode
         if ((InVehicle) && AllDoorsClosed)
         {
-            if (!RollingNull)
+            if (Rolling)
             {
                 if ((bool)SAVControl.GetProgramVariable("Taxiing"))
                 {
@@ -328,20 +306,20 @@ public class SAV_SoundController : UdonSharpBehaviour
             if ((Piloting || (Passenger && (bool)SAVControl.GetProgramVariable("Occupied"))) && (float)SAVControl.GetProgramVariable("Fuel") > 0.1f) //you're piloting or someone is piloting and you're a passenger
             {
                 float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
-                if (!PlaneInsideNull)
+                if (PlaneInside)
                 {
                     PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (engineout * .4f) + .8f, 2.25f * DeltaTime);
                     PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, PlaneInsideTargetVolume, .72f * DeltaTime);
                 }
                 PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume * InVehicleThrustVolumeFactor, 1.08f * DeltaTime);
-                if (!PlaneWindNull)
+                if (PlaneWind)
                 {
                     PlaneWind.volume = Mathf.Min((float)SAVControl.GetProgramVariable("AngleOfAttack") * ((float)SAVControl.GetProgramVariable("Speed") * PlaneWindMaxVolSpeedDivider) * PlaneWindMultiplier, PlaneWindMaxVolume);
                 }
             }
             else//you're a passenger and no one is flying
             {
-                if (!PlaneInsideNull)
+                if (PlaneInside)
                 {
                     PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * DeltaTime);
                     PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * DeltaTime);
@@ -385,7 +363,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         SonicBoomPreventer += DeltaTime;
         //set final volumes and pitches
         //lerp should help smooth out laggers and the dopple only being calculated every 5 frames
-        if (!SonicBoomNull && !silent && playsonicboom)
+        if (playsonicboom && !silent && !SonicBoomNull)
         {
             if (SonicBoomPreventer > 5 && !EntityControl.dead)
             {
@@ -401,7 +379,7 @@ public class SAV_SoundController : UdonSharpBehaviour
             idle.volume = Mathf.Lerp(idle.volume, PlaneIdleVolume, 30f * DeltaTime) * silentint;
             idle.pitch = Mathf.Lerp(idle.pitch, PlaneIdlePitchDopple, 30f * DeltaTime);
         }
-        if (!PlaneDistantNull)
+        if (PlaneDistant)
         {
             PlaneDistantVolume *= silentint;
             PlaneDistant.volume = Mathf.Lerp(PlaneDistant.volume, PlaneDistantVolume, 30f * DeltaTime);
@@ -424,18 +402,18 @@ public class SAV_SoundController : UdonSharpBehaviour
         InWater = true;
         if (InVehicle)
         {
-            if (!EnterWaterNull) { EnterWater.Play(); }
-            if (!UnderwaterNull) { UnderWater.Play(); }
+            if (EnterWater) { EnterWater.Play(); }
+            if (UnderWater) { UnderWater.Play(); }
         }
         else
         {
-            if (!EnterWaterOutsideNull) { EnterWaterOutside.Play(); }
+            if (EnterWaterOutside) { EnterWaterOutside.Play(); }
         }
 
-        if (!ABOnInsideNull && ABOnInside.isPlaying)
+        if (ABOnInside && ABOnInside.isPlaying)
         { ABOnInside.Stop(); }
 
-        if (!ABOnOutsideNull && ABOnOutside.isPlaying)
+        if (ABOnOutside && ABOnOutside.isPlaying)
         { ABOnOutside.Stop(); }
 
 
@@ -445,7 +423,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         PlaneDistantVolume = 0;
         PlaneDistantVolume = 0;
 
-        if (!PlaneDistantNull) { PlaneDistant.volume = 0; }
+        if (PlaneDistant) { PlaneDistant.volume = 0; }
 
         foreach (AudioSource thrust in Thrust)
         {
@@ -473,7 +451,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     public void SFEXT_G_ExitWater()
     {
         InWater = false;
-        if (!UnderwaterNull) { if (UnderWater.isPlaying) UnderWater.Stop(); }
+        if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
         PlaneInsideTargetVolume = PlaneInsideInitialVolume;
         PlaneIdleTargetVolume = PlaneIdleInitialVolume;
         PlaneThrustTargetVolume = PlaneThrustInitialVolume;
@@ -498,7 +476,7 @@ public class SAV_SoundController : UdonSharpBehaviour
             if (!SonicBoomNull)
             {
                 int rand = Random.Range(0, SonicBoom.Length);
-                if (SonicBoom[rand] != null)
+                if (SonicBoom[rand])
                 {
                     SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
                     float delay = (SonicBoomDistance - SonicBoomWave) / 343;
@@ -512,7 +490,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (!ExplosionNull)
         {
             int rand = Random.Range(0, Explosion.Length);
-            if (Explosion[rand] != null)
+            if (Explosion[rand])
             {
                 Explosion[rand].Play();
             }
@@ -523,14 +501,14 @@ public class SAV_SoundController : UdonSharpBehaviour
         Piloting = true;
         InVehicle = true;
         if (AllDoorsClosed) { SetSoundsInside(); }
-        if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
+        if (InWater) { if (UnderWater) { UnderWater.Play(); } }
     }
     public void SFEXT_O_PilotExit()
     {
         Piloting = false;
         InVehicle = false;
-        if (!PlaneWindNull) { PlaneWind.Stop(); }
-        if (!UnderwaterNull) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
+        if (PlaneWind) { PlaneWind.Stop(); }
+        if (UnderWater) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
         if (AllDoorsClosed)
         { SetSoundsOutside(); }
     }
@@ -539,14 +517,14 @@ public class SAV_SoundController : UdonSharpBehaviour
         Passenger = true;
         InVehicle = true;
         if (AllDoorsClosed) { SetSoundsInside(); }
-        if (InWater) { if (!UnderwaterNull) { UnderWater.Play(); } }
+        if (InWater) { if (UnderWater) { UnderWater.Play(); } }
     }
     public void SFEXT_P_PassengerExit()
     {
         Passenger = false;
         InVehicle = false;
-        if (!PlaneWindNull) PlaneWind.Stop();
-        if (!UnderwaterNull) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
+        if (PlaneWind) PlaneWind.Stop();
+        if (UnderWater) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
         if (AllDoorsClosed)
         { SetSoundsOutside(); }
     }
@@ -569,7 +547,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                 foreach (AudioSource idle in PlaneIdle)
                 { idle.Play(); }
             }
-            if (!PlaneDistantNull && !PlaneDistant.isPlaying)
+            if (PlaneDistant && !PlaneDistant.isPlaying)
             {
                 { PlaneDistant.Play(); }
             }
@@ -591,7 +569,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             PlayTouchDownSound();
         }
-        if (!Rolling_Seaplane && !RollingNull) { Rolling.volume = (float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve; }
+        if (!Rolling_Seaplane && Rolling) { Rolling.volume = (float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve; }
     }
     public void SFEXT_G_TouchDownWater()
     {
@@ -633,7 +611,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         PlaneThrustVolume = 0;
         PlaneDistantVolume = 0;
 
-        if (!PlaneDistantNull) { PlaneDistant.volume = 0; }
+        if (PlaneDistant) { PlaneDistant.volume = 0; }
 
         foreach (AudioSource thrust in Thrust)
         {
@@ -683,15 +661,15 @@ public class SAV_SoundController : UdonSharpBehaviour
     private void SetSoundsInside()
     {
         //change stuff when you get in/canopy closes
-        if (!ABOnOutsideNull) { ABOnOutside.Stop(); }
-        if (!PlaneInsideNull && !PlaneIdleNull)
+        if (ABOnOutside) { ABOnOutside.Stop(); }
+        if (PlaneInside && !PlaneIdleNull)
         {
             PlaneInside.pitch = PlaneIdle[0].pitch * .8f;
             PlaneInside.volume = PlaneIdle[0].volume * .4f;//it'll lerp up from here
         }
         PlaneThrustVolume *= InVehicleThrustVolumeFactor;
 
-        if (!RollingNull)
+        if (Rolling)
         {
             Rolling.Play();
             Rolling.volume = 0;
@@ -702,11 +680,11 @@ public class SAV_SoundController : UdonSharpBehaviour
             if (!thrust.isPlaying)
             { thrust.Play(); }
         }
-        if (!PlaneDistantNull && PlaneDistant.isPlaying)
+        if (PlaneDistant && PlaneDistant.isPlaying)
         { PlaneDistant.Stop(); }
-        if (!PlaneWindNull && !PlaneWind.isPlaying)
+        if (PlaneWind && !PlaneWind.isPlaying)
         { PlaneWind.volume = 0; PlaneWind.Play(); }
-        if (!PlaneInsideNull && !PlaneInside.isPlaying)
+        if (PlaneInside && !PlaneInside.isPlaying)
         { PlaneInside.Play(); }
         if (!PlaneIdleNull && PlaneIdle[0].isPlaying)
         {
@@ -716,27 +694,27 @@ public class SAV_SoundController : UdonSharpBehaviour
     }
     private void SetSoundsOutside()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
     {
-        if (!RadarLockedNull) { RadarLocked.Stop(); }
-        if (!RollingNull) { Rolling.Stop(); }
-        if (!PlaneInsideNull) { PlaneInside.Stop(); }
-        if (!PlaneWindNull) { PlaneWind.Stop(); }
+        if (RadarLocked) { RadarLocked.Stop(); }
+        if (Rolling) { Rolling.Stop(); }
+        if (PlaneInside) { PlaneInside.Stop(); }
+        if (PlaneWind) { PlaneWind.Stop(); }
 
         if (!EntityControl.dead)
         {
             foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
             foreach (AudioSource thrust in Thrust) { thrust.Play(); }
-            if (!PlaneDistantNull) { PlaneDistant.Play(); }
+            if (PlaneDistant) { PlaneDistant.Play(); }
             PlaneIdleVolume = PlaneIdleTargetVolume * .4f;
             PlaneThrustVolume *= PlaneThrustTargetVolume * InVehicleThrustVolumeFactorReverse;
             PlaneDistantVolume = PlaneThrustVolume;
-            if (!PlaneInsideNull) { PlaneIdlePitch = PlaneInside.pitch; }
+            if (PlaneInside) { PlaneIdlePitch = PlaneInside.pitch; }
         }
     }
     public void ResupplySound()
     {
         if ((int)SAVControl.GetProgramVariable("ReSupplied") > 0)
         {
-            if (!ReSupplyNull)
+            if (ReSupply)
             {
                 ReSupply.Play();
             }
@@ -744,14 +722,14 @@ public class SAV_SoundController : UdonSharpBehaviour
     }
     public void PlayAfturburnersound()
     {
-        if ((Piloting || Passenger) && (AllDoorsClosed))
+        if ((InVehicle) && (AllDoorsClosed))
         {
-            if (!ABOnInsideNull)
+            if (ABOnInside)
                 ABOnInside.Play();
         }
         else
         {
-            if (!ABOnOutsideNull)
+            if (ABOnOutside)
                 ABOnOutside.Play();
         }
     }

@@ -77,7 +77,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     }
     private void Explode()
     {
-        if (AGMRigid != null)
+        if (AGMRigid)
         { AGMRigid.constraints = RigidbodyConstraints.FreezePosition; }
         Exploding = true;
         if (ExplosionSounds.Length > 0)

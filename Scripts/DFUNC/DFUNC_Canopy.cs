@@ -25,7 +25,6 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     [SerializeField] private float CanopyDragMulti = 1.2f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private bool Dial_FunconNULL = true;
     private bool TriggerLastFrame;
     private Transform VehicleTransform;
     private VRCPlayerApi localPlayer;
@@ -48,7 +47,6 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         InEditor = localPlayer == null;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
-        Dial_FunconNULL = Dial_Funcon == null;
         CanopyDragMulti -= 1;
         //crashes if not sent delayed because the order of events sent by SendCustomEvent are not maintained, (SaccEntity.SendEventToExtensions())
         SendCustomEventDelayedFrames(nameof(CanopyOpening), 1);
@@ -66,7 +64,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         gameObject.SetActive(true);
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(CanopyOpen); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(CanopyOpen); }
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
     }
     public void SFEXT_O_PilotExit()
@@ -77,7 +75,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void SFEXT_P_PassengerEnter()
     {
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(CanopyOpen); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(CanopyOpen); }
     }
     public void SFEXT_G_Explode()
     {
@@ -157,7 +155,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     {
         if (CanopyOpen || CanopyBroken) { return; }
         LastCanopyToggleTime = Time.time;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(true); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         CanopyOpen = true;
         CanopyAnimator.SetBool(CANOPYOPEN_STRING, true);
         SoundControl.SendCustomEvent("DoorOpen");
@@ -176,7 +174,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     {
         if (!CanopyOpen || CanopyBroken) { return; }//don't bother when not necessary (OnPlayerJoined() wasn't you)
         LastCanopyToggleTime = Time.time;
-        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         CanopyOpen = false;
         CanopyAnimator.SetBool(CANOPYOPEN_STRING, false);
         CanopyTransitioning = true;

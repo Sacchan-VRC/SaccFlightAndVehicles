@@ -16,10 +16,8 @@ public class SAV_EffectsController : UdonSharpBehaviour
     [SerializeField] private ParticleSystem SplashParticle;
     [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
     [SerializeField] private float PlaySplashSpeed = 7;
-    private bool SplashNULL;
     private bool TrailsOn;
     private bool HasTrails;
-    [System.NonSerializedAttribute] public bool FrontWheelNull = true;
     private bool vapor;
     private float Gs_trail = 1000;//ensures trails wont emit at first frame
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
@@ -69,7 +67,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetBool(OCCUPIED_STRING, true);
         }
         else { InEditor = false; }
-        SplashNULL = SplashParticle == null;
     }
     private void Update()
     {
@@ -215,7 +212,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_EnterWater()
     {
-        if (SAVControl.Speed > PlaySplashSpeed && !SplashNULL) { SplashParticle.Play(); }
+        if (SAVControl.Speed > PlaySplashSpeed && SplashParticle) { SplashParticle.Play(); }
     }
     public void SFEXT_G_TakeOff()
     {

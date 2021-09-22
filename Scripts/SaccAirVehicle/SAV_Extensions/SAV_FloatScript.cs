@@ -50,7 +50,6 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [SerializeField] private float HoverBikeTurningStrength = 20;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifintg-at-90-degrees extra turning ability")]
     [SerializeField] private float BackThrustStrength = 15;
-    private bool SAVControlNULL;
     private float[] FloatDepth;
     private float[] FloatDepthLastFrame;
     private float[] FloatLastRayHitHeight;
@@ -66,8 +65,6 @@ public class SAV_FloatScript : UdonSharpBehaviour
     private int FPLength;
     void Start()
     {
-        SAVControlNULL = SAVControl == null;
-
         FPLength = FloatPoints.Length;
         FloatDiameter = FloatRadius * 2;
 
@@ -132,7 +129,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         if (!HitLandLast[currentfloatpoint])
         {
             float time = Time.time;
-            //add height of waves (noise(+-0.5) * waveheight)
+            //waves = (noise(+-0.5) * waveheight)
             Waves = (Vector3.up * ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f));
         }
         ///if above water, trace down to find water
@@ -194,10 +191,10 @@ public class SAV_FloatScript : UdonSharpBehaviour
             }
             VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * DepthMaxd * WaterRotDrag);
             VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * DepthMaxd * WaterVelDrag);
-            if (!SAVControlNULL && !HoverBike) { SAVControl.SetProgramVariable("Floating", true); }
+            if (SAVControl && !HoverBike) { SAVControl.SetProgramVariable("Floating", true); }
         }
         else
-        { if (!SAVControlNULL && !HoverBike) { SAVControl.SetProgramVariable("Floating", false); } }
+        { if (SAVControl && !HoverBike) { SAVControl.SetProgramVariable("Floating", false); } }
 
         Vector3 right = VehicleTransform.right;
         Vector3 forward = VehicleTransform.forward;

@@ -36,7 +36,7 @@ public class SAAG_HUDController : UdonSharpBehaviour
         BulletSpeedDivider = 1f / BulletSpeed;
         AAMReloadBarDivider = 1f / AAGunControl.MissileReloadTime;
         MGReloadBarDivider = 1f / AAGunControl.MGAmmoSeconds;
-        if (PilotSeatAdjusterTarget != null) { transform.position = PilotSeatAdjusterTarget.position; }
+        if (PilotSeatAdjusterTarget) { transform.position = PilotSeatAdjusterTarget.position; }
 
         Rotator = AAGunControl.Rotator.transform;
     }
@@ -78,7 +78,7 @@ public class SAAG_HUDController : UdonSharpBehaviour
         {
             GUNLeadIndicator.gameObject.SetActive(true);
             Vector3 TargetDir;
-            if (AAGunControl.AAMCurrentTargetSAVControl == null)//target is a dummy target
+            if (!AAGunControl.AAMCurrentTargetSAVControl)//target is a dummy target
             { TargetDir = AAGunControl.AAMTargets[AAGunControl.AAMTarget].transform.position - transform.position; }
             else
             { TargetDir = AAGunControl.AAMCurrentTargetSAVControl.CenterOfMass.position - transform.position; }
