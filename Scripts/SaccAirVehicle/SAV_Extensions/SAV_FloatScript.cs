@@ -135,12 +135,13 @@ public class SAV_FloatScript : UdonSharpBehaviour
         ///if above water, trace down to find water
         //if touching/in water trace down from diameterx2 above last water height at current xz to find water
         RaycastHit hit;
+        FloatTouchWaterPoint[currentfloatpoint] = FloatLastRayHitHeight[currentfloatpoint] + FloatDiameter + Waves.y;
         if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat.y)
         {
             //Touching or under water
             if (DoOnLand || !HitLandLast[currentfloatpoint])
             {
-                FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y + Waves.y;
+                FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y;
                 float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]));
                 if (CompressionDifference > 0)
                 { CompressionDifference = Mathf.Min(CompressionDifference * Compressing, MaxCompressingForce); }
@@ -150,14 +151,18 @@ public class SAV_FloatScript : UdonSharpBehaviour
                 }
                 FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
                 FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], MaxDepthForce) * FloatForce) + CompressionDifference));
-                Vector3 checksurface = new Vector3(TopOfFloat.x, FloatTouchWaterPoint[currentfloatpoint], TopOfFloat.z);
-                if (Physics.Raycast(checksurface, -Vector3.up, out hit, FloatDiameter * 2, FloatLayers, QueryTriggerInteraction.Collide))
+                //float is potentially below the top of the trigger, so fire a raycast from above the last known trigger height to check if it's still there
+                //the '+10': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
+                Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + 10, TopOfFloat.z);
+                if (Physics.Raycast(checksurface, -Vector3.up, out hit, 14, FloatLayers, QueryTriggerInteraction.Collide))
                 {
                     if (DoOnLand || hit.collider.isTrigger)
-                    { FloatTouchWaterPoint[currentfloatpoint] = hit.point.y + FloatDiameter; }
+                    { FloatLastRayHitHeight[currentfloatpoint] = hit.point.y; ; }
                 }
                 else
-                { FloatTouchWaterPoint[currentfloatpoint] = float.MinValue; }
+                {
+                    FloatLastRayHitHeight[currentfloatpoint] = float.MinValue;
+                }
             }
         }
         else
@@ -169,6 +174,8 @@ public class SAV_FloatScript : UdonSharpBehaviour
             if (Vel.y > 0 || HitLandLast[currentfloatpoint])//only reset water level if moving up (or last hit was land), so things don't break if we go straight from air all the way to under the water
             { FloatTouchWaterPoint[currentfloatpoint] = float.MinValue; }
             //Debug.Log(string.Concat(currentfloatpoint.ToString(), ": Air: floatpointforce: ", FloatPointForce[currentfloatpoint].ToString()));
+            //float could be below the top of the trigger if the waves are big enough, check for water trigger with current position + waveheight
+            Vector3 checksurface = new Vector3(TopOfFloat.x, TopOfFloat.y + WaveHeight, TopOfFloat.z);
             if (Physics.Raycast(TopOfFloat, -Vector3.up, out hit, 35, FloatLayers, QueryTriggerInteraction.Collide))
             {
                 FloatTouchWaterPoint[currentfloatpoint] = hit.point.y + FloatDiameter;
@@ -192,39 +199,41 @@ public class SAV_FloatScript : UdonSharpBehaviour
             VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * DepthMaxd * WaterRotDrag);
             VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * DepthMaxd * WaterVelDrag);
             if (SAVControl && !HoverBike) { SAVControl.SetProgramVariable("Floating", true); }
-        }
-        else
-        { if (SAVControl && !HoverBike) { SAVControl.SetProgramVariable("Floating", false); } }
 
-        Vector3 right = VehicleTransform.right;
-        Vector3 forward = VehicleTransform.forward;
 
-        float sidespeed = Vector3.Dot(Vel, right);
-        float forwardspeed = Vector3.Dot(Vel, forward);
+            Vector3 right = VehicleTransform.right;
+            Vector3 forward = VehicleTransform.forward;
 
-        if (HoverBike)
-        {
-            Vector3 up = VehicleTransform.up;
-            float RightY = Mathf.Abs(right.y);
-            right.y = 0;
-            if (Vector3.Dot(Vel, -up) > 0)
+            float sidespeed = Vector3.Dot(Vel, right);
+            float forwardspeed = Vector3.Dot(Vel, forward);
+
+            if (HoverBike)
             {
-                right = right.normalized * (1 + (RightY * HoverBikeTurningStrength));
+                Vector3 up = VehicleTransform.up;
+                float RightY = Mathf.Abs(right.y);
+                right.y = 0;
+                if (Vector3.Dot(Vel, -up) > 0)
+                {
+                    right = right.normalized * (1 + (RightY * HoverBikeTurningStrength));
+                }
+                else
+                {
+                    right = Vector3.zero;
+                }
+                float BackThrustAmount = -((Vector3.Dot(Vel, forward)) * BackThrustStrength);
+                if (BackThrustAmount > 0)
+                { VehicleRigidbody.AddForce(forward * BackThrustAmount * DepthMaxd * (float)SAVControl.GetProgramVariable("ThrottleInput"), ForceMode.Acceleration); }
+                VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * DepthMaxd, ForceMode.Acceleration);
             }
             else
             {
-                right = Vector3.zero;
+                VehicleRigidbody.AddForceAtPosition(right * -sidespeed * WaterSidewaysDrag * DepthMaxd, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
             }
-            float BackThrustAmount = -((Vector3.Dot(Vel, forward)) * BackThrustStrength);
-            if (BackThrustAmount > 0)
-            { VehicleRigidbody.AddForce(forward * BackThrustAmount * DepthMaxd * (float)SAVControl.GetProgramVariable("ThrottleInput"), ForceMode.Acceleration); }
-            VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * DepthMaxd, ForceMode.Acceleration);
+            VehicleRigidbody.AddForceAtPosition(forward * -forwardspeed * WaterForwardDrag * DepthMaxd, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
+
         }
         else
-        {
-            VehicleRigidbody.AddForceAtPosition(right * -sidespeed * WaterSidewaysDrag * DepthMaxd, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
-        }
-        VehicleRigidbody.AddForceAtPosition(forward * -forwardspeed * WaterForwardDrag * DepthMaxd, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
+        { if (SAVControl && !HoverBike) { SAVControl.SetProgramVariable("Floating", false); } }
 
         currentfloatpoint++;
         if (currentfloatpoint == FPLength) { currentfloatpoint = 0; }
