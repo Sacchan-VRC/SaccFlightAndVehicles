@@ -9,7 +9,7 @@ public class SaccMultiObjectToggle : UdonSharpBehaviour
 {
     public GameObject[] ToggleObjs;
     private int current = 0;
-    private void Interact()//entering the plane
+    public override void Interact()//entering the plane
     {
         current++;
         if (current == ToggleObjs.Length)

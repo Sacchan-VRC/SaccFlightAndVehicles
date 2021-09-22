@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_BombController : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour BombLauncherControl;
@@ -57,7 +57,7 @@ public class SAV_BombController : UdonSharpBehaviour
         float sidespeed = Vector3.Dot(BombRigid.velocity, transform.right);
         float downspeed = Vector3.Dot(BombRigid.velocity, transform.up);
         BombConstant.relativeTorque = new Vector3(-downspeed, sidespeed, 0) * StraightenFactor;
-        BombConstant.relativeForce = new Vector3(-sidespeed, -downspeed, ForwardThrust);
+        BombConstant.relativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, ForwardThrust);
         Lifetime += Time.deltaTime;
         if (Lifetime > MaxLifetime)
         {

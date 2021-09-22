@@ -32,7 +32,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private Transform CatapultTransform;
     private int CatapultDeadTimer;
     private Rigidbody VehicleRigidbody;
-    private bool CatapultSteamNull = true;
     private float InVehicleThrustVolumeFactor;
     [System.NonSerializedAttribute] public bool CatapultLockNull;
     private Animator VehicleAnimator;
@@ -55,7 +54,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     {
         InEditor = Networking.LocalPlayer == null;
         Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(false);
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
@@ -114,6 +113,10 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     {
         OnCatapult = false;
         DisableOverrides();
+    }
+    public void SFEXT_G_RespawnButton()
+    {
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
     }
     private void EnableOneFrameToFindAnimator()
     {

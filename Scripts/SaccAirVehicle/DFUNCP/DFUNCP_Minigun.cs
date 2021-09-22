@@ -20,7 +20,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
     private bool AmmoBarNULL = true;
-    private bool TriggerLastFrame;
     [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
     private bool InVR;
     private VRCPlayerApi localPlayer;
@@ -70,7 +69,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         Selected = false;
-        TriggerLastFrame = false;
         if (firing)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
@@ -87,7 +85,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     {
         func_active = false;
         Selected = false;
-        TriggerLastFrame = false;
         GunDamageParticle_Parent.gameObject.SetActive(false);
         if (firing)
         {
@@ -140,7 +137,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
                 }
                 GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
 
-                TriggerLastFrame = true;
             }
             else
             {
@@ -148,7 +144,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
                     firing = false;
-                    TriggerLastFrame = false;
                 }
             }
             if (TimeSinceSerialization > 1f)
@@ -164,7 +159,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
                 firing = false;
             }
-            TriggerLastFrame = false;
         }
         if (func_active)
         {
@@ -207,7 +201,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     public void Disable_Stopfiring()
     {
         firing = false;
-        TriggerLastFrame = false;
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
     }
     public void GunStartFiring()

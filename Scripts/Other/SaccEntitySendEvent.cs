@@ -11,7 +11,7 @@ public class SaccEntitySendEvent : UdonSharpBehaviour
     [Tooltip("Name of event to send to the SaccEntity")]
     [SerializeField] private string EventName;
     private bool Global = false;
-    private void Interact()
+    public override void Interact()
     {
         if (Global)
         {

@@ -13,7 +13,7 @@ public class SaccEntity : UdonSharpBehaviour
     public UdonSharpBehaviour[] Dial_Functions_L;
     [Tooltip("Function dial scripts that you wish to be on the right dial")]
     public UdonSharpBehaviour[] Dial_Functions_R;
-    [Tooltip("Should there be a function at the top middle of the function dial? Or a divider? Useful for adjusting function positions with an odd number of functions")]
+    [Tooltip("Should there be a function at the top middle of the function dial[ ]? Or a divider[x]? Useful for adjusting function positions with an odd number of functions")]
     [SerializeField] private bool LeftDialDivideStraightUp = false;
     [Tooltip("See above")]
     [SerializeField] private bool RightDialDivideStraightUp = false;
@@ -38,8 +38,6 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int NumAAMTargets = 0;
     private Vector2 RStickCheckAngle;
     private Vector2 LStickCheckAngle;
-    private UdonSharpBehaviour CurrentSelectedFunctionL;
-    private UdonSharpBehaviour CurrentSelectedFunctionR;
     [System.NonSerializedAttribute] public GameObject LastHitParticle;
     [System.NonSerializedAttribute] public float LStickFuncDegrees;
     [System.NonSerializedAttribute] public float RStickFuncDegrees;
@@ -247,7 +245,6 @@ public class SaccEntity : UdonSharpBehaviour
                         {
                             Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
-                        else { CurrentSelectedFunctionL = null; }
                     }
                     if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
                     if (!LStickDisplayHighlighterNULL)
@@ -289,7 +286,6 @@ public class SaccEntity : UdonSharpBehaviour
                         {
                             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
-                        else { CurrentSelectedFunctionR = null; }
                     }
                     if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
                     if (!RStickDisplayHighlighterNULL)

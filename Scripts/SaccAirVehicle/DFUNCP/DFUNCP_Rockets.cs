@@ -29,8 +29,6 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     private float FullRocketsDivider;
     private Transform VehicleTransform;
     private float reloadspeed;
-    private bool LeftDial = false;
-    private int DialPosition = -999;
     private Vector3 AmmoBarScaleStart;
     private VRCPlayerApi localPlayer;
     private bool InVR;

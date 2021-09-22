@@ -19,6 +19,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     private bool TriggerLastFrame;
     [System.NonSerializedAttribute] public bool GearUp = false;
     private bool DragApplied = false;
+    private bool IsOwner = false;
     private bool DisableGroundDetector = false;
     [System.NonSerializedAttribute] public int DisableGearToggle = 0;
     private int GEARUP_STRING = Animator.StringToHash("gearup");
@@ -31,7 +32,8 @@ public class DFUNC_Gear : UdonSharpBehaviour
         LandingGearDragMulti -= 1;//to match how the old values worked
         SetGearDown();
         Dial_FunconNULL = Dial_Funcon == null;
-        if (!Dial_FunconNULL) Dial_Funcon.SetActive(!GearUp);
+        if (!Dial_FunconNULL) { Dial_Funcon.SetActive(!GearUp); }
+        IsOwner = Networking.LocalPlayer.isInstanceOwner;
     }
     public void DFUNC_Selected()
     {
@@ -54,6 +56,14 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public void SFEXT_O_PassengerEnter()
     {
         if (!Dial_FunconNULL) Dial_Funcon.SetActive(!GearUp);
+    }
+    public void SFEXT_O_TakeOwnership()
+    {
+        IsOwner = true;
+    }
+    public void SFEXT_O_LoseOwnership()
+    {
+        IsOwner = false;
     }
     public void SFEXT_G_Explode()
     {
@@ -88,7 +98,8 @@ public class DFUNC_Gear : UdonSharpBehaviour
         if (!DisableGroundDetector)
         {
             SAVControl.SetProgramVariable("DisableGroundDetection", (int)SAVControl.GetProgramVariable("DisableGroundDetection") + 1);
-            SAVControl.SetProgramVariable("Taxiing", false);
+            SAVControl.SetProgramVariable("GroundedLastFrame", false);
+            SAVControl.SetProgramVariable("GDHitRigidbody", null);
             DisableGroundDetector = true;
         }
         if (!Dial_FunconNULL) { Dial_Funcon.SetActive(false); }
@@ -100,7 +111,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
             DragApplied = false;
         }
 
-        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+        if (IsOwner)
         {
             EntityControl.SendEventToExtensions("SFEXT_O_GearUp");
         }
@@ -122,7 +133,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
             DragApplied = true;
         }
 
-        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+        if (IsOwner)
         {
             EntityControl.SendEventToExtensions("SFEXT_O_GearDown");
         }
@@ -131,18 +142,18 @@ public class DFUNC_Gear : UdonSharpBehaviour
     {
         if (!GearUp)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearUp));
         }
         else
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearDown");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearDown));
         }
     }
     public void SFEXT_O_PlayerJoined()
     {
         if (GearUp)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetGearUp");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearUp));
         }
     }
 

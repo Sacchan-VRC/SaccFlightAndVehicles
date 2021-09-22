@@ -19,7 +19,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private bool SplashNULL;
     private bool TrailsOn;
     private bool HasTrails;
-    private bool JoyStickNull = true;
     [System.NonSerializedAttribute] public bool FrontWheelNull = true;
     private bool vapor;
     private float Gs_trail = 1000;//ensures trails wont emit at first frame
@@ -42,17 +41,20 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private int AOA_STRING = Animator.StringToHash("AoA");
     private int MACH10_STRING = Animator.StringToHash("mach10");
     private int GS_STRING = Animator.StringToHash("Gs");
-    private int WEAPON_STRING = Animator.StringToHash("weapon");
     private int BOMB_STRING = Animator.StringToHash("bombs");
     private int AAMS_STRING = Animator.StringToHash("AAMs");
     private int AGMS_STRING = Animator.StringToHash("AGMs");
     private int EXPLODE_STRING = Animator.StringToHash("explode");
     private int MISSILESINCOMING_STRING = Animator.StringToHash("missilesincoming");
     private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
+    private int LOCALPASSENGER_STRING = Animator.StringToHash("localpassenger");
     private int BULLETHIT_STRING = Animator.StringToHash("bullethit");
     private int ONGROUND_STRING = Animator.StringToHash("onground");
     private int ONWATER_STRING = Animator.StringToHash("onwater");
     private int LOCKEDAAM_STRING = Animator.StringToHash("locked_aam");
+    private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
+    private int REAPPEAR_STRING = Animator.StringToHash("reappear");
+    private int RESUPPLY_STRING = Animator.StringToHash("resupply");
 
 
     private void Start()
@@ -108,7 +110,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
         }
         else { DoEffects += DeltaTime; }
 
-
         VehicleAnimator.SetFloat(VTOLANGLE_STRING, SAVControl.VTOLAngle);
 
         vapor = SAVControl.Speed > 20;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
@@ -148,13 +149,12 @@ public class SAV_EffectsController : UdonSharpBehaviour
         }
         //("mach10", EngineControl.Speed / 343 / 10)
         VehicleAnimator.SetFloat(MACH10_STRING, SAVControl.Speed * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
-        //("Gs", vapor ? EngineControl.Gs / 50 : 0)
+        //("Gs", vapor ? EngineControl.Gs / 200 + .5f : 0) (.5 == 0 Gs, 1 == 100Gs, 0 == -100Gs)
         VehicleAnimator.SetFloat(GS_STRING, vapor ? (SAVControl.VertGs * 0.005f) + 0.5f : 0.5f);
     }
     public void EffectsResetStatus()//called from enginecontroller.Explode();
     {
         DoEffects = 6;
-        VehicleAnimator.SetInteger(WEAPON_STRING, 4);
         VehicleAnimator.SetFloat(BOMB_STRING, 1);
         VehicleAnimator.SetFloat(AAMS_STRING, 1);
         VehicleAnimator.SetFloat(AGMS_STRING, 1);
@@ -167,20 +167,47 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public void SFEXT_G_PilotEnter()
     {
         DoEffects = 0f;
+        VehicleAnimator.SetBool(OCCUPIED_STRING, true);
     }
     public void SFEXT_O_PilotEnter()
     {
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
+        VehicleAnimator.SetBool(LOCALPILOT_STRING, true);
     }
-    public void SFEXT_O_ReAppear()
+    public void SFEXT_O_PilotExit()
+    {
+        VehicleAnimator.SetBool(LOCALPILOT_STRING, false);
+    }
+    public void SFEXT_P_PassengerEnter()
+    {
+        VehicleAnimator.SetBool(LOCALPASSENGER_STRING, true);
+    }
+    public void SFEXT_P_PassengerExit()
+    {
+        VehicleAnimator.SetBool(LOCALPASSENGER_STRING, false);
+        VehicleAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
+    }
+    public void SFEXT_G_ReAppear()
     {
         DoEffects = 6f; //wake up if was asleep
+        VehicleAnimator.SetTrigger(REAPPEAR_STRING);
     }
-    public void SFEXT_L_BulletHit()
+    public void SFEXT_G_AfterburnerOn()
     {
+        VehicleAnimator.SetBool(AFTERBURNERON_STRING, true);
+    }
+    public void SFEXT_G_AfterburnerOff()
+    {
+        VehicleAnimator.SetBool(AFTERBURNERON_STRING, false);
+    }
+    public void SFEXT_G_ReSupply()
+    {
+        VehicleAnimator.SetTrigger(RESUPPLY_STRING);
+    }
+    public void SFEXT_G_BulletHit()
+    {
+        WakeUp();
         VehicleAnimator.SetTrigger(BULLETHIT_STRING);
-        if (DoEffects > 0)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(WakeUp)); }
     }
     public void WakeUp()
     {
@@ -214,7 +241,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
         VehicleAnimator.SetFloat(AAMS_STRING, 1);
         VehicleAnimator.SetFloat(AGMS_STRING, 1);
         VehicleAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
-        VehicleAnimator.SetInteger(WEAPON_STRING, 0);
         VehicleAnimator.SetFloat(PITCHINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(ROLLINPUT_STRING, .5f);

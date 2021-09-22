@@ -5,7 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
-public class SaccPilotSeat : UdonSharpBehaviour
+public class SaccVehicleSeat : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
     [Tooltip("Gameobject with script that runs when you enter the seat to edjust your view position")]
@@ -21,7 +21,7 @@ public class SaccPilotSeat : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
 
     }
-    private void Interact()//entering the plane
+    public override void Interact()//entering the plane
     {
         if (!SeatInitialized) { InitializeSeat(); }
         EntityControl.MySeat = ThisStationID;

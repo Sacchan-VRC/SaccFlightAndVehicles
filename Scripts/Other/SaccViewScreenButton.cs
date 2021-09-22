@@ -8,7 +8,7 @@ using VRC.Udon;
 public class SaccViewScreenButton : UdonSharpBehaviour
 {
     public SaccViewScreenController ViewScreenControl;
-    void Interact()
+    public override void Interact()
     {
         if (ViewScreenControl.Disabled && ViewScreenControl.NumAAMTargets > 0)
         {

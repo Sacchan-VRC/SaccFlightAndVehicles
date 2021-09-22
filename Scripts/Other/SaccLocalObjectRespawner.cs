@@ -14,7 +14,7 @@ public class SaccLocalObjectRespawner : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
     }
-    void Interact()
+    public override void Interact()
     {
         Networking.SetOwner(localPlayer, ObjectToRespawn);
         ObjectToRespawn.transform.position = RespawnPoint.position;

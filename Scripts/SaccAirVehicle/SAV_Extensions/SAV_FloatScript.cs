@@ -127,33 +127,23 @@ public class SAV_FloatScript : UdonSharpBehaviour
     private void FixedUpdate()
     {
         Vector3 Vel = VehicleRigidbody.velocity;
-        Vector3 RayCastPoint = FloatPoints[currentfloatpoint].position + (Vector3.up * FloatRadius);
-        float TopOfFloat = RayCastPoint.y;
+        Vector3 TopOfFloat = FloatPoints[currentfloatpoint].position + (Vector3.up * FloatRadius);
         Vector3 Waves = Vector3.zero;
-        if (!HitLandLast[currentfloatpoint])//move RayCastPoint around to simulate waves
+        if (!HitLandLast[currentfloatpoint])
         {
             float time = Time.time;
             //add height of waves (noise(+-0.5) * waveheight)
-            Waves = (Vector3.up * ((Mathf.PerlinNoise(((RayCastPoint.x + (time * WaveSpeed)) * WaveScale), ((RayCastPoint.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f));
-            RayCastPoint += Waves;
+            Waves = (Vector3.up * ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f));
         }
+        ///if above water, trace down to find water
+        //if touching/in water trace down from diameterx2 above last water height at current xz to find water
         RaycastHit hit;
-        if (Physics.Raycast(RayCastPoint, -Vector3.up, out hit, 35, FloatLayers, QueryTriggerInteraction.Collide))
-        {
-            FloatTouchWaterPoint[currentfloatpoint] = hit.point.y + FloatDiameter + Waves.y;
-            HitLandLast[currentfloatpoint] = !hit.collider.isTrigger;
-            FloatLastRayHitHeight[currentfloatpoint] = hit.point.y;
-        }
-        else
-        {
-            FloatTouchWaterPoint[currentfloatpoint] = FloatLastRayHitHeight[currentfloatpoint] + FloatDiameter + Waves.y;
-        }
-        if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat)
+        if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat.y)
         {
             //Touching or under water
             if (DoOnLand || !HitLandLast[currentfloatpoint])
             {
-                FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat;
+                FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y + Waves.y;
                 float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]));
                 if (CompressionDifference > 0)
                 { CompressionDifference = Mathf.Min(CompressionDifference * Compressing, MaxCompressingForce); }
@@ -163,8 +153,14 @@ public class SAV_FloatScript : UdonSharpBehaviour
                 }
                 FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
                 FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], MaxDepthForce) * FloatForce) + CompressionDifference));
-                //Debug.Log(string.Concat(currentfloatpoint.ToString(), ": floating: CompressonDif: ", CompressionDifference.ToString()));
-                //Debug.Log(string.Concat(currentfloatpoint.ToString(), ": floating: floatpointforce: ", FloatPointForce[currentfloatpoint].ToString()));
+                Vector3 checksurface = new Vector3(TopOfFloat.x, FloatTouchWaterPoint[currentfloatpoint], TopOfFloat.z);
+                if (Physics.Raycast(checksurface, -Vector3.up, out hit, FloatDiameter * 2, FloatLayers, QueryTriggerInteraction.Collide))
+                {
+                    if (DoOnLand || hit.collider.isTrigger)
+                    { FloatTouchWaterPoint[currentfloatpoint] = hit.point.y + FloatDiameter; }
+                }
+                else
+                { FloatTouchWaterPoint[currentfloatpoint] = float.MinValue; }
             }
         }
         else
@@ -174,8 +170,14 @@ public class SAV_FloatScript : UdonSharpBehaviour
             FloatDepthLastFrame[currentfloatpoint] = 0;
             FloatPointForce[currentfloatpoint] = Vector3.zero;
             if (Vel.y > 0 || HitLandLast[currentfloatpoint])//only reset water level if moving up (or last hit was land), so things don't break if we go straight from air all the way to under the water
-            { FloatLastRayHitHeight[currentfloatpoint] = -500000; }
+            { FloatTouchWaterPoint[currentfloatpoint] = float.MinValue; }
             //Debug.Log(string.Concat(currentfloatpoint.ToString(), ": Air: floatpointforce: ", FloatPointForce[currentfloatpoint].ToString()));
+            if (Physics.Raycast(TopOfFloat, -Vector3.up, out hit, 35, FloatLayers, QueryTriggerInteraction.Collide))
+            {
+                FloatTouchWaterPoint[currentfloatpoint] = hit.point.y + FloatDiameter;
+                HitLandLast[currentfloatpoint] = !hit.collider.isTrigger;
+                FloatLastRayHitHeight[currentfloatpoint] = hit.point.y;
+            }
         }
 
         depth = 0;

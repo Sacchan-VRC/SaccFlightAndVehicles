@@ -353,18 +353,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Vector3 JoystickOverride;
 
 
-
     [System.NonSerializedAttribute] public int ReSupplied = 0;
-
-    private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
-    private int RADARLOCKED_STRING = Animator.StringToHash("radarlocked");
-    private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
-    private int RESUPPLY_STRING = Animator.StringToHash("resupply");
-    private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
-    private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
-    private int LOCALPASSENGER_STRING = Animator.StringToHash("localpassenger");
-    private int OCCUPIED_STRING = Animator.StringToHash("occupied");
-    private int REAPPEAR_STRING = Animator.StringToHash("reappear");
     public void SFEXT_L_EntityStart()
     {
         VehicleGameObj = EntityControl.gameObject;
@@ -435,8 +424,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Planelayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
         VehicleAnimator = EntityControl.GetComponent<Animator>();
-        //set these values at start in case they haven't been set correctly in editor
-
 
         FullHealth = Health;
         FullFuel = Fuel;
@@ -1105,9 +1092,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//so passengers can hear the airbrake
                                                              //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
                                                              //AirSpeed = AirVel.magnitude;
-        }/* 
-        if (Piloting)
-        { Debug.Log(string.Concat("ExtraDrag: ", ExtraDrag.ToString())); } */
+        }
     }
     private void FixedUpdate()
     {
@@ -1189,7 +1174,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void ReAppear()
     {
-        VehicleAnimator.SetTrigger("reappear");
+        EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
         VehicleRigidbody.drag = 0;
         VehicleRigidbody.angularDrag = 0;
     }
@@ -1244,23 +1229,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SetAfterburnerOn()
     {
         AfterburnerOn = true;
-        VehicleAnimator.SetBool(AFTERBURNERON_STRING, true);
-
-        if (IsOwner)
-        {
-            EntityControl.SendEventToExtensions("SFEXT_O_AfterburnerOn");
-        }
+        EntityControl.SendEventToExtensions("SFEXT_G_AfterburnerOn");
     }
     public void SetAfterburnerOff()
     {
         AfterburnerOn = false;
-
-        VehicleAnimator.SetBool(AFTERBURNERON_STRING, false);
-
-        if (IsOwner)
-        {
-            EntityControl.SendEventToExtensions("SFEXT_O_AfterburnerOff");
-        }
+        EntityControl.SendEventToExtensions("SFEXT_G_AfterburnerOff");
     }
     private void ToggleAfterburner()
     {
@@ -1293,7 +1267,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
             Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
         }
-        VehicleAnimator.SetTrigger(RESUPPLY_STRING);
     }
     public void SFEXT_O_RespawnButton()//called when using respawn button
     {
@@ -1470,7 +1443,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_P_PassengerEnter()
     {
         Passenger = true;
-        VehicleAnimator.SetBool(LOCALPASSENGER_STRING, true);
         SetPlaneLayerInside();
     }
     public void SFEXT_P_PassengerExit()
@@ -1480,8 +1452,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
-        VehicleAnimator.SetInteger("missilesincoming", 0);
-        VehicleAnimator.SetBool("localpassenger", false);
 
         SetPlaneLayerOutside();
     }
@@ -1519,8 +1489,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Piloting = true;
         if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
-        VehicleAnimator.SetBool(LOCALPILOT_STRING, true);
-
         //hopefully prevents explosions when you enter the plane
         VehicleRigidbody.velocity = CurrentVel;
         VertGs = 0;
@@ -1532,7 +1500,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_G_PilotEnter()
     {
         Occupied = true;
-        VehicleAnimator.SetBool(OCCUPIED_STRING, true);
         EntityControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
     }
     public void SFEXT_G_PilotExit()
@@ -1560,7 +1527,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
-        VehicleAnimator.SetBool(LOCALPILOT_STRING, false);
         localPlayer.SetVelocity(CurrentVel);
 
         //set plane's layer back

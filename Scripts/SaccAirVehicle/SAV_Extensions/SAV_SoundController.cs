@@ -81,7 +81,6 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool MissileHitNULL = true;
     private SaccEntity EntityControl;
     //public Transform testcamera;
-    private bool SuperSonic = false;
     private float IdleDoppleTemp;
     [System.NonSerializedAttribute] public float Doppler = 1;
     float LastFrameDist;

@@ -47,7 +47,7 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
         AwakeTimer = CalibrateTimer = 0f;
     }
 
-    private void PostLateUpdate()
+    public override void PostLateUpdate()
     {
         AwakeTimer += Time.deltaTime;
         CalibrateTimer += Time.deltaTime;

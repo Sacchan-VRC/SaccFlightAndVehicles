@@ -35,7 +35,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     private float FullGunAmmoInSeconds = 12;
     private Rigidbody VehicleRigidbody;
-    private bool TriggerLastFrame;
     private bool GunRecoilEmptyNULL = true;
     [UdonSynced, FieldChangeCallback(nameof(Firing))] private bool _firing;
     public bool Firing
@@ -49,11 +48,9 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     private int GUNFIRING_STRING = Animator.StringToHash("gunfiring");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
-    private bool Passenger;
     private float FullGunAmmoDivider;
     private bool Selected = false;
     private float reloadspeed;
-    private bool Initialized = false;
     private bool LeftDial = false;
     private bool Piloting = false;
     private int DialPosition = -999;
@@ -90,7 +87,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active));
         Selected = true;
         if (DoAnimBool && !AnimOn)
@@ -101,7 +97,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
         if (Selected)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
         Selected = false;
-        TriggerLastFrame = false;
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
@@ -118,19 +113,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         Piloting = false;
-        TriggerLastFrame = false;
         RequestSerialization();
         if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
         Selected = false;
         GunDamageParticle.gameObject.SetActive(false);
-    }
-    public void SFEXT_P_PassengerEnter()
-    {
-        Passenger = true;
-    }
-    public void SFEXT_P_PassengerExit()
-    {
-        Passenger = false;
     }
     public void SFEXT_G_ReSupply()
     {
@@ -201,7 +187,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 {
                     VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in a similar range as above*/, GunRecoilEmpty.position, ForceMode.Force);
                 }
-                TriggerLastFrame = true;
             }
             else
             {
@@ -209,7 +194,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 {
                     Firing = false;
                     RequestSerialization();
-                    TriggerLastFrame = false;
                     if ((bool)SAVControl.GetProgramVariable("IsOwner"))
                     { EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
                 }
@@ -228,7 +212,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private int OutsidePlaneLayer;
     [SerializeField] private float MaxTargetDistance = 6000;
     private float AAMLockTimer;
-    private float AAMTargetedTimer;
     private int NumAAMTargets;
     private Vector3 AAMCurrentTargetDirection;
     private float AAMTargetObscuredDelay;
@@ -287,7 +270,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
                     AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                     AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
-                    AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
                     AAMCurrentTargetSAVControlNull = AAMCurrentTargetSAVControl == null;
                     if (HUDControl != null)
                     {
@@ -339,14 +321,12 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 }
                 else
                 {
-                    AAMTargetedTimer = 2f;
                     AAMLockTimer = 0;
                 }
             }
         }
         else
         {
-            AAMTargetedTimer = 2f;
             AAMLockTimer = 0;
             GUNHasTarget = false;
         }

@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_AAMController : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour AAMLauncherControl;
@@ -34,7 +34,6 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool ColliderActive = false;
     private bool Exploding = false;
     private CapsuleCollider AAMCollider;
-    private bool TargetIsVehicle = false;
     private bool MissileIncoming = false;
     private Rigidbody MissileRigid;
     private float TargDistlastframe = 999999999;
@@ -89,7 +88,6 @@ public class SAV_AAMController : UdonSharpBehaviour
                     TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
                     TargetSAVNULL = false;
                     MissileIncoming = true;
-                    TargetIsVehicle = true;
                     TargetABPoint = (float)TargetSAVControl.GetProgramVariable("ThrottleAfterburnerPoint");
                     TargetThrottleNormalizer = 1 / TargetABPoint;
                 }

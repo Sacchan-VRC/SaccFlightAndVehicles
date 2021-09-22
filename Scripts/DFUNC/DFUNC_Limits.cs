@@ -21,7 +21,6 @@ public class DFUNC_Limits : UdonSharpBehaviour
     private bool Dial_FunconNULL = true;
     private bool HudLimitNULL = true;
     private bool TriggerLastFrame;
-    private bool Selected;
     private bool InVR;
     private bool Piloting;
     [System.NonSerializedAttribute] public bool FlightLimitsEnabled = false;
@@ -41,13 +40,11 @@ public class DFUNC_Limits : UdonSharpBehaviour
     {
         TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
-        Selected = true;
     }
     public void DFUNC_Deselected()
     {
         if (!FlightLimitsEnabled) { gameObject.SetActive(false); }
         TriggerLastFrame = false;
-        Selected = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -60,7 +57,6 @@ public class DFUNC_Limits : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         gameObject.SetActive(false);
-        Selected = false;
         Piloting = false;
     }
     public void SFEXT_G_TouchDown()

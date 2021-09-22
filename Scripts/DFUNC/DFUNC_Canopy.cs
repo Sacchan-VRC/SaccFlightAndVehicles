@@ -18,7 +18,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     [SerializeField] private bool CanopyCanComeOff = true;
     [Header("Meters/s")]
     [Tooltip("Speed at which canopy will break off if it's still open")]
-    [SerializeField] private float CanopyBreakSpeed = 50;
+    [SerializeField] private float CanopyBreakSpeed = 60;
     [Tooltip("Speed at which canopy will close itself (useful for noobs/lazy people)")]
     [SerializeField] private float CanopyAutoCloseSpeed = 20;
     [Tooltip("Extra drag applied to vehicle while canopy is open")]
@@ -143,7 +143,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
 
         if (!CanopyBroken && CanopyOpen && !EntityControl.dead)
         {
-            if (CanopyCanComeOff && (float)SAVControl.GetProgramVariable("AirSpeed") > 100)
+            if (CanopyCanComeOff && (float)SAVControl.GetProgramVariable("AirSpeed") > CanopyBreakSpeed)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyBreakOff");
             }

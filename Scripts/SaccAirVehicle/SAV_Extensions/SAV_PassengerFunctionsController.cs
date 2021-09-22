@@ -23,8 +23,6 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     private bool SwitchFunctionSoundNULL;
     private bool LStickDisplayHighlighterNULL;
     private bool RStickDisplayHighlighterNULL;
-    private UdonSharpBehaviour CurrentSelectedFunctionL;
-    private UdonSharpBehaviour CurrentSelectedFunctionR;
     private int LStickNumFuncs;
     private int RStickNumFuncs;
     private float LStickFuncDegrees;
@@ -135,7 +133,6 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
                     {
                         Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                     }
-                    else { CurrentSelectedFunctionL = null; }
                 }
 
                 if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
@@ -175,7 +172,6 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
                     {
                         Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                     }
-                    else { CurrentSelectedFunctionR = null; }
                 }
 
                 if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }

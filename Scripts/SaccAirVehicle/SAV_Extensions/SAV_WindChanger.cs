@@ -67,12 +67,12 @@ public class SAV_WindChanger : UdonSharpBehaviour
                WindTurbulanceScaleSlider.value = WindTurbulanceScale;
            } */
     }
-    private void OnPickup()
+    public override void OnPickup()
     {
         WindMenu.SetActive(true);
         menuactive = true;
     }
-    private void OnPickupUseDown()
+    public override void OnPickupUseDown()
     {
         ApplyWindDir();
         //SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ApplyWindDir");
