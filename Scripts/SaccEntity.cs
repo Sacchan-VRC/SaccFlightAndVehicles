@@ -76,7 +76,7 @@ public class SaccEntity : UdonSharpBehaviour
         if (localPlayer != null)
         {
             InEditor = false;
-            if (localPlayer.isInstanceOwner) { IsOwner = true; }
+            if (localPlayer.isMaster) { IsOwner = true; }
         }
         else
         {

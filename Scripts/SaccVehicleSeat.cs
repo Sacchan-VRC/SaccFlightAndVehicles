@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SaccVehicleSeat : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
@@ -16,10 +16,13 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     private int ThisStationID;
     private bool SeatInitialized = false;
     private VRCPlayerApi localPlayer;
+    private Transform Seat;
+    private Quaternion SeatStartRot;
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
-
+        Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
+        SeatStartRot = Seat.localRotation;
     }
     public override void Interact()//entering the plane
     {
@@ -31,7 +34,9 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         else
         { EntityControl.PassengerEnterVehicleLocal(); }
         if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
+        Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle in VR
         localPlayer.UseAttachedStation();
+        Seat.localRotation = SeatStartRot;
         if (SeatAdjuster) { SeatAdjuster.SetActive(true); }
     }
     public override void OnStationEntered(VRCPlayerApi player)

@@ -8,7 +8,7 @@ using UnityEngine.UI;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SAV_HUDController : UdonSharpBehaviour
 {
-    [Tooltip("Transform of the pilot seat's target eye position, HUDContrller is automatically moved to this position in Start() to ensure perfect alignment")]
+    [Tooltip("Transform of the pilot seat's target eye position, HUDController is automatically moved to this position in Start() to ensure perfect alignment. Not required")]
     [SerializeField] private Transform PilotSeatAdjusterTarget;
     [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator HUDAnimator;
@@ -87,7 +87,7 @@ public class SAV_HUDController : UdonSharpBehaviour
         }
         else
         {
-            VelLerper = Vector3.Lerp(VelLerper, tempvel, 35f * Time.smoothDeltaTime);
+            VelLerper = Vector3.Lerp(VelLerper, tempvel, 12.5f * Time.smoothDeltaTime);
             VelocityIndicator.position = transform.position + VelLerper;
         }
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
@@ -127,9 +127,8 @@ public class SAV_HUDController : UdonSharpBehaviour
                 HUDText_angleofattack.text = ((float)SAVControl.GetProgramVariable("AngleOfAttack")).ToString("F0");
             }
             check = 0;
+            HUDAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
         }
         check += SmoothDeltaTime;
-
-        HUDAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
     }
 }

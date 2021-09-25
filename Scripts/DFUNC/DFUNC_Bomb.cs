@@ -25,6 +25,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     [SerializeField] private string AnimBoolName = "BombSelected";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
+    [SerializeField] private Camera AtGCam;
+    public GameObject AtGScreen;
     [UdonSynced, FieldChangeCallback(nameof(BombFire))] private short _BombFire;
     public short BombFire
     {
@@ -93,6 +95,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         Piloting = false;
         gameObject.SetActive(false);
         TriggerLastFrame = false;
+        if (AtGScreen) { AtGScreen.SetActive(false); }
+        if (AtGCam) { AtGCam.gameObject.SetActive(false); }
     }
     public void SFEXT_P_PassengerEnter()
     {
@@ -106,6 +110,13 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         if (DoAnimBool && !AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         if (!OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
+        if (AtGScreen) AtGScreen.SetActive(true);
+        if (AtGCam)
+        {
+            AtGCam.gameObject.SetActive(true);
+            AtGCam.fieldOfView = 60;
+            AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
+        }
     }
     public void DFUNC_Deselected()
     {
@@ -115,6 +126,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
         if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
+        if (AtGScreen) { AtGScreen.SetActive(false); }
+        if (AtGCam) { AtGCam.gameObject.SetActive(false); }
     }
     public void SFEXT_G_Explode()
     {

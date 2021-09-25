@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -33,7 +33,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         {
-            if (!localPlayer.isInstanceOwner)
+            if (!localPlayer.isMaster)
             { gameObject.SetActive(false); }
         }
 
@@ -50,7 +50,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
-        if (other != null && other.gameObject.layer == WaterLayer)
+        if (other && other.gameObject.layer == WaterLayer)
         {
             NumTriggers += 1;
             InWater = true;
@@ -64,7 +64,7 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
     }
     private void OnTriggerExit(Collider other)
     {
-        if (other != null && other.gameObject.layer == WaterLayer)
+        if (other && other.gameObject.layer == WaterLayer)
         {
             NumTriggers -= 1;
             if (NumTriggers == 0)

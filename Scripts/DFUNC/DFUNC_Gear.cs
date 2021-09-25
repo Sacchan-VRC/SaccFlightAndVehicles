@@ -31,7 +31,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         LandingGearDragMulti -= 1;//to match how the old values worked
         SetGearDown();
         if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
-        IsOwner = Networking.LocalPlayer.isInstanceOwner;
+        IsOwner = Networking.LocalPlayer.isMaster;
     }
     public void DFUNC_Selected()
     {

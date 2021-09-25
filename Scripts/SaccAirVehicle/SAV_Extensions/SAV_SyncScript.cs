@@ -12,9 +12,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     [SerializeField] private Transform VehicleTransform;
     [Tooltip("In seconds")]
     [Range(0.05f, 1f)]
-    [SerializeField] private float updateInterval = 0.1f;
-    [Tooltip("Should never be more than update interval")]
-    [Range(0.01f, 1f)]
+    [SerializeField] private float updateInterval = 0.2f;
     [SerializeField] private float IdleMaxUpdateDelay = 3f;
     private VRCPlayerApi localPlayer;
     private float nextUpdateTime = 0;
@@ -54,18 +52,20 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private float UpdateTime;
     private int UpdatesSentWhileStill;
     private Rigidbody VehicleRigid;
+    private bool Initialized = false;
     private void Start()
     {
-        if (StartupTimeMS == 0)//shouldn't be active until entitystart
+        if (!Initialized)//shouldn't be active until entitystart
         { gameObject.SetActive(false); }
     }
     public void SFEXT_L_EntityStart()
     {
+        Initialized = true;
         localPlayer = Networking.LocalPlayer;
         bool InEditor = localPlayer == null;
-        if (!InEditor && localPlayer.isInstanceOwner)
+        if (!InEditor && localPlayer.isMaster)
         { IsOwner = true; }
-        else if (!InEditor) { IsOwner = false; }
+        else if (!InEditor) { IsOwner = false; }//late joiner
         else { IsOwner = true; }//play mode in editor
         nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
         SmoothingTimeDivider = 1f / updateInterval;
@@ -81,7 +81,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     {
         IsOwner = false;
         L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
-        O_LastRotation2 = O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
+        O_LastRotation2 = O_LastRotation = O_Rotation_Q;
 
     }
     private void Update()
@@ -98,7 +98,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
                         if (Still) { UpdatesSentWhileStill++; }
                         else { UpdatesSentWhileStill = 0; }
                         O_Position = VehicleTransform.position;
-                        Vector3 rot = VehicleTransform.rotation.eulerAngles;
+                        O_Rotation_Q = VehicleTransform.rotation;
+                        Vector3 rot = O_Rotation_Q.eulerAngles;
 
                         rot = new Vector3(rot.x > 180 ? rot.x - 360 : rot.x,
                          rot.y > 180 ? rot.y - 360 : rot.y,

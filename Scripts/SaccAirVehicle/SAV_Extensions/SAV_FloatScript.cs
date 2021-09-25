@@ -86,7 +86,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         {
             FloatLocalPos[i] = FloatPoints[i].localPosition;
         }
-        if (HoverBike || (!InEditor && !localPlayer.isInstanceOwner))
+        if (HoverBike || (!InEditor && !localPlayer.isMaster))
         {
             gameObject.SetActive(false);
         }

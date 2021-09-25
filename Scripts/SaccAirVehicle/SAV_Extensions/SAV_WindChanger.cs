@@ -5,7 +5,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_WindChanger : UdonSharpBehaviour
 {
     [Tooltip("List of SaccAirVehicles to be effected by this WindChnager")]

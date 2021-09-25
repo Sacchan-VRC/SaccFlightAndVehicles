@@ -68,7 +68,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool dead;
     [System.NonSerializedAttribute] public bool firing;
     [System.NonSerializedAttribute] public float FullHealth;
-    [System.NonSerializedAttribute] public bool Manning;//like Piloting in the plane
+    [System.NonSerializedAttribute] public bool Manning = false;//like Piloting in the plane
     [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
     [System.NonSerializedAttribute] public float RotationSpeedX = 0f;
     [System.NonSerializedAttribute] public float RotationSpeedY = 0f;
@@ -115,7 +115,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         {
             InEditor = false;
             InVR = localPlayer.IsUserInVR();
-            IsOwner = localPlayer.isInstanceOwner;
+            IsOwner = localPlayer.isMaster;
         }
         CenterOfMass = EntityControl.CenterOfMass;
 

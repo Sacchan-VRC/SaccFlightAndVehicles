@@ -24,18 +24,23 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private float CalibrateTimer = 0f;
     private float AwakeTimer = 0f;
+    private bool FirstEnable = true;
     void Start()
     {
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
         SeatOriginalPos = Seat.transform.localPosition;
-        gameObject.SetActive(false); //object needs to be active at least once to make the functions work over network
+        gameObject.SetActive(false);
     }
 
     private void OnEnable()
     {
         //set seat back to it's original position
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResetSeat");
+        if (!FirstEnable)//prevent new players who join from resetting everyone's seat
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetSeat));
+            FirstEnable = false;
+        }
 
         CalibratedZ = false;
         CalibratedY = false;

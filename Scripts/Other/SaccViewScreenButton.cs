@@ -8,28 +8,33 @@ using VRC.Udon;
 public class SaccViewScreenButton : UdonSharpBehaviour
 {
     public SaccViewScreenController ViewScreenControl;
+    private VRCPlayerApi localPlayer;
+    private bool InEditor = true;
+    void Start()
+    {
+        localPlayer = Networking.LocalPlayer;
+        if (localPlayer != null)
+        { InEditor = false; }
+    }
     public override void Interact()
     {
-        if (ViewScreenControl.Disabled && ViewScreenControl.NumAAMTargets > 0)
+        if (ViewScreenControl.Disabled)
         {
-            ViewScreenControl.PlaneCamera.gameObject.SetActive(true);
-            ViewScreenControl.ViewScreen.gameObject.SetActive(true);
-            ViewScreenControl.Disabled = false;
-            ViewScreenControl.PlaneCamera.transform.rotation = ViewScreenControl.AAMTargets[ViewScreenControl.AAMTarget].transform.rotation;
+            ViewScreenControl.TurnOn();
         }
         else
         {
-            if (!ViewScreenControl.InEditor)
+            if (!InEditor)
             {
-                Networking.SetOwner(ViewScreenControl.localPlayer, ViewScreenControl.gameObject);
-                ViewScreenControl.RequestSerialization();
+                if (!localPlayer.IsOwner(ViewScreenControl.gameObject))
+                { Networking.SetOwner(localPlayer, ViewScreenControl.gameObject); }
             }
-
             ViewScreenControl.AAMTarget++;
-            if (ViewScreenControl.AAMTarget > ViewScreenControl.NumAAMTargets - 1)
+            if (ViewScreenControl.AAMTarget == ViewScreenControl.NumAAMTargets)
             {
                 ViewScreenControl.AAMTarget = 0;
             }
+            ViewScreenControl.RequestSerialization();
         }
     }
 }

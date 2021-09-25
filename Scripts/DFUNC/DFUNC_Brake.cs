@@ -31,7 +31,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private int BRAKE_STRING = Animator.StringToHash("brake");
     private bool Braking;
     private bool BrakingLastFrame;
-    private float DragAdded = 0;
+    private float LastDrag = 0;
     private float AirbrakeLerper;
     private float NonLocalActiveDelay;//this var is for adding a min delay for disabling for non-local users to account for lag
     private bool Selected;
@@ -48,7 +48,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         HasAirBrake = AirbrakeStrength != 0;
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
-        if (localPlayer != null && !localPlayer.isInstanceOwner)
+        if (localPlayer != null && !localPlayer.isMaster)
         { gameObject.SetActive(false); }
         else
         { gameObject.SetActive(true); }
@@ -82,8 +82,8 @@ public class DFUNC_Brake : UdonSharpBehaviour
     {
         BrakeInput = 0;
         Selected = false;
-        SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - DragAdded);
-        DragAdded = 0;
+        SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - LastDrag);
+        LastDrag = 0;
         if (!NoPilotAlwaysGroundBrake)
         { GroundBrakeStrength = 0; WaterBrakeStrength = 0; }
     }
@@ -134,6 +134,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
         {
             float Speed = (float)SAVControl.GetProgramVariable("Speed");
             Vector3 CurrentVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+            bool Taxiing = (bool)SAVControl.GetProgramVariable("Taxiing");
             if ((bool)SAVControl.GetProgramVariable("Piloting"))
             {
                 float KeyboardBrakeInput = 0;
@@ -155,7 +156,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                     KeyboardBrakeInput = 1;
                 }
                 BrakeInput = Mathf.Max(VRBrakeInput, KeyboardBrakeInput);
-                if ((bool)SAVControl.GetProgramVariable("Taxiing"))
+                if (Taxiing)
                 {
                     //ground brake checks if vehicle is on top of a rigidbody, and if it is, brakes towards its speed rather than zero
                     //does not work if owner of vehicle does not own the rigidbody 
@@ -177,12 +178,19 @@ public class DFUNC_Brake : UdonSharpBehaviour
                         }
                     }
                 }
+                if (!HasAirBrake)
+                {
+                    BrakeInput = 0;
+                }
                 //remove the drag added last frame to add the new value for this frame
-                SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - DragAdded);
-                DragAdded = AirbrakeStrength * BrakeInput;
-                SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + DragAdded);
+                float extradrag = (float)SAVControl.GetProgramVariable("ExtraDrag");
+                float newdrag = (AirbrakeStrength * BrakeInput);
+                float dragtoadd = -LastDrag + newdrag;
+                extradrag += dragtoadd;
+                LastDrag = newdrag;
+                SAVControl.SetProgramVariable("ExtraDrag", extradrag);
 
-                //send events to other users to tell them to enable the function so they can see the animation
+                //send events to other users to tell them to enable the script so they can see the animation
                 Braking = BrakeInput > .1f;
                 if (Braking && !BrakingLastFrame)
                 {
@@ -203,14 +211,14 @@ public class DFUNC_Brake : UdonSharpBehaviour
                 if (gdhr)
                 {
                     float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
-                    if ((bool)SAVControl.GetProgramVariable("Taxiing") && RBSpeed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                    if (Taxiing && RBSpeed < GroundBrakeSpeed && DisableGroundBrake == 0)
                     {
                         VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), GroundBrakeStrength * DeltaTime);
                     }
                 }
                 else
                 {
-                    if ((bool)SAVControl.GetProgramVariable("Taxiing") && Speed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                    if (Taxiing && Speed < GroundBrakeSpeed && DisableGroundBrake == 0)
                     {
                         VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, GroundBrakeStrength * DeltaTime);
                     }

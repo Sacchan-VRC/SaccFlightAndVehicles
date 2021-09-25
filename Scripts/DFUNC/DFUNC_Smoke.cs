@@ -11,7 +11,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     [Tooltip("Material to change the color value of to match smoke color")]
     [SerializeField] private Material SmokeColorIndicatorMaterial;
     [SerializeField] private ParticleSystem[] DisplaySmoke;
-    [SerializeField] private GameObject SmokeOnIndicator;
+    [Tooltip("HUD Smoke indicator")]
+    [SerializeField] private GameObject HUD_SmokeOnIndicator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
     private SaccEntity EntityControl;
@@ -165,7 +166,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         Smoking = true;
         gameObject.SetActive(true);
-        SmokeOnIndicator.SetActive(true);
+        HUD_SmokeOnIndicator.SetActive(true);
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = true; }
         if (Dial_Funcon) Dial_Funcon.SetActive(true);
@@ -179,7 +180,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         Smoking = false;
         if (!Pilot)
         { gameObject.SetActive(false); }
-        SmokeOnIndicator.SetActive(false);
+        HUD_SmokeOnIndicator.SetActive(false);
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = false; }
         if (Dial_Funcon) Dial_Funcon.SetActive(false);

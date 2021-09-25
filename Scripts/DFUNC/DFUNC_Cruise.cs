@@ -222,7 +222,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         }
         SetSpeed = (float)SAVControl.GetProgramVariable("AirSpeed");
         Cruise = true;
-        if (Dial_Funcon) { Dial_Funcon.SetActive(Cruise); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseEnabled");
     }
     public void SetCruiseOff()
@@ -231,15 +231,18 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         if (Piloting)
         {
             func_active = false;
+            if (!InVR)
+            { gameObject.SetActive(false); }
         }
         if (CruiseThrottleOverridden)
         {
             SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
             CruiseThrottleOverridden = false;
         }
+        TriggerTapTime = 1;
         SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
         Cruise = false;
-        if (Dial_Funcon) { Dial_Funcon.SetActive(Cruise); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
     }
 }

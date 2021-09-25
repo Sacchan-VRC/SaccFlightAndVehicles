@@ -29,7 +29,7 @@ public class SaccViewScreenController : UdonSharpBehaviour
     void Start()
     {
         localPlayer = Networking.LocalPlayer;
-        if (localPlayer != null) InEditor = false;
+        if (localPlayer != null) { InEditor = false; }
         //get array of AAM Targets
         RaycastHit[] aamtargs = Physics.SphereCastAll(gameObject.transform.position, 1000000, gameObject.transform.forward, 5, AAMTargetsLayer, QueryTriggerInteraction.Collide);
         NumAAMTargets = aamtargs.Length;
@@ -91,7 +91,7 @@ public class SaccViewScreenController : UdonSharpBehaviour
             //disable if far away
             if (!InEditor)
             {
-                if (Vector3.Distance(localPlayer.GetPosition(), gameObject.transform.position) > DisableDistance)
+                if (Vector3.Distance(localPlayer.GetPosition(), transform.position) > DisableDistance)
                 {
                     ViewScreen.SetActive(false);
                     PlaneCamera.gameObject.SetActive(false);
@@ -125,7 +125,14 @@ public class SaccViewScreenController : UdonSharpBehaviour
         if (localPlayer.IsOwner(gameObject))
         { RequestSerialization(); }
     }
-
+    public void TurnOn()
+    {
+        if (NumAAMTargets == 0) Debug.LogWarning("Viewscreen: Zero targets");
+        PlaneCamera.gameObject.SetActive(true);
+        ViewScreen.SetActive(true);
+        Disabled = false;
+        PlaneCamera.transform.rotation = AAMTargets[AAMTarget].transform.rotation;
+    }
     void SortTargets(GameObject[] Targets, float[] order)
     {
         for (int i = 1; i < order.Length; i++)

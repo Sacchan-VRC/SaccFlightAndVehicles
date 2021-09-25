@@ -376,7 +376,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             InEditor = false;
             InVR = localPlayer.IsUserInVR();
-            if (localPlayer.isInstanceOwner)
+            if (localPlayer.isMaster)
             {
                 VehicleRigidbody.WakeUp();
                 VehicleRigidbody.constraints = RigidbodyConstraints.None;
@@ -834,11 +834,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     {
                         if (ThrottleInput > ThrottleAfterburnerPoint && !AfterburnerOn)
                         {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOn");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
                         }
                         else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
                         {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetAfterburnerOff");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
                         }
                     }
                     if (JoystickOverridden > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
