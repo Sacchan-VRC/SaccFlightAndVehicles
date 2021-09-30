@@ -313,7 +313,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         VehicleAnimator.SetBool(ONCATAPULT_STRING, true);
         VehicleRigidbody.Sleep();//don't think this actually helps
         if (CatapultLock) { CatapultLock.Play(); }
-        if (Dial_Funcon) Dial_Funcon.SetActive(true);
+        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
     }
     public void CatapultLockOff()
     {

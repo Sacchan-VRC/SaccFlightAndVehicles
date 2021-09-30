@@ -376,6 +376,10 @@ public class SaccEntity : UdonSharpBehaviour
     {
         Passenger = true;
         InVehicle = true;
+        if (LStickDisplayHighlighter)
+        { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+        if (RStickDisplayHighlighter)
+        { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
         if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
         if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
         SendEventToExtensions("SFEXT_P_PassengerEnter");

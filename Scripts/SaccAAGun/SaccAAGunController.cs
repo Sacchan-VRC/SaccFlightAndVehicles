@@ -5,12 +5,12 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SaccAAGunController : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
     [Tooltip("The part of the AAGun that aims")]
-    public GameObject Rotator;
+    public Transform Rotator;
     [SerializeField] private SAAG_HUDController HUDControl;
     [SerializeField] private VRCStation AAGunSeat;
     [Tooltip("Missile object to be duplicated and enabled when a missile is fired")]
@@ -57,13 +57,19 @@ public class SaccAAGunController : UdonSharpBehaviour
     [Tooltip("Multiplies how much damage is taken from bullets")]
     [SerializeField] private float BulletDamageTaken = 10f;
     [SerializeField] private bool PredictDamage = true;
-    [SerializeField] private float PredictedHealth;
-    [SerializeField] private float LastHitTime;
+    [SerializeField] private float SerializationInterval = .35f;
+    private float PredictedHealth;
+    private float LastHitTime;
     private float MGAmmoRecharge = 0;
     [System.NonSerializedAttribute] public float MGAmmoFull = 4;
     private float FullMGDivider;
     [SerializeField] private GameObject SeatAdjuster;
-    [UdonSynced(UdonSyncMode.Linear)] private Vector2 GunRotation;
+    private Vector2 LastGunRotationSpeed;
+    private Vector2 GunRotationSpeed;
+    private Vector2 O_LastGunRotation2;
+    private Vector2 O_LastGunRotation;
+    [UdonSynced(UdonSyncMode.None)] private Vector2 O_GunRotation;
+    [UdonSynced(UdonSyncMode.None)] private Vector2 gunrottemp;
     [System.NonSerializedAttribute] public Animator AAGunAnimator;
     [System.NonSerializedAttribute] public bool dead;
     [System.NonSerializedAttribute] public bool firing;
@@ -76,6 +82,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool InEditor = true;
     [System.NonSerializedAttribute] public bool IsOwner = false;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
+    [UdonSynced(UdonSyncMode.None)] private int O_UpdateTime = 0;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
     [System.NonSerializedAttribute] public int NumAAMTargets = 0;
     private int AAMTargetChecker = 0;
@@ -104,9 +111,17 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float InputYKeyb;
     [System.NonSerializedAttribute] public float LastHealthUpdate = 0;
     [System.NonSerializedAttribute] public Transform CenterOfMass;
-    private float LastSerialization;
-    private float SerializationInterval = .35f;
+    private float NextSerialization;
     private bool Occupied;
+    private int StartupTimeMS = 0;
+    private int O_LastUpdateTime;
+    private int L_UpdateTime;
+    private int L_LastUpdateTime;
+    private float LastPing;
+    private float Ping;
+    private int O_LastUpdateTime2;
+    //private Vector3 NonOwnerRotLerper;
+    private float SmoothingTimeDivider;
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
@@ -122,7 +137,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         AAGunAnimator = EntityControl.GetComponent<Animator>();
         FullHealth = Health;
         FullHealthDivider = 1f / (Health > 0 ? Health : 10000000);
-        StartRot = Rotator.transform.localRotation.eulerAngles;
+        StartRot = Rotator.localRotation.eulerAngles;
 
         FullAAMs = NumAAM;
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
@@ -133,6 +148,9 @@ public class SaccAAGunController : UdonSharpBehaviour
         AAMTargets = EntityControl.AAMTargets;
         NumAAMTargets = EntityControl.NumAAMTargets;
         if (NumAAMTargets != 0 && !DisableAAMTargeting) { DoAAMTargeting = true; }
+        StartupTimeMS = Networking.GetServerTimeInMilliseconds();
+        NextSerialization = Time.time + Random.Range(0f, SerializationInterval);
+        SmoothingTimeDivider = 1f / SerializationInterval;
 
         gameObject.SetActive(true);
     }
@@ -166,7 +184,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                 {
                     if (RGrip > 0.75)
                     {
-                        Quaternion RotDif = Rotator.transform.rotation * Quaternion.Inverse(AAGunRotLastFrame);//difference in vehicle's rotation since last frame
+                        Quaternion RotDif = Rotator.rotation * Quaternion.Inverse(AAGunRotLastFrame);//difference in vehicle's rotation since last frame
                         JoystickZeroPoint = RotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
                         if (!RGripLastFrame)//first frame you gripped joystick
                         {
@@ -174,10 +192,10 @@ public class SaccAAGunController : UdonSharpBehaviour
                             JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
                         }
                         //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
-                        Quaternion JoystickDifference = (Quaternion.Inverse(Rotator.transform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
-                        JoystickPosYaw = (JoystickDifference * Rotator.transform.forward);//angles to vector
+                        Quaternion JoystickDifference = (Quaternion.Inverse(Rotator.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
+                        JoystickPosYaw = (JoystickDifference * Rotator.forward);//angles to vector
                         JoystickPosYaw.y = 0;
-                        JoystickPos = (JoystickDifference * Rotator.transform.up);
+                        JoystickPos = (JoystickDifference * Rotator.up);
                         JoystickPos.y = 0;
                         VRPitchYawInput = new Vector2(JoystickPos.z, JoystickPosYaw.x) * 1.41421f;
 
@@ -189,7 +207,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                         VRPitchYawInput = Vector3.zero;
                         RGripLastFrame = false;
                     }
-                    AAGunRotLastFrame = Rotator.transform.rotation;
+                    AAGunRotLastFrame = Rotator.rotation;
                 }
                 int InX = (Wf + Sf);
                 int InY = (Af + Df);
@@ -208,20 +226,20 @@ public class SaccAAGunController : UdonSharpBehaviour
                 InputX *= TurnSpeedMulti;
                 InputY *= TurnSpeedMulti;
 
-                RotationSpeedX += -(RotationSpeedX * TurnFriction * DeltaTime) + InputX * DeltaTime;
-                RotationSpeedY += -(RotationSpeedY * TurnFriction * DeltaTime) + InputY * DeltaTime;
+                RotationSpeedX += -(RotationSpeedX * TurnFriction * DeltaTime) + (InputX * DeltaTime);
+                RotationSpeedY += -(RotationSpeedY * TurnFriction * DeltaTime) + (InputY * DeltaTime);
 
                 //rotate turret
-                float NewX = Rotator.transform.localRotation.eulerAngles.x;
+                float NewX = Rotator.localRotation.eulerAngles.x;
                 NewX += RotationSpeedX;
                 if (NewX > 180) { NewX -= 360; }
                 if (NewX > DownAngleMax || NewX < -UpAngleMax) RotationSpeedX = 0;
                 NewX = Mathf.Clamp(NewX, -UpAngleMax, DownAngleMax);//limit angles
-                float NewY = Rotator.transform.localRotation.eulerAngles.y + (RotationSpeedY);
-                Rotator.transform.localRotation = Quaternion.Euler(new Vector3(NewX, NewY, 0));
+                float NewY = Rotator.localRotation.eulerAngles.y + (RotationSpeedY);
+                Rotator.localRotation = Quaternion.Euler(new Vector3(NewX, NewY, 0));
                 //syncedvars
-                GunRotation.x = NewX;
-                GunRotation.y = NewY;
+                gunrottemp.x = NewX;
+                gunrottemp.y = NewY;
                 //Firing the gun
                 if ((RTrigger >= 0.75 || Input.GetKey(KeyCode.Space)) && MGAmmoSeconds > 0)
                 {
@@ -299,16 +317,42 @@ public class SaccAAGunController : UdonSharpBehaviour
                     AAMLocking.gameObject.SetActive(false);
                     AAMLockedOn.gameObject.SetActive(false);
                 }
-                if (Time.time - LastSerialization > SerializationInterval)
+                if (Time.time > NextSerialization)
                 {
+                    O_UpdateTime = Networking.GetServerTimeInMilliseconds();
                     RequestSerialization();
-                    LastSerialization = Time.time;
+                    NextSerialization = Time.time + SerializationInterval;
                 }
             }
         }
         else if (Occupied)
         {
-            Rotator.transform.localRotation = Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0));
+
+            float TimeSinceUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_UpdateTime) * .001f);
+            Vector2 PredictedRotation = Vector2.zero;
+            PredictedRotation = O_GunRotation + (GunRotationSpeed * (Ping + TimeSinceUpdate));
+            PredictedRotation.x = Mathf.Clamp(PredictedRotation.x, -UpAngleMax, DownAngleMax);
+
+            Vector3 PredictedRotation_3 = new Vector3(PredictedRotation.x, PredictedRotation.y, 0);
+
+            if (TimeSinceUpdate < SerializationInterval)
+            {
+                float TimeSincePreviousUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_LastUpdateTime) * .001f);
+
+                Vector2 OldPredictedRotation = O_LastGunRotation2 + (LastGunRotationSpeed * (LastPing + TimeSincePreviousUpdate));
+                OldPredictedRotation.x = Mathf.Clamp(OldPredictedRotation.x, -UpAngleMax, DownAngleMax);
+
+                Vector3 OldPredictedRotation_3 = new Vector3(OldPredictedRotation.x, OldPredictedRotation.y, 0);
+
+                Vector3 TargetRot = Vector3.Lerp(OldPredictedRotation_3, PredictedRotation_3, TimeSinceUpdate * SmoothingTimeDivider);
+                // NonOwnerRotLerper = Vector3.Lerp(NonOwnerRotLerper, TargetRot, Time.smoothDeltaTime * 10);
+                Rotator.localRotation = Quaternion.Euler(TargetRot);
+            }
+            else
+            {
+                // NonOwnerRotLerper = Vector3.Lerp(NonOwnerRotLerper, PredictedRotation_3, Time.smoothDeltaTime * 10);
+                Rotator.localRotation = Quaternion.Euler(PredictedRotation_3);
+            }
         }
     }
     public void StartFiring()
@@ -344,7 +388,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         AAGunAnimator.SetFloat("health", 1);
         if (IsOwner)
         {
-            Rotator.transform.localRotation = Quaternion.Euler(StartRot);
+            Rotator.localRotation = Quaternion.Euler(StartRot);
         }
         AAGunAnimator.SetTrigger("explode");
 
@@ -424,7 +468,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
         Vector3 HudControlPosition = HUDControl.transform.position;
-        float AAMCurrentTargetAngle = Vector3.Angle(Rotator.transform.forward, (AAMCurrentTargetPosition - HudControlPosition));
+        float AAMCurrentTargetAngle = Vector3.Angle(Rotator.forward, (AAMCurrentTargetPosition - HudControlPosition));
 
         //check 1 target per frame to see if it's infront of us and worthy of being our current target
         var TargetChecker = AAMTargets[AAMTargetChecker];
@@ -432,7 +476,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         var TargetCheckerParent = TargetCheckerTransform.parent;
 
         Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
-        float NextTargetAngle = Vector3.Angle(Rotator.transform.forward, AAMNextTargetDirection);
+        float NextTargetAngle = Vector3.Angle(Rotator.forward, AAMNextTargetDirection);
         float NextTargetDistance = Vector3.Distance(HudControlPosition, TargetCheckerTransform.position);
 
         if (TargetChecker.activeInHierarchy)
@@ -470,7 +514,6 @@ public class SaccAAGunController : UdonSharpBehaviour
                     AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
-                    LastSerialization -= SerializationInterval * .4f;//make it sync faster, maybe too fast if you change targets really quickly
                     if (HUDControl)
                     {
                         HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
@@ -675,5 +718,40 @@ public class SaccAAGunController : UdonSharpBehaviour
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
+    }
+    public override void OnDeserialization()
+    {
+        if (O_UpdateTime != O_LastUpdateTime)//only do anything if OnDeserialization was for this script
+        {
+            O_GunRotation = gunrottemp;
+
+            LastPing = Ping;
+            L_LastUpdateTime = L_UpdateTime;
+            float updatedelta = (O_UpdateTime - O_LastUpdateTime) * .001f;
+            float speednormalizer = 1 / updatedelta;
+
+            L_UpdateTime = Networking.GetServerTimeInMilliseconds();
+            Ping = (L_UpdateTime - O_UpdateTime) * .001f;
+            LastGunRotationSpeed = GunRotationSpeed;
+
+            //check if going from rotation 0->360 and fix values for interpolation
+            if (Mathf.Abs(O_GunRotation.y - O_LastGunRotation.y) > 180)
+            {
+                if (O_GunRotation.y > O_LastGunRotation.y)
+                {
+                    O_LastGunRotation.y += 360;
+                    //NonOwnerRotLerper.y += 360;
+                }
+                else
+                {
+                    O_LastGunRotation.y -= 360;
+                    //NonOwnerRotLerper.y -= 360;
+                }
+            }
+            GunRotationSpeed = (O_GunRotation - O_LastGunRotation) * speednormalizer;
+            O_LastGunRotation2 = O_LastGunRotation;
+            O_LastGunRotation = O_GunRotation;
+            O_LastUpdateTime = O_UpdateTime;
+        }
     }
 }

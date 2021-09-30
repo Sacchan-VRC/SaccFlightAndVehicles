@@ -31,6 +31,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private Vector3 TempSmokeCol = Vector3.zero;
     private bool Pilot;
     private bool InPlane;
+    private bool Selected;
     private bool InEditor;
     private int NumSmokes;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -52,6 +53,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
+        Selected = true;
         gameObject.SetActive(true);
     }
     public void DFUNC_Deselected()
@@ -62,8 +64,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        Pilot = true;
         InPlane = true;
+        Selected = false;
         if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
     }
     public void SFEXT_O_PilotExit()
@@ -97,59 +99,56 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     private void LateUpdate()
     {
-        if (InPlane)
+        if (Selected)
         {
-            if (Pilot)
+            float DeltaTime = Time.deltaTime;
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            if (Trigger > 0.75)
             {
-                float DeltaTime = Time.deltaTime;
-                float Trigger;
-                if (UseLeftTrigger)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if (Trigger > 0.75)
+                //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
+                Vector3 HandPosSmoke = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
+                HandPosSmoke = VehicleTransform.InverseTransformDirection(HandPosSmoke);
+                if (!TriggerLastFrame)
                 {
-                    //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
-                    Vector3 HandPosSmoke = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
-                    HandPosSmoke = VehicleTransform.InverseTransformDirection(HandPosSmoke);
-                    if (!TriggerLastFrame)
-                    {
-                        SmokeZeroPoint = HandPosSmoke;
-                        TempSmokeCol = SmokeColor;
+                    SmokeZeroPoint = HandPosSmoke;
+                    TempSmokeCol = SmokeColor;
 
-                        ToggleSmoking();
-                        SmokeHoldTime = 0;
-                    }
-                    SmokeHoldTime += Time.deltaTime;
-                    if (SmokeHoldTime > .4f)
-                    {
-                        //VR Set Smoke
-
-                        Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -(float)SAVControl.GetProgramVariable("ThrottleSensitivity");
-                        SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
-                        SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
-                        SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
-                    }
-                    TriggerLastFrame = true;
+                    ToggleSmoking();
+                    SmokeHoldTime = 0;
                 }
-                else { TriggerLastFrame = false; }
-
-                if (Smoking)
+                SmokeHoldTime += Time.deltaTime;
+                if (SmokeHoldTime > .4f)
                 {
-                    int keypad7 = Input.GetKey(KeyCode.Keypad7) ? 1 : 0;
-                    int Keypad4 = Input.GetKey(KeyCode.Keypad4) ? 1 : 0;
-                    int Keypad8 = Input.GetKey(KeyCode.Keypad8) ? 1 : 0;
-                    int Keypad5 = Input.GetKey(KeyCode.Keypad5) ? 1 : 0;
-                    int Keypad9 = Input.GetKey(KeyCode.Keypad9) ? 1 : 0;
-                    int Keypad6 = Input.GetKey(KeyCode.Keypad6) ? 1 : 0;
-                    SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * DeltaTime), 0, 1);
-                    SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
-                    SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
+                    //VR Set Smoke
+
+                    Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -(float)SAVControl.GetProgramVariable("ThrottleSensitivity");
+                    SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
+                    SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
+                    SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
                 }
+                TriggerLastFrame = true;
             }
-            //Smoke Color Indicator
-            SmokeColorIndicatorMaterial.color = SmokeColor_Color;
+            else { TriggerLastFrame = false; }
+
+            if (Smoking)
+            {
+                int keypad7 = Input.GetKey(KeyCode.Keypad7) ? 1 : 0;
+                int Keypad4 = Input.GetKey(KeyCode.Keypad4) ? 1 : 0;
+                int Keypad8 = Input.GetKey(KeyCode.Keypad8) ? 1 : 0;
+                int Keypad5 = Input.GetKey(KeyCode.Keypad5) ? 1 : 0;
+                int Keypad9 = Input.GetKey(KeyCode.Keypad9) ? 1 : 0;
+                int Keypad6 = Input.GetKey(KeyCode.Keypad6) ? 1 : 0;
+                SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * DeltaTime), 0, 1);
+                SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
+                SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
+            }
         }
+        //Smoke Color Indicator
+        SmokeColorIndicatorMaterial.color = SmokeColor_Color;
         SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
         //everyone does this while smoke is active
         if (Smoking && !DisplaySmokeNull)

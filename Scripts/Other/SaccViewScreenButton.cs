@@ -37,4 +37,8 @@ public class SaccViewScreenButton : UdonSharpBehaviour
             ViewScreenControl.RequestSerialization();
         }
     }
+    public override void OnPlayerJoined(VRCPlayerApi player)
+    {
+        ViewScreenControl.RequestSerialization();
+    }
 }
