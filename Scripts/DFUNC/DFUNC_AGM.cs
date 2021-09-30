@@ -43,8 +43,9 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool AGMLocked;
-    [System.NonSerializedAttribute] private int AGMUnlocking = 0;
-    [System.NonSerializedAttribute] private float AGMUnlockTimer;
+    [System.NonSerializedAttribute] public bool IsOwner;
+    private int AGMUnlocking = 0;
+    private float AGMUnlockTimer;
     private float AGMRotDif;
     private bool TriggerLastFrame;
     private float TriggerTapTime;
@@ -131,6 +132,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         NumAGM = FullAGMs;
+        AGMAnimator.SetFloat(AGMS_STRING, 1);
         if (func_active)
         { DFUNC_Deselected(); }
         if (DoAnimBool && AnimOn)
@@ -329,10 +331,11 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void LaunchAGM()
     {
         if (NumAGM > 0) { NumAGM--; }
+        if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         AGMAnimator.SetTrigger(AGMLAUNCHED_STRING);
         if (AGM)
         {
-            GameObject NewAGM = VRCInstantiate(AGM);
+            GameObject NewAGM = Object.Instantiate(AGM);
             if (!(NumAGM % 2 == 0))
             {
                 Vector3 temp = AGMLaunchPoint.localPosition;

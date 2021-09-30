@@ -302,16 +302,14 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void LaunchCatapult()
     {
-        CatapultAnimator.SetTrigger("launch");
+        if (Utilities.IsValid(CatapultAnimator))
+        { CatapultAnimator.SetTrigger("launch"); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-        VehicleRigidbody.WakeUp();//i don't think it actually sleeps anyway but this might help other clients sync the launch faster idk
     }
-
     public void CatapultLockIn()
     {
         OnCatapult = true;
         VehicleAnimator.SetBool(ONCATAPULT_STRING, true);
-        VehicleRigidbody.Sleep();//don't think this actually helps
         if (CatapultLock) { CatapultLock.Play(); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
     }

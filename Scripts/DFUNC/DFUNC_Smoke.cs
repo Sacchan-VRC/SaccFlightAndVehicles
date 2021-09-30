@@ -30,7 +30,6 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Color SmokeColor_Color;
     private Vector3 TempSmokeCol = Vector3.zero;
     private bool Pilot;
-    private bool InPlane;
     private bool Selected;
     private bool InEditor;
     private int NumSmokes;
@@ -64,26 +63,23 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        InPlane = true;
+        Pilot = true;
         Selected = false;
         if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
     }
     public void SFEXT_O_PilotExit()
     {
         Pilot = false;
-        InPlane = true;
         TriggerLastFrame = false;
         gameObject.SetActive(false);
         if (Smoking) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
     }
     public void SFEXT_P_PassengerEnter()
     {
-        InPlane = true;
         if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
     }
     public void SFEXT_P_PassengerExit()
     {
-        InPlane = false;
     }
     public void SFEXT_G_Explode()
     {

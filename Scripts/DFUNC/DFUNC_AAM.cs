@@ -128,6 +128,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         NumAAM = FullAAMs;
+        AAMAnimator.SetFloat(AAMS_STRING, 1);
         if (func_active)
         {
             DFUNC_Deselected();
@@ -230,8 +231,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                             AAMFire++;//launch AAM using set
                             RequestSerialization();
                             if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
-                            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
-                            { EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch"); }
+                            EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
                         }
                     }
                     TriggerLastFrame = true;
@@ -449,7 +449,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMAnimator.SetTrigger(AAMLAUNCHED_STRING);
         if (AAM)
         {
-            GameObject NewAAM = VRCInstantiate(AAM);
+            GameObject NewAAM = Object.Instantiate(AAM);
             if (!(NumAAM % 2 == 0))
             {
                 //invert local x coordinates of launch point, launch, then revert

@@ -39,9 +39,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private int AOA_STRING = Animator.StringToHash("AoA");
     private int MACH10_STRING = Animator.StringToHash("mach10");
     private int GS_STRING = Animator.StringToHash("Gs");
-    private int BOMB_STRING = Animator.StringToHash("bombs");
-    private int AAMS_STRING = Animator.StringToHash("AAMs");
-    private int AGMS_STRING = Animator.StringToHash("AGMs");
     private int EXPLODE_STRING = Animator.StringToHash("explode");
     private int MISSILESINCOMING_STRING = Animator.StringToHash("missilesincoming");
     private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
@@ -149,13 +146,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
         //("Gs", vapor ? EngineControl.Gs / 200 + .5f : 0) (.5 == 0 Gs, 1 == 100Gs, 0 == -100Gs)
         VehicleAnimator.SetFloat(GS_STRING, vapor ? (SAVControl.VertGs * 0.005f) + 0.5f : 0.5f);
     }
-    public void EffectsResetStatus()//called from enginecontroller.Explode();
-    {
-        DoEffects = 6;
-        VehicleAnimator.SetFloat(BOMB_STRING, 1);
-        VehicleAnimator.SetFloat(AAMS_STRING, 1);
-        VehicleAnimator.SetFloat(AGMS_STRING, 1);
-    }
     public void SFEXT_G_PilotExit()
     {
         VehicleAnimator.SetBool(OCCUPIED_STRING, false);
@@ -234,9 +224,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public void SFEXT_G_Explode()//old EffectsExplode()
     {
         VehicleAnimator.SetTrigger(EXPLODE_STRING);
-        VehicleAnimator.SetFloat(BOMB_STRING, 1);
-        VehicleAnimator.SetFloat(AAMS_STRING, 1);
-        VehicleAnimator.SetFloat(AGMS_STRING, 1);
         VehicleAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
         VehicleAnimator.SetFloat(PITCHINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);

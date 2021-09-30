@@ -14,7 +14,6 @@ public class SAV_SyncScript : UdonSharpBehaviour
     [Range(0.05f, 1f)]
     [SerializeField] private float updateInterval = 0.2f;
     [SerializeField] private float IdleMaxUpdateDelay = 3f;
-    private VRCPlayerApi localPlayer;
     private float nextUpdateTime = 0;
     //[UdonSynced(UdonSyncMode.None)] private int O_UpdateTime;
     private int StartupTimeMS = 0;
@@ -60,29 +59,48 @@ public class SAV_SyncScript : UdonSharpBehaviour
     }
     public void SFEXT_L_EntityStart()
     {
+        VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
         Initialized = true;
-        localPlayer = Networking.LocalPlayer;
+        VRCPlayerApi localPlayer = Networking.LocalPlayer;
         bool InEditor = localPlayer == null;
         if (!InEditor && localPlayer.isMaster)
-        { IsOwner = true; }
-        else if (!InEditor) { IsOwner = false; }//late joiner
+        {
+            IsOwner = true;
+            VehicleRigid.WakeUp();
+            IsOwner = true;
+        }
+        else if (!InEditor)
+        {//late joiner
+            IsOwner = false;
+            VehicleRigid.Sleep();
+        }
         else { IsOwner = true; }//play mode in editor
         nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
         SmoothingTimeDivider = 1f / updateInterval;
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
         StartupTime = Time.realtimeSinceStartup;
+        //script is disabled for 10 seconds to make sure nothing moves before everything is initialized
+        SendCustomEventDelayedSeconds(nameof(ActivateScript), 5);
+    }
+    public void ActivateScript()
+    {
         gameObject.SetActive(true);
+        if (IsOwner)
+        { VehicleRigid.constraints = RigidbodyConstraints.None; }
     }
     public void SFEXT_O_TakeOwnership()
     {
         IsOwner = true;
+        VehicleRigid.WakeUp();
+        VehicleRigid.constraints = RigidbodyConstraints.None;
     }
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
         L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
         O_LastRotation2 = O_LastRotation = O_Rotation_Q;
-
+        VehicleRigid.Sleep();
+        VehicleRigid.constraints = RigidbodyConstraints.FreezePosition;
     }
     private void Update()
     {

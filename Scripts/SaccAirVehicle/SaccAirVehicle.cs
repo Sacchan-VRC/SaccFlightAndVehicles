@@ -378,14 +378,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             InVR = localPlayer.IsUserInVR();
             if (localPlayer.isMaster)
             {
-                VehicleRigidbody.WakeUp();
-                VehicleRigidbody.constraints = RigidbodyConstraints.None;
                 IsOwner = true;
-            }
-            else
-            {
-                VehicleRigidbody.Sleep();
-                VehicleRigidbody.constraints = RigidbodyConstraints.FreezePosition;
             }
         }
 
@@ -507,7 +500,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private void LateUpdate()
     {
         float DeltaTime = Time.deltaTime;
-
         if (IsOwner)//works in editor or ingame
         {
             if (!EntityControl.dead)
@@ -942,14 +934,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
             else
             {
                 //brake is always on if the plane is on the ground
-                if (DisablePhysicsAndInputs == 0)
+                if (Taxiing)
                 {
-                    if (Taxiing)
-                    {
-                        StillWindMulti = Mathf.Min(Speed * .1f, 1);
-                    }
-                    else { StillWindMulti = 1; }
+                    StillWindMulti = Mathf.Min(Speed * .1f, 1);
                 }
+                else { StillWindMulti = 1; }
             }
 
             if (DisablePhysicsAndInputs == 0)
@@ -1131,6 +1120,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         if (HasAfterburner) { SetAfterburnerOff(); }
         Fuel = FullFuel;
         Atmosphere = 1;//planemoving optimization requires this to be here
+        Pitching = Vector3.zero;
+        Yawing = Vector3.zero;
 
         EntityControl.SendEventToExtensions("SFEXT_G_Explode");
 
@@ -1459,16 +1450,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         IsOwner = true;
         VehicleRigidbody.velocity = CurrentVel;
-        VehicleRigidbody.WakeUp();
-        VehicleRigidbody.constraints = RigidbodyConstraints.None;
     }
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
-        //VRChat doesn't set Angular Velocity to 0 when you're not the owner of a rigidbody,
-        //causing spazzing, the script handles angular drag it itself, so when we're not owner of the plane, set this value non-zero to stop spazzing
-        VehicleRigidbody.Sleep();
-        VehicleRigidbody.constraints = RigidbodyConstraints.FreezePosition;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -1527,6 +1512,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
+        Pitching = Vector3.zero;
+        Yawing = Vector3.zero;
         localPlayer.SetVelocity(CurrentVel);
 
         //set plane's layer back
