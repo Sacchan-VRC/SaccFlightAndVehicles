@@ -182,6 +182,10 @@ public class SAV_FloatScript : UdonSharpBehaviour
                 HitLandLast[currentfloatpoint] = !hit.collider.isTrigger;
                 FloatLastRayHitHeight[currentfloatpoint] = hit.point.y;
             }
+            else
+            {
+                FloatLastRayHitHeight[currentfloatpoint] = float.MinValue;
+            }
         }
 
         depth = 0;
