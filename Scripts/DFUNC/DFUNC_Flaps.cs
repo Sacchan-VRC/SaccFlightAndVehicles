@@ -206,7 +206,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
         }
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SFEXT_O_OnPlayerJoined()
     {
         if (!Flaps && !DefaultFlapsOff)
         {

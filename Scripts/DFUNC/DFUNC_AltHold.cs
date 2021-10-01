@@ -81,7 +81,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         if (AltHold)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DeactivateAltHold)); }
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SFEXT_O_OnPlayerJoined()
     {
         if (AltHold)
         {

@@ -117,7 +117,7 @@ public class SaccViewScreenController : UdonSharpBehaviour
             PlaneCamera.position = NewPos;
             PlaneCamera.rotation = Quaternion.Slerp(PlaneCamera.rotation, NewRot, 8f * Time.deltaTime);
 
-            ChannelNumberText.text = string.Concat((AAMTarget + 1).ToString(), "\n", TargetEntity.PilotName);
+            ChannelNumberText.text = string.Concat((AAMTarget + 1).ToString(), "\n", TargetEntity.UsersName);
         }
     }
     public override void OnPlayerJoined(VRCPlayerApi player)

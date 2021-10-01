@@ -19,19 +19,20 @@ public class SAV_KillTracker : UdonSharpBehaviour
         { InEditor = true; }
     }
 
-    public void SFEXT_O_Explode()
+    public void SFEXT_G_Explode()
     {
-        //our killer increases their kills
         float time = Time.time;
-        if (EntityControl.LastAttacker && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 5 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((time - EntityControl.PilotExitTime) < 5))))
+        if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 5 && ((time - EntityControl.PilotExitTime) < 5))))
         {
             EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
-            EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotKill");
+            EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotAKill");
         }
-        //Update Kills board (person with most kills will probably show as having one less kill than they really have until they die, because synced variables will update after this)
-        //should be fixed
     }
-    public void SFEXT_O_GotKill()
+    public void SFEXT_O_PilotEnter()
+    {
+        KillsBoard.MyKills = 0;
+    }
+    public void SFEXT_O_GotAKill()
     {
         if (KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))
         {

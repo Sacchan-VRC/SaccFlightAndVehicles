@@ -52,7 +52,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
             { funcon.SetActive(OnDefault); }
         }
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SFEXT_O_OnPlayerJoined()
     {
         if (!IsSecondary)
         {

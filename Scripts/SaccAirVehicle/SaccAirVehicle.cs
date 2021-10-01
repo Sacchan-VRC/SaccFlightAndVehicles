@@ -11,7 +11,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
     public Transform PlaneMesh;
     [Tooltip("Layer to set the colliders to when entering vehicle")]
-    public int OnboardPlaneLayer = 19;
+    public int OnboardVehicleLayer = 19;
     [Tooltip("Position used to raycast from in order to calculate ground effect")]
     public Transform GroundEffectEmpty;
     [Tooltip("Position pitching forces are applied at")]
@@ -303,7 +303,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool FloatingLastFrame = false;
     bool GroundedLastFrame = false;
     private float VelLiftStart;
-    private int Planelayer;
+    private int VehicleLayer;
     private float VelLiftMaxStart;
     private bool HasAirBrake;//set to false if air brake strength is 0
     private float HandDistanceZLastFrame;
@@ -371,6 +371,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Piloting = true;
             IsOwner = true;
             Occupied = true;
+            VehicleRigidbody.drag = 0;
+            VehicleRigidbody.angularDrag = 0;
         }
         else
         {
@@ -379,6 +381,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
             if (localPlayer.isMaster)
             {
                 IsOwner = true;
+                VehicleRigidbody.drag = 0;
+                VehicleRigidbody.angularDrag = 0;
+            }
+            else
+            {
+                VehicleRigidbody.drag = 9999;
+                VehicleRigidbody.angularDrag = 9999;
             }
         }
 
@@ -414,7 +423,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 wheel.suspensionSpring = SusiSpring;
             }
         }
-        Planelayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
+        VehicleLayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
         OutsidePlaneLayer = PlaneMesh.gameObject.layer;
         VehicleAnimator = EntityControl.GetComponent<Animator>();
 
@@ -1142,7 +1151,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VelLift = VelLiftStart;
             VTOLAngle90 = 0;
             SendCustomEventDelayedSeconds("MoveToSpawn", RespawnDelay - 3);
-
             EntityControl.SendEventToExtensions("SFEXT_O_Explode");
         }
 
@@ -1152,7 +1160,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             EntityControl.ExitStation();
         }
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SFEXT_O_OnPlayerJoined()
     {
         if (GroundedLastFrame)
         {
@@ -1166,8 +1174,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void ReAppear()
     {
         EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
-        VehicleRigidbody.drag = 0;
-        VehicleRigidbody.angularDrag = 0;
+        if (IsOwner)
+        {
+            VehicleRigidbody.drag = 0;
+            VehicleRigidbody.angularDrag = 0;
+        }
     }
     public void NotDead()
     {
@@ -1323,6 +1334,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SFEXT_G_BulletHit()
     {
+        LastHitTime = Time.time;
         if (IsOwner)
         {
             Health -= BulletDamageTaken;
@@ -1357,6 +1369,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         if (IsOwner)
         { TakeMissileDamage(.251f); }
+        LastHitTime = Time.time;
     }
     public void SFEXT_L_MissileHit50()
     {
@@ -1372,6 +1385,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         if (IsOwner)
         { TakeMissileDamage(.501f); }
+        LastHitTime = Time.time;
     }
     public void SFEXT_L_MissileHit75()
     {
@@ -1387,6 +1401,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         if (IsOwner)
         { TakeMissileDamage(.751f); }
+        LastHitTime = Time.time;
     }
     public void SFEXT_L_MissileHit100()
     {
@@ -1402,6 +1417,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         if (IsOwner)
         { TakeMissileDamage(1.001f); }
+        LastHitTime = Time.time;
     }
     public void TakeMissileDamage(float damage)
     {
@@ -1429,12 +1445,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
             }
         }
-        LastHitTime = Time.time;
     }
     public void SFEXT_P_PassengerEnter()
     {
         Passenger = true;
-        SetPlaneLayerInside();
+        SetCollidersLayer(OnboardVehicleLayer);
     }
     public void SFEXT_P_PassengerExit()
     {
@@ -1443,17 +1458,20 @@ public class SaccAirVehicle : UdonSharpBehaviour
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
-
-        SetPlaneLayerOutside();
+        SetCollidersLayer(VehicleLayer);
     }
     public void SFEXT_O_TakeOwnership()
     {
         IsOwner = true;
         VehicleRigidbody.velocity = CurrentVel;
+        VehicleRigidbody.drag = 0;
+        VehicleRigidbody.angularDrag = 0;
     }
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
+        VehicleRigidbody.drag = 9999;
+        VehicleRigidbody.angularDrag = 9999;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -1467,7 +1485,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         EngineOutput = 0;
         ThrottleInput = 0;
         PlayerThrottle = 0;
-        VehicleRigidbody.angularDrag = 0;//set to something nonzero when you're not owner to prevent juddering motion on collisions
         VTOLAngleInput = VTOLAngle;
         GDHitRigidbody = null;
 
@@ -1480,7 +1497,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         AllGs = 0;
         LastFrameVel = CurrentVel;
 
-        SetPlaneLayerInside();
+        SetCollidersLayer(OnboardVehicleLayer);
     }
     public void SFEXT_G_PilotEnter()
     {
@@ -1516,28 +1533,17 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Yawing = Vector3.zero;
         localPlayer.SetVelocity(CurrentVel);
 
-        //set plane's layer back
-        SetPlaneLayerOutside();
+        //set vehicle's collider's layers back
+        SetCollidersLayer(VehicleLayer);
     }
-    public void SetPlaneLayerInside()
+    public void SetCollidersLayer(int Layer)
     {
         if (PlaneMesh)
         {
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
             foreach (Transform child in children)
             {
-                child.gameObject.layer = OnboardPlaneLayer;
-            }
-        }
-    }
-    public void SetPlaneLayerOutside()
-    {
-        if (PlaneMesh)
-        {
-            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
-            foreach (Transform child in children)
-            {
-                child.gameObject.layer = Planelayer;
+                child.gameObject.layer = VehicleLayer;
             }
         }
     }

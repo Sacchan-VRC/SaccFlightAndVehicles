@@ -147,7 +147,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearDown));
         }
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SFEXT_O_OnPlayerJoined()
     {
         if (GearUp)
         {

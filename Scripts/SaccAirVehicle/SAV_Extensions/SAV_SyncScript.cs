@@ -157,7 +157,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                     * O_LastRotation2);
                 RotationLerper = Quaternion.Slerp(RotationLerper,
                  Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),
-                  Time.smoothDeltaTime * 5);
+                  Time.smoothDeltaTime * 10);
 
                 VehicleTransform.SetPositionAndRotation(
                     Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider),

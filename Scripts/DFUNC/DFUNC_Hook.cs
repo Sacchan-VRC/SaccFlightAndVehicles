@@ -90,7 +90,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     {
         ToggleHook();
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SFEXT_O_OnPlayerJoined()
     {
         if (HookDown)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown"); }

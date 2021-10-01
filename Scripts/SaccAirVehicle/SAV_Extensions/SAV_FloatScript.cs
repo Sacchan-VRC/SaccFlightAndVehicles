@@ -40,7 +40,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
     [SerializeField] private bool DoOnLand = false;
     [Tooltip("If a player takes ownership of the vehicle while its floats are below the water, the new owner will not know they are below the water and it will fall through the water. Move the vehicle up by this amount to prevent this from happening.")]
-    public float MoveUpOnTakeOwnerShip = 2f;
+    public float MoveUpOnTakeOwnership = 2f;
     [Header("HoverBike Only")]
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     public bool HoverBike = false;
@@ -101,7 +101,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         if (!HoverBike) { gameObject.SetActive(true); }
 
         Vector3 vehpos = VehicleTransform.position;
-        vehpos.y += MoveUpOnTakeOwnerShip;
+        vehpos.y += MoveUpOnTakeOwnership;
         VehicleTransform.position = vehpos;
     }
     public void SFEXT_O_LoseOwnership()
@@ -130,7 +130,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         {
             float time = Time.time;
             //waves = (noise(+-0.5) * waveheight)
-            Waves = (Vector3.up * ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f));
+            Waves.y = ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f);
         }
         ///if above water, trace down to find water
         //if touching/in water trace down from diameterx2 above last water height at current xz to find water

@@ -64,12 +64,12 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         Pilot = true;
-        Selected = false;
         if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
     }
     public void SFEXT_O_PilotExit()
     {
         Pilot = false;
+        Selected = false;
         TriggerLastFrame = false;
         gameObject.SetActive(false);
         if (Smoking) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
@@ -95,41 +95,42 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     private void LateUpdate()
     {
-        if (Selected)
+        if (Pilot)
         {
             float DeltaTime = Time.deltaTime;
-            float Trigger;
-            if (UseLeftTrigger)
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-            else
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-            if (Trigger > 0.75)
+            if (Selected)
             {
-                //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
-                Vector3 HandPosSmoke = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
-                HandPosSmoke = VehicleTransform.InverseTransformDirection(HandPosSmoke);
-                if (!TriggerLastFrame)
+                float Trigger;
+                if (UseLeftTrigger)
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                else
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                if (Trigger > 0.75)
                 {
-                    SmokeZeroPoint = HandPosSmoke;
-                    TempSmokeCol = SmokeColor;
+                    //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
+                    Vector3 HandPosSmoke = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
+                    HandPosSmoke = VehicleTransform.InverseTransformDirection(HandPosSmoke);
+                    if (!TriggerLastFrame)
+                    {
+                        SmokeZeroPoint = HandPosSmoke;
+                        TempSmokeCol = SmokeColor;
 
-                    ToggleSmoking();
-                    SmokeHoldTime = 0;
+                        ToggleSmoking();
+                        SmokeHoldTime = 0;
+                    }
+                    SmokeHoldTime += Time.deltaTime;
+                    if (SmokeHoldTime > .4f)
+                    {
+                        //VR set smoke color
+                        Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -(float)SAVControl.GetProgramVariable("ThrottleSensitivity");
+                        SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
+                        SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
+                        SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
+                    }
+                    TriggerLastFrame = true;
                 }
-                SmokeHoldTime += Time.deltaTime;
-                if (SmokeHoldTime > .4f)
-                {
-                    //VR Set Smoke
-
-                    Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -(float)SAVControl.GetProgramVariable("ThrottleSensitivity");
-                    SmokeColor.x = Mathf.Clamp(TempSmokeCol.x + SmokeDifference.x, 0, 1);
-                    SmokeColor.y = Mathf.Clamp(TempSmokeCol.y + SmokeDifference.y, 0, 1);
-                    SmokeColor.z = Mathf.Clamp(TempSmokeCol.z + SmokeDifference.z, 0, 1);
-                }
-                TriggerLastFrame = true;
+                else { TriggerLastFrame = false; }
             }
-            else { TriggerLastFrame = false; }
-
             if (Smoking)
             {
                 int keypad7 = Input.GetKey(KeyCode.Keypad7) ? 1 : 0;

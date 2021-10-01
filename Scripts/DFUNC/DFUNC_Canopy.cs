@@ -82,7 +82,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         RepairCanopy();
         if (!CanopyOpen) { CanopyOpening(); }
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SFEXT_O_OnPlayerJoined()
     {
         if (CanopyBroken)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyBreakOff"); }

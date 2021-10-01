@@ -107,7 +107,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (DefaultLimitsOn) { SetLimitsOn(); }
         else { SetLimitsOff(); }
     }
-    public void SFEXT_O_PlayerJoined()
+    public void SFEXT_O_OnPlayerJoined()
     {
         if (!FlightLimitsEnabled && DefaultLimitsOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetLimitsOff"); }

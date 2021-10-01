@@ -31,8 +31,9 @@ public class SaccEntity : UdonSharpBehaviour
     [SerializeField] private Transform RStickDisplayHighlighter;
     [System.NonSerializedAttribute] public bool InEditor = true;
     private VRCPlayerApi localPlayer;
-    [System.NonSerializedAttribute] public int PilotID;
-    [System.NonSerializedAttribute] public string PilotName;
+    [System.NonSerializedAttribute] public bool Piloting;
+    [System.NonSerializedAttribute] public int UsersID;
+    [System.NonSerializedAttribute] public string UsersName;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
     [System.NonSerializedAttribute] public int NumAAMTargets = 0;
     private Vector2 RStickCheckAngle;
@@ -320,6 +321,7 @@ public class SaccEntity : UdonSharpBehaviour
     public void PilotEnterVehicleLocal()//called from PilotSeat
     {
         Using = true;
+        Piloting = true;
         InVehicle = true;
         if (LStickNumFuncs == 1)
         {
@@ -348,16 +350,16 @@ public class SaccEntity : UdonSharpBehaviour
     {
         if (player != null)
         {
-            PilotName = player.displayName;
-            PilotID = player.playerId;
+            UsersName = player.displayName;
+            UsersID = player.playerId;
             PilotEnterTime = Time.time;
             SendEventToExtensions("SFEXT_G_PilotEnter");
         }
     }
     public void PilotExitVehicle(VRCPlayerApi player)
     {
-        PilotName = string.Empty;
-        PilotID = -1;
+        //do this one frame later to ensure any script running pilotexit, explode, etc has access to the values
+        SendCustomEventDelayedFrames(nameof(SetUserNull), 1);
         PilotExitTime = Time.time;
         LStickSelection = -1;
         RStickSelection = -1;
@@ -367,10 +369,16 @@ public class SaccEntity : UdonSharpBehaviour
         if (player.isLocal)
         {
             Using = false;
+            Piloting = false;
             InVehicle = false;
             if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
             { SendEventToExtensions("SFEXT_O_PilotExit"); }
         }
+    }
+    public void SetUserNull()
+    {
+        UsersName = string.Empty;
+        UsersID = -1;
     }
     public void PassengerEnterVehicleLocal()
     {
@@ -399,30 +407,51 @@ public class SaccEntity : UdonSharpBehaviour
     {
         SendEventToExtensions("SFEXT_G_PassengerExit");
     }
+    //these can be used to send messages to vehicles from other vehicles or whatever can find a SaccEntity for custom functionality
+    public void SendGenericEvent0()
+    { SendEventToExtensions("SFEXT_G_GenericEvent0"); }
+    public void SendGenericEvent1()
+    { SendEventToExtensions("SFEXT_G_GenericEvent1"); }
+    public void SendGenericEvent2()
+    { SendEventToExtensions("SFEXT_G_GenericEvent2"); }
+    public void SendGenericEvent3()
+    { SendEventToExtensions("SFEXT_G_GenericEvent3"); }
+    public void SendGenericEvent4()
+    { SendEventToExtensions("SFEXT_G_GenericEvent4"); }
+    public void SendGenericEvent5()
+    { SendEventToExtensions("SFEXT_G_GenericEvent5"); }
+    public void SendGenericEvent6()
+    { SendEventToExtensions("SFEXT_G_GenericEvent6"); }
+    public void SendGenericEvent7()
+    { SendEventToExtensions("SFEXT_G_GenericEvent7"); }
+    public void SendGenericEvent8()
+    { SendEventToExtensions("SFEXT_G_GenericEvent8"); }
+    public void SendGenericEvent9()
+    { SendEventToExtensions("SFEXT_G_GenericEvent9"); }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
         //Owner sends events to sync the vehicle so late joiners don't see it flying with it's canopy open and stuff
         //only change things that aren't in the default state
         if (IsOwner)
-        { SendEventToExtensions("SFEXT_O_PlayerJoined"); }
+        { SendEventToExtensions("SFEXT_O_OnPlayerJoined"); }
     }
     public override void OnPickup()
     {
         Holding = true;
         Using = true;
         HoldingOnly.SetActive(true);
-        SendEventToExtensions("SFEXT_O_PickedUp");
+        SendEventToExtensions("SFEXT_O_OnPickup");
     }
     public override void OnDrop()
     {
         Holding = false;
         Using = true;
         HoldingOnly.SetActive(false);
-        SendEventToExtensions("SFEXT_O_Dropped");
+        SendEventToExtensions("SFEXT_O_OnDrop");
     }
     public override void OnPickupUseDown()
     {
-        SendEventToExtensions("SFEXT_O_PickUpUseDown");
+        SendEventToExtensions("SFEXT_O_OnPickupUseDown");
     }
     private void FindAAMTargets()
     {
