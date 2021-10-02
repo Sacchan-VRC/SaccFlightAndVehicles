@@ -36,10 +36,11 @@ public class SaccSeatAdjuster : UdonSharpBehaviour
     private void OnEnable()
     {
         //set seat back to it's original position
-        if (!FirstEnable)//prevent new players who join from resetting everyone's seat
+        if (FirstEnable)//prevent new players who join from resetting everyone's seat
+        { FirstEnable = false; }
+        else
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetSeat));
-            FirstEnable = false;
         }
 
         CalibratedZ = false;

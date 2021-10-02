@@ -116,7 +116,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         if (!IsOwner)
         {
             gameObject.SetActive(true);
-            SendCustomEventDelayedFrames("DisableThisObjNonOnwer", 1);
+            SendCustomEventDelayedFrames(nameof(DisableThisObjNonOnwer), 1);
         }
     }
     private void DisableThisObjNonOnwer()
@@ -126,69 +126,72 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     private bool FindCatapultAnimator(GameObject other)
     {
+        if (OnCatapult) { return false; }//Why is this needed?
         GameObject CatapultObjects = other.gameObject;
         CatapultAnimator = null;
         CatapultAnimator = other.GetComponent<Animator>();
-        while (!Utilities.IsValid(CatapultAnimator) && CatapultObjects.transform.parent)
+        while (CatapultAnimator == null && CatapultObjects.transform.parent)
         {
             CatapultObjects = CatapultObjects.transform.parent.gameObject;
             CatapultAnimator = CatapultObjects.GetComponent<Animator>();
         }
-        return (Utilities.IsValid(CatapultAnimator));
+        return (CatapultAnimator != null);
     }
     private void OnTriggerEnter(Collider other)
     {
         if (Piloting && !EntityControl.dead)
         {
-            if (other)
+            if (!OnCatapult)
             {
-                if (!OnCatapult)
+                if (other)
                 {
                     if (other.gameObject.layer == CatapultLayer)
                     {
-                        if (!FindCatapultAnimator(other.gameObject)) { return; }
-                        CatapultTransform = other.transform;
-                        //Hit detected, check if the plane is facing in the right direction..
-                        if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
+                        if (FindCatapultAnimator(other.gameObject))
                         {
-                            CatapultPosLastFrame = CatapultTransform.position;
-                            //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
-                            //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
-                            VehicleTransform.rotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
-
-                            //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
-                            PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
-                            VehicleTransform.position = CatapultTransform.position;
-                            VehicleTransform.position -= CatapultTransform.up * PlaneCatapultUpDistance;
-
-                            //move the plane back so that the catapult is aligned to the catapult detector
-                            PlaneCatapultBackDistance = VehicleTransform.InverseTransformDirection(VehicleTransform.position - transform.position).z;
-                            VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
-
-                            PlaneCatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(VehicleTransform.rotation);
-
-                            if (!DisableGearToggle && GearFunc)
+                            CatapultTransform = other.transform;
+                            //Hit detected, check if the plane is facing in the right direction..
+                            if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
                             {
-                                GearFunc.SetProgramVariable("DisableGearToggle", (int)GearFunc.GetProgramVariable("DisableGearToggle") + 1);
-                                DisableGearToggle = true;
-                            }
-                            if (!DisableTaxiRotation)
-                            {
-                                SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") + 1);
-                                DisableTaxiRotation = true;
-                            }
-                            if (!OverrideConstantForce)
-                            {
-                                SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") + 1);
-                                SAVControl.SetProgramVariable("CFRelativeForceOverride", Vector3.zero);
-                                SAVControl.SetProgramVariable("CFRelativeTorqueOverride", Vector3.zero);
-                                OverrideConstantForce = true;
-                            }
-                            //use dead to make plane invincible for x frames when entering the catapult to prevent taking G damage from stopping instantly
-                            EntityControl.dead = true;
-                            CatapultDeadTimer = 5;
+                                CatapultPosLastFrame = CatapultTransform.position;
+                                //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
+                                //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
+                                VehicleTransform.rotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
 
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockIn));
+                                //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
+                                PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
+                                VehicleTransform.position = CatapultTransform.position;
+                                VehicleTransform.position -= CatapultTransform.up * PlaneCatapultUpDistance;
+
+                                //move the plane back so that the catapult is aligned to the catapult detector
+                                PlaneCatapultBackDistance = VehicleTransform.InverseTransformDirection(VehicleTransform.position - transform.position).z;
+                                VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
+
+                                PlaneCatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(VehicleTransform.rotation);
+
+                                if (!DisableGearToggle && GearFunc)
+                                {
+                                    GearFunc.SetProgramVariable("DisableGearToggle", (int)GearFunc.GetProgramVariable("DisableGearToggle") + 1);
+                                    DisableGearToggle = true;
+                                }
+                                if (!DisableTaxiRotation)
+                                {
+                                    SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") + 1);
+                                    DisableTaxiRotation = true;
+                                }
+                                if (!OverrideConstantForce)
+                                {
+                                    SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") + 1);
+                                    SAVControl.SetProgramVariable("CFRelativeForceOverride", Vector3.zero);
+                                    SAVControl.SetProgramVariable("CFRelativeTorqueOverride", Vector3.zero);
+                                    OverrideConstantForce = true;
+                                }
+                                //use dead to make plane invincible for x frames when entering the catapult to prevent taking G damage from stopping instantly
+                                EntityControl.dead = true;
+                                CatapultDeadTimer = 5;
+
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockIn));
+                            }
                         }
                     }
                 }

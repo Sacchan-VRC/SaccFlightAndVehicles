@@ -59,6 +59,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         if (!Smoking)
         { gameObject.SetActive(false); }
+        Selected = false;
         TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
@@ -143,13 +144,13 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                 SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
                 SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
             }
+            //Smoke Color Indicator
+            SmokeColorIndicatorMaterial.color = SmokeColor_Color;
         }
-        //Smoke Color Indicator
-        SmokeColorIndicatorMaterial.color = SmokeColor_Color;
-        SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
-        //everyone does this while smoke is active
         if (Smoking && !DisplaySmokeNull)
         {
+            //everyone does this while smoke is active
+            SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
             Color SmokeCol = SmokeColor_Color;
             foreach (ParticleSystem smoke in DisplaySmoke)
             {

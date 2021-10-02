@@ -1536,14 +1536,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
         //set vehicle's collider's layers back
         SetCollidersLayer(VehicleLayer);
     }
-    public void SetCollidersLayer(int Layer)
+    public void SetCollidersLayer(int NewLayer)
     {
         if (PlaneMesh)
         {
             Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
             foreach (Transform child in children)
             {
-                child.gameObject.layer = VehicleLayer;
+                child.gameObject.layer = NewLayer;
             }
         }
     }
