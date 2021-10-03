@@ -21,8 +21,10 @@ public class SAV_AAMController : UdonSharpBehaviour
     [SerializeField] private float ColliderActiveDistance = 45;
     [Tooltip("Maximum speed missile can rotate")]
     [SerializeField] private float RotSpeed = 400;
-    [Tooltip("Missile tracks weaker if target's throttle is low, this value is the throttle at which lowering throttle more doesn't do anything")]
-    [SerializeField] private float TargetLowThrottleTrack = .3f;
+    [Tooltip("If target vehicle has afterburner on, multiply rotation speed by this value")]
+    [SerializeField] private float AfterBurnerTrackMulti = 2f;
+    [Tooltip("Missile rotates weaker if target's throttle is low, this value is the throttle at which lowering throttle more doesn't do anything")]
+    [SerializeField] private float TargetMinThrottleTrack = .3f;
     [Tooltip("When passing target, if within this range, explode")]
     [SerializeField] private float ProximityExplodeDistance = 20;
     private UdonSharpBehaviour TargetSAVControl;
@@ -134,14 +136,14 @@ public class SAV_AAMController : UdonSharpBehaviour
             if (TargetSAVControl)
             {
                 Dumb = Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
-                EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetLowThrottleTrack);//Track target more weakly the lower their throttle
+                EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle
             }
             else
             {
                 EngineTrack = 1;
                 Dumb = false;
             }
-            if (EngineTrack > 1) { EngineTrack = 2; }//if AB on track 2x as well
+            if (EngineTrack > 1) { EngineTrack *= AfterBurnerTrackMulti; }//if AB on track 2x as well
             if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
             {
                 if ((!Dumb && TargetDistance < TargDistlastframe) || LockHack)

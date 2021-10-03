@@ -21,15 +21,27 @@ public class SaccAAGunController : UdonSharpBehaviour
     [SerializeField] private AudioSource AAMLockedOn;
     [Tooltip("Joystick object that moves around in response to rotation inputs")]
     [SerializeField] private Transform JoyStick;
+    [Tooltip("When destroyed, will reappear after this many seconds")]
     [SerializeField] private float RespawnDelay = 20;
+    [Tooltip("Vehicle is un-destroyable for this long after spawning")]
     [SerializeField] private float InvincibleAfterSpawn = 1;
     public float Health = 100f;
-    [SerializeField] private float TurnSpeedMulti = 5;
-    [SerializeField] private float TurnFriction = 4;
+    [Tooltip("Rotation strength")]
+    [SerializeField] private float TurnSpeedMulti = 6;
+    [Tooltip("Rotation slowdown per frame")]
+    [Range(0, 1)]
+    [SerializeField] private float TurnFriction = .04f;
+    [Tooltip("Angle above the horizon that this gun can look")]
     [SerializeField] private float UpAngleMax = 89;
+    [Tooltip("Angle below the horizon that this gun can look")]
     [SerializeField] private float DownAngleMax = 35;
-    [SerializeField] private float TurningResponseDesktop = 3f;
+    [Tooltip("Lerp rotational inputs by this amount when used in desktop mode so the aim isn't too twitchy")]
+    [SerializeField] private float TurningResponseDesktop = 2f;
+    [Tooltip("HP repairs every x seconds")]
     [SerializeField] private float HPRepairDelay = 5f;
+    [Tooltip("HP will start repairing this long after being hit")]
+    [SerializeField] private float HPRepairHitTimer = 10f;
+    [Tooltip("HP repairs by this amount every HPRepairDelay seconds")]
     [SerializeField] private float HPRepairAmount = 5f;
     public float MissileReloadTime = 10;
     [Tooltip("How long gun can fire for before running out of ammo in seconds")]
@@ -64,7 +76,6 @@ public class SaccAAGunController : UdonSharpBehaviour
     private float FullMGDivider;
     [SerializeField] private GameObject SeatAdjuster;
     [System.NonSerializedAttribute] public Animator AAGunAnimator;
-    [System.NonSerializedAttribute] public bool dead;
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Manning = false;//like Piloting in the plane
     [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
@@ -157,7 +168,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         {
             if (Manning)
             {
-                float DeltaTime = Time.deltaTime;
+                float DeltaTime = Time.smoothDeltaTime;
                 //get inputs
                 int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
                 int Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
@@ -210,8 +221,8 @@ public class SaccAAGunController : UdonSharpBehaviour
                 int InY = (Af + Df);
                 if (InX > 0 && InputXKeyb < 0 || InX < 0 && InputXKeyb > 0) InputXKeyb = 0;
                 if (InY > 0 && InputYKeyb < 0 || InY < 0 && InputYKeyb > 0) InputYKeyb = 0;
-                InputXKeyb = Mathf.Lerp((InputXKeyb), InX, Mathf.Abs(InX) > 0 ? TurningResponseDesktop * DeltaTime : 1);
-                InputYKeyb = Mathf.Lerp((InputYKeyb), InY, Mathf.Abs(InY) > 0 ? TurningResponseDesktop * DeltaTime : 1);
+                InputXKeyb = Mathf.Lerp(InputXKeyb, InX, Mathf.Abs(InX) > 0 ? TurningResponseDesktop * DeltaTime : 1);
+                InputYKeyb = Mathf.Lerp(InputYKeyb, InY, Mathf.Abs(InY) > 0 ? TurningResponseDesktop * DeltaTime : 1);
 
                 float InputX = Mathf.Clamp((VRPitchYawInput.x + InputXKeyb), -1, 1);
                 float InputY = Mathf.Clamp((VRPitchYawInput.y + InputYKeyb), -1, 1);
@@ -223,16 +234,17 @@ public class SaccAAGunController : UdonSharpBehaviour
                 InputX *= TurnSpeedMulti;
                 InputY *= TurnSpeedMulti;
 
-                RotationSpeedX += -(RotationSpeedX * TurnFriction * DeltaTime) + (InputX * DeltaTime);
-                RotationSpeedY += -(RotationSpeedY * TurnFriction * DeltaTime) + (InputY * DeltaTime);
+                RotationSpeedX += -(RotationSpeedX * TurnFriction) + (InputX);
+                RotationSpeedY += -(RotationSpeedY * TurnFriction) + (InputY);
 
                 //rotate turret
-                float NewX = Rotator.localRotation.eulerAngles.x;
-                NewX += RotationSpeedX;
+                Vector3 rot = Rotator.localRotation.eulerAngles;
+                float NewX = rot.x;
+                NewX += RotationSpeedX * DeltaTime;
                 if (NewX > 180) { NewX -= 360; }
                 if (NewX > DownAngleMax || NewX < -UpAngleMax) RotationSpeedX = 0;
                 NewX = Mathf.Clamp(NewX, -UpAngleMax, DownAngleMax);//limit angles
-                float NewY = Rotator.localRotation.eulerAngles.y + (RotationSpeedY);
+                float NewY = rot.y + (RotationSpeedY * DeltaTime);
                 Rotator.localRotation = Quaternion.Euler(new Vector3(NewX, NewY, 0));
                 //Firing the gun
                 if ((RTrigger >= 0.75 || Input.GetKey(KeyCode.Space)) && MGAmmoSeconds > 0)
@@ -338,7 +350,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         {
             if (AAGunSeat) { AAGunSeat.ExitStation(localPlayer); }
         }
-        dead = true;
+        EntityControl.dead = true;
         Firing = false;
         MGAmmoSeconds = MGAmmoFull;
         Health = FullHealth;//turns off low health smoke and stops it from calling Explode() every frame
@@ -354,15 +366,17 @@ public class SaccAAGunController : UdonSharpBehaviour
 
         SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay);
         SendCustomEventDelayedSeconds(nameof(NotDead), RespawnDelay + InvincibleAfterSpawn);
+        EntityControl.SendEventToExtensions("SFEXT_G_Explode");
     }
     public void ReAppear()
     {
         AAGunAnimator.SetTrigger("reappear");
-        dead = false;
+        EntityControl.dead = false;
         if (IsOwner)
         {
             Health = FullHealth;
         }
+        EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
     }
     public void NotDead()
     {
@@ -399,20 +413,25 @@ public class SaccAAGunController : UdonSharpBehaviour
     }
     public void SFEXT_G_BulletHit()
     {
-        if (IsOwner)
+        HPRepairTimer = HPRepairDelay - HPRepairHitTimer;
+        if (!EntityControl.dead)
         {
-            Health -= BulletDamageTaken;
-            if (Health <= 0)
+            if (IsOwner)
             {
-                if (PredictDamage)//the attacker calls the explode function in this case
+                Health -= BulletDamageTaken;
+                if (Health <= 0)
                 {
-                    Health = 0.1f;
-                    //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
-                    SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself}
+                    if (PredictDamage)//the attacker calls the explode function in this case
+                    {
+                        Health = 0.1f;
+                        //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
+                        SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself}
+                    }
+                    else
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode)); }
                 }
-                else
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode)); }
             }
+            AAGunAnimator.SetFloat("health", Health * FullHealthDivider);
         }
     }
     public void CheckLaggyKilled()
@@ -474,6 +493,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                     AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
                     AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
+                    RequestSerialization();
                     if (HUDControl)
                     {
                         HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
@@ -599,10 +619,12 @@ public class SaccAAGunController : UdonSharpBehaviour
     }
     public void HPRepair()
     {
-        HPRepairTimer = 0;
         Health += HPRepairAmount;
+        if (Health == FullHealth)
+        { HPRepairTimer = float.MinValue; }
+        else { HPRepairTimer = 0; }
         if (Health > FullHealth) { Health = FullHealth; }
-        AAGunAnimator.SetFloat("health", Health / FullHealth);
+        AAGunAnimator.SetFloat("health", Health * FullHealthDivider);
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -619,9 +641,9 @@ public class SaccAAGunController : UdonSharpBehaviour
         {
             AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
         }
-        if (localPlayer != null && localPlayer.IsUserInVR())
+        if (localPlayer != null)
         {
-            InVR = true;//has to be set on enter otherwise Built And Test thinks you're in desktop
+            InVR = localPlayer.IsUserInVR();//has to be set on enter otherwise Built And Test thinks you're in desktop
         }
     }
     public void SFEXT_G_PilotEnter()
@@ -637,7 +659,7 @@ public class SaccAAGunController : UdonSharpBehaviour
             NumAAM = Mathf.Min((NumAAM + ((int)(TimeSinceLast / MissileReloadTime))), FullAAMs);
             AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
             Health = Mathf.Min((Health + (((int)(TimeSinceLast / HPRepairDelay))) * HPRepairAmount), FullHealth);
-            AAGunAnimator.SetFloat("health", Health / FullHealth);
+            AAGunAnimator.SetFloat("health", Health * FullHealthDivider);
             MGAmmoRecharge += TimeSinceLast * MGReloadSpeed;
         }
     }

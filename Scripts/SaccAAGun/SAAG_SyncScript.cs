@@ -55,6 +55,7 @@ public class SAAG_SyncScript : UdonSharpBehaviour
     //private Vector3 NonOwnerRotLerper;
     private float UpAngleMax = 89;
     private float DownAngleMax = 35;
+    private Quaternion RotatorStartRot;
     private void Start()
     {
         if (!Initialized)//shouldn't be active until entitystart
@@ -75,6 +76,11 @@ public class SAAG_SyncScript : UdonSharpBehaviour
         gameObject.SetActive(false);
         UpAngleMax = (float)AAGunControl.GetProgramVariable("UpAngleMax");
         DownAngleMax = (float)AAGunControl.GetProgramVariable("DownAngleMax");
+        RotatorStartRot = Rotator.localRotation;
+    }
+    public void SFEXT_G_ReAppear()
+    {
+        Rotator.localRotation = RotatorStartRot;
     }
     public void SFEXT_O_TakeOwnership()
     {

@@ -111,7 +111,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         Pilot = false;
         TriggerLastFrame = false;
-        RequestSerialization();
         gameObject.SetActive(false);
         AAMLockTimer = 0;
         AAMHasTarget = false;
@@ -237,12 +236,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
                     TriggerLastFrame = true;
                 }
                 else TriggerLastFrame = false;
-
-                if (TimeSinceSerialization > .5f)
-                {
-                    TimeSinceSerialization = 0;
-                    RequestSerialization();
-                }
             }
             else { AAMLocked = false; AAMHasTarget = false; }
 
@@ -336,6 +329,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         AAMCurrentTargetSAVControl = NextTargetSAVontrol;
                         AAMLockTimer = 0;
                         AAMTargetedTimer = .9f;//send targeted .1s after targeting so it can't get spammed too fast (and doesnt send if you instantly target something else)
+                        RequestSerialization();
                     }
                 }
             }

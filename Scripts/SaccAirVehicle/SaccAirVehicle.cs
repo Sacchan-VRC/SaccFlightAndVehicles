@@ -8,8 +8,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
 {
     [Tooltip("Base object reference")]
     public SaccEntity EntityControl;
+    public Transform ControlsRoot;
     [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
-    public Transform PlaneMesh;
+    public Transform VehicleMesh;
     [Tooltip("Layer to set the colliders to when entering vehicle")]
     public int OnboardVehicleLayer = 19;
     [Tooltip("Position used to raycast from in order to calculate ground effect")]
@@ -391,7 +392,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
         }
 
-        WheelCollider[] wc = PlaneMesh.GetComponentsInChildren<WheelCollider>(true);
+        WheelCollider[] wc = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
         if (wc.Length != 0) { HasWheelColliders = true; }
 
         if (AutoAdjustValuesToMass)
@@ -423,8 +424,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 wheel.suspensionSpring = SusiSpring;
             }
         }
-        VehicleLayer = PlaneMesh.gameObject.layer;//get the layer of the plane as set by the world creator
-        OutsidePlaneLayer = PlaneMesh.gameObject.layer;
+        VehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the plane as set by the world creator
+        OutsidePlaneLayer = VehicleMesh.gameObject.layer;
         VehicleAnimator = EntityControl.GetComponent<Animator>();
 
         FullHealth = Health;
@@ -1334,30 +1335,36 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SFEXT_G_BulletHit()
     {
-        LastHitTime = Time.time;
-        if (IsOwner)
+        if (!EntityControl.dead)
         {
-            Health -= BulletDamageTaken;
-            if (PredictDamage && Health <= 0)//the attacker calls the explode function in this case
+            LastHitTime = Time.time;
+            if (IsOwner)
             {
-                Health = 0.1f;
-                //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
-                SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself
+                Health -= BulletDamageTaken;
+                if (PredictDamage && Health <= 0)//the attacker calls the explode function in this case
+                {
+                    Health = 0.0911f;
+                    //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
+                    SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself
+                }
             }
         }
     }
     public void CheckLaggyKilled()
     {
-        //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
-        if (Health == 0.1f)
+        if (!EntityControl.dead)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+            //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
+            if (Health == 0.0911f)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+            }
         }
     }
     //Add .001 to each value of damage taken to prevent float comparison bullshit
     public void SFEXT_L_MissileHit25()
     {
-        if (PredictDamage)
+        if (PredictDamage && !EntityControl.dead)
         { MissileDamagePrediction(.251f); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit25));
     }
@@ -1373,7 +1380,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SFEXT_L_MissileHit50()
     {
-        if (PredictDamage)
+        if (PredictDamage && !EntityControl.dead)
         { MissileDamagePrediction(.501f); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit50));
     }
@@ -1389,7 +1396,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SFEXT_L_MissileHit75()
     {
-        if (PredictDamage)
+        if (PredictDamage && !EntityControl.dead)
         { MissileDamagePrediction(.751f); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit75));
     }
@@ -1405,7 +1412,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SFEXT_L_MissileHit100()
     {
-        if (PredictDamage)
+        if (PredictDamage && !EntityControl.dead)
         { MissileDamagePrediction(1.001f); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit100));
     }
@@ -1422,7 +1429,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void TakeMissileDamage(float damage)
     {
         Health -= ((FullHealth * damage) * MissileDamageTakenMultiplier);
-        if (PredictDamage && Health <= 0)
+        if (PredictDamage && !EntityControl.dead && Health <= 0)
         { Health = 0.1f; }//the attacker calls the explode function in this case
         Vector3 explosionforce = new Vector3(Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce)) * damage;
         VehicleRigidbody.AddTorque(explosionforce, ForceMode.VelocityChange);
@@ -1538,9 +1545,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void SetCollidersLayer(int NewLayer)
     {
-        if (PlaneMesh)
+        if (VehicleMesh)
         {
-            Transform[] children = PlaneMesh.GetComponentsInChildren<Transform>();
+            Transform[] children = VehicleMesh.GetComponentsInChildren<Transform>();
             foreach (Transform child in children)
             {
                 child.gameObject.layer = NewLayer;

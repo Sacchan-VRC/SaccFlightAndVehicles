@@ -53,7 +53,19 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int LStickSelection = -1;
     [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
     [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
-    [System.NonSerializedAttribute] public bool dead = false;
+    [System.NonSerializedAttribute] public bool _dead = false;
+    public bool dead
+    {
+        set
+        {
+            if (value)
+            { SendEventToExtensions("SFEXT_G_Dead"); }
+            else
+            { SendEventToExtensions("SFEXT_G_NotDead"); }
+            _dead = value;
+        }
+        get => _dead;
+    }
     [System.NonSerializedAttribute] public bool Using = false;
     [System.NonSerializedAttribute] public bool Passenger = false;
     [System.NonSerializedAttribute] public bool InVehicle = false;

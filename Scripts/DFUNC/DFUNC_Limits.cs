@@ -57,11 +57,6 @@ public class DFUNC_Limits : UdonSharpBehaviour
         Selected = false;
         Piloting = false;
     }
-    public void SFEXT_G_TouchDown()
-    {
-        if (Piloting && FlightLimitsEnabled)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetLimitsOff)); }
-    }
     public void SFEXT_O_EnterVTOL()
     {
         if (FlightLimitsEnabled)
