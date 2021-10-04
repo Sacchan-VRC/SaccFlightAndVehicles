@@ -8,7 +8,6 @@ using VRC.Udon;
 public class SAV_BombController : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour BombLauncherControl;
-    public SaccEntity EntityControl;
     [Tooltip("Bomb will explode after this time")]
     [SerializeField] private float MaxLifetime = 40;
     [Tooltip("Play a random one of these explosion sounds")]
@@ -23,21 +22,23 @@ public class SAV_BombController : UdonSharpBehaviour
     [SerializeField] private float AirPhysicsStrength = .1f;
     [Tooltip("Used for making rockets, should probably disable air physics and angle randomization when making rockets.")]
     [SerializeField] private float ForwardThrust = 0f;
+    private SaccEntity EntityControl;
     private ConstantForce BombConstant;
     private Rigidbody BombRigid;
     private bool Exploding = false;
     private bool ColliderActive = false;
     private float Lifetime = 0;
     private CapsuleCollider BombCollider;
-    private Transform CenterOfMass;
+    private Transform VehicleCenterOfMass;
     private bool IsOwner;
 
     private void Start()
     {
-        CenterOfMass = EntityControl.CenterOfMass;
+        VehicleCenterOfMass = EntityControl.CenterOfMass;
         BombCollider = GetComponent<CapsuleCollider>();
         BombRigid = GetComponent<Rigidbody>();
         BombConstant = GetComponent<ConstantForce>();
+        EntityControl = (SaccEntity)((UdonSharpBehaviour)BombLauncherControl.GetProgramVariable("SAVControl")).GetProgramVariable("EntityControl");
         transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
         if (EntityControl.InEditor) { IsOwner = true; }
         else
@@ -48,7 +49,7 @@ public class SAV_BombController : UdonSharpBehaviour
     {
         if (!ColliderActive)
         {
-            if (Vector3.Distance(transform.position, CenterOfMass.position) > ColliderActiveDistance)
+            if (Vector3.Distance(transform.position, VehicleCenterOfMass.position) > ColliderActiveDistance)
             {
                 BombCollider.enabled = true;
                 ColliderActive = true;

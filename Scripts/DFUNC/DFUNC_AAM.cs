@@ -91,6 +91,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
+        TriggerLastFrame = true;
         Pilot = true;
         HUDText_AAM_ammo.text = NumAAM.ToString("F0");
         //Make sure SAVeControl.AAMCurrentTargetSAVControl is correct
@@ -110,7 +111,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         Pilot = false;
-        TriggerLastFrame = false;
         gameObject.SetActive(false);
         AAMLockTimer = 0;
         AAMHasTarget = false;
@@ -157,7 +157,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
         func_active = true;
         AAMTargetIndicator.gameObject.SetActive(true);
@@ -169,6 +168,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(false);
         AAMTargeting.gameObject.SetActive(false);
         AAMTargetLock.gameObject.SetActive(false);
@@ -180,7 +180,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
         func_active = false;
         if (OthersEnabled)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
-        TriggerLastFrame = false;
 
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }

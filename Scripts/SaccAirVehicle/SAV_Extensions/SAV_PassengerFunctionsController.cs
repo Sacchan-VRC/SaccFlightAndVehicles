@@ -14,6 +14,10 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     public UdonSharpBehaviour[] Dial_Functions_L;
     [Tooltip("Function dial scripts that you wish to be on the right dial")]
     public UdonSharpBehaviour[] Dial_Functions_R;
+    [Tooltip("Should there be a function at the top middle of the function dial[ ]? Or a divider[x]? Useful for adjusting function positions with an odd number of functions")]
+    [SerializeField] private bool LeftDialDivideStraightUp = false;
+    [Tooltip("See above")]
+    [SerializeField] private bool RightDialDivideStraightUp = false;
     [Tooltip("Object that points toward the currently selected function on the left stick")]
     [SerializeField] private Transform LStickDisplayHighlighter;
     [Tooltip("Object that points toward the currently selected function on the right stick")]
@@ -87,9 +91,34 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
         LStickCheckAngle.y = angle.z;
 
         angle = new Vector3(0, 0, -1);
-        if (!RightDialEmpty) { angle = Quaternion.Euler(0, -((360 / RStickNumFuncs) / 2), 0) * angle; }
-        RStickCheckAngle.x = angle.x;
-        RStickCheckAngle.y = angle.z;
+        if (RStickNumFuncs > 1)
+        {
+            if (RightDialDivideStraightUp)
+            {
+                RStickCheckAngle.x = 0;
+                RStickCheckAngle.y = -1;
+            }
+            else
+            {
+                angle = Quaternion.Euler(0, -((360 / RStickNumFuncs) / 2), 0) * angle;
+                RStickCheckAngle.x = angle.x;
+                RStickCheckAngle.y = angle.z;
+            }
+        }
+        if (LStickNumFuncs > 1)
+        {
+            if (LeftDialDivideStraightUp)
+            {
+                LStickCheckAngle.x = 0;
+                LStickCheckAngle.y = -1;
+            }
+            else
+            {
+                angle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle;
+                LStickCheckAngle.x = angle.x;
+                LStickCheckAngle.y = angle.z;
+            }
+        }
 
         SwitchFunctionSoundNULL = SwitchFunctionSound == null;
         LStickDisplayHighlighterNULL = LStickDisplayHighlighter == null;

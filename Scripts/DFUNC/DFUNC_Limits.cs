@@ -36,17 +36,17 @@ public class DFUNC_Limits : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         Selected = true;
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         Selected = false;
         if (!FlightLimitsEnabled) { gameObject.SetActive(false); }
-        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
+        TriggerLastFrame = true;
         if (FlightLimitsEnabled) { gameObject.SetActive(true); }
         Piloting = true;
         if (Dial_Funcon) Dial_Funcon.SetActive(FlightLimitsEnabled);

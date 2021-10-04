@@ -8,7 +8,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
 {
     [Tooltip("Base object reference")]
     public SaccEntity EntityControl;
-    public Transform ControlsRoot;
     [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
     public Transform VehicleMesh;
     [Tooltip("Layer to set the colliders to when entering vehicle")]
@@ -175,10 +174,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Header("Other:")]
     [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders suspension values")]
     [SerializeField] private bool AutoAdjustValuesToMass = true;
+    [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
+    public Transform ControlsRoot;
     [Tooltip("Zero height of the calculation of atmosphere thickness and HUD altitude display")]
     public float SeaLevel = -10f;
     [Tooltip("Wind speed on each axis")]
     public Vector3 Wind;
+    [Tooltip("Strength of noise-based changes in wind strength")]
     public float WindGustStrength = 15;
     [Tooltip("How often wind gust changes strength")]
     public float WindGustiness = 0.03f;
@@ -242,7 +244,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float ThrottleZeroPoint;
-    private float ThrottlePlayspaceLastFrame;
     [System.NonSerializedAttribute] public float ThrottleInput = 0f;
     private float roll = 0f;
     private float pitch = 0f;
@@ -324,6 +325,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float TaxiFullTurningSpeedDivider;
     private float vtolangledif;
+    private bool LowFuelLastFrame;
+    private bool NoFuelLastFrame;
     Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
     [System.NonSerializedAttribute] public float ThrottleStrengthAB;
     [System.NonSerializedAttribute] public float FuelConsumptionAB;
@@ -333,7 +336,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private float GDamageToTake;
     [System.NonSerializedAttribute] public float LastHitTime = -100;
     [System.NonSerializedAttribute] public float PredictedHealth;
-    [System.NonSerializedAttribute] public SaccEntity LastAttacker;
 
 
     [System.NonSerializedAttribute] public int NumActiveFlares;
@@ -506,6 +508,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             TaxiFullTurningSpeedDivider = 1 / TaxiFullTurningSpeed;
         }
+        if (!ControlsRoot)
+        { ControlsRoot = VehicleTransform; }
     }
     private void LateUpdate()
     {
@@ -644,8 +648,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     //VR Joystick                
                     if (JoyStickGrip > 0.75)
                     {
-                        Quaternion PlaneRotDif = VehicleTransform.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
-                        PlaneRotLastFrame = VehicleTransform.rotation;
+                        Quaternion PlaneRotDif = ControlsRoot.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
+                        PlaneRotLastFrame = ControlsRoot.rotation;
                         JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
                         if (!JoystickGripLastFrame)//first frame you gripped joystick
                         {
@@ -659,12 +663,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
                         Quaternion JoystickDifference;
                         if (SwitchHandsJoyThrottle)
-                        { JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
-                        else { JoystickDifference = (Quaternion.Inverse(VehicleTransform.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
+                        { JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
+                        else { JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
 
-                        JoystickPosYaw = (JoystickDifference * VehicleTransform.forward);//angles to vector
+                        JoystickPosYaw = (JoystickDifference * ControlsRoot.forward);//angles to vector
                         JoystickPosYaw.y = 0;
-                        JoystickPos = (JoystickDifference * VehicleTransform.up);
+                        JoystickPos = (JoystickDifference * ControlsRoot.up);
                         VRPitchRoll = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;
 
                         JoystickGripLastFrame = true;
@@ -703,7 +707,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     {
                         JoystickPosYaw.x = 0;
                         VRPitchRoll = Vector3.zero;
-                        if (JoystickGripLastFrame)//first frame you gripped joystick
+                        if (JoystickGripLastFrame)//first frame you let go of joystick
                         { EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped"); }
                         JoystickGripLastFrame = false;
                     }
@@ -722,25 +726,18 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     {
                         Vector3 handdistance;
                         if (SwitchHandsJoyThrottle)
-                        { handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
-                        else { handdistance = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
-                        handdistance = VehicleTransform.InverseTransformDirection(handdistance);
-
-                        Vector3 PlaySpaceDistance = transform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin).position;
-                        PlaySpaceDistance = VehicleTransform.InverseTransformDirection(PlaySpaceDistance);
+                        { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
+                        else { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
+                        handdistance = ControlsRoot.InverseTransformDirection(handdistance);
 
                         float HandThrottleAxis;
                         if (VerticalThrottle)
                         {
                             HandThrottleAxis = handdistance.y;
-                            /*    - (PlaySpaceDistance.y - ThrottlePlayspaceLastFrame);
-                              ThrottlePlayspaceLastFrame = PlaySpaceDistance.y; */
                         }
                         else
                         {
                             HandThrottleAxis = handdistance.z;
-                            /*     - (PlaySpaceDistance.y - ThrottlePlayspaceLastFrame);
-                               ThrottlePlayspaceLastFrame = PlaySpaceDistance.z; */
                         }
 
                         if (!ThrottleGripLastFrame)
@@ -830,7 +827,21 @@ public class SaccAirVehicle : UdonSharpBehaviour
                                             + (Throttles.y * FuelConsumptionAB)) * DeltaTime, 0);
 
 
-                    if (Fuel < LowFuel) { ThrottleInput = ThrottleInput * (Fuel * LowFuelDivider); }//decrease max throttle as fuel runs out
+                    if (Fuel < LowFuel)
+                    {
+                        //max throttle scales down with amount of fuel below LowFuel
+                        ThrottleInput = ThrottleInput * Fuel * LowFuelDivider;
+                        if (!LowFuelLastFrame)
+                        {
+                            EntityControl.SendEventToExtensions("SFEXT_O_LowFuel");
+                            LowFuelLastFrame = true;
+                        }
+                        if (Fuel == 0 && !NoFuelLastFrame)
+                        {
+                            NoFuelLastFrame = true;
+                            EntityControl.SendEventToExtensions("SFEXT_O_NoFuel");
+                        }
+                    }
 
                     if (HasAfterburner)
                     {
@@ -1269,6 +1280,16 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             Fuel = Mathf.Min(Fuel + (FullFuel / RefuelTime), FullFuel);
             Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
+            if (LowFuelLastFrame && Fuel > LowFuel)
+            {
+                LowFuelLastFrame = false;
+                EntityControl.SendEventToExtensions("SFEXT_O_NotLowFuel");
+            }
+            if (NoFuelLastFrame && Fuel > 0)
+            {
+                NoFuelLastFrame = false;
+                EntityControl.SendEventToExtensions("SFEXT_O_NotNoFuel");
+            }
         }
     }
     public void SFEXT_O_RespawnButton()//called when using respawn button

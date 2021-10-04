@@ -89,6 +89,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
+        TriggerLastFrame = true;
         AGMLocked = false;
         Piloting = true;
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
@@ -112,7 +113,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
         gameObject.SetActive(false);
         func_active = false;
         Piloting = false;
-        TriggerLastFrame = false;
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -140,7 +140,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         func_active = true;
         gameObject.SetActive(true);
         if (DoAnimBool && !AnimOn)
@@ -149,11 +148,11 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         func_active = false;
         AtGScreen.SetActive(false);
         AtGCam.gameObject.SetActive(false);
         gameObject.SetActive(false);
-        TriggerLastFrame = false;
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
         if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }

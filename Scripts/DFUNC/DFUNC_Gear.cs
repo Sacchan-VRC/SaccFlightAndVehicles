@@ -35,16 +35,16 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(false);
-        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
+        TriggerLastFrame = true;
         if (Dial_Funcon) Dial_Funcon.SetActive(!GearUp);
     }
     public void SFEXT_O_PilotExit()

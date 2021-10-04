@@ -74,7 +74,6 @@ public class SaccAAGunController : UdonSharpBehaviour
     private float MGAmmoRecharge = 0;
     [System.NonSerializedAttribute] public float MGAmmoFull = 4;
     private float FullMGDivider;
-    [SerializeField] private GameObject SeatAdjuster;
     [System.NonSerializedAttribute] public Animator AAGunAnimator;
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Manning = false;//like Piloting in the plane
@@ -632,7 +631,6 @@ public class SaccAAGunController : UdonSharpBehaviour
         RotationSpeedX = 0;
         RotationSpeedY = 0;
         if (AAGunAnimator) AAGunAnimator.SetBool("inside", true);
-        if (SeatAdjuster) { SeatAdjuster.SetActive(true); }
         if (HUDControl) { HUDControl.GUN_TargetSpeedLerper = 0; }
 
         //Make sure SAVControl.AAMCurrentTargetSAVControl is correct
@@ -678,7 +676,6 @@ public class SaccAAGunController : UdonSharpBehaviour
         AAMLocking.gameObject.SetActive(false);
         AAMLockedOn.gameObject.SetActive(false);
         AAGunAnimator.SetBool("inside", false);
-        if (SeatAdjuster) { SeatAdjuster.SetActive(false); }
     }
     public void NotOccupied() { Occupied = false; }
     public void SFEXT_O_TakeOwnership()

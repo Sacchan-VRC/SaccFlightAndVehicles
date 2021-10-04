@@ -50,7 +50,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
     private int REAPPEAR_STRING = Animator.StringToHash("reappear");
     private int RESUPPLY_STRING = Animator.StringToHash("resupply");
-
+    [SerializeField] private bool PrintAnimHashNamesOnStart;
 
     private void Start()
     {
@@ -64,6 +64,9 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetBool(OCCUPIED_STRING, true);
         }
         else { InEditor = false; }
+
+        if (PrintAnimHashNamesOnStart)
+        { PrintStringHashes(); }
     }
     private void Update()
     {
@@ -242,5 +245,30 @@ public class SAV_EffectsController : UdonSharpBehaviour
     {
         if (SAVControl.Piloting || SAVControl.Passenger)
         { VehicleAnimator.SetTrigger(LOCKEDAAM_STRING); }
+    }
+    private void PrintStringHashes()
+    {
+        Debug.Log(string.Concat("OCCUPIED_STRING : ", OCCUPIED_STRING));
+        Debug.Log(string.Concat("PITCHINPUT_STRING : ", PITCHINPUT_STRING));
+        Debug.Log(string.Concat("YAWINPUT_STRING : ", YAWINPUT_STRING));
+        Debug.Log(string.Concat("ROLLINPUT_STRING : ", ROLLINPUT_STRING));
+        Debug.Log(string.Concat("THROTTLE_STRING : ", THROTTLE_STRING));
+        Debug.Log(string.Concat("ENGINEOUTPUT_STRING : ", ENGINEOUTPUT_STRING));
+        Debug.Log(string.Concat("VTOLANGLE_STRING : ", VTOLANGLE_STRING));
+        Debug.Log(string.Concat("HEALTH_STRING : ", HEALTH_STRING));
+        Debug.Log(string.Concat("AOA_STRING : ", AOA_STRING));
+        Debug.Log(string.Concat("MACH10_STRING : ", MACH10_STRING));
+        Debug.Log(string.Concat("GS_STRING : ", GS_STRING));
+        Debug.Log(string.Concat("EXPLODE_STRING : ", EXPLODE_STRING));
+        Debug.Log(string.Concat("MISSILESINCOMING_STRING : ", MISSILESINCOMING_STRING));
+        Debug.Log(string.Concat("LOCALPILOT_STRING : ", LOCALPILOT_STRING));
+        Debug.Log(string.Concat("LOCALPASSENGER_STRING : ", LOCALPASSENGER_STRING));
+        Debug.Log(string.Concat("BULLETHIT_STRING : ", BULLETHIT_STRING));
+        Debug.Log(string.Concat("ONGROUND_STRING : ", ONGROUND_STRING));
+        Debug.Log(string.Concat("ONWATER_STRING : ", ONWATER_STRING));
+        Debug.Log(string.Concat("LOCKEDAAM_STRING : ", LOCKEDAAM_STRING));
+        Debug.Log(string.Concat("AFTERBURNERON_STRING : ", AFTERBURNERON_STRING));
+        Debug.Log(string.Concat("REAPPEAR_STRING : ", REAPPEAR_STRING));
+        Debug.Log(string.Concat("RESUPPLY_STRING : ", RESUPPLY_STRING));
     }
 }

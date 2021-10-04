@@ -19,7 +19,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     [SerializeField] private float LockAngle = 90;
     [Tooltip("Maximum speed missile can rotate")]
     [SerializeField] private float RotSpeed = 15;
-    private Transform CenterOfMass;
+    private Transform VehicleCenterOfMass;
     private Vector3 Target;
     private float Lifetime = 0;
     private bool ColliderActive = false;
@@ -29,7 +29,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     private Rigidbody AGMRigid;
     private void Start()
     {
-        CenterOfMass = EntityControl.CenterOfMass;
+        VehicleCenterOfMass = EntityControl.CenterOfMass;
         Target = (Vector3)AGMLauncherControl.GetProgramVariable("AGMTarget");
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
         AGMRigid = gameObject.GetComponent<Rigidbody>();
@@ -43,7 +43,7 @@ public class SAV_AGMController : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (!ColliderActive)
         {
-            if (Vector3.Distance(transform.position, CenterOfMass.position) > ColliderActiveDistance)
+            if (Vector3.Distance(transform.position, VehicleCenterOfMass.position) > ColliderActiveDistance)
             {
                 AGMCollider.enabled = true;
                 ColliderActive = true;

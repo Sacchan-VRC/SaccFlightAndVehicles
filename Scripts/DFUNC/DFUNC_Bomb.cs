@@ -8,7 +8,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Bomb : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    [SerializeField] public UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator BombAnimator;
     [SerializeField] private GameObject Bomb;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
@@ -80,6 +80,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
+        TriggerLastFrame = true;
         Piloting = true;
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }
@@ -94,7 +95,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         func_active = false;
         Piloting = false;
         gameObject.SetActive(false);
-        TriggerLastFrame = false;
         if (AtGScreen) { AtGScreen.SetActive(false); }
         if (AtGCam) { AtGCam.gameObject.SetActive(false); }
     }
@@ -105,7 +105,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         func_active = true;
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
         if (DoAnimBool && !AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -120,9 +119,9 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         func_active = false;
         gameObject.SetActive(false);
-        TriggerLastFrame = false;
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
         if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }

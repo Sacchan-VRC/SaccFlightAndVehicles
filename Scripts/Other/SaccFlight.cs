@@ -51,4 +51,9 @@ public class SaccFlight : UdonSharpBehaviour
             localPlayer.SetVelocity(PlayerVel + NewForwardVec + NewUpVec);
         }
     }
+    public override void OnPlayerRespawn(VRCPlayerApi player)
+    {
+        if (player.isLocal)
+        { player.SetVelocity(Vector3.zero); }
+    }
 }

@@ -68,7 +68,12 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(false);
+    }
+    public void SFEXTP_O_UserEnter()
+    {
+        TriggerLastFrame = true;
     }
     public void SFEXTP_O_UserExit()
     {

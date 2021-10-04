@@ -4,28 +4,49 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SaccVehicleSeat : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
     [Tooltip("Gameobject with script that runs when you enter the seat to edjust your view position")]
-    [SerializeField] private GameObject SeatAdjuster;
     [SerializeField] private bool IsPilotSeat = false;
     [Tooltip("Object that is enabled only when sitting in this seat")]
     [SerializeField] private GameObject ThisSeatOnly;
+    [SerializeField] private bool AdjustSeat = true;
+    [SerializeField] private Transform TargetEyePosition;
+    [UdonSynced, FieldChangeCallback(nameof(AdjustedPos))] private Vector2 _adjustedPos;
+    public Vector2 AdjustedPos
+    {
+        set
+        {
+            _adjustedPos = value;
+            SetRecievedSeatPosition();
+        }
+        get => _adjustedPos;
+    }
+    private float AdjustTime;
+    private bool DoSeatAdjustment = false;
+    private bool CalibratedY = false;
+    private bool CalibratedZ = false;
+    private Vector3 SeatStartPos;
     private int ThisStationID;
     private bool SeatInitialized = false;
+    private bool InEditor = true;
     private VRCPlayerApi localPlayer;
     private Transform Seat;
     private Quaternion SeatStartRot;
+    private bool InVehicle;
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
+        if (localPlayer != null) { InEditor = false; }
         Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
         SeatStartRot = Seat.localRotation;
+        SeatStartPos = Seat.localPosition;
     }
-    public override void Interact()//entering the plane
+    public override void Interact()//entering the vehicle
     {
+        Networking.SetOwner(localPlayer, gameObject);
         if (!SeatInitialized) { InitializeSeat(); }
         EntityControl.MySeat = ThisStationID;
 
@@ -37,7 +58,14 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle in VR
         localPlayer.UseAttachedStation();
         Seat.localRotation = SeatStartRot;
-        if (SeatAdjuster) { SeatAdjuster.SetActive(true); }
+        InVehicle = true;
+        if (AdjustSeat && TargetEyePosition)
+        {
+            CalibratedY = false;
+            CalibratedZ = false;
+            AdjustTime = 0;
+            SeatAdjustment();
+        }
     }
     public override void OnStationEntered(VRCPlayerApi player)
     {
@@ -68,6 +96,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     {
         if (!SeatInitialized) { InitializeSeat(); }
         PlayerExitPlane(player);
+        Seat.localPosition = SeatStartPos;
     }
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
@@ -81,7 +110,6 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     {
         if (!SeatInitialized) { InitializeSeat(); }
         EntityControl.SeatedPlayers[ThisStationID] = -1;
-        if (SeatAdjuster) { SeatAdjuster.SetActive(false); }
         if (player != null)
         {
             if (IsPilotSeat) { EntityControl.PilotExitVehicle(player); }
@@ -101,6 +129,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                     }
                 }
                 if (ThisSeatOnly) { ThisSeatOnly.SetActive(false); }
+                InVehicle = false;
             }
         }
     }
@@ -130,5 +159,73 @@ public class SaccVehicleSeat : UdonSharpBehaviour
             x++;
         }
         SeatInitialized = true;
+    }
+
+
+
+
+    //seat adjuster stuff
+    public void SeatAdjustment()
+    {
+        Debug.Log("Adjust");
+        if (!InEditor)
+        {
+            AdjustTime += .3f;
+            //find head relative position ingame
+            Vector3 TargetRelative = TargetEyePosition.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position);
+            if (!CalibratedY)
+            {
+                if (Mathf.Abs(TargetRelative.y) > 0.01f)
+                {
+                    Seat.position -= TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y);
+                }
+                else
+                {
+                    if (AdjustTime > 1f)
+                    {
+                        CalibratedY = true;
+                    }
+                }
+            }
+            if (!CalibratedZ)
+            {
+                if (Mathf.Abs(TargetRelative.z) > 0.01f)
+                {
+                    Seat.position -= TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z);
+                }
+                else
+                {
+                    if (AdjustTime > 1f)
+                    {
+                        CalibratedZ = true;
+                    }
+                }
+            }
+            Vector3 newpos = Seat.localPosition;
+            _adjustedPos.x = newpos.y;
+            _adjustedPos.y = newpos.z;
+            RequestSerialization();
+            if (InVehicle && (!CalibratedY || !CalibratedZ))
+            {
+                SendCustomEventDelayedSeconds(nameof(SeatAdjustment), .3f);
+            }
+        }
+    }
+    private float FindNearestPowerOf2Below(float target)
+    {
+        float targetAbs = Mathf.Abs(target);
+        float x = .01f;
+        while (x < targetAbs)
+        { x *= 2; }
+        if (target > 0)
+        { return x; }
+        else
+        { return -x; }
+    }
+    public void SetRecievedSeatPosition()
+    {
+        Debug.Log("SetRecieved");
+        Vector3 newpos = (new Vector3(0, _adjustedPos.x, _adjustedPos.y));
+        Seat.localPosition = newpos;
     }
 }

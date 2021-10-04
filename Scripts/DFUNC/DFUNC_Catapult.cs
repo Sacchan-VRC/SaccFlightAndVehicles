@@ -32,6 +32,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private float InVehicleThrustVolumeFactor;
     private Animator VehicleAnimator;
     private int ONCATAPULT_STRING = Animator.StringToHash("oncatapult");
+    private int LAUNCH_STRING = Animator.StringToHash("launch");
     private float PlaneCatapultBackDistance;
     private float PlaneCatapultUpDistance;
     private Quaternion PlaneCatapultRotDif;
@@ -57,20 +58,19 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         Selected = true;
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         Selected = false;
-        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(true);
         Piloting = true;
         DisableOverrides();
-        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotExit()
     {
@@ -81,7 +81,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
         }
         Selected = false;
-        TriggerLastFrame = false;
         DisableOverrides();
     }
     public void SFEXT_O_PassengerEnter()
@@ -244,7 +243,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             if (Launching && !CatapultTransform.gameObject.activeInHierarchy)
             {
                 float DeltaTime = Time.deltaTime;
-                TriggerLastFrame = false;
                 Launching = false;
                 DisableOverrides();
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff));
@@ -306,7 +304,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     public void LaunchCatapult()
     {
         if (Utilities.IsValid(CatapultAnimator))
-        { CatapultAnimator.SetTrigger("launch"); }
+        { CatapultAnimator.SetTrigger(LAUNCH_STRING); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
     }
     public void CatapultLockIn()

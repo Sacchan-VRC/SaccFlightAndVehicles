@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Smoke : UdonSharpBehaviour
 {
     [SerializeField] UdonSharpBehaviour SAVControl;
@@ -15,6 +15,16 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     [SerializeField] private GameObject HUD_SmokeOnIndicator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
+    [UdonSynced, FieldChangeCallback(nameof(SmokeOn))] private bool _smokeon;
+    public bool SmokeOn
+    {
+        set
+        {
+            _smokeon = value;
+            SetSmoking(value);
+        }
+        get => _smokeon;
+    }
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private Transform VehicleTransform;
@@ -33,6 +43,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private bool Selected;
     private bool InEditor;
     private int NumSmokes;
+    private int DialPosition;
+    private bool LeftDial;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -48,51 +60,63 @@ public class DFUNC_Smoke : UdonSharpBehaviour
 
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x] = DisplaySmoke[x].emission; }
+        FindSelf();
     }
     public void DFUNC_Selected()
     {
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
+        TriggerLastFrame = true;
         Selected = true;
-        gameObject.SetActive(true);
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetActive));
     }
     public void DFUNC_Deselected()
     {
         if (!Smoking)
-        { gameObject.SetActive(false); }
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotActive));
+        }
         Selected = false;
-        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
+        TriggerLastFrame = true;
         Pilot = true;
-        if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
+        if (Dial_Funcon) { Dial_Funcon.SetActive(Smoking); }
     }
     public void SFEXT_O_PilotExit()
     {
         Pilot = false;
         Selected = false;
-        TriggerLastFrame = false;
         gameObject.SetActive(false);
-        if (Smoking) SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
+    }
+    public void SFEXT_G_PilotExit()
+    {
+        SetNotActive();
     }
     public void SFEXT_P_PassengerEnter()
     {
         if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
     }
-    public void SFEXT_P_PassengerExit()
-    {
-    }
     public void SFEXT_G_Explode()
     {
-        SetSmokingOff();
+        SetNotActive();
     }
     public void SFEXT_G_RespawnButton()
     {
-        SetSmokingOff();
+        SetNotActive();
     }
-    public void KeyboardInput()
+    public void SetActive()
     {
-        ToggleSmoking();
+        gameObject.SetActive(true);
+    }
+    public void LateJoiner()
+    {
+        gameObject.SetActive(true);
+        SmokeOn = true;
+    }
+    public void SetNotActive()
+    {
+        gameObject.SetActive(false);
+        if (Smoking) { SetSmoking(false); }
     }
     private void LateUpdate()
     {
@@ -106,7 +130,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if (Trigger > 0.75)
+                if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
                 {
                     //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
                     Vector3 HandPosSmoke = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
@@ -116,7 +140,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                         SmokeZeroPoint = HandPosSmoke;
                         TempSmokeCol = SmokeColor;
 
-                        ToggleSmoking();
+                        SmokeOn = !SmokeOn;
+                        RequestSerialization();
                         SmokeHoldTime = 0;
                     }
                     SmokeHoldTime += Time.deltaTime;
@@ -159,59 +184,81 @@ public class DFUNC_Smoke : UdonSharpBehaviour
             }
         }
     }
-    public void SetSmokingOn()
+    public void KeyboardInput()
     {
-        Smoking = true;
-        gameObject.SetActive(true);
-        HUD_SmokeOnIndicator.SetActive(true);
-        for (int x = 0; x < DisplaySmokeem.Length; x++)
-        { DisplaySmokeem[x].enabled = true; }
-        if (Dial_Funcon) Dial_Funcon.SetActive(true);
-        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+        if (LeftDial)
         {
-            EntityControl.SendEventToExtensions("SFEXT_O_SmokeOn");
-        }
-    }
-    public void SetSmokingOff()
-    {
-        Smoking = false;
-        if (!Pilot)
-        { gameObject.SetActive(false); }
-        HUD_SmokeOnIndicator.SetActive(false);
-        for (int x = 0; x < DisplaySmokeem.Length; x++)
-        { DisplaySmokeem[x].enabled = false; }
-        if (Dial_Funcon) Dial_Funcon.SetActive(false);
-        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
-        {
-            EntityControl.SendEventToExtensions("SFEXT_O_SmokeOff");
-        }
-    }
-    public void ToggleSmoking()
-    {
-        if (!Smoking)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn");
+            if (EntityControl.LStickSelection == DialPosition)
+            { EntityControl.LStickSelection = -1; }
+            else
+            { EntityControl.LStickSelection = DialPosition; }
         }
         else
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
+            if (EntityControl.RStickSelection == DialPosition)
+            { EntityControl.RStickSelection = -1; }
+            else
+            { EntityControl.RStickSelection = DialPosition; }
+        }
+    }
+    public void SetSmoking(bool smoking)
+    {
+        Smoking = smoking;
+        HUD_SmokeOnIndicator.SetActive(smoking);
+        for (int x = 0; x < DisplaySmokeem.Length; x++)
+        { DisplaySmokeem[x].enabled = smoking; }
+        if (Dial_Funcon) Dial_Funcon.SetActive(smoking);
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+        {
+            if (smoking)
+            { EntityControl.SendEventToExtensions("SFEXT_G_SmokeOn"); }
+            else
+            { EntityControl.SendEventToExtensions("SFEXT_G_SmokeOff"); }
         }
     }
     public void SFEXT_O_TakeOwnership()
     {
         if (Smoking)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOff");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotActive));
         }
     }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
-            if (Smoking)
+            if (Selected)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetSmokingOn");
+                if (Smoking)
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LateJoiner)); }
+                else
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetActive)); }
             }
         }
+    }
+    private void FindSelf()
+    {
+        int x = 0;
+        foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_R)
+        {
+            if (this == usb)
+            {
+                DialPosition = x;
+                return;
+            }
+            x++;
+        }
+        x = 0;
+        foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_L)
+        {
+            if (this == usb)
+            {
+                DialPosition = x;
+                return;
+            }
+            x++;
+        }
+        DialPosition = -999;
+        Debug.LogWarning("DFUNC_AAM: Can't find self in dial functions");
     }
 }

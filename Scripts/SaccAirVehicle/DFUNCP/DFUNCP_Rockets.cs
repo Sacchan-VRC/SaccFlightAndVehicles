@@ -55,11 +55,12 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(false);
-        TriggerLastFrame = false;
     }
     public void SFEXTP_O_UserEnter()
     {
+        TriggerLastFrame = true;
         if (!InVR)
         {
             DFUNC_Selected();

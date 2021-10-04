@@ -53,13 +53,12 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         Selected = true;
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         Selected = false;
-        TriggerLastFrame = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -69,9 +68,9 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(false);
         Selected = false;
-        TriggerLastFrame = false;
     }
     public void SFEXT_P_PassengerEnter()
     {

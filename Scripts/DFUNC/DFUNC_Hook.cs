@@ -46,14 +46,13 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        TriggerLastFrame = true;//To prevent function enabling if you hold the trigger when selecting it
         gameObject.SetActive(true);
         func_active = true;
     }
     public void DFUNC_Deselected()
     {
+        TriggerLastFrame = true;
         if (!HookDown) { gameObject.SetActive(false); }
-        TriggerLastFrame = false;
         func_active = false;
     }
     public void SFEXT_O_PilotEnter()
@@ -63,7 +62,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
-        TriggerLastFrame = false;
+        TriggerLastFrame = true;
         Hooked = false;
         func_active = false;
         if (DisableGroundBrake && BrakeFunction)
