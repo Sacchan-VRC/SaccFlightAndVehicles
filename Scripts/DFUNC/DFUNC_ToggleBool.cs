@@ -8,7 +8,7 @@ using VRC.Udon;
 public class DFUNC_ToggleBool : UdonSharpBehaviour
 {
     [SerializeField] private Animator BoolAnimator;
-    [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing\n If this is enabled, the only other setting that doesn anything here is Dial_Funcon")]
+    [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing\n If this isn't empty, the only other setting that does anything here is Dial_Funcon")]
     [SerializeField] private UdonSharpBehaviour MasterToggle;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject[] Dial_Funcon;

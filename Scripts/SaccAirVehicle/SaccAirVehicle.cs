@@ -484,7 +484,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         VTOLAngleDivider = VTOLAngleTurnRate / vtolangledif;
         VTOLAngle = VTOLAngleInput = VTOLDefaultValue;
 
-        if (GroundDetectorRayDistance == 0)
+        if (GroundDetectorRayDistance == 0 || !GroundDetector)
         { DisableGroundDetection++; }
 
         if (GroundEffectEmpty == null)

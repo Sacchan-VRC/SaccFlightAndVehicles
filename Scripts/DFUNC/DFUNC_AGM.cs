@@ -84,7 +84,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
 
         FindSelf();
 
-        HUDText_AGM_ammo.text = NumAGM.ToString("F0");
+        if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
         AnimBool_STRING = Animator.StringToHash(AnimBoolName);
     }
     public void SFEXT_O_PilotEnter()
@@ -93,11 +93,11 @@ public class DFUNC_AGM : UdonSharpBehaviour
         AGMLocked = false;
         Piloting = true;
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
-        HUDText_AGM_ammo.text = NumAGM.ToString("F0");
+        if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
     }
     public void SFEXT_P_PassengerEnter()
     {
-        HUDText_AGM_ammo.text = NumAGM.ToString("F0");
+        if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
     }
     public void SFEXT_G_PilotExit()
     {
@@ -127,7 +127,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
-        HUDText_AGM_ammo.text = NumAGM.ToString("F0");
+        if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
     }
     public void SFEXT_G_Explode()
     {
@@ -352,7 +352,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
             NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
         AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
-        HUDText_AGM_ammo.text = NumAGM.ToString("F0");
+        if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
     }
     private void FindSelf()
     {

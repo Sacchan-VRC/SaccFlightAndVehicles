@@ -11,6 +11,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     public SaccEntity EntityControl;
     [Tooltip("Missile will explode after this time")]
     [SerializeField] private float MaxLifetime = 12;
+    [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
+    [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("Strength of the effect of countermeasures on the missile")]
     [SerializeField] private float FlareEffect = 1;
     [Tooltip("Name of integer to +1 on the target plane while chasing it")]
@@ -27,11 +29,12 @@ public class SAV_AAMController : UdonSharpBehaviour
     [SerializeField] private float TargetMinThrottleTrack = .3f;
     [Tooltip("When passing target, if within this range, explode")]
     [SerializeField] private float ProximityExplodeDistance = 20;
+    [Tooltip("Lockhack stops the missile from being able to stop tracking before a certain amount of time has passed for people who didn't fire it. It ensures the missile tracks its target in cases where the firer's position is desynced badly. Very necessary when using VRC_ObjectSync.")]
+    [SerializeField] private float LockHackTime = .2f;
     private UdonSharpBehaviour TargetSAVControl;
     private Animator TargetAnimator;
     SaccEntity TargetEntityControl;
     private bool LockHack = true;
-    private float Lifetime = 0;
     private Transform Target;
     private bool ColliderActive = false;
     private bool Exploding = false;
@@ -92,12 +95,13 @@ public class SAV_AAMController : UdonSharpBehaviour
                 }
             }
 
-            if (InEditor || IsOwner)
-            {
-                LockHack = false;
-            }
+            if (InEditor || IsOwner || LockHackTime == 0)
+            { LockHack = false; }
+            else
+            { SendCustomEventDelayedSeconds(nameof(DisbaleLockHack), LockHackTime); }
         }
         Initialized = true;
+        SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
     }
     void FixedUpdate()
     {
@@ -110,22 +114,6 @@ public class SAV_AAMController : UdonSharpBehaviour
                 ColliderActive = true;
             }
         }
-        if (LockHack)
-        {
-            if (Lifetime > .6f)
-            {
-                LockHack = false;
-            }
-        }
-        if (Lifetime > MaxLifetime)
-        {
-            if (Exploding)//missile exploded 10 seconds ago
-            {
-                Destroy(gameObject);
-            }
-            else Explode();//explode and give Lifetime another 10 seconds
-        }
-
         if (!TargetLost)
         {
             Vector3 Position = transform.position;
@@ -182,8 +170,13 @@ public class SAV_AAMController : UdonSharpBehaviour
             }
             TargDistlastframe = TargetDistance;
         }
-        Lifetime += DeltaTime;
     }
+    public void DisbaleLockHack()
+    { LockHack = false; }
+    public void LifeTimeExplode()
+    { if (!Exploding) { Explode(); } }
+    public void DestroySelf()
+    { Destroy(gameObject); }
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
@@ -252,6 +245,6 @@ public class SAV_AAMController : UdonSharpBehaviour
             }
         }
         AAMani.SetTrigger("explode");
-        Lifetime = MaxLifetime - 10;//10 seconds to finish exploding
+        SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
     }
 }

@@ -1312,13 +1312,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: HoverBike
+      Data: DisableTaxiRotation
     - Name: $v
       Entry: 7
       Data: 80|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: HoverBike
+      Data: DisableTaxiRotation
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 73
@@ -1345,20 +1345,16 @@ MonoBehaviour:
       Data: 2
     - Name: 
       Entry: 7
-      Data: 82|UnityEngine.HeaderAttribute, UnityEngine.CoreModule
-    - Name: header
+      Data: 82|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
+    - Name: tooltip
       Entry: 1
-      Data: HoverBike Only
+      Data: Disable the totally non-physical ground rotation functionality
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 83|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
-    - Name: tooltip
-      Entry: 1
-      Data: If hoverbike, script is only active when being piloted, also adds steering
-        effects when near the ground
+      Data: 83|UnityEngine.SerializeField, UnityEngine.CoreModule
     - Name: 
       Entry: 8
       Data: 
@@ -1382,13 +1378,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: DisableGroundDetection
+      Data: HoverBike
     - Name: $v
       Entry: 7
       Data: 84|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: DisableGroundDetection
+      Data: HoverBike
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 73
@@ -1415,16 +1411,20 @@ MonoBehaviour:
       Data: 2
     - Name: 
       Entry: 7
-      Data: 86|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
-    - Name: tooltip
+      Data: 86|UnityEngine.HeaderAttribute, UnityEngine.CoreModule
+    - Name: header
       Entry: 1
-      Data: Disable ground detection on attached vehicle (disable 'taxiing' movement)
+      Data: HoverBike Only
     - Name: 
       Entry: 8
       Data: 
     - Name: 
       Entry: 7
-      Data: 87|UnityEngine.SerializeField, UnityEngine.CoreModule
+      Data: 87|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
+    - Name: tooltip
+      Entry: 1
+      Data: If hoverbike, script is only active when being piloted, also adds steering
+        effects when near the ground
     - Name: 
       Entry: 8
       Data: 

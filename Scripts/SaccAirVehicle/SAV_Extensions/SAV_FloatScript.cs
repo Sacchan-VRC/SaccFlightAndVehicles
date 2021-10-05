@@ -41,11 +41,11 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [SerializeField] private bool DoOnLand = false;
     [Tooltip("If a player takes ownership of the vehicle while its floats are below the water, the new owner will not know they are below the water and it will fall through the water. Move the vehicle up by this amount to prevent this from happening.")]
     public float MoveUpOnTakeOwnership = 2f;
+    [Tooltip("Disable the totally non-physical ground rotation functionality")]
+    [SerializeField] private bool DisableTaxiRotation = false;
     [Header("HoverBike Only")]
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     public bool HoverBike = false;
-    [Tooltip("Disable ground detection on attached vehicle (disable 'taxiing' movement)")]
-    [SerializeField] private bool DisableGroundDetection = false;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the rolling-into-a-turn extra turning ability")]
     [SerializeField] private float HoverBikeTurningStrength = 20;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifintg-at-90-degrees extra turning ability")]
@@ -90,9 +90,9 @@ public class SAV_FloatScript : UdonSharpBehaviour
         {
             gameObject.SetActive(false);
         }
-        if (HoverBike || DisableGroundDetection)
+        if (HoverBike || DisableTaxiRotation)
         {
-            SAVControl.SetProgramVariable("DisableGroundDetection", (int)SAVControl.GetProgramVariable("DisableGroundDetection") + 1);
+            SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") + 1);
             SAVControl.SetProgramVariable("Taxiing", false);
         }
     }

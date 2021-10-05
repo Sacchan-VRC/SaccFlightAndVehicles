@@ -10,6 +10,8 @@ public class SAV_BombController : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour BombLauncherControl;
     [Tooltip("Bomb will explode after this time")]
     [SerializeField] private float MaxLifetime = 40;
+    [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
+    [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
     [Tooltip("Spawn bomb at a random angle up to this number")]
@@ -21,13 +23,11 @@ public class SAV_BombController : UdonSharpBehaviour
     [Tooltip("Amount of drag bomb has when moving horizontally/vertically")]
     [SerializeField] private float AirPhysicsStrength = .1f;
     [Tooltip("Used for making rockets, should probably disable air physics and angle randomization when making rockets.")]
-    [SerializeField] private float ForwardThrust = 0f;
     private SaccEntity EntityControl;
     private ConstantForce BombConstant;
     private Rigidbody BombRigid;
     private bool Exploding = false;
     private bool ColliderActive = false;
-    private float Lifetime = 0;
     private CapsuleCollider BombCollider;
     private Transform VehicleCenterOfMass;
     private bool IsOwner;
@@ -43,6 +43,7 @@ public class SAV_BombController : UdonSharpBehaviour
         if (EntityControl.InEditor) { IsOwner = true; }
         else
         { IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner"); }
+        SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
     }
 
     void LateUpdate()
@@ -58,17 +59,12 @@ public class SAV_BombController : UdonSharpBehaviour
         float sidespeed = Vector3.Dot(BombRigid.velocity, transform.right);
         float downspeed = Vector3.Dot(BombRigid.velocity, transform.up);
         BombConstant.relativeTorque = new Vector3(-downspeed, sidespeed, 0) * StraightenFactor;
-        BombConstant.relativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, ForwardThrust);
-        Lifetime += Time.deltaTime;
-        if (Lifetime > MaxLifetime)
-        {
-            if (Exploding)//missile exploded 10 seconds ago
-            {
-                Destroy(gameObject);
-            }
-            else Explode();//explode and give Lifetime another 10 seconds
-        }
+        BombConstant.relativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0);
     }
+    public void LifeTimeExplode()
+    { if (!Exploding) { Explode(); } }
+    public void DestroySelf()
+    { Destroy(gameObject); }
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
@@ -95,6 +91,6 @@ public class SAV_BombController : UdonSharpBehaviour
         if (IsOwner)
         { Bombani.SetTrigger("explodeowner"); }
         else { Bombani.SetTrigger("explode"); }
-        Lifetime = MaxLifetime - 10;//10 seconds to finish exploding
+        SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
     }
 }

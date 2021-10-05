@@ -161,13 +161,9 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         SeatInitialized = true;
     }
 
-
-
-
     //seat adjuster stuff
     public void SeatAdjustment()
     {
-        Debug.Log("Adjust");
         if (!InEditor)
         {
             AdjustTime += .3f;
@@ -224,7 +220,6 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     }
     public void SetRecievedSeatPosition()
     {
-        Debug.Log("SetRecieved");
         Vector3 newpos = (new Vector3(0, _adjustedPos.x, _adjustedPos.y));
         Seat.localPosition = newpos;
     }

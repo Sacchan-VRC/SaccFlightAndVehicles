@@ -36,19 +36,14 @@ public class SAV_RocketController : UdonSharpBehaviour
         else
         { IsOwner = (bool)LauncherControl.GetProgramVariable("IsOwner"); }
         SendCustomEventDelayedSeconds(nameof(EnableCollider), ColliderEnableDelay);
-        SendCustomEventDelayedSeconds(nameof(LifeTimeDestroy), ExplosionLifeTime);
+        SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
     }
     public void EnableCollider()
-    {
-        RocketCollider.enabled = true;
-    }
-    public void LifeTimeDestroy()
-    {
-        if (Exploding)//missile has already exploded
-        { Destroy(gameObject); }
-        else
-        { Explode(); }
-    }
+    { RocketCollider.enabled = true; }
+    public void LifeTimeExplode()
+    { if (!Exploding) { Explode(); } }
+    public void DestroySelf()
+    { Destroy(gameObject); }
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
@@ -75,6 +70,6 @@ public class SAV_RocketController : UdonSharpBehaviour
         if (IsOwner)
         { Bombani.SetTrigger("explodeowner"); }
         else { Bombani.SetTrigger("explode"); }
-        SendCustomEventDelayedSeconds(nameof(LifeTimeDestroy), ExplosionLifeTime);
+        SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
     }
 }

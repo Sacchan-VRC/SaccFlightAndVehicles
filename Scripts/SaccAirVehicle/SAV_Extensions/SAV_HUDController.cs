@@ -39,8 +39,8 @@ public class SAV_HUDController : UdonSharpBehaviour
     private float FullGunAmmoDivider;
     private Transform VehicleTransform;
     private SAV_EffectsController EffectsControl;
-    private float LStickFuncDegrees;
-    private float RStickFuncDegrees;
+    private float SeaLevel;
+    private Transform CenterOfMass;
     private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     private Vector3 VelLerper;
@@ -57,8 +57,8 @@ public class SAV_HUDController : UdonSharpBehaviour
 
         if (PilotSeatAdjusterTarget) { transform.position = PilotSeatAdjusterTarget.position; }
 
-        RStickFuncDegrees = EntityControl.RStickFuncDegrees;
-        LStickFuncDegrees = EntityControl.LStickFuncDegrees;
+        SeaLevel = (float)SAVControl.GetProgramVariable("SeaLevel");
+        CenterOfMass = EntityControl.CenterOfMass;
 
         localPlayer = Networking.LocalPlayer;
     }
@@ -114,7 +114,7 @@ public class SAV_HUDController : UdonSharpBehaviour
             { maxGs = (float)SAVControl.GetProgramVariable("VertGs"); }
             HUDText_G.text = string.Concat(((float)SAVControl.GetProgramVariable("VertGs")).ToString("F1"), "\n", maxGs.ToString("F1"));
             HUDText_mach.text = (((float)SAVControl.GetProgramVariable("Speed")) / 343f).ToString("F2");
-            HUDText_altitude.text = string.Concat((((Vector3)SAVControl.GetProgramVariable("CurrentVel")).y * 60 * 3.28084f).ToString("F0"), "\n", ((((Transform)SAVControl.GetProgramVariable("CenterOfMass")).position.y + -(float)SAVControl.GetProgramVariable("SeaLevel")) * 3.28084f).ToString("F0"));
+            HUDText_altitude.text = string.Concat((((Vector3)SAVControl.GetProgramVariable("CurrentVel")).y * 60 * 3.28084f).ToString("F0"), "\n", ((CenterOfMass.position.y - SeaLevel) * 3.28084f).ToString("F0"));
             HUDText_knots.text = (((float)SAVControl.GetProgramVariable("Speed")) * 1.9438445f).ToString("F0");
             HUDText_knotsairspeed.text = (((float)SAVControl.GetProgramVariable("AirSpeed")) * 1.9438445f).ToString("F0");
 

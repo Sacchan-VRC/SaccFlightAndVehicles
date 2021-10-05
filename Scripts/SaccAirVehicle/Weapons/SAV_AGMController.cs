@@ -11,6 +11,8 @@ public class SAV_AGMController : UdonSharpBehaviour
     public SaccEntity EntityControl;
     [Tooltip("Missile will explode after this time")]
     [SerializeField] private float MaxLifetime = 20;
+    [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
+    [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from colliding with own plane")]
@@ -21,7 +23,6 @@ public class SAV_AGMController : UdonSharpBehaviour
     [SerializeField] private float RotSpeed = 15;
     private Transform VehicleCenterOfMass;
     private Vector3 Target;
-    private float Lifetime = 0;
     private bool ColliderActive = false;
     private bool Exploding = false;
     private bool IsOwner = false;
@@ -37,6 +38,7 @@ public class SAV_AGMController : UdonSharpBehaviour
         if (EntityControl.InEditor) { IsOwner = true; }
         else
         { IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner"); }
+        SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
     }
     void LateUpdate()
     {
@@ -58,16 +60,11 @@ public class SAV_AGMController : UdonSharpBehaviour
             var deltaAngle = Vector3.Angle(missileForward, targetDirection);
             transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
         }
-        Lifetime += DeltaTime;
-        if (Lifetime > MaxLifetime)
-        {
-            if (Exploding)//missile exploded 10 seconds ago
-            {
-                Destroy(gameObject);
-            }
-            else Explode();//explode and give Lifetime another 10 seconds
-        }
     }
+    public void LifeTimeExplode()
+    { if (!Exploding) { Explode(); } }
+    public void DestroySelf()
+    { Destroy(gameObject); }
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
@@ -91,6 +88,6 @@ public class SAV_AGMController : UdonSharpBehaviour
         if (IsOwner)
         { AGMani.SetTrigger("explodeowner"); }
         else { AGMani.SetTrigger("explode"); }
-        Lifetime = MaxLifetime - 10;//10 seconds to finish exploding
+        SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
     }
 }

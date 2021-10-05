@@ -167,7 +167,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
 
         //get a Maximum audible distance of plane based on its assumed furthest reaching audio sources (for optimization)
-        if (!SonicBoomNull) MaxAudibleDistance = SonicBoom[0].maxDistance;
+        if (!SonicBoomNull) { MaxAudibleDistance = SonicBoom[0].maxDistance; }
         if (!ExplosionNull)
         {
             if (MaxAudibleDistance < Explosion[0].maxDistance)
