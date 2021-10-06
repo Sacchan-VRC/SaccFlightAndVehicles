@@ -7,7 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SAV_EffectsController : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [Tooltip("Wing trails, emit when pulling Gs")]
     [SerializeField] private TrailRenderer[] Trails;
     [Tooltip("How many Gs do you have to pull before the trails appear?")]
@@ -54,10 +54,10 @@ public class SAV_EffectsController : UdonSharpBehaviour
 
     private void Start()
     {
-        FullHealthDivider = 1f / SAVControl.Health;
+        FullHealthDivider = 1f / (float)SAVControl.GetProgramVariable("Health");
         HasTrails = Trails.Length > 0;
 
-        VehicleAnimator = SAVControl.EntityControl.GetComponent<Animator>();
+        VehicleAnimator = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Animator>();
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         {
@@ -78,9 +78,9 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void Effects()
     {
-        Vector3 RotInputs = SAVControl.RotationInputs;
+        Vector3 RotInputs = (Vector3)SAVControl.GetProgramVariable("RotationInputs");
         float DeltaTime = Time.deltaTime;
-        if (SAVControl.IsOwner)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             if (InVR)
             { OwnerRotationInputs = RotInputs; }//vr users use raw input
@@ -89,30 +89,30 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetFloat(PITCHINPUT_STRING, (OwnerRotationInputs.x * 0.5f) + 0.5f);
             VehicleAnimator.SetFloat(YAWINPUT_STRING, (OwnerRotationInputs.y * 0.5f) + 0.5f);
             VehicleAnimator.SetFloat(ROLLINPUT_STRING, (OwnerRotationInputs.z * 0.5f) + 0.5f);
-            VehicleAnimator.SetFloat(THROTTLE_STRING, SAVControl.ThrottleInput);
-            VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, SAVControl.EngineOutput);
+            VehicleAnimator.SetFloat(THROTTLE_STRING, (float)SAVControl.GetProgramVariable("ThrottleInput"));
+            VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, (float)SAVControl.GetProgramVariable("EngineOutput"));
         }
         else
         {
-            float EngineOutput = SAVControl.EngineOutput;
+            float EngineOutput = (float)SAVControl.GetProgramVariable("EngineOutput");
             VehicleAnimator.SetFloat(PITCHINPUT_STRING, (RotInputs.x * 0.5f) + 0.5f);
             VehicleAnimator.SetFloat(YAWINPUT_STRING, (RotInputs.y * 0.5f) + 0.5f);
             VehicleAnimator.SetFloat(ROLLINPUT_STRING, (RotInputs.z * 0.5f) + 0.5f);
             VehicleAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
         }
-        if (SAVControl.Occupied)
+        if ((bool)SAVControl.GetProgramVariable("Occupied"))
         {
             DoEffects = 0f;
         }
         else { DoEffects += DeltaTime; }
 
-        VehicleAnimator.SetFloat(VTOLANGLE_STRING, SAVControl.VTOLAngle);
+        VehicleAnimator.SetFloat(VTOLANGLE_STRING, (float)SAVControl.GetProgramVariable("VTOLAngle"));
 
-        vapor = SAVControl.Speed > 20;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
+        vapor = (float)SAVControl.GetProgramVariable("Speed") > 20;// only make vapor when going above "20m/s", prevents vapour appearing when taxiing into a wall or whatever
 
-        VehicleAnimator.SetFloat(HEALTH_STRING, SAVControl.Health * FullHealthDivider);
-        VehicleAnimator.SetFloat(AOA_STRING, vapor ? Mathf.Abs(SAVControl.AngleOfAttack * 0.00555555556f /* Divide by 180 */ ) : 0);
+        VehicleAnimator.SetFloat(HEALTH_STRING, (float)SAVControl.GetProgramVariable("Health") * FullHealthDivider);
+        VehicleAnimator.SetFloat(AOA_STRING, vapor ? Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack") * 0.00555555556f /* Divide by 180 */ ) : 0);
     }
 
     private void LargeEffects()//large effects visible from a long distance
@@ -122,7 +122,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
         if (HasTrails)
         {
             //this is to finetune when wingtrails appear and disappear
-            float vertgs = Mathf.Abs(SAVControl.VertGs);
+            float vertgs = Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs"));
             if (vertgs > Gs_trail) //Gs are increasing
             {
                 Gs_trail = Mathf.Lerp(Gs_trail, vertgs, 30f * DeltaTime);//apear fast when pulling Gs
@@ -145,9 +145,9 @@ public class SAV_EffectsController : UdonSharpBehaviour
             }
         }
         //("mach10", EngineControl.Speed / 343 / 10)
-        VehicleAnimator.SetFloat(MACH10_STRING, SAVControl.Speed * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
+        VehicleAnimator.SetFloat(MACH10_STRING, (float)SAVControl.GetProgramVariable("Speed") * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
         //("Gs", vapor ? EngineControl.Gs / 200 + .5f : 0) (.5 == 0 Gs, 1 == 100Gs, 0 == -100Gs)
-        VehicleAnimator.SetFloat(GS_STRING, vapor ? (SAVControl.VertGs * 0.005f) + 0.5f : 0.5f);
+        VehicleAnimator.SetFloat(GS_STRING, vapor ? ((float)SAVControl.GetProgramVariable("VertGs") * 0.005f) + 0.5f : 0.5f);
     }
     public void SFEXT_G_PilotExit()
     {
@@ -205,7 +205,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_EnterWater()
     {
-        if (SAVControl.Speed > PlaySplashSpeed && SplashParticle) { SplashParticle.Play(); }
+        if ((float)SAVControl.GetProgramVariable("Speed") > PlaySplashSpeed && SplashParticle) { SplashParticle.Play(); }
     }
     public void SFEXT_G_TakeOff()
     {
@@ -243,7 +243,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void PlayLockedAAM()
     {
-        if (SAVControl.Piloting || SAVControl.Passenger)
+        if ((bool)SAVControl.GetProgramVariable("Piloting") || (bool)SAVControl.GetProgramVariable("Passenger"))
         { VehicleAnimator.SetTrigger(LOCKEDAAM_STRING); }
     }
     private void PrintStringHashes()

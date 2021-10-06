@@ -11,6 +11,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     [SerializeField] UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     [SerializeField] private GameObject Dial_Funcon;
+    [SerializeField] private bool AllowCruiseGrounded;
     [SerializeField] private Text HUDText_knotstarget;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
@@ -87,7 +88,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void SFEXT_G_TouchDown()
     {
-        if (Cruise)
+        if (Cruise && !AllowCruiseGrounded)
         { SetCruiseOff(); }
     }
     public void SFEXT_O_EnterVTOL()
@@ -120,7 +121,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                         {
                             if (!Cruise)
                             {
-                                if (!(bool)SAVControl.GetProgramVariable("Taxiing"))
+                                if (!(bool)SAVControl.GetProgramVariable("Taxiing") || AllowCruiseGrounded)
                                 { SetCruiseOn(); }
                             }
                             if (TriggerTapTime > .4f)//no double tap
@@ -197,7 +198,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     {
         if (!Cruise)
         {
-            if (!(bool)SAVControl.GetProgramVariable("Taxiing") && !(bool)SAVControl.GetProgramVariable("InVTOL"))
+            if ((!(bool)SAVControl.GetProgramVariable("Taxiing") || AllowCruiseGrounded) && !(bool)SAVControl.GetProgramVariable("InVTOL"))
             { SetCruiseOn(); }
         }
         else

@@ -51,7 +51,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     {
         DFUNC_Deselected();
     }
-    public void SFEXT_O_PassengerEnter()
+    public void SFEXT_L_PassengerEnter()
     {
         if (Dial_Funcon) Dial_Funcon.SetActive(!GearUp);
     }

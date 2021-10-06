@@ -93,7 +93,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         SAVControl.SetProgramVariable("Limits", 1f);
     }
-    public void SFEXT_O_PassengerEnter()
+    public void SFEXT_L_PassengerEnter()
     {
         if (Dial_Funcon) { Dial_Funcon.SetActive(FlightLimitsEnabled); }
     }

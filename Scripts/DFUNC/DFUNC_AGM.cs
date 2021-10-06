@@ -23,6 +23,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private float FullReloadTimeSec = 8;
     [SerializeField] private AudioSource AGMLock;
     [SerializeField] private AudioSource AGMUnlock;
+    [SerializeField] private bool AllowFiringWhenGrounded;
     [SerializeField] private bool DoAnimBool = false;
     [SerializeField] private string AnimBoolName = "AGMSelected";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
@@ -199,7 +200,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                     {//double tap detected
                         if (AGMLocked)
                         {//locked on, launch missile
-                            if (NumAGM > 0 && !(bool)SAVControl.GetProgramVariable("Taxiing"))
+                            if (NumAGM > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
                             {
                                 AGMFire++;//launch AGM using set
                                 RequestSerialization();

@@ -312,10 +312,6 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             FunctionsActive = false;
             SendEventToExtensions_Gunner("SFEXTP_O_UserExit");
         }
-        else
-        {
-            SendEventToExtensions_Gunner("SFEXTP_O_PassengerExit");
-        }
     }
     public void SFEXT_G_ReSupply()
     {

@@ -200,8 +200,8 @@ public class SAV_FloatScript : UdonSharpBehaviour
             {
                 VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.Acceleration);
             }
-            VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * DepthMaxd * WaterRotDrag);
-            VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * DepthMaxd * WaterVelDrag);
+            VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * DepthMaxd * WaterRotDrag, ForceMode.Acceleration);
+            VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * DepthMaxd * WaterVelDrag, ForceMode.Acceleration);
             if (SAVControl && !HoverBike) { SAVControl.SetProgramVariable("Floating", true); }
 
 

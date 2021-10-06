@@ -42,7 +42,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource Rolling;
     [Tooltip("Maximum volume rolling sound reaches when moving forward quickly")]
     [SerializeField] private float RollingMaxVol = 1;
-    [Tooltip("How quickly the rolling sound reaches max volume as speed increases")]
+    [Tooltip("How quickly the rolling sound reaches max volume as speed increases. Higher = faster")]
     [SerializeField] private float RollingVolCurve = .03f;
     [Tooltip("If ticked, will lerp Rolling volume on touchdown. For seaplanes water touchdown")]
     [SerializeField] private bool Rolling_Seaplane;
@@ -205,6 +205,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                 if (PlaneDistant) { PlaneDistant.Stop(); }
                 if (PlaneWind) { PlaneWind.Stop(); }
                 if (PlaneInside) { PlaneInside.Stop(); }
+                if (Rolling) { Rolling.Stop(); }
                 if (!ThrustNull)
                 {
                     foreach (AudioSource thrust in Thrust)
@@ -288,18 +289,14 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
 
         //Piloting = true in editor play mode
-        if ((InVehicle) && AllDoorsClosed)
+        if (InVehicle && AllDoorsClosed)
         {
             if (Rolling)
             {
                 if ((bool)SAVControl.GetProgramVariable("Taxiing"))
-                {
-                    Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime);
-                }
+                { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
                 else
-                {
-                    Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min(0), 5f * DeltaTime);
-                }
+                { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
             }
             if ((Piloting || (Passenger && (bool)SAVControl.GetProgramVariable("Occupied"))) && (float)SAVControl.GetProgramVariable("Fuel") > 0.1f) //you're piloting or someone is piloting and you're a passenger
             {
@@ -327,6 +324,13 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
         else if ((bool)SAVControl.GetProgramVariable("Occupied") && (float)SAVControl.GetProgramVariable("Fuel") > 1)//someone else is piloting
         {
+            if (Rolling_Seaplane && Rolling)
+            {
+                if ((bool)SAVControl.GetProgramVariable("Taxiing"))
+                { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
+                else
+                { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
+            }
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, .72f * DeltaTime);
             float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
             if (Doppler > 50)
@@ -529,6 +533,11 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             ResetSounds();
         }
+        if (Rolling_Seaplane && Rolling)
+        {
+            Rolling.Play();
+            Rolling.volume = 0;
+        }
         foreach (AudioSource thrust in Thrust)
         {
             if (!thrust.isPlaying)
@@ -663,7 +672,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
         PlaneThrustVolume *= InVehicleThrustVolumeFactor;
 
-        if (Rolling)
+        if (!Rolling_Seaplane && Rolling)
         {
             Rolling.Play();
             Rolling.volume = 0;
@@ -689,7 +698,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     private void SetSoundsOutside()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
     {
         if (RadarLocked) { RadarLocked.Stop(); }
-        if (Rolling) { Rolling.Stop(); }
+        if (!Rolling_Seaplane && Rolling) { Rolling.Stop(); }
         if (PlaneInside) { PlaneInside.Stop(); }
         if (PlaneWind) { PlaneWind.Stop(); }
 

@@ -13,6 +13,8 @@ public class SAV_AGMController : UdonSharpBehaviour
     [SerializeField] private float MaxLifetime = 20;
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
     [SerializeField] private float ExplosionLifeTime = 10;
+    [Tooltip("AGM will fly straight for this many seconds before it starts homing in on target")]
+    [SerializeField] private float FlyStraightTime = 0;
     [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from colliding with own plane")]
@@ -28,6 +30,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     private bool IsOwner = false;
     private CapsuleCollider AGMCollider;
     private Rigidbody AGMRigid;
+    private float StartHomingTime;
     private void Start()
     {
         VehicleCenterOfMass = EntityControl.CenterOfMass;
@@ -38,6 +41,8 @@ public class SAV_AGMController : UdonSharpBehaviour
         if (EntityControl.InEditor) { IsOwner = true; }
         else
         { IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner"); }
+        if (FlyStraightTime > 0)
+        { StartHomingTime = Time.time + FlyStraightTime; }
         SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
     }
     void LateUpdate()
@@ -51,7 +56,7 @@ public class SAV_AGMController : UdonSharpBehaviour
                 ColliderActive = true;
             }
         }
-        if (Vector3.Angle(transform.forward, (Target - transform.position)) < LockAngle)
+        if (Time.time > StartHomingTime && Vector3.Angle(transform.forward, (Target - transform.position)) < LockAngle)
         {
             var missileToTargetVector = Target - transform.position;
             var missileForward = transform.forward;

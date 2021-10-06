@@ -81,7 +81,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     {
         SetHookUp();
     }
-    public void SFEXT_O_PassengerEnter()
+    public void SFEXT_L_PassengerEnter()
     {
         if (Dial_Funcon) { Dial_Funcon.SetActive(HookDown); }
     }

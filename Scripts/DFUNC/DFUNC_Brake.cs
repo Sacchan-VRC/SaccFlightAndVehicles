@@ -78,7 +78,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
             }
         }
     }
-    public void SFEXT_O_PilotExit()
+    public void SFEXT_P_PilotExit()
     {
         BrakeInput = 0;
         Selected = false;
@@ -235,10 +235,12 @@ public class DFUNC_Brake : UdonSharpBehaviour
                 return;
             }
         }
-
         AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, BrakeInput, 2f * DeltaTime);
         BrakeAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper);
-        Airbrake_snd.pitch = BrakeInput * .2f + .9f;
-        Airbrake_snd.volume = AirbrakeLerper * (float)SAVControl.GetProgramVariable("rotlift");
+        if (Airbrake_snd)
+        {
+            Airbrake_snd.pitch = BrakeInput * .2f + .9f;
+            Airbrake_snd.volume = AirbrakeLerper * (float)SAVControl.GetProgramVariable("rotlift");
+        }
     }
 }
