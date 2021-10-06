@@ -709,7 +709,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                     Vector2 Outputs = UnpackThrottles(EngineOutput);
                     Thrust = ThrustPoint.forward * (Mathf.Min(Outputs.x)//Throttle
                     * ThrottleStrength
-                    + Mathf.Max((Outputs.y), 0)//Afterburner throttle
+                    + Mathf.Max(Outputs.y, 0)//Afterburner throttle
                     * ThrottleStrengthAB);
                 }
                 else

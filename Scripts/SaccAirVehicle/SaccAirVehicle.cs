@@ -1027,7 +1027,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     Vector2 Outputs = UnpackThrottles(EngineOutput);
                     float Thrust = (Mathf.Min(Outputs.x)//Throttle
                     * ThrottleStrength
-                    + Mathf.Max((Outputs.y), 0)//Afterburner throttle
+                    + Mathf.Max(Outputs.y, 0)//Afterburner throttle
                     * ThrottleStrengthAB);
 
 
