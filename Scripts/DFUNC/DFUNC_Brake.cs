@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Brake : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
@@ -26,8 +26,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     //other functions can set this +1 to disable breaking
     [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
     private SaccEntity EntityControl;
-    private float StartGroundBrakeStrength;
-    private float StartWaterBrakeStrength;
+    private float BrakeStrength;
     private int BRAKE_STRING = Animator.StringToHash("brake");
     private bool Braking;
     private bool BrakingLastFrame;
@@ -35,15 +34,13 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private float AirbrakeLerper;
     private float NonLocalActiveDelay;//this var is for adding a min delay for disabling for non-local users to account for lag
     private bool Selected;
+    private bool IsOwner;
+    private bool Piloting;
+    private float NextUpdateTime;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        StartGroundBrakeStrength = GroundBrakeStrength;
-        StartWaterBrakeStrength = WaterBrakeStrength;
-        GroundBrakeStrength = 1;
-        WaterBrakeStrength = 1;
-
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         HasAirBrake = AirbrakeStrength != 0;
@@ -64,28 +61,27 @@ public class DFUNC_Brake : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
+        Piloting = true;
         if (!NoPilotAlwaysGroundBrake)
         {
-            if ((bool)SAVControl.GetProgramVariable("Taxiing"))
+            if ((bool)SAVControl.GetProgramVariable("Floating"))
             {
-                GroundBrakeStrength = StartGroundBrakeStrength;
-                WaterBrakeStrength = 1;
+                BrakeStrength = WaterBrakeStrength;
             }
-            else if ((bool)SAVControl.GetProgramVariable("Floating"))
+            else if ((bool)SAVControl.GetProgramVariable("Taxiing"))
             {
-                GroundBrakeStrength = 1;
-                WaterBrakeStrength = StartWaterBrakeStrength;
+                BrakeStrength = GroundBrakeStrength;
             }
         }
     }
-    public void SFEXT_P_PilotExit()
+    public void SFEXT_O_PilotExit()
     {
+        Piloting = false;
         BrakeInput = 0;
+        RequestSerialization();
         Selected = false;
-        SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - LastDrag);
-        LastDrag = 0;
         if (!NoPilotAlwaysGroundBrake)
-        { GroundBrakeStrength = 0; WaterBrakeStrength = 0; }
+        { BrakeStrength = 0; }
     }
     public void SFEXT_G_Explode()
     {
@@ -113,22 +109,30 @@ public class DFUNC_Brake : UdonSharpBehaviour
         BrakeAnimator.SetFloat(BRAKE_STRING, 0);
         BrakeInput = 0;
         AirbrakeLerper = 0;
-        Airbrake_snd.pitch = BrakeInput * .2f + .9f;
-        Airbrake_snd.volume = BrakeInput * (float)SAVControl.GetProgramVariable("rotlift");
+        if (Airbrake_snd)
+        {
+            Airbrake_snd.pitch = 0;
+            Airbrake_snd.volume = 0;
+        }
         gameObject.SetActive(false);
     }
     public void SFEXT_G_TouchDownWater()
     {
-        WaterBrakeStrength = StartWaterBrakeStrength;
-        GroundBrakeStrength = 1;
+        if ((bool)SAVControl.GetProgramVariable("Piloting") || NoPilotAlwaysGroundBrake)
+        {
+            BrakeStrength = WaterBrakeStrength;
+        }
     }
     public void SFEXT_G_TouchDown()
     {
-        WaterBrakeStrength = 1;
-        GroundBrakeStrength = StartGroundBrakeStrength;
+        if ((bool)SAVControl.GetProgramVariable("Piloting") || NoPilotAlwaysGroundBrake)
+        {
+            BrakeStrength = GroundBrakeStrength;
+        }
     }
     private void Update()
     {
+        Debug.Log(BrakeStrength);
         float DeltaTime = Time.deltaTime;
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
@@ -166,14 +170,14 @@ public class DFUNC_Brake : UdonSharpBehaviour
                         float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
                         if (BrakeInput > 0 && RBSpeed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
                         {
-                            VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), BrakeInput * GroundBrakeStrength * DeltaTime);
+                            VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), BrakeInput * BrakeStrength * DeltaTime);
                         }
                     }
                     else
                     {
                         if (BrakeInput > 0 && Speed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
                         {
-                            VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, BrakeInput * GroundBrakeStrength * DeltaTime);
+                            VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, BrakeInput * BrakeStrength * DeltaTime);
                             // VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
                         }
                     }
@@ -191,11 +195,29 @@ public class DFUNC_Brake : UdonSharpBehaviour
                 SAVControl.SetProgramVariable("ExtraDrag", extradrag);
 
                 //send events to other users to tell them to enable the script so they can see the animation
-                Braking = BrakeInput > .1f;
-                if (Braking && !BrakingLastFrame)
+                Braking = BrakeInput > .02f;
+                if (Braking)
                 {
-                    if (Airbrake_snd && !Airbrake_snd.isPlaying) { Airbrake_snd.Play(); }
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForAnimation");
+                    if (!BrakingLastFrame)
+                    {
+                        if (Airbrake_snd && !Airbrake_snd.isPlaying) { Airbrake_snd.Play(); }
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForAnimation");
+                    }
+                    if (Time.time > NextUpdateTime)
+                    {
+                        RequestSerialization();
+                        NextUpdateTime = Time.time + .4f;
+                    }
+                }
+                else
+                {
+                    if (BrakingLastFrame)
+                    {
+                        float brk = BrakeInput;
+                        BrakeInput = 0;
+                        RequestSerialization();
+                        BrakeInput = brk;
+                    }
                 }
                 if (AirbrakeLerper < .03 && BrakeInput < .03)
                 {
@@ -239,7 +261,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
         BrakeAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper);
         if (Airbrake_snd)
         {
-            Airbrake_snd.pitch = BrakeInput * .2f + .9f;
+            Airbrake_snd.pitch = AirbrakeLerper * .2f + .9f;
             Airbrake_snd.volume = AirbrakeLerper * (float)SAVControl.GetProgramVariable("rotlift");
         }
     }

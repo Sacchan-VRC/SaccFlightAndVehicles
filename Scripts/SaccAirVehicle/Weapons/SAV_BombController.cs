@@ -34,11 +34,11 @@ public class SAV_BombController : UdonSharpBehaviour
 
     private void Start()
     {
-        VehicleCenterOfMass = EntityControl.CenterOfMass;
         BombCollider = GetComponent<CapsuleCollider>();
         BombRigid = GetComponent<Rigidbody>();
         BombConstant = GetComponent<ConstantForce>();
         EntityControl = (SaccEntity)((UdonSharpBehaviour)BombLauncherControl.GetProgramVariable("SAVControl")).GetProgramVariable("EntityControl");
+        VehicleCenterOfMass = EntityControl.CenterOfMass;
         transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
         if (EntityControl.InEditor) { IsOwner = true; }
         else

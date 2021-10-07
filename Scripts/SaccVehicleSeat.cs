@@ -25,7 +25,6 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         get => _adjustedPos;
     }
     private float AdjustTime;
-    private bool DoSeatAdjustment = false;
     private bool CalibratedY = false;
     private bool CalibratedZ = false;
     private Vector3 SeatStartPos;
@@ -213,6 +212,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         float x = .01f;
         while (x < targetAbs)
         { x *= 2; }
+        x *= .5f;
         if (target > 0)
         { return x; }
         else

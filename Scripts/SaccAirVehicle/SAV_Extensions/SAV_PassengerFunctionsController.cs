@@ -24,9 +24,6 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     [SerializeField] private Transform RStickDisplayHighlighter;
     [Tooltip("Oneshot sound played when switching functions")]
     [SerializeField] private AudioSource SwitchFunctionSound;
-    private bool SwitchFunctionSoundNULL;
-    private bool LStickDisplayHighlighterNULL;
-    private bool RStickDisplayHighlighterNULL;
     private int LStickNumFuncs;
     private int RStickNumFuncs;
     private float LStickFuncDegrees;
@@ -84,27 +81,8 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
         if (RStickNumFuncs == 0) { RightDialEmpty = true; }
         if (LeftDialEmpty || LeftDialOnlyOne) { DoFuncsL = false; } else { DoFuncsL = true; }
         if (RightDialEmpty || RightDialOnlyOne) { DoFuncsR = false; } else { DoFuncsR = true; }
-        //work out angle to check against for function selection because straight up is the middle of a function
+        //work out angle to check against for function selection because straight up is the middle of a function (if *DialDivideStraightUp isn't true)
         Vector3 angle = new Vector3(0, 0, -1);
-        if (!LeftDialEmpty) { angle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle; }
-        LStickCheckAngle.x = angle.x;
-        LStickCheckAngle.y = angle.z;
-
-        angle = new Vector3(0, 0, -1);
-        if (RStickNumFuncs > 1)
-        {
-            if (RightDialDivideStraightUp)
-            {
-                RStickCheckAngle.x = 0;
-                RStickCheckAngle.y = -1;
-            }
-            else
-            {
-                angle = Quaternion.Euler(0, -((360 / RStickNumFuncs) / 2), 0) * angle;
-                RStickCheckAngle.x = angle.x;
-                RStickCheckAngle.y = angle.z;
-            }
-        }
         if (LStickNumFuncs > 1)
         {
             if (LeftDialDivideStraightUp)
@@ -114,15 +92,26 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             }
             else
             {
-                angle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle;
-                LStickCheckAngle.x = angle.x;
-                LStickCheckAngle.y = angle.z;
+                Vector3 LAngle = Quaternion.Euler(0, -((360 / LStickNumFuncs) / 2), 0) * angle;
+                LStickCheckAngle.x = LAngle.x;
+                LStickCheckAngle.y = LAngle.z;
+            }
+        }
+        if (RStickNumFuncs > 1)
+        {
+            if (RightDialDivideStraightUp)
+            {
+                RStickCheckAngle.x = 0;
+                RStickCheckAngle.y = -1;
+            }
+            else
+            {
+                Vector3 RAngle = Quaternion.Euler(0, -((360 / RStickNumFuncs) / 2), 0) * angle;
+                RStickCheckAngle.x = RAngle.x;
+                RStickCheckAngle.y = RAngle.z;
             }
         }
 
-        SwitchFunctionSoundNULL = SwitchFunctionSound == null;
-        LStickDisplayHighlighterNULL = LStickDisplayHighlighter == null;
-        RStickDisplayHighlighterNULL = RStickDisplayHighlighter == null;
 
         TellDFUNCsLR();
         SendEventToExtensions_Gunner("SFEXTP_L_EntityStart");
@@ -164,12 +153,12 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
                     }
                 }
 
-                if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
+                if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
                 if (LStickSelection < 0)
-                { if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
+                { if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
                 else
                 {
-                    if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, LStickFuncDegrees * LStickSelection); }
+                    if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, LStickFuncDegrees * LStickSelection); }
                 }
             }
             LStickSelectionLastFrame = LStickSelection;
@@ -203,12 +192,12 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
                     }
                 }
 
-                if (!SwitchFunctionSoundNULL) { SwitchFunctionSound.Play(); }
+                if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
                 if (LStickSelection < 0)
-                { if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
+                { if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
                 else
                 {
-                    if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, RStickFuncDegrees * RStickSelection); }
+                    if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, RStickFuncDegrees * RStickSelection); }
                 }
             }
             RStickSelectionLastFrame = RStickSelection;
@@ -272,8 +261,8 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             RStickSelection = 0;
             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
         }
-        if (!RStickDisplayHighlighterNULL) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
-        if (!LStickDisplayHighlighterNULL) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+        if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+        if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
         TakeOwnerShipOfExtensions();
         FunctionsActive = true;
     }
@@ -281,10 +270,12 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     {
         if (LeftDialOnlyOne)
         {
+            LStickSelection = 0;
             Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Deselected");
         }
         if (RightDialOnlyOne)
         {
+            RStickSelection = 0;
             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Deselected");
         }
         LStickSelection = -1;

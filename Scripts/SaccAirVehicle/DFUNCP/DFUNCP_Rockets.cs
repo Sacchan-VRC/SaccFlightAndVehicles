@@ -7,7 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNCP_Rockets : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private GameObject Rocket;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
@@ -19,6 +19,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     [SerializeField] private Transform[] RocketLaunchPoints;
     [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
+    [SerializeField] private KeyCode LaunchRocketKey = KeyCode.C;
     private bool UseLeftTrigger = false;
     private float Trigger;
     private bool TriggerLastFrame;
@@ -41,7 +42,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         FullRocketsDivider = 1f / (NumRocket > 0 ? NumRocket : 10000000);
         if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
         if (RocketHoldDelay < RocketDelay) { RocketHoldDelay = RocketDelay; }
-        VehicleTransform = SAVControl.EntityControl.transform;
+        VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
@@ -82,7 +83,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     }
     public void SFEXTP_G_ReSupply()
     {
-        if (NumRocket != FullRockets) { SAVControl.ReSupplied++; }
+        if (NumRocket != FullRockets) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumRocket = (int)Mathf.Min(NumRocket + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullRockets);
         RocketPoint = 0;
         if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
@@ -94,7 +95,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
         else
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-        if (Trigger > 0.75 || (Input.GetKey(KeyCode.C)))
+        if (Trigger > 0.75 || (Input.GetKey(LaunchRocketKey)))
         {
             if (!TriggerLastFrame)
             {
@@ -128,7 +129,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
 
             NewRocket.transform.SetPositionAndRotation(RocketLaunchPoints[RocketPoint].position, RocketLaunchPoints[RocketPoint].rotation);
             NewRocket.SetActive(true);
-            NewRocket.GetComponent<Rigidbody>().velocity = SAVControl.CurrentVel;
+            NewRocket.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
             RocketPoint++;
             if (RocketPoint == RocketLaunchPoints.Length) RocketPoint = 0;
         }

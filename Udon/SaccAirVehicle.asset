@@ -604,7 +604,7 @@ MonoBehaviour:
       Data: 34|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: HP of the plane, bullets do 10 damage per hit
+      Data: HP of the vehicle
     - Name: 
       Entry: 8
       Data: 
@@ -1511,7 +1511,7 @@ MonoBehaviour:
       Data: 80|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: How much the plane slows down (Speed lerped towards 0)
+      Data: How much the vehicle slows down (Speed lerped towards 0)
     - Name: 
       Entry: 8
       Data: 
@@ -3234,7 +3234,7 @@ MonoBehaviour:
       Data: 164|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Angle of attack above which the plane will lose control
+      Data: Angle of attack on the yaw axis above which the plane will lose control
     - Name: 
       Entry: 8
       Data: 
@@ -3295,7 +3295,7 @@ MonoBehaviour:
       Data: 167|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Angle of attack above which the plane will lose control
+      Data: Angle of attack on the pitch axis above which the plane will lose control
     - Name: 
       Entry: 8
       Data: 
@@ -3854,8 +3854,8 @@ MonoBehaviour:
       Data: 194|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: When the above is ticked, This is the speed at which the plane will reach
-        its full turning speed. Meters/second.
+      Data: When the above is ticked, This is the speed at which the vehicle will
+        reach its full turning speed. Meters/second.
     - Name: 
       Entry: 8
       Data: 
@@ -6233,7 +6233,7 @@ MonoBehaviour:
       Data: 312|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Time after reappearing the plane is invincible for
+      Data: Time after reappearing the vehicle is invincible for
     - Name: 
       Entry: 8
       Data: 
@@ -7816,13 +7816,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PlaneRotLastFrame
+      Data: VehicleRotLastFrame
     - Name: $v
       Entry: 7
       Data: 396|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: PlaneRotLastFrame
+      Data: VehicleRotLastFrame
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 394
@@ -10984,13 +10984,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: OutsidePlaneLayer
+      Data: OutsideVehicleLayer
     - Name: $v
       Entry: 7
       Data: 544|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: OutsidePlaneLayer
+      Data: OutsideVehicleLayer
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 12

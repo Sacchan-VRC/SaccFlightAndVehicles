@@ -7,7 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNCP_Minigun : UdonSharpBehaviour
 {
-    [SerializeField] private SaccAirVehicle SAVControl;
+    [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private Transform VehicleTransform;
     [SerializeField] private Transform Minigun;
     [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
@@ -19,6 +19,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     [SerializeField] private Animator GunAnimator;
     [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
+    [SerializeField] private KeyCode MinigunFireKey = KeyCode.Space;
     private bool AmmoBarNULL = true;
     [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
     private bool InVR;
@@ -113,7 +114,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     {
         if (Selected)
         {
-            if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.ReSupplied++; }
+            if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
             GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
         }
     }
@@ -128,7 +129,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-            if ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
+            if ((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && GunAmmoInSeconds > 0)
             {
                 if (!firing)
                 {

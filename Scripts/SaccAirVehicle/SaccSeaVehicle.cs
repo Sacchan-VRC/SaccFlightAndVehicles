@@ -38,7 +38,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float AccelerationResponse = 4.5f;
     [Tooltip("How quickly the vehicle throttles down relative to how fast it throttles up after throttle is decreased")]
     public float EngineSpoolDownSpeedMulti = .5f;
-    [Tooltip("How much the plane slows down (Speed lerped towards 0)")]
+    [Tooltip("How much the vehicle slows down (Speed lerped towards 0)")]
     public float AirFriction = 0.0004f;
     [Tooltip("Yaw force multiplier, (gets stronger with airspeed)")]
     public float YawStrength = 3f;
@@ -50,7 +50,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float YawConstantFriction = 0f;
     [Tooltip("How quickly the vehicle responds to changes in joystick's yaw (Lerp)")]
     public float YawResponse = 20f;
-    [Tooltip("Adjust the rotation of Unity's inbuilt Inertia Tensor Rotation, which is a function of rigidbodies. If set to 0, the plane will be very stable and feel boring to fly.")]
+    [Tooltip("Adjust the rotation of Unity's inbuilt Inertia Tensor Rotation, which is a function of rigidbodies. If set to 0, the vehicle will be very stable and feel boring to fly.")]
     public float InertiaTensorRotationMulti = 1;
     [Tooltip("Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear. (Meters/second)")]
     public float RotMultiMaxSpeed = 10;
@@ -62,7 +62,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float TaxiRotationResponse = 2.5f;
     [Tooltip("Make taxiing more realistic by not allowing vehicle to rotate on the spot")]
     public bool DisallowTaxiRotationWhileStill = false;
-    [Tooltip("When the above is ticked, This is the speed at which the plane will reach its full turning speed. Meters/second.")]
+    [Tooltip("When the above is ticked, This is the speed at which the vehicle will reach its full turning speed. Meters/second.")]
     public float TaxiFullTurningSpeed = 20f;
     [Tooltip("Push the vehicle up based on speed. Sit higher on the water when moving faster")]
     public float VelLift = 1f;
@@ -98,7 +98,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float RepairTime = 30;
     [Tooltip("Time until vehicle reappears after exploding")]
     public float RespawnDelay = 10;
-    [Tooltip("Time after reappearing the plane is invincible for")]
+    [Tooltip("Time after reappearing the vehicle is invincible for")]
     public float InvincibleAfterSpawn = 2.5f;
     [Tooltip("Damage taken when hit by a bullet")]
     public float BulletDamageTaken = 10f;
@@ -123,13 +123,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool ThrottleGripLastFrame = false;
     [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
     Quaternion JoystickZeroPoint;
-    Quaternion PlaneRotLastFrame;
+    Quaternion VehicleRotLastFrame;
     [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float ThrottleZeroPoint;
     [System.NonSerializedAttribute] public float ThrottleInput = 0f;
-    private float roll = 0f;
-    private float pitch = 0f;
     private float yaw = 0f;
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Taxiing = false;
@@ -152,15 +150,15 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool IsOwner = false;
     private Vector3 FinalWind;//includes Gusts
     [System.NonSerializedAttribute] public Vector3 AirVel;
-    private float StillWindMulti;//multiplies the speed of the wind by the speed of the plane when taxiing to prevent still planes flying away
+    private float StillWindMulti;//multiplies the speed of the wind by the speed of the vehicle when taxiing to prevent still vehicles flying away
     private float SoundBarrier;
     [System.NonSerializedAttribute] public float FullFuel;
     private float LowFuelDivider;
-    private float LastResupplyTime = 5;//can't resupply for the first 10 seconds after joining, fixes potential null ref if sending something to PlaneAnimator on first frame
+    private float LastResupplyTime = 0;
     [System.NonSerializedAttribute] public float FullGunAmmo;
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] public Quaternion Spawnrotation;
-    [System.NonSerializedAttribute] public int OutsidePlaneLayer;
+    [System.NonSerializedAttribute] public int OutsideVehicleLayer;
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
     [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
     [System.NonSerializedAttribute] public bool UsingManualSync;
@@ -185,7 +183,6 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float ThrottleStrengthAB;
     [System.NonSerializedAttribute] public float FuelConsumptionAB;
     [System.NonSerializedAttribute] public bool AfterburnerOn;
-    [System.NonSerializedAttribute] public bool PitchDown;//air is hitting plane from the top
     private float GDamageToTake;
     [System.NonSerializedAttribute] public float LastHitTime = -100;
     [System.NonSerializedAttribute] public float PredictedHealth;
@@ -267,8 +264,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                 wheel.suspensionSpring = SusiSpring;
             }
         }
-        VehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the plane as set by the world creator
-        OutsidePlaneLayer = VehicleMesh.gameObject.layer;
+        VehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
+        OutsideVehicleLayer = VehicleMesh.gameObject.layer;
         VehicleAnimator = EntityControl.GetComponent<Animator>();
 
         FullHealth = Health;
@@ -314,7 +311,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                 //G/crash Damage
                 Health -= Mathf.Max((GDamageToTake) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
                 GDamageToTake = 0;
-                if (Health <= 0f)//plane is ded
+                if (Health <= 0f)//vehicle is ded
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
 
@@ -340,7 +337,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             CurrentVel = VehicleRigidbody.velocity;
             Speed = CurrentVel.magnitude;
             bool VehicleMoving = false;
-            if (Speed > .1f)//don't bother doing all this for planes that arent moving and it therefore wont even effect
+            if (Speed > .1f)//don't bother doing all this for vehicles that arent moving and it therefore wont even effect
             {
                 VehicleMoving = true;//check this bool later for more optimizations
                 WindAndAoA();
@@ -424,19 +421,19 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                     //VR Joystick                
                     if (JoyStickGrip > 0.75)
                     {
-                        Quaternion PlaneRotDif = ControlsRoot.rotation * Quaternion.Inverse(PlaneRotLastFrame);//difference in plane's rotation since last frame
-                        PlaneRotLastFrame = ControlsRoot.rotation;
-                        JoystickZeroPoint = PlaneRotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
+                        Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
+                        VehicleRotLastFrame = ControlsRoot.rotation;
+                        JoystickZeroPoint = VehicleRotDif * JoystickZeroPoint;//zero point rotates with the vehicle so it appears still to the pilot
                         if (!JoystickGripLastFrame)//first frame you gripped joystick
                         {
                             EntityControl.SendEventToExtensions("SFEXT_O_JoystickGrabbed");
-                            PlaneRotDif = Quaternion.identity;
+                            VehicleRotDif = Quaternion.identity;
                             if (SwitchHandsJoyThrottle)
-                            { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the plane when it was pressed
+                            { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the vehicle when it was pressed
                             else
                             { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }
                         }
-                        //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
+                        //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
                         Quaternion JoystickDifference;
                         if (SwitchHandsJoyThrottle)
                         { JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
@@ -662,7 +659,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                     }
 
                     yaw = Mathf.Clamp(-RotationInputs.y, -1, 1) * YawStrength;
-                    //wheel colliders are broken, this workaround stops the plane from being 'sticky' when you try to start moving it.
+                    //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
                     if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
                     {
                         if (ThrottleStrength < 0)
@@ -674,7 +671,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             }
             else
             {
-                //brake is always on if the plane is on the ground
+                //brake is always on if the vehicle is on the ground
                 if (Taxiing)
                 {
                     StillWindMulti = Mathf.Min(Speed * .1f, 1);
@@ -701,9 +698,9 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                 }
                 else
                 {
-                    VelLift = pitch = yaw = roll = 0;
+                    VelLift = yaw = 0;
                 }
-                if (Floating)
+                if (Taxiing)//on ground or water (boats will never be on ground because you disable grounddetector)
                 {
                     Yawing = (VehicleTransform.right * LerpedYaw);
                     Vector2 Outputs = UnpackThrottles(EngineOutput);
@@ -779,7 +776,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             EntityControl.SendEventToExtensions("SFEXT_O_Explode");
         }
 
-        //pilot and passengers are dropped out of the plane
+        //pilot and passengers are dropped out of the vehicle
         if ((Piloting || Passenger) && !InEditor)
         {
             EntityControl.ExitStation();
@@ -1029,7 +1026,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         Piloting = true;
         if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
-        //hopefully prevents explosions when you enter the plane
+        //hopefully prevents explosions when you enter the vehicle
         VehicleRigidbody.velocity = CurrentVel;
         VertGs = 0;
         AllGs = 0;
@@ -1040,7 +1037,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public void SFEXT_G_PilotEnter()
     {
         Occupied = true;
-        EntityControl.dead = false;//Plane stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
+        EntityControl.dead = false;//vehicle stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
     }
     public void SFEXT_G_PilotExit()
     {
@@ -1050,8 +1047,6 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         //zero control values
-        roll = 0;
-        pitch = 0;
         yaw = 0;
         LerpedYaw = 0;
         RotationInputs = Vector3.zero;
