@@ -43,8 +43,13 @@ public class SAV_HUDController : UdonSharpBehaviour
     private Transform CenterOfMass;
     private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
-    private Vector3 VelLerper;
     VRCPlayerApi localPlayer;
+    private Vector3 Vel_Lerper;
+    private float Vel_UpdateInterval;
+    private float Vel_UpdateTime;
+    private Vector3 Vel_PredictedCurVel;
+    private Vector3 Vel_LastCurVel;
+    private Vector3 Vel_NormalizedExtrapDir;
     private void Start()
     {
 
@@ -71,24 +76,33 @@ public class SAV_HUDController : UdonSharpBehaviour
         float SmoothDeltaTime = Time.smoothDeltaTime;
 
         //Velocity indicator
-        Vector3 tempvel;
-        if (((Vector3)SAVControl.GetProgramVariable("CurrentVel")).magnitude < 2)
+        Vector3 currentvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+        if (currentvel.magnitude < 2)
         {
-            tempvel = -Vector3.up * 2;//straight down instead of spazzing out when moving very slow
+            currentvel = -Vector3.up * 2;//straight down instead of spazzing out when moving very slow
         }
         else
         {
-            tempvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+            //extrapolate CurrentVel and lerp towards it to smooth out the velocity indicator of non-owners
+            if (currentvel != Vel_LastCurVel)
+            {
+                float tim = Time.time;
+                Vel_UpdateInterval = tim - Vel_UpdateTime;
+                Vel_NormalizedExtrapDir = (currentvel - Vel_LastCurVel) * (1 / Vel_UpdateInterval);
+                Vel_LastCurVel = currentvel;
+                Vel_UpdateTime = tim;
+            }
+            Vel_PredictedCurVel = currentvel + (Vel_NormalizedExtrapDir * (Time.time - Vel_UpdateTime));
         }
 
-        if ((bool)SAVControl.GetProgramVariable("Piloting"))
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
-            VelocityIndicator.position = transform.position + tempvel;
+            VelocityIndicator.position = transform.position + currentvel;
         }
         else
         {
-            VelLerper = Vector3.Lerp(VelLerper, tempvel, 12.5f * Time.smoothDeltaTime);
-            VelocityIndicator.position = transform.position + VelLerper;
+            Vel_Lerper = Vector3.Lerp(Vel_Lerper, Vel_PredictedCurVel, 9f * Time.smoothDeltaTime);
+            VelocityIndicator.position = transform.position + Vel_Lerper;
         }
         VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
         /////////////////

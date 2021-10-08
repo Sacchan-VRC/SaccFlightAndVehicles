@@ -19,7 +19,12 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private float FullReloadTimeSec = 10;
     [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
     [SerializeField] private bool DoAnimBool = false;
+    [Tooltip("Animator bool that is true when this function is selected")]
     [SerializeField] private string AnimBoolName = "AAMSelected";
+    [Tooltip("Animator float that represents how many missiles are left")]
+    [SerializeField] private string AnimFloatName = "AAMs";
+    [Tooltip("Animator trigger that is set true when a missile is launched")]
+    [SerializeField] private string AnimFiredTriggerName = "aamlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
     [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private short _AAMFire;
@@ -45,9 +50,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private bool TriggerLastFrame = false;
     private float AAMLastFiredTime = 0;
     private float AAMLaunchDelay = 0.5f;
-    private int AAMS_STRING = Animator.StringToHash("AAMs");
+    private int AAMS_STRING;
     private float FullAAMsDivider;
-    private int AAMLAUNCHED_STRING = Animator.StringToHash("aamlaunched");
+    private int AAMLAUNCHED_STRING;
     public GameObject AAM;
     public Transform AAMLaunchPoint;
     float TimeSinceSerialization;
@@ -78,6 +83,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
 
         AnimBool_STRING = Animator.StringToHash(AnimBoolName);
+        AAMS_STRING = Animator.StringToHash(AnimFloatName);
+        AAMLAUNCHED_STRING = Animator.StringToHash(AnimFiredTriggerName);
         //HUD
         if (HUDControl)
         {

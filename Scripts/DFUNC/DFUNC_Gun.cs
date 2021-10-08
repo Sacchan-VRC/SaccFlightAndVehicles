@@ -25,6 +25,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     [SerializeField] private float GunRecoil = 150;
     [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
     [SerializeField] private bool DoAnimBool = false;
+    [Tooltip("Animator bool that is true when this function is selected")]
     [SerializeField] private string AnimBoolName = "GunSelected";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;

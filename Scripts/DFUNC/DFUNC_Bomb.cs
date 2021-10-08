@@ -22,7 +22,12 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
     [SerializeField] private Transform[] BombLaunchPoints;
     [SerializeField] private bool DoAnimBool = false;
+    [Tooltip("Animator bool that is true when this function is selected")]
     [SerializeField] private string AnimBoolName = "BombSelected";
+    [Tooltip("Animator float that represents how many bombs are left")]
+    [SerializeField] private string AnimFloatName = "bombs";
+    [Tooltip("Animator trigger that is set true when a bomb is dropped")]
+    [SerializeField] private string AnimFiredTriggerName = "bomblaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
     [SerializeField] private Camera AtGCam;
@@ -48,8 +53,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private float LastBombDropTime = 0f;
     private int FullBombs;
     private float FullBombsDivider;
-    private int BOMBLAUNCHED_STRING = Animator.StringToHash("bomblaunched");
-    private int BOMBS_STRING = Animator.StringToHash("bombs");
+    private int BOMBLAUNCHED_STRING;
+    private int BOMBS_STRING;
     private Transform VehicleTransform;
     private float reloadspeed;
     private bool LeftDial = false;
@@ -77,6 +82,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
 
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
         AnimBool_STRING = Animator.StringToHash(AnimBoolName);
+        BOMBS_STRING = Animator.StringToHash(AnimFloatName);
+        BOMBLAUNCHED_STRING = Animator.StringToHash(AnimFiredTriggerName);
     }
     public void SFEXT_O_PilotEnter()
     {

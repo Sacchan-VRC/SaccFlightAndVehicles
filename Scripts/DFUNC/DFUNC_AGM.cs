@@ -21,11 +21,18 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private GameObject Dial_Funcon;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
+    [Tooltip("Sound that plays when the AGM locks")]
     [SerializeField] private AudioSource AGMLock;
+    [Tooltip("Sound that plays when the AGM unlocks")]
     [SerializeField] private AudioSource AGMUnlock;
     [SerializeField] private bool AllowFiringWhenGrounded;
     [SerializeField] private bool DoAnimBool = false;
+    [Tooltip("Animator bool that is true when this function is selected")]
     [SerializeField] private string AnimBoolName = "AGMSelected";
+    [Tooltip("Animator float that represents how many missiles are left")]
+    [SerializeField] private string AnimFloatName = "AGMs";
+    [Tooltip("Animator trigger that is set true when a missile is launched")]
+    [SerializeField] private string AnimFiredTriggerName = "agmlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
     [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private short _AGMFire;
@@ -63,8 +70,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private Quaternion AGMCamLastFrame;
     private bool func_active;
     private float reloadspeed;
-    private int AGMLAUNCHED_STRING = Animator.StringToHash("agmlaunched");
-    private int AGMS_STRING = Animator.StringToHash("AGMs");
+    private int AGMLAUNCHED_STRING;
+    private int AGMS_STRING;
     private bool LeftDial = false;
     private int DialPosition = -999;
     private bool OthersEnabled;
@@ -87,6 +94,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
 
         if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
         AnimBool_STRING = Animator.StringToHash(AnimBoolName);
+        AGMS_STRING = Animator.StringToHash(AnimFloatName);
+        AGMLAUNCHED_STRING = Animator.StringToHash(AnimFiredTriggerName);
     }
     public void SFEXT_O_PilotEnter()
     {
