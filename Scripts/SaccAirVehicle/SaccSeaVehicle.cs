@@ -89,7 +89,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [Tooltip("Amount of fuel at which throttle will start reducing")]
     public float LowFuel = 125;
     [Tooltip("Fuel consumed per second at max throttle, scales with throttle")]
-    public float FuelConsumption = 2;
+    public float FuelConsumption = 1;
     [Tooltip("Multiply FuelConsumption by this number when at full afterburner Scales with afterburner level")]
     public float FuelConsumptionABMulti = 3f;
     [Tooltip("Number of resupply ticks it takes to refuel fully from zero")]

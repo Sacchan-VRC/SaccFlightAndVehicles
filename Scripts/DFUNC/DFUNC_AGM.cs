@@ -339,19 +339,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         if (AGM)
         {
             GameObject NewAGM = Object.Instantiate(AGM);
-            if (!(NumAGM % 2 == 0))
-            {
-                Vector3 temp = AGMLaunchPoint.localPosition;
-                temp.x *= -1;
-                AGMLaunchPoint.localPosition = temp;
-                NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.transform.rotation);
-                temp.x *= -1;
-                AGMLaunchPoint.localPosition = temp;
-            }
-            else
-            {
-                NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.transform.rotation);
-            }
+            NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.rotation);
             NewAGM.SetActive(true);
             NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }

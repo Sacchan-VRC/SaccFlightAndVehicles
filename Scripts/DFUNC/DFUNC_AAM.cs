@@ -443,20 +443,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (AAM)
         {
             GameObject NewAAM = Object.Instantiate(AAM);
-            if (!(NumAAM % 2 == 0))
-            {
-                //invert local x coordinates of launch point, launch, then revert
-                Vector3 temp = AAMLaunchPoint.localPosition;
-                temp.x *= -1;
-                AAMLaunchPoint.localPosition = temp;
-                NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
-                temp.x *= -1;
-                AAMLaunchPoint.localPosition = temp;
-            }
-            else
-            {
-                NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
-            }
+            NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
