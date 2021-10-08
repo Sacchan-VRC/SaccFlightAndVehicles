@@ -266,7 +266,10 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 Quaternion newangle;
                 if (InVR)
                 {
-                    newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0);
+                    if (UseLeftTrigger)
+                    { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
+                    else
+                    { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
                 }
                 else if (!InEditor)//desktop mode
                 {
