@@ -211,7 +211,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public bool PredictDamage = true;
     [Tooltip("Multiply how much damage is done by missiles")]
     public float MissileDamageTakenMultiplier = 1f;
-    [Tooltip("Strength of force that pushes the vehicle when exploding")]
+    [Tooltip("Strength of force that pushes the vehicle when a missile hits it")]
     [SerializeField] private float MissilePushForce = 1f;
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere starts thinning, In meters. 12192 = 40,000~ feet")]
     public float AtmosphereThinningStart = 12192f; //40,000 feet

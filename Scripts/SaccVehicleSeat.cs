@@ -202,7 +202,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
             RequestSerialization();
             if (InVehicle && (!CalibratedY || !CalibratedZ))
             {
-                SendCustomEventDelayedSeconds(nameof(SeatAdjustment), .3f);
+                SendCustomEventDelayedSeconds(nameof(SeatAdjustment), .3f, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
             }
         }
     }
@@ -220,7 +220,10 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     }
     public void SetRecievedSeatPosition()
     {
-        Vector3 newpos = (new Vector3(0, _adjustedPos.x, _adjustedPos.y));
-        Seat.localPosition = newpos;
+        if (Seat)
+        {
+            Vector3 newpos = (new Vector3(0, _adjustedPos.x, _adjustedPos.y));
+            Seat.localPosition = newpos;
+        }
     }
 }

@@ -72,7 +72,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         NumAAMTargets = EntityControl.NumAAMTargets;
         VehicleTransform = EntityControl.transform;
         CenterOfMass = EntityControl.CenterOfMass;
-        OutsidePlaneLayer = LayerMask.NameToLayer("Walkthrough");
+        OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
         GunRecoil *= VehicleRigidbody.mass;
 
         FindSelf();
@@ -208,7 +208,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour HUDControl;
     private Transform CenterOfMass;
     private SaccAirVehicle AAMCurrentTargetSAVControl;
-    private int OutsidePlaneLayer;
+    private int OutsideVehicleLayer;
     [SerializeField] private float MaxTargetDistance = 6000;
     private float AAMLockTimer;
     private int NumAAMTargets;
@@ -255,7 +255,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                                 Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
 
                 if ((LineOfSightNext
-                    && hitnext.collider.gameObject.layer == OutsidePlaneLayer //did raycast hit an object on the layer planes are on?
+                    && hitnext.collider.gameObject.layer == OutsideVehicleLayer //did raycast hit an object on the layer planes are on?
                         && NextTargetAngle < 70//lock angle
                             && NextTargetAngle < AAMCurrentTargetAngle)
                                 && NextTargetDistance < MaxTargetDistance
@@ -298,7 +298,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         RaycastHit hitcurrent;
         bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
         //used to make lock remain for .25 seconds after target is obscured
-        if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsidePlaneLayer)
+        if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsideVehicleLayer)
         { AAMTargetObscuredDelay += DeltaTime; }
         else
         { AAMTargetObscuredDelay = 0; }

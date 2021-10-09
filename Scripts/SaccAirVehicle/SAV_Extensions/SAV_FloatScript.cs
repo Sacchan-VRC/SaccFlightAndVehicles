@@ -50,6 +50,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [SerializeField] private float HoverBikeTurningStrength = 20;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifintg-at-90-degrees extra turning ability")]
     [SerializeField] private float BackThrustStrength = 15;
+    [System.NonSerializedAttribute] public float SurfaceHeight;
     private float[] FloatDepth;
     private float[] FloatDepthLastFrame;
     private float[] FloatLastRayHitHeight;
@@ -133,7 +134,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
             Waves.y = ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f);
         }
         ///if above water, trace down to find water
-        //if touching/in water trace down from diameterx2 above last water height at current xz to find water
+        //if touching/in water trace down from diameter above last water height at current xz to find water
         RaycastHit hit;
         FloatTouchWaterPoint[currentfloatpoint] = FloatLastRayHitHeight[currentfloatpoint] + FloatDiameter + Waves.y;
         if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat.y)
@@ -157,7 +158,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
                 if (Physics.Raycast(checksurface, -Vector3.up, out hit, 14, FloatLayers, QueryTriggerInteraction.Collide))
                 {
                     if (DoOnLand || hit.collider.isTrigger)
-                    { FloatLastRayHitHeight[currentfloatpoint] = hit.point.y; ; }
+                    { SurfaceHeight = FloatLastRayHitHeight[currentfloatpoint] = hit.point.y; }
                 }
                 else
                 {
