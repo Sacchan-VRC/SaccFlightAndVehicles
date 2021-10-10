@@ -33,6 +33,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     private bool Piloting;
     private bool InVR;
     private bool CruiseThrottleOverridden;
+    private Transform ControlsRoot;
     [System.NonSerializedAttribute] public float SetSpeed;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -42,6 +43,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         if (localPlayer != null)
         { InVR = localPlayer.IsUserInVR(); }
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         VehicleTransform = EntityControl.transform;
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
     }
@@ -113,8 +115,8 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                     if (Trigger > 0.75)
                     {
                         //for setting speed in VR
-                        Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                        handpos = VehicleTransform.InverseTransformDirection(handpos);
+                        Vector3 handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                        handpos = ControlsRoot.InverseTransformDirection(handpos);
 
                         //enable and disable
                         if (!TriggerLastFrame)

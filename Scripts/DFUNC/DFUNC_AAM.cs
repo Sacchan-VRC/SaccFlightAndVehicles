@@ -15,6 +15,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     [SerializeField] private float AAMLockTime = 1.5f;
+    [Tooltip("Minimum time between missile launches")]
+    [SerializeField] private float AAMLaunchDelay = 0.5f;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 10;
     [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
@@ -49,7 +51,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private bool AAMLocked = false;
     private bool TriggerLastFrame = false;
     private float AAMLastFiredTime = 0;
-    private float AAMLaunchDelay = 0.5f;
     private int AAMS_STRING;
     private float FullAAMsDivider;
     private int AAMLAUNCHED_STRING;

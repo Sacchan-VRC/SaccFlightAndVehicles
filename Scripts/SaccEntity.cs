@@ -29,6 +29,8 @@ public class SaccEntity : UdonSharpBehaviour
     [SerializeField] private AudioSource SwitchFunctionSound;
     [SerializeField] private Transform LStickDisplayHighlighter;
     [SerializeField] private Transform RStickDisplayHighlighter;
+    [Tooltip("Any objects in this list get set inactive after 10 seconds, used to disable AAMTarget object for vehicles that should never be targetable but that should be in the targets list for the camera etc")]
+    public GameObject[] DisableAfter10Seconds;
     [System.NonSerializedAttribute] public bool InEditor = true;
     private VRCPlayerApi localPlayer;
     [System.NonSerializedAttribute] public bool Piloting;
@@ -168,8 +170,9 @@ public class SaccEntity : UdonSharpBehaviour
                 RStickCheckAngle.y = angle.z;
             }
         }
+        SendCustomEventDelayedSeconds(nameof(Disable10), 10);
 
-        //if in edit mode without cyanemu
+        //if in editor play mode without cyanemu
         if (InEditor)
         {
             PilotEnterVehicleLocal();
@@ -550,6 +553,13 @@ public class SaccEntity : UdonSharpBehaviour
                     Targets[j] = k;
                 }
             }
+        }
+    }
+    private void Disable10()
+    {
+        foreach (GameObject obj in DisableAfter10Seconds)
+        {
+            obj.SetActive(false);
         }
     }
     public void TellDFUNCsLR()

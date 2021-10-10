@@ -84,9 +84,9 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void SFEXT_O_OnPlayerJoined()
     {
         if (CanopyBroken)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyBreakOff"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyBreakOff)); }
         else if (!CanopyOpen)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyClosing)); }
     }
     public void SFEXT_O_RespawnButton()
     {
@@ -100,9 +100,9 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     }
     public void SFEXT_G_ReSupply()
     {
-        if ((float)SAVControl.GetProgramVariable("Health") == (float)SAVControl.GetProgramVariable("FullHealth"))
+        if (CanopyBroken)
         {
-            if (CanopyBroken)
+            if ((float)SAVControl.GetProgramVariable("Health") == (float)SAVControl.GetProgramVariable("FullHealth"))
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RepairCanopy));
             }
@@ -142,11 +142,11 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         {
             if (CanopyCanBreakOff && (float)SAVControl.GetProgramVariable("AirSpeed") > CanopyBreakSpeed)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyBreakOff");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyBreakOff));
             }
             else if ((float)SAVControl.GetProgramVariable("AirSpeed") > CanopyAutoCloseSpeed && (Time.time - LastCanopyToggleTime) > CanopyCloseTime + .1f)//.1f is extra delay to match the animator because it's using write defaults off
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyClosing));
             }
         }
     }
@@ -233,11 +233,11 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         {
             if (CanopyOpen)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyClosing");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyClosing));
             }
             else
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "CanopyOpening");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CanopyOpening));
             }
         }
     }

@@ -10,7 +10,7 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private float VTOLDefault;
-    private Transform VehicleTransform;
+    private Transform ControlsRoot;
     private VRCPlayerApi localPlayer;
     private bool TriggerLastFrame;
     private float VTOLTemp;
@@ -21,7 +21,7 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
     public void SFEXT_L_EntityStart()
     {
         VTOLDefault = (float)SAVControl.GetProgramVariable("VTOLDefaultValue");
-        VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Transform>();
+        ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         localPlayer = Networking.LocalPlayer;
         ThrottleSensitivity = (float)SAVControl.GetProgramVariable("ThrottleSensitivity");
         SAVControl.SetProgramVariable("VTOLenabled", true);
@@ -49,8 +49,8 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
         if (Trigger > 0.75)
         {
-            Vector3 handpos = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-            handpos = VehicleTransform.InverseTransformDirection(handpos);
+            Vector3 handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+            handpos = ControlsRoot.InverseTransformDirection(handpos);
 
             if (!TriggerLastFrame)
             {

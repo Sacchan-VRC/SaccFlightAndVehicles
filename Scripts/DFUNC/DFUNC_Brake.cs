@@ -14,7 +14,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     [Tooltip("Because you have to hold the break, and the keyboardcontrols script can only send events, this option is here.")]
     [SerializeField] private KeyCode KeyboardControl = KeyCode.B;
     private bool UseLeftTrigger = false;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] private float BrakeInput;
+    [System.NonSerializedAttribute] private float BrakeInput;
     private Rigidbody VehicleRigidbody;
     private bool HasAirBrake;
     [SerializeField] private float AirbrakeStrength = 4f;

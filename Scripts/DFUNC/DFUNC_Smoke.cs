@@ -27,7 +27,6 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private Transform VehicleTransform;
     private VRCPlayerApi localPlayer;
     private bool TriggerLastFrame;
     private float SmokeHoldTime;
@@ -45,6 +44,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private int NumSmokes;
     private int DialPosition;
     private bool LeftDial;
+    private Transform ControlsRoot;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -52,7 +52,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-        VehicleTransform = EntityControl.transform;
+        ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
         NumSmokes = DisplaySmoke.Length;
         if (NumSmokes > 0) DisplaySmokeNull = false;
@@ -133,8 +133,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                 if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
                 {
                     //you can change smoke colour by holding down the trigger and waving your hand around. x/y/z = r/g/b
-                    Vector3 HandPosSmoke = VehicleTransform.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
-                    HandPosSmoke = VehicleTransform.InverseTransformDirection(HandPosSmoke);
+                    Vector3 HandPosSmoke = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
+                    HandPosSmoke = ControlsRoot.InverseTransformDirection(HandPosSmoke);
                     if (!TriggerLastFrame)
                     {
                         SmokeZeroPoint = HandPosSmoke;

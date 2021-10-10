@@ -132,7 +132,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Taxiing = false;
     [System.NonSerializedAttribute] public bool Floating = false;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
+    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float YawInput;
     [System.NonSerializedAttribute] public bool Piloting = false;
     [System.NonSerializedAttribute] public bool Passenger = false;
     [System.NonSerializedAttribute] public bool InEditor = true;
@@ -418,7 +418,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         ThrottleGrip = LGrip;
                         JoyStickGrip = RGrip;
                     }
-                    //VR Joystick                
+                    //VR Joystick //should be improved/modularized
                     if (JoyStickGrip > 0.75)
                     {
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
@@ -543,7 +543,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         float TaxiingStillMulti = 1;
                         if (DisallowTaxiRotationWhileStill)
                         { TaxiingStillMulti = Mathf.Min(Speed * TaxiFullTurningSpeedDivider, 1); }
-                        Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
+                        Taxiinglerper = Mathf.Lerp(Taxiinglerper, YawInput * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
                         VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
 
                         StillWindMulti = Mathf.Min(Speed * .1f, 1);
@@ -618,13 +618,12 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                     }
                     if (JoystickOverridden > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
                     {
-                        RotationInputs = JoystickOverride;
+                        YawInput = JoystickOverride.z;
                     }
                     else//joystick override disabled, player has control
                     {
                         if (!InVR)
                         {
-                            //allow stick flight in desktop mode
                             Vector2 LStickPos = new Vector2(0, 0);
                             Vector2 RStickPos = new Vector2(0, 0);
                             if (!InEditor)
@@ -652,13 +651,15 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                             }
                         }
 
-                        RotationInputs.x = Mathf.Clamp(VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
-                        RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits;
+                        /*                         RotationInputs.x = Mathf.Clamp(VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
+                                                RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits; */
                         //roll isn't subject to flight limits
-                        RotationInputs.z = Mathf.Clamp(((VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
+                        YawInput = Mathf.Clamp(((VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
                     }
-
-                    yaw = Mathf.Clamp(-RotationInputs.y, -1, 1) * YawStrength;
+                    if (JoystickGripLastFrame)
+                    { yaw = Mathf.Clamp(-YawInput, -1, 1) * YawStrength; }
+                    else
+                    { yaw = Mathf.MoveTowards(yaw, 0, .3f); }
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
                     if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
                     {
@@ -1049,7 +1050,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         //zero control values
         yaw = 0;
         LerpedYaw = 0;
-        RotationInputs = Vector3.zero;
+        YawInput = 0;
         ThrottleInput = 0;
         //reset everything
         Piloting = false;
