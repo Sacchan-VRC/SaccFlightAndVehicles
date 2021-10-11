@@ -21,7 +21,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private bool vapor;
     private float Gs_trail = 1000;//ensures trails wont emit at first frame
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
-    [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
+    [System.NonSerializedAttribute] public float DoEffects = 999f;//don't do effects before initialized
     private float brake;
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
@@ -52,7 +52,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private int RESUPPLY_STRING = Animator.StringToHash("resupply");
     [SerializeField] private bool PrintAnimHashNamesOnStart;
 
-    private void Start()
+    public void SFEXT_L_EntityStart()
     {
         FullHealthDivider = 1f / (float)SAVControl.GetProgramVariable("Health");
         HasTrails = Trails.Length > 0;
@@ -67,6 +67,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
 
         if (PrintAnimHashNamesOnStart)
         { PrintStringHashes(); }
+        DoEffects = 6f;
     }
     private void Update()
     {

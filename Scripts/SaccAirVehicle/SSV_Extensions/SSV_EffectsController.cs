@@ -15,7 +15,7 @@ public class SSV_EffectsController : UdonSharpBehaviour
     [SerializeField] private Transform[] FlatWaterEffects;
     [SerializeField] private UdonSharpBehaviour FloatScript;
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
-    [System.NonSerializedAttribute] public float DoEffects = 6f; //4 seconds before sleep so late joiners see effects if someone is already piloting
+    [System.NonSerializedAttribute] public float DoEffects = 999f;//don't do effects before initialized
     private float brake;
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
@@ -39,7 +39,7 @@ public class SSV_EffectsController : UdonSharpBehaviour
     private int RESUPPLY_STRING = Animator.StringToHash("resupply");
     [SerializeField] private bool PrintAnimHashNamesOnStart;
 
-    private void Start()
+    public void SFEXT_L_EntityStart()
     {
         FullHealthDivider = 1f / (float)SSVControl.GetProgramVariable("Health");
 
@@ -53,6 +53,7 @@ public class SSV_EffectsController : UdonSharpBehaviour
 
         if (PrintAnimHashNamesOnStart)
         { PrintStringHashes(); }
+        DoEffects = 6;
     }
     private void Update()
     {

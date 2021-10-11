@@ -73,6 +73,7 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool InVehicle = false;
     [System.NonSerializedAttribute] public bool InVR = false;
     private bool IsOwner;
+    private bool Initialized;
 
     //old Leavebutton Stuff
     [System.NonSerializedAttribute] public int PilotSeat = -1;
@@ -87,6 +88,7 @@ public class SaccEntity : UdonSharpBehaviour
     //end of old Leavebutton stuff
     private void Start()
     {
+        Initialized = true;
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         {
@@ -445,8 +447,6 @@ public class SaccEntity : UdonSharpBehaviour
     { SendEventToExtensions("SFEXT_G_GenericEvent9"); }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
-        //Owner sends events to sync the vehicle so late joiners don't see it flying with it's canopy open and stuff
-        //only change things that aren't in the default state
         if (IsOwner)
         { SendEventToExtensions("SFEXT_O_OnPlayerJoined"); }
     }
@@ -590,6 +590,7 @@ public class SaccEntity : UdonSharpBehaviour
     [RecursiveMethod]
     public void SendEventToExtensions(string eventname)
     {
+        if (!Initialized) { return; }
         foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
         {
             if (EXT)

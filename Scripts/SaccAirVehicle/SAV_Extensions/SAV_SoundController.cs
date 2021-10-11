@@ -96,7 +96,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float SonicBoomWave = 0f;
     [System.NonSerializedAttribute] public float SonicBoomDistance = -1f;
     private int dopplecounter;
-    [System.NonSerializedAttribute] public float DoSound = 20;//15 seconds before idle so late joiners have time to sync before going idle
+    [System.NonSerializedAttribute] public float DoSound = 999;//don't do sound before initialized
     [System.NonSerializedAttribute] public bool silent;
     private int silentint = 0;
     [System.NonSerializedAttribute] public bool soundsoff;
@@ -113,12 +113,8 @@ public class SAV_SoundController : UdonSharpBehaviour
     private bool InVehicle;
     private int DoorsOpen = 0;
     private bool InWater;
-    private bool Initiatlized;
-    private void SFEXT_L_EntityStart()
+    public void SFEXT_L_EntityStart()
     {
-        if (Initiatlized) { return; }
-        Initiatlized = true;
-
         MissileHitNULL = MissileHit.Length < 1;
         PlaneIdleNull = PlaneIdle.Length < 1;
         ThrustNull = Thrust.Length < 1;
@@ -189,11 +185,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             DopplerSounds_InitialVolumes[x] = DopplerSounds_TargetVolumes[x] = DopplerSounds[x].volume;
         }
-    }
-    private void Start()
-    {
-        if (!Initiatlized)
-        { SFEXT_L_EntityStart(); }
+        DoSound = 20;
     }
     private void Update()
     {
