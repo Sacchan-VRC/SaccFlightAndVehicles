@@ -14,14 +14,14 @@ public class SAV_AAMController : UdonSharpBehaviour
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
     [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("Strength of the effect of countermeasures on the missile")]
-    [SerializeField] private float FlareEffect = 1;
+    [SerializeField] private float FlareEffect = 10;
     [Tooltip("Name of integer to +1 on the target plane while chasing it")]
     [SerializeField] private string AnimINTName = "missilesincoming";
     [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from collider with own plane")]
     [SerializeField] private float ColliderActiveDistance = 45;
-    [Tooltip("Maximum speed missile can rotate")]
+    [Tooltip("Speed missile can rotate in degrees per second")]
     [SerializeField] private float RotSpeed = 400;
     [Tooltip("If target vehicle has afterburner on, multiply rotation speed by this value")]
     [SerializeField] private float AfterBurnerTrackMulti = 2f;
@@ -30,7 +30,15 @@ public class SAV_AAMController : UdonSharpBehaviour
     [Tooltip("When passing target, if within this range, explode")]
     [SerializeField] private float ProximityExplodeDistance = 20;
     [Tooltip("Lockhack stops the missile from being able to stop tracking before a certain amount of time has passed for people who didn't fire it. It ensures the missile tracks its target in cases where the firer's position is desynced badly. Very necessary when using VRC_ObjectSync.")]
-    [SerializeField] private float LockHackTime = .2f;
+    [SerializeField] private float LockHackTime = .1f;
+    [Tooltip("How long after launch the missile should start tracking")]
+    [SerializeField] private float FlyStraightTime = .3f;
+    [Tooltip("Strength of the forces applied to the sides of the missiles as it drifts through the air when it turns")]
+    [SerializeField] private float AirPhysicsStrength = .8f;
+    [Tooltip("Missile predicts movement of target and tries to intercept rather than flying towards targets current position")]
+    [SerializeField] private bool PredictiveChase = true;
+    [Tooltip("Sensitivity of the missile to notching effect 0 = disabled, 1 = always notch")]
+    [SerializeField] private float NotchLimit = 0;
     private UdonSharpBehaviour TargetSAVControl;
     private Animator TargetAnimator;
     SaccEntity TargetEntityControl;
@@ -53,6 +61,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool InEditor;
     private bool Initialized = false;
     private bool HitTarget = false;
+    private bool StartTrack = false;
+    private ConstantForce MissileConstant;
     void Start()
     {
         //whatever script is launching the missiles must contain all of these variables
@@ -64,7 +74,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
         VehicleCenterOfMass = (Transform)AAMLauncherControl.GetProgramVariable("CenterOfMass");
 
-
+        MissileConstant = GetComponent<ConstantForce>();
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
         Target = AAMTargets[aamtarg].transform;
@@ -102,9 +112,19 @@ public class SAV_AAMController : UdonSharpBehaviour
         }
         Initialized = true;
         SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+        SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
+    }
+    public void StartTracking()
+    {
+        StartTrack = true;
     }
     void FixedUpdate()
     {
+        float sidespeed = Vector3.Dot(MissileRigid.velocity, transform.right);
+        float downspeed = Vector3.Dot(MissileRigid.velocity, transform.up);
+        float ConstantRelativeForce = MissileConstant.relativeForce.z;
+        Vector3 NewConstantRelativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, ConstantRelativeForce);
+        MissileConstant.relativeForce = NewConstantRelativeForce;
         float DeltaTime = Time.fixedDeltaTime;
         if (!ColliderActive && Initialized)
         {
@@ -114,16 +134,19 @@ public class SAV_AAMController : UdonSharpBehaviour
                 ColliderActive = true;
             }
         }
-        if (!TargetLost)
+        if (!TargetLost && StartTrack)
         {
             Vector3 Position = transform.position;
             Vector3 TargetPos = Target.position;
             float TargetDistance = Vector3.Distance(Position, TargetPos);
             float EngineTrack;
             bool Dumb;
+            Vector3 Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
+            TargetPosLastFrame = TargetPos;
             if (TargetSAVControl)
             {
-                Dumb = Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect;//if there are flares active, there's a chance it will not track per frame.
+                Dumb = Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect//if there are flares active, there's a chance it will not track per frame.
+                    || Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, (transform.position - TargetPos).normalized)) < NotchLimit;//if the target is traveling perpendicular to the direction the missile is looking at it from, it is 'notching' the missile
                 EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle
             }
             else
@@ -136,14 +159,26 @@ public class SAV_AAMController : UdonSharpBehaviour
             {
                 if ((!Dumb && TargetDistance < TargDistlastframe) || LockHack)
                 {
+                    Vector3 missileToTargetVector;
+                    if (PredictiveChase)
+                    {
+                        float timetotarget = Mathf.Min(TargetDistance / Mathf.Max(((TargDistlastframe - TargetDistance) / DeltaTime), 0.001f), 3);//ensure no division by 0
+                        Vector3 TargetPredictedPos = TargetPos + ((Targetmovedir * timetotarget));
+                        missileToTargetVector = TargetPredictedPos - Position;
+                    }
+                    else
+                    {
+                        missileToTargetVector = TargetPos - Position;
+                    }
                     UnlockTime = 0;
                     //turn towards the target
-                    Vector3 missileToTargetVector = TargetPos - Position;
-                    var missileForward = transform.forward;
-                    var targetDirection = missileToTargetVector.normalized;
-                    var rotationAxis = Vector3.Cross(missileForward, targetDirection);
-                    var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-                    transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * EngineTrack * DeltaTime, deltaAngle), Space.World);
+                    Vector3 TargetDirNormalized = missileToTargetVector.normalized * 1.2f;
+                    Vector3 MissileVelNormalized = MissileRigid.velocity.normalized;
+                    Vector3 MissileForward = transform.forward;
+                    Vector3 targetDirection = TargetDirNormalized - MissileVelNormalized;
+                    Vector3 RotationAxis = Vector3.Cross(MissileForward, targetDirection);
+                    float deltaAngle = Vector3.Angle(MissileForward, targetDirection);
+                    transform.Rotate(RotationAxis, Mathf.Min(RotSpeed * EngineTrack * DeltaTime, deltaAngle), Space.World);
                 }
                 else
                 {
@@ -151,7 +186,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                     {
                         Explode();
                     }
-                    UnlockTime += Time.deltaTime;
+                    UnlockTime += DeltaTime;
                 }
             }
             else
@@ -188,6 +223,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                 if (TargetEntity)
                 {
                     TargetEntity.SendEventToExtensions("SFEXT_L_MissileHit100");
+                    //Debug.Log("DIRECTHIT");
                 }
             }
             Explode();
@@ -230,6 +266,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         {
             if (DamageDist < 1 && !HitTarget)
             {
+                //Debug.Log(string.Concat("TARGETDIST: ", Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position).ToString()));
                 if (DamageDist > .66666f)
                 {
                     TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit25");

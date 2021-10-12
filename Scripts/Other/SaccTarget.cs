@@ -35,9 +35,9 @@ public class SaccTarget : UdonSharpBehaviour
     {
         if (other == null) return;
         if (HitPoints <= DamageFromCollision)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode)); }
+        { Explode(); }
         else
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TargetTakeDamageCollision)); }
+        { TargetTakeDamageCollision(); }
     }
     public void TargetTakeDamage()
     { HitPoints -= DamageFromBullet; }

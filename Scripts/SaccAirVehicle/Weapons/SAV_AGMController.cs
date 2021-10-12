@@ -14,7 +14,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
     [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("AGM will fly straight for this many seconds before it starts homing in on target")]
-    [SerializeField] private float FlyStraightTime = 0;
+    [SerializeField] private float FlyStraightTime = .3f;
     [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from colliding with own plane")]
@@ -23,6 +23,9 @@ public class SAV_AGMController : UdonSharpBehaviour
     [SerializeField] private float LockAngle = 90;
     [Tooltip("Maximum speed missile can rotate")]
     [SerializeField] private float RotSpeed = 15;
+    [Tooltip("Strength of the forces applied to the sides of the missiles as it drifts through the air when it turns")]
+    [SerializeField] private float AirPhysicsStrength = 3f;
+    private bool StartTrack = false;
     private Transform VehicleCenterOfMass;
     private Vector3 Target;
     private bool ColliderActive = false;
@@ -30,23 +33,28 @@ public class SAV_AGMController : UdonSharpBehaviour
     private bool IsOwner = false;
     private CapsuleCollider AGMCollider;
     private Rigidbody AGMRigid;
-    private float StartHomingTime;
+    private ConstantForce MissileConstant;
     private void Start()
     {
         VehicleCenterOfMass = EntityControl.CenterOfMass;
         Target = (Vector3)AGMLauncherControl.GetProgramVariable("AGMTarget");
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
         AGMRigid = gameObject.GetComponent<Rigidbody>();
+        MissileConstant = GetComponent<ConstantForce>();
 
         if (EntityControl.InEditor) { IsOwner = true; }
         else
         { IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner"); }
-        if (FlyStraightTime > 0)
-        { StartHomingTime = Time.time + FlyStraightTime; }
         SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+        SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
     }
     void LateUpdate()
     {
+        float sidespeed = Vector3.Dot(AGMRigid.velocity, transform.right);
+        float downspeed = Vector3.Dot(AGMRigid.velocity, transform.up);
+        float ConstantRelativeForce = MissileConstant.relativeForce.z;
+        Vector3 NewConstantRelativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, ConstantRelativeForce);
+        MissileConstant.relativeForce = NewConstantRelativeForce;
         float DeltaTime = Time.deltaTime;
         if (!ColliderActive)
         {
@@ -56,16 +64,20 @@ public class SAV_AGMController : UdonSharpBehaviour
                 ColliderActive = true;
             }
         }
-        if (Time.time > StartHomingTime && Vector3.Angle(transform.forward, (Target - transform.position)) < LockAngle)
+        if (StartTrack && Vector3.Angle(transform.forward, (Target - transform.position)) < LockAngle)
         {
-            var missileToTargetVector = Target - transform.position;
-            var missileForward = transform.forward;
-            var targetDirection = missileToTargetVector.normalized;
-            var rotationAxis = Vector3.Cross(missileForward, targetDirection);
-            var deltaAngle = Vector3.Angle(missileForward, targetDirection);
-            transform.Rotate(rotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
+            Vector3 missileToTargetVector = Target - transform.position;
+            Vector3 TargetDirNormalized = missileToTargetVector.normalized * 1.2f;
+            Vector3 MissileVelNormalized = AGMRigid.velocity.normalized;
+            Vector3 MissileForward = transform.forward;
+            Vector3 targetDirection = TargetDirNormalized - MissileVelNormalized;
+            Vector3 RotationAxis = Vector3.Cross(MissileForward, targetDirection);
+            float deltaAngle = Vector3.Angle(MissileForward, targetDirection);
+            transform.Rotate(RotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
         }
     }
+    public void StartTracking()
+    { StartTrack = true; }
     public void LifeTimeExplode()
     { if (!Exploding) { Explode(); } }
     public void DestroySelf()

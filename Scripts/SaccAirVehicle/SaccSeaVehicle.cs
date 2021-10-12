@@ -132,6 +132,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Taxiing = false;
     [System.NonSerializedAttribute] public bool Floating = false;
+    [System.NonSerializedAttribute] public Vector3 RotationInputs;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float YawInput;
     [System.NonSerializedAttribute] public bool Piloting = false;
     [System.NonSerializedAttribute] public bool Passenger = false;
@@ -378,15 +379,9 @@ public class SaccSeaVehicle : UdonSharpBehaviour
 
                 if (DisablePhysicsAndInputs == 0)
                 {
-                    //collect inputs
-                    int Wi = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
-                    int Si = Input.GetKey(KeyCode.S) ? -1 : 0;
+                    //collect inputs//inputs as ints
                     int Ai = Input.GetKey(KeyCode.A) ? -1 : 0;
                     int Di = Input.GetKey(KeyCode.D) ? 1 : 0;
-                    int Qi = Input.GetKey(KeyCode.Q) ? -1 : 0;
-                    int Ei = Input.GetKey(KeyCode.E) ? 1 : 0;
-                    int upi = Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
-                    int downi = Input.GetKey(KeyCode.DownArrow) ? -1 : 0;
                     int lefti = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
                     int righti = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
                     bool Shift = Input.GetKey(KeyCode.LeftShift);
@@ -656,10 +651,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         //roll isn't subject to flight limits
                         YawInput = Mathf.Clamp(((VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
                     }
-                    if (JoystickGripLastFrame)
-                    { yaw = Mathf.Clamp(-YawInput, -1, 1) * YawStrength; }
-                    else
-                    { yaw = Mathf.MoveTowards(yaw, 0, .3f); }
+                    yaw = Mathf.Clamp(YawInput, -1, 1) * YawStrength;
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
                     if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
                     {
@@ -724,6 +716,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                                                              //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
                                                              //AirSpeed = AirVel.magnitude;
         }
+        RotationInputs.y = YawInput;
     }
     private void FixedUpdate()
     {

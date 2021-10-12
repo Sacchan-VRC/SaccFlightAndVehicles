@@ -132,7 +132,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
     }
     private void Update()
     {
-        Debug.Log(BrakeStrength);
         float DeltaTime = Time.deltaTime;
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
