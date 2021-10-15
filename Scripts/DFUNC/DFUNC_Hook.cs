@@ -26,11 +26,9 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [System.NonSerializedAttribute] private float HookedTime = 0f;
     private Vector3 HookedLoc;
     private Transform VehicleTransform;
-    private int HOOKED_STRING = Animator.StringToHash("hooked");
     private Animator VehicleAnimator;
     private Rigidbody VehicleRigidbody;
     [System.NonSerializedAttribute] private bool HookDown = false;
-    private int HOOKDOWN_STRING = Animator.StringToHash("hookdown");
     private bool DisableGroundBrake;
     private bool func_active;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -123,7 +121,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
                 HookedLoc = VehicleTransform.position;
                 Hooked = true;
                 HookedTime = Time.time;
-                VehicleAnimator.SetTrigger(HOOKED_STRING);
+                VehicleAnimator.SetTrigger("hooked");
             }
         }
         //slow down if hooked and on the ground
@@ -184,7 +182,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     public void SetHookDown()
     {
         HookDown = true;
-        VehicleAnimator.SetBool(HOOKDOWN_STRING, true);
+        VehicleAnimator.SetBool("hookdown", true);
 
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
@@ -194,7 +192,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     public void SetHookUp()
     {
         HookDown = false;
-        VehicleAnimator.SetBool(HOOKDOWN_STRING, false);
+        VehicleAnimator.SetBool("hookdown", false);
         Hooked = false;
 
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))

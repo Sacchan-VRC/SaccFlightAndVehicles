@@ -28,7 +28,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private bool InVR;
     private bool InEditor = true;
-    private int OCCUPIED_STRING = Animator.StringToHash("occupied");
+    //animator strings that are sent every frame are converted to int for optimization
     private int PITCHINPUT_STRING = Animator.StringToHash("pitchinput");
     private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
     private int ROLLINPUT_STRING = Animator.StringToHash("rollinput");
@@ -39,17 +39,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private int AOA_STRING = Animator.StringToHash("AoA");
     private int MACH10_STRING = Animator.StringToHash("mach10");
     private int GS_STRING = Animator.StringToHash("Gs");
-    private int EXPLODE_STRING = Animator.StringToHash("explode");
-    private int MISSILESINCOMING_STRING = Animator.StringToHash("missilesincoming");
-    private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
-    private int LOCALPASSENGER_STRING = Animator.StringToHash("localpassenger");
-    private int BULLETHIT_STRING = Animator.StringToHash("bullethit");
-    private int ONGROUND_STRING = Animator.StringToHash("onground");
-    private int ONWATER_STRING = Animator.StringToHash("onwater");
-    private int LOCKEDAAM_STRING = Animator.StringToHash("locked_aam");
-    private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
-    private int REAPPEAR_STRING = Animator.StringToHash("reappear");
-    private int RESUPPLY_STRING = Animator.StringToHash("resupply");
     [SerializeField] private bool PrintAnimHashNamesOnStart;
 
     public void SFEXT_L_EntityStart()
@@ -61,7 +50,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         {
-            VehicleAnimator.SetBool(OCCUPIED_STRING, true);
+            VehicleAnimator.SetBool("occupied", true);
         }
         else { InEditor = false; }
 
@@ -152,53 +141,53 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_PilotExit()
     {
-        VehicleAnimator.SetBool(OCCUPIED_STRING, false);
-        VehicleAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
+        VehicleAnimator.SetBool("occupied", false);
+        VehicleAnimator.SetInteger("missilesincoming", 0);
     }
     public void SFEXT_G_PilotEnter()
     {
         DoEffects = 0f;
-        VehicleAnimator.SetBool(OCCUPIED_STRING, true);
+        VehicleAnimator.SetBool("occupied", true);
     }
     public void SFEXT_O_PilotEnter()
     {
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
-        VehicleAnimator.SetBool(LOCALPILOT_STRING, true);
+        VehicleAnimator.SetBool("localpilot", true);
     }
     public void SFEXT_O_PilotExit()
     {
-        VehicleAnimator.SetBool(LOCALPILOT_STRING, false);
+        VehicleAnimator.SetBool("localpilot", false);
     }
     public void SFEXT_P_PassengerEnter()
     {
-        VehicleAnimator.SetBool(LOCALPASSENGER_STRING, true);
+        VehicleAnimator.SetBool("localpassenger", true);
     }
     public void SFEXT_P_PassengerExit()
     {
-        VehicleAnimator.SetBool(LOCALPASSENGER_STRING, false);
-        VehicleAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
+        VehicleAnimator.SetBool("localpassenger", false);
+        VehicleAnimator.SetInteger("missilesincoming", 0);
     }
     public void SFEXT_G_ReAppear()
     {
         DoEffects = 6f; //wake up if was asleep
-        VehicleAnimator.SetTrigger(REAPPEAR_STRING);
+        VehicleAnimator.SetTrigger("reappear");
     }
     public void SFEXT_G_AfterburnerOn()
     {
-        VehicleAnimator.SetBool(AFTERBURNERON_STRING, true);
+        VehicleAnimator.SetBool("afterburneron", true);
     }
     public void SFEXT_G_AfterburnerOff()
     {
-        VehicleAnimator.SetBool(AFTERBURNERON_STRING, false);
+        VehicleAnimator.SetBool("afterburneron", false);
     }
     public void SFEXT_G_ReSupply()
     {
-        VehicleAnimator.SetTrigger(RESUPPLY_STRING);
+        VehicleAnimator.SetTrigger("resupply");
     }
     public void SFEXT_G_BulletHit()
     {
         WakeUp();
-        VehicleAnimator.SetTrigger(BULLETHIT_STRING);
+        VehicleAnimator.SetTrigger("bullethit");
     }
     public void WakeUp()
     {
@@ -210,16 +199,16 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_TakeOff()
     {
-        VehicleAnimator.SetBool(ONGROUND_STRING, false);
-        VehicleAnimator.SetBool(ONWATER_STRING, false);
+        VehicleAnimator.SetBool("onground", false);
+        VehicleAnimator.SetBool("onwater", false);
     }
     public void SFEXT_G_TouchDown()
     {
-        VehicleAnimator.SetBool(ONGROUND_STRING, true);
+        VehicleAnimator.SetBool("onground", true);
     }
     public void SFEXT_G_TouchDownWater()
     {
-        VehicleAnimator.SetBool(ONWATER_STRING, true);
+        VehicleAnimator.SetBool("onwater", true);
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -227,14 +216,14 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_Explode()//old EffectsExplode()
     {
-        VehicleAnimator.SetTrigger(EXPLODE_STRING);
-        VehicleAnimator.SetInteger(MISSILESINCOMING_STRING, 0);
+        VehicleAnimator.SetTrigger("explode");
+        VehicleAnimator.SetInteger("missilesincoming", 0);
         VehicleAnimator.SetFloat(PITCHINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(ROLLINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
         VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);
-        if (!InEditor) { VehicleAnimator.SetBool(OCCUPIED_STRING, false); }
+        if (!InEditor) { VehicleAnimator.SetBool("occupied", false); }
         DoEffects = 0f;//keep awake
     }
     public void SFEXT_L_AAMTargeted()//sent locally by the person who's locking onto this plane
@@ -245,11 +234,10 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public void PlayLockedAAM()
     {
         if ((bool)SAVControl.GetProgramVariable("Piloting") || (bool)SAVControl.GetProgramVariable("Passenger"))
-        { VehicleAnimator.SetTrigger(LOCKEDAAM_STRING); }
+        { VehicleAnimator.SetTrigger("locked_aam"); }
     }
     private void PrintStringHashes()
     {
-        Debug.Log(string.Concat("OCCUPIED_STRING : ", OCCUPIED_STRING));
         Debug.Log(string.Concat("PITCHINPUT_STRING : ", PITCHINPUT_STRING));
         Debug.Log(string.Concat("YAWINPUT_STRING : ", YAWINPUT_STRING));
         Debug.Log(string.Concat("ROLLINPUT_STRING : ", ROLLINPUT_STRING));
@@ -260,16 +248,5 @@ public class SAV_EffectsController : UdonSharpBehaviour
         Debug.Log(string.Concat("AOA_STRING : ", AOA_STRING));
         Debug.Log(string.Concat("MACH10_STRING : ", MACH10_STRING));
         Debug.Log(string.Concat("GS_STRING : ", GS_STRING));
-        Debug.Log(string.Concat("EXPLODE_STRING : ", EXPLODE_STRING));
-        Debug.Log(string.Concat("MISSILESINCOMING_STRING : ", MISSILESINCOMING_STRING));
-        Debug.Log(string.Concat("LOCALPILOT_STRING : ", LOCALPILOT_STRING));
-        Debug.Log(string.Concat("LOCALPASSENGER_STRING : ", LOCALPASSENGER_STRING));
-        Debug.Log(string.Concat("BULLETHIT_STRING : ", BULLETHIT_STRING));
-        Debug.Log(string.Concat("ONGROUND_STRING : ", ONGROUND_STRING));
-        Debug.Log(string.Concat("ONWATER_STRING : ", ONWATER_STRING));
-        Debug.Log(string.Concat("LOCKEDAAM_STRING : ", LOCKEDAAM_STRING));
-        Debug.Log(string.Concat("AFTERBURNERON_STRING : ", AFTERBURNERON_STRING));
-        Debug.Log(string.Concat("REAPPEAR_STRING : ", REAPPEAR_STRING));
-        Debug.Log(string.Concat("RESUPPLY_STRING : ", RESUPPLY_STRING));
     }
 }

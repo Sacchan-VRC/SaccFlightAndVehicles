@@ -23,13 +23,16 @@ public class SAV_AAMController : UdonSharpBehaviour
     [SerializeField] private float ColliderActiveDistance = 45;
     [Tooltip("Speed missile can rotate in degrees per second")]
     [SerializeField] private float RotSpeed = 400;
+    [Range(1.01f, 2f)]
+    [Tooltip("Amount the target direction vector is extended when calculating missile rotation. Lower number = more aggressive drifting missile, but more likely to oscilate")]
+    [SerializeField] private float TargetVectorExtension = 1.2f;
     [Tooltip("If target vehicle has afterburner on, multiply rotation speed by this value")]
     [SerializeField] private float AfterBurnerTrackMulti = 2f;
     [Tooltip("Missile rotates weaker if target's throttle is low, this value is the throttle at which lowering throttle more doesn't do anything")]
     [SerializeField] private float TargetMinThrottleTrack = .3f;
     [Tooltip("When passing target, if within this range, explode")]
     [SerializeField] private float ProximityExplodeDistance = 20;
-    [Tooltip("Lockhack stops the missile from being able to stop tracking before a certain amount of time has passed for people who didn't fire it. It ensures the missile tracks its target in cases where the firer's position is desynced badly. Very necessary when using VRC_ObjectSync.")]
+    [Tooltip("Lockhack stops the missile from being able to lose lock before a certain amount of time has passed after it starts tracking for people who didn't fire it. It ensures the missile tracks its target in cases where the firer's position is desynced badly. Very necessary when using VRC_ObjectSync.")]
     [SerializeField] private float LockHackTime = .1f;
     [Tooltip("How long after launch the missile should start tracking")]
     [SerializeField] private float FlyStraightTime = .3f;
@@ -37,8 +40,13 @@ public class SAV_AAMController : UdonSharpBehaviour
     [SerializeField] private float AirPhysicsStrength = .8f;
     [Tooltip("Missile predicts movement of target and tries to intercept rather than flying towards targets current position")]
     [SerializeField] private bool PredictiveChase = true;
-    [Tooltip("Sensitivity of the missile to notching effect 0 = disabled, 1 = always notch")]
-    [SerializeField] private float NotchLimit = 0;
+    [Range(0, 90f)]
+    [Tooltip("Closeness in degrees to perpendicular the missile must be to be notched 0 = no notching")]
+    [SerializeField] private float NotchAngle = 0;
+
+    [Range(-90f, 90f)]
+    [Tooltip("Degrees above the missile's horizon at which notching the missile becomes impossible")]
+    [SerializeField] private float NotchHorizon = 5;
     private UdonSharpBehaviour TargetSAVControl;
     private Animator TargetAnimator;
     SaccEntity TargetEntityControl;
@@ -62,6 +70,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool Initialized = false;
     private bool HitTarget = false;
     private bool StartTrack = false;
+    private float NotchHorizonDot;
+    private float NotchLimitDot;
     private ConstantForce MissileConstant;
     void Start()
     {
@@ -78,6 +88,8 @@ public class SAV_AAMController : UdonSharpBehaviour
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
         Target = AAMTargets[aamtarg].transform;
+        NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
+        NotchLimitDot = 1 - Mathf.Cos(NotchAngle * Mathf.Deg2Rad);
         if (!Target)
         {
             TargetLost = true;
@@ -108,7 +120,7 @@ public class SAV_AAMController : UdonSharpBehaviour
             if (InEditor || IsOwner || LockHackTime == 0)
             { LockHack = false; }
             else
-            { SendCustomEventDelayedSeconds(nameof(DisbaleLockHack), LockHackTime); }
+            { SendCustomEventDelayedSeconds(nameof(DisbaleLockHack), FlyStraightTime + LockHackTime); }
         }
         Initialized = true;
         SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
@@ -143,10 +155,18 @@ public class SAV_AAMController : UdonSharpBehaviour
             bool Dumb;
             Vector3 Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
             TargetPosLastFrame = TargetPos;
+            Vector3 targdirection = (TargetPos - transform.position).normalized;
             if (TargetSAVControl)
             {
-                Dumb = Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect//if there are flares active, there's a chance it will not track per frame.
-                    || Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, (transform.position - TargetPos).normalized)) < NotchLimit;//if the target is traveling perpendicular to the direction the missile is looking at it from, it is 'notching' the missile
+                targdirection = (TargetPos - transform.position).normalized;
+                Dumb = //Missile just flies straight if it's confused by flares or notched
+                       //flare effect
+                    Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect//if there are flares active, there's a chance it will not track per frame.
+                    ||
+                    //notching
+                    Vector3.Dot(Vector3.up, targdirection) < NotchHorizonDot
+                    && Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, targdirection)) < NotchLimitDot;//if the target is traveling perpendicular to the direction the missile is looking at it from, it is 'notching' the missile
+
                 EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle
             }
             else
@@ -154,8 +174,8 @@ public class SAV_AAMController : UdonSharpBehaviour
                 EngineTrack = 1;
                 Dumb = false;
             }
-            if (EngineTrack > 1) { EngineTrack *= AfterBurnerTrackMulti; }//if AB on track 2x as well
-            if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
+            if (EngineTrack > 1) { EngineTrack = AfterBurnerTrackMulti; }//if AB on, faster rotation
+            if (Target.gameObject.activeInHierarchy/*  && UnlockTime < .1f */)
             {
                 if ((!Dumb && TargetDistance < TargDistlastframe) || LockHack)
                 {
@@ -172,7 +192,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                     }
                     UnlockTime = 0;
                     //turn towards the target
-                    Vector3 TargetDirNormalized = missileToTargetVector.normalized * 1.2f;
+                    Vector3 TargetDirNormalized = missileToTargetVector.normalized * TargetVectorExtension;
                     Vector3 MissileVelNormalized = MissileRigid.velocity.normalized;
                     Vector3 MissileForward = transform.forward;
                     Vector3 targetDirection = TargetDirNormalized - MissileVelNormalized;

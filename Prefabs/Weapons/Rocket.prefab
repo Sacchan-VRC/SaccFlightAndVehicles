@@ -19737,7 +19737,7 @@ Rigidbody:
   m_GameObject: {fileID: 5130862382244124424}
   serializedVersion: 2
   m_Mass: 1
-  m_Drag: 3
+  m_Drag: 0.15
   m_AngularDrag: 0.7
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -19767,7 +19767,7 @@ ConstantForce:
   m_GameObject: {fileID: 5130862382244124424}
   m_Enabled: 1
   m_Force: {x: 0, y: 0, z: 0}
-  m_RelativeForce: {x: 0, y: 0, z: 2000}
+  m_RelativeForce: {x: 0, y: 0, z: 0}
   m_Torque: {x: 0, y: 0, z: 0}
   m_RelativeTorque: {x: 0, y: 0, z: 0}
 --- !u!95 &5130862382244124429
@@ -19780,7 +19780,7 @@ Animator:
   m_GameObject: {fileID: 5130862382244124424}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: de2faea383bdfce45800b63d959b884d, type: 2}
+  m_Controller: {fileID: 9100000, guid: d0f630b26d7f433468aa2f5730cb8d14, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0

@@ -23,6 +23,10 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     [SerializeField] private float CanopyAutoCloseSpeed = 20;
     [Tooltip("Extra drag applied to vehicle while canopy is open")]
     [SerializeField] private float CanopyDragMulti = 1.2f;
+    [Tooltip("Name of animator boolean that is true when canopy is open")]
+    [SerializeField]private string AnimCanopyBool = "canopyopen";
+    [Tooltip("Name of animator boolean that is true when canopy is broken")]
+    [SerializeField]private string AnimCanopyBroken = "canopybroken";
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
@@ -30,8 +34,6 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private SAV_HUDController HUDControl;
     private bool InVR;
-    private int CANOPYOPEN_STRING = Animator.StringToHash("canopyopen");
-    private int CANOPYBROKEN_STRING = Animator.StringToHash("canopybroken");
     private bool CanopyOpen;
     private bool CanopyBroken;
     private bool Selected;
@@ -95,7 +97,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void SFEXT_G_RespawnButton()
     {
         CanopyBroken = false;
-        CanopyAnimator.SetBool(CANOPYBROKEN_STRING, false);
+        CanopyAnimator.SetBool(AnimCanopyBroken, false);
         if (!CanopyOpen) CanopyOpening();
     }
     public void SFEXT_G_ReSupply()
@@ -111,7 +113,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public void RepairCanopy()
     {
         CanopyBroken = false;
-        CanopyAnimator.SetBool(CANOPYBROKEN_STRING, false);
+        CanopyAnimator.SetBool(AnimCanopyBroken, false);
         if ((bool)SAVControl.GetProgramVariable("IsOwner")) { SendCustomEventDelayedFrames(nameof(SendCanopyRepair), 1); }
     }
     private void Update()
@@ -156,7 +158,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         LastCanopyToggleTime = Time.time;
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         CanopyOpen = true;
-        CanopyAnimator.SetBool(CANOPYOPEN_STRING, true);
+        CanopyAnimator.SetBool(AnimCanopyBool, true);
         SoundControl.SendCustomEvent("DoorOpen");
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
@@ -175,7 +177,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         LastCanopyToggleTime = Time.time;
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         CanopyOpen = false;
-        CanopyAnimator.SetBool(CANOPYOPEN_STRING, false);
+        CanopyAnimator.SetBool(AnimCanopyBool, false);
         CanopyTransitioning = true;
         SoundControl.SendCustomEventDelayedSeconds("DoorClose", CanopyCloseTime);
         SendCustomEventDelayedSeconds("SetCanopyTransitioningFalse", CanopyCloseTime);
@@ -216,7 +218,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         Dial_Funcon.SetActive(true);
         CanopyOpen = true;
         CanopyBroken = true;
-        CanopyAnimator.SetBool(CANOPYBROKEN_STRING, true);
+        CanopyAnimator.SetBool(AnimCanopyBroken, true);
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
             SendCustomEventDelayedFrames(nameof(SendCanopyBreak), 1);

@@ -21,8 +21,6 @@ public class DFUNC_Gear : UdonSharpBehaviour
     private bool IsOwner = false;
     private bool DisableGroundDetector = false;
     [System.NonSerializedAttribute] public int DisableGearToggle = 0;
-    private int GEARUP_STRING = Animator.StringToHash("gearup");
-    private int INSTANTGEARDOWN_STRING = Animator.StringToHash("instantgeardown");
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -70,7 +68,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public void SFEXT_G_RespawnButton()
     {
         SetGearDown();
-        GearAnimator.SetTrigger(INSTANTGEARDOWN_STRING);
+        GearAnimator.SetTrigger("instantgeardown");
     }
     public void KeyboardInput()
     {
@@ -102,7 +100,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         GearUp = true;
-        GearAnimator.SetBool(GEARUP_STRING, true);
+        GearAnimator.SetBool("gearup", true);
         if (DragApplied)
         {
             SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - LandingGearDragMulti);
@@ -124,7 +122,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         }
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         GearUp = false;
-        GearAnimator.SetBool(GEARUP_STRING, false);
+        GearAnimator.SetBool("gearup", false);
         if (!DragApplied)
         {
             SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + LandingGearDragMulti);

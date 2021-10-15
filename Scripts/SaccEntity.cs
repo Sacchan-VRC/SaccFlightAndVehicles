@@ -173,7 +173,6 @@ public class SaccEntity : UdonSharpBehaviour
             }
         }
         SendCustomEventDelayedSeconds(nameof(Disable10), 10);
-
         //if in editor play mode without cyanemu
         if (InEditor)
         {
@@ -555,7 +554,7 @@ public class SaccEntity : UdonSharpBehaviour
             }
         }
     }
-    private void Disable10()
+    public void Disable10()
     {
         foreach (GameObject obj in DisableAfter10Seconds)
         {

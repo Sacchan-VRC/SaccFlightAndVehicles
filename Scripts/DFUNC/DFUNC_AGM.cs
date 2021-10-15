@@ -47,7 +47,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     private float boolToggleTime;
     private bool AnimOn = false;
-    private int AnimBool_STRING;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool AGMLocked;
@@ -70,8 +69,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private Quaternion AGMCamLastFrame;
     private bool func_active;
     private float reloadspeed;
-    private int AGMLAUNCHED_STRING;
-    private int AGMS_STRING;
     private bool LeftDial = false;
     private int DialPosition = -999;
     private bool OthersEnabled;
@@ -87,15 +84,12 @@ public class DFUNC_AGM : UdonSharpBehaviour
         InEditor = localPlayer == null;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
-        AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
+        AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider);
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
 
         FindSelf();
 
         if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
-        AnimBool_STRING = Animator.StringToHash(AnimBoolName);
-        AGMS_STRING = Animator.StringToHash(AnimFloatName);
-        AGMLAUNCHED_STRING = Animator.StringToHash(AnimFiredTriggerName);
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -127,7 +121,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void SFEXT_G_RespawnButton()
     {
         NumAGM = FullAGMs;
-        AGMAnimator.SetFloat(AGMS_STRING, 1);
+        AGMAnimator.SetFloat(AnimFloatName, 1);
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
@@ -136,13 +130,13 @@ public class DFUNC_AGM : UdonSharpBehaviour
         if (NumAGM != FullAGMs)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
-        AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
+        AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider);
         if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
     }
     public void SFEXT_G_Explode()
     {
         NumAGM = FullAGMs;
-        AGMAnimator.SetFloat(AGMS_STRING, 1);
+        AGMAnimator.SetFloat(AnimFloatName, 1);
         if (func_active)
         { DFUNC_Deselected(); }
         if (DoAnimBool && AnimOn)
@@ -248,15 +242,16 @@ public class DFUNC_AGM : UdonSharpBehaviour
                             }
                             else
                             {//didn't find one, lock onto raycast point
-                                Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
-                                //enable for others so they sync the variable
-                                if (AGMLock)
-                                { AGMLock.Play(); }
-                                AGMTarget = lockpoint.point;
-                                AGMLocked = true;
-                                AGMUnlocking = 0;
-                                RequestSerialization();
-                                if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+                                if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore))
+                                {//enable for others so they sync the variable
+                                    if (AGMLock)
+                                    { AGMLock.Play(); }
+                                    AGMTarget = lockpoint.point;
+                                    AGMLocked = true;
+                                    AGMUnlocking = 0;
+                                    RequestSerialization();
+                                    if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+                                }
                             }
                         }
                     }
@@ -344,7 +339,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         if (NumAGM > 0) { NumAGM--; }
         if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
-        AGMAnimator.SetTrigger(AGMLAUNCHED_STRING);
+        AGMAnimator.SetTrigger(AnimFiredTriggerName);
         if (AGM)
         {
             GameObject NewAGM = Object.Instantiate(AGM);
@@ -352,7 +347,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
             NewAGM.SetActive(true);
             NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
-        AGMAnimator.SetFloat(AGMS_STRING, (float)NumAGM * FullAGMsDivider);
+        AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider);
         if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
     }
     private void FindSelf()
@@ -385,13 +380,13 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         boolToggleTime = Time.time;
         AnimOn = true;
-        AGMAnimator.SetBool(AnimBool_STRING, AnimOn);
+        AGMAnimator.SetBool(AnimBoolName, AnimOn);
     }
     public void SetBoolOff()
     {
         boolToggleTime = Time.time;
         AnimOn = false;
-        AGMAnimator.SetBool(AnimBool_STRING, AnimOn);
+        AGMAnimator.SetBool(AnimBoolName, AnimOn);
     }
     public void KeyboardInput()
     {

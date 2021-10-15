@@ -41,7 +41,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     private float boolToggleTime;
     private bool AnimOn = false;
-    private int AnimBool_STRING;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private int FullAAMs;
@@ -51,9 +50,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private bool AAMLocked = false;
     private bool TriggerLastFrame = false;
     private float AAMLastFiredTime = 0;
-    private int AAMS_STRING;
     private float FullAAMsDivider;
-    private int AAMLAUNCHED_STRING;
     public GameObject AAM;
     public Transform AAMLaunchPoint;
     float TimeSinceSerialization;
@@ -83,9 +80,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
         OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
         localPlayer = Networking.LocalPlayer;
 
-        AnimBool_STRING = Animator.StringToHash(AnimBoolName);
-        AAMS_STRING = Animator.StringToHash(AnimFloatName);
-        AAMLAUNCHED_STRING = Animator.StringToHash(AnimFiredTriggerName);
         //HUD
         if (HUDControl)
         {
@@ -135,7 +129,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         NumAAM = FullAAMs;
-        AAMAnimator.SetFloat(AAMS_STRING, 1);
+        AAMAnimator.SetFloat(AnimFloatName, 1);
         if (func_active)
         {
             DFUNC_Deselected();
@@ -148,13 +142,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (NumAAM != FullAAMs)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
-        AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
+        AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider);
         HUDText_AAM_ammo.text = NumAAM.ToString("F0");
     }
     public void SFEXT_G_RespawnButton()
     {
         NumAAM = FullAAMs;
-        AAMAnimator.SetFloat(AAMS_STRING, 1);
+        AAMAnimator.SetFloat(AnimFloatName, 1);
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
@@ -447,7 +441,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         InEditor = (bool)SAVControl.GetProgramVariable("InEditor");
         if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
-        AAMAnimator.SetTrigger(AAMLAUNCHED_STRING);
+        AAMAnimator.SetTrigger(AnimFiredTriggerName);
         if (AAM)
         {
             GameObject NewAAM = Object.Instantiate(AAM);
@@ -455,7 +449,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
-        AAMAnimator.SetFloat(AAMS_STRING, (float)NumAAM * FullAAMsDivider);
+        AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider);
         HUDText_AAM_ammo.text = NumAAM.ToString("F0");
     }
     private void FindSelf()
@@ -487,13 +481,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         boolToggleTime = Time.time;
         AnimOn = true;
-        AAMAnimator.SetBool(AnimBool_STRING, AnimOn);
+        AAMAnimator.SetBool(AnimBoolName, AnimOn);
     }
     public void SetBoolOff()
     {
         boolToggleTime = Time.time;
         AnimOn = false;
-        AAMAnimator.SetBool(AnimBool_STRING, AnimOn);
+        AAMAnimator.SetBool(AnimBoolName, AnimOn);
     }
     public void KeyboardInput()
     {

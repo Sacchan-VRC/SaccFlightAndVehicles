@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: AGM_BoatBurn
+  m_Name: RocketBurn
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -22,7 +22,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 200
+        value: 1100
         inSlope: 0
         outSlope: 0
         tangentMode: 69
@@ -30,18 +30,18 @@ AnimationClip:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 10
-        value: 200
+        time: 1
+        value: 1100
         inSlope: -0
-        outSlope: -12000.184
+        outSlope: -66000.06
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 10.016666
+        time: 1.0166667
         value: 0
-        inSlope: -12000.184
+        inSlope: -66000.06
         outSlope: 0
         tangentMode: 69
         weightedMode: 0
@@ -61,15 +61,15 @@ AnimationClip:
         time: 0
         value: 1
         inSlope: Infinity
-        outSlope: -0.1
+        outSlope: -1
         tangentMode: 69
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 10
+        time: 1
         value: 0
-        inSlope: -0.1
+        inSlope: -1
         outSlope: Infinity
         tangentMode: 69
         weightedMode: 0
@@ -79,35 +79,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Mesh/AGM/Effects/EngineFire
-    classID: 1
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: Infinity
-        outSlope: -0.1
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 10
-        value: 0
-        inSlope: -0.1
-        outSlope: Infinity
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_IsActive
-    path: Mesh/AGM/Effects/Particle System_missileflare
+    path: Mesh/AAM/Effects/Particle System_missileflare
     classID: 1
     script: {fileID: 0}
   - curve:
@@ -123,7 +95,7 @@ AnimationClip:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 10
+        time: 1
         value: 0
         inSlope: Infinity
         outSlope: Infinity
@@ -134,9 +106,9 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: EmissionModule.enabled
-    path: SmokeTrail
-    classID: 198
+    attribute: m_Emitting
+    path: MissileTrail
+    classID: 96
     script: {fileID: 0}
   m_PPtrCurves: []
   m_SampleRate: 60
@@ -154,25 +126,18 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 2195815046
+      path: 934128333
       attribute: 2086281974
       script: {fileID: 0}
       typeID: 1
       customType: 0
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 1273664890
-      attribute: 2086281974
+      path: 1154500409
+      attribute: 1228858774
       script: {fileID: 0}
-      typeID: 1
+      typeID: 96
       customType: 0
-      isPPtrCurve: 0
-    - serializedVersion: 2
-      path: 1900894905
-      attribute: 1087013301
-      script: {fileID: 0}
-      typeID: 198
-      customType: 27
       isPPtrCurve: 0
     pptrCurveMapping: []
   m_AnimationClipSettings:
@@ -180,7 +145,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 10.016666
+    m_StopTime: 1.0166667
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
@@ -201,7 +166,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 200
+        value: 1100
         inSlope: 0
         outSlope: 0
         tangentMode: 69
@@ -209,18 +174,18 @@ AnimationClip:
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 10
-        value: 200
+        time: 1
+        value: 1100
         inSlope: -0
-        outSlope: -12000.184
+        outSlope: -66000.06
         tangentMode: 69
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
       - serializedVersion: 3
-        time: 10.016666
+        time: 1.0166667
         value: 0
-        inSlope: -12000.184
+        inSlope: -66000.06
         outSlope: 0
         tangentMode: 69
         weightedMode: 0
@@ -240,15 +205,15 @@ AnimationClip:
         time: 0
         value: 1
         inSlope: Infinity
-        outSlope: -0.1
+        outSlope: -1
         tangentMode: 69
         weightedMode: 0
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 10
+        time: 1
         value: 0
-        inSlope: -0.1
+        inSlope: -1
         outSlope: Infinity
         tangentMode: 69
         weightedMode: 0
@@ -258,35 +223,7 @@ AnimationClip:
       m_PostInfinity: 2
       m_RotationOrder: 4
     attribute: m_IsActive
-    path: Mesh/AGM/Effects/EngineFire
-    classID: 1
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: Infinity
-        outSlope: -0.1
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 10
-        value: 0
-        inSlope: -0.1
-        outSlope: Infinity
-        tangentMode: 69
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_IsActive
-    path: Mesh/AGM/Effects/Particle System_missileflare
+    path: Mesh/AAM/Effects/Particle System_missileflare
     classID: 1
     script: {fileID: 0}
   - curve:
@@ -302,7 +239,7 @@ AnimationClip:
         inWeight: 0
         outWeight: 0
       - serializedVersion: 3
-        time: 10
+        time: 1
         value: 0
         inSlope: Infinity
         outSlope: Infinity
@@ -313,9 +250,9 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: EmissionModule.enabled
-    path: SmokeTrail
-    classID: 198
+    attribute: m_Emitting
+    path: MissileTrail
+    classID: 96
     script: {fileID: 0}
   m_EulerEditorCurves: []
   m_HasGenericRootTransform: 0

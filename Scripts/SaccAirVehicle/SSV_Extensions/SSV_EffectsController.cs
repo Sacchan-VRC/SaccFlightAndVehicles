@@ -19,24 +19,16 @@ public class SSV_EffectsController : UdonSharpBehaviour
     private float brake;
     private float FullHealthDivider;
     private Vector3 OwnerRotationInputs;
+    private Vector3[] FlatWaterFXLocalSpawnPos;
     private VRCPlayerApi localPlayer;
+    private int FlatWaterEffectsLength;
     private bool InVR;
     private bool InEditor = true;
-    private int OCCUPIED_STRING = Animator.StringToHash("occupied");
     private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
     private int THROTTLE_STRING = Animator.StringToHash("throttle");
     private int ENGINEOUTPUT_STRING = Animator.StringToHash("engineoutput");
     private int HEALTH_STRING = Animator.StringToHash("health");
     private int MACH10_STRING = Animator.StringToHash("mach10");
-    private int EXPLODE_STRING = Animator.StringToHash("explode");
-    private int LOCALPILOT_STRING = Animator.StringToHash("localpilot");
-    private int LOCALPASSENGER_STRING = Animator.StringToHash("localpassenger");
-    private int BULLETHIT_STRING = Animator.StringToHash("bullethit");
-    private int ONGROUND_STRING = Animator.StringToHash("onground");
-    private int ONWATER_STRING = Animator.StringToHash("onwater");
-    private int AFTERBURNERON_STRING = Animator.StringToHash("afterburneron");
-    private int REAPPEAR_STRING = Animator.StringToHash("reappear");
-    private int RESUPPLY_STRING = Animator.StringToHash("resupply");
     [SerializeField] private bool PrintAnimHashNamesOnStart;
 
     public void SFEXT_L_EntityStart()
@@ -47,13 +39,19 @@ public class SSV_EffectsController : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         {
-            VehicleAnimator.SetBool(OCCUPIED_STRING, true);
+            VehicleAnimator.SetBool("occupied", true);
         }
         else { InEditor = false; }
 
         if (PrintAnimHashNamesOnStart)
         { PrintStringHashes(); }
         DoEffects = 6;
+        FlatWaterEffectsLength = FlatWaterEffects.Length;
+        FlatWaterFXLocalSpawnPos = new Vector3[FlatWaterEffects.Length];
+        for (int x = 0; x < FlatWaterEffectsLength; x++)
+        {
+            FlatWaterFXLocalSpawnPos[x] = FlatWaterEffects[x].localPosition;
+        }
     }
     private void Update()
     {
@@ -93,64 +91,65 @@ public class SSV_EffectsController : UdonSharpBehaviour
 
         float watersurface = (float)FloatScript.GetProgramVariable("SurfaceHeight") + .02f;
 
-        foreach (Transform trns in FlatWaterEffects)
+        for (int x = 0; x < FlatWaterEffectsLength; x++)
         {
-            Vector3 pos = trns.position;
+            FlatWaterEffects[x].localPosition = FlatWaterFXLocalSpawnPos[x];
+            Vector3 pos = FlatWaterEffects[x].position;
             pos.y = watersurface;
-            trns.position = pos;
-            Vector3 rot = trns.eulerAngles;
+            FlatWaterEffects[x].position = pos;
+            Vector3 rot = FlatWaterEffects[x].eulerAngles;
             rot.z = 0; rot.x = 0;
             Quaternion newrot = Quaternion.Euler(rot);
-            trns.rotation = newrot;
+            FlatWaterEffects[x].rotation = newrot;
         }
     }
     public void SFEXT_G_PilotExit()
     {
-        VehicleAnimator.SetBool(OCCUPIED_STRING, false);
+        VehicleAnimator.SetBool("occupied", false);
     }
     public void SFEXT_G_PilotEnter()
     {
         DoEffects = 0f;
-        VehicleAnimator.SetBool(OCCUPIED_STRING, true);
+        VehicleAnimator.SetBool("occupied", true);
     }
     public void SFEXT_O_PilotEnter()
     {
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
-        VehicleAnimator.SetBool(LOCALPILOT_STRING, true);
+        VehicleAnimator.SetBool("localpilot", true);
     }
     public void SFEXT_O_PilotExit()
     {
-        VehicleAnimator.SetBool(LOCALPILOT_STRING, false);
+        VehicleAnimator.SetBool("localpilot", false);
     }
     public void SFEXT_P_PassengerEnter()
     {
-        VehicleAnimator.SetBool(LOCALPASSENGER_STRING, true);
+        VehicleAnimator.SetBool("localpassenger", true);
     }
     public void SFEXT_P_PassengerExit()
     {
-        VehicleAnimator.SetBool(LOCALPASSENGER_STRING, false);
+        VehicleAnimator.SetBool("localpassenger", false);
     }
     public void SFEXT_G_ReAppear()
     {
         DoEffects = 6f; //wake up if was asleep
-        VehicleAnimator.SetTrigger(REAPPEAR_STRING);
+        VehicleAnimator.SetTrigger("reappear");
     }
     public void SFEXT_G_AfterburnerOn()
     {
-        VehicleAnimator.SetBool(AFTERBURNERON_STRING, true);
+        VehicleAnimator.SetBool("afterburneron", true);
     }
     public void SFEXT_G_AfterburnerOff()
     {
-        VehicleAnimator.SetBool(AFTERBURNERON_STRING, false);
+        VehicleAnimator.SetBool("afterburneron", false);
     }
     public void SFEXT_G_ReSupply()
     {
-        VehicleAnimator.SetTrigger(RESUPPLY_STRING);
+        VehicleAnimator.SetTrigger("resupply");
     }
     public void SFEXT_G_BulletHit()
     {
         WakeUp();
-        VehicleAnimator.SetTrigger(BULLETHIT_STRING);
+        VehicleAnimator.SetTrigger("bullethit");
     }
     public void WakeUp()
     {
@@ -162,16 +161,16 @@ public class SSV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_TakeOff()
     {
-        VehicleAnimator.SetBool(ONGROUND_STRING, false);
-        VehicleAnimator.SetBool(ONWATER_STRING, false);
+        VehicleAnimator.SetBool("onground", false);
+        VehicleAnimator.SetBool("ONWATER_STRING", false);
     }
     public void SFEXT_G_TouchDown()
     {
-        VehicleAnimator.SetBool(ONGROUND_STRING, true);
+        VehicleAnimator.SetBool("onground", true);
     }
     public void SFEXT_G_TouchDownWater()
     {
-        VehicleAnimator.SetBool(ONWATER_STRING, true);
+        VehicleAnimator.SetBool("ONWATER_STRING", true);
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -179,29 +178,19 @@ public class SSV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_Explode()//old EffectsExplode()
     {
-        VehicleAnimator.SetTrigger(EXPLODE_STRING);
+        VehicleAnimator.SetTrigger("explode");
         VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
         VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);
-        if (!InEditor) { VehicleAnimator.SetBool(OCCUPIED_STRING, false); }
+        if (!InEditor) { VehicleAnimator.SetBool("occupied", false); }
         DoEffects = 0f;//keep awake
     }
     private void PrintStringHashes()
     {
-        Debug.Log(string.Concat("OCCUPIED_STRING : ", OCCUPIED_STRING));
         Debug.Log(string.Concat("YAWINPUT_STRING : ", YAWINPUT_STRING));
         Debug.Log(string.Concat("THROTTLE_STRING : ", THROTTLE_STRING));
         Debug.Log(string.Concat("ENGINEOUTPUT_STRING : ", ENGINEOUTPUT_STRING));
         Debug.Log(string.Concat("HEALTH_STRING : ", HEALTH_STRING));
         Debug.Log(string.Concat("MACH10_STRING : ", MACH10_STRING));
-        Debug.Log(string.Concat("EXPLODE_STRING : ", EXPLODE_STRING));
-        Debug.Log(string.Concat("LOCALPILOT_STRING : ", LOCALPILOT_STRING));
-        Debug.Log(string.Concat("LOCALPASSENGER_STRING : ", LOCALPASSENGER_STRING));
-        Debug.Log(string.Concat("BULLETHIT_STRING : ", BULLETHIT_STRING));
-        Debug.Log(string.Concat("ONGROUND_STRING : ", ONGROUND_STRING));
-        Debug.Log(string.Concat("ONWATER_STRING : ", ONWATER_STRING));
-        Debug.Log(string.Concat("AFTERBURNERON_STRING : ", AFTERBURNERON_STRING));
-        Debug.Log(string.Concat("REAPPEAR_STRING : ", REAPPEAR_STRING));
-        Debug.Log(string.Concat("RESUPPLY_STRING : ", RESUPPLY_STRING));
     }
 }

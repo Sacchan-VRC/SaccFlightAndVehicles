@@ -16,6 +16,12 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public Transform ThrustPoint;
     [Tooltip("Position yawing forces are applied at")]
     public Transform YawMoment;
+    [Tooltip("Position traced down from to detect whether the vehicle is currently on the ground. Trace distance is 44cm. Place between the back wheels around 20cm above the height where the wheels touch the ground")]
+    public Transform GroundDetector;
+    [Tooltip("Distance traced down from the ground detector's position to see if the ground is there, in order to determine if the vehicle is grounded")]
+    public float GroundDetectorRayDistance = .44f;
+    [Tooltip("HP of the vehicle")]
+    public LayerMask GroundDetectorLayers = 2049;
     [UdonSynced(UdonSyncMode.None)] public float Health = 23f;
     [Tooltip("Teleport the vehicle to the oposite side of the map when flying too far in one direction?")]
     public bool RepeatingWorld = true;
@@ -301,6 +307,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         }
         if (!ControlsRoot)
         { ControlsRoot = VehicleTransform; }
+        if (!GroundDetector) { DisableGroundDetection++; }
     }
     private void LateUpdate()
     {
@@ -329,6 +336,23 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             }
             else
             { FloatingLastFrame = false; }
+            if (DisableGroundDetection == 0)
+            {
+                RaycastHit GDHit;
+                if ((Physics.Raycast(GroundDetector.position, -GroundDetector.up, out GDHit, GroundDetectorRayDistance, GroundDetectorLayers, QueryTriggerInteraction.Ignore)))
+                {
+                    GDHitRigidbody = GDHit.collider.attachedRigidbody;
+                    if (!GroundedLastFrame)
+                    {
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDown));
+                    }
+                }
+                else
+                {
+                    GroundedLastFrame = false;
+                    GDHitRigidbody = null;
+                }
+            }
             if (Taxiing && !GroundedLastFrame && !FloatingLastFrame)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));

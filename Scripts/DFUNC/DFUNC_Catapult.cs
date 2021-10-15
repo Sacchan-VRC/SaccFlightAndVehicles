@@ -31,8 +31,6 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private Rigidbody VehicleRigidbody;
     private float InVehicleThrustVolumeFactor;
     private Animator VehicleAnimator;
-    private int ONCATAPULT_STRING = Animator.StringToHash("oncatapult");
-    private int LAUNCH_STRING = Animator.StringToHash("launch");
     private float PlaneCatapultBackDistance;
     private float PlaneCatapultUpDistance;
     private Quaternion PlaneCatapultRotDif;
@@ -304,19 +302,19 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     public void LaunchCatapult()
     {
         if (Utilities.IsValid(CatapultAnimator))
-        { CatapultAnimator.SetTrigger(LAUNCH_STRING); }
+        { CatapultAnimator.SetTrigger("launch"); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
     }
     public void CatapultLockIn()
     {
         OnCatapult = true;
-        VehicleAnimator.SetBool(ONCATAPULT_STRING, true);
+        VehicleAnimator.SetBool("oncatapult", true);
         if (CatapultLock) { CatapultLock.Play(); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
     }
     public void CatapultLockOff()
     {
         OnCatapult = false;
-        VehicleAnimator.SetBool(ONCATAPULT_STRING, false);
+        VehicleAnimator.SetBool("oncatapult", false);
     }
 }

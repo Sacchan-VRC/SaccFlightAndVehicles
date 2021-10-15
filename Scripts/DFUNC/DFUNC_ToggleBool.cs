@@ -26,7 +26,6 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     private float ToggleTime;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
-    private int AnimBool_STRING;
     private bool sound_DoorOpen;
     private bool Dial_FunconNULL;
     private bool IsSecondary = false;
@@ -43,7 +42,6 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         else//this object is master
         {
             if (OpensDoor && (ToggleMinDelay < DoorCloseTime)) { ToggleMinDelay = DoorCloseTime; }
-            AnimBool_STRING = Animator.StringToHash(AnimBoolName);
             if (OnDefault)
             {
                 SetBoolOn();
@@ -168,7 +166,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         if (AnimOn) { return; }
         ToggleTime = Time.time;
         AnimOn = true;
-        BoolAnimator.SetBool(AnimBool_STRING, AnimOn);
+        BoolAnimator.SetBool("AnimBoolName", AnimOn);
         foreach (GameObject funcon in Dial_Funcon)
         { funcon.SetActive(true); }
         if (OpensDoor)
@@ -179,7 +177,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         if (!AnimOn) { return; }
         ToggleTime = Time.time;
         AnimOn = false;
-        BoolAnimator.SetBool(AnimBool_STRING, AnimOn);
+        BoolAnimator.SetBool("AnimBoolName", AnimOn);
         foreach (GameObject funcon in Dial_Funcon)
         { funcon.SetActive(false); }
         if (OpensDoor)

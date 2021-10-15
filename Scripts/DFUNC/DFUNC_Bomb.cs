@@ -44,7 +44,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     private float boolToggleTime;
     private bool AnimOn = false;
-    private int AnimBool_STRING;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private float Trigger;
@@ -53,8 +52,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private float LastBombDropTime = 0f;
     private int FullBombs;
     private float FullBombsDivider;
-    private int BOMBLAUNCHED_STRING;
-    private int BOMBS_STRING;
     private Transform VehicleTransform;
     private float reloadspeed;
     private bool LeftDial = false;
@@ -75,15 +72,12 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         BombAnimator = EntityControl.GetComponent<Animator>();
         VehicleTransform = EntityControl.transform;
-        BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
+        BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
         localPlayer = Networking.LocalPlayer;
 
         FindSelf();
 
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
-        AnimBool_STRING = Animator.StringToHash(AnimBoolName);
-        BOMBS_STRING = Animator.StringToHash(AnimFloatName);
-        BOMBLAUNCHED_STRING = Animator.StringToHash(AnimFiredTriggerName);
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -139,14 +133,14 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     {
         BombPoint = 0;
         NumBomb = FullBombs;
-        BombAnimator.SetFloat(BOMBS_STRING, 1);
+        BombAnimator.SetFloat(AnimFloatName, 1);
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
     public void SFEXT_G_RespawnButton()
     {
         NumBomb = FullBombs;
-        BombAnimator.SetFloat(BOMBS_STRING, 1);
+        BombAnimator.SetFloat(AnimFloatName, 1);
         BombPoint = 0;
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
@@ -156,7 +150,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         if (NumBomb != FullBombs)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullBombs);
-        BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
+        BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
         BombPoint = 0;
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }
@@ -215,7 +209,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     {
         IsOwner = localPlayer.IsOwner(gameObject);
         if (NumBomb > 0) { NumBomb--; }
-        BombAnimator.SetTrigger(BOMBLAUNCHED_STRING);
+        BombAnimator.SetTrigger(AnimFiredTriggerName);
         if (Bomb)
         {
             GameObject NewBomb = Object.Instantiate(Bomb);
@@ -226,7 +220,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             BombPoint++;
             if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
         }
-        BombAnimator.SetFloat(BOMBS_STRING, (float)NumBomb * FullBombsDivider);
+        BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }
     private void FindSelf()
@@ -259,13 +253,13 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     {
         boolToggleTime = Time.time;
         AnimOn = true;
-        BombAnimator.SetBool(AnimBool_STRING, AnimOn);
+        BombAnimator.SetBool(AnimBoolName, AnimOn);
     }
     public void SetBoolOff()
     {
         boolToggleTime = Time.time;
         AnimOn = false;
-        BombAnimator.SetBool(AnimBool_STRING, AnimOn);
+        BombAnimator.SetBool(AnimBoolName, AnimOn);
     }
     public void KeyboardInput()
     {

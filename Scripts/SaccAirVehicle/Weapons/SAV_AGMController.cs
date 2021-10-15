@@ -10,7 +10,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour AGMLauncherControl;
     public SaccEntity EntityControl;
     [Tooltip("Missile will explode after this time")]
-    [SerializeField] private float MaxLifetime = 20;
+    [SerializeField] private float MaxLifetime = 35;
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
     [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("AGM will fly straight for this many seconds before it starts homing in on target")]
@@ -23,6 +23,9 @@ public class SAV_AGMController : UdonSharpBehaviour
     [SerializeField] private float LockAngle = 90;
     [Tooltip("Maximum speed missile can rotate")]
     [SerializeField] private float RotSpeed = 15;
+    [Range(1.01f, 2f)]
+    [Tooltip("Amount the target direction vector is extended when calculating missile rotation. Lower number = more aggressive drifting missile, but more likely to oscilate")]
+    [SerializeField] private float TargetVectorExtension = 1.2f;
     [Tooltip("Strength of the forces applied to the sides of the missiles as it drifts through the air when it turns")]
     [SerializeField] private float AirPhysicsStrength = 3f;
     private bool StartTrack = false;
@@ -67,7 +70,7 @@ public class SAV_AGMController : UdonSharpBehaviour
         if (StartTrack && Vector3.Angle(transform.forward, (Target - transform.position)) < LockAngle)
         {
             Vector3 missileToTargetVector = Target - transform.position;
-            Vector3 TargetDirNormalized = missileToTargetVector.normalized * 1.2f;
+            Vector3 TargetDirNormalized = missileToTargetVector.normalized * TargetVectorExtension;
             Vector3 MissileVelNormalized = AGMRigid.velocity.normalized;
             Vector3 MissileForward = transform.forward;
             Vector3 targetDirection = TargetDirNormalized - MissileVelNormalized;

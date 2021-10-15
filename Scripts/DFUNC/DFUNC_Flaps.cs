@@ -23,7 +23,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     private bool Flaps = false;
     private bool TriggerLastFrame;
-    private int FLAPS_STRING;
     private bool DragApplied;
     private bool LiftApplied;
     private bool MaxLiftApplied;
@@ -49,7 +48,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null) { InEditor = false; }
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-        FLAPS_STRING = Animator.StringToHash(AnimatorBool);
         //to match how the old values worked
         FlapsDragMulti -= 1f;
         FlapsLiftMulti -= 1f;
@@ -141,7 +139,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     {
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
         Flaps = false;
-        FlapsAnimator.SetBool(FLAPS_STRING, false);
+        FlapsAnimator.SetBool(AnimatorBool, false);
 
         if (DragApplied)
         {
@@ -168,7 +166,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     public void SetFlapsOn()
     {
         Flaps = true;
-        FlapsAnimator.SetBool(FLAPS_STRING, true);
+        FlapsAnimator.SetBool(AnimatorBool, true);
         if (Dial_Funcon) Dial_Funcon.SetActive(true);
 
         if (!DragApplied)
