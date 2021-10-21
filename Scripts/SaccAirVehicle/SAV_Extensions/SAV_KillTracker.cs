@@ -14,6 +14,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     void Start()
     {
+        gameObject.SetActive(false);//this object never needs to be active
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         { InEditor = true; }

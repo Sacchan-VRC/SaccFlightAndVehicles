@@ -73,7 +73,7 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool InVehicle = false;
     [System.NonSerializedAttribute] public bool InVR = false;
     private bool IsOwner;
-    private bool Initialized;
+    [System.NonSerializedAttribute] public bool Initialized;
 
     //old Leavebutton Stuff
     [System.NonSerializedAttribute] public int PilotSeat = -1;

@@ -118,8 +118,16 @@ public class SaccAAGunController : UdonSharpBehaviour
     {
         set
         {
-            _firing = value;
-            AAGunAnimator.SetBool("firing", value);
+            if (!EntityControl.dead)
+            {
+                _firing = value;
+                AAGunAnimator.SetBool("firing", value);
+            }
+            else
+            {
+                _firing = false;
+                AAGunAnimator.SetBool("firing", false);
+            }
         }
         get => _firing;
     }

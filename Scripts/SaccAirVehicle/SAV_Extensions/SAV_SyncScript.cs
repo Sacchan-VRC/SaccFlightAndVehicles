@@ -111,7 +111,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                 if (!Networking.IsClogged || (bool)SAVControl.GetProgramVariable("Piloting"))
                 {
                     bool Still = ((VehicleTransform.position - O_Position).magnitude < .35f * updateInterval) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < 5f * updateInterval;
-                    if (!Still || UpdatesSentWhileStill < 2 || (Time.time - UpdateTime > IdleMaxUpdateDelay))
+                    if (!Still || UpdatesSentWhileStill < 3 || (Time.time - UpdateTime > IdleMaxUpdateDelay))
                     {
                         if (Still) { UpdatesSentWhileStill++; }
                         else { UpdatesSentWhileStill = 0; }
@@ -189,8 +189,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
             { CurrentVelocity = (O_Position - O_LastPosition) * speednormalizer; }
             else
             { CurrentVelocity = O_CurVel; }
-            Acceleration = (CurrentVelocity - O_LastCurVel) * (1 + Ping);
-            if (Vector3.Dot(Acceleration, LastAcceleration) < 0)//if direction of acceleration changed by more than 180 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
+            Acceleration = (CurrentVelocity - O_LastCurVel);
+            if (Vector3.Dot(Acceleration, LastAcceleration) < 0)//if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             { Acceleration = Vector3.zero; }
 
             O_Rotation = new Vector3(O_RotationX, O_RotationY, O_RotationZ) * .0054931640625f;//65536 to 360

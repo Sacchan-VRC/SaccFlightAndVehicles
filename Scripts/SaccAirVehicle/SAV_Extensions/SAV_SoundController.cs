@@ -41,6 +41,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     [Tooltip("Sounds played when vehicle is rolling along the ground. Also works for seaplanes")]
     public AudioSource Rolling;
     [Tooltip("Maximum volume rolling sound reaches when moving forward quickly")]
+    [Range(0.0f, 1f)]
     [SerializeField] private float RollingMaxVol = 1;
     [Tooltip("How quickly the rolling sound reaches max volume as speed increases. Higher = faster")]
     [SerializeField] private float RollingVolCurve = .03f;

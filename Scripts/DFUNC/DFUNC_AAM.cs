@@ -48,7 +48,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private float AAMLockTimer = 0;
     private bool AAMHasTarget = false;
     private bool AAMLocked = false;
-    private bool TriggerLastFrame = false;
+    private bool TriggerLastFrame;
     private float AAMLastFiredTime = 0;
     private float FullAAMsDivider;
     public GameObject AAM;

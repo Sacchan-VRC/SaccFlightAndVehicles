@@ -312,6 +312,10 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     {
         SendEventToExtensions_Gunner("SFEXTP_G_Explode");
     }
+    public void SFEXT_G_ReAppear()
+    {
+        SendEventToExtensions_Gunner("SFEXTP_G_ReAppear");
+    }
     public void SFEXT_G_RespawnButton()
     {
         SendEventToExtensions_Gunner("SFEXTP_G_RespawnButton");

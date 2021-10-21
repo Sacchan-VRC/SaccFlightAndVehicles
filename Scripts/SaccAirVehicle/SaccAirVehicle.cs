@@ -34,6 +34,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public bool HasAfterburner = true;
     public KeyCode AfterBurnerKey = KeyCode.T;
     [Tooltip("Point in the throttle at which afterburner enables, .8 = 80%")]
+    [Range(0.0f, 1f)]
     public float ThrottleAfterburnerPoint = 0.8f;
     [Tooltip("Disable Thrust/VTOL rotation values transition calculations and assume VTOL mode always (for helicopters)")]
     public bool VTOLOnly = false;
@@ -55,6 +56,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("Pitch force multiplier, (gets stronger with airspeed)")]
     public float PitchStrength = 5f;
     [Tooltip("Pitch rotation force (as multiple of PitchStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
+    [Range(0.0f, 1f)]
     public float PitchThrustVecMulti = 0f;
     [Tooltip("Force that stops vehicle from pitching, (gets stronger with airspeed)")]
     public float PitchFriction = 24f;
@@ -67,6 +69,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("Yaw force multiplier, (gets stronger with airspeed)")]
     public float YawStrength = 3f;
     [Tooltip("Yaw rotation force (as multiple of YawStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
+    [Range(0.0f, 1f)]
     public float YawThrustVecMulti = 0f;
     [Tooltip("Force that stops vehicle from yawing, (gets stronger with airspeed)")]
     public float YawFriction = 15f;
@@ -79,6 +82,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("Yaw force multiplier, (gets stronger with airspeed)")]
     public float RollStrength = 450f;
     [Tooltip("Roll rotation force (as multiple of RollStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
+    [Range(0.0f, 1f)]
     public float RollThrustVecMulti = 0f;
     [Tooltip("Force that stops vehicle from rolling, (gets stronger with airspeed)")]
     public float RollFriction = 90f;
@@ -152,6 +156,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("Degrees per second which the angle of the thrusters on the vehicle rotate toward desired angle")]
     public float VTOLAngleTurnRate = 90f;
     [Tooltip("Position between VTOL Min Angle and VTOL Max Angle that the plane is at by default. 0 = min, 1 = max.")]
+    [Range(0.0f, 1f)]
     public float VTOLDefaultValue = 0;
     [Tooltip("Allow after burner whilst VTOL is engaged, (VTOL angle is not 0), VTOL Min Angle must be 0 for afterburner to work if this is unticked.")]
     public bool VTOLAllowAfterburner = false;
@@ -160,6 +165,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("Minimum angle of thrust direction, 0 = straight backwards, 90 = straight down, 180 = straight forwards")]
     public float VTOLMinAngle = 0;
     [Tooltip("Maximum angle of thrust direction, 0 = straight backwards, 90 = straight down, 180 = straight forwards")]
+    [Range(0.0f, 180f)]
     public float VTOLMaxAngle = 90;
     [Tooltip("Amount of Thrust Vectoring the plane has whilst in VTOL mode. (Remember thrust vectoring is as a multiple of the normal rotation values, so best to keep below 1, usually below .4)\nLeave at 1 and adjust Pitch Strength etc for helicopters")]
     public float VTOLPitchThrustVecMulti = .3f;

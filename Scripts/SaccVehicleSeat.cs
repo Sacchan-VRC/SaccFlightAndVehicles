@@ -45,7 +45,11 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     }
     public override void Interact()//entering the vehicle
     {
-        Networking.SetOwner(localPlayer, gameObject);
+        if (!InEditor)
+        {
+            localPlayer.UseAttachedStation();
+            Networking.SetOwner(localPlayer, gameObject);
+        }
         if (!SeatInitialized) { InitializeSeat(); }
         EntityControl.MySeat = ThisStationID;
 
@@ -55,7 +59,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         { EntityControl.PassengerEnterVehicleLocal(); }
         if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
         Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle in VR
-        localPlayer.UseAttachedStation();
+
         Seat.localRotation = SeatStartRot;
         InVehicle = true;
         if (AdjustSeat && TargetEyePosition)
@@ -85,7 +89,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                     }
                 }
             }
-            else if (EntityControl.InVehicle)
+            else if (InVehicle)
             {
                 SetVoiceInside(player);
             }
@@ -146,6 +150,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     }
     private void InitializeSeat()
     {
+        if (!EntityControl.Initialized) { return; }
         int x = 0;
         foreach (VRCStation station in EntityControl.VehicleStations)
         {

@@ -75,11 +75,13 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     {
         RocketPoint = 0;
         NumRocket = FullRockets;
+        if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     public void SFEXTP_G_RespawnButton()
     {
         NumRocket = FullRockets;
         RocketPoint = 0;
+        if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     public void SFEXTP_G_ReSupply()
     {
