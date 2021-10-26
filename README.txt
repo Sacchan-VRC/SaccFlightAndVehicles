@@ -211,19 +211,49 @@ Implemented (unrealistic) increased lift at higher speeds, you can now fall down
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Version 1.5 has the largest changes of any update so far. I intentionally disregarded compatability/ease of update in order to improve functionaly and modularize as much as possible.
+Version 1.5 has the largest changes of any update so far. I intentionally disregarded compatability/ease of update in order to modularize andimprove functionality as much as possible.
 Updating old projects with custom vehicles will be a challenge. Old animations can be reused but may requires some adjustments.
 To upgrade old vehicles, i recommend just remaking them. Re-make the animator by copying it from the prefab again and re-add your animations to it.
 A number of layers have been removed from the animator and are now done in code.
 #Flares (as they are now launched per-click in code)
-#Smoke (it's a simple particle system that is more efficient to toggle in code)
+#DisplaySmoke (it's a simple particle system that is more efficient to toggle in code)
+#TrailsGs (Trails are now done in an array in effectscontroller)
+#GunAmmo (now done in dfunc code)
 
-The 'Respawn' animation is no longer needed as respawning is handled by delayed events rather than events triggered through an animation. (The explode animation layer is quite different)
+Modularization:
+EngineController has been renamed to SaccAirVehicle, it and many things it did are now modular scripts
+HitDetector is now named SaccEntity, and acts as the central object which contains references and sends events to all modular scripts, as well as handles the function dials
+Function dial functions are now each their own script, each referenced by SaccEntity.
+All modular scripts that use the event system must be referenced in the SaccEntity's 'Extension Udon Behaviours' array.
+The SaccEntity also sends events related to being picked up, so can probably be used to make handheld weapons. I haven't tried it yet.
 
-Due to the new custom position syncing script, more network data is being used, and the maximum limit for number of vehicles has decreased. The limit is around 10 with default settings, more if you reduce Update Interval.
+Some new modular scripts:
+WaterTrigger:
+Tells the vehicle when it enters and leaves water
+SyncScript:
+The new position sync script
+KillTracker:
+Not required, used to make the KillsBoard work
+
+Function dials:
+SaccEntity has 2 arrays, one for left dial functions, and right dial functions.
+And number of functions can be placed in each array. The code divides the dial up automatically for selection.
+The order they are input into that array is the order they'll work on the dial, clockwise. First function is in top middle, unless the 'Left/RightDialDivideStraightUp' is ticked, in which case it's to the right of straight up.
+The visuals of the function dial must be set up manually. I recommend looking at the dials in the vehicle prefabs in order to understand how.
+The MFD.fbx file containts 12 divider meshes for the function dials, for the number of functions on the dial. Named StickDisplay2-12 (the old default, 8 is just named 'StickDisplay' still.
+To set the 'funcon' rotations, you can type '360/7' for example, into its Z rotation(if you have 7 functions). Then multiply that by the dial position -1, then multiply by -1.
+
+
+The 'Respawn' animation is no longer needed as respawning is handled by delayed events rather than events triggered through an animation.
+
+Due to the new custom position syncing script, more network data is being used, and the maximum limit for number of vehicles has decreased.
+The limit is around 10 with default settings, more if you increase Update Interval.
+
+Inside the /Prefabs folder are individual prefabs for each vehicle, you can place them and they should work right away.
 
 I recommend using CyanEmu to test things inside of Unity editor.
-Inside the /Prefabs folder are individual prefabs for each vehicle, you can place them and they should work right away. Open the example scene 'SaccFlightExample.unity' to see an example of vehicles set up to work with the Killsboard and racing scripts.
+
+Open the example scene 'SaccFlightExample.unity' to see an example of vehicles set up to work with the Killsboard and racing scripts.
 
 Race set up:
 There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object you can remove this if you don't intend to use it. It should be disabled by default, it's enabled when a race is selected with the racebutton.

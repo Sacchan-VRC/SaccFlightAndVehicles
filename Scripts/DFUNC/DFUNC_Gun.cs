@@ -245,7 +245,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             {
                 RaycastHit hitnext;
                 //raycast to check if it's behind something
-                bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+                bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
 
                 /*                 Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
                                 if (hitnext.collider != null) Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsidePlaneLayer)));
@@ -296,7 +296,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
         //raycast to check if it's behind something
         RaycastHit hitcurrent;
-        bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+        bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
         //used to make lock remain for .25 seconds after target is obscured
         if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsideVehicleLayer)
         { AAMTargetObscuredDelay += DeltaTime; }

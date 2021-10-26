@@ -89,13 +89,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
         FindSelf();
 
-        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
+        if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
     }
     public void SFEXT_O_PilotEnter()
     {
         TriggerLastFrame = true;
         Pilot = true;
-        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
+        if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
         //Make sure SAVeControl.AAMCurrentTargetSAVControl is correct
         var Target = AAMTargets[AAMTarget];
         if (Target && Target.transform.parent)
@@ -124,7 +124,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_P_PassengerEnter()
     {
-        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
+        if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
     }
     public void SFEXT_G_Explode()
     {
@@ -143,7 +143,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
         AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider);
-        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
+        if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -306,7 +306,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 {
                     RaycastHit hitnext;
                     //raycast to check if it's behind something
-                    bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+                    bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
 
                     /*                 Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
                                     if (hitnext.collider != null) Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsidePlaneLayer)));
@@ -350,7 +350,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             //check if target is active, and if it's SaccAirVehicle is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
             //raycast to check if it's behind something
             RaycastHit hitcurrent;
-            bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
+            bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
             //used to make lock remain for .25 seconds after target is obscured
             if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsideVehicleLayer)
             { AAMTargetObscuredDelay += DeltaTime; }
@@ -450,7 +450,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
         AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider);
-        HUDText_AAM_ammo.text = NumAAM.ToString("F0");
+        if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
     }
     private void FindSelf()
     {

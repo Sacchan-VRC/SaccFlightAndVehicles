@@ -118,7 +118,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     {
         set
         {
-            if (!EntityControl.dead)
+            if (!EntityControl.dead && Occupied)
             {
                 _firing = value;
                 AAGunAnimator.SetBool("firing", value);
@@ -137,7 +137,8 @@ public class SaccAAGunController : UdonSharpBehaviour
         set
         {
             _AAMFire = value;
-            LaunchAAM();
+            if (!EntityControl.dead && Occupied)
+            { LaunchAAM(); }
         }
         get => _AAMFire;
     }
@@ -685,23 +686,22 @@ public class SaccAAGunController : UdonSharpBehaviour
         AAMLockedOn.gameObject.SetActive(false);
         AAGunAnimator.SetBool("inside", false);
     }
-    public void NotOccupied() { Occupied = false; }
     public void SFEXT_O_TakeOwnership()
     {
-        SendCustomEventDelayedFrames(nameof(CheckOwnership), 1);
         IsOwner = true;
+    }
+    public void SFEXT_L_OwnershipTransfer()
+    {
+        SendCustomEventDelayedSeconds(nameof(CheckOwnership), .2f);
     }
     //if took ownership after someone timed out while in vehicle, turn off this stuff
     public void CheckOwnership()
     {
-        if (!Manning)//if we took ownership by getting in, don't do this
+        if (!Occupied)//if we took ownership by getting in, don't do this
         {
-            if (Occupied)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(NotOccupied)); }
             if (Firing)
             {
                 Firing = false;
-                RequestSerialization();
             }
         }
     }

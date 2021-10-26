@@ -7,6 +7,8 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNCP_ToggleBool : UdonSharpBehaviour
 {
+    [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing")]
+    [SerializeField] private UdonSharpBehaviour MasterToggle;
     [SerializeField] private Animator BoolAnimator;
     [SerializeField] private string AnimBoolName = "AnimBool";
     [Tooltip("Object enabled when function is enabled (used on MFD)")]
@@ -14,19 +16,21 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
     public bool OnDefault = false;
     [Tooltip("Set toggle to its default when exiting?")]
     [SerializeField] private bool PilotExitTurnOff = true;
+    [Tooltip("How long before toggle can be activated again")]
     [SerializeField] private float ToggleMinDelay;
+    [Tooltip("Objects to turn on/off with the toggle")]
+    [SerializeField] private GameObject[] ToggleObjects;
     [Tooltip("Send Events to sound script for opening a door?")]
     [SerializeField] private bool OpensDoor = false;
     [Header("Door Only:")]
+    [Tooltip("If this toggle opens a door, it will change the sound to the outside sounds using the soundcontroller")]
     [SerializeField] private UdonBehaviour SoundControl;
+    [Tooltip("How long it takes for the sound to change after toggle to closed")]
     [SerializeField] private float DoorCloseTime = 2;
-    [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing")]
-    [SerializeField] private UdonSharpBehaviour MasterToggle;
     private bool AnimOn = false;
     private float ToggleTime;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
-    private int AnimBool_STRING;
     private bool sound_DoorOpen;
     private bool Dial_FunconNULL;
     private bool IsSecondary = false;
@@ -43,7 +47,6 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
         else//this object is master
         {
             if (OpensDoor && (ToggleMinDelay < DoorCloseTime)) { ToggleMinDelay = DoorCloseTime; }
-            AnimBool_STRING = Animator.StringToHash(AnimBoolName);
             if (OnDefault)
             {
                 SetBoolOn();
@@ -57,9 +60,9 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
         if (!IsSecondary)
         {
             if (OnDefault && !AnimOn)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
             else if (!OnDefault && AnimOn)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         }
     }
     public void DFUNC_Selected()
@@ -82,9 +85,9 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
             if (PilotExitTurnOff)
             {
                 if (!OnDefault && AnimOn)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
                 else if (OnDefault && !AnimOn)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
             }
         }
         gameObject.SetActive(false);
@@ -107,11 +110,11 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
             {
                 if ((bool)MasterToggle.GetProgramVariable("AnimOn"))
                 {
-                    MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff");
+                    MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff));
                 }
                 else
                 {
-                    MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn");
+                    MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn));
                 }
             }
         }
@@ -120,9 +123,9 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
             if (Time.time - ToggleTime > ToggleMinDelay)
             {
                 if (AnimOn)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
                 else
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
             }
         }
     }
@@ -143,11 +146,11 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
                     {
                         if ((bool)MasterToggle.GetProgramVariable("AnimOn"))
                         {
-                            MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff");
+                            MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff));
                         }
                         else
                         {
-                            MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn");
+                            MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn));
                         }
                     }
                 }
@@ -156,9 +159,9 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
                     if (Time.time - ToggleTime > ToggleMinDelay)
                     {
                         if (AnimOn)
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
                         else
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
                     }
                 }
             }
@@ -171,31 +174,35 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
         if (AnimOn) { return; }
         ToggleTime = Time.time;
         AnimOn = true;
-        BoolAnimator.SetBool(AnimBool_STRING, AnimOn);
+        if (BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, true); }
         foreach (GameObject funcon in Dial_Funcon)
         { funcon.SetActive(true); }
         if (OpensDoor)
         { SoundControl.SendCustomEvent("DoorOpen"); }
+        foreach (GameObject obj in ToggleObjects)
+        { obj.SetActive(true); }
     }
     public void SetBoolOff()
     {
         if (!AnimOn) { return; }
         ToggleTime = Time.time;
         AnimOn = false;
-        BoolAnimator.SetBool(AnimBool_STRING, AnimOn);
+        if (BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, false); }
         foreach (GameObject funcon in Dial_Funcon)
         { funcon.SetActive(false); }
         if (OpensDoor)
         { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); }
+        foreach (GameObject obj in ToggleObjects)
+        { obj.SetActive(false); }
     }
     public void SFEXTP_G_RespawnButton()
     {
         if (!IsSecondary)
         {
             if (!OnDefault && AnimOn)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
             else if (OnDefault && !AnimOn)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         }
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
@@ -205,9 +212,9 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
             if (PilotExitTurnOff && player.isLocal)
             {
                 if (!OnDefault && AnimOn)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOff"); }
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
                 else if (OnDefault && !AnimOn)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetBoolOn"); }
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
             }
         }
     }

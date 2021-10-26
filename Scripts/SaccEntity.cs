@@ -5,6 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[DefaultExecutionOrder(-10)]
 public class SaccEntity : UdonSharpBehaviour
 {
     [Tooltip("Put all scripts used by this vehicle that use the event system into this list (excluding DFUNCs)")]
@@ -608,6 +609,7 @@ public class SaccEntity : UdonSharpBehaviour
     }
     public void ExitStation()
     {
-        VehicleStations[MySeat].ExitStation(localPlayer);
+        if (MySeat > -1 && MySeat < VehicleStations.Length)
+        { VehicleStations[MySeat].ExitStation(localPlayer); }
     }
 }

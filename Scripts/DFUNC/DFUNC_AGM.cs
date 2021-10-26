@@ -242,7 +242,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                             }
                             else
                             {//didn't find one, lock onto raycast point
-                                if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore))
+                                if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
                                 {//enable for others so they sync the variable
                                     if (AGMLock)
                                     { AGMLock.Play(); }

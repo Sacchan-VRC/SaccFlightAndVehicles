@@ -175,7 +175,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                 Dumb = false;
             }
             if (EngineTrack > 1) { EngineTrack = AfterBurnerTrackMulti; }//if AB on, faster rotation
-            if (Target.gameObject.activeInHierarchy/*  && UnlockTime < .1f */)
+            if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
             {
                 if ((!Dumb && TargetDistance < TargDistlastframe) || LockHack)
                 {

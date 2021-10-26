@@ -12,7 +12,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     public SaccScoreboard_Kills KillsBoard;
     private bool InEditor;
     private VRCPlayerApi localPlayer;
-    void Start()
+    void SFEXT_L_EntityStart()
     {
         gameObject.SetActive(false);//this object never needs to be active
         localPlayer = Networking.LocalPlayer;
