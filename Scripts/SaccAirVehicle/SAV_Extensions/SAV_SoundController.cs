@@ -322,7 +322,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                 if ((bool)SAVControl.GetProgramVariable("Taxiing"))
                 { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
                 else
-                { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
+                { Rolling.volume = Mathf.Lerp(Rolling.volume, 0, 5f * DeltaTime); }
             }
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, .72f * DeltaTime);
             float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");

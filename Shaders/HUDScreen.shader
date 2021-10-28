@@ -6,8 +6,9 @@ Shader "SF-1/HUDScreen"
     }
     SubShader
     {
-        Tags { "RenderType"="Transparent" "Queue"="Transparent+5"}
+        Tags { "RenderType"="Transparent" "Queue"="Transparent"}
         Blend DstColor Zero
+        ZWrite OFF
 
         Stencil{
             Ref 1

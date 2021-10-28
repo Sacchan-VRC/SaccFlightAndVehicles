@@ -78,8 +78,8 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Manning = false;//like Piloting in the plane
     [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
-    [System.NonSerializedAttribute] public float RotationSpeedX = 0f;
-    [System.NonSerializedAttribute] public float RotationSpeedY = 0f;
+    private float RotationSpeedX = 0f;
+    private float RotationSpeedY = 0f;
     private Vector3 StartRot;
     [System.NonSerializedAttribute] public bool InEditor = true;
     [System.NonSerializedAttribute] public bool IsOwner = false;
@@ -99,7 +99,6 @@ public class SaccAAGunController : UdonSharpBehaviour
     Quaternion AAGunRotLastFrame;
     Quaternion JoystickZeroPoint;
     [System.NonSerializedAttribute] public bool RGripLastFrame = false;
-    Vector2 VRPitchYawInput;
     private float FullAAMsDivider;
     private float FullHealthDivider;
     private bool LTriggerLastFrame;
@@ -108,8 +107,8 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AAMReloadTimer;
     [System.NonSerializedAttribute] public float HealthUpTimer;
     [System.NonSerializedAttribute] public float HPRepairTimer;
-    [System.NonSerializedAttribute] public float InputXKeyb;
-    [System.NonSerializedAttribute] public float InputYKeyb;
+    [System.NonSerializedAttribute] private float InputXKeyb;
+    [System.NonSerializedAttribute] private float InputYKeyb;
     [System.NonSerializedAttribute] public float LastHealthUpdate = 0;
     [System.NonSerializedAttribute] public Transform CenterOfMass;
     private bool Occupied;
@@ -196,6 +195,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                 Vector3 JoystickPos;
 
                 //virtual joystick
+                Vector2 VRPitchYawInput = Vector2.zero;
                 if (InVR)
                 {
                     if (RGrip > 0.75)

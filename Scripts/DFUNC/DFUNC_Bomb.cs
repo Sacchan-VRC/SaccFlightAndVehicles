@@ -21,6 +21,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     [SerializeField] private float BombDelay = 0f;
     [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
     [SerializeField] private Transform[] BombLaunchPoints;
+    [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
+    [SerializeField] private bool AllowFiringWhenGrounded = false;
     [SerializeField] private bool DoAnimBool = false;
     [Tooltip("Animator bool that is true when this function is selected")]
     [SerializeField] private string AnimBoolName = "BombSelected";
@@ -179,7 +181,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             {
                 if (!TriggerLastFrame)
                 {
-                    if (NumBomb > 0 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((Time.time - LastBombDropTime) > BombDelay))
+                    if (NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
                     {
                         LastBombDropTime = Time.time;
                         BombFire++;
@@ -188,18 +190,14 @@ public class DFUNC_Bomb : UdonSharpBehaviour
                         { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                     }
                 }
-                else//launch every BombHoldDelay
-                    if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !(bool)SAVControl.GetProgramVariable("Taxiing"))
-                {
-                    {
-                        LastBombDropTime = Time.time;
-                        BombFire++;
-                        RequestSerialization();
-                        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
-                        { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
-                    }
+                else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
+                {///launch every BombHoldDelay
+                    LastBombDropTime = Time.time;
+                    BombFire++;
+                    RequestSerialization();
+                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                    { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                 }
-
                 TriggerLastFrame = true;
             }
             else { TriggerLastFrame = false; }

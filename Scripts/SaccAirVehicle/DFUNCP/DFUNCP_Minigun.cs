@@ -20,7 +20,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
     [SerializeField] private KeyCode MinigunFireKey = KeyCode.Space;
-    private bool AmmoBarNULL = true;
     [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
     private bool InVR;
     private VRCPlayerApi localPlayer;
@@ -42,8 +41,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     {
         FullGunAmmoInSeconds = GunAmmoInSeconds;
         reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
-        AmmoBarNULL = AmmoBar == null;
-        if (!AmmoBarNULL) { AmmoBarScaleStart = AmmoBar.localScale; }
+        if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
         FullGunAmmoInSeconds = GunAmmoInSeconds;
         FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
         GUNFIRING_STRING = Animator.StringToHash(AnimatorFiringStringName);
@@ -54,14 +52,8 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             InVR = localPlayer.IsUserInVR();
         }
     }
-    public void Activate()
-    {
-        gameObject.SetActive(true);
-    }
-    public void Deactivate()
-    {
-        gameObject.SetActive(false);
-    }
+    public void Activate() { gameObject.SetActive(true); }
+    public void Deactivate() { gameObject.SetActive(false); }
     public void DFUNC_Selected()
     {
         Selected = true;
@@ -112,7 +104,15 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     }
     public void SFEXTP_G_ReSupply()
     {
-        if (Selected)
+        if (gameObject.activeInHierarchy)
+        {
+            if (func_active)
+            {
+                if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+                GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+            }
+        }
+        else
         {
             if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
             GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
@@ -185,9 +185,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             Quaternion newrot = (Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0)));
             Minigun.rotation = Quaternion.Slerp(Minigun.rotation, newrot, 4 * DeltaTime);
         }
-
-
-        if (!AmmoBarNULL) AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+        if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     private void OnDisable()
     {

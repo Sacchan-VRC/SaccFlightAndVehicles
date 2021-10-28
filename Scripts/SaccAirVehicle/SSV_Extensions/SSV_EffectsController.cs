@@ -162,7 +162,7 @@ public class SSV_EffectsController : UdonSharpBehaviour
     public void SFEXT_G_TakeOff()
     {
         VehicleAnimator.SetBool("onground", false);
-        VehicleAnimator.SetBool("ONWATER_STRING", false);
+        VehicleAnimator.SetBool("onwater", false);
     }
     public void SFEXT_G_TouchDown()
     {
@@ -170,7 +170,7 @@ public class SSV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_TouchDownWater()
     {
-        VehicleAnimator.SetBool("ONWATER_STRING", true);
+        VehicleAnimator.SetBool("onwater", true);
     }
     public void SFEXT_G_RespawnButton()
     {

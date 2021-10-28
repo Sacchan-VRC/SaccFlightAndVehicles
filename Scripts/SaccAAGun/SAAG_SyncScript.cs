@@ -110,8 +110,7 @@ public class SAAG_SyncScript : UdonSharpBehaviour
         else
         {
             float TimeSinceUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_UpdateTime) * .001f);
-            Vector2 PredictedRotation = Vector2.zero;
-            PredictedRotation = O_GunRotation + (GunRotationSpeed * (Ping + TimeSinceUpdate));
+            Vector2 PredictedRotation = O_GunRotation + (GunRotationSpeed * (Ping + TimeSinceUpdate));
             PredictedRotation.x = Mathf.Clamp(PredictedRotation.x, -UpAngleMax, DownAngleMax);
 
             Vector3 PredictedRotation_3 = new Vector3(PredictedRotation.x, PredictedRotation.y, 0);

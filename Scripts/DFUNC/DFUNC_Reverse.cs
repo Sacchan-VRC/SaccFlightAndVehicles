@@ -7,7 +7,7 @@ using VRC.Udon;
 public class DFUNC_Reverse : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private float ReversingThrottleMultiplier = -1.25f;
+    [SerializeField] private float ReversingThrottleMultiplier = -.5f;
     [SerializeField] private GameObject Dial_funcon;
     private float StartThrottleStrength;
     private float StartABStrength;

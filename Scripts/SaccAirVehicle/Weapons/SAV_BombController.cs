@@ -14,6 +14,7 @@ public class SAV_BombController : UdonSharpBehaviour
     [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
+    [SerializeField] private float LaunchSpeed = 0;
     [Tooltip("Spawn bomb at a random angle up to this number")]
     [SerializeField] private float AngleRandomization = 1;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent bomb from colliding with own plane")]
@@ -44,6 +45,7 @@ public class SAV_BombController : UdonSharpBehaviour
         else
         { IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner"); }
         SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+        BombRigid.velocity += transform.forward * LaunchSpeed;
     }
 
     void LateUpdate()

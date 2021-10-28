@@ -19,7 +19,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private float AAMLaunchDelay = 0.5f;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 10;
-    [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
+    [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
+    [SerializeField] private bool AllowFiringWhenGrounded = false;
+    [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
     [SerializeField] private bool DoAnimBool = false;
     [Tooltip("Animator bool that is true when this function is selected")]
     [SerializeField] private string AnimBoolName = "AAMSelected";
@@ -85,7 +87,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
         {
             distance_from_head = (float)HUDControl.GetProgramVariable("distance_from_head");
         }
-        if (distance_from_head == 0) { distance_from_head = 1.333f; }
+        else
+        { distance_from_head = 1.333f; }
 
         FindSelf();
 
@@ -129,7 +132,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         NumAAM = FullAAMs;
-        AAMAnimator.SetFloat(AnimFloatName, 1);
+        if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, 1); }
         if (func_active)
         {
             DFUNC_Deselected();
@@ -142,13 +145,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (NumAAM != FullAAMs)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
-        AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider);
+        if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
         if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
     }
     public void SFEXT_G_RespawnButton()
     {
         NumAAM = FullAAMs;
-        AAMAnimator.SetFloat(AnimFloatName, 1);
+        if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, 1); }
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
@@ -225,7 +228,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 {
                     if (!TriggerLastFrame)
                     {
-                        if (AAMLocked && !(bool)SAVControl.GetProgramVariable("Taxiing") && Time.time - AAMLastFiredTime > AAMLaunchDelay)
+                        if (AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                         {
                             AAMLastFiredTime = Time.time;
                             AAMFire++;//launch AAM using set
@@ -357,7 +360,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             else
             { AAMTargetObscuredDelay = 0; }
 
-            if (!(bool)SAVControl.GetProgramVariable("Taxiing")
+            if ((!(bool)SAVControl.GetProgramVariable("Taxiing") || AllowFiringWhenGrounded)
                 && (AAMTargetObscuredDelay < .25f)
                     && AAMCurrentTargetDistance < AAMMaxTargetDistance
                         && AAMTargets[AAMTarget].activeInHierarchy
@@ -441,7 +444,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         InEditor = (bool)SAVControl.GetProgramVariable("InEditor");
         if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
-        AAMAnimator.SetTrigger(AnimFiredTriggerName);
+        if (AAMAnimator) { AAMAnimator.SetTrigger(AnimFiredTriggerName); }
         if (AAM)
         {
             GameObject NewAAM = Object.Instantiate(AAM);
@@ -449,7 +452,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
-        AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider);
+        if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
         if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
     }
     private void FindSelf()
@@ -481,13 +484,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         boolToggleTime = Time.time;
         AnimOn = true;
-        AAMAnimator.SetBool(AnimBoolName, AnimOn);
+        if (AAMAnimator) { AAMAnimator.SetBool(AnimBoolName, AnimOn); }
     }
     public void SetBoolOff()
     {
         boolToggleTime = Time.time;
         AnimOn = false;
-        AAMAnimator.SetBool(AnimBoolName, AnimOn);
+        if (AAMAnimator) { AAMAnimator.SetBool(AnimBoolName, AnimOn); }
     }
     public void KeyboardInput()
     {

@@ -161,14 +161,14 @@ public class SAV_SyncScript : UdonSharpBehaviour
             {
                 //time since recieving previous update
                 float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + ((double)Time.realtimeSinceStartup - StartupTime)) - L_LastUpdateTime);
-                //extrapolated position based on time passed since previous update
+                //extrapolated position based on data from previous update using time passed since previous update
                 Vector3 OldPredictedPosition = L_LastPingAdjustedPosition
                     + ((LastExtrapolationDirection) * TimeSincePreviousUpdate);
-                //extrapolated rotation based on time passed since previous update
+                //extrapolated rotation based on data from previous update using time passed since previous update
                 Quaternion OldPredictedRotation =
                     (Quaternion.SlerpUnclamped(Quaternion.identity, LastCurAngMom, LastPing + TimeSincePreviousUpdate)
                     * O_LastRotation2);
-                //Rotation is lerped to smooth it out, because it's not as important as position, and because sudden rotations create large over-predictions anyway
+                //Rotation is slerped to smooth it out, because it's not as important as position, and because sudden rotations create large over-predictions anyway
                 //Slerp towards a slerp(interpolation) of last 2 extrapolations
                 RotationLerper = Quaternion.Slerp(RotationLerper,
                  Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),

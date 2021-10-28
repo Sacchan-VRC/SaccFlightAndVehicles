@@ -25,7 +25,9 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private AudioSource AGMLock;
     [Tooltip("Sound that plays when the AGM unlocks")]
     [SerializeField] private AudioSource AGMUnlock;
-    [SerializeField] private bool AllowFiringWhenGrounded;
+    [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
+    [SerializeField] private bool AllowFiringWhenGrounded = false;
+    [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
     [SerializeField] private bool DoAnimBool = false;
     [Tooltip("Animator bool that is true when this function is selected")]
     [SerializeField] private string AnimBoolName = "AGMSelected";

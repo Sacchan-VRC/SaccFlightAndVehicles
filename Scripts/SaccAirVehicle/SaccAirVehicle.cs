@@ -1304,7 +1304,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             Networking.SetOwner(localPlayer, EntityControl.gameObject);
             EntityControl.TakeOwnerShipOfExtensions();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResetStatus");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
             IsOwner = true;
             Atmosphere = 1;//vehiclemoving optimization requires this to be here
                            //synced variables
