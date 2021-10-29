@@ -244,7 +244,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                             }
                             else
                             {//didn't find one, lock onto raycast point
-                                if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
+                                if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore))
                                 {//enable for others so they sync the variable
                                     if (AGMLock)
                                     { AGMLock.Play(); }
@@ -290,7 +290,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
 
                 if (AtGCam)
                 {
-                    AGMRotDif = Quaternion.Angle(AtGCam.transform.rotation, AGMCamRotLastFrame);
+                    AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotLastFrame * Vector3.forward);
                     AtGCam.transform.rotation = AGMCamRotSlerper;
 
                     Vector3 temp2 = AtGCam.transform.localRotation.eulerAngles;

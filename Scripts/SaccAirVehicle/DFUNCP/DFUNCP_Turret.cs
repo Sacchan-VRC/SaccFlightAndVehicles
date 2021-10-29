@@ -160,7 +160,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
         if (Manning)
         {
             //GUN
-            float Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+            float Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
             if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
             {
                 if (!TriggerLastFrame)
