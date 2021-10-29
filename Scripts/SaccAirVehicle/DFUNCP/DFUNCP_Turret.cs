@@ -145,15 +145,15 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     {
         Ammo = FullAmmo;
         if (AmmoBar) { AmmoBar.localScale = AmmoBarScaleStart; }
-        TurretRotatorHor.rotation = Quaternion.identity;
-        TurretRotatorVert.rotation = Quaternion.identity;
+        TurretRotatorHor.localRotation = Quaternion.identity;
+        TurretRotatorVert.localRotation = Quaternion.identity;
     }
     public void SFEXTP_G_Explode()
     {
         Ammo = FullAmmo;
         if (AmmoBar) { AmmoBar.localScale = AmmoBarScaleStart; }
-        TurretRotatorHor.rotation = Quaternion.identity;
-        TurretRotatorVert.rotation = Quaternion.identity;
+        TurretRotatorHor.localRotation = Quaternion.identity;
+        TurretRotatorVert.localRotation = Quaternion.identity;
     }
     private void Update()
     {
