@@ -19,7 +19,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     [SerializeField] private AudioSource AAMLocking;
     [Tooltip("Sound that plays when locked onto a target")]
     [SerializeField] private AudioSource AAMLockedOn;
-    [Tooltip("Joystick object that moves around in response to rotation inputs")]
+    [Tooltip("Joystick object that moves around in to show rotation inputs")]
     [SerializeField] private Transform JoyStick;
     [Tooltip("When destroyed, will reappear after this many seconds")]
     [SerializeField] private float RespawnDelay = 20;

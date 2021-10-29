@@ -68,7 +68,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private bool InEditor;
     private Transform VehicleTransform;
     private Quaternion AGMCamRotSlerper;
-    private Quaternion AGMCamLastFrame;
+    private Quaternion AGMCamRotLastFrame;
     private bool func_active;
     private float reloadspeed;
     private bool LeftDial = false;
@@ -290,15 +290,14 @@ public class DFUNC_AGM : UdonSharpBehaviour
 
                 if (AtGCam)
                 {
-                    AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamLastFrame * Vector3.forward);
-                    // AGMRotDif = Vector3.Angle(AtGCam.transform.rotation * Vector3.forward, AGMCamRotSlerper * Vector3.forward);
+                    AGMRotDif = Quaternion.Angle(AtGCam.transform.rotation, AGMCamRotLastFrame);
                     AtGCam.transform.rotation = AGMCamRotSlerper;
 
                     Vector3 temp2 = AtGCam.transform.localRotation.eulerAngles;
                     temp2.z = 0;
                     AtGCam.transform.localRotation = Quaternion.Euler(temp2);
                 }
-                AGMCamLastFrame = newangle;
+                AGMCamRotLastFrame = newangle;
             }
 
 

@@ -8,10 +8,11 @@ using VRC.Udon;
 public class DFUNCP_Turret : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private Animator TurretAnimator;
     [SerializeField] private Transform TurretRotatorHor;
     [SerializeField] private Transform TurretRotatorVert;
     [SerializeField] private float TurnSpeedMulti = 6;
+    [Tooltip("Lerp rotational inputs by this amount when used in desktop mode so the aim isn't too twitchy")]
+    [SerializeField] private float TurningResponseDesktop = 2f;
     [Tooltip("Rotation slowdown per frame")]
     [Range(0, 1)]
     [SerializeField] private float TurnFriction = .04f;
@@ -28,6 +29,8 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     [SerializeField] private float updateInterval = 0.25f;
     [SerializeField] private GameObject Projectile;
     [SerializeField] private AudioSource FireSound;
+    [SerializeField] private Camera ViewCamera;
+    [SerializeField] private GameObject ViewCameraScreen;
     [SerializeField] private Transform AmmoBar;
     [SerializeField] private int Ammo = 60;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
@@ -37,6 +40,9 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     [Tooltip("Delay between firing when holding the trigger")]
     [SerializeField] private float FireHoldDelay = 0.5f;
     [SerializeField] private Transform[] FirePoints;
+    [SerializeField] private bool SendAnimTrigger = false;
+    [SerializeField] private Animator TurretAnimator;
+    [SerializeField] private string AnimTriggerName = "TurretFire";
     private float LastFireTime = 0f;
     private int FullAmmo;
     private float FullAmmoDivider;
@@ -49,6 +55,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     private Vector3 AmmoBarScaleStart;
     private float reloadspeed;
     private bool InEditor = true;
+    private bool RGripLastFrame;
     private bool InVR;
     private VRCPlayerApi localPlayer;
 
@@ -69,6 +76,8 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     private bool Occupied;
     private bool TriggerLastFrame;
     private bool Manning;
+    Quaternion AAGunRotLastFrame;
+    Quaternion JoystickZeroPoint;
     [System.NonSerializedAttribute] public bool IsOwner;//required by the bomb script, not actually related to being the owner of the object
     [UdonSynced(UdonSyncMode.None)] private Vector2 O_GunRotation;
     [UdonSynced(UdonSyncMode.None)] private int O_UpdateTime = 0;
@@ -80,6 +89,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
         nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
         SmoothingTimeDivider = 1f / updateInterval;
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
+        FullAmmo = Ammo;
         FullAmmoDivider = 1f / (Ammo > 0 ? Ammo : 10000000);
         if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
         reloadspeed = FullAmmo / FullReloadTimeSec;
@@ -90,12 +100,18 @@ public class DFUNCP_Turret : UdonSharpBehaviour
         Manning = true;
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active));
+        if (AmmoBar) { AmmoBar.gameObject.SetActive(true); }
+        if (ViewCamera) { ViewCamera.gameObject.SetActive(true); }
+        if (ViewCameraScreen) { ViewCameraScreen.gameObject.SetActive(true); }
     }
     public void SFEXTP_O_UserExit()
     {
         IsOwner = false;
         Manning = false;
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_NotActive));
+        if (AmmoBar) { AmmoBar.gameObject.SetActive(false); }
+        if (ViewCamera) { ViewCamera.gameObject.SetActive(false); }
+        if (ViewCameraScreen) { ViewCameraScreen.gameObject.SetActive(false); }
     }
     public void Set_Active()
     {
@@ -103,7 +119,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
         if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     public void Set_NotActive() { gameObject.SetActive(false); }
-    public void FireCannon()
+    public void FireGun()
     {
         int fp = FirePoints.Length;
         if (Ammo > 0) { Ammo--; }
@@ -114,14 +130,30 @@ public class DFUNCP_Turret : UdonSharpBehaviour
             proj.SetActive(true);
             proj.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
+        FireSound.pitch = Random.Range(.94f, 1.08f);
         FireSound.PlayOneShot(FireSound.clip);
         if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+        if (SendAnimTrigger) { TurretAnimator.SetTrigger(AnimTriggerName); }
     }
     public void SFEXTP_G_ReSupply()
     {
         if (Ammo != FullAmmo) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         Ammo = (int)Mathf.Min(Ammo + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAmmo);
         if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+    }
+    public void SFEXTP_G_RespawnButton()
+    {
+        Ammo = FullAmmo;
+        if (AmmoBar) { AmmoBar.localScale = AmmoBarScaleStart; }
+        TurretRotatorHor.rotation = Quaternion.identity;
+        TurretRotatorVert.rotation = Quaternion.identity;
+    }
+    public void SFEXTP_G_Explode()
+    {
+        Ammo = FullAmmo;
+        if (AmmoBar) { AmmoBar.localScale = AmmoBarScaleStart; }
+        TurretRotatorHor.rotation = Quaternion.identity;
+        TurretRotatorVert.rotation = Quaternion.identity;
     }
     private void Update()
     {
@@ -136,13 +168,13 @@ public class DFUNCP_Turret : UdonSharpBehaviour
                     if (Ammo > 0 && ((Time.time - LastFireTime) > FireDelay))
                     {
                         LastFireTime = Time.time;
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireCannon));
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
                     }
                 }
                 else if (Ammo > 0 && ((Time.time - LastFireTime) > FireHoldDelay))
                 {//launch every FireHoldDelay
                     LastFireTime = Time.time;
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireCannon));
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
                 }
                 TriggerLastFrame = true;
             }
@@ -151,38 +183,64 @@ public class DFUNCP_Turret : UdonSharpBehaviour
 
 
             //ROTATION
-            float HorDif = 0;
-            float VertDif = 0;
-            float HorDot = 1;
+            float DeltaTime = Time.smoothDeltaTime;
+            //get inputs
+            int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
+            int Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
+            int Af = Input.GetKey(KeyCode.A) ? -1 : 0;
+            int Df = Input.GetKey(KeyCode.D) ? 1 : 0;
+
+            float RGrip = 0;
+            float RTrigger = 0;
+            float LTrigger = 0;
+            if (!InEditor)
+            {
+                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
+            }
+            Vector3 JoystickPosYaw;
+            Vector3 JoystickPos;
+            //virtual joystick
+            Vector2 VRPitchYawInput = Vector2.zero;
             if (InVR)
             {
-                if (Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger") > .75)
+                if (RGrip > 0.75)
                 {
-                    Vector3 RHandDir = (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0)) * Vector3.forward;
-                    HorDif = Vector3.SignedAngle(TurretRotatorHor.forward, Vector3.ProjectOnPlane(RHandDir, TurretRotatorHor.up), TurretRotatorHor.up);
-                    HorDot = Mathf.Abs(Vector3.Dot(TurretRotatorHor.forward, RHandDir));
-                    VertDif = Vector3.SignedAngle(TurretRotatorVert.forward, Vector3.ProjectOnPlane(RHandDir, TurretRotatorHor.right), TurretRotatorHor.right);
+                    Quaternion RotDif = TurretRotatorHor.rotation * Quaternion.Inverse(AAGunRotLastFrame);//difference in vehicle's rotation since last frame
+                    JoystickZeroPoint = RotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
+                    if (!RGripLastFrame)//first frame you gripped joystick
+                    {
+                        RotDif = Quaternion.identity;
+                        JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
+                    }
+                    //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
+                    Quaternion JoystickDifference = (Quaternion.Inverse(TurretRotatorHor.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
+                    JoystickPosYaw = (JoystickDifference * TurretRotatorHor.forward);//angles to vector
+                    JoystickPosYaw.y = 0;
+                    JoystickPos = (JoystickDifference * TurretRotatorHor.up);
+                    JoystickPos.y = 0;
+                    VRPitchYawInput = new Vector2(JoystickPos.z, JoystickPosYaw.x) * 1.41421f;
+
+                    RGripLastFrame = true;
                 }
+                else
+                {
+                    JoystickPosYaw.x = 0;
+                    VRPitchYawInput = Vector3.zero;
+                    RGripLastFrame = false;
+                }
+                AAGunRotLastFrame = TurretRotatorHor.rotation;
             }
-            else
-            {
-                Vector3 HeadDir = (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation) * Vector3.forward;
-                HorDif = Vector3.SignedAngle(TurretRotatorHor.forward, Vector3.ProjectOnPlane(HeadDir, TurretRotatorHor.up), TurretRotatorHor.up);
-                HorDot = Mathf.Abs(Vector3.Dot(TurretRotatorHor.forward, HeadDir));
-                VertDif = Vector3.SignedAngle(TurretRotatorVert.forward, Vector3.ProjectOnPlane(HeadDir, TurretRotatorHor.right), TurretRotatorHor.right);
-            }
+            int InX = (Wf + Sf);
+            int InY = (Af + Df);
+            if (InX > 0 && InputXKeyb < 0 || InX < 0 && InputXKeyb > 0) InputXKeyb = 0;
+            if (InY > 0 && InputYKeyb < 0 || InY < 0 && InputYKeyb > 0) InputYKeyb = 0;
+            InputXKeyb = Mathf.Lerp(InputXKeyb, InX, Mathf.Abs(InX) > 0 ? TurningResponseDesktop * DeltaTime : 1);
+            InputYKeyb = Mathf.Lerp(InputYKeyb, InY, Mathf.Abs(InY) > 0 ? TurningResponseDesktop * DeltaTime : 1);
 
-            if (Mathf.Abs(HorDif) < 1.5f) { HorDif = 0; }
-            HorDif *= .02f;
-            if (Mathf.Abs(VertDif) < 1.5f) { VertDif = 0; }
-            VertDif *= .02f * HorDot;
-
-            Vector2 VRPitchYawInput = new Vector2(VertDif, HorDif);
-            float DeltaTime = Time.smoothDeltaTime;
-
-            float InputX = Mathf.Clamp((VRPitchYawInput.x), -1, 1);
-            float InputY = Mathf.Clamp((VRPitchYawInput.y), -1, 1);
-            //joystick model movement
+            float InputX = Mathf.Clamp((VRPitchYawInput.x + InputXKeyb), -1, 1);
+            float InputY = Mathf.Clamp((VRPitchYawInput.y + InputYKeyb), -1, 1);
 
             InputX *= TurnSpeedMulti;
             InputY *= TurnSpeedMulti;

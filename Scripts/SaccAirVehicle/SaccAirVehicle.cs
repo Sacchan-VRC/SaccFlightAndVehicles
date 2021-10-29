@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
 public class SaccAirVehicle : UdonSharpBehaviour
 {
     [Tooltip("Base object reference")]

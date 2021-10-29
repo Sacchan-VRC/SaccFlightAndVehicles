@@ -31,7 +31,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     private float FullGunAmmoInSeconds;
     private float TimeSinceSerialization;
     private bool firing;
-    private int GUNFIRING_STRING;
     private float FullGunAmmoDivider;
     private Vector3 AmmoBarScaleStart;
 
@@ -44,7 +43,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
         if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
         FullGunAmmoInSeconds = GunAmmoInSeconds;
         FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
-        GUNFIRING_STRING = Animator.StringToHash(AnimatorFiringStringName);
         GunDamageParticle_Parent.gameObject.SetActive(false);
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
@@ -204,10 +202,10 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     }
     public void GunStartFiring()
     {
-        GunAnimator.SetBool(GUNFIRING_STRING, true);
+        GunAnimator.SetBool(AnimatorFiringStringName, true);
     }
     public void GunStopFiring()
     {
-        GunAnimator.SetBool(GUNFIRING_STRING, false);
+        GunAnimator.SetBool(AnimatorFiringStringName, false);
     }
 }
