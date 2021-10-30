@@ -22,7 +22,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     [SerializeField] private KeyCode LaunchRocketKey = KeyCode.C;
     private bool UseLeftTrigger = false;
     private float Trigger;
-    private bool TriggerLastFrame;
+    private bool TriggerLastFrame = true;
     private int RocketPoint = 0;
     private float LastRocketDropTime = 0f;
     private int FullRockets;

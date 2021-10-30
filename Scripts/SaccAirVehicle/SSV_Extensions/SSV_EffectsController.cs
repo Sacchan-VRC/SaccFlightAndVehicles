@@ -22,6 +22,8 @@ public class SSV_EffectsController : UdonSharpBehaviour
     private Vector3[] FlatWaterFXLocalSpawnPos;
     private VRCPlayerApi localPlayer;
     private int FlatWaterEffectsLength;
+    private float FullFuelDivider;
+    private bool Occupied;
     private bool InVR;
     private bool InEditor = true;
     private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
@@ -29,11 +31,14 @@ public class SSV_EffectsController : UdonSharpBehaviour
     private int ENGINEOUTPUT_STRING = Animator.StringToHash("engineoutput");
     private int HEALTH_STRING = Animator.StringToHash("health");
     private int MACH10_STRING = Animator.StringToHash("mach10");
+    private int FUEL_STRING = Animator.StringToHash("fuel");
     [SerializeField] private bool PrintAnimHashNamesOnStart;
 
     public void SFEXT_L_EntityStart()
     {
         FullHealthDivider = 1f / (float)SSVControl.GetProgramVariable("Health");
+        float fuel = (float)SSVControl.GetProgramVariable("Fuel");
+        FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
 
         VehicleAnimator = ((SaccEntity)SSVControl.GetProgramVariable("EntityControl")).GetComponent<Animator>();
         localPlayer = Networking.LocalPlayer;
@@ -81,9 +86,10 @@ public class SSV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
         }
-        if ((bool)SSVControl.GetProgramVariable("Occupied"))
+        if (Occupied)
         {
             DoEffects = 0f;
+            VehicleAnimator.SetFloat(FUEL_STRING, (float)SSVControl.GetProgramVariable("Fuel") * FullFuelDivider);
         }
         else { DoEffects += DeltaTime; }
         VehicleAnimator.SetFloat(HEALTH_STRING, (float)SSVControl.GetProgramVariable("Health") * FullHealthDivider);
@@ -103,14 +109,16 @@ public class SSV_EffectsController : UdonSharpBehaviour
             FlatWaterEffects[x].rotation = newrot;
         }
     }
-    public void SFEXT_G_PilotExit()
-    {
-        VehicleAnimator.SetBool("occupied", false);
-    }
     public void SFEXT_G_PilotEnter()
     {
         DoEffects = 0f;
         VehicleAnimator.SetBool("occupied", true);
+        Occupied = true;
+    }
+    public void SFEXT_G_PilotExit()
+    {
+        VehicleAnimator.SetBool("occupied", false);
+        Occupied = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -192,5 +200,6 @@ public class SSV_EffectsController : UdonSharpBehaviour
         Debug.Log(string.Concat("ENGINEOUTPUT_STRING : ", ENGINEOUTPUT_STRING));
         Debug.Log(string.Concat("HEALTH_STRING : ", HEALTH_STRING));
         Debug.Log(string.Concat("MACH10_STRING : ", MACH10_STRING));
+        Debug.Log(string.Concat("FUEL_STRING : ", FUEL_STRING));
     }
 }

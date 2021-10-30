@@ -24,8 +24,10 @@ public class SAV_EffectsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float DoEffects = 999f;//don't do effects before initialized
     private float brake;
     private float FullHealthDivider;
+    private float FullFuelDivider;
     private Vector3 OwnerRotationInputs;
     private VRCPlayerApi localPlayer;
+    private bool Occupied;
     private bool InVR;
     private bool InEditor = true;
     //animator strings that are sent every frame are converted to int for optimization
@@ -39,6 +41,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private int AOA_STRING = Animator.StringToHash("AoA");
     private int MACH10_STRING = Animator.StringToHash("mach10");
     private int GS_STRING = Animator.StringToHash("Gs");
+    private int FUEL_STRING = Animator.StringToHash("fuel");
     [SerializeField] private bool PrintAnimHashNamesOnStart;
 
     public void SFEXT_L_EntityStart()
@@ -48,6 +51,8 @@ public class SAV_EffectsController : UdonSharpBehaviour
 
         VehicleAnimator = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Animator>();
         localPlayer = Networking.LocalPlayer;
+        float fuel = (float)SAVControl.GetProgramVariable("Fuel");
+        FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
         if (localPlayer == null)
         {
             VehicleAnimator.SetBool("occupied", true);
@@ -91,9 +96,10 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
         }
-        if ((bool)SAVControl.GetProgramVariable("Occupied"))
+        if (Occupied)
         {
             DoEffects = 0f;
+            VehicleAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
         }
         else { DoEffects += DeltaTime; }
 
@@ -104,7 +110,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
         VehicleAnimator.SetFloat(HEALTH_STRING, (float)SAVControl.GetProgramVariable("Health") * FullHealthDivider);
         VehicleAnimator.SetFloat(AOA_STRING, vapor ? Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack") * 0.00555555556f /* Divide by 180 */ ) : 0);
     }
-
     private void LargeEffects()//large effects visible from a long distance
     {
         float DeltaTime = Time.deltaTime;
@@ -139,15 +144,17 @@ public class SAV_EffectsController : UdonSharpBehaviour
         //("Gs", vapor ? EngineControl.Gs / 200 + .5f : 0) (.5 == 0 Gs, 1 == 100Gs, 0 == -100Gs)
         VehicleAnimator.SetFloat(GS_STRING, vapor ? ((float)SAVControl.GetProgramVariable("VertGs") * 0.005f) + 0.5f : 0.5f);
     }
-    public void SFEXT_G_PilotExit()
-    {
-        VehicleAnimator.SetBool("occupied", false);
-        VehicleAnimator.SetInteger("missilesincoming", 0);
-    }
     public void SFEXT_G_PilotEnter()
     {
         DoEffects = 0f;
         VehicleAnimator.SetBool("occupied", true);
+        Occupied = true;
+    }
+    public void SFEXT_G_PilotExit()
+    {
+        VehicleAnimator.SetBool("occupied", false);
+        VehicleAnimator.SetInteger("missilesincoming", 0);
+        Occupied = false;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -248,5 +255,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
         Debug.Log(string.Concat("AOA_STRING : ", AOA_STRING));
         Debug.Log(string.Concat("MACH10_STRING : ", MACH10_STRING));
         Debug.Log(string.Concat("GS_STRING : ", GS_STRING));
+        Debug.Log(string.Concat("FUEL_STRING : ", FUEL_STRING));
     }
 }

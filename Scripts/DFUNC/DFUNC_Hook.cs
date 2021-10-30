@@ -55,12 +55,12 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
+        TriggerLastFrame = true;
         if (Dial_Funcon) Dial_Funcon.SetActive(HookDown);
         if (HookDown) { gameObject.SetActive(true); }
     }
     public void SFEXT_O_PilotExit()
     {
-        TriggerLastFrame = true;
         Hooked = false;
         func_active = false;
         if (DisableGroundBrake && BrakeFunction)

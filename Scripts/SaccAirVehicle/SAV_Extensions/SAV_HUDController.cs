@@ -35,13 +35,11 @@ public class SAV_HUDController : UdonSharpBehaviour
     private int showvel;
     private Vector3 TargetDir = Vector3.zero;
     private Vector3 TargetSpeed;
-    private float FullFuelDivider;
     private float FullGunAmmoDivider;
     private Transform VehicleTransform;
     private SAV_EffectsController EffectsControl;
     private float SeaLevel;
     private Transform CenterOfMass;
-    private int FUEL_STRING = Animator.StringToHash("fuel");
     private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     VRCPlayerApi localPlayer;
     private Vector3 Vel_Lerper;
@@ -56,9 +54,6 @@ public class SAV_HUDController : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         HUDAnimator = EntityControl.GetComponent<Animator>();
         VehicleTransform = EntityControl.transform;
-
-        float fuel = (float)SAVControl.GetProgramVariable("Fuel");
-        FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
 
         if (PilotSeatAdjusterTarget) { transform.position = PilotSeatAdjusterTarget.position; }
 
@@ -141,7 +136,6 @@ public class SAV_HUDController : UdonSharpBehaviour
                 HUDText_angleofattack.text = ((float)SAVControl.GetProgramVariable("AngleOfAttack")).ToString("F0");
             }
             check = 0;
-            HUDAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
         }
         check += SmoothDeltaTime;
     }

@@ -8,6 +8,8 @@ using VRC.Udon;
 public class DFUNCP_Turret : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
+    [Tooltip("Transform to base your controls on, should be facing the same direction as the seat. If left empty it will be set to the Horizontal Rotator.")]
+    [SerializeField] private Transform ControlsRoot;
     [SerializeField] private Transform TurretRotatorHor;
     [SerializeField] private Transform TurretRotatorVert;
     [SerializeField] private float TurnSpeedMulti = 6;
@@ -76,7 +78,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     private bool Occupied;
     private bool TriggerLastFrame;
     private bool Manning;
-    Quaternion AAGunRotLastFrame;
+    Quaternion ControlsRotLastFrame;
     Quaternion JoystickZeroPoint;
     [System.NonSerializedAttribute] public bool IsOwner;//required by the bomb script, not actually related to being the owner of the object
     [UdonSynced(UdonSyncMode.None)] private Vector2 O_GunRotation;
@@ -85,6 +87,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
+        if (!ControlsRoot) { ControlsRoot = TurretRotatorHor; }
 
         nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
         SmoothingTimeDivider = 1f / updateInterval;
@@ -207,7 +210,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
             {
                 if (RGrip > 0.75)
                 {
-                    Quaternion RotDif = TurretRotatorHor.rotation * Quaternion.Inverse(AAGunRotLastFrame);//difference in vehicle's rotation since last frame
+                    Quaternion RotDif = ControlsRoot.rotation * Quaternion.Inverse(ControlsRotLastFrame);//difference in vehicle's rotation since last frame
                     JoystickZeroPoint = RotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
                     if (!RGripLastFrame)//first frame you gripped joystick
                     {
@@ -215,10 +218,10 @@ public class DFUNCP_Turret : UdonSharpBehaviour
                         JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
                     }
                     //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
-                    Quaternion JoystickDifference = (Quaternion.Inverse(TurretRotatorHor.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
-                    JoystickPosYaw = (JoystickDifference * TurretRotatorHor.forward);//angles to vector
+                    Quaternion JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
+                    JoystickPosYaw = (JoystickDifference * ControlsRoot.forward);//angles to vector
                     JoystickPosYaw.y = 0;
-                    JoystickPos = (JoystickDifference * TurretRotatorHor.up);
+                    JoystickPos = (JoystickDifference * ControlsRoot.up);
                     JoystickPos.y = 0;
                     VRPitchYawInput = new Vector2(JoystickPos.z, JoystickPosYaw.x) * 1.41421f;
 
@@ -230,7 +233,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
                     VRPitchYawInput = Vector3.zero;
                     RGripLastFrame = false;
                 }
-                AAGunRotLastFrame = TurretRotatorHor.rotation;
+                ControlsRotLastFrame = ControlsRoot.rotation;
             }
             int InX = (Wf + Sf);
             int InY = (Af + Df);
