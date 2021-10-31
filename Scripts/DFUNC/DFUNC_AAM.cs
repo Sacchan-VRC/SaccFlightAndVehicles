@@ -12,7 +12,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private Animator AAMAnimator;
     [SerializeField] private int NumAAM = 6;
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
-    [SerializeField] private float AAMLockAngle = 15;
+    public float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     [SerializeField] private float AAMLockTime = 1.5f;
     [Tooltip("Minimum time between missile launches")]
@@ -27,7 +27,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [SerializeField] private string AnimBoolName = "AAMSelected";
     [Tooltip("Animator float that represents how many missiles are left")]
     [SerializeField] private string AnimFloatName = "AAMs";
-    [Tooltip("Animator trigger that is set true when a missile is launched")]
+    [Tooltip("Animator trigger that is set when a missile is launched")]
     [SerializeField] private string AnimFiredTriggerName = "aamlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;
@@ -81,6 +81,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         VehicleTransform = EntityControl.transform;
         OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
         localPlayer = Networking.LocalPlayer;
+        InEditor = localPlayer == null;
 
         //HUD
         if (HUDControl)
@@ -441,7 +442,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void LaunchAAM()
     {
-        InEditor = (bool)SAVControl.GetProgramVariable("InEditor");
         if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         if (AAMAnimator) { AAMAnimator.SetTrigger(AnimFiredTriggerName); }

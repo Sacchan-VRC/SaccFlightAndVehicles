@@ -15,6 +15,11 @@ public class SAV_AAMController : UdonSharpBehaviour
     [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("Strength of the effect of countermeasures on the missile")]
     [SerializeField] private float FlareEffect = 10;
+    [Range(0, 90f)]
+    [Tooltip("If the missile and target vehicle are facing towards each other, multiply rotation speed by HighAspectRotSpeedMulti with this nose angle (facing perfectly towards each other = 0 degrees, which is the same as disabled) Set 0 for any non-heatseeker missiles")]
+    [SerializeField] private float HighAspectTrackAngle = 60;
+    [Tooltip("See above")]
+    [SerializeField] private float HighAspectRotSpeedMulti = .3f;
     [Tooltip("Name of integer to +1 on the target plane while chasing it")]
     [SerializeField] private string AnimINTName = "missilesincoming";
     [Tooltip("Play a random one of these explosion sounds")]
@@ -22,7 +27,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from collider with own plane")]
     [SerializeField] private float ColliderActiveDistance = 45;
     [Tooltip("Speed missile can rotate in degrees per second")]
-    [SerializeField] private float RotSpeed = 400;
+    [SerializeField] private float RotSpeed = 180;
     [Range(1.01f, 2f)]
     [Tooltip("Amount the target direction vector is extended when calculating missile rotation. Lower number = more aggressive drifting missile, but more likely to oscilate")]
     [SerializeField] private float TargetVectorExtension = 1.2f;
@@ -70,6 +75,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool Initialized = false;
     private bool HitTarget = false;
     private bool StartTrack = false;
+    private float HighAspectTrack;
     private float NotchHorizonDot;
     private float NotchLimitDot;
     private ConstantForce MissileConstant;
@@ -90,6 +96,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         Target = AAMTargets[aamtarg].transform;
         NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
         NotchLimitDot = 1 - Mathf.Cos(NotchAngle * Mathf.Deg2Rad);
+        HighAspectTrack = Mathf.Cos(HighAspectTrackAngle * Mathf.Deg2Rad);
         if (!Target)
         {
             TargetLost = true;
@@ -152,53 +159,52 @@ public class SAV_AAMController : UdonSharpBehaviour
             Vector3 TargetPos = Target.position;
             float TargetDistance = Vector3.Distance(Position, TargetPos);
             float EngineTrack;
+            float AspectTrack;
             bool Dumb;
             Vector3 Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
             TargetPosLastFrame = TargetPos;
-            Vector3 targdirection = (TargetPos - transform.position).normalized;
+            Vector3 MissileToTargetVector = (TargetPos - Position).normalized;
             if (TargetSAVControl)
             {
-                targdirection = (TargetPos - transform.position).normalized;
+                MissileToTargetVector = (TargetPos - transform.position).normalized;
                 Dumb = //Missile just flies straight if it's confused by flares or notched
                        //flare effect
                     Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect//if there are flares active, there's a chance it will not track per frame.
                     ||
                     //notching
-                    Vector3.Dot(Vector3.up, targdirection) < NotchHorizonDot
-                    && Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, targdirection)) < NotchLimitDot;//if the target is traveling perpendicular to the direction the missile is looking at it from, it is 'notching' the missile
+                    Vector3.Dot(Vector3.up, MissileToTargetVector) < NotchHorizonDot
+                    && Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, MissileToTargetVector)) < NotchLimitDot;//if the target is traveling perpendicular to the direction the missile is looking at it from, it is 'notching' the missile
 
+                AspectTrack = Vector3.Dot(MissileToTargetVector, -TargetEntityControl.transform.forward) > HighAspectTrack ? .5f : 1;
                 EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle
             }
             else
             {
                 EngineTrack = 1;
+                AspectTrack = 1;
                 Dumb = false;
             }
             if (EngineTrack > 1) { EngineTrack = AfterBurnerTrackMulti; }//if AB on, faster rotation
             if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
             {
-                if ((!Dumb && TargetDistance < TargDistlastframe) || LockHack)
+                if (!Dumb && Vector3.Dot(MissileToTargetVector, MissileRigid.velocity) > 0 || LockHack)
                 {
-                    Vector3 missileToTargetVector;
                     if (PredictiveChase)
                     {
                         float timetotarget = Mathf.Min(TargetDistance / Mathf.Max(((TargDistlastframe - TargetDistance) / DeltaTime), 0.001f), 3);//ensure no division by 0
                         Vector3 TargetPredictedPos = TargetPos + ((Targetmovedir * timetotarget));
-                        missileToTargetVector = TargetPredictedPos - Position;
+                        MissileToTargetVector = TargetPredictedPos - Position;
                     }
-                    else
-                    {
-                        missileToTargetVector = TargetPos - Position;
-                    }
+                    //else using the already set targdirection
                     UnlockTime = 0;
                     //turn towards the target
-                    Vector3 TargetDirNormalized = missileToTargetVector.normalized * TargetVectorExtension;
+                    Vector3 TargetDirNormalized = MissileToTargetVector.normalized * TargetVectorExtension;
                     Vector3 MissileVelNormalized = MissileRigid.velocity.normalized;
                     Vector3 MissileForward = transform.forward;
                     Vector3 targetDirection = TargetDirNormalized - MissileVelNormalized;
                     Vector3 RotationAxis = Vector3.Cross(MissileForward, targetDirection);
                     float deltaAngle = Vector3.Angle(MissileForward, targetDirection);
-                    transform.Rotate(RotationAxis, Mathf.Min(RotSpeed * EngineTrack * DeltaTime, deltaAngle), Space.World);
+                    transform.Rotate(RotationAxis, Mathf.Min(RotSpeed * EngineTrack * AspectTrack * DeltaTime, deltaAngle), Space.World);
                 }
                 else
                 {

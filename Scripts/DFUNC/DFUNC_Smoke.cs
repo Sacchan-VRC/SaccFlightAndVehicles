@@ -204,7 +204,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void SetSmoking(bool smoking)
     {
         Smoking = smoking;
-        HUD_SmokeOnIndicator.SetActive(smoking);
+        if (HUD_SmokeOnIndicator) { HUD_SmokeOnIndicator.SetActive(smoking); }
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = smoking; }
         if (Dial_Funcon) Dial_Funcon.SetActive(smoking);
@@ -248,6 +248,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
             }
             x++;
         }
+        LeftDial = true;
         x = 0;
         foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_L)
         {

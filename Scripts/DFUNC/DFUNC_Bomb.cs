@@ -28,7 +28,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     [SerializeField] private string AnimBoolName = "BombSelected";
     [Tooltip("Animator float that represents how many bombs are left")]
     [SerializeField] private string AnimFloatName = "bombs";
-    [Tooltip("Animator trigger that is set true when a bomb is dropped")]
+    [Tooltip("Animator trigger that is set when a bomb is dropped")]
     [SerializeField] private string AnimFiredTriggerName = "bomblaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;

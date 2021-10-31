@@ -34,7 +34,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     [SerializeField] private Camera ViewCamera;
     [SerializeField] private GameObject ViewCameraScreen;
     [SerializeField] private Transform AmmoBar;
-    [SerializeField] private int Ammo = 60;
+    [SerializeField] private int Ammo = 160;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
     [Tooltip("Minimum delay between firing")]

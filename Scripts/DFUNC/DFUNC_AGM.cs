@@ -33,7 +33,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     [SerializeField] private string AnimBoolName = "AGMSelected";
     [Tooltip("Animator float that represents how many missiles are left")]
     [SerializeField] private string AnimFloatName = "AGMs";
-    [Tooltip("Animator trigger that is set true when a missile is launched")]
+    [Tooltip("Animator trigger that is set when a missile is launched")]
     [SerializeField] private string AnimFiredTriggerName = "agmlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     [SerializeField] private bool AnimBoolStayTrueOnExit;

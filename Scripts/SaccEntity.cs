@@ -454,14 +454,15 @@ public class SaccEntity : UdonSharpBehaviour
     {
         Holding = true;
         Using = true;
-        HoldingOnly.SetActive(true);
+        if (HoldingOnly) { HoldingOnly.SetActive(true); }
+        TakeOwnerShipOfExtensions();
         SendEventToExtensions("SFEXT_O_OnPickup");
     }
     public override void OnDrop()
     {
         Holding = false;
         Using = true;
-        HoldingOnly.SetActive(false);
+        if (HoldingOnly) { HoldingOnly.SetActive(false); }
         SendEventToExtensions("SFEXT_O_OnDrop");
     }
     public override void OnPickupUseDown()
