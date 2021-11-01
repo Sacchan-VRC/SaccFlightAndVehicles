@@ -40,7 +40,6 @@ public class SAV_HUDController : UdonSharpBehaviour
     private SAV_EffectsController EffectsControl;
     private float SeaLevel;
     private Transform CenterOfMass;
-    private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     VRCPlayerApi localPlayer;
     private Vector3 Vel_Lerper;
     private float Vel_UpdateInterval;

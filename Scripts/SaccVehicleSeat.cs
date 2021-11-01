@@ -34,7 +34,6 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private Transform Seat;
     private Quaternion SeatStartRot;
-    private bool InVehicle;
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
@@ -47,7 +46,9 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     {
         if (!InEditor)
         {
+            Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle in VR
             localPlayer.UseAttachedStation();
+            Seat.localRotation = SeatStartRot;
             Networking.SetOwner(localPlayer, gameObject);
         }
         if (!SeatInitialized) { InitializeSeat(); }
@@ -58,10 +59,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         else
         { EntityControl.PassengerEnterVehicleLocal(); }
         if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
-        Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle in VR
 
-        Seat.localRotation = SeatStartRot;
-        InVehicle = true;
         if (AdjustSeat && TargetEyePosition)
         {
             CalibratedY = false;
@@ -89,7 +87,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                     }
                 }
             }
-            else if (InVehicle)
+            else if (EntityControl.InVehicle)
             {
                 SetVoiceInside(player);
             }
@@ -132,7 +130,6 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                     }
                 }
                 if (ThisSeatOnly) { ThisSeatOnly.SetActive(false); }
-                InVehicle = false;
             }
         }
     }
@@ -201,11 +198,16 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                     }
                 }
             }
+            //remove floating point errors on x
+            Vector3 seatpos = Seat.localPosition;
+            seatpos.x = 0;
+            Seat.localPosition = seatpos;
+            //set synced variable
             Vector3 newpos = Seat.localPosition;
             _adjustedPos.x = newpos.y;
             _adjustedPos.y = newpos.z;
             RequestSerialization();
-            if (InVehicle && (!CalibratedY || !CalibratedZ))
+            if (EntityControl.InVehicle && (!CalibratedY || !CalibratedZ))
             {
                 SendCustomEventDelayedSeconds(nameof(SeatAdjustment), .3f, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
             }

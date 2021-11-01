@@ -39,8 +39,6 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int LStickSelection = -1;
     [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
     [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
-    private int Lstickselection_STRING = Animator.StringToHash("Lstickselection");
-    private int Rstickselection_STRING = Animator.StringToHash("Rstickselection");
     private bool FunctionsActive = false;
     private bool LeftDialOnlyOne;
     private bool RightDialOnlyOne;

@@ -110,7 +110,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     public void SFEXTP_O_UserExit()
     {
         IsOwner = false;
-        Manning = false;
+        SendCustomEventDelayedFrames(nameof(ManningFalse), 1);
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_NotActive));
         if (AmmoBar) { AmmoBar.gameObject.SetActive(false); }
         if (ViewCamera) { ViewCamera.gameObject.SetActive(false); }
@@ -122,6 +122,8 @@ public class DFUNCP_Turret : UdonSharpBehaviour
         if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     public void Set_NotActive() { gameObject.SetActive(false); }
+    public void ManningFalse()
+    { Manning = false; }//if this is in SFEXTP_O_UserExit rather than here update runs for one frame with it false before it's disabled    
     public void FireGun()
     {
         int fp = FirePoints.Length;

@@ -461,7 +461,7 @@ public class SaccEntity : UdonSharpBehaviour
     public override void OnDrop()
     {
         Holding = false;
-        Using = true;
+        Using = false;
         if (HoldingOnly) { HoldingOnly.SetActive(false); }
         SendEventToExtensions("SFEXT_O_OnDrop");
     }

@@ -31,6 +31,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     [Range(1.01f, 2f)]
     [Tooltip("Amount the target direction vector is extended when calculating missile rotation. Lower number = more aggressive drifting missile, but more likely to oscilate")]
     [SerializeField] private float TargetVectorExtension = 1.2f;
+    [Tooltip("Maxmimum extrapolation distance in seconds for target interception, to prevent distant missiles getting confused too easily")]
+    [SerializeField] private float MaximumExtrapTime = 3f;
     [Tooltip("If target vehicle has afterburner on, multiply rotation speed by this value")]
     [SerializeField] private float AfterBurnerTrackMulti = 2f;
     [Tooltip("Missile rotates weaker if target's throttle is low, this value is the throttle at which lowering throttle more doesn't do anything")]
@@ -73,7 +75,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool IsOwner;
     private bool InEditor;
     private bool Initialized = false;
-    private bool HitTarget = false;
+    private bool DirectHit = false;
+    private bool SplashHit = false;
     private bool StartTrack = false;
     private float HighAspectTrack;
     private float NotchHorizonDot;
@@ -191,7 +194,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                 {
                     if (PredictiveChase)
                     {
-                        float timetotarget = Mathf.Min(TargetDistance / Mathf.Max(((TargDistlastframe - TargetDistance) / DeltaTime), 0.001f), 3);//ensure no division by 0
+                        float timetotarget = Mathf.Min(TargetDistance / Mathf.Max(((TargDistlastframe - TargetDistance) / DeltaTime), 0.001f), MaximumExtrapTime);//ensure no division by 0
                         Vector3 TargetPredictedPos = TargetPos + ((Targetmovedir * timetotarget));
                         MissileToTargetVector = TargetPredictedPos - Position;
                     }
@@ -210,6 +213,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                 {
                     if (TargetDistance < ProximityExplodeDistance)//missile flew past the target, but is within proximity explode range?
                     {
+                        SplashHit = true;
                         Explode();
                     }
                     UnlockTime += DeltaTime;
@@ -244,7 +248,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         {
             if (IsOwner)
             {
-                HitTarget = true;
+                DirectHit = true;
                 SaccEntity TargetEntity = other.gameObject.GetComponent<SaccEntity>();
                 if (TargetEntity)
                 {
@@ -283,27 +287,28 @@ public class SAV_AAMController : UdonSharpBehaviour
         AAMCollider.enabled = false;
         Animator AAMani = GetComponent<Animator>();
         float DamageDist = 999f;
-        if (TargetSAVControl)
+        if (TargetEntityControl && (DirectHit || SplashHit))
         {
             TargetEntityControl.LastAttacker = EntityControl;
+            TargetSAVControl.SetProgramVariable("LastHitTime", Time.time);
             DamageDist = Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position) / ProximityExplodeDistance;
-        }
-        if (IsOwner && TargetEntityControl)
-        {
-            if (DamageDist < 1 && !HitTarget)
+            if (IsOwner)
             {
-                //Debug.Log(string.Concat("TARGETDIST: ", Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position).ToString()));
-                if (DamageDist > .66666f)
+                if (DamageDist < 1 && !DirectHit)
                 {
-                    TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit25");
-                }
-                else if (DamageDist > .33333f)
-                {
-                    TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit50");
-                }
-                else
-                {
-                    TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit75");
+                    //Debug.Log(string.Concat("TARGETDIST: ", Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position).ToString()));
+                    if (DamageDist > .66666f)
+                    {
+                        TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit25");
+                    }
+                    else if (DamageDist > .33333f)
+                    {
+                        TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit50");
+                    }
+                    else
+                    {
+                        TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit75");
+                    }
                 }
             }
         }

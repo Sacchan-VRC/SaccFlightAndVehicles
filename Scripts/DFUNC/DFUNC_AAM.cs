@@ -36,10 +36,30 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         set
         {
+            if (value > _AAMFire)//if _AAMFire is higher, it's because a late joiner just took ownership, so don't launch
+            { LaunchAAM(); }
             _AAMFire = value;
-            LaunchAAM();
         }
         get => _AAMFire;
+    }
+    [UdonSynced, FieldChangeCallback(nameof(sendtargeted))] private bool _SendTargeted;
+    public bool sendtargeted
+    {
+        set
+        {
+            if (!Pilot)
+            {
+                var Target = AAMTargets[AAMTarget];
+                if (Target && Target.transform.parent)
+                {
+                    AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
+                }
+                if (AAMCurrentTargetSAVControl != null)
+                { AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted"); }
+            }
+            _SendTargeted = value;
+        }
+        get => _SendTargeted;
     }
     private float boolToggleTime;
     private bool AnimOn = false;
@@ -106,18 +126,15 @@ public class DFUNC_AAM : UdonSharpBehaviour
         {
             AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
         }
+        RequestSerialization();
     }
+    public void SFEXT_G_PilotEnter()
+    { gameObject.SetActive(true); }
     public void SFEXT_G_PilotExit()
-    {
-        if (OthersEnabled)
-        { DisableForOthers(); }
-        if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
-        { SetBoolOff(); }
-    }
+    { gameObject.SetActive(false); }
     public void SFEXT_O_PilotExit()
     {
         Pilot = false;
-        gameObject.SetActive(false);
         AAMLockTimer = 0;
         AAMHasTarget = false;
         AAMLocked = false;
@@ -163,11 +180,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        gameObject.SetActive(true);
         func_active = true;
         AAMTargetIndicator.gameObject.SetActive(true);
-        if (!OthersEnabled)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
 
         if (DoAnimBool && !AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -175,7 +189,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         TriggerLastFrame = true;
-        gameObject.SetActive(false);
         AAMTargeting.gameObject.SetActive(false);
         AAMTargetLock.gameObject.SetActive(false);
         AAMLockTimer = 0;
@@ -184,28 +197,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMTargetIndicator.localRotation = Quaternion.identity;
         AAMTargetIndicator.gameObject.SetActive(false);
         func_active = false;
-        if (OthersEnabled)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
 
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
-    }
-    //synced variables recieved while object is disabled do not get set until the object is enabled
-    public void EnableForOthers()
-    {
-        if (!Pilot)
-        {
-            gameObject.SetActive(true);
-        }
-        OthersEnabled = true;
-    }
-    public void DisableForOthers()
-    {
-        if (!Pilot)
-        {
-            gameObject.SetActive(false);
-        }
-        OthersEnabled = false;
     }
     void Update()
     {
@@ -242,7 +236,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 }
                 else TriggerLastFrame = false;
             }
-            else { AAMLocked = false; AAMHasTarget = false; }
 
 
             //sound
@@ -333,8 +326,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                         AAMCurrentTargetSAVControl = NextTargetSAVontrol;
                         AAMLockTimer = 0;
-                        AAMTargetedTimer = .9f;//send targeted .1s after targeting so it can't get spammed too fast (and doesnt send if you instantly target something else)
-                        RequestSerialization();
+                        AAMTargetedTimer = 99f;//send targeted straight away
                     }
                 }
             }
@@ -373,15 +365,15 @@ public class DFUNC_AAM : UdonSharpBehaviour
                     if (AAMCurrentTargetAngle < AAMLockAngle && NumAAM > 0)
                     {
                         AAMLockTimer += DeltaTime;
-                        //give enemy radar lock even if you're out of missiles
                         if (AAMCurrentTargetSAVControl)
                         {
                             //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
                             AAMTargetedTimer += DeltaTime;
                             if (AAMTargetedTimer > 1)
                             {
+                                sendtargeted = !sendtargeted;
+                                RequestSerialization();
                                 AAMTargetedTimer = 0;
-                                AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted");
                             }
                         }
                     }

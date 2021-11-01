@@ -114,6 +114,9 @@ public class SAV_SoundController : UdonSharpBehaviour
     private bool InVehicle;
     private int DoorsOpen = 0;
     private bool InWater;
+    private bool Taxiing;
+    private bool Occupied;
+    private bool NoFuel;
     public void SFEXT_L_EntityStart()
     {
         MissileHitNULL = MissileHit.Length < 1;
@@ -213,7 +216,7 @@ public class SAV_SoundController : UdonSharpBehaviour
             }
             return;
         }
-        if ((bool)SAVControl.GetProgramVariable("Occupied")) { DoSound = 0f; }
+        if (Occupied) { DoSound = 0f; }
         else { DoSound += DeltaTime; }
 
 
@@ -284,14 +287,14 @@ public class SAV_SoundController : UdonSharpBehaviour
         //Piloting = true in editor play mode
         if (InVehicle && AllDoorsClosed)
         {
-            if (Rolling)
+            if (!Rolling_Seaplane && Rolling)
             {
-                if ((bool)SAVControl.GetProgramVariable("Taxiing"))
+                if (Taxiing)
                 { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
                 else
                 { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
             }
-            if ((Piloting || (Passenger && (bool)SAVControl.GetProgramVariable("Occupied"))) && (float)SAVControl.GetProgramVariable("Fuel") > 0.1f) //you're piloting or someone is piloting and you're a passenger
+            if ((Piloting || (Passenger && Occupied)) && !NoFuel) //you're piloting or someone is piloting and you're a passenger
             {
                 float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
                 if (PlaneInside)
@@ -315,15 +318,9 @@ public class SAV_SoundController : UdonSharpBehaviour
                 PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime);
             }
         }
-        else if ((bool)SAVControl.GetProgramVariable("Occupied") && (float)SAVControl.GetProgramVariable("Fuel") > 1)//someone else is piloting
+        else if (Occupied && !NoFuel)//someone else is piloting
         {
-            if (Rolling_Seaplane && Rolling)
-            {
-                if ((bool)SAVControl.GetProgramVariable("Taxiing"))
-                { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
-                else
-                { Rolling.volume = Mathf.Lerp(Rolling.volume, 0, 5f * DeltaTime); }
-            }
+
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, .72f * DeltaTime);
             float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
             if (Doppler > 50)
@@ -345,7 +342,13 @@ public class SAV_SoundController : UdonSharpBehaviour
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * DeltaTime);
             PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, .72f * DeltaTime);
         }
-
+        if (Rolling_Seaplane && Rolling)
+        {
+            if (Taxiing)
+            { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
+            else
+            { Rolling.volume = Mathf.Lerp(Rolling.volume, 0, 5f * DeltaTime); }
+        }
         float PlaneIdlePitchDopple = PlaneIdlePitch;
         float dopplemin = Mathf.Min(Doppler, 2.25f);
         if (!InVehicle) //apply doppler if you're not in the vehicle
@@ -459,10 +462,12 @@ public class SAV_SoundController : UdonSharpBehaviour
     public void SFEXT_G_RespawnButton()
     {
         ResetSounds();
+        NoFuel = false;
     }
     public void SFEXT_G_Explode()
     {
         ResetSounds();
+        NoFuel = false;
         //play the sonic boom that is coming towards you, after the vehicle explodes with the correct delay
         if (playsonicboom && silent)
         {
@@ -519,8 +524,11 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (AllDoorsClosed)
         { SetSoundsOutside(); }
     }
+    public void SFEXT_G_PilotExit()//old WakeUp
+    { Occupied = false; }
     public void SFEXT_G_PilotEnter()//old WakeUp
     {
+        Occupied = true;
         DoSound = 0f;
         if (soundsoff)
         {
@@ -559,8 +567,13 @@ public class SAV_SoundController : UdonSharpBehaviour
             BulletHit[rand].Play();
         }
     }
+    public void SFEXT_O_NotNoFuel()//old WakeUp
+    { NoFuel = false; }
+    public void SFEXT_O_NoFuel()//old WakeUp
+    { NoFuel = true; }
     public void SFEXT_G_TouchDown()
     {
+        { Taxiing = true; }
         if ((float)SAVControl.GetProgramVariable("Speed") > TouchDownSoundSpeed)
         {
             PlayTouchDownSound();
@@ -569,11 +582,14 @@ public class SAV_SoundController : UdonSharpBehaviour
     }
     public void SFEXT_G_TouchDownWater()
     {
+        { Taxiing = true; }
         if ((float)SAVControl.GetProgramVariable("Speed") > TouchDownSoundSpeed)
         {
             PlayTouchDownSound();
         }
     }
+    public void SFEXT_G_TakeOff()
+    { Taxiing = false; }
     public void SFEXT_G_ReSupply()
     {
         SendCustomEventDelayedFrames("ResupplySound", 1);

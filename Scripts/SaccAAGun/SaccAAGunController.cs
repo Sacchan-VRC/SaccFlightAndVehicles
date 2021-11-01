@@ -141,6 +141,25 @@ public class SaccAAGunController : UdonSharpBehaviour
         }
         get => _AAMFire;
     }
+    [UdonSynced, FieldChangeCallback(nameof(sendtargeted))] private bool _SendTargeted;
+    public bool sendtargeted
+    {
+        set
+        {
+            if (!Manning)
+            {
+                var Target = AAMTargets[AAMTarget];
+                if (Target && Target.transform.parent)
+                {
+                    AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
+                }
+                if (AAMCurrentTargetSAVControl != null)
+                { AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted"); }
+            }
+            _SendTargeted = value;
+        }
+        get => _SendTargeted;
+    }
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
@@ -354,6 +373,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
+        if (EntityControl.dead) { return; }
         if (Manning && !InEditor)
         {
             if (AAGunSeat) { AAGunSeat.ExitStation(localPlayer); }
@@ -500,8 +520,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                     AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                     AAMCurrentTargetSAVControl = NextTargetSAVControl;
                     AAMLockTimer = 0;
-                    AAMTargetedTimer = .6f;//give the synced variable(AAMTarget) time to update before sending targeted
-                    RequestSerialization();
+                    AAMTargetedTimer = 99f;//send targeted straight away
                     if (HUDControl)
                     {
                         HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
@@ -549,8 +568,9 @@ public class SaccAAGunController : UdonSharpBehaviour
                         AAMTargetedTimer += DeltaTime;
                         if (AAMTargetedTimer > 1)
                         {
+                            sendtargeted = !sendtargeted;
+                            RequestSerialization();
                             AAMTargetedTimer = 0;
-                            AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted");
                         }
                     }
                 }
@@ -652,6 +672,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         {
             InVR = localPlayer.IsUserInVR();//has to be set on enter otherwise Built And Test thinks you're in desktop
         }
+        RequestSerialization();
     }
     public void SFEXT_G_PilotEnter()
     {

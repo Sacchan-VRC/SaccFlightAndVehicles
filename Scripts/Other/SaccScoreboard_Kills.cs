@@ -14,7 +14,7 @@ public class SaccScoreboard_Kills : UdonSharpBehaviour
         set
         {
             _topKiller = value;
-            UpdateScores();
+            SendCustomEventDelayedSeconds(nameof(UpdateScores), 1);//TopKills can be not updated yet if this is done instantly
         }
         get => _topKiller;
     }
@@ -31,10 +31,7 @@ public class SaccScoreboard_Kills : UdonSharpBehaviour
     }
     public void UpdateScores()
     {
+        Debug.Log("UpdateScores");
         Scores.text = string.Concat("Instance Best Killing Spree: ", TopKiller, " : ", TopKills, "\nMy Best Killing Spree: ", MyBestKills);
-    }
-    public override void OnPlayerJoined(VRCPlayerApi player)
-    {
-        RequestSerialization();
     }
 }

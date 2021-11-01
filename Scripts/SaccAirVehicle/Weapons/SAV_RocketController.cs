@@ -13,7 +13,7 @@ public class SAV_RocketController : UdonSharpBehaviour
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
     [SerializeField] private float ExplosionLifeTime = 10;
     [Tooltip("Enable collider this long after missile has launched (collider is disabled to prevent hitting your own vehicle")]
-    [SerializeField] private float ColliderEnableDelay = .07f;
+    [SerializeField] private float ColliderEnableDelay = .08f;
     [Tooltip("Play a random one of these explosion sounds")]
     [SerializeField] private AudioSource[] ExplosionSounds;
     [Tooltip("Spawn bomb at a random angle up to this number of degrees")]

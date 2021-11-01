@@ -146,7 +146,6 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool InVR = false;
     [System.NonSerializedAttribute] public Vector3 LastFrameVel = Vector3.zero;
     [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
-    [System.NonSerializedAttribute] public float rotlift;
     private Vector3 Yawing;
     private Vector3 Thrust;
     [System.NonSerializedAttribute] public float Taxiinglerper;
@@ -706,7 +705,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
 
                 if (VehicleMoving)//optimization
                 {
-                    rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
+                    float rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
                     yaw *= Mathf.Max(YawThrustVecMulti, rotlift);
 
@@ -736,9 +735,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         else//non-owners need to know these values
         {
             Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
-            rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//so passengers can hear the airbrake
-                                                             //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
-                                                             //AirSpeed = AirVel.magnitude;
+                                                    //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
+                                                    //AirSpeed = AirVel.magnitude;
         }
         RotationInputs.y = YawInput;
     }
@@ -767,6 +765,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
+        if (EntityControl.dead) { return; }
         EntityControl.dead = true;
         PlayerThrottle = 0;
         ThrottleInput = 0;

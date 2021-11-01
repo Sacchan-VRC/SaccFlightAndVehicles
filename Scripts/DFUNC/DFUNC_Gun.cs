@@ -47,7 +47,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
         get => _firing;
     }
     private int GUNFIRING_STRING = Animator.StringToHash("gunfiring");
-    private int GUNAMMO_STRING = Animator.StringToHash("gunammo");
     private float FullGunAmmoDivider;
     private bool Selected = false;
     private float reloadspeed;
@@ -59,7 +58,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        AnimBool_STRING = Animator.StringToHash(AnimBoolName);
 
         reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
         FullGunAmmoInSeconds = GunAmmoInSeconds;
@@ -427,13 +425,13 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         boolToggleTime = Time.time;
         AnimOn = true;
-        GunAnimator.SetBool(AnimBool_STRING, AnimOn);
+        GunAnimator.SetBool(AnimBoolName, AnimOn);
     }
     public void SetBoolOff()
     {
         boolToggleTime = Time.time;
         AnimOn = false;
-        GunAnimator.SetBool(AnimBool_STRING, AnimOn);
+        GunAnimator.SetBool(AnimBoolName, AnimOn);
     }
     public void KeyboardInput()
     {

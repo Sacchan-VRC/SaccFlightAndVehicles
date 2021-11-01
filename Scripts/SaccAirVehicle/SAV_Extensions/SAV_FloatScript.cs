@@ -64,7 +64,8 @@ public class SAV_FloatScript : UdonSharpBehaviour
     private bool InEditor = false;
     private float FloatDiameter;
     private int FPLength;
-    void Start()
+    private bool Initialized;
+    public void SFEXT_L_EntityStart()
     {
         FPLength = FloatPoints.Length;
         FloatDiameter = FloatRadius * 2;
@@ -86,10 +87,12 @@ public class SAV_FloatScript : UdonSharpBehaviour
         for (int i = 0; i != numfloats; i++)
         {
             FloatLocalPos[i] = FloatPoints[i].localPosition;
+            FloatTouchWaterPoint[i] = float.MinValue;
+            FloatLastRayHitHeight[i] = float.MinValue;
         }
-        if (HoverBike || (!InEditor && !localPlayer.isMaster))
+        if (!HoverBike && (InEditor || localPlayer.isMaster))
         {
-            gameObject.SetActive(false);
+            gameObject.SetActive(true);
         }
         if (HoverBike || DisableTaxiRotation)
         {

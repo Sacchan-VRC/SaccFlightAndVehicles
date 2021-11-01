@@ -15,7 +15,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     [Tooltip("Because you have to hold the break, and the keyboardcontrols script can only send events, this option is here.")]
     [SerializeField] private KeyCode KeyboardControl = KeyCode.B;
     private bool UseLeftTrigger = false;
-    [System.NonSerializedAttribute] private float BrakeInput;
+    [UdonSynced(UdonSyncMode.None)] private float BrakeInput;
     private Rigidbody VehicleRigidbody;
     private bool HasAirBrake;
     [SerializeField] private float AirbrakeStrength = 4f;
@@ -23,6 +23,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     [Tooltip("Water brake functionality requires that floatscript is being used")]
     [SerializeField] private float WaterBrakeStrength = 1f;
     [SerializeField] private bool NoPilotAlwaysGroundBrake = true;
+    [Tooltip("Speed below which the ground break works meters/s")]
     [SerializeField] private float GroundBrakeSpeed = 40f;
     //other functions can set this +1 to disable breaking
     [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
@@ -38,6 +39,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private bool IsOwner;
     private bool Piloting;
     private float NextUpdateTime;
+    private float RotMultiMaxSpeedDivider;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -45,6 +47,8 @@ public class DFUNC_Brake : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         HasAirBrake = AirbrakeStrength != 0;
+        RotMultiMaxSpeedDivider = 1 / (float)SAVControl.GetProgramVariable("RotMultiMaxSpeed");
+        IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null && !localPlayer.isMaster)
         { gameObject.SetActive(false); }
@@ -92,15 +96,18 @@ public class DFUNC_Brake : UdonSharpBehaviour
     public void SFEXT_O_TakeOwnership()
     {
         gameObject.SetActive(true);
+        IsOwner = true;
     }
     public void SFEXT_O_LoseOwnership()
     {
         gameObject.SetActive(false);
+        IsOwner = false;
     }
     public void EnableForAnimation()
     {
-        if (!(bool)SAVControl.GetProgramVariable("IsOwner"))
+        if (!IsOwner)
         {
+            Airbrake_snd.Play();
             gameObject.SetActive(true);
             NonLocalActiveDelay = 3;
         }
@@ -134,7 +141,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private void Update()
     {
         float DeltaTime = Time.deltaTime;
-        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+        if (IsOwner)
         {
             float Speed = (float)SAVControl.GetProgramVariable("Speed");
             Vector3 CurrentVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
@@ -201,7 +208,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                     if (!BrakingLastFrame)
                     {
                         if (Airbrake_snd && !Airbrake_snd.isPlaying) { Airbrake_snd.Play(); }
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "EnableForAnimation");
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForAnimation));
                     }
                     if (Time.time > NextUpdateTime)
                     {
@@ -262,7 +269,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
         if (Airbrake_snd)
         {
             Airbrake_snd.pitch = AirbrakeLerper * .2f + .9f;
-            Airbrake_snd.volume = AirbrakeLerper * (float)SAVControl.GetProgramVariable("rotlift");
+            Airbrake_snd.volume = AirbrakeLerper * Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RotMultiMaxSpeedDivider, 1);
         }
     }
 }

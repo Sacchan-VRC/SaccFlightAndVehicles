@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Flares : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
@@ -22,17 +22,28 @@ public class DFUNC_Flares : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;
+    private bool func_active;
     private bool TriggerLastFrame;
+    [UdonSynced, FieldChangeCallback(nameof(sendlaunchflare))] private bool _SendLaunchFlare;
+    public bool sendlaunchflare
+    {
+        set
+        {
+            LaunchFlare();
+            _SendLaunchFlare = value;
+        }
+        get => _SendLaunchFlare;
+    }
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void DFUNC_Selected()
     {
-        gameObject.SetActive(true);
+        func_active = true;
     }
     public void DFUNC_Deselected()
     {
         TriggerLastFrame = true;
-        gameObject.SetActive(false);
+        func_active = false;
     }
     public void SFEXT_L_EntityStart()
     {
@@ -40,10 +51,14 @@ public class DFUNC_Flares : UdonSharpBehaviour
         reloadspeed = FullFlares / FullReloadTimeSec;
         if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
     }
+    public void SFEXT_G_PilotEnter()
+    { gameObject.SetActive(true); }
+    public void SFEXT_G_PilotExit()
+    { gameObject.SetActive(false); }
     public void SFEXT_O_PilotExit()
     {
         TriggerLastFrame = true;
-        gameObject.SetActive(false);
+        func_active = false;
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -64,22 +79,28 @@ public class DFUNC_Flares : UdonSharpBehaviour
     }
     private void Update()
     {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-        if (Trigger > 0.75)
+        if (func_active)
         {
-            if (!TriggerLastFrame)
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+            if (Trigger > 0.75)
             {
-                if (NumFlares > 0)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlare"); }
+                if (!TriggerLastFrame)
+                {
+                    if (NumFlares > 0)
+                    {
+                        sendlaunchflare = !sendlaunchflare;
+                        RequestSerialization();
+                    }
+                }
+                TriggerLastFrame = true;
             }
-            TriggerLastFrame = true;
+            else { TriggerLastFrame = false; }
         }
-        else { TriggerLastFrame = false; }
     }
     public void LaunchFlare()
     {
@@ -101,7 +122,10 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public void KeyboardInput()
     {
         if (NumFlares > 0)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "LaunchFlare"); }
+        {
+            sendlaunchflare = !sendlaunchflare;
+            RequestSerialization();
+        }
     }
     public void RemoveFlare()
     {

@@ -235,8 +235,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_L_AAMTargeted()//sent locally by the person who's locking onto this plane
     {
-        //broadcast to tell the occupants
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayLockedAAM));
+        PlayLockedAAM();
     }
     public void PlayLockedAAM()
     {

@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SAV_KillTracker : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
@@ -12,7 +12,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     public SaccScoreboard_Kills KillsBoard;
     private bool InEditor;
     private VRCPlayerApi localPlayer;
-    void SFEXT_L_EntityStart()
+    public void SFEXT_L_EntityStart()
     {
         gameObject.SetActive(false);//this object never needs to be active
         localPlayer = Networking.LocalPlayer;
@@ -35,6 +35,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     }
     public void SFEXT_O_GotAKill()
     {
+        Debug.Log("SFEXT_O_GotAKill");
         if (KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))
         {
             KillsBoard.MyKills++;

@@ -268,7 +268,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AtmoshpereFadeDistance;
     [System.NonSerializedAttribute] public float AtmosphereHeightThing;
     [System.NonSerializedAttribute] public float Atmosphere = 1;
-    [System.NonSerializedAttribute] public float rotlift;
     [System.NonSerializedAttribute] public float AngleOfAttackPitch;
     [System.NonSerializedAttribute] public float AngleOfAttackYaw;
     private float AoALiftYaw;
@@ -980,6 +979,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 float sidespeed = 0;
                 float downspeed = 0;
                 float SpeedLiftFactor = 0;
+                float rotlift = 0;
 
                 if (VehicleMoving)//optimization
                 {
@@ -1106,9 +1106,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         else//non-owners need to know these values
         {
             Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
-            rotlift = Mathf.Min(Speed / RotMultiMaxSpeed, 1);//so passengers can hear the airbrake
-                                                             //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
-                                                             //AirSpeed = AirVel.magnitude;
+                                                    //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
+                                                    //AirSpeed = AirVel.magnitude;
         }
     }
     private void FixedUpdate()
@@ -1136,6 +1135,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void Explode()//all the things players see happen when the vehicle explodes
     {
+        if (EntityControl.dead) { return; }//can happen with prediction enabled if two people kill something at the same time
         EntityControl.dead = true;
         PlayerThrottle = 0;
         ThrottleInput = 0;
