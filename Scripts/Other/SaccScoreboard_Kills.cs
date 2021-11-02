@@ -31,7 +31,7 @@ public class SaccScoreboard_Kills : UdonSharpBehaviour
     }
     public void UpdateScores()
     {
-        Debug.Log("UpdateScores");
+        //Debug.Log("UpdateScores");
         Scores.text = string.Concat("Instance Best Killing Spree: ", TopKiller, " : ", TopKills, "\nMy Best Killing Spree: ", MyBestKills);
     }
 }

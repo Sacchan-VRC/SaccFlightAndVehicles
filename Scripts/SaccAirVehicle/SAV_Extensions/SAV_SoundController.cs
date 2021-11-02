@@ -711,7 +711,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (PlaneInside) { PlaneInside.Stop(); }
         if (PlaneWind) { PlaneWind.Stop(); }
 
-        if (!EntityControl.dead)
+        if (!EntityControl.dead && !soundsoff)
         {
             foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
             foreach (AudioSource thrust in Thrust) { thrust.Play(); }

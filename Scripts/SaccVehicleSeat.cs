@@ -28,7 +28,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     private bool CalibratedY = false;
     private bool CalibratedZ = false;
     private Vector3 SeatStartPos;
-    private int ThisStationID;
+    [System.NonSerializedAttribute] public int ThisStationID;
     private bool SeatInitialized = false;
     private bool InEditor = true;
     private VRCPlayerApi localPlayer;

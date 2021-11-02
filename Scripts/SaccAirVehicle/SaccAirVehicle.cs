@@ -363,6 +363,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
 
     [System.NonSerializedAttribute] public int ReSupplied = 0;
+    public void SFEXT_G_Dead()
+    {
+        Debug.Log("SFEXT_G_Dead");
+    }
+    public void SFEXT_G_NotDead()
+    {
+        Debug.Log("SFEXT_G_NotDead");
+    }
     public void SFEXT_L_EntityStart()
     {
         VehicleGameObj = EntityControl.gameObject;

@@ -22,10 +22,8 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     [SerializeField] private float UpAngleMax = 89;
     [Tooltip("Angle below the horizon that this gun can look")]
     [SerializeField] private float DownAngleMax = 0;
-    [Tooltip("Angle left that this gun can look, set both to 180 to freely spin")]
-    [SerializeField] private float LeftAngleMax = 180;
-    [Tooltip("Angle right that this gun can look, set both to 180 to freely spin")]
-    [SerializeField] private float RightAngleMax = 180;
+    [Tooltip("Angle that this gun can look to the left and right, set to 180 to freely spin")]
+    [SerializeField] private float SideAngleMax = 180;
     [Tooltip("In seconds")]
     [Range(0.05f, 1f)]
     [SerializeField] private float updateInterval = 0.25f;
@@ -75,6 +73,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
     private Vector2 O_LastGunRotation;
     private int O_LastUpdateTime2;
     private float SmoothingTimeDivider;
+    private bool ClampHor = false;
     private bool Occupied;
     private bool TriggerLastFrame;
     private bool Manning;
@@ -96,6 +95,7 @@ public class DFUNCP_Turret : UdonSharpBehaviour
         FullAmmoDivider = 1f / (Ammo > 0 ? Ammo : 10000000);
         if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
         reloadspeed = FullAmmo / FullReloadTimeSec;
+        if (SideAngleMax < 180) { ClampHor = true; }
     }
     public void SFEXTP_O_UserEnter()
     {
@@ -266,8 +266,8 @@ public class DFUNCP_Turret : UdonSharpBehaviour
             float NewY = rothor.y;
             NewY += RotationSpeedY * DeltaTime;
             if (NewY > 180) { NewY -= 360; }
-            if (NewY > RightAngleMax || NewY < -LeftAngleMax) RotationSpeedY = 0;
-            NewY = Mathf.Clamp(NewY, -LeftAngleMax, RightAngleMax);//limit angles
+            if (NewY > SideAngleMax || NewY < -SideAngleMax) RotationSpeedY = 0;
+            NewY = Mathf.Clamp(NewY, -SideAngleMax, SideAngleMax);//limit angles
 
             TurretRotatorHor.localRotation = Quaternion.Euler(new Vector3(0, NewY, 0));
             TurretRotatorVert.localRotation = Quaternion.Euler(new Vector3(NewX, 0, 0));
@@ -283,18 +283,95 @@ public class DFUNCP_Turret : UdonSharpBehaviour
         else
         {
             float TimeSinceUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_UpdateTime) * .001f);
-            Vector2 PredictedRotation = O_GunRotation + (GunRotationSpeed * (Ping + TimeSinceUpdate));
+            Vector2 prediction = (GunRotationSpeed * (Ping + TimeSinceUpdate));
+            //clamp angle in a way that will never cause an overshoot to clip to the other side
+            if (ClampHor)
+            {
+                float maxturn;
+                if (O_GunRotation.y < 180)//looking right
+                {
+                    if (prediction.y > 0)//moving right
+                    {
+                        maxturn = SideAngleMax - O_GunRotation.y;
+                        if (prediction.y > maxturn)
+                        { prediction.y = maxturn; }
+                    }
+                    else//moving left
+                    {
+                        maxturn = O_GunRotation.y + SideAngleMax;
+                        if (-prediction.y > maxturn)
+                        { prediction.y = -maxturn; }
+                    }
+                }
+                else//looking left
+                {
+                    if (prediction.y > 0)//moving right
+                    {
+                        maxturn = 360 - O_GunRotation.y + SideAngleMax;
+                        if (prediction.y > maxturn)
+                        { prediction.y = maxturn; }
+                    }
+                    else//moving left
+                    {
+                        maxturn = SideAngleMax - (360 - O_GunRotation.y);
+                        if (-prediction.y > maxturn)
+                        { prediction.y = -maxturn; }
+                    }
+                }
+            }
+            Vector2 PredictedRotation = O_GunRotation + prediction;
             PredictedRotation.x = Mathf.Clamp(PredictedRotation.x, -UpAngleMax, DownAngleMax);
-
+            //previous imperfect clamp
+            /*             if (PredictedRotation.y > SideAngleMax && PredictedRotation.y < 360 - SideAngleMax)
+                        {
+                            if (O_GunRotation.y > 180)
+                            { PredictedRotation.y = 360 - SideAngleMax; }
+                            else
+                            { PredictedRotation.y = SideAngleMax; }
+                        } */
             Vector3 PredictedRotation_3 = new Vector3(PredictedRotation.x, PredictedRotation.y, 0);
 
             if (TimeSinceUpdate < updateInterval)
             {
                 float TimeSincePreviousUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_LastUpdateTime) * .001f);
-
-                Vector2 OldPredictedRotation = O_LastGunRotation2 + (LastGunRotationSpeed * (LastPing + TimeSincePreviousUpdate));
+                Vector2 oldprediction = (LastGunRotationSpeed * (LastPing + TimeSincePreviousUpdate));
+                //clamp angle in a way that will never cause an overshoot to clip to the other side
+                if (ClampHor)
+                {
+                    float maxturn;
+                    if (O_LastGunRotation2.y < 180)//looking right
+                    {
+                        if (oldprediction.y > 0)//moving right
+                        {
+                            maxturn = SideAngleMax - O_LastGunRotation2.y;
+                            if (oldprediction.y > maxturn)
+                            { oldprediction.y = maxturn; }
+                        }
+                        else//moving left
+                        {
+                            maxturn = O_LastGunRotation2.y + SideAngleMax;
+                            if (-oldprediction.y > maxturn)
+                            { oldprediction.y = -maxturn; }
+                        }
+                    }
+                    else//looking left
+                    {
+                        if (oldprediction.y > 0)//moving right
+                        {
+                            maxturn = 360 - O_LastGunRotation2.y + SideAngleMax;
+                            if (oldprediction.y > maxturn)
+                            { oldprediction.y = maxturn; }
+                        }
+                        else//moving left
+                        {
+                            maxturn = SideAngleMax - (360 - O_LastGunRotation2.y);
+                            if (-oldprediction.y > maxturn)
+                            { oldprediction.y = -maxturn; }
+                        }
+                    }
+                }
+                Vector2 OldPredictedRotation = O_LastGunRotation2 + oldprediction;
                 OldPredictedRotation.x = Mathf.Clamp(OldPredictedRotation.x, -UpAngleMax, DownAngleMax);
-
                 Vector3 OldPredictedRotation_3 = new Vector3(OldPredictedRotation.x, OldPredictedRotation.y, 0);
 
                 Vector3 TargetRot = Vector3.Lerp(OldPredictedRotation_3, PredictedRotation_3, TimeSinceUpdate * SmoothingTimeDivider);

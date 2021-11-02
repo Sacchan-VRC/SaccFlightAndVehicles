@@ -56,7 +56,7 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int LStickSelection = -1;
     [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
     [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
-    [System.NonSerializedAttribute] public bool _dead = false;
+    [System.NonSerializedAttribute] private bool _dead = false;
     public bool dead
     {
         set
