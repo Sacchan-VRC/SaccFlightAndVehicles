@@ -5,7 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-public class DFUNCP_Turret : UdonSharpBehaviour
+public class EXTP_Turret : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
     [Tooltip("Transform to base your controls on, should be facing the same direction as the seat. If left empty it will be set to the Horizontal Rotator.")]
