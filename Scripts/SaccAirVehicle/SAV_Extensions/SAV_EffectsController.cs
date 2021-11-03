@@ -203,6 +203,11 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public void SFEXT_G_EnterWater()
     {
         if ((float)SAVControl.GetProgramVariable("Speed") > PlaySplashSpeed && SplashParticle) { SplashParticle.Play(); }
+        VehicleAnimator.SetBool("underwater", true);
+    }
+    public void SFEXT_G_ExitWater()
+    {
+        VehicleAnimator.SetBool("underwater", false);
     }
     public void SFEXT_G_TakeOff()
     {

@@ -195,6 +195,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMHasTarget = false;
         AAMLocked = false;
         AAMTargetIndicator.localRotation = Quaternion.identity;
+        AAMTargetIndicator.localScale = Vector3.one;
         AAMTargetIndicator.gameObject.SetActive(false);
         func_active = false;
 
@@ -272,6 +273,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private Vector3 AAMCurrentTargetDirection;
     private float AAMTargetedTimer = 2;
     private float AAMTargetObscuredDelay;
+    /* everywhere that GetComponent<SaccAirVehicle>() is used should be changed to UdonBehaviour for modularity's sake,
+    but it seems that it's impossible until further udon/sharp updates, because it currently doesn't support checking if a variable exists before trying to get it */
     private void FixedUpdate()//old AAMTargeting function
     {
         if (func_active)

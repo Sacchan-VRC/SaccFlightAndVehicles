@@ -297,6 +297,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float FullFuel;
     private float LowFuelDivider;
     private float LastResupplyTime = 0;
+    [System.NonSerializedAttribute] public bool IsAirVehicle = true;//checked by any script targeting/checking this vehicle to see if it is the kind of vehicle they're looking for
+    [System.NonSerializedAttribute] public bool dead = false;
     [System.NonSerializedAttribute] public float FullGunAmmo;
     //use these for whatever, Only MissilesIncomingHeat is used by the prefab
     [System.NonSerializedAttribute] public int MissilesIncomingHeat = 0;
@@ -363,14 +365,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
 
     [System.NonSerializedAttribute] public int ReSupplied = 0;
-    public void SFEXT_G_Dead()
-    {
-        Debug.Log("SFEXT_G_Dead");
-    }
-    public void SFEXT_G_NotDead()
-    {
-        Debug.Log("SFEXT_G_NotDead");
-    }
     public void SFEXT_L_EntityStart()
     {
         VehicleGameObj = EntityControl.gameObject;
@@ -1552,6 +1546,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Occupied = false;
         SetAfterburnerOff();
     }
+    public void SFEXT_G_NotDead()
+    { dead = false; }
+    public void SFEXT_G_Dead()
+    { dead = true; }
     public void SFEXT_O_PilotExit()
     {
         //zero control values
