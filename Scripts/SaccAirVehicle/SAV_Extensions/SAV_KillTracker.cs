@@ -35,7 +35,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
     }
     public void SFEXT_O_GotAKill()
     {
-        Debug.Log("SFEXT_O_GotAKill");
+        //Debug.Log("SFEXT_O_GotAKill");
         if (KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))
         {
             KillsBoard.MyKills++;

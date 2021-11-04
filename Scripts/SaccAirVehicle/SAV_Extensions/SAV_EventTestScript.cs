@@ -6,7 +6,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
-public class DFUNC_EventTestScript : UdonSharpBehaviour
+public class SAV_EventTestScript : UdonSharpBehaviour
 {
     [SerializeField] private Text DebugText;
     private int NumEvents = 26;

@@ -426,25 +426,25 @@ public class SaccEntity : UdonSharpBehaviour
     }
     //these can be used to send messages to vehicles from other vehicles or whatever can find a SaccEntity for custom functionality
     public void SendGenericEvent0()
-    { SendEventToExtensions("SFEXT_G_GenericEvent0"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent0"); }
     public void SendGenericEvent1()
-    { SendEventToExtensions("SFEXT_G_GenericEvent1"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent1"); }
     public void SendGenericEvent2()
-    { SendEventToExtensions("SFEXT_G_GenericEvent2"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent2"); }
     public void SendGenericEvent3()
-    { SendEventToExtensions("SFEXT_G_GenericEvent3"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent3"); }
     public void SendGenericEvent4()
-    { SendEventToExtensions("SFEXT_G_GenericEvent4"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent4"); }
     public void SendGenericEvent5()
-    { SendEventToExtensions("SFEXT_G_GenericEvent5"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent5"); }
     public void SendGenericEvent6()
-    { SendEventToExtensions("SFEXT_G_GenericEvent6"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent6"); }
     public void SendGenericEvent7()
-    { SendEventToExtensions("SFEXT_G_GenericEvent7"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent7"); }
     public void SendGenericEvent8()
-    { SendEventToExtensions("SFEXT_G_GenericEvent8"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent8"); }
     public void SendGenericEvent9()
-    { SendEventToExtensions("SFEXT_G_GenericEvent9"); }
+    { SendEventToExtensions("SFEXT_X_GenericEvent9"); }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
         if (IsOwner)
