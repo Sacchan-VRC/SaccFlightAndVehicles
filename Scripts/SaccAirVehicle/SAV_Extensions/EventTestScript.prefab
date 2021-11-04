@@ -35,7 +35,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 256, y: 512}
+  m_SizeDelta: {x: 256, y: 1330}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5073964988264207621
 CanvasRenderer:
@@ -54,12 +54,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5073964988264207616}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_RaycastTarget: 1
+  m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
@@ -76,7 +77,159 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: text
+  m_Text: 'SFEXT_L_EntityStart
+
+    SFEXT_G_Dead
+
+    SFEXT_G_NotDead
+
+    SFEXT_L_BulletHit
+
+    SFEXT_O_TakeOwnership
+
+    SFEXT_O_LoseOwnership
+
+    SFEXT_L_OwnershipTransfer
+
+    SFEXT_O_PilotEnter
+
+    SFEXT_G_PilotEnter
+
+    SFEXT_G_PilotExit
+
+    SFEXT_O_PilotExit
+
+    SFEXT_P_PassengerEnter
+
+    SFEXT_P_PassengerExit
+
+    SFEXT_G_PassengerEnter
+
+    SFEXT_G_PassengerExit
+
+    SFEXT_O_OnPlayerJoined
+
+    SFEXT_O_OnPickup
+
+    SFEXT_O_OnDrop
+
+    SFEXT_O_OnPickupUseDown
+
+    SFEXT_L_AAMTargeted
+
+    SFEXT_O_AAMLaunch
+
+    SFEXT_O_AGMLaunch
+
+    SFEXT_O_AltHoldOn
+
+    SFEXT_O_AltHoldOff
+
+    SFEXT_O_BombLaunch
+
+    SFEXT_O_CanopyClosed
+
+    SFEXT_O_CanopyOpen
+
+    SFEXT_O_CanopyBreak
+
+    SFEXT_O_CanopyRepair
+
+    SFEXT_O_LaunchFromCatapult
+
+    SFEXT_O_CruiseEnabled
+
+    SFEXT_O_CruiseDisabled
+
+    SFEXT_O_FlapsOff
+
+    SFEXT_O_FlapsOn
+
+    SFEXT_G_LaunchFlare
+
+    SFEXT_O_GearUp
+
+    SFEXT_O_GearDown
+
+    SFEXT_O_GunStartFiring
+
+    SFEXT_O_GunStopFiring
+
+    SFEXT_O_HookDown
+
+    SFEXT_O_HookUp
+
+    SFEXT_O_LimitsOn
+
+    SFEXT_G_LimitsOff
+
+    SFEXT_G_SmokeOn
+
+    SFEXT_G_SmokeOff
+
+    SFEXT_O_ReSupply
+
+    SFEXT_O_JoystickGrabbed
+
+    SFEXT_O_JoystickDropped
+
+    SFEXT_O_ThrottleGrabbed
+
+    SFEXT_O_ThrottleDropped
+
+    SFEXT_O_LowFuel
+
+    SFEXT_O_NoFuel
+
+    SFEXT_O_EnterVTOL
+
+    SFEXT_O_ExitVTOL
+
+    SFEXT_O_Explode
+
+    SFEXT_G_ReAppear
+
+    SFEXT_O_MoveToSpawn
+
+    SFEXT_G_TouchDown
+
+    SFEXT_G_TouchDownWater
+
+    SFEXT_G_TakeOff
+
+    SFEXT_G_AfterburnerOn
+
+    SFEXT_G_AfterburnerOff
+
+    SFEXT_G_ReSupply
+
+    SFEXT_O_NotLowFuel
+
+    SFEXT_O_NotNoFuel
+
+    SFEXT_G_RespawnButton
+
+    SFEXT_G_BulletHit
+
+    SFEXT_G_MissileHit25
+
+    SFEXT_G_MissileHit50
+
+    SFEXT_G_MissileHit75
+
+    SFEXT_G_MissileHit100
+
+    SFEXT_O_GotKilled
+
+    SFEXT_O_GotAKill
+
+    SFEXT_O_DoorsClosed
+
+    SFEXT_O_DoorsOpened
+
+    SFEXT_G_EnterWater
+
+    SFEXT_G_ExitWater'
 --- !u!1 &5073964988496478295
 GameObject:
   m_ObjectHideFlags: 0
@@ -128,6 +281,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
+  _syncMethod: 2
   serializedProgramAsset: {fileID: 11400000, guid: 8902a1a6ec6a915449c84658529b1450,
     type: 2}
   programSource: {fileID: 11400000, guid: c7042f134b83a7e4ca2bf5d1e7d27825, type: 2}
@@ -161,18 +315,18 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5073964989177081896}
-  m_LocalRotation: {x: 1.13686824e-13, y: -1, z: -3.9790388e-13, w: -0.00000032782552}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.014247512, y: 0.01424751, z: 0.014247512}
+  m_LocalRotation: {x: -0, y: -0.26933965, z: -0, w: 0.96304524}
+  m_LocalPosition: {x: 0, y: 0, z: -0.4203}
+  m_LocalScale: {x: 0.0004726804, y: 0.00047268026, z: 0.0004726804}
   m_Children:
   - {fileID: 5073964988264207619}
   m_Father: {fileID: 5073964988496478313}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: -179.99998, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -31.250002, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: -0, y: 3.64}
-  m_SizeDelta: {x: 256, y: 512}
+  m_AnchoredPosition: {x: -0.2381, y: 2.6249}
+  m_SizeDelta: {x: 256, y: 1330}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &5073964989177081900
 Canvas:
@@ -204,7 +358,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5073964989177081896}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1980459831, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_UiScaleMode: 0
@@ -226,7 +380,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5073964989177081896}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 1301386320, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_IgnoreReversedGraphics: 1

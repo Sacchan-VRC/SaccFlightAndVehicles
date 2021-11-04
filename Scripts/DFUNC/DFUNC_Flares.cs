@@ -25,6 +25,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     private bool func_active;
     private bool TriggerLastFrame;
     [UdonSynced, FieldChangeCallback(nameof(sendlaunchflare))] private bool _SendLaunchFlare;
+    private SaccEntity EntityControl;
     public bool sendlaunchflare
     {
         set
@@ -50,6 +51,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
         FullFlares = NumFlares;
         reloadspeed = FullFlares / FullReloadTimeSec;
         if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
     }
     public void SFEXT_G_PilotEnter()
     { gameObject.SetActive(true); }
@@ -118,6 +120,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
         }
         { SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") + 1); }
         SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
+        EntityControl.SendEventToExtensions("SFEXT_G_LaunchFlare");
     }
     public void KeyboardInput()
     {

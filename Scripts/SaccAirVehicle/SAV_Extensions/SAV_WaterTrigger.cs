@@ -53,8 +53,9 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         if (other && other.gameObject.layer == WaterLayer)
         {
             NumTriggers += 1;
+            if (!InWater)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEnterWater)); }
             InWater = true;
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEnterWater));
             if (!CFOverridden)
             {
                 CFOverridden = true;
@@ -69,8 +70,9 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
             NumTriggers -= 1;
             if (NumTriggers == 0)
             {
+                if (InWater)
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendExitWater)); }
                 InWater = false;
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendExitWater));
                 if (CFOverridden)
                 {
                     CFOverridden = false;
@@ -125,10 +127,6 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
         {
             CFOverridden = false;
             SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") - 1);
-        }
-        if (InWater)
-        {
-            SendExitWater();
         }
     }
     public void SFEXT_O_TakeOwnership()

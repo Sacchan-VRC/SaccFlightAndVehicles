@@ -9,42 +9,93 @@ using VRC.Udon;
 public class SAV_EventTestScript : UdonSharpBehaviour
 {
     [SerializeField] private Text DebugText;
-    private int NumEvents = 26;
+    private int NumEvents = 77;
     private string[] Event;
     private int[] Ints;
 
-    private void Start()
+    public void SFEXT_L_EntityStart()
     {
         Event = new string[NumEvents];
         Ints = new int[NumEvents];
         int x = 0;
 
-        Event[x++] = "Respawn";
-        Event[x++] = "PilotEnter";
-        Event[x++] = "PilotExit";
-        Event[x++] = "PassengerEnter";
-        Event[x++] = "PassengerExit";
-        Event[x++] = "Explode";
-        Event[x++] = "ReSupply";
-        Event[x++] = "TakeOff";
-        Event[x++] = "TouchDown";
-        Event[x++] = "AfterburnerOn";
-        Event[x++] = "AfterburnerOff";
-        Event[x++] = "CanopyOpened";
-        Event[x++] = "CanopyClosed";
-        Event[x++] = "GearUp";
-        Event[x++] = "GearDown";
-        Event[x++] = "FlapsOn";
-        Event[x++] = "FlapsOff";
-        Event[x++] = "HookDown";
-        Event[x++] = "HookUp";
-        Event[x++] = "SmokeOn";
-        Event[x++] = "SmokeOff";
-        Event[x++] = "LimitsOn";
-        Event[x++] = "LimitsOff";
-        Event[x++] = "PlaneHit";
-        Event[x++] = "TakeOwnership";
-        Event[x++] = "LoseOwnership";
+        Event[x++] = "SFEXT_L_EntityStart";
+        Event[x++] = "SFEXT_G_Dead";
+        Event[x++] = "SFEXT_G_NotDead";
+        Event[x++] = "SFEXT_L_BulletHit";
+        Event[x++] = "SFEXT_O_TakeOwnership";
+        Event[x++] = "SFEXT_O_LoseOwnership";
+        Event[x++] = "SFEXT_L_OwnershipTransfer";
+        Event[x++] = "SFEXT_O_PilotEnter";
+        Event[x++] = "SFEXT_G_PilotEnter";
+        Event[x++] = "SFEXT_G_PilotExit";
+        Event[x++] = "SFEXT_O_PilotExit";
+        Event[x++] = "SFEXT_P_PassengerEnter";
+        Event[x++] = "SFEXT_P_PassengerExit";
+        Event[x++] = "SFEXT_G_PassengerEnter";
+        Event[x++] = "SFEXT_G_PassengerExit";
+        Event[x++] = "SFEXT_O_OnPlayerJoined";
+        Event[x++] = "SFEXT_O_OnPickup";
+        Event[x++] = "SFEXT_O_OnDrop";
+        Event[x++] = "SFEXT_O_OnPickupUseDown";
+        Event[x++] = "SFEXT_L_AAMTargeted";
+        Event[x++] = "SFEXT_O_AAMLaunch";
+        Event[x++] = "SFEXT_O_AGMLaunch";
+        Event[x++] = "SFEXT_O_AltHoldOn";
+        Event[x++] = "SFEXT_O_AltHoldOff";
+        Event[x++] = "SFEXT_O_BombLaunch";
+        Event[x++] = "SFEXT_O_CanopyClosed";
+        Event[x++] = "SFEXT_O_CanopyOpen";
+        Event[x++] = "SFEXT_O_CanopyBreak";
+        Event[x++] = "SFEXT_O_CanopyRepair";
+        Event[x++] = "SFEXT_O_LaunchFromCatapult";
+        Event[x++] = "SFEXT_O_CruiseEnabled";
+        Event[x++] = "SFEXT_O_CruiseDisabled";
+        Event[x++] = "SFEXT_O_FlapsOff";
+        Event[x++] = "SFEXT_O_FlapsOn";
+        Event[x++] = "SFEXT_G_LaunchFlare";
+        Event[x++] = "SFEXT_O_GearUp";
+        Event[x++] = "SFEXT_O_GearDown";
+        Event[x++] = "SFEXT_O_GunStartFiring";
+        Event[x++] = "SFEXT_O_GunStopFiring";
+        Event[x++] = "SFEXT_O_HookDown";
+        Event[x++] = "SFEXT_O_HookUp";
+        Event[x++] = "SFEXT_O_LimitsOn";
+        Event[x++] = "SFEXT_O_LimitsOff";
+        Event[x++] = "SFEXT_G_SmokeOn";
+        Event[x++] = "SFEXT_G_SmokeOff";
+        Event[x++] = "SFEXT_O_ReSupply";
+        Event[x++] = "SFEXT_O_JoystickGrabbed";
+        Event[x++] = "SFEXT_O_JoystickDropped";
+        Event[x++] = "SFEXT_O_ThrottleGrabbed";
+        Event[x++] = "SFEXT_O_ThrottleDropped";
+        Event[x++] = "SFEXT_O_LowFuel";
+        Event[x++] = "SFEXT_O_NoFuel";
+        Event[x++] = "SFEXT_O_EnterVTOL";
+        Event[x++] = "SFEXT_O_ExitVTOL";
+        Event[x++] = "SFEXT_O_Explode";
+        Event[x++] = "SFEXT_G_ReAppear";
+        Event[x++] = "SFEXT_O_MoveToSpawn";
+        Event[x++] = "SFEXT_G_TouchDown";
+        Event[x++] = "SFEXT_G_TouchDownWater";
+        Event[x++] = "SFEXT_G_TakeOff";
+        Event[x++] = "SFEXT_G_AfterburnerOn";
+        Event[x++] = "SFEXT_G_AfterburnerOff";
+        Event[x++] = "SFEXT_G_ReSupply";
+        Event[x++] = "SFEXT_O_NotLowFuel";
+        Event[x++] = "SFEXT_O_NotNoFuel";
+        Event[x++] = "SFEXT_G_RespawnButton";
+        Event[x++] = "SFEXT_G_BulletHit";
+        Event[x++] = "SFEXT_G_MissileHit25";
+        Event[x++] = "SFEXT_G_MissileHit50";
+        Event[x++] = "SFEXT_G_MissileHit75";
+        Event[x++] = "SFEXT_G_MissileHit100";
+        Event[x++] = "SFEXT_O_GotKilled";
+        Event[x++] = "SFEXT_O_GotAKill";
+        Event[x++] = "SFEXT_O_DoorsClosed";
+        Event[x++] = "SFEXT_O_DoorsOpened";
+        Event[x++] = "SFEXT_G_EnterWater";
+        Event[x++] = "SFEXT_G_ExitWater";
 
         x = 0;
         while (x < NumEvents)
@@ -52,6 +103,7 @@ public class SAV_EventTestScript : UdonSharpBehaviour
             Ints[x] = 0;
             x++;
         }
+        Ints[0]++;//entitystart is an event
         CompileString();
     }
     private void CompileString()
@@ -64,134 +116,384 @@ public class SAV_EventTestScript : UdonSharpBehaviour
             x++;
         }
     }
-    public void SFEXT_O_Respawn()
+    public void SFEXT_G_Dead()
     {
-        Ints[0] += 1;
+        Ints[01]++;
         CompileString();
     }
-    public void SFEXT_O_PilotEnter()
+    public void SFEXT_G_NotDead()
     {
-        Ints[1] += 1;
+        Ints[02]++;
         CompileString();
     }
-    public void SFEXT_O_PilotExit()
+    public void SFEXT_L_BulletHit()
     {
-        Ints[2] += 1;
-        CompileString();
-    }
-    public void SFEXT_P_PassengerEnter()
-    {
-        Ints[3] += 1;
-        CompileString();
-    }
-    public void SFEXT_P_PassengerExit()
-    {
-        Ints[4] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_Explode()
-    {
-        Ints[5] += 1;
-        CompileString();
-    }
-    public void SFEXT_G_ReSupply()
-    {
-        Ints[6] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_TakeOff()
-    {
-        Ints[7] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_TouchDown()
-    {
-        Ints[8] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_AfterburnerOn()
-    {
-        Ints[9] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_AfterburnerOff()
-    {
-        Ints[10] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_CanopyOpened()
-    {
-        Ints[11] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_CanopyClosed()
-    {
-        Ints[12] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_GearUp()
-    {
-        Ints[13] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_GearDown()
-    {
-        Ints[14] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_FlapsOn()
-    {
-        Ints[15] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_FlapsOff()
-    {
-        Ints[16] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_HookDown()
-    {
-        Ints[17] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_HookUp()
-    {
-        Ints[18] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_SmokeOn()
-    {
-        Ints[19] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_SmokeOff()
-    {
-        Ints[20] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_LimitsOn()
-    {
-        Ints[21] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_LimitsOff()
-    {
-        Ints[22] += 1;
-        CompileString();
-    }
-    public void SFEXT_O_PlaneHit()
-    {
-        Ints[23] += 1;
+        Ints[03]++;
         CompileString();
     }
     public void SFEXT_O_TakeOwnership()
     {
-        Ints[24] += 1;
+        Ints[04]++;
         CompileString();
     }
-    public void SFEXT_L_LoseOwnership()
+    public void SFEXT_O_LoseOwnership()
     {
-        Ints[25] += 1;
+        Ints[05]++;
+        CompileString();
+    }
+    public void SFEXT_L_OwnershipTransfer()
+    {
+        Ints[06]++;
+        CompileString();
+    }
+    public void SFEXT_O_PilotEnter()
+    {
+        Ints[07]++;
+        CompileString();
+    }
+    public void SFEXT_G_PilotEnter()
+    {
+        Ints[08]++;
+        CompileString();
+    }
+    public void SFEXT_G_PilotExit()
+    {
+        Ints[09]++;
+        CompileString();
+    }
+    public void SFEXT_O_PilotExit()
+    {
+        Ints[10]++;
+        CompileString();
+    }
+    public void SFEXT_P_PassengerEnter()
+    {
+        Ints[11]++;
+        CompileString();
+    }
+    public void SFEXT_P_PassengerExit()
+    {
+        Ints[12]++;
+        CompileString();
+    }
+    public void SFEXT_G_PassengerEnter()
+    {
+        Ints[13]++;
+        CompileString();
+    }
+    public void SFEXT_G_PassengerExit()
+    {
+        Ints[14]++;
+        CompileString();
+    }
+    public void SFEXT_O_OnPlayerJoined()
+    {
+        Ints[15]++;
+        CompileString();
+    }
+    public void SFEXT_O_OnPickup()
+    {
+        Ints[16]++;
+        CompileString();
+    }
+    public void SFEXT_O_OnDrop()
+    {
+        Ints[17]++;
+        CompileString();
+    }
+    public void SFEXT_O_OnPickupUseDown()
+    {
+        Ints[18]++;
+        CompileString();
+    }
+    public void SFEXT_L_AAMTargeted()
+    {
+        Ints[19]++;
+        CompileString();
+    }
+    public void SFEXT_O_AAMLaunch()
+    {
+        Ints[20]++;
+        CompileString();
+    }
+    public void SFEXT_O_AGMLaunch()
+    {
+        Ints[21]++;
+        CompileString();
+    }
+    public void SFEXT_O_AltHoldOn()
+    {
+        Ints[22]++;
+        CompileString();
+    }
+    public void SFEXT_O_AltHoldOff()
+    {
+        Ints[23]++;
+        CompileString();
+    }
+    public void SFEXT_O_BombLaunch()
+    {
+        Ints[24]++;
+        CompileString();
+    }
+    public void SFEXT_O_CanopyClosed()
+    {
+        Ints[25]++;
+        CompileString();
+    }
+    public void SFEXT_O_CanopyOpen()
+    {
+        Ints[26]++;
+        CompileString();
+    }
+    public void SFEXT_O_CanopyBreak()
+    {
+        Ints[27]++;
+        CompileString();
+    }
+    public void SFEXT_O_CanopyRepair()
+    {
+        Ints[28]++;
+        CompileString();
+    }
+    public void SFEXT_O_LaunchFromCatapult()
+    {
+        Ints[29]++;
+        CompileString();
+    }
+    public void SFEXT_O_CruiseEnabled()
+    {
+        Ints[30]++;
+        CompileString();
+    }
+    public void SFEXT_O_CruiseDisabled()
+    {
+        Ints[31]++;
+        CompileString();
+    }
+    public void SFEXT_O_FlapsOff()
+    {
+        Ints[32]++;
+        CompileString();
+    }
+    public void SFEXT_O_FlapsOn()
+    {
+        Ints[33]++;
+        CompileString();
+    }
+    public void SFEXT_G_LaunchFlare()
+    {
+        Ints[34]++;
+        CompileString();
+    }
+    public void SFEXT_O_GearUp()
+    {
+        Ints[35]++;
+        CompileString();
+    }
+    public void SFEXT_O_GearDown()
+    {
+        Ints[36]++;
+        CompileString();
+    }
+    public void SFEXT_O_GunStartFiring()
+    {
+        Ints[37]++;
+        CompileString();
+    }
+    public void SFEXT_O_GunStopFiring()
+    {
+        Ints[38]++;
+        CompileString();
+    }
+    public void SFEXT_O_HookDown()
+    {
+        Ints[39]++;
+        CompileString();
+    }
+    public void SFEXT_O_HookUp()
+    {
+        Ints[40]++;
+        CompileString();
+    }
+    public void SFEXT_O_LimitsOn()
+    {
+        Ints[41]++;
+        CompileString();
+    }
+    public void SFEXT_O_LimitsOff()
+    {
+        Ints[42]++;
+        CompileString();
+    }
+    public void SFEXT_G_SmokeOn()
+    {
+        Ints[43]++;
+        CompileString();
+    }
+    public void SFEXT_G_SmokeOff()
+    {
+        Ints[44]++;
+        CompileString();
+    }
+    public void SFEXT_O_ReSupply()
+    {
+        Ints[45]++;
+        CompileString();
+    }
+    public void SFEXT_O_JoystickGrabbed()
+    {
+        Ints[46]++;
+        CompileString();
+    }
+    public void SFEXT_O_JoystickDropped()
+    {
+        Ints[47]++;
+        CompileString();
+    }
+    public void SFEXT_O_ThrottleGrabbed()
+    {
+        Ints[48]++;
+        CompileString();
+    }
+    public void SFEXT_O_ThrottleDropped()
+    {
+        Ints[49]++;
+        CompileString();
+    }
+    public void SFEXT_O_LowFuel()
+    {
+        Ints[50]++;
+        CompileString();
+    }
+    public void SFEXT_O_NoFuel()
+    {
+        Ints[51]++;
+        CompileString();
+    }
+    public void SFEXT_O_EnterVTOL()
+    {
+        Ints[52]++;
+        CompileString();
+    }
+    public void SFEXT_O_ExitVTOL()
+    {
+        Ints[53]++;
+        CompileString();
+    }
+    public void SFEXT_O_Explode()
+    {
+        Ints[54]++;
+        CompileString();
+    }
+    public void SFEXT_G_ReAppear()
+    {
+        Ints[55]++;
+        CompileString();
+    }
+    public void SFEXT_O_MoveToSpawn()
+    {
+        Ints[56]++;
+        CompileString();
+    }
+    public void SFEXT_G_TouchDown()
+    {
+        Ints[57]++;
+        CompileString();
+    }
+    public void SFEXT_G_TouchDownWater()
+    {
+        Ints[58]++;
+        CompileString();
+    }
+    public void SFEXT_G_TakeOff()
+    {
+        Ints[59]++;
+        CompileString();
+    }
+    public void SFEXT_G_AfterburnerOn()
+    {
+        Ints[60]++;
+        CompileString();
+    }
+    public void SFEXT_G_AfterburnerOff()
+    {
+        Ints[61]++;
+        CompileString();
+    }
+    public void SFEXT_G_ReSupply()
+    {
+        Ints[62]++;
+        CompileString();
+    }
+    public void SFEXT_O_NotLowFuel()
+    {
+        Ints[63]++;
+        CompileString();
+    }
+    public void SFEXT_O_NotNoFuel()
+    {
+        Ints[64]++;
+        CompileString();
+    }
+    public void SFEXT_G_RespawnButton()
+    {
+        Ints[65]++;
+        CompileString();
+    }
+    public void SFEXT_G_BulletHit()
+    {
+        Ints[66]++;
+        CompileString();
+    }
+    public void SFEXT_G_MissileHit25()
+    {
+        Ints[67]++;
+        CompileString();
+    }
+    public void SFEXT_G_MissileHit50()
+    {
+        Ints[68]++;
+        CompileString();
+    }
+    public void SFEXT_G_MissileHit75()
+    {
+        Ints[69]++;
+        CompileString();
+    }
+    public void SFEXT_G_MissileHit100()
+    {
+        Ints[70]++;
+        CompileString();
+    }
+    public void SFEXT_O_GotKilled()
+    {
+        Ints[71]++;
+        CompileString();
+    }
+    public void SFEXT_O_GotAKill()
+    {
+        Ints[72]++;
+        CompileString();
+    }
+    public void SFEXT_O_DoorsClosed()
+    {
+        Ints[73]++;
+        CompileString();
+    }
+    public void SFEXT_O_DoorsOpened()
+    {
+        Ints[74]++;
+        CompileString();
+    }
+    public void SFEXT_G_EnterWater()
+    {
+        Ints[75]++;
+        CompileString();
+    }
+    public void SFEXT_G_ExitWater()
+    {
+        Ints[76]++;
         CompileString();
     }
 }

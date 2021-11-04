@@ -6,11 +6,11 @@ https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Modularization Update 1.5
-Split functionality of SaccAirVehicle into many different scripts allowing for greater customization
+Split functionality of EngineController into many different scripts allowing for greater customization
 Function dial functions are now each their own script, allowing world creators to code their own
 Now using an event system to send events to modular scripts
-Added SB-1 hoverbike, SS-1 boat, SC-1 Seaplane
-Now using custom position synchronization code which allows formation flying and more realistic dogfights
+Added SB-1 hoverbike, SS-1 boat, SC-1 Seaplane, SaccStinger
+Now using custom position synchronization code which allows formation flying and better dogfights
 Fixed afterburner fuel consumption
 Improvements to functionality of many of the now-modular function dial scripts
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -400,6 +400,6 @@ The trigger must be on the correct layer, the one selected in the ResupplyTrigge
 Target
 A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc. May not sync perfectly
 
+The SaccEntity script contains events related to VRC_Pickup. The SaccStinger folder contains an example handheld weapon using these.
 
 This readme used to contain explanations of every variable in every script, that information is now contained in the tooltips of the variables. Hold the mouse still over a variable to see a description of what it does.
-

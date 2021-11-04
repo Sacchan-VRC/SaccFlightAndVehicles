@@ -66,15 +66,9 @@ public class DFUNC_Limits : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
         if (DefaultLimitsOn)
-        {
-            SetLimitsOn();
-            EntityControl.SendEventToExtensions("SFEXT_G_LimitsOn");
-        }
+        { SetLimitsOn(); }
         else
-        {
-            SetLimitsOff();
-            EntityControl.SendEventToExtensions("SFEXT_G_LimitsOff");
-        }
+        { SetLimitsOff(); }
     }
     public void SetLimitsOn()
     {
@@ -83,6 +77,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         FlightLimitsEnabled = true;
         if (HudLimit) { HudLimit.SetActive(true); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+        EntityControl.SendEventToExtensions("SFEXT_O_LimitsOn");
     }
     public void SetLimitsOff()
     {
@@ -92,6 +87,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         if (HudLimit) { HudLimit.SetActive(false); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         SAVControl.SetProgramVariable("Limits", 1f);
+        EntityControl.SendEventToExtensions("SFEXT_O_LimitsOff");
     }
     public void SFEXT_L_PassengerEnter()
     {
