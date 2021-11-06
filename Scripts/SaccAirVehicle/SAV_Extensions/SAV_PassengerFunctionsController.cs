@@ -191,7 +191,7 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
                 }
 
                 if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
-                if (LStickSelection < 0)
+                if (RStickSelection < 0)
                 { if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
                 else
                 {

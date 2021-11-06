@@ -27,6 +27,7 @@ public class DFUNC_Reverse : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(true);
     }
     public void DFUNC_Deselected()

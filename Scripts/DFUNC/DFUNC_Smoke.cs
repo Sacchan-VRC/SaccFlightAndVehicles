@@ -65,6 +65,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         TriggerLastFrame = true;
+        SmokeHoldTime = 0;
         Selected = true;
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetActive));
     }
@@ -78,7 +79,6 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        TriggerLastFrame = true;
         Pilot = true;
         if (Dial_Funcon) { Dial_Funcon.SetActive(Smoking); }
     }

@@ -44,18 +44,17 @@ public class DFUNC_Hook : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(true);
         func_active = true;
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         if (!HookDown) { gameObject.SetActive(false); }
         func_active = false;
     }
     public void SFEXT_O_PilotEnter()
     {
-        TriggerLastFrame = true;
         if (Dial_Funcon) Dial_Funcon.SetActive(HookDown);
         if (HookDown) { gameObject.SetActive(true); }
     }

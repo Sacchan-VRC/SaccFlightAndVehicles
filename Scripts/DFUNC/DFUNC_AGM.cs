@@ -146,6 +146,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         func_active = true;
         gameObject.SetActive(true);
         if (DoAnimBool && !AnimOn)
@@ -154,7 +155,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         func_active = false;
         AtGScreen.SetActive(false);
         AtGCam.gameObject.SetActive(false);

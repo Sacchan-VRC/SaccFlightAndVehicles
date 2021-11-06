@@ -83,7 +83,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        TriggerLastFrame = true;
         Piloting = true;
         HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
     }
@@ -107,6 +106,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
+        LastBombDropTime = Time.time;
         func_active = true;
         gameObject.SetActive(true);
         if (DoAnimBool && !AnimOn)
@@ -122,7 +123,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         func_active = false;
         gameObject.SetActive(false);
         if (DoAnimBool && AnimOn)

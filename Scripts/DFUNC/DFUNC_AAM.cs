@@ -36,7 +36,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         set
         {
-            if (value > _AAMFire)//if _AAMFire is higher, it's because a late joiner just took ownership, so don't launch
+            if (value > _AAMFire)//if _AAMFire is higher locally, it's because a late joiner just took ownership, so don't launch
             { LaunchAAM(); }
             _AAMFire = value;
         }
@@ -117,7 +117,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        TriggerLastFrame = true;
         Pilot = true;
         if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
         //Make sure SAVeControl.AAMCurrentTargetSAVControl is correct

@@ -34,12 +34,12 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(true);
         Selected = true;
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         if (!Flaps) { gameObject.SetActive(false); }
         Selected = false;
     }
@@ -58,7 +58,6 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        TriggerLastFrame = true;
         if (Flaps) { gameObject.SetActive(true); }
         if (!InEditor) { InVR = Networking.LocalPlayer.IsUserInVR(); }//move to start when they fix the bug
         if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);

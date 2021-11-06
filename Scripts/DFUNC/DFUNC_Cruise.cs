@@ -49,12 +49,12 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(true);
         Selected = true;
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         if (!Cruise) { gameObject.SetActive(false); }
         TriggerTapTime = 1;
         Selected = false;
@@ -72,7 +72,6 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
-        TriggerLastFrame = true;
         gameObject.SetActive(false);
         Piloting = false;
         TriggerTapTime = 1;

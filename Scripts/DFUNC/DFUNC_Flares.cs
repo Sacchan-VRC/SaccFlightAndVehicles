@@ -39,11 +39,11 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         func_active = true;
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         func_active = false;
     }
     public void SFEXT_L_EntityStart()
@@ -59,7 +59,6 @@ public class DFUNC_Flares : UdonSharpBehaviour
     { gameObject.SetActive(false); }
     public void SFEXT_O_PilotExit()
     {
-        TriggerLastFrame = true;
         func_active = false;
     }
     public void SFEXT_G_RespawnButton()

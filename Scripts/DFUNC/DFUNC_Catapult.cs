@@ -56,16 +56,15 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         Selected = true;
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         Selected = false;
     }
     public void SFEXT_O_PilotEnter()
     {
-        TriggerLastFrame = true;
         gameObject.SetActive(true);
         Piloting = true;
         DisableOverrides();

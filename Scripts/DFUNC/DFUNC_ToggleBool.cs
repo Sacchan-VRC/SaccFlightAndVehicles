@@ -74,7 +74,6 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
-        TriggerLastFrame = true;
         if (!IsSecondary)
         {
             if (PilotExitTurnOff)

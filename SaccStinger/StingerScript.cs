@@ -146,6 +146,8 @@ public class StingerScript : UdonSharpBehaviour
     public void SFEXT_O_TakeOwnership()
     {
         IsOwner = true;
+        if (!Holding)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableScript)); }
     }
     public void SFEXT_O_LoseOwnership()
     {

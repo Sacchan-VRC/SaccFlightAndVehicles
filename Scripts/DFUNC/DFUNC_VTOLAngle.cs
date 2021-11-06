@@ -28,16 +28,15 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(true);
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         gameObject.SetActive(false);
     }
     public void SFEXT_O_PilotExit()
     {
-        TriggerLastFrame = true;
         gameObject.SetActive(false);
     }
     private void LateUpdate()

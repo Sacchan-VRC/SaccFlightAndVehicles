@@ -43,18 +43,17 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
+        TriggerLastFrame = true;
         gameObject.SetActive(true);
         Selected = true;
     }
     public void DFUNC_Deselected()
     {
-        TriggerLastFrame = true;
         if (!AltHold) { gameObject.SetActive(false); }
         Selected = false;
     }
     public void SFEXT_O_PilotEnter()
     {
-        TriggerLastFrame = true;
         gameObject.SetActive(false);
         Piloting = true;
         if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);

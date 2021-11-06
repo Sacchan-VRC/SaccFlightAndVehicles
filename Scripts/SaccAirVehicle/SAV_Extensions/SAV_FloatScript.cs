@@ -64,7 +64,11 @@ public class SAV_FloatScript : UdonSharpBehaviour
     private bool InEditor = false;
     private float FloatDiameter;
     private int FPLength;
-    private bool Initialized;
+    void Start()
+    {
+        if (!SAVControl)
+        { SFEXT_L_EntityStart(); }
+    }
     public void SFEXT_L_EntityStart()
     {
         FPLength = FloatPoints.Length;
