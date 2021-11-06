@@ -1076,7 +1076,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         FinalInputAcc *= Atmosphere;
                     }
 
-                    float outputdif = (EngineOutput - EngineOutputLastFrame);
+                    float outputdif = (EngineOutput - EngineOutputLastFrame) / DeltaTime;//divide by deltatime to counter the *deltatime added by the constantforce
                     float ADVYaw = outputdif * AdverseYaw;
                     float ADVRoll = outputdif * AdverseRoll;
                     EngineOutputLastFrame = EngineOutput;
@@ -1085,9 +1085,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
 
                     //roll + rotational frictions
-                    Vector3 FinalInputRot = new Vector3((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw * Atmosphere) - (localAngularVelocity.x * PitchConstantFriction),// X Pitch
-                        (-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw * Atmosphere - (localAngularVelocity.y * YawConstantFriction),// Y Yaw
-                            ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVRoll) * Atmosphere) - (localAngularVelocity.z * RollConstantFriction));// Z Roll
+                    Vector3 FinalInputRot = new Vector3(((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw) - (localAngularVelocity.x * PitchConstantFriction)) * Atmosphere,// X Pitch
+                        (((-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw) - (localAngularVelocity.y * YawConstantFriction)) * Atmosphere,// Y Yaw
+                            ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVRoll) - (localAngularVelocity.z * RollConstantFriction)) * Atmosphere);// Z Roll
 
                     //create values for use in fixedupdate (control input and straightening forces)
                     Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
