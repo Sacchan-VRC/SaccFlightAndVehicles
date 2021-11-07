@@ -44,7 +44,7 @@ public class StingerScript : UdonSharpBehaviour
     {
         set
         {
-            if (value > _AAMFire)//if _AAMFire is higher, it's because a late joiner just took ownership, so don't launch
+            if (value > _AAMFire)//if _AAMFire is higher locally, it's because a late joiner just took ownership or value was reset, so don't launch
             { LaunchAAM(); }
             _AAMFire = value;
         }
@@ -182,6 +182,7 @@ public class StingerScript : UdonSharpBehaviour
     }
     public void EnableScript()
     {
+        AAMFire = 0;
         gameObject.SetActive(true);
         active = true;
         if (Holding)

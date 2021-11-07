@@ -36,7 +36,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     {
         set
         {
-            if (value > _AAMFire)//if _AAMFire is higher locally, it's because a late joiner just took ownership, so don't launch
+            if (value > _AAMFire)//if _AAMFire is higher locally, it's because a late joiner just took ownership or value was reset, so don't launch
             { LaunchAAM(); }
             _AAMFire = value;
         }
@@ -128,7 +128,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         RequestSerialization();
     }
     public void SFEXT_G_PilotEnter()
-    { gameObject.SetActive(true); }
+    { gameObject.SetActive(true); AAMFire = 0; }
     public void SFEXT_G_PilotExit()
     { gameObject.SetActive(false); }
     public void SFEXT_O_PilotExit()

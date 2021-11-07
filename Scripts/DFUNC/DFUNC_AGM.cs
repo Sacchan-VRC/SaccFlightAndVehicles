@@ -42,8 +42,9 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         set
         {
+            if (value > _AGMFire)//if _AGMFire is higher locally, it's because a late joiner just took ownership or value was reset, so don't launch
+            { LaunchAGM(); }
             _AGMFire = value;
-            LaunchAGM();
         }
         get => _AGMFire;
     }
@@ -166,7 +167,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void EnableForOthers()
     {
         if (!Piloting)
-        { gameObject.SetActive(true); }
+        { gameObject.SetActive(true); AGMFire = 0; }
         OthersEnabled = true;
     }
     public void DisableForOthers()

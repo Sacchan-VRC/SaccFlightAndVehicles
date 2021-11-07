@@ -39,8 +39,9 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     {
         set
         {
+            if (value > _BombFire)//if _BombFire is higher locally, it's because a late joiner just took ownership or value was reset, so don't launch
+            { LaunchBomb(); }
             _BombFire = value;
-            LaunchBomb();
         }
         get => _BombFire;
     }
@@ -159,7 +160,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public void EnableForOthers()
     {
         if (!Piloting)
-        { gameObject.SetActive(true); }
+        { gameObject.SetActive(true); BombFire = 0; }
         OthersEnabled = true;
     }
     public void DisableForOthers()
