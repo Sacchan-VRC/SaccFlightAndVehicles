@@ -47,8 +47,8 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     public bool HoverBike = false;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the rolling-into-a-turn extra turning ability")]
-    [SerializeField] private float HoverBikeTurningStrength = 20;
-    [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifintg-at-90-degrees extra turning ability")]
+    [SerializeField] private float HoverBikeTurningStrength = .3f;
+    [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifing-at-90-degrees extra turning ability")]
     [SerializeField] private float BackThrustStrength = 15;
     [System.NonSerializedAttribute] public float SurfaceHeight;
     private float[] FloatDepth;
@@ -203,7 +203,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         }
         float DepthMaxd = Mathf.Min(depth, MaxDepthForce);
         if (depth > 0)
-        {//apply last calculated floating force for each floatpoint to respective floatpoints
+        {//apply last calculated floating force for each floatpoint to respective floatpoint
             for (int i = 0; i != FloatPoints.Length; i++)
             {
                 VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.Acceleration);
@@ -218,24 +218,20 @@ public class SAV_FloatScript : UdonSharpBehaviour
 
             float sidespeed = Vector3.Dot(Vel, right);
             float forwardspeed = Vector3.Dot(Vel, forward);
-
             if (HoverBike)
             {
+                Vector3 hoverup = Vector3.Cross(Vel, forward);
                 Vector3 up = VehicleTransform.up;
-                float RightY = Mathf.Abs(right.y);
-                right.y = 0;
-                if (Vector3.Dot(Vel, -up) > 0)
+                float RightY = Mathf.Abs(Vector3.Dot(hoverup, right));
+                right = Vector3.ProjectOnPlane(right, hoverup);
+                if (Vector3.Dot(Vel, -up) > 0)//rolling into turn?
                 {
-                    right = right.normalized * (1 + (RightY * HoverBikeTurningStrength));
-                }
-                else
-                {
-                    right = Vector3.zero;
+                    right = right.normalized * ((RightY * HoverBikeTurningStrength));
+                    VehicleRigidbody.AddForce(right * -sidespeed * DepthMaxd, ForceMode.Acceleration);
                 }
                 float BackThrustAmount = -((Vector3.Dot(Vel, forward)) * BackThrustStrength);
                 if (BackThrustAmount > 0)
                 { VehicleRigidbody.AddForce(forward * BackThrustAmount * DepthMaxd * (float)SAVControl.GetProgramVariable("ThrottleInput"), ForceMode.Acceleration); }
-                VehicleRigidbody.AddForce(right * -sidespeed * WaterSidewaysDrag * DepthMaxd, ForceMode.Acceleration);
             }
             else
             {
