@@ -201,7 +201,6 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
     [System.NonSerializedAttribute] public float Limits = 1;
     [System.NonSerializedAttribute] public int DisablePhysicsAndInputs = 0;
-    [System.NonSerializedAttribute] public int OverrideConstantForce = 0;
     [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
     [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
     [System.NonSerializedAttribute] public int DisableTaxiRotation = 0;
@@ -218,6 +217,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         VehicleGameObj = EntityControl.gameObject;
         VehicleTransform = EntityControl.transform;
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
+        VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
+        if (VehicleObjectSync == null)
+        {
+            UsingManualSync = true;
+        }
 
         Spawnposition = VehicleTransform.position;
         Spawnrotation = VehicleTransform.rotation;
@@ -229,8 +233,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             Piloting = true;
             IsOwner = true;
             Occupied = true;
-            VehicleRigidbody.drag = 0;
-            VehicleRigidbody.angularDrag = 0;
+            if (!UsingManualSync)
+            {
+                VehicleRigidbody.drag = 0;
+                VehicleRigidbody.angularDrag = 0;
+            }
         }
         else
         {
@@ -239,13 +246,19 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             if (localPlayer.isMaster)
             {
                 IsOwner = true;
-                VehicleRigidbody.drag = 0;
-                VehicleRigidbody.angularDrag = 0;
+                if (!UsingManualSync)
+                {
+                    VehicleRigidbody.drag = 0;
+                    VehicleRigidbody.angularDrag = 0;
+                }
             }
             else
             {
-                VehicleRigidbody.drag = 9999;
-                VehicleRigidbody.angularDrag = 9999;
+                if (!UsingManualSync)
+                {
+                    VehicleRigidbody.drag = 9999;
+                    VehicleRigidbody.angularDrag = 9999;
+                }
             }
         }
 
@@ -292,11 +305,6 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         FuelConsumptionAB = (FuelConsumption * FuelConsumptionABMulti) - FuelConsumption;
         ThrottleStrengthAB = (ThrottleStrength * AfterburnerThrustMulti) - ThrottleStrength;
 
-        VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
-        if (VehicleObjectSync == null)
-        {
-            UsingManualSync = true;
-        }
 
         LowFuelDivider = 1 / LowFuel;
 
@@ -783,8 +791,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         {
             VehicleRigidbody.velocity = Vector3.zero;
             VehicleRigidbody.angularVelocity = Vector3.zero;
-            VehicleRigidbody.drag = 9999;
-            VehicleRigidbody.angularDrag = 9999;
+            if (!UsingManualSync)
+            {
+                VehicleRigidbody.drag = 9999;
+                VehicleRigidbody.angularDrag = 9999;
+            }
             Health = FullHealth;//turns off low health smoke
             Fuel = FullFuel;
             AngleOfAttack = 0;
@@ -815,8 +826,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
         if (IsOwner)
         {
-            VehicleRigidbody.drag = 0;
-            VehicleRigidbody.angularDrag = 0;
+            if (!UsingManualSync)
+            {
+                VehicleRigidbody.drag = 0;
+                VehicleRigidbody.angularDrag = 0;
+            }
         }
     }
     public void NotDead()
@@ -1017,14 +1031,20 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         IsOwner = true;
         VehicleRigidbody.velocity = CurrentVel;
-        VehicleRigidbody.drag = 0;
-        VehicleRigidbody.angularDrag = 0;
+        if (!UsingManualSync)
+        {
+            VehicleRigidbody.drag = 0;
+            VehicleRigidbody.angularDrag = 0;
+        }
     }
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
-        VehicleRigidbody.drag = 9999;
-        VehicleRigidbody.angularDrag = 9999;
+        if (!UsingManualSync)
+        {
+            VehicleRigidbody.drag = 9999;
+            VehicleRigidbody.angularDrag = 9999;
+        }
     }
     public void SFEXT_O_PilotEnter()
     {

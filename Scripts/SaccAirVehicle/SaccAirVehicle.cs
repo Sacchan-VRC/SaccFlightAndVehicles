@@ -371,7 +371,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
         VehicleTransform = EntityControl.transform;
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         VehicleConstantForce = EntityControl.GetComponent<ConstantForce>();
-
+        VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)VehicleGameObj.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
+        if (VehicleObjectSync == null)
+        {
+            UsingManualSync = true;
+        }
         Spawnposition = VehicleTransform.position;
         Spawnrotation = VehicleTransform.rotation;
 
@@ -382,8 +386,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Piloting = true;
             IsOwner = true;
             Occupied = true;
-            VehicleRigidbody.drag = 0;
-            VehicleRigidbody.angularDrag = 0;
+            if (!UsingManualSync)
+            {
+                VehicleRigidbody.drag = 0;
+                VehicleRigidbody.angularDrag = 0;
+            }
         }
         else
         {
@@ -392,13 +399,19 @@ public class SaccAirVehicle : UdonSharpBehaviour
             if (localPlayer.isMaster)
             {
                 IsOwner = true;
-                VehicleRigidbody.drag = 0;
-                VehicleRigidbody.angularDrag = 0;
+                if (!UsingManualSync)
+                {
+                    VehicleRigidbody.drag = 0;
+                    VehicleRigidbody.angularDrag = 0;
+                }
             }
             else
             {
-                VehicleRigidbody.drag = 9999;
-                VehicleRigidbody.angularDrag = 9999;
+                if (!UsingManualSync)
+                {
+                    VehicleRigidbody.drag = 9999;
+                    VehicleRigidbody.angularDrag = 9999;
+                }
             }
         }
 
@@ -499,12 +512,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             Debug.LogWarning("GroundEffectEmpty not found, using CenterOfMass instead");
             GroundEffectEmpty = CenterOfMass;
-        }
-
-        VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
-        if (VehicleObjectSync == null)
-        {
-            UsingManualSync = true;
         }
 
         LowFuelDivider = 1 / LowFuel;
@@ -1162,8 +1169,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             VehicleRigidbody.velocity = Vector3.zero;
             VehicleRigidbody.angularVelocity = Vector3.zero;
-            VehicleRigidbody.drag = 9999;
-            VehicleRigidbody.angularDrag = 9999;
+            if (!UsingManualSync)
+            {
+                VehicleRigidbody.drag = 9999;
+                VehicleRigidbody.angularDrag = 9999;
+            }
             Health = FullHealth;//turns off low health smoke
             Fuel = FullFuel;
             AoALiftPitch = 0;
@@ -1171,7 +1181,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
             VTOLAngle90 = 0;
-            SendCustomEventDelayedSeconds("MoveToSpawn", RespawnDelay - 3);
+            SendCustomEventDelayedSeconds(nameof(MoveToSpawn), RespawnDelay - 3);
             EntityControl.SendEventToExtensions("SFEXT_O_Explode");
         }
 
@@ -1197,8 +1207,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
         EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
         if (IsOwner)
         {
-            VehicleRigidbody.drag = 0;
-            VehicleRigidbody.angularDrag = 0;
+            if (!UsingManualSync)
+            {
+                VehicleRigidbody.drag = 0;
+                VehicleRigidbody.angularDrag = 0;
+            }
         }
     }
     public void NotDead()
@@ -1501,14 +1514,20 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         IsOwner = true;
         VehicleRigidbody.velocity = CurrentVel;
-        VehicleRigidbody.drag = 0;
-        VehicleRigidbody.angularDrag = 0;
+        if (!UsingManualSync)
+        {
+            VehicleRigidbody.drag = 0;
+            VehicleRigidbody.angularDrag = 0;
+        }
     }
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
-        VehicleRigidbody.drag = 9999;
-        VehicleRigidbody.angularDrag = 9999;
+        if (!UsingManualSync)
+        {
+            VehicleRigidbody.drag = 9999;
+            VehicleRigidbody.angularDrag = 9999;
+        }
     }
     public void SFEXT_O_PilotEnter()
     {

@@ -242,6 +242,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
                                     }
                                 }
+                                if (AGMLock)
+                                { AGMLock.Play(); }
                             }
                             else
                             {//didn't find one, lock onto raycast point

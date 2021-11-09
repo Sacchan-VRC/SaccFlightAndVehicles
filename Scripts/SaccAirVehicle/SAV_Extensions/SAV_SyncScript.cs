@@ -80,8 +80,26 @@ public class SAV_SyncScript : UdonSharpBehaviour
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
         dblStartupTimeMS = (double)StartupTimeMS * .001f;
         StartupTime = Time.realtimeSinceStartup;
-        //script is disabled for 10 seconds to make sure nothing moves before everything is initialized
+        //script is disabled for 5 seconds to make sure nothing moves before everything is initialized
         SendCustomEventDelayedSeconds(nameof(ActivateScript), 5);
+        if (localPlayer == null)
+        {
+            VehicleRigid.drag = 0;
+            VehicleRigid.angularDrag = 0;
+        }
+        else
+        {
+            if (localPlayer.isMaster)
+            {
+                VehicleRigid.drag = 0;
+                VehicleRigid.angularDrag = 0;
+            }
+            else
+            {
+                VehicleRigid.drag = 9999;
+                VehicleRigid.angularDrag = 9999;
+            }
+        }
     }
     public void ActivateScript()
     {
@@ -94,6 +112,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
         IsOwner = true;
         VehicleRigid.WakeUp();
         VehicleRigid.constraints = RigidbodyConstraints.None;
+        VehicleRigid.drag = 0;
+        VehicleRigid.angularDrag = 0;
     }
     public void SFEXT_O_LoseOwnership()
     {
@@ -102,6 +122,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
         O_LastRotation2 = O_LastRotation = O_Rotation_Q;
         VehicleRigid.Sleep();
         VehicleRigid.constraints = RigidbodyConstraints.FreezePosition;
+        VehicleRigid.drag = 9999;
+        VehicleRigid.angularDrag = 9999;
     }
     private void Update()
     {
@@ -218,7 +240,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
 
             //convert short back to angle (0-65536 to 0-360)
             O_Rotation_Q = Quaternion.Euler(new Vector3(O_RotationX, O_RotationY, O_RotationZ) * .0054931640625f);
-            //rotate Acceleration by the difference in rotation of vehicle between last and this update to make it match the angle for the next frame better
+            //rotate Acceleration by the difference in rotation of vehicle between last and this update to make it match the angle for the next update better
             Quaternion PlaneRotDif = O_Rotation_Q * Quaternion.Inverse(O_LastRotation);
             Acceleration = PlaneRotDif * Acceleration;
 
@@ -238,6 +260,22 @@ public class SAV_SyncScript : UdonSharpBehaviour
             O_LastRotation = O_Rotation_Q;
             O_LastPosition = O_Position;
             O_LastCurVel = CurrentVelocity;
+        }
+    }
+    public void SFEXT_O_Explode()//all the things players see happen when the vehicle explodes
+    {
+        if (IsOwner)
+        {
+            VehicleRigid.drag = 9999;
+            VehicleRigid.angularDrag = 9999;
+        }
+    }
+    public void SFEXT_G_ReAppear()
+    {
+        if (IsOwner)
+        {
+            VehicleRigid.drag = 0;
+            VehicleRigid.angularDrag = 0;
         }
     }
 }
