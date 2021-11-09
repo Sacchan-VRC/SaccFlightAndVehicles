@@ -36,6 +36,7 @@ public class StingerScript : UdonSharpBehaviour
     [SerializeField] private Text HUDText_AAM_ammo;
     [Tooltip("Hud element to highlight current target")]
     [SerializeField] private Transform AAMTargetIndicator;
+    [SerializeField] private AudioSource FireSound;
     private float distance_from_head = 1.333333f;
     private VRC.SDK3.Components.VRCObjectSync StingerObjectSync;
     private VRC_Pickup StingerPickup;
@@ -414,6 +415,7 @@ public class StingerScript : UdonSharpBehaviour
     }
     public void LaunchAAM()
     {
+        if (FireSound) { FireSound.PlayOneShot(FireSound.clip); }
         if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         if (StingerAnimator) { StingerAnimator.SetTrigger(AnimFiredTriggerName); }

@@ -343,12 +343,10 @@ public class SaccEntity : UdonSharpBehaviour
         if (LStickNumFuncs == 1)
         {
             Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected");
-            Dial_Functions_L[0].SetProgramVariable("TriggerLastFrame", true);//prevent
         }
         if (RStickNumFuncs == 1)
         {
             Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected");
-            Dial_Functions_R[0].SetProgramVariable("TriggerLastFrame", true);
         }
         if (LStickDisplayHighlighter)
         { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }

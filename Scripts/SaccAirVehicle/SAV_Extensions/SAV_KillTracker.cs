@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_KillTracker : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
@@ -53,11 +53,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
                 }
                 else
                 {
-                    Networking.SetOwner(localPlayer, KillsBoard.gameObject);
-                    KillsBoard.TopKiller = localPlayer.displayName;
-                    KillsBoard.TopKills = KillsBoard.MyKills;
-                    KillsBoard.RequestSerialization();
-                    KillsBoard.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "UpdateScores");
+                    KillsBoard.SendCustomEvent("UpdateTopKiller");
                 }
             }
         }

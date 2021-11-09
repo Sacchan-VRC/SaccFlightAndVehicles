@@ -4,7 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class DFUNC_VTOLAngle : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;

@@ -35,14 +35,12 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private ParticleSystem.EmissionModule[] DisplaySmokeem;
     private bool DisplaySmokeNull = true;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 SmokeColor = Vector3.one;
-    [System.NonSerializedAttribute] public bool Smoking = false;
+    [System.NonSerializedAttribute] public bool localSmoking = false;
     [System.NonSerializedAttribute] public Color SmokeColor_Color;
     private Vector3 TempSmokeCol = Vector3.zero;
     private bool Pilot;
     private bool Selected;
-    private bool InEditor;
-    private int NumSmokes;
-    private int DialPosition;
+    private bool InEditor; private int DialPosition;
     private bool LeftDial;
     private Transform ControlsRoot;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -54,7 +52,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
-        NumSmokes = DisplaySmoke.Length;
+        int NumSmokes = DisplaySmoke.Length;
         if (NumSmokes > 0) DisplaySmokeNull = false;
         DisplaySmokeem = new ParticleSystem.EmissionModule[NumSmokes];
 
@@ -71,7 +69,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     public void DFUNC_Deselected()
     {
-        if (!Smoking)
+        if (!localSmoking)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotActive));
         }
@@ -80,7 +78,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         Pilot = true;
-        if (Dial_Funcon) { Dial_Funcon.SetActive(Smoking); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(localSmoking); }
     }
     public void SFEXT_O_PilotExit()
     {
@@ -94,7 +92,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     public void SFEXT_P_PassengerEnter()
     {
-        if (Dial_Funcon) Dial_Funcon.SetActive(Smoking);
+        if (Dial_Funcon) Dial_Funcon.SetActive(localSmoking);
     }
     public void SFEXT_G_Explode()
     {
@@ -108,15 +106,10 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         gameObject.SetActive(true);
     }
-    public void LateJoiner()
-    {
-        gameObject.SetActive(true);
-        SmokeOn = true;
-    }
     public void SetNotActive()
     {
+        SmokeOn = false;
         gameObject.SetActive(false);
-        if (Smoking) { SetSmoking(false); }
     }
     private void LateUpdate()
     {
@@ -157,7 +150,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                 }
                 else { TriggerLastFrame = false; }
             }
-            if (Smoking)
+            if (localSmoking)
             {
                 int keypad7 = Input.GetKey(KeyCode.Keypad7) ? 1 : 0;
                 int Keypad4 = Input.GetKey(KeyCode.Keypad4) ? 1 : 0;
@@ -172,7 +165,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
             //Smoke Color Indicator
             SmokeColorIndicatorMaterial.color = SmokeColor_Color;
         }
-        if (Smoking && !DisplaySmokeNull)
+        if (localSmoking && !DisplaySmokeNull)
         {
             //everyone does this while smoke is active
             SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
@@ -203,7 +196,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     public void SetSmoking(bool smoking)
     {
-        Smoking = smoking;
+        localSmoking = smoking;
         if (HUD_SmokeOnIndicator) { HUD_SmokeOnIndicator.SetActive(smoking); }
         for (int x = 0; x < DisplaySmokeem.Length; x++)
         { DisplaySmokeem[x].enabled = smoking; }
@@ -218,7 +211,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     }
     public void SFEXT_O_TakeOwnership()
     {
-        if (Smoking)
+        if (localSmoking)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotActive));
         }
@@ -227,12 +220,9 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
-            if (Selected)
+            if (localSmoking)
             {
-                if (Smoking)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LateJoiner)); }
-                else
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetActive)); }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetActive));
             }
         }
     }

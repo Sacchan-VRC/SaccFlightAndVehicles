@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class DFUNC_Reverse : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
