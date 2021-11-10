@@ -19,7 +19,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     [Tooltip("If the missile and target vehicle are facing towards each other, multiply rotation speed by HighAspectRotSpeedMulti with this nose angle (facing perfectly towards each other = 0 degrees, which is the same as disabled) Set 0 for any non-heatseeker missiles")]
     [SerializeField] private float HighAspectTrackAngle = 60;
     [Tooltip("See above")]
-    [SerializeField] private float HighAspectRotSpeedMulti = .3f;
+    [SerializeField] private float HighAspectRotSpeedMulti = .5f;
     [Tooltip("Name of integer to +1 on the target plane while chasing it")]
     [SerializeField] private string AnimINTName = "missilesincoming";
     [Tooltip("Play a random one of these explosion sounds")]
@@ -178,7 +178,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                     Vector3.Dot(Vector3.up, MissileToTargetVector) < NotchHorizonDot
                     && Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, MissileToTargetVector)) < NotchLimitDot;//if the target is traveling perpendicular to the direction the missile is looking at it from, it is 'notching' the missile
 
-                AspectTrack = Vector3.Dot(MissileToTargetVector, -TargetEntityControl.transform.forward) > HighAspectTrack ? .5f : 1;
+                AspectTrack = Vector3.Dot(MissileToTargetVector, -TargetEntityControl.transform.forward) > HighAspectTrack ? HighAspectRotSpeedMulti : 1;
                 EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle
             }
             else

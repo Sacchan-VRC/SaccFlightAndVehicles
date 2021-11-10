@@ -34,7 +34,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private Vector3 SmokeZeroPoint;
     private ParticleSystem.EmissionModule[] DisplaySmokeem;
     private bool DisplaySmokeNull = true;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 SmokeColor = Vector3.one;
+    [System.NonSerializedAttribute] public Vector3 SmokeColor = Vector3.one;
     [System.NonSerializedAttribute] public bool localSmoking = false;
     [System.NonSerializedAttribute] public Color SmokeColor_Color;
     private Vector3 TempSmokeCol = Vector3.zero;

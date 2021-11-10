@@ -126,7 +126,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
         if (Rocket != null)
         {
-            GameObject NewRocket = Object.Instantiate(Rocket);
+            GameObject NewRocket =  VRCInstantiate(Rocket);
 
             NewRocket.transform.SetPositionAndRotation(RocketLaunchPoints[RocketPoint].position, RocketLaunchPoints[RocketPoint].rotation);
             NewRocket.SetActive(true);

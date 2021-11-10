@@ -211,7 +211,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         BombAnimator.SetTrigger(AnimFiredTriggerName);
         if (Bomb)
         {
-            GameObject NewBomb = Object.Instantiate(Bomb);
+            GameObject NewBomb = VRCInstantiate(Bomb);
 
             NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, VehicleTransform.rotation);
             NewBomb.SetActive(true);

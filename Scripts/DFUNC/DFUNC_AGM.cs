@@ -176,6 +176,18 @@ public class DFUNC_AGM : UdonSharpBehaviour
         { gameObject.SetActive(false); }
         OthersEnabled = false;
     }
+    private void RaycastLock()
+    {
+        RaycastHit lockpoint;
+        if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore))
+        {//enable for others so they sync the variable
+            AGMTarget = lockpoint.point;
+            AGMLocked = true;
+            AGMUnlocking = 0;
+            RequestSerialization();
+            if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+        }
+    }
     private void Update()
     {
         if (func_active)
@@ -222,7 +234,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
                         {
                             //check for agmtargets to lock to
                             float targetangle = 999;
-                            RaycastHit lockpoint;
                             RaycastHit[] agmtargs = Physics.SphereCastAll(AtGCam.transform.position, 150, AtGCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);
                             if (agmtargs.Length > 0)
                             {//found one or more, find lowest angle one
@@ -236,27 +247,26 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                         //enable for others so they sync the variable
                                         targetangle = angle;
                                         AGMTarget = target.collider.transform.position;
-                                        AGMLocked = true;
-                                        AGMUnlocking = 0;
-                                        RequestSerialization();
-                                        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
                                     }
                                 }
-                                if (AGMLock)
+                                //the spherecastall should really be a cone but this works for now
+                                if (targetangle > 20)
+                                { RaycastLock(); }
+                                else
+                                {
+                                    AGMLocked = true;
+                                    AGMUnlocking = 0;
+                                    if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+                                    RequestSerialization();
+                                }
+                                if (AGMLocked && AGMLock)
                                 { AGMLock.Play(); }
                             }
                             else
                             {//didn't find one, lock onto raycast point
-                                if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore))
-                                {//enable for others so they sync the variable
-                                    if (AGMLock)
-                                    { AGMLock.Play(); }
-                                    AGMTarget = lockpoint.point;
-                                    AGMLocked = true;
-                                    AGMUnlocking = 0;
-                                    RequestSerialization();
-                                    if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
-                                }
+                                RaycastLock();
+                                if (AGMLocked && AGMLock)
+                                { AGMLock.Play(); }
                             }
                         }
                     }
@@ -346,7 +356,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         AGMAnimator.SetTrigger(AnimFiredTriggerName);
         if (AGM)
         {
-            GameObject NewAGM = Object.Instantiate(AGM);
+            GameObject NewAGM = VRCInstantiate(AGM);
             NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.rotation);
             NewAGM.SetActive(true);
             NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

@@ -9,7 +9,6 @@ using VRC.Udon;
 public class StingerScript : UdonSharpBehaviour
 {
     [SerializeField] private SaccEntity EntityControl;
-    [SerializeField] private KeyCode FireKey = KeyCode.G;
     [SerializeField] private Transform HUD;
     [SerializeField] private float AAMMaxTargetDistance;
     [SerializeField] private int OutsideVehicleLayer = 17;
@@ -82,7 +81,6 @@ public class StingerScript : UdonSharpBehaviour
     private bool AAMHasTarget = false;
     private bool AAMLocked = false;
     private bool InEditor = true;
-    private bool LeftHand;
     private float AAMLastFiredTime = 0;
     private float FullAAMsDivider;
     private SaccAirVehicle AAMCurrentTargetSAVControl;
@@ -116,7 +114,7 @@ public class StingerScript : UdonSharpBehaviour
         StingerObjectSync = (VRC.SDK3.Components.VRCObjectSync)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
         Spawnposition = StingerTransform.position;
         Spawnrotation = StingerTransform.rotation;
-        StingerPickup = (VRC_Pickup)EntityControl.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
+        StingerPickup = (VRC_Pickup)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
     }
     public void SFEXT_O_OnPickup()
     {
@@ -130,9 +128,6 @@ public class StingerScript : UdonSharpBehaviour
         }
         if (HUD) { HUD.gameObject.SetActive(true); }
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableScript));
-        if (StingerPickup.currentHand == VRC_Pickup.PickupHand.Left)
-        { LeftHand = true; }
-        else { LeftHand = false; }
         RequestSerialization();
     }
     public void SFEXT_O_OnDrop()
@@ -421,7 +416,7 @@ public class StingerScript : UdonSharpBehaviour
         if (StingerAnimator) { StingerAnimator.SetTrigger(AnimFiredTriggerName); }
         if (AAM)
         {
-            GameObject NewAAM = Object.Instantiate(AAM);
+            GameObject NewAAM = VRCInstantiate(AAM);
             NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = StingerRigid.velocity + (NewAAM.transform.forward * 7);

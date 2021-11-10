@@ -37,7 +37,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private float NonLocalActiveDelay;//this var is for adding a min delay for disabling for non-local users to account for lag
     private bool Selected;
     private bool IsOwner;
-    private bool Piloting;
     private float NextUpdateTime;
     private float RotMultiMaxSpeedDivider;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -66,7 +65,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        Piloting = true;
         if (!NoPilotAlwaysGroundBrake)
         {
             if ((bool)SAVControl.GetProgramVariable("Floating"))
@@ -81,7 +79,6 @@ public class DFUNC_Brake : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
-        Piloting = false;
         BrakeInput = 0;
         RequestSerialization();
         Selected = false;

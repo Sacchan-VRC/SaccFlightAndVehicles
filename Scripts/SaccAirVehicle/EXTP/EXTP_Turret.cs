@@ -130,7 +130,7 @@ public class EXTP_Turret : UdonSharpBehaviour
         if (Ammo > 0) { Ammo--; }
         for (int x = 0; x < fp; x++)
         {
-            GameObject proj = Object.Instantiate(Projectile);
+            GameObject proj =  VRCInstantiate(Projectile);
             proj.transform.SetPositionAndRotation(FirePoints[x].position, FirePoints[x].rotation);
             proj.SetActive(true);
             proj.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

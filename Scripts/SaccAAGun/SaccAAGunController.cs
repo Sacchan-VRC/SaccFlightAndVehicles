@@ -616,7 +616,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     {
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         AAGunAnimator.SetTrigger("aamlaunched");
-        GameObject NewAAM = Object.Instantiate(AAM);
+        GameObject NewAAM = VRCInstantiate(AAM); ;
         if (!(NumAAM % 2 == 0))
         {
             //invert local x coordinates of launch point, launch, then revert, for odd numbered shots

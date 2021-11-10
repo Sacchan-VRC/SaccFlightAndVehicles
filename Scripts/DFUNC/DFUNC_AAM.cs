@@ -78,7 +78,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
     float TimeSinceSerialization;
     private bool func_active = false;
     private bool Pilot = false;
-    private bool OthersEnabled = false;
     public AudioSource AAMTargeting;
     public AudioSource AAMTargetLock;
     [System.NonSerializedAttribute] public bool IsOwner;
@@ -441,7 +440,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (AAMAnimator) { AAMAnimator.SetTrigger(AnimFiredTriggerName); }
         if (AAM)
         {
-            GameObject NewAAM = Object.Instantiate(AAM);
+            GameObject NewAAM = VRCInstantiate(AAM);
             NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
