@@ -212,8 +212,8 @@ Implemented (unrealistic) increased lift at higher speeds, you can now fall down
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-Version 1.5 has the largest changes of any update so far. I intentionally disregarded compatability/ease of update in order to modularize andimprove functionality as much as possible.
-Updating old projects with custom vehicles will be a challenge. Old animations can be reused but may requires some adjustments.
+Version 1.5 has the largest changes of any update so far. I intentionally disregarded compatability/ease of update in order to modularize and improve functionality as much as possible.
+Updating old projects with custom vehicles will be a challenge. Old animations can be reused but may require some adjustments.
 To upgrade old vehicles, i recommend just remaking them. Re-make the animator by copying it from the prefab again and re-add your animations to it.
 A number of layers have been removed from the animator and are now done in code.
 #Flares (as they are now launched per-click in code)
@@ -225,8 +225,11 @@ Modularization:
 EngineController has been renamed to SaccAirVehicle, it and many things it did are now modular scripts
 HitDetector is now named SaccEntity, and acts as the central object which contains references and sends events to all modular scripts, as well as handles the function dials
 Function dial functions are now each their own script, each referenced by SaccEntity.
-All modular scripts that use the event system must be referenced in the SaccEntity's 'Extension Udon Behaviours' array.
-The SaccEntity also sends events related to being picked up, so can probably be used to make handheld weapons. I haven't tried it yet.
+Modular scripts that use the event system must be referenced in the SaccEntity's 'Extension Udon Behaviours' array. Function dial scripts are also sent events.
+The SaccEntity also sends events related to being picked up, so can be used to make handheld weapons, the SaccStinger is an example of this.
+
+The extension scripts i've written for SaccAirVehicle(SAV_EffectsController, SAV_SoundController) are modular, it's possible to duplicate them, and add your own code to them.
+The same is true for SaccAirVehicle. The one caveat being that the AAM Function will not be able to read the target's variables(grounded, etc) if targeting a modified script because it only looks for SaccAirVehicle presently. Waiting for UdonSharp updates to fix this.
 
 Some new modular scripts:
 WaterTrigger:
@@ -234,21 +237,23 @@ Tells the vehicle when it enters and leaves water
 SyncScript:
 The new position sync script
 KillTracker:
-Not required, used to make the KillsBoard work
+Not required, used to make the KillsBoard work. Can be used without the killboard if you want to use the events that it sends for something else.
 
 Function dials:
 SaccEntity has 2 arrays, one for left dial functions, and right dial functions.
-And number of functions can be placed in each array. The code divides the dial up automatically for selection.
-The order they are input into that array is the order they'll work on the dial, clockwise. First function is in top middle, unless the 'Left/RightDialDivideStraightUp' is ticked, in which case it's to the right of straight up.
-The visuals of the function dial must be set up manually. I recommend looking at the dials in the vehicle prefabs in order to understand how.
-The MFD.fbx file containts 12 divider meshes for the function dials, for the number of functions on the dial. Named StickDisplay2-12 (the old default, 8 is just named 'StickDisplay' still.
-To set the 'funcon' rotations, you can type '360/7' for example, into its Z rotation(if you have 7 functions). Then multiply that by the dial position -1, then multiply by -1.
-
+Any number of functions can be placed in each array. The code divides the dial up automatically for selection. (Not visually, just for control input)
+The order they are input into that array is the order they'll work on the dial, clockwise. First function is in straight up, unless the 'Left/RightDialDivideStraightUp' is ticked, in which case it's to the right of straight up. Look at the difference between the left and right dials in the SF-1 for an example of the difference.
+The visuals of the function dial must be set up manually. Look at the dials in the vehicle prefabs in order to understand how.
+The MFD.fbx file containts 12 divider meshes for function dials for dials with those number of functions. Named StickDisplay2-12 (the old default, 8, is just named 'StickDisplay')
+Function dial scripts contain a 'funcon' (function on) reference if they are toggles. It's the mesh that appears to highlight the function on the dial when it's enabled.
+To set the 'funcon' rotations, you can type '360/7' for example, into its Z rotation(if you have 7 functions). Then multiply the result by the dial position -1, then multiply by -1.
 
 The 'Respawn' animation is no longer needed as respawning is handled by delayed events rather than events triggered through an animation.
 
 Due to the new custom position syncing script, more network data is being used, and the maximum limit for number of vehicles has decreased.
-The limit is around 10 with default settings, more if you increase Update Interval.
+The limit is around 12 with default settings, probably more if you increase Update Interval.
+
+================================================================================================================
 
 Inside the /Prefabs folder are individual prefabs for each vehicle, you can place them and they should work right away.
 
@@ -276,18 +281,24 @@ This variable can be used to do other things like F-14 wings moving back at a ce
 
 The angle of attack variable is 0 at 0 AoA, and 1 at 180.
 
-In Unity play mode without CyanEmu, all vehicles will be controlled at the same time.
-You can test fly the vehicles by adding a camera to them. Recommend adding camera as child of HudController, or PilotSeat's TargetEyePosition.
+In Unity play mode without CyanEmu, (and on the VRC Upload screen after build), all vehicles will be controlled at the same time.
+You can test fly the vehicles by adding a camera to them. Recommend adding camera as child of the TargetEyeHeight of the PilotSeat.
 You can test buttons by clicking Interact in the inspector with the object selected(VehicleRespawner etc), some may crash when tested in the editor.
 You can also test the animator variables, but some are set every frame so you won't be able to change them without disabling the script.
 To test the gun damage to planes/objects in editor, you must enable the Gun_pilot object, as it's disabled by default (The Interact button on the pilotseat also enables it)
 However, it wont hit any other vehicles because they are all set to the onboard vehicle layer because you're controlling them all. I recommend using CyanEmu to test weapons.
-All planes will react to inputs in the editor play mode. I recommend disabling vehicles that you aren't testing.
+As all vehicles will react to inputs in the editor play mode. I recommend disabling vehicles that you aren't testing.
 The 'SaccFlight' script will always crash when testing in editor, because it's looking for the VRChat player. This doesnt matter.
 
-It's best to break my prefab in order to make your own planes.
 
-When using a custom model, remove the Avatar reference from the animator to stop some confusing things from happening with object references in animations.
+Making your own vehicles:
+
+When making a new vehicle, place the prefab that is closest in type to your desired vehicle and Unpack Prefab (not completely) and also unpack prefab on the mesh if necessary. Now your objective is to replace the mesh (PlaneBody on the SF-1) completely.
+I recommend just disabling it at first, and placing your mesh just below it on the hierarchy. The first thing you should do is set the VehicleMesh to your new mesh in the SaccAirVehicle script.
+Next add colliders to your mesh, any collider types are fine. If your vehicle has wheels, i recommend copying the wheel colliders from the SF-1, and adjusting the size to fit your wheels.
+Now go through the entire hierarchy and move all the empties, effects, and sounds to the proper position for your new vehicle.
+Finally, duplicate the Animator for the vehicle prefab you used, rename it, place it in a new folder, apply it to your vehicle, and go through each layer and replace any animations that need replacing.
+When you're done look at the EffectsController and SoundController, and make sure no array references are empty (the ones that you can change the length of), they're likely to crash if any are.
 
 Tips for modifying basic flight characteristics of aircraft:
 If it's having trouble taking off, try adjusting the center of mass and pitch moment positions, as well as the ground effect settings.
@@ -308,9 +319,9 @@ You can make the blade tilt angle larger than implied in order to make the vehic
 Set Adverse yaw to 0 if you don't want the helicopter to spin when increasing the throttle
 the Vel Straighten values are just as important for the handling of helicopters as planes
 
-The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
+This file used to contain explanations of every variable in every script, that information is now contained in the tooltips of the variables. Hold the mouse still over a variable name in unity to see a description of what it does.
 
-Never leave an entry of an array input empty in EffectsController and SoundController, it'll cause them to crash.
+The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
 
 The hud can be made to appear smaller by moving all children of the 'bigstuff' object +Z local. 'bigstuff' is a child of HudController.
 
@@ -320,11 +331,9 @@ When making a custom plane, you must customize a number of the animations, I rec
 Likely to need replacing animations:
 AAMs
 AGMs
-AoA (for stall angle)
 Bombs
 Brake
 CanopyOpen
-DropFlares
 Explode
 FlapsOn
 Mach
@@ -337,26 +346,24 @@ EngineOutputAB
 Pitch
 Yaw
 Roll
-Remember for animations that are controlled by floats that use motion time, set the curves to linear.
+Remember for animations that are controlled by floats that use motion time, set the animation curves to linear.
 Joystick animation is done in the Pitch Yaw and Roll animations. Each one rotates a seperate empty of which the joystick is the last child of.
 
 Hierarchy:
 PlaneBody--------
-Everything in here is visual, except that it also contains colliders, and wheel colliders.
+Everything in here is visual, except that it also contains colliders, and wheel colliders. Objects can be placed as children of this if they need to move with parts of it (SS-1)
 SaccAirVehicle(formally SaccAirVehicle)--------
 Children of this are transforms used by the SaccAirVehicle, and weapon objects for cloning and launching.
 EffectsController--------
 The children of this are mostly particle systems, visual effects used by EffectsController and the animator.
 SoundController--------
-The children are all the sounds the plane uses. The AttachedSounds object contains all sounds that are disabled instantly when the plane explodes.
+The children are all the sounds the plane uses. The AttachedSounds object contains all sounds that are disabled instantly when the plane explodes. The 'beeps' empty contains all the cockpit beep sounds, just move the 'beeps' object instead of all children individually.
 InVehicleOnly--------
 The children of this are all things that are disabled when you're not inside the plane. Many different objects are in here including the HUD, joystick, MFDs(Multi-Function-Display).
-HUDController is also a child of this.
-HUDController's 'bigstuff' child object is scaled to 720 to make the hud appear to be on the sky like a real HUD. You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
+HUDController's 'bigstuff' child object is scaled to 720 to make the hud appear to be on the sky like a real HUD(roughly 1km away). You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
 PilotSeat--------
 A custom station with seat adjustment code for entering the plane
 PassengerSeat--------
-A custom station with seat adjustment code for entering a passenger seat of the plane
 AAMs--------
 AGMs--------
 Bombs--------
@@ -373,13 +380,13 @@ References to the layers will be retained and will work, but they will appear bl
 26:AGMTargets
 27:Resupply
 28:Racing
-The trigger objects that you may need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of SaccAirVehicle.
+The trigger objects that you may need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of SaccAirVehicle(If it's not, it will not be treated like a vehicle(untargetable on ground etc).
 Note that the AAMTarget object on a plane MUST be a first child of the SaccAirVehicle object, or the code to play the radar lock warning tone will fail.
 
-This package also contains a few prefabs that can be used with the plane. Explanations follow.
+This package also contains a few prefabs that can be used with the vehicles. Explanations follow.
 
 AAMDummyTarget
-Target object that can be placed on anything that you want air-to-air missiles to be able to lock on to. MUST be enabled by default or planes will not detect it during initial target enumeration in Start().
+Target object that can be placed on anything that you want air-to-air missiles to be able to lock on to. MUST be enabled at game start or planes will not detect it during initial target enumeration in Start(). After Start(), it can be disabled to become untargetable.
 
 AGMLockTarget
 object that if detected when attempting to lock target close to it with the AGM targeting system, will cause the targeted spot to snap to this location.
@@ -395,12 +402,8 @@ The trigger must be on the correct layer, the one selected in the DFUNC_Catapult
 Catapult launches are controlled by an animation. The point in the animation where the trigger is disabled is the point at which the plane is released.
 
 ResupplyZone
-A prefab containing a square outline mesh with a trigger beneath it, used to reload, repair and refuel planes.
+A prefab containing a square outline mesh with a trigger beneath it, used to reload, repair and refuel planes. Remove the mesh and just use the trigger if you want.
 The trigger must be on the correct layer, the one selected in the ResupplyTrigger.
 
 Target
-A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc. May not sync perfectly
-
-The SaccEntity script contains events related to VRC_Pickup. The SaccStinger folder contains an example handheld weapon using these.
-
-This readme used to contain explanations of every variable in every script, that information is now contained in the tooltips of the variables. Hold the mouse still over a variable to see a description of what it does.
+A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc. May not sync perfectly.

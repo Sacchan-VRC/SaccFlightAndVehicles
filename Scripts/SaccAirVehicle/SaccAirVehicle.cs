@@ -510,7 +510,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
         if (GroundEffectEmpty == null)
         {
-            Debug.LogWarning("GroundEffectEmpty not found, using CenterOfMass instead");
+            Debug.Log("GroundEffectEmpty not found, using CenterOfMass instead");
             GroundEffectEmpty = CenterOfMass;
         }
 
