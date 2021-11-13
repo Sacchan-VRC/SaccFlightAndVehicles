@@ -25,6 +25,7 @@ public class DFUNC_Reverse : UdonSharpBehaviour
         StartABStrength = (float)SAVControl.GetProgramVariable("ThrottleStrengthAB");
         ReversingThrottleStrength = StartThrottleStrength * ReversingThrottleMultiplier;
         ReversingABStrength = StartABStrength * ReversingThrottleMultiplier;
+        if (Dial_funcon) { Dial_funcon.SetActive(false); }
     }
     public void DFUNC_Selected()
     {
@@ -34,10 +35,6 @@ public class DFUNC_Reverse : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         gameObject.SetActive(false);
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        if (Dial_funcon) { Dial_funcon.SetActive(Reversing); }
     }
     public void SFEXT_O_PilotExit()
     {
