@@ -20,7 +20,7 @@ public class StingerScript : UdonSharpBehaviour
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
     [SerializeField] private float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
-    [SerializeField] private float AAMLockTime = 1.5f;
+    [SerializeField] private float AAMLockTime = 2.5f;
     [Tooltip("Minimum time between missile launches")]
     [SerializeField] private float AAMLaunchDelay = 0.5f;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
@@ -36,6 +36,8 @@ public class StingerScript : UdonSharpBehaviour
     [Tooltip("Hud element to highlight current target")]
     [SerializeField] private Transform AAMTargetIndicator;
     [SerializeField] private AudioSource FireSound;
+    [Tooltip("Require re-lock after firing?")]
+    [SerializeField] private bool LoseLockAfterShot = true;
     private float distance_from_head = 1.333333f;
     private VRC.SDK3.Components.VRCObjectSync StingerObjectSync;
     private VRC_Pickup StingerPickup;
@@ -133,7 +135,6 @@ public class StingerScript : UdonSharpBehaviour
     public void SFEXT_O_OnDrop()
     {
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableScript));
-        Holding = false;
         if (HUD) { HUD.gameObject.SetActive(false); }
         AAMTargeting.gameObject.SetActive(false);
         AAMTargetLock.gameObject.SetActive(false);
@@ -201,20 +202,12 @@ public class StingerScript : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
         active = false;
-        if (Holding)
+        Holding = false;
+        EntityControl.gameObject.layer = 13;
+        foreach (Collider stngcol in StingerColliders)
         {
-            EntityControl.gameObject.layer = 13;
-            foreach (Collider stngcol in StingerColliders)
-            {
-                stngcol.isTrigger = false;
-            }
-        }
-        else
-        {
-            foreach (Collider stngcol in StingerColliders)
-            {
-                stngcol.enabled = true;
-            }
+            stngcol.isTrigger = false;
+            stngcol.enabled = true;
         }
     }
     public void SFEXT_O_OnPickupUseDown()
@@ -227,7 +220,7 @@ public class StingerScript : UdonSharpBehaviour
                 AAMLastFiredTime = Time.time;
                 AAMFire++;//launch AAM using set
                 RequestSerialization();
-                if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
+                if (NumAAM == 0 || LoseLockAfterShot) { AAMLockTimer = 0; AAMLocked = false; }
                 EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
             }
         }

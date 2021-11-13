@@ -47,7 +47,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     public bool HoverBike = false;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the rolling-into-a-turn extra turning ability")]
-    [SerializeField] private float HoverBikeTurningStrength = .3f;
+    [SerializeField] private float HoverBikeTurningStrength = .2f;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifing-at-90-degrees extra turning ability")]
     [SerializeField] private float BackThrustStrength = 15;
     [System.NonSerializedAttribute] public float SurfaceHeight;

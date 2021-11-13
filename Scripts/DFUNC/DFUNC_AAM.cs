@@ -16,7 +16,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     [SerializeField] private float AAMLockTime = 1.5f;
     [Tooltip("Minimum time between missile launches")]
-    [SerializeField] private float AAMLaunchDelay = 0.5f;
+    [SerializeField] private float AAMLaunchDelay = 0;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 10;
     [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
@@ -327,7 +327,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                         AAMCurrentTargetSAVControl = NextTargetSAVontrol;
                         AAMLockTimer = 0;
-                        AAMTargetedTimer = 99f;//send targeted straight away
+                        AAMTargetedTimer = .99f;//don't send targeted this frame incase new target is found next frame
                     }
                 }
             }
@@ -369,13 +369,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         if (AAMCurrentTargetSAVControl)
                         {
                             //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
-                            AAMTargetedTimer += DeltaTime;
                             if (AAMTargetedTimer > 1)
                             {
                                 sendtargeted = !sendtargeted;
                                 RequestSerialization();
                                 AAMTargetedTimer = 0;
                             }
+                            AAMTargetedTimer += DeltaTime;
                         }
                     }
                     else

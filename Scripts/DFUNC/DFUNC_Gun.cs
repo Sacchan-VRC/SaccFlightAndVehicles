@@ -52,6 +52,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private float reloadspeed;
     private bool LeftDial = false;
     private bool Piloting = false;
+    private bool InVehicle = false;
     private int DialPosition = -999;
     private Vector3 AmmoBarScaleStart;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -97,10 +98,16 @@ public class DFUNC_Gun : UdonSharpBehaviour
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
+    public void SFEXT_O_OnPlayerJoined()
+    {
+        if (Selected)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active)); }
+    }
     public void SFEXT_O_PilotEnter()
     {
         GunDamageParticle.gameObject.SetActive(true);
         Piloting = true;
+        InVehicle = true;
     }
     public void SFEXT_G_PilotExit()
     {
@@ -110,11 +117,16 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         Piloting = false;
+        InVehicle = false;
         RequestSerialization();
         if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
         Selected = false;
         GunDamageParticle.gameObject.SetActive(false);
     }
+    public void SFEXT_P_PassengerEnter()
+    { InVehicle = true; }
+    public void SFEXT_P_PassengerExit()
+    { InVehicle = false; }
     public void SFEXT_G_ReSupply()
     {
         if (GunAmmoInSeconds != FullGunAmmoInSeconds)
@@ -158,46 +170,49 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void LateUpdate()
     {
-        if (Piloting && Selected)
+        if (InVehicle)
         {
-            float DeltaTime = Time.deltaTime;
-            float Trigger;
-            if (UseLeftTrigger)
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-            else
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-            if ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
+            if (Selected)
             {
-                if (!_firing)
+                float DeltaTime = Time.deltaTime;
+                float Trigger;
+                if (UseLeftTrigger)
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                else
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                if ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
                 {
-                    Firing = true;
-                    RequestSerialization();
-                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
-                    { EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
-                }
-                GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
-                if (!GunRecoilEmpty)
-                {
-                    VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime, ForceMode.Force);
+                    if (!_firing)
+                    {
+                        Firing = true;
+                        RequestSerialization();
+                        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                        { EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
+                    }
+                    GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
+                    if (!GunRecoilEmpty)
+                    {
+                        VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime, ForceMode.Force);
+                    }
+                    else
+                    {
+                        VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in a similar range as above*/, GunRecoilEmpty.position, ForceMode.Force);
+                    }
                 }
                 else
                 {
-                    VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in a similar range as above*/, GunRecoilEmpty.position, ForceMode.Force);
+                    if (_firing)
+                    {
+                        Firing = false;
+                        RequestSerialization();
+                        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                        { EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
+                    }
                 }
+                Hud();
             }
-            else
-            {
-                if (_firing)
-                {
-                    Firing = false;
-                    RequestSerialization();
-                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
-                    { EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
-                }
-            }
-            Hud();
+            AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
         }
-        AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
     }
     private GameObject[] AAMTargets;
     private Transform VehicleTransform;
@@ -216,124 +231,127 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
                               //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
     {
-        float DeltaTime = Time.fixedDeltaTime;
-        var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-        Vector3 HudControlPosition = HUDControl.transform.position;
-        float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
-
-        //check 1 target per frame to see if it's infront of us and worthy of being our current target
-        var TargetChecker = AAMTargets[AAMTargetChecker];
-        var TargetCheckerTransform = TargetChecker.transform;
-        var TargetCheckerParent = TargetCheckerTransform.parent;
-
-        Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
-        float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
-        float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
-
-        if (TargetChecker.activeInHierarchy)
+        if (Selected)
         {
-            SaccAirVehicle NextTargetSAVControl = null;
+            float DeltaTime = Time.fixedDeltaTime;
+            var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+            Vector3 HudControlPosition = HUDControl.transform.position;
+            float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
 
-            if (TargetCheckerParent)
+            //check 1 target per frame to see if it's infront of us and worthy of being our current target
+            var TargetChecker = AAMTargets[AAMTargetChecker];
+            var TargetCheckerTransform = TargetChecker.transform;
+            var TargetCheckerParent = TargetCheckerTransform.parent;
+
+            Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
+            float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
+            float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
+
+            if (TargetChecker.activeInHierarchy)
             {
-                NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
-            }
-            //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
-            if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
-            {
-                RaycastHit hitnext;
-                //raycast to check if it's behind something
-                bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
+                SaccAirVehicle NextTargetSAVControl = null;
 
-                /*                 Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
-                                if (hitnext.collider != null) Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsidePlaneLayer)));
-                                if (hitnext.collider != null) Debug.Log(string.Concat("RayCastLayer_next ", hitnext.collider.gameObject.layer));
-                                Debug.Log(string.Concat("LowerAngle_next ", NextTargetAngle < AAMCurrentTargetAngle));
-                                Debug.Log(string.Concat("InAngle_next ", NextTargetAngle < 70));
-                                Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
-
-                if ((LineOfSightNext
-                    && hitnext.collider.gameObject.layer == OutsideVehicleLayer //did raycast hit an object on the layer planes are on?
-                        && NextTargetAngle < 70//lock angle
-                            && NextTargetAngle < AAMCurrentTargetAngle)
-                                && NextTargetDistance < MaxTargetDistance
-                                    || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
-                                        || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
+                if (TargetCheckerParent)
                 {
-                    //found new target
-                    AAMCurrentTargetAngle = NextTargetAngle;
-                    AAMTarget = AAMTargetChecker;
-                    AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                    AAMCurrentTargetSAVControl = NextTargetSAVControl;
-                    AAMLockTimer = 0;
-                    if (HUDControl)
+                    NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
+                }
+                //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
+                if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
+                {
+                    RaycastHit hitnext;
+                    //raycast to check if it's behind something
+                    bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
+
+                    /*                 Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
+                                    if (hitnext.collider != null) Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsidePlaneLayer)));
+                                    if (hitnext.collider != null) Debug.Log(string.Concat("RayCastLayer_next ", hitnext.collider.gameObject.layer));
+                                    Debug.Log(string.Concat("LowerAngle_next ", NextTargetAngle < AAMCurrentTargetAngle));
+                                    Debug.Log(string.Concat("InAngle_next ", NextTargetAngle < 70));
+                                    Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
+
+                    if ((LineOfSightNext
+                        && hitnext.collider.gameObject.layer == OutsideVehicleLayer //did raycast hit an object on the layer planes are on?
+                            && NextTargetAngle < 70//lock angle
+                                && NextTargetAngle < AAMCurrentTargetAngle)
+                                    && NextTargetDistance < MaxTargetDistance
+                                        || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                            || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                     {
-                        RelativeTargetVelLastFrame = Vector3.zero;
-                        GUN_TargetSpeedLerper = 0f;
-                        GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
+                        //found new target
+                        AAMCurrentTargetAngle = NextTargetAngle;
+                        AAMTarget = AAMTargetChecker;
+                        AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+                        AAMCurrentTargetSAVControl = NextTargetSAVControl;
+                        AAMLockTimer = 0;
+                        if (HUDControl)
+                        {
+                            RelativeTargetVelLastFrame = Vector3.zero;
+                            GUN_TargetSpeedLerper = 0f;
+                            GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
+                        }
+                    }
+
+                }
+            }
+            //increase target checker ready for next frame
+            AAMTargetChecker++;
+            if (AAMTargetChecker == AAMTarget && AAMTarget == NumAAMTargets - 1)
+            { AAMTargetChecker = 0; }
+            else if (AAMTargetChecker == AAMTarget)
+            { AAMTargetChecker++; }
+            else if (AAMTargetChecker > NumAAMTargets - 1)
+            { AAMTargetChecker = 0; }
+
+            //if target is currently in front of plane, lock onto it
+            if (!AAMCurrentTargetSAVControl)
+            { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
+            else
+            { AAMCurrentTargetDirection = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }
+            float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
+            //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
+            //raycast to check if it's behind something
+            RaycastHit hitcurrent;
+            bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
+            //used to make lock remain for .25 seconds after target is obscured
+            if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsideVehicleLayer)
+            { AAMTargetObscuredDelay += DeltaTime; }
+            else
+            { AAMTargetObscuredDelay = 0; }
+
+            if (!(bool)SAVControl.GetProgramVariable("Taxiing")
+                && (AAMTargetObscuredDelay < .25f)
+                    && AAMCurrentTargetDistance < MaxTargetDistance
+                        && AAMTargets[AAMTarget].activeInHierarchy
+                            && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
+            {
+                if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < MaxTargetDistance)
+                {
+                    GUNHasTarget = true;
+                    if (AAMCurrentTargetAngle < 70)//lock angle
+                    {
+                        AAMLockTimer += DeltaTime;
+                    }
+                    else
+                    {
+                        AAMLockTimer = 0;
                     }
                 }
-
             }
-        }
-        //increase target checker ready for next frame
-        AAMTargetChecker++;
-        if (AAMTargetChecker == AAMTarget && AAMTarget == NumAAMTargets - 1)
-        { AAMTargetChecker = 0; }
-        else if (AAMTargetChecker == AAMTarget)
-        { AAMTargetChecker++; }
-        else if (AAMTargetChecker > NumAAMTargets - 1)
-        { AAMTargetChecker = 0; }
-
-        //if target is currently in front of plane, lock onto it
-        if (!AAMCurrentTargetSAVControl)
-        { AAMCurrentTargetDirection = AAMCurrentTargetPosition - HudControlPosition; }
-        else
-        { AAMCurrentTargetDirection = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }
-        float AAMCurrentTargetDistance = AAMCurrentTargetDirection.magnitude;
-        //check if target is active, and if it's enginecontroller is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
-        //raycast to check if it's behind something
-        RaycastHit hitcurrent;
-        bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
-        //used to make lock remain for .25 seconds after target is obscured
-        if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsideVehicleLayer)
-        { AAMTargetObscuredDelay += DeltaTime; }
-        else
-        { AAMTargetObscuredDelay = 0; }
-
-        if (!(bool)SAVControl.GetProgramVariable("Taxiing")
-            && (AAMTargetObscuredDelay < .25f)
-                && AAMCurrentTargetDistance < MaxTargetDistance
-                    && AAMTargets[AAMTarget].activeInHierarchy
-                        && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
-        {
-            if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < MaxTargetDistance)
+            else
             {
-                GUNHasTarget = true;
-                if (AAMCurrentTargetAngle < 70)//lock angle
-                {
-                    AAMLockTimer += DeltaTime;
-                }
-                else
-                {
-                    AAMLockTimer = 0;
-                }
+                AAMLockTimer = 0;
+                GUNHasTarget = false;
             }
+            /*         Debug.Log(string.Concat("AAMTarget ", AAMTarget));
+                    Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
+                    Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
+                    Debug.Log(string.Concat("LoS ", LineOfSightCur));
+                    Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsidePlaneLayer)));
+                    Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
+                    Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
+                    Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < 70));
+                    Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance)); */
         }
-        else
-        {
-            AAMLockTimer = 0;
-            GUNHasTarget = false;
-        }
-        /*         Debug.Log(string.Concat("AAMTarget ", AAMTarget));
-                Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
-                Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
-                Debug.Log(string.Concat("LoS ", LineOfSightCur));
-                Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsidePlaneLayer)));
-                Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
-                Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
-                Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < 70));
-                Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance)); */
     }
 
 

@@ -152,7 +152,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("Multiply the force of the ground effect")]
     public float GroundEffectStrength = 4;
     [Tooltip("Limit the force that can be applied by ground effect")]
-    public float GroundEffectLiftMax = 9999999;
+    public float GroundEffectLiftMax = 100;
     [Header("Response VTOL:")]
     [Tooltip("Degrees per second which the angle of the thrusters on the vehicle rotate toward desired angle")]
     public float VTOLAngleTurnRate = 90f;
@@ -268,10 +268,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AtmoshpereFadeDistance;
     [System.NonSerializedAttribute] public float AtmosphereHeightThing;
     [System.NonSerializedAttribute] public float Atmosphere = 1;
-    [System.NonSerializedAttribute] public float AngleOfAttackPitch;
-    [System.NonSerializedAttribute] public float AngleOfAttackYaw;
     private float AoALiftYaw;
     private float AoALiftPitch;
+    private float AoALift_Min;
     private Vector3 Pitching;
     private Vector3 Yawing;
     [System.NonSerializedAttribute] public float Taxiinglerper;
@@ -439,6 +438,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VelLiftMax *= RBMass;
             AdverseRoll *= RBMass;
             AdverseYaw *= RBMass;
+            GroundEffectLiftMax *= RBMass;
             foreach (WheelCollider wheel in wc)
             {
                 JointSpring SusiSpring = wheel.suspensionSpring;
@@ -997,7 +997,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     //and add wind
                     sidespeed = Vector3.Dot(AirVel, VehicleTransform.right);
                     downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
-
                     PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
                     if (PitchDown)
                     {
@@ -1019,6 +1018,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     //rotation inputs are done, now we can set the minimum lift/drag when at high aoa, this should be higher than 0 because if it's 0 you will have 0 drag when at 90 degree AoA.
                     AoALiftPitch = Mathf.Clamp(AoALiftPitch, HighPitchAoaMinLift, 1);
                     AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
+                    AoALift_Min = Mathf.Min(AoALiftYaw, AoALiftPitch);
 
                     //Lerp the inputs for 'rotation response'
                     LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * DeltaTime);
@@ -1035,7 +1035,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                     //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
                     Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Sideways
-                            (downspeed * ExtraLift * PitchDownLiftMulti * SpeedLiftFactor * AoALiftPitch),// Y Up
+                            (downspeed * ExtraLift * SpeedLiftFactor * AoALiftPitch),// Y Up
                             0);//Z Forward
 
                     float GroundEffectAndVelLift = 0;
@@ -1067,7 +1067,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         VTOLInputAcc *= GroundEffectAndVelLift;
 
                         //Add Airplane Ground Effect
-                        GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
+                        GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
                         //add lift and thrust
 
                         FinalInputAcc += VTOLInputAcc;
@@ -1076,7 +1076,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
                     else//Simpler version for non-VTOL craft
                     {
-                        GroundEffectAndVelLift = GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
+                        GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
 
                         FinalInputAcc.y += GroundEffectAndVelLift;
                         FinalInputAcc.z += Thrust;
@@ -1619,8 +1619,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         AirVel = VehicleRigidbody.velocity - (FinalWind * StillWindMulti);
         AirSpeed = AirVel.magnitude;
         Vector3 VecForward = VehicleTransform.forward;
-        AngleOfAttackPitch = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.right);
-        AngleOfAttackYaw = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.up);
+        float AngleOfAttackPitch = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.right);
+        float AngleOfAttackYaw = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.up);
 
         //angle of attack stuff, pitch and yaw are calculated seperately
         //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
@@ -1653,7 +1653,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             if (VTOL) { return 1 + GroundEffect; }
             GroundEffect *= ExtraLift;
             VelLift = VelLiftStart + GroundEffect;
-            VelLiftMax = Mathf.Max(VelLiftMaxStart, VTOL ? 99999f : GroundEffectLiftMax);
+            VelLiftMax = Mathf.Max(VelLiftMaxStart, VTOL ? 999999999f : GroundEffectLiftMax);
         }
         else//set non-groundeffect'd vel lift values
         {
