@@ -31,6 +31,8 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     private bool func_active;
     private bool Selected;
     private bool Piloting;
+    private bool InVTOL;
+    private bool InReverse;
     private bool InVR;
     private bool CruiseThrottleOverridden;
     private Transform ControlsRoot;
@@ -96,7 +98,18 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     {
         if (Cruise)
         { SetCruiseOff(); }
+        InVTOL = true;
     }
+    public void SFEXT_O_ExitVTOL()
+    { InVTOL = false; }
+    public void SFEXT_O_StartReversing()
+    {
+        if (Cruise)
+        { SetCruiseOff(); }
+        InReverse = true;
+    }
+    public void SFEXT_O_StopReversing()
+    { InReverse = false; }
     private void LateUpdate()
     {
         if (Piloting)
@@ -122,7 +135,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
                         {
                             if (!Cruise)
                             {
-                                if (!(bool)SAVControl.GetProgramVariable("Taxiing") || AllowCruiseGrounded)
+                                if ((!(bool)SAVControl.GetProgramVariable("Taxiing") || AllowCruiseGrounded) && !InVTOL && !InReverse)
                                 { SetCruiseOn(); }
                             }
                             if (TriggerTapTime > .4f)//no double tap
@@ -199,7 +212,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     {
         if (!Cruise)
         {
-            if ((!(bool)SAVControl.GetProgramVariable("Taxiing") || AllowCruiseGrounded) && !(bool)SAVControl.GetProgramVariable("InVTOL"))
+            if ((!(bool)SAVControl.GetProgramVariable("Taxiing") || AllowCruiseGrounded) && !InVTOL && !InReverse)
             { SetCruiseOn(); }
         }
         else

@@ -75,7 +75,7 @@ public class EXTP_Turret : UdonSharpBehaviour
     private float SmoothingTimeDivider;
     private bool ClampHor = false;
     private bool Occupied;
-    private bool TriggerLastFrame;
+    private bool TriggerLastFrame = true;
     private bool Manning;
     Quaternion ControlsRotLastFrame;
     Quaternion JoystickZeroPoint;
@@ -99,6 +99,7 @@ public class EXTP_Turret : UdonSharpBehaviour
     }
     public void SFEXTP_O_UserEnter()
     {
+        TriggerLastFrame = true;
         IsOwner = true;
         Manning = true;
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
@@ -130,7 +131,7 @@ public class EXTP_Turret : UdonSharpBehaviour
         if (Ammo > 0) { Ammo--; }
         for (int x = 0; x < fp; x++)
         {
-            GameObject proj =  VRCInstantiate(Projectile);
+            GameObject proj = VRCInstantiate(Projectile);
             proj.transform.SetPositionAndRotation(FirePoints[x].position, FirePoints[x].rotation);
             proj.SetActive(true);
             proj.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

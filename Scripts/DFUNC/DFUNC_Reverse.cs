@@ -10,6 +10,7 @@ public class DFUNC_Reverse : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private float ReversingThrottleMultiplier = -.5f;
     [SerializeField] private GameObject Dial_funcon;
+    private SaccEntity EntityControl;
     private float StartThrottleStrength;
     private float StartABStrength;
     private float ReversingThrottleStrength;
@@ -21,6 +22,7 @@ public class DFUNC_Reverse : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         StartThrottleStrength = (float)SAVControl.GetProgramVariable("ThrottleStrength");
         StartABStrength = (float)SAVControl.GetProgramVariable("ThrottleStrengthAB");
         ReversingThrottleStrength = StartThrottleStrength * ReversingThrottleMultiplier;
@@ -69,6 +71,7 @@ public class DFUNC_Reverse : UdonSharpBehaviour
         SAVControl.SetProgramVariable("ThrottleStrength", ReversingThrottleStrength);
         SAVControl.SetProgramVariable("ThrottleStrengthAB", ReversingABStrength);
         if (Dial_funcon) { Dial_funcon.SetActive(true); }
+        EntityControl.SendEventToExtensions("SFEXT_O_StartReversing");
     }
     private void SetNotReversing()
     {
@@ -76,6 +79,7 @@ public class DFUNC_Reverse : UdonSharpBehaviour
         SAVControl.SetProgramVariable("ThrottleStrength", StartThrottleStrength);
         SAVControl.SetProgramVariable("ThrottleStrengthAB", StartABStrength);
         if (Dial_funcon) { Dial_funcon.SetActive(false); }
+        EntityControl.SendEventToExtensions("SFEXT_O_StopReversing");
     }
     public void KeyboardInput()
     {
