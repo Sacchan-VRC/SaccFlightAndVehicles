@@ -21,7 +21,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     [SerializeField] private float FlapsExtraMaxLift = 0;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private bool Flaps = false;
+    [System.NonSerializedAttribute] public bool Flaps = false;
     private bool TriggerLastFrame;
     private bool DragApplied;
     private bool LiftApplied;

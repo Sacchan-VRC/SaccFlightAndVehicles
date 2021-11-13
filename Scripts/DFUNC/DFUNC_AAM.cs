@@ -10,11 +10,11 @@ public class DFUNC_AAM : UdonSharpBehaviour
 {
     [SerializeField] public UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator AAMAnimator;
-    [SerializeField] private int NumAAM = 6;
+    public int NumAAM = 6;
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
     public float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
-    [SerializeField] private float AAMLockTime = 1.5f;
+    public float AAMLockTime = 1.5f;
     [Tooltip("Minimum time between missile launches")]
     [SerializeField] private float AAMLaunchDelay = 0;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
@@ -69,7 +69,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private int NumAAMTargets;
     private float AAMLockTimer = 0;
     private bool AAMHasTarget = false;
-    private bool AAMLocked = false;
+    [System.NonSerializedAttribute] public bool AAMLocked = false;
     private bool TriggerLastFrame;
     private float AAMLastFiredTime = 0;
     private float FullAAMsDivider;

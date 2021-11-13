@@ -34,7 +34,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private Vector3 SmokeZeroPoint;
     private ParticleSystem.EmissionModule[] DisplaySmokeem;
     private bool DisplaySmokeNull = true;
-    [System.NonSerializedAttribute] public Vector3 SmokeColor = Vector3.one;
+    [UdonSynced, System.NonSerializedAttribute] public Vector3 SmokeColor = Vector3.one;
+    [System.NonSerializedAttribute] private Vector3 SmokeColorLast = Vector3.one;
     [System.NonSerializedAttribute] public bool localSmoking = false;
     [System.NonSerializedAttribute] public Color SmokeColor_Color;
     private Vector3 TempSmokeCol = Vector3.zero;
@@ -42,6 +43,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private bool Selected;
     private bool InEditor; private int DialPosition;
     private bool LeftDial;
+    private float LastSerialization;
     private Transform ControlsRoot;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -161,6 +163,12 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                 SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * DeltaTime), 0, 1);
                 SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
                 SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
+                if (SmokeColor != SmokeColorLast && (Time.time - LastSerialization > .5f))
+                {
+                    RequestSerialization();
+                    LastSerialization = Time.time;
+                }
+                SmokeColorLast = SmokeColor;
             }
             //Smoke Color Indicator
             SmokeColorIndicatorMaterial.color = SmokeColor_Color;

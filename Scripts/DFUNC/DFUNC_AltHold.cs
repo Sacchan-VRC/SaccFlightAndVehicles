@@ -17,7 +17,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
-    private bool AltHold;
+    [System.NonSerializedAttribute] public bool AltHold;
     private Rigidbody VehicleRigidbody;
     private Transform VehicleTransform;
     private Vector3 RotationInputs;

@@ -16,7 +16,7 @@ public class DFUNC_Reverse : UdonSharpBehaviour
     private float ReversingABStrength;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
-    private bool Reversing;
+    [System.NonSerializedAttribute] public bool Reversing;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()

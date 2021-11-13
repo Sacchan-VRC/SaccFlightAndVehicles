@@ -27,8 +27,8 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     [SerializeField] private UdonSharpBehaviour SoundControl;
     [Tooltip("How long it takes for the sound to change after toggle to closed")]
     [SerializeField] private float DoorCloseTime = 2;
-    private bool AnimOn = false;
-    private float ToggleTime;
+    [System.NonSerializedAttribute] public bool AnimOn = false;
+    [System.NonSerializedAttribute] public float ToggleTime;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private bool sound_DoorOpen;

@@ -22,13 +22,13 @@ public class DFUNC_Hook : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     public LayerMask HookCableLayer;
     private bool TriggerLastFrame;
-    [System.NonSerializedAttribute] private bool Hooked = false;
-    [System.NonSerializedAttribute] private float HookedTime = 0f;
+    [System.NonSerializedAttribute] public bool Hooked = false;
+    private float HookedTime = 0f;
     private Vector3 HookedLoc;
     private Transform VehicleTransform;
     private Animator VehicleAnimator;
     private Rigidbody VehicleRigidbody;
-    [System.NonSerializedAttribute] private bool HookDown = false;
+    [System.NonSerializedAttribute] public bool HookDown = false;
     private bool DisableGroundBrake;
     private bool func_active;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }

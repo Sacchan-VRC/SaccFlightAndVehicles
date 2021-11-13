@@ -22,11 +22,11 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private bool Selected;
-    private bool OnCatapult;
-    private bool Launching = false;
+    [System.NonSerializedAttribute] public bool OnCatapult;
+    [System.NonSerializedAttribute] public bool Launching = false;
     private bool Piloting = false;
     private Transform VehicleTransform;
-    private Transform CatapultTransform;
+    [System.NonSerializedAttribute] public Transform CatapultTransform;
     private int CatapultDeadTimer;
     private Rigidbody VehicleRigidbody;
     private float InVehicleThrustVolumeFactor;
@@ -303,6 +303,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         if (Utilities.IsValid(CatapultAnimator))
         { CatapultAnimator.SetTrigger("launch"); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+        EntityControl.SendEventToExtensions("SFEXT_G_LaunchFromCatapult");
     }
     public void CatapultLockIn()
     {
@@ -310,10 +311,12 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         VehicleAnimator.SetBool("oncatapult", true);
         if (CatapultLock) { CatapultLock.Play(); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+        EntityControl.SendEventToExtensions("SFEXT_G_CatapultLockIn");
     }
     public void CatapultLockOff()
     {
         OnCatapult = false;
         VehicleAnimator.SetBool("oncatapult", false);
+        EntityControl.SendEventToExtensions("SFEXT_G_CatapultLockOff");
     }
 }

@@ -9,7 +9,7 @@ using VRC.Udon;
 public class DFUNC_Flares : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private int NumFlares = 60;
+    public int NumFlares = 60;
     [Tooltip("Speed to launch flare particles at")]
     [SerializeField] private float FlareLaunchSpeed = 100;
     [SerializeField] private ParticleSystem[] FlareParticles;

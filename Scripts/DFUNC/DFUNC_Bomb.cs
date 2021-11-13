@@ -10,11 +10,11 @@ public class DFUNC_Bomb : UdonSharpBehaviour
 {
     [SerializeField] public UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator BombAnimator;
-    [SerializeField] private GameObject Bomb;
+    public GameObject Bomb;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     [SerializeField] private float FullReloadTimeSec = 8;
     [SerializeField] private Text HUDText_Bomb_ammo;
-    [SerializeField] private int NumBomb = 4;
+    public int NumBomb = 4;
     [Tooltip("Delay between bomb drops when holding the trigger")]
     [SerializeField] private float BombHoldDelay = 0.5f;
     [Tooltip("Minimum delay between bomb drops")]

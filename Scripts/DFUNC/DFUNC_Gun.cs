@@ -36,7 +36,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     private float FullGunAmmoInSeconds = 12;
     private Rigidbody VehicleRigidbody;
-    [UdonSynced, FieldChangeCallback(nameof(Firing))] private bool _firing;
+    [System.NonSerializedAttribute, UdonSynced, FieldChangeCallback(nameof(Firing))] public bool _firing;
     public bool Firing
     {
         set

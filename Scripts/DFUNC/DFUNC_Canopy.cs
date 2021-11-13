@@ -24,9 +24,9 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     [Tooltip("Extra drag applied to vehicle while canopy is open")]
     [SerializeField] private float CanopyDragMulti = 1.2f;
     [Tooltip("Name of animator boolean that is true when canopy is open")]
-    [SerializeField]private string AnimCanopyBool = "canopyopen";
+    [SerializeField] private string AnimCanopyBool = "canopyopen";
     [Tooltip("Name of animator boolean that is true when canopy is broken")]
-    [SerializeField]private string AnimCanopyBroken = "canopybroken";
+    [SerializeField] private string AnimCanopyBroken = "canopybroken";
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
@@ -34,8 +34,8 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private SAV_HUDController HUDControl;
     private bool InVR;
-    private bool CanopyOpen;
-    private bool CanopyBroken;
+    [System.NonSerializedAttribute] public bool CanopyOpen;
+    [System.NonSerializedAttribute] public bool CanopyBroken;
     private bool Selected;
     private float LastCanopyToggleTime = -999;
     private bool DragApplied;
