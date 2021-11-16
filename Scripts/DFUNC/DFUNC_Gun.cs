@@ -55,6 +55,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool InVehicle = false;
     private int DialPosition = -999;
     private Vector3 AmmoBarScaleStart;
+    private bool HasHud = false;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -74,10 +75,13 @@ public class DFUNC_Gun : UdonSharpBehaviour
         OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
         GunRecoil *= VehicleRigidbody.mass;
 
+        HasHud = HUDControl != null;
+
         FindSelf();
 
+
         //HUD
-        if (HUDControl)
+        if (HasHud)
         {
             distance_from_head = (float)HUDControl.GetProgramVariable("distance_from_head");
         }
@@ -231,7 +235,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
                               //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
     {
-        if (Selected)
+        if (Selected && HasHud)
         {
             float DeltaTime = Time.fixedDeltaTime;
             var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
@@ -368,7 +372,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private void Hud()
     {
         float SmoothDeltaTime = Time.smoothDeltaTime;
-        if (GUNHasTarget)
+        if (GUNHasTarget && HasHud)
         {
             TargetIndicator.gameObject.SetActive(true);
             TargetIndicator.position = HUDControl.transform.position + AAMCurrentTargetDirection;
@@ -379,7 +383,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
 
         //GUN Lead Indicator
-        if (GUNHasTarget)
+        if (GUNHasTarget && HasHud)
         {
             Vector3 HudControlPosition = HUDControl.transform.position;
             GUNLeadIndicator.gameObject.SetActive(true);
