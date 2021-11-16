@@ -100,6 +100,7 @@ public class EXTP_Turret : UdonSharpBehaviour
     public void SFEXTP_O_UserEnter()
     {
         TriggerLastFrame = true;
+        LastFireTime = Time.time;
         IsOwner = true;
         Manning = true;
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }

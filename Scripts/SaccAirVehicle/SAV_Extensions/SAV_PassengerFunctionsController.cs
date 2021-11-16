@@ -330,6 +330,14 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     {
         SendEventToExtensions_Gunner("SFEXTP_G_PassengerEnter");
     }
+    public void SFEXT_G_PilotEnter()
+    {
+        SendEventToExtensions_Gunner("SFEXTP_G_PilotEnter");
+    }
+    public void SFEXT_G_PilotExit()
+    {
+        SendEventToExtensions_Gunner("SFEXTP_G_PilotExit");
+    }
     public void SFEXT_G_PassengerExit()
     {
         SendEventToExtensions_Gunner("SFEXTP_G_PassengerExit");

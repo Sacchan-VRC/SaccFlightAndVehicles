@@ -111,6 +111,11 @@ public class SAV_FloatScript : UdonSharpBehaviour
         Vector3 vehpos = VehicleTransform.position;
         vehpos.y += MoveUpOnTakeOwnership;
         VehicleTransform.position = vehpos;
+        for (int i = 0; i != FloatPoints.Length; i++)
+        {
+            FloatTouchWaterPoint[i] = float.MinValue;
+            FloatLastRayHitHeight[i] = float.MinValue;
+        }
     }
     public void SFEXT_O_LoseOwnership()
     {
@@ -122,7 +127,14 @@ public class SAV_FloatScript : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (HoverBike) { gameObject.SetActive(true); }
+        if (HoverBike)
+        {
+            gameObject.SetActive(true); for (int i = 0; i != FloatPoints.Length; i++)
+            {
+                FloatTouchWaterPoint[i] = float.MinValue;
+                FloatLastRayHitHeight[i] = float.MinValue;
+            }
+        }
     }
     public override void OnPlayerLeft(VRCPlayerApi player)
     {

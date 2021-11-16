@@ -10,11 +10,20 @@ public class SAV_SyncScript : UdonSharpBehaviour
     // whispers to Zwei, "it's okay"
     [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private Transform VehicleTransform;
-    [Tooltip("In seconds")]
+    [Tooltip("Delay between updates in seconds")]
     [Range(0.05f, 1f)]
     [SerializeField] private float updateInterval = 0.2f;
-    [SerializeField] private float IdleMaxUpdateDelay = 3f;
-    private float nextUpdateTime = 0;
+    [Tooltip("Delay between updates in seconds when the sync has entered idle mode")]
+    [SerializeField] private float IdleModeUpdateInterval = 3f;
+    [Tooltip("How quickly to lerp rotation to new extrapolated target rotation, it might help to reduce it in high-lag situations with planes that can roll quickly")]
+    [SerializeField] private float RotationSyncAgressiveness = 10f;
+    [Tooltip("Multiply velocity vectors recieved while in idle mode, useful for stopping sea vehicles from extrapolating above and below the water")]
+    [SerializeField] private float IdleModeVelMultiplier = .4f;
+    [Tooltip("If vehicle moves less than this distance since it's last update, it'll be considered to be idle, may need to be increased for vehicles that want to be idle on water. If the vehicle floats away sometimes, this value is probably too big")]
+    [SerializeField] private float IdleMoveMentRange = .35f;
+    [Tooltip("If vehicle rotates less than this many degrees since it's last update, it'll be considered to be idle")]
+    [SerializeField] private float IdleRotationRange = 5f;
+    private float nextUpdateTime = float.MaxValue;
     private int StartupTimeMS = 0;
     private double dblStartupTimeMS = 0;
     private double StartupTime;
@@ -52,6 +61,11 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private int UpdatesSentWhileStill;
     private Rigidbody VehicleRigid;
     private bool Initialized = false;
+    private bool IdleUpdateMode;
+    private bool IdleUpdateMode_Last;
+    private bool Piloting;
+    private float CurrentUpdateInterval;
+    private int EnterIdleModeNumber;
     private void Start()
     {
         if (!Initialized)//shouldn't be active until entitystart
@@ -80,6 +94,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
         dblStartupTimeMS = (double)StartupTimeMS * .001f;
         StartupTime = Time.realtimeSinceStartup;
+        CurrentUpdateInterval = updateInterval;
+        EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
         //script is disabled for 5 seconds to make sure nothing moves before everything is initialized
         SendCustomEventDelayedSeconds(nameof(ActivateScript), 5);
         if (localPlayer == null)
@@ -106,6 +122,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
         gameObject.SetActive(true);
         if (IsOwner)
         { VehicleRigid.constraints = RigidbodyConstraints.None; }
+        nextUpdateTime = Time.time;
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -119,11 +136,36 @@ public class SAV_SyncScript : UdonSharpBehaviour
     {
         IsOwner = false;
         L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
-        O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+        RotationLerper = O_LastRotation2 = O_LastRotation = O_Rotation_Q;
         VehicleRigid.Sleep();
         VehicleRigid.constraints = RigidbodyConstraints.FreezePosition;
         VehicleRigid.drag = 9999;
         VehicleRigid.angularDrag = 9999;
+        UpdatesSentWhileStill = 0;
+        IdleUpdateMode_Last = false;
+    }
+    public void SFEXT_O_PilotEnter()
+    { Piloting = true; }
+    public void SFEXT_O_PilotExit()
+    { Piloting = false; }
+    public void SFEXT_L_OwnershipTransfer()
+    {
+        ExitIdleMode();
+    }
+    public void SFEXT_O_RespawnButton()
+    {
+        nextUpdateTime = 0;
+    }
+    public void SFEXT_G_RespawnButton()
+    {
+        ExitIdleMode();
+        UpdatesSentWhileStill = 0;
+        ExtrapolationDirection = Vector3.zero;
+        LastExtrapolationDirection = Vector3.zero;
+        VehicleTransform.position = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_LastPosition = O_Position;
+        RotationLerper = VehicleTransform.rotation = O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+        O_LastCurVel = Vector3.zero;
+        LastAcceleration = Acceleration = Vector3.zero;
     }
     private void Update()
     {
@@ -131,36 +173,55 @@ public class SAV_SyncScript : UdonSharpBehaviour
         {
             if (Time.time > nextUpdateTime)
             {
-                if (!Networking.IsClogged || (bool)SAVControl.GetProgramVariable("Piloting"))
+                if (!Networking.IsClogged || Piloting)
                 {
-                    bool Still = ((VehicleTransform.position - O_Position).magnitude < .35f * updateInterval) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < 5f * updateInterval;
-                    if (!Still || UpdatesSentWhileStill < 3 || (Time.time - UpdateTime > IdleMaxUpdateDelay))
-                    {
-                        if (Still) { UpdatesSentWhileStill++; }
-                        else { UpdatesSentWhileStill = 0; }
-                        O_Position = VehicleTransform.position;//send position
-                        O_Rotation_Q = VehicleTransform.rotation;
-                        //convert each euler angle to shorts to save bandwidth
-                        Vector3 rot = O_Rotation_Q.eulerAngles;
-                        rot = new Vector3(rot.x > 180 ? rot.x - 360 : rot.x,
-                         rot.y > 180 ? rot.y - 360 : rot.y,
-                          rot.z > 180 ? rot.z - 360 : rot.z)
-                          * 182.0444444444444f;//convert 0-360 to 0-65536
-                        //this shouldn't need clamping but for some reason it does
-                        O_RotationX = (short)Mathf.Clamp(rot.x, short.MinValue, short.MaxValue);
-                        O_RotationY = (short)Mathf.Clamp(rot.y, short.MinValue, short.MaxValue);
-                        O_RotationZ = (short)Mathf.Clamp(rot.z, short.MinValue, short.MaxValue);
+                    bool Still;
+                    //check if the vehicle has moved enough from it's last sent location and rotation to bother exiting idle mode
+                    Still = !Piloting && (((VehicleTransform.position - O_Position).magnitude < IdleMoveMentRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
 
-                        O_CurVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");//send velocity
-                        //update time is a double so that it can interact with (int)Networking.GetServerTimeInMilliseconds() without innacuracy
-                        //update time is the Networking.GetServerTimeInMilliseconds() taken from SFEXT_L_EntityStart() + real time as float since that to make
-                        //the sub-millisecond error constant to eliminate jitter
-                        O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);//send servertime of update
-                        RequestSerialization();
-                        UpdateTime = Time.time;
+                    if (Still)
+                    {
+                        UpdatesSentWhileStill++;
+                        if (UpdatesSentWhileStill > EnterIdleModeNumber)
+                        { IdleUpdateMode = true; }
                     }
+                    else
+                    {
+                        UpdatesSentWhileStill = 0;
+                        IdleUpdateMode = false;
+                    }
+                    if (IdleUpdateMode)
+                    {
+                        if (!IdleUpdateMode_Last)
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnterIdleMode)); }
+                    }
+                    else
+                    {
+                        if (IdleUpdateMode_Last)
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ExitIdleMode)); }
+                    }
+                    IdleUpdateMode_Last = IdleUpdateMode;
+                    O_Position = VehicleTransform.position;//send position
+                    O_Rotation_Q = VehicleTransform.rotation;
+                    //convert each euler angle to shorts to save bandwidth
+                    Vector3 rot = O_Rotation_Q.eulerAngles;
+                    rot = new Vector3(rot.x > 180 ? rot.x - 360 : rot.x,
+                     rot.y > 180 ? rot.y - 360 : rot.y,
+                      rot.z > 180 ? rot.z - 360 : rot.z)
+                      * 182.0444444444444f;//convert 0-360 to 0-65536
+                                           //this shouldn't need clamping but for some reason it does
+                    O_RotationX = (short)Mathf.Clamp(rot.x, short.MinValue, short.MaxValue);
+                    O_RotationY = (short)Mathf.Clamp(rot.y, short.MinValue, short.MaxValue);
+                    O_RotationZ = (short)Mathf.Clamp(rot.z, short.MinValue, short.MaxValue);
+
+                    //update time is a double so that it can interact with (int)Networking.GetServerTimeInMilliseconds() without innacuracy
+                    //update time is the Networking.GetServerTimeInMilliseconds() taken from SFEXT_L_EntityStart() + real time as float since that to make
+                    //the sub-millisecond error constant to eliminate jitter
+                    O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);//send servertime of update
+                    RequestSerialization();
+                    UpdateTime = Time.time;
                 }
-                nextUpdateTime = (Time.time + updateInterval);
+                nextUpdateTime = (Time.time + (IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
             }
         }
         else//extrapolate and interpolate based on recieved data
@@ -173,19 +234,19 @@ public class SAV_SyncScript : UdonSharpBehaviour
             float TimeSinceUpdate = (float)((dblStartupTimeMS + ((double)Time.realtimeSinceStartup - StartupTime)) - L_UpdateTime);
             //extrapolated position based on time passed since update
             Vector3 PredictedPosition = L_PingAdjustedPosition
-                 + ((ExtrapolationDirection) * TimeSinceUpdate);
+                 + (ExtrapolationDirection * TimeSinceUpdate);
             //extrapolated rotation based on time passed since update
             Quaternion PredictedRotation =
                 (Quaternion.SlerpUnclamped(Quaternion.identity, CurAngMom, Ping + TimeSinceUpdate)
                 * O_Rotation_Q);
             //If interpolation hasn't finished, calculate extrapolation of last update
-            if (TimeSinceUpdate < updateInterval)
+            if (TimeSinceUpdate < CurrentUpdateInterval)
             {
                 //time since recieving previous update
                 float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + ((double)Time.realtimeSinceStartup - StartupTime)) - L_LastUpdateTime);
                 //extrapolated position based on data from previous update using time passed since previous update
                 Vector3 OldPredictedPosition = L_LastPingAdjustedPosition
-                    + ((LastExtrapolationDirection) * TimeSincePreviousUpdate);
+                    + (LastExtrapolationDirection * TimeSincePreviousUpdate);
                 //extrapolated rotation based on data from previous update using time passed since previous update
                 Quaternion OldPredictedRotation =
                     (Quaternion.SlerpUnclamped(Quaternion.identity, LastCurAngMom, LastPing + TimeSincePreviousUpdate)
@@ -194,7 +255,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                 //Slerp towards a slerp(interpolation) of last 2 extrapolations
                 RotationLerper = Quaternion.Slerp(RotationLerper,
                  Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),
-                  Time.smoothDeltaTime * 10);
+                  IdleUpdateMode ? Time.smoothDeltaTime : Time.smoothDeltaTime * RotationSyncAgressiveness);
 
                 //Set position to a lerp(interpolation) of last 2 extrapolations  
                 VehicleTransform.SetPositionAndRotation(
@@ -208,6 +269,19 @@ public class SAV_SyncScript : UdonSharpBehaviour
                 VehicleTransform.SetPositionAndRotation(PredictedPosition, RotationLerper);
             }
         }
+    }
+    public void EnterIdleMode()
+    {
+        IdleUpdateMode = true;
+        CurrentUpdateInterval = IdleModeUpdateInterval;
+        SmoothingTimeDivider = 1f / CurrentUpdateInterval;
+        LastExtrapolationDirection *= IdleModeVelMultiplier;
+    }
+    public void ExitIdleMode()
+    {
+        IdleUpdateMode = false;
+        CurrentUpdateInterval = updateInterval;
+        SmoothingTimeDivider = 1f / CurrentUpdateInterval;
     }
     public override void OnDeserialization()
     {
@@ -233,7 +307,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
             { CurrentVelocity = O_CurVel; }
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             //and if the updates aren't being recieved at the expected time (by more than 50%), don't bother with acceleration as it could be huge
-            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || updatedelta > updateInterval * 1.5f)
+            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || updatedelta > updateInterval * 1.5f || IdleUpdateMode)
             { Acceleration = Vector3.zero; }
             else
             { Acceleration = (CurrentVelocity - O_LastCurVel); }//acceleration is difference in velocity
@@ -254,6 +328,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
 
             LastExtrapolationDirection = ExtrapolationDirection;
             ExtrapolationDirection = CurrentVelocity + Acceleration;
+            if (IdleUpdateMode) { ExtrapolationDirection *= IdleModeVelMultiplier; }
             O_LastRotation2 = O_LastRotation;//O_LastRotation2 is needed for use in Update() as O_LastRotation is the same as O_Rotation_Q there
 
             O_LastUpdateTime = O_UpdateTime;
