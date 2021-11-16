@@ -59,10 +59,9 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-
         reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
         FullGunAmmoInSeconds = GunAmmoInSeconds;
-        AmmoBarScaleStart = AmmoBar.localScale;
+        if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
 
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
@@ -132,27 +131,27 @@ public class DFUNC_Gun : UdonSharpBehaviour
         if (GunAmmoInSeconds != FullGunAmmoInSeconds)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
-        AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+        if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     public void SFEXT_G_RespawnButton()
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
-        AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+        if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
     public void Set_Active()
     {
-        HudCrosshairGun.SetActive(true);
-        HudCrosshair.SetActive(false);
+        if (HudCrosshairGun) { HudCrosshairGun.SetActive(true); }
+        if (HudCrosshair) { HudCrosshair.SetActive(false); }
         gameObject.SetActive(true);
     }
     public void Set_Inactive()
     {
-        HudCrosshairGun.SetActive(false);
-        HudCrosshair.SetActive(true);
-        TargetIndicator.gameObject.SetActive(false);
-        GUNLeadIndicator.gameObject.SetActive(false);
+        if (HudCrosshairGun) { HudCrosshairGun.SetActive(false); }
+        if (HudCrosshair) { HudCrosshair.SetActive(true); }
+        if (TargetIndicator) { TargetIndicator.gameObject.SetActive(false); }
+        if (GUNLeadIndicator) { GUNLeadIndicator.gameObject.SetActive(false); }
         GunAnimator.SetBool(GUNFIRING_STRING, false);
         Firing = false;
         gameObject.SetActive(false);
@@ -209,9 +208,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
                         { EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
                     }
                 }
-                Hud();
+                if (HUDControl)
+                { Hud(); }
             }
-            AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z);
+            if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
         }
     }
     private GameObject[] AAMTargets;
@@ -231,7 +231,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
                               //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
     {
-        if (Selected)
+        if (Selected && HUDControl)
         {
             float DeltaTime = Time.fixedDeltaTime;
             var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
@@ -370,47 +370,54 @@ public class DFUNC_Gun : UdonSharpBehaviour
         float SmoothDeltaTime = Time.smoothDeltaTime;
         if (GUNHasTarget)
         {
-            TargetIndicator.gameObject.SetActive(true);
-            TargetIndicator.position = HUDControl.transform.position + AAMCurrentTargetDirection;
-            TargetIndicator.localPosition = TargetIndicator.localPosition.normalized * distance_from_head;
+            if (TargetIndicator)
+            {
+                //Target Indicator
+                TargetIndicator.gameObject.SetActive(true);
+                TargetIndicator.position = HUDControl.transform.position + AAMCurrentTargetDirection;
+                TargetIndicator.localPosition = TargetIndicator.localPosition.normalized * distance_from_head;
+            }
+
+            if (GUNLeadIndicator)
+            {
+                //GUN Lead Indicator
+                Vector3 HudControlPosition = HUDControl.transform.position;
+                GUNLeadIndicator.gameObject.SetActive(true);
+                Vector3 TargetDir;
+                if (!AAMCurrentTargetSAVControl)//target is a dummy target
+                { TargetDir = AAMTargets[AAMTarget].transform.position - HudControlPosition; }
+                else
+                { TargetDir = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }
+                GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
+
+                Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
+                float BulletPlusPlaneSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .25f)).magnitude;
+                Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
+                //GUN_TargetDirOld is around 4 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
+                //multiplying the result by .25(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
+                GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .25f) / SmoothDeltaTime, 15 * SmoothDeltaTime);
+                float BulletHitTime = TargetDir.magnitude / BulletPlusPlaneSpeed;
+                //normalize lerped relative target velocity vector and multiply by lerped speed
+                Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
+                Vector3 PredictedPos = (TargetDir
+                    + ((RelTargVelNormalized * GUN_TargetSpeedLerper)//Linear 
+                                                                     //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
+                        + (TargetAccel * .125f * BulletHitTime)
+                            + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
+                                * BulletHitTime);
+                GUNLeadIndicator.position = HUDControl.transform.position + PredictedPos;
+                GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
+
+                RelativeTargetVelLastFrame = RelativeTargetVel;
+            }
         }
-        else TargetIndicator.gameObject.SetActive(false);
-
-
-
-        //GUN Lead Indicator
-        if (GUNHasTarget)
+        else
         {
-            Vector3 HudControlPosition = HUDControl.transform.position;
-            GUNLeadIndicator.gameObject.SetActive(true);
-            Vector3 TargetDir;
-            if (!AAMCurrentTargetSAVControl)//target is a dummy target
-            { TargetDir = AAMTargets[AAMTarget].transform.position - HudControlPosition; }
-            else
-            { TargetDir = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }
-            GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
-
-            Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-            float BulletPlusPlaneSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .25f)).magnitude;
-            Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
-            //GUN_TargetDirOld is around 4 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
-            //multiplying the result by .25(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
-            GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .25f) / SmoothDeltaTime, 15 * SmoothDeltaTime);
-            float BulletHitTime = TargetDir.magnitude / BulletPlusPlaneSpeed;
-            //normalize lerped relative target velocity vector and multiply by lerped speed
-            Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
-            Vector3 PredictedPos = (TargetDir
-                + ((RelTargVelNormalized * GUN_TargetSpeedLerper)//Linear 
-                                                                 //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
-                    + (TargetAccel * .125f * BulletHitTime)
-                        + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
-                            * BulletHitTime);
-            GUNLeadIndicator.position = HUDControl.transform.position + PredictedPos;
-            GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
-
-            RelativeTargetVelLastFrame = RelativeTargetVel;
+            if (TargetIndicator)
+            { TargetIndicator.gameObject.SetActive(false); }
+            if (GUNLeadIndicator)
+            { GUNLeadIndicator.gameObject.SetActive(false); }
         }
-        else GUNLeadIndicator.gameObject.SetActive(false);
         /////////////////
     }
     private void FindSelf()
