@@ -462,12 +462,10 @@ public class SAV_SoundController : UdonSharpBehaviour
     public void SFEXT_G_RespawnButton()
     {
         ResetSounds();
-        NoFuel = false;
     }
     public void SFEXT_G_Explode()
     {
         ResetSounds();
-        NoFuel = false;
         //play the sonic boom that is coming towards you, after the vehicle explodes with the correct delay
         if (playsonicboom && silent)
         {
@@ -567,9 +565,9 @@ public class SAV_SoundController : UdonSharpBehaviour
             BulletHit[rand].Play();
         }
     }
-    public void SFEXT_O_NotNoFuel()//old WakeUp
+    public void SFEXT_G_NotNoFuel()
     { NoFuel = false; }
-    public void SFEXT_O_NoFuel()//old WakeUp
+    public void SFEXT_G_NoFuel()
     { NoFuel = true; }
     public void SFEXT_G_TouchDown()
     {

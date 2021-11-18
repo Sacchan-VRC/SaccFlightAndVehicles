@@ -73,7 +73,7 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool Passenger = false;
     [System.NonSerializedAttribute] public bool InVehicle = false;
     [System.NonSerializedAttribute] public bool InVR = false;
-    private bool IsOwner;
+    [System.NonSerializedAttribute] public bool IsOwner;
     [System.NonSerializedAttribute] public bool Initialized;
 
     //old Leavebutton Stuff
@@ -422,27 +422,6 @@ public class SaccEntity : UdonSharpBehaviour
     {
         SendEventToExtensions("SFEXT_G_PassengerExit");
     }
-    //these can be used to send messages to vehicles from other vehicles or whatever can find a SaccEntity for custom functionality
-    public void SendGenericEvent0()
-    { SendEventToExtensions("SFEXT_X_GenericEvent0"); }
-    public void SendGenericEvent1()
-    { SendEventToExtensions("SFEXT_X_GenericEvent1"); }
-    public void SendGenericEvent2()
-    { SendEventToExtensions("SFEXT_X_GenericEvent2"); }
-    public void SendGenericEvent3()
-    { SendEventToExtensions("SFEXT_X_GenericEvent3"); }
-    public void SendGenericEvent4()
-    { SendEventToExtensions("SFEXT_X_GenericEvent4"); }
-    public void SendGenericEvent5()
-    { SendEventToExtensions("SFEXT_X_GenericEvent5"); }
-    public void SendGenericEvent6()
-    { SendEventToExtensions("SFEXT_X_GenericEvent6"); }
-    public void SendGenericEvent7()
-    { SendEventToExtensions("SFEXT_X_GenericEvent7"); }
-    public void SendGenericEvent8()
-    { SendEventToExtensions("SFEXT_X_GenericEvent8"); }
-    public void SendGenericEvent9()
-    { SendEventToExtensions("SFEXT_X_GenericEvent9"); }
     public override void OnPlayerJoined(VRCPlayerApi player)
     {
         if (IsOwner)

@@ -332,8 +332,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float TaxiFullTurningSpeedDivider;
     private float vtolangledif;
-    private bool LowFuelLastFrame;
-    private bool NoFuelLastFrame;
+    [System.NonSerializedAttribute] public bool LowFuelLastFrame;
+    [System.NonSerializedAttribute] public bool NoFuelLastFrame;
     Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
     [System.NonSerializedAttribute] public float ThrottleStrengthAB;
     [System.NonSerializedAttribute] public float FuelConsumptionAB;
@@ -848,13 +848,25 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         ThrottleInput = ThrottleInput * Fuel * LowFuelDivider;
                         if (!LowFuelLastFrame)
                         {
-                            EntityControl.SendEventToExtensions("SFEXT_O_LowFuel");
-                            LowFuelLastFrame = true;
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendLowFuel));
                         }
                         if (Fuel == 0 && !NoFuelLastFrame)
                         {
-                            NoFuelLastFrame = true;
-                            EntityControl.SendEventToExtensions("SFEXT_O_NoFuel");
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNoFuel));
+                        }
+                    }
+                    else
+                    {
+                        if (LowFuelLastFrame)
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
+                        }
+                    }
+                    if (Fuel > 0)
+                    {
+                        if (NoFuelLastFrame)
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
                         }
                     }
 
@@ -1190,6 +1202,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             EntityControl.ExitStation();
         }
+        if (LowFuelLastFrame)
+        { SendNotLowFuel(); }
+        if (NoFuelLastFrame)
+        { SendNotNoFuel(); }
     }
     public void SFEXT_O_OnPlayerJoined()
     {
@@ -1272,6 +1288,26 @@ public class SaccAirVehicle : UdonSharpBehaviour
         AfterburnerOn = false;
         EntityControl.SendEventToExtensions("SFEXT_G_AfterburnerOff");
     }
+    public void SendLowFuel()
+    {
+        LowFuelLastFrame = true;
+        EntityControl.SendEventToExtensions("SFEXT_G_LowFuel");
+    }
+    public void SendNotLowFuel()
+    {
+        LowFuelLastFrame = false;
+        EntityControl.SendEventToExtensions("SFEXT_G_NotLowFuel");
+    }
+    public void SendNoFuel()
+    {
+        NoFuelLastFrame = true;
+        EntityControl.SendEventToExtensions("SFEXT_G_NoFuel");
+    }
+    public void SendNotNoFuel()
+    {
+        NoFuelLastFrame = false;
+        EntityControl.SendEventToExtensions("SFEXT_G_NotNoFuel");
+    }
     private void ToggleAfterburner()
     {
         if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint && Fuel > LowFuel)
@@ -1304,13 +1340,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
             if (LowFuelLastFrame && Fuel > LowFuel)
             {
-                LowFuelLastFrame = false;
-                EntityControl.SendEventToExtensions("SFEXT_O_NotLowFuel");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
             }
             if (NoFuelLastFrame && Fuel > 0)
             {
-                NoFuelLastFrame = false;
-                EntityControl.SendEventToExtensions("SFEXT_O_NotNoFuel");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
             }
         }
     }
@@ -1347,6 +1381,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
         EntityControl.dead = true;
         SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
         EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
+        if (LowFuelLastFrame)
+        { SendNotLowFuel(); }
+        if (NoFuelLastFrame)
+        { SendNotNoFuel(); }
     }
     public void SendBulletHit()
     {
