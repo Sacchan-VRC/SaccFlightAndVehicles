@@ -9,6 +9,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
 {
     [SerializeField] private UdonSharpBehaviour SAVControl;
     [SerializeField] private Animator GunAnimator;
+    [Tooltip("Animator bool that is true when the gun is firing")]
+    [SerializeField] private string GunFiringBoolName = "gunfiring";
     [Tooltip("Transform of which its X scale scales with ammo")]
     [SerializeField] private Transform AmmoBar;
     [Tooltip("Position at which recoil forces are added, not required for recoil to work. Only use this if you want the vehicle to rotate when shooting")]
@@ -42,11 +44,10 @@ public class DFUNC_Gun : UdonSharpBehaviour
         set
         {
             _firing = value;
-            GunAnimator.SetBool(GUNFIRING_STRING, value);
+            GunAnimator.SetBool(GunFiringBoolName, value);
         }
         get => _firing;
     }
-    private int GUNFIRING_STRING = Animator.StringToHash("gunfiring");
     private float FullGunAmmoDivider;
     private bool Selected = false;
     private float reloadspeed;
@@ -152,7 +153,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         if (HudCrosshair) { HudCrosshair.SetActive(true); }
         if (TargetIndicator) { TargetIndicator.gameObject.SetActive(false); }
         if (GUNLeadIndicator) { GUNLeadIndicator.gameObject.SetActive(false); }
-        GunAnimator.SetBool(GUNFIRING_STRING, false);
+        GunAnimator.SetBool(GunFiringBoolName, false);
         Firing = false;
         gameObject.SetActive(false);
     }
