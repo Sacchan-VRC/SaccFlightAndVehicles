@@ -271,7 +271,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                                     Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
 
                     if ((LineOfSightNext
-                        && hitnext.collider.gameObject.layer == OutsideVehicleLayer //did raycast hit an object on the layer planes are on?
+                        && (hitnext.collider && hitnext.collider.gameObject.layer == OutsideVehicleLayer) //did raycast hit an object on the layer planes are on?
                             && NextTargetAngle < 70//lock angle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < MaxTargetDistance
@@ -314,7 +314,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
             RaycastHit hitcurrent;
             bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
             //used to make lock remain for .25 seconds after target is obscured
-            if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsideVehicleLayer)
+            if (!LineOfSightCur || (hitcurrent.collider && hitcurrent.collider.gameObject.layer != OutsideVehicleLayer))
             { AAMTargetObscuredDelay += DeltaTime; }
             else
             { AAMTargetObscuredDelay = 0; }
