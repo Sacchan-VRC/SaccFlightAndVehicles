@@ -126,7 +126,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         }
         if (FlightLimitsEnabled && Piloting)
         {
-            float GLimitStrength = Mathf.Clamp(-((float)SAVControl.GetProgramVariable("VertGs") / GLimiter) + 1, 0, 1);
+            float GLimitStrength = Mathf.Clamp(-(Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs")) / GLimiter) + 1, 0, 1);
             float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack")) / AoALimiter) + 1, 0, 1);
             SAVControl.SetProgramVariable("Limits", Mathf.Min(GLimitStrength, AoALimitStrength));
         }

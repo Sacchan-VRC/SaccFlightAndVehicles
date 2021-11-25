@@ -32,7 +32,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] private short O_RotationX;
     [UdonSynced(UdonSyncMode.None)] private short O_RotationY;
     [UdonSynced(UdonSyncMode.None)] private short O_RotationZ;
-    [UdonSynced(UdonSyncMode.None)] private Vector3 O_CurVel = Vector3.zero;
+    //sending velocity improves quality but will cause laggy movment if someone has very low fps.
+    //[UdonSynced(UdonSyncMode.None)] private Vector3 O_CurVel = Vector3.zero;
     private Vector3 O_Rotation;
     private Quaternion O_Rotation_Q = Quaternion.identity;
     private Vector3 O_LastCurVel = Vector3.zero;
@@ -89,7 +90,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
             VehicleRigid.Sleep();
         }
         else { IsOwner = true; }//play mode in editor
-        nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
+        nextUpdateTime = Time.realtimeSinceStartup + Random.Range(0f, updateInterval);
         SmoothingTimeDivider = 1f / updateInterval;
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
         dblStartupTimeMS = (double)StartupTimeMS * .001f;
@@ -122,7 +123,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
         gameObject.SetActive(true);
         if (IsOwner)
         { VehicleRigid.constraints = RigidbodyConstraints.None; }
-        nextUpdateTime = Time.time;
+        nextUpdateTime = Time.realtimeSinceStartup;
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -171,7 +172,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     {
         if (IsOwner)//send data
         {
-            if (Time.time > nextUpdateTime)
+            if (Time.realtimeSinceStartup > nextUpdateTime)
             {
                 if (!Networking.IsClogged || Piloting)
                 {
@@ -201,8 +202,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
                         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ExitIdleMode)); }
                     }
                     IdleUpdateMode_Last = IdleUpdateMode;
-                    O_Position = VehicleTransform.position;//send position
-                    O_Rotation_Q = VehicleTransform.rotation;
+                    O_Position = VehicleRigid.position;//send position
+                    O_Rotation_Q = VehicleRigid.rotation;
                     //convert each euler angle to shorts to save bandwidth
                     Vector3 rot = O_Rotation_Q.eulerAngles;
                     rot = new Vector3(rot.x > 180 ? rot.x - 360 : rot.x,
@@ -214,14 +215,15 @@ public class SAV_SyncScript : UdonSharpBehaviour
                     O_RotationY = (short)Mathf.Clamp(rot.y, short.MinValue, short.MaxValue);
                     O_RotationZ = (short)Mathf.Clamp(rot.z, short.MinValue, short.MaxValue);
 
+                    //O_CurVel = VehicleRigid.velocity;
                     //update time is a double so that it can interact with (int)Networking.GetServerTimeInMilliseconds() without innacuracy
                     //update time is the Networking.GetServerTimeInMilliseconds() taken from SFEXT_L_EntityStart() + real time as float since that to make
                     //the sub-millisecond error constant to eliminate jitter
                     O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);//send servertime of update
                     RequestSerialization();
-                    UpdateTime = Time.time;
+                    UpdateTime = Time.realtimeSinceStartup;
                 }
-                nextUpdateTime = (Time.time + (IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
+                nextUpdateTime = (Time.realtimeSinceStartup + (IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
             }
         }
         else//extrapolate and interpolate based on recieved data
@@ -258,15 +260,15 @@ public class SAV_SyncScript : UdonSharpBehaviour
                   IdleUpdateMode ? Time.smoothDeltaTime : Time.smoothDeltaTime * RotationSyncAgressiveness);
 
                 //Set position to a lerp(interpolation) of last 2 extrapolations  
-                VehicleTransform.SetPositionAndRotation(
-                 Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider),
-                  RotationLerper);
+                VehicleRigid.MovePosition(Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider));
+                VehicleRigid.MoveRotation(RotationLerper);
             }
             else
             {
                 //interpolation is over, just move position and rotation towards last extrapolation
                 RotationLerper = Quaternion.Slerp(RotationLerper, PredictedRotation, Time.smoothDeltaTime * SmoothingTimeDivider);
-                VehicleTransform.SetPositionAndRotation(PredictedPosition, RotationLerper);
+                VehicleRigid.MovePosition(PredictedPosition);
+                VehicleRigid.MoveRotation(RotationLerper);
             }
         }
     }
@@ -301,10 +303,10 @@ public class SAV_SyncScript : UdonSharpBehaviour
             Ping = (float)(L_UpdateTime - O_UpdateTime);
             //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
             Vector3 CurrentVelocity;
-            if (O_CurVel.sqrMagnitude == 0)
-            { CurrentVelocity = (O_Position - O_LastPosition) * speednormalizer; }
-            else
-            { CurrentVelocity = O_CurVel; }
+            //if (O_CurVel.sqrMagnitude == 0)
+            CurrentVelocity = (O_Position - O_LastPosition) * speednormalizer;
+            /* else
+            { CurrentVelocity = O_CurVel; } */
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             //and if the updates aren't being recieved at the expected time (by more than 50%), don't bother with acceleration as it could be huge
             if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || updatedelta > updateInterval * 1.5f || IdleUpdateMode)

@@ -7,14 +7,15 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_KillTracker : UdonSharpBehaviour
 {
-    [SerializeField] private SaccEntity EntityControl;
     [SerializeField] private UdonSharpBehaviour SAVControl;
+    private SaccEntity EntityControl;
     [Tooltip("Leave empty if you just want to use the SFEXT_O_GotKilled and SFEXT_O_GotAKill events for something else")]
     public SaccScoreboard_Kills KillsBoard;
     private bool InEditor;
     private VRCPlayerApi localPlayer;
     public void SFEXT_L_EntityStart()
     {
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         gameObject.SetActive(false);//this object never needs to be active
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)

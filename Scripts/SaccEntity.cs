@@ -104,7 +104,10 @@ public class SaccEntity : UdonSharpBehaviour
         }
 
         if (!CenterOfMass)
-        { CenterOfMass = gameObject.transform; }
+        {
+            CenterOfMass = gameObject.transform;
+            Debug.Log(string.Concat(gameObject.name, ": ", "No Center Of Mass Set"));
+        }
 
         VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
         SeatedPlayers = new int[VehicleStations.Length];
@@ -537,7 +540,7 @@ public class SaccEntity : UdonSharpBehaviour
     {
         foreach (GameObject obj in DisableAfter10Seconds)
         {
-            obj.SetActive(false);
+            if (obj) { obj.SetActive(false); }
         }
     }
     public void TellDFUNCsLR()

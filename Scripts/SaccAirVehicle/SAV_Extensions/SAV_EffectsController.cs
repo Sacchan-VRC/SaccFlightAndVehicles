@@ -55,6 +55,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
         if (localPlayer == null)
         {
+            Occupied = true;
             VehicleAnimator.SetBool("occupied", true);
         }
         else { InEditor = false; }
@@ -67,7 +68,6 @@ public class SAV_EffectsController : UdonSharpBehaviour
     {
         if (DoEffects > 10) { return; }
 
-        //if a long way away just skip effects except large vapor effects
         Effects();
         LargeEffects();
     }

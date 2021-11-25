@@ -5,6 +5,12 @@ Usage instructions below changelog
 Contact:
 https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
+Support:
+https://ko-fi.com/sacchanvrc
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Small Update 1.51
+Stopped using reserved2 layer
+SaccFlight menu started
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Modularization Update 1.5
 Split functionality of EngineController into many different scripts allowing for greater customization
@@ -211,6 +217,8 @@ Added option to disable thrust vectoring
 Implemented (unrealistic) increased lift at higher speeds, you can now fall down faster at low speed
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+The most important change from 1.5 to 1.51 is that the OnboardVehicleLayer has changed from 19 to 31 due to VRChat update changing layer 19. Vehicles on set to 19 will fall into to the ground when entered.
 
 Version 1.5 has the largest changes of any update so far. I intentionally disregarded compatability/ease of update in order to modularize and improve functionality as much as possible.
 Updating old projects with custom vehicles will be a challenge. Old animations can be reused but may require some adjustments.

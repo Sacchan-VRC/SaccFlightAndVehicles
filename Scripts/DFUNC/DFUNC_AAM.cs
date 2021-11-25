@@ -65,7 +65,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private bool AnimOn = false;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
-    private int FullAAMs;
+    [System.NonSerializedAttribute] public int FullAAMs;
     private int NumAAMTargets;
     private float AAMLockTimer = 0;
     private bool AAMHasTarget = false;

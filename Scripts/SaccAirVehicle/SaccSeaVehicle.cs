@@ -11,7 +11,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
     public Transform VehicleMesh;
     [Tooltip("Layer to set the colliders to when entering vehicle")]
-    public int OnboardVehicleLayer = 19;
+    public int OnboardVehicleLayer = 31;
     [Tooltip("Position Thrust force is applied at")]
     public Transform ThrustPoint;
     [Tooltip("Position yawing forces are applied at")]

@@ -12,7 +12,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
     public Transform VehicleMesh;
     [Tooltip("Layer to set the colliders to when entering vehicle")]
-    public int OnboardVehicleLayer = 19;
+    public int OnboardVehicleLayer = 31;
     [Tooltip("Position used to raycast from in order to calculate ground effect")]
     public Transform GroundEffectEmpty;
     [Tooltip("Position pitching forces are applied at")]
@@ -375,8 +375,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             UsingManualSync = true;
         }
-        Spawnposition = VehicleTransform.position;
-        Spawnrotation = VehicleTransform.rotation;
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
@@ -462,15 +460,19 @@ public class SaccAirVehicle : UdonSharpBehaviour
         RollThrustVecMultiStart = RollThrustVecMulti;
 
         CenterOfMass = EntityControl.CenterOfMass;
-        VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
-        VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
-        if (InvertITRYaw)
+        //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
+        Vector3 CoMOffset = CenterOfMass.position - VehicleTransform.position;
+        int c = VehicleTransform.childCount;
+        Transform[] MainObjChildren = new Transform[c];
+        for (int i = 0; i < c; i++)
         {
-            Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
-            ITR.x *= -1;
-            VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
+            VehicleTransform.GetChild(i).position -= CoMOffset;
         }
-
+        VehicleTransform.position += CoMOffset;
+        SendCustomEventDelayedFrames(nameof(SetCoM_ITR), 1);//this has to be delayed one frame because ?
+        Spawnposition = VehicleTransform.position;
+        Spawnrotation = VehicleTransform.rotation;
+        
         if (AtmosphereThinningStart > AtmosphereThinningEnd) { AtmosphereThinningEnd = (AtmosphereThinningStart + 1); }
         AtmoshpereFadeDistance = (AtmosphereThinningEnd + SeaLevel) - (AtmosphereThinningStart + SeaLevel); //for finding atmosphere thinning gradient
         AtmosphereHeightThing = (AtmosphereThinningStart + SeaLevel) / (AtmoshpereFadeDistance); //used to add back the height to the atmosphere after finding gradient
@@ -1216,6 +1218,17 @@ public class SaccAirVehicle : UdonSharpBehaviour
         if (FloatingLastFrame)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDownWater));
+        }
+    }
+    public void SetCoM_ITR()
+    {
+        VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
+        VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
+        if (InvertITRYaw)
+        {
+            Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
+            ITR.x *= -1;
+            VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
         }
     }
     public void ReAppear()

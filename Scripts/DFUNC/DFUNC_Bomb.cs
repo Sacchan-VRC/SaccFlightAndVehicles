@@ -53,7 +53,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private bool TriggerLastFrame;
     private int BombPoint = 0;
     private float LastBombDropTime = 0f;
-    private int FullBombs;
+    [System.NonSerializedAttribute] public int FullBombs;
     private float FullBombsDivider;
     private Transform VehicleTransform;
     private float reloadspeed;

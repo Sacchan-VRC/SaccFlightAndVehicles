@@ -23,7 +23,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     [SerializeField] private GameObject HudCrosshair;
     [Tooltip("How long it takes to fully reload from empty in seconds")]
     [SerializeField] private float FullReloadTimeSec = 20;
-    [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
+    [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
     [SerializeField] private float GunRecoil = 150;
     [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
     [SerializeField] private bool DoAnimBool = false;
@@ -36,7 +36,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool AnimOn;
     private int AnimBool_STRING;
     private bool UseLeftTrigger = false;
-    private float FullGunAmmoInSeconds = 12;
+    [System.NonSerializedAttribute] public float FullGunAmmoInSeconds;
     private Rigidbody VehicleRigidbody;
     [System.NonSerializedAttribute, UdonSynced, FieldChangeCallback(nameof(Firing))] public bool _firing;
     public bool Firing
@@ -365,6 +365,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private Vector3 RelativeTargetVel;
     private Vector3 GUN_TargetDirOld;
     private float distance_from_head;
+    [Tooltip("Put the speed from the bullet particle system in here so that the lead indicator works with the correct offset")]
     [SerializeField] private float BulletSpeed;
     private void Hud()
     {
