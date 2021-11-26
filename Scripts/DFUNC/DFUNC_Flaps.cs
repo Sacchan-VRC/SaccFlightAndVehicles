@@ -7,7 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Flaps : UdonSharpBehaviour
 {
-    [SerializeField] UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     public Animator FlapsAnimator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;
@@ -51,6 +51,9 @@ public class DFUNC_Flaps : UdonSharpBehaviour
         //to match how the old values worked
         FlapsDragMulti -= 1f;
         FlapsLiftMulti -= 1f;
+
+        if ((bool)SAVControl.GetProgramVariable("AutoAdjustValuesToMass"))
+        { FlapsExtraMaxLift *= ((Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody")).mass; }
 
         if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
         if (DefaultFlapsOff) { SetFlapsOff(); }
