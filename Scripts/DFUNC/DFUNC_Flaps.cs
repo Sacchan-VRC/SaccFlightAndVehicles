@@ -196,23 +196,23 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     {
         if (!Flaps)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOn");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetFlapsOn));
         }
         else
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetFlapsOff));
         }
     }
     public void SFEXT_O_OnPlayerJoined()
     {
         if (!Flaps && !DefaultFlapsOff)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOff");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetFlapsOff));
         }
 
         else if (Flaps && DefaultFlapsOff)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetFlapsOn");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetFlapsOn));
         }
     }
 }

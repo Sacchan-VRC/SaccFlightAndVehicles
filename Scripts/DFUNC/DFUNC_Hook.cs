@@ -89,7 +89,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
     public void SFEXT_O_OnPlayerJoined()
     {
         if (HookDown)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetHookDown"); }
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHookDown)); }
     }
     private void Update()
     {
@@ -120,7 +120,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
                 HookedLoc = VehicleTransform.position;
                 Hooked = true;
                 HookedTime = Time.time;
-                VehicleAnimator.SetTrigger("hooked");
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHooked)); }
             }
         }
         //slow down if hooked and on the ground
@@ -146,7 +146,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
                 //this results in 1 frame's worth of not being able to catch a cable if hook stays down after being 'hooked', not snapping and then trying to hook again
                 //but that should be a very rare and unnoitcable(if it happens) occurance
                 if (HookedDelta < 5)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayCableSnap"); }
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayCableSnap)); }
             }
             float DeltaTime = Time.deltaTime;
             if ((float)SAVControl.GetProgramVariable("Speed") > HookedBrakeStrength * DeltaTime)
@@ -177,6 +177,10 @@ public class DFUNC_Hook : UdonSharpBehaviour
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHookUp));
             }
         }
+    }
+    public void SetHooked()
+    {
+        VehicleAnimator.SetTrigger("hooked");
     }
     public void SetHookDown()
     {
