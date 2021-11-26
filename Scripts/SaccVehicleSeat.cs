@@ -7,13 +7,13 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SaccVehicleSeat : UdonSharpBehaviour
 {
-    [SerializeField] private SaccEntity EntityControl;
+    public SaccEntity EntityControl;
     [Tooltip("Gameobject with script that runs when you enter the seat to edjust your view position")]
-    [SerializeField] private bool IsPilotSeat = false;
+    public bool IsPilotSeat = false;
     [Tooltip("Object that is enabled only when sitting in this seat")]
-    [SerializeField] private GameObject ThisSeatOnly;
-    [SerializeField] private bool AdjustSeat = true;
-    [SerializeField] private Transform TargetEyePosition;
+    public GameObject ThisSeatOnly;
+    public bool AdjustSeat = true;
+    public Transform TargetEyePosition;
     [UdonSynced, FieldChangeCallback(nameof(AdjustedPos))] private Vector2 _adjustedPos;
     public Vector2 AdjustedPos
     {

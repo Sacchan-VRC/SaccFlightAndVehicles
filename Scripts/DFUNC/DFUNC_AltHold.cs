@@ -7,13 +7,13 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_AltHold : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private GameObject HudHold;
-    [SerializeField] private GameObject Dial_Funcon;
+    public UdonSharpBehaviour SAVControl;
+    public GameObject HudHold;
+    public GameObject Dial_Funcon;
     [Tooltip("Limit Gs that can be pulled by the altitude hold auto pilot")]
-    [SerializeField] private float GLimiter = 12f;
+    public float GLimiter = 12f;
     [Tooltip("Limit AoA that can be pulled by the altitude hold auto pilot")]
-    [SerializeField] private float AoALimiter = 15f;
+    public float AoALimiter = 15f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;

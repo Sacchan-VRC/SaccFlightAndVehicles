@@ -7,42 +7,42 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class EXTP_Turret : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     [Tooltip("Transform to base your controls on, should be facing the same direction as the seat. If left empty it will be set to the Horizontal Rotator.")]
-    [SerializeField] private Transform ControlsRoot;
-    [SerializeField] private Transform TurretRotatorHor;
-    [SerializeField] private Transform TurretRotatorVert;
-    [SerializeField] private float TurnSpeedMulti = 6;
+    public Transform ControlsRoot;
+    public Transform TurretRotatorHor;
+    public Transform TurretRotatorVert;
+    public float TurnSpeedMulti = 6;
     [Tooltip("Lerp rotational inputs by this amount when used in desktop mode so the aim isn't too twitchy")]
-    [SerializeField] private float TurningResponseDesktop = 2f;
+    public float TurningResponseDesktop = 2f;
     [Tooltip("Rotation slowdown per frame")]
     [Range(0, 1)]
-    [SerializeField] private float TurnFriction = .04f;
+    public float TurnFriction = .04f;
     [Tooltip("Angle above the horizon that this gun can look")]
-    [SerializeField] private float UpAngleMax = 89;
+    public float UpAngleMax = 89;
     [Tooltip("Angle below the horizon that this gun can look")]
-    [SerializeField] private float DownAngleMax = 0;
+    public float DownAngleMax = 0;
     [Tooltip("Angle that this gun can look to the left and right, set to 180 to freely spin")]
-    [SerializeField] private float SideAngleMax = 180;
+    public float SideAngleMax = 180;
     [Tooltip("In seconds")]
     [Range(0.05f, 1f)]
-    [SerializeField] private float updateInterval = 0.25f;
-    [SerializeField] private GameObject Projectile;
-    [SerializeField] private AudioSource FireSound;
-    [SerializeField] private Camera ViewCamera;
-    [SerializeField] private GameObject ViewCameraScreen;
-    [SerializeField] private Transform AmmoBar;
-    [SerializeField] private int Ammo = 160;
+    public float updateInterval = 0.25f;
+    public GameObject Projectile;
+    public AudioSource FireSound;
+    public Camera ViewCamera;
+    public GameObject ViewCameraScreen;
+    public Transform AmmoBar;
+    public int Ammo = 160;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
-    [SerializeField] private float FullReloadTimeSec = 8;
+    public float FullReloadTimeSec = 8;
     [Tooltip("Minimum delay between firing")]
-    [SerializeField] private float FireDelay = 0f;
+    public float FireDelay = 0f;
     [Tooltip("Delay between firing when holding the trigger")]
-    [SerializeField] private float FireHoldDelay = 0.5f;
-    [SerializeField] private Transform[] FirePoints;
-    [SerializeField] private bool SendAnimTrigger = false;
-    [SerializeField] private Animator TurretAnimator;
-    [SerializeField] private string AnimTriggerName = "TurretFire";
+    public float FireHoldDelay = 0.5f;
+    public Transform[] FirePoints;
+    public bool SendAnimTrigger = false;
+    public Animator TurretAnimator;
+    public string AnimTriggerName = "TurretFire";
     private float LastFireTime = 0f;
     private int FullAmmo;
     private float FullAmmoDivider;

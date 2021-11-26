@@ -9,34 +9,34 @@ using VRC.Udon;
 public class DFUNC_AGM : UdonSharpBehaviour
 {
     [SerializeField] public UdonSharpBehaviour SAVControl;
-    [SerializeField] private Animator AGMAnimator;
+    public Animator AGMAnimator;
     [Tooltip("Camera script that is used to see the target")]
     public GameObject AGM;
     public int NumAGM = 4;
-    [SerializeField] private Text HUDText_AGM_ammo;
+    public Text HUDText_AGM_ammo;
     [Tooltip("Camera that renders onto the AtGScreen")]
-    [SerializeField] private Camera AtGCam;
+    public Camera AtGCam;
     [Tooltip("Screen that displays target, that is enabled when selected")]
-    [SerializeField] private GameObject AtGScreen;
-    [SerializeField] private GameObject Dial_Funcon;
+    public GameObject AtGScreen;
+    public GameObject Dial_Funcon;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
-    [SerializeField] private float FullReloadTimeSec = 8;
+    public float FullReloadTimeSec = 8;
     [Tooltip("Sound that plays when the AGM locks")]
-    [SerializeField] private AudioSource AGMLock;
+    public AudioSource AGMLock;
     [Tooltip("Sound that plays when the AGM unlocks")]
-    [SerializeField] private AudioSource AGMUnlock;
+    public AudioSource AGMUnlock;
     [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
-    [SerializeField] private bool AllowFiringWhenGrounded = false;
+    public bool AllowFiringWhenGrounded = false;
     [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
-    [SerializeField] private bool DoAnimBool = false;
+    public bool DoAnimBool = false;
     [Tooltip("Animator bool that is true when this function is selected")]
-    [SerializeField] private string AnimBoolName = "AGMSelected";
+    public string AnimBoolName = "AGMSelected";
     [Tooltip("Animator float that represents how many missiles are left")]
-    [SerializeField] private string AnimFloatName = "AGMs";
+    public string AnimFloatName = "AGMs";
     [Tooltip("Animator trigger that is set when a missile is launched")]
-    [SerializeField] private string AnimFiredTriggerName = "agmlaunched";
+    public string AnimFiredTriggerName = "agmlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
-    [SerializeField] private bool AnimBoolStayTrueOnExit;
+    public bool AnimBoolStayTrueOnExit;
     [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private short _AGMFire;
     public short AGMFire
     {

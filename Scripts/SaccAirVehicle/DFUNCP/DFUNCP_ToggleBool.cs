@@ -8,25 +8,25 @@ using VRC.Udon;
 public class DFUNCP_ToggleBool : UdonSharpBehaviour
 {
     [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing")]
-    [SerializeField] private UdonSharpBehaviour MasterToggle;
-    [SerializeField] private Animator BoolAnimator;
-    [SerializeField] private string AnimBoolName = "AnimBool";
+    public UdonSharpBehaviour MasterToggle;
+    public Animator BoolAnimator;
+    public string AnimBoolName = "AnimBool";
     [Tooltip("Object enabled when function is enabled (used on MFD)")]
-    [SerializeField] private GameObject[] Dial_Funcon;
+    public GameObject[] Dial_Funcon;
     public bool OnDefault = false;
     [Tooltip("Set toggle to its default when exiting?")]
-    [SerializeField] private bool PilotExitTurnOff = true;
+    public bool PilotExitTurnOff = true;
     [Tooltip("How long before toggle can be activated again")]
-    [SerializeField] private float ToggleMinDelay;
+    public float ToggleMinDelay;
     [Tooltip("Objects to turn on/off with the toggle")]
-    [SerializeField] private GameObject[] ToggleObjects;
+    public GameObject[] ToggleObjects;
     [Tooltip("Send Events to sound script for opening a door?")]
-    [SerializeField] private bool OpensDoor = false;
+    public bool OpensDoor = false;
     [Header("Door Only:")]
     [Tooltip("If this toggle opens a door, it will change the sound to the outside sounds using the soundcontroller")]
-    [SerializeField] private UdonBehaviour SoundControl;
+    public UdonBehaviour SoundControl;
     [Tooltip("How long it takes for the sound to change after toggle to closed")]
-    [SerializeField] private float DoorCloseTime = 2;
+    public float DoorCloseTime = 2;
     private bool AnimOn = false;
     private float ToggleTime;
     private bool UseLeftTrigger = false;

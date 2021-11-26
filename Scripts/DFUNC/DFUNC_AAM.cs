@@ -9,28 +9,28 @@ using VRC.Udon;
 public class DFUNC_AAM : UdonSharpBehaviour
 {
     [SerializeField] public UdonSharpBehaviour SAVControl;
-    [SerializeField] private Animator AAMAnimator;
+    public Animator AAMAnimator;
     public int NumAAM = 6;
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
     public float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     public float AAMLockTime = 1.5f;
     [Tooltip("Minimum time between missile launches")]
-    [SerializeField] private float AAMLaunchDelay = 0;
+    public float AAMLaunchDelay = 0;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
-    [SerializeField] private float FullReloadTimeSec = 10;
+    public float FullReloadTimeSec = 10;
     [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
-    [SerializeField] private bool AllowFiringWhenGrounded = false;
+    public bool AllowFiringWhenGrounded = false;
     [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
-    [SerializeField] private bool DoAnimBool = false;
+    public bool DoAnimBool = false;
     [Tooltip("Animator bool that is true when this function is selected")]
-    [SerializeField] private string AnimBoolName = "AAMSelected";
+    public string AnimBoolName = "AAMSelected";
     [Tooltip("Animator float that represents how many missiles are left")]
-    [SerializeField] private string AnimFloatName = "AAMs";
+    public string AnimFloatName = "AAMs";
     [Tooltip("Animator trigger that is set when a missile is launched")]
-    [SerializeField] private string AnimFiredTriggerName = "aamlaunched";
+    public string AnimFiredTriggerName = "aamlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
-    [SerializeField] private bool AnimBoolStayTrueOnExit;
+    public bool AnimBoolStayTrueOnExit;
     [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private short _AAMFire;
     public short AAMFire
     {
@@ -258,9 +258,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
 
     //AAMTargeting
-    [SerializeField] private UdonSharpBehaviour HUDControl;
+    public UdonSharpBehaviour HUDControl;
     [Tooltip("Max distance an enemy can be targeted at")]
-    [SerializeField] private float AAMMaxTargetDistance = 6000;
+    public float AAMMaxTargetDistance = 6000;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     private int AAMTargetChecker = 0;
@@ -409,9 +409,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
 
     //hud stuff
-    [SerializeField] private Text HUDText_AAM_ammo;
+    public Text HUDText_AAM_ammo;
     [Tooltip("Hud element to highlight current target")]
-    [SerializeField] private Transform AAMTargetIndicator;
+    public Transform AAMTargetIndicator;
     private float distance_from_head;
     private void Hud()
     {

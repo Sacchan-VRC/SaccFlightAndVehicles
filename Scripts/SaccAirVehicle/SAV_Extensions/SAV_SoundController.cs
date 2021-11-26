@@ -27,9 +27,9 @@ public class SAV_SoundController : UdonSharpBehaviour
     [Tooltip("'Wind' sound that gets louder with AoA and various other factors")]
     public AudioSource PlaneWind;
     [Tooltip("How quickly when pulling AoA the wind will get louder")]
-    [SerializeField] private float PlaneWindMultiplier = .25f;
+    public float PlaneWindMultiplier = .25f;
     [Tooltip("How fast before the planewind stops getting louder when pulling AoA")]
-    [SerializeField] private float PlaneWindMaxVolSpeed = 1000f;
+    public float PlaneWindMaxVolSpeed = 1000f;
     [Tooltip("Sounds that can be played when vehicle causes a sonic boom")]
     public AudioSource[] SonicBoom;
     [Tooltip("Sounds that can be played when vehicle explodes")]
@@ -42,11 +42,11 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource Rolling;
     [Tooltip("Maximum volume rolling sound reaches when moving forward quickly")]
     [Range(0.0f, 1f)]
-    [SerializeField] private float RollingMaxVol = 1;
+    public float RollingMaxVol = 1;
     [Tooltip("How quickly the rolling sound reaches max volume as speed increases. Higher = faster")]
-    [SerializeField] private float RollingVolCurve = .03f;
+    public float RollingVolCurve = .03f;
     [Tooltip("If ticked, will lerp Rolling volume on touchdown. For seaplanes water touchdown")]
-    [SerializeField] private bool Rolling_Seaplane;
+    public bool Rolling_Seaplane;
     [Tooltip("Oneshot sound sound played each time vehicle recieves a resupply event")]
     public AudioSource ReSupply;
     [Tooltip("Looping Sound that plays when vehicle is being targeted by a missile")]

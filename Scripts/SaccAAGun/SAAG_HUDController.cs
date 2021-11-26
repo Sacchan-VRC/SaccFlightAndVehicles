@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class SAAG_HUDController : UdonSharpBehaviour
 {
     [Tooltip("Transform of the pilot seat's target eye position, HUDContrller is automatically moved to this position in Start() to ensure perfect alignment")]
-    [SerializeField] private Transform PilotSeatAdjusterTarget;
+    public Transform PilotSeatAdjusterTarget;
     public SaccAAGunController AAGunControl;
     public Transform ElevationIndicator;
     public Transform HeadingIndicator;

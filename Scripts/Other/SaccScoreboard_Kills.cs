@@ -8,7 +8,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SaccScoreboard_Kills : UdonSharpBehaviour
 {
-    [SerializeField] private Text Scores;
+    public Text Scores;
     [System.NonSerializedAttribute, UdonSynced] public string TopKiller = "Nobody";
 
     [System.NonSerializedAttribute, UdonSynced, FieldChangeCallback(nameof(TopKills))] public int _topKills = 0;

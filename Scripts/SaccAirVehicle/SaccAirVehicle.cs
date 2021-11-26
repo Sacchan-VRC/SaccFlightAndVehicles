@@ -180,7 +180,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float VTOLGroundEffectStrength = 4;
     [Header("Other:")]
     [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders suspension values")]
-    [SerializeField] private bool AutoAdjustValuesToMass = true;
+    public bool AutoAdjustValuesToMass = true;
     [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
     public Transform ControlsRoot;
     [Tooltip("Zero height of the calculation of atmosphere thickness and HUD altitude display")]
@@ -219,7 +219,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [Tooltip("Multiply how much damage is done by missiles")]
     public float MissileDamageTakenMultiplier = 1f;
     [Tooltip("Strength of force that pushes the vehicle when a missile hits it")]
-    [SerializeField] private float MissilePushForce = 1f;
+    public float MissilePushForce = 1f;
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere starts thinning, In meters. 12192 = 40,000~ feet")]
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere reaches zero thickness. In meters. 19812 = 65,000~ feet")]

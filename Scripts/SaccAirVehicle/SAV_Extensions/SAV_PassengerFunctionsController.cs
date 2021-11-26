@@ -15,15 +15,15 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     [Tooltip("Function dial scripts that you wish to be on the right dial")]
     public UdonSharpBehaviour[] Dial_Functions_R;
     [Tooltip("Should there be a function at the top middle of the function dial[ ]? Or a divider[x]? Useful for adjusting function positions with an odd number of functions")]
-    [SerializeField] private bool LeftDialDivideStraightUp = false;
+    public bool LeftDialDivideStraightUp = false;
     [Tooltip("See above")]
-    [SerializeField] private bool RightDialDivideStraightUp = false;
+    public bool RightDialDivideStraightUp = false;
     [Tooltip("Object that points toward the currently selected function on the left stick")]
-    [SerializeField] private Transform LStickDisplayHighlighter;
+    public Transform LStickDisplayHighlighter;
     [Tooltip("Object that points toward the currently selected function on the right stick")]
-    [SerializeField] private Transform RStickDisplayHighlighter;
+    public Transform RStickDisplayHighlighter;
     [Tooltip("Oneshot sound played when switching functions")]
-    [SerializeField] private AudioSource SwitchFunctionSound;
+    public AudioSource SwitchFunctionSound;
     private int LStickNumFuncs;
     private int RStickNumFuncs;
     private float LStickFuncDegrees;

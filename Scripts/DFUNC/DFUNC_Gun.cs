@@ -7,30 +7,30 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Gun : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private Animator GunAnimator;
+    public UdonSharpBehaviour SAVControl;
+    public Animator GunAnimator;
     [Tooltip("Animator bool that is true when the gun is firing")]
-    [SerializeField] private string GunFiringBoolName = "gunfiring";
+    public string GunFiringBoolName = "gunfiring";
     [Tooltip("Transform of which its X scale scales with ammo")]
-    [SerializeField] private Transform AmmoBar;
+    public Transform AmmoBar;
     [Tooltip("Position at which recoil forces are added, not required for recoil to work. Only use this if you want the vehicle to rotate when shooting")]
-    [SerializeField] private Transform GunRecoilEmpty;
+    public Transform GunRecoilEmpty;
     [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
-    [SerializeField] private Transform GunDamageParticle;
+    public Transform GunDamageParticle;
     [Tooltip("Crosshair to switch to when gun is selected")]
-    [SerializeField] private GameObject HudCrosshairGun;
+    public GameObject HudCrosshairGun;
     [Tooltip("Vehicle's normal crosshair")]
-    [SerializeField] private GameObject HudCrosshair;
+    public GameObject HudCrosshair;
     [Tooltip("How long it takes to fully reload from empty in seconds")]
-    [SerializeField] private float FullReloadTimeSec = 20;
+    public float FullReloadTimeSec = 20;
     [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
-    [SerializeField] private float GunRecoil = 150;
+    public float GunRecoil = 150;
     [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
-    [SerializeField] private bool DoAnimBool = false;
+    public bool DoAnimBool = false;
     [Tooltip("Animator bool that is true when this function is selected")]
-    [SerializeField] private string AnimBoolName = "GunSelected";
+    public string AnimBoolName = "GunSelected";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
-    [SerializeField] private bool AnimBoolStayTrueOnExit;
+    public bool AnimBoolStayTrueOnExit;
     private SaccEntity EntityControl;
     private float boolToggleTime;
     private bool AnimOn;
@@ -219,11 +219,11 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private Transform VehicleTransform;
     private int AAMTarget;
     private int AAMTargetChecker;
-    [SerializeField] private UdonSharpBehaviour HUDControl;
+    public UdonSharpBehaviour HUDControl;
     private Transform CenterOfMass;
     private SaccAirVehicle AAMCurrentTargetSAVControl;
     private int OutsideVehicleLayer;
-    [SerializeField] private float MaxTargetDistance = 6000;
+    public float MaxTargetDistance = 6000;
     private float AAMLockTimer;
     private int NumAAMTargets;
     private Vector3 AAMCurrentTargetDirection;
@@ -358,15 +358,15 @@ public class DFUNC_Gun : UdonSharpBehaviour
 
 
     //hud stuff
-    [SerializeField] private Transform TargetIndicator;
-    [SerializeField] private Transform GUNLeadIndicator;
+    public Transform TargetIndicator;
+    public Transform GUNLeadIndicator;
     private float GUN_TargetSpeedLerper;
     private Vector3 RelativeTargetVelLastFrame;
     private Vector3 RelativeTargetVel;
     private Vector3 GUN_TargetDirOld;
     private float distance_from_head;
     [Tooltip("Put the speed from the bullet particle system in here so that the lead indicator works with the correct offset")]
-    [SerializeField] private float BulletSpeed;
+    public float BulletSpeed;
     private void Hud()
     {
         float SmoothDeltaTime = Time.smoothDeltaTime;

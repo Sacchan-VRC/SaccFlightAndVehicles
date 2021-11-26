@@ -7,17 +7,17 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Hook : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
-    [SerializeField] private GameObject Dial_Funcon;
-    [SerializeField] private AudioSource CableSnap;
-    [SerializeField] private Transform HookDetector;
+    public GameObject Dial_Funcon;
+    public AudioSource CableSnap;
+    public Transform HookDetector;
     [Tooltip("Strength of force slowing down the vehicle when it's snagged on a cable")]
-    [SerializeField] private float HookedBrakeStrength = 55f;
+    public float HookedBrakeStrength = 55f;
     [Tooltip("Distance from the initial snag point that the cable will 'snap' and the vehicle will be released (and damaged) if it hasnt stopped")]
-    [SerializeField] private float HookedCableSnapDistance = 120f;
+    public float HookedCableSnapDistance = 120f;
     [Tooltip("If this vehicle has a brake function, need a reference to it to disable it when this function is braking the vehicle")]
-    [SerializeField] private UdonSharpBehaviour BrakeFunction;
+    public UdonSharpBehaviour BrakeFunction;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     public LayerMask HookCableLayer;

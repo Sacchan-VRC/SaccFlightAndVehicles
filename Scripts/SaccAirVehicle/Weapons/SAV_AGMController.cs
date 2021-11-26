@@ -7,27 +7,27 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_AGMController : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour AGMLauncherControl;
+    public UdonSharpBehaviour AGMLauncherControl;
     public SaccEntity EntityControl;
     [Tooltip("Missile will explode after this time")]
-    [SerializeField] private float MaxLifetime = 35;
+    public float MaxLifetime = 35;
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
-    [SerializeField] private float ExplosionLifeTime = 10;
+    public float ExplosionLifeTime = 10;
     [Tooltip("AGM will fly straight for this many seconds before it starts homing in on target")]
-    [SerializeField] private float FlyStraightTime = .3f;
+    public float FlyStraightTime = .3f;
     [Tooltip("Play a random one of these explosion sounds")]
-    [SerializeField] private AudioSource[] ExplosionSounds;
+    public AudioSource[] ExplosionSounds;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from colliding with own plane")]
-    [SerializeField] private float ColliderActiveDistance = 30;
+    public float ColliderActiveDistance = 30;
     [Tooltip("Max angle able to track target at")]
-    [SerializeField] private float LockAngle = 90;
+    public float LockAngle = 90;
     [Tooltip("Maximum speed missile can rotate")]
-    [SerializeField] private float RotSpeed = 15;
+    public float RotSpeed = 15;
     [Range(1.01f, 2f)]
     [Tooltip("Amount the target direction vector is extended when calculating missile rotation. Lower number = more aggressive drifting missile, but more likely to oscilate")]
-    [SerializeField] private float TargetVectorExtension = 1.2f;
+    public float TargetVectorExtension = 1.2f;
     [Tooltip("Strength of the forces applied to the sides of the missiles as it drifts through the air when it turns")]
-    [SerializeField] private float AirPhysicsStrength = 3f;
+    public float AirPhysicsStrength = 3f;
     private bool StartTrack = false;
     private Transform VehicleCenterOfMass;
     private Vector3 Target;

@@ -8,11 +8,11 @@ using VRC.Udon;
 public class SAAG_SyncScript : UdonSharpBehaviour
 {
     // whispers to Zwei, "it's okay"
-    [SerializeField] private SaccAAGunController AAGunControl;
-    [SerializeField] private Transform Rotator;
+    public SaccAAGunController AAGunControl;
+    public Transform Rotator;
     [Tooltip("In seconds")]
     [Range(0.05f, 1f)]
-    [SerializeField] private float updateInterval = 0.25f;
+    public float updateInterval = 0.25f;
     private VRCPlayerApi localPlayer;
     private float nextUpdateTime = 0;
     private double StartupTime;

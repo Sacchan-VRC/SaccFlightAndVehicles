@@ -7,15 +7,15 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Limits : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private GameObject HudLimit;
-    [SerializeField] private bool DefaultLimitsOn = true;
+    public UdonSharpBehaviour SAVControl;
+    public GameObject HudLimit;
+    public bool DefaultLimitsOn = true;
     [Tooltip("Object enabled when function is active (used on MFD)")]
-    [SerializeField] private GameObject Dial_Funcon;
+    public GameObject Dial_Funcon;
     [Tooltip("Try to stop pilot pulling this many Gs")]
-    [SerializeField] private float GLimiter = 12f;
+    public float GLimiter = 12f;
     [Tooltip("Try to stop pilot pulling this much AoA")]
-    [SerializeField] private float AoALimiter = 15f;
+    public float AoALimiter = 15f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;

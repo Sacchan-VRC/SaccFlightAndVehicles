@@ -7,15 +7,15 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_EffectsController : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     [Tooltip("Wing trails, emit when pulling Gs")]
-    [SerializeField] private TrailRenderer[] Trails;
+    public TrailRenderer[] Trails;
     [Tooltip("How many Gs do you have to pull before the trails appear?")]
-    [SerializeField] private float TrailGs = 4;
+    public float TrailGs = 4;
     [Tooltip("Particle system that plays when vehicle enters water")]
-    [SerializeField] private ParticleSystem SplashParticle;
+    public ParticleSystem SplashParticle;
     [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
-    [SerializeField] private float PlaySplashSpeed = 7;
+    public float PlaySplashSpeed = 7;
     private bool TrailsOn;
     private bool HasTrails;
     private bool vapor;
@@ -42,7 +42,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private int MACH10_STRING = Animator.StringToHash("mach10");
     private int GS_STRING = Animator.StringToHash("Gs");
     private int FUEL_STRING = Animator.StringToHash("fuel");
-    [SerializeField] private bool PrintAnimHashNamesOnStart;
+    public bool PrintAnimHashNamesOnStart;
 
     public void SFEXT_L_EntityStart()
     {

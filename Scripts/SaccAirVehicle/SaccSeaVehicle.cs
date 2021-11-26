@@ -80,7 +80,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float GDamage = 10f;
     [Header("Other:")]
     [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders suspension values")]
-    [SerializeField] private bool AutoAdjustValuesToMass = true;
+    public bool AutoAdjustValuesToMass = true;
     [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
     public Transform ControlsRoot;
     [Tooltip("Wind speed on each axis")]

@@ -8,21 +8,21 @@ using VRC.Udon;
 public class SAV_SyncScript : UdonSharpBehaviour
 {
     // whispers to Zwei, "it's okay"
-    [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private Transform VehicleTransform;
+    public UdonSharpBehaviour SAVControl;
+    public Transform VehicleTransform;
     [Tooltip("Delay between updates in seconds")]
     [Range(0.05f, 1f)]
-    [SerializeField] private float updateInterval = 0.2f;
+    public float updateInterval = 0.2f;
     [Tooltip("Delay between updates in seconds when the sync has entered idle mode")]
-    [SerializeField] private float IdleModeUpdateInterval = 3f;
+    public float IdleModeUpdateInterval = 3f;
     [Tooltip("How quickly to lerp rotation to new extrapolated target rotation, it might help to reduce it in high-lag situations with planes that can roll quickly")]
-    [SerializeField] private float RotationSyncAgressiveness = 10f;
+    public float RotationSyncAgressiveness = 10f;
     [Tooltip("Multiply velocity vectors recieved while in idle mode, useful for stopping sea vehicles from extrapolating above and below the water")]
-    [SerializeField] private float IdleModeVelMultiplier = .4f;
+    public float IdleModeVelMultiplier = .4f;
     [Tooltip("If vehicle moves less than this distance since it's last update, it'll be considered to be idle, may need to be increased for vehicles that want to be idle on water. If the vehicle floats away sometimes, this value is probably too big")]
-    [SerializeField] private float IdleMoveMentRange = .35f;
+    public float IdleMoveMentRange = .35f;
     [Tooltip("If vehicle rotates less than this many degrees since it's last update, it'll be considered to be idle")]
-    [SerializeField] private float IdleRotationRange = 5f;
+    public float IdleRotationRange = 5f;
     private float nextUpdateTime = float.MaxValue;
     private int StartupTimeMS = 0;
     private double dblStartupTimeMS = 0;

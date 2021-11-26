@@ -7,13 +7,13 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SSV_EffectsController : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SSVControl;
+    public UdonSharpBehaviour SSVControl;
     [Tooltip("Particle system that plays when vehicle enters water")]
-    [SerializeField] private ParticleSystem SplashParticle;
+    public ParticleSystem SplashParticle;
     [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
-    [SerializeField] private float PlaySplashSpeed = 7;
-    [SerializeField] private Transform[] FlatWaterEffects;
-    [SerializeField] private UdonSharpBehaviour FloatScript;
+    public float PlaySplashSpeed = 7;
+    public Transform[] FlatWaterEffects;
+    public UdonSharpBehaviour FloatScript;
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
     [System.NonSerializedAttribute] public float DoEffects = 999f;//don't do effects before initialized
     private float brake;
@@ -32,7 +32,7 @@ public class SSV_EffectsController : UdonSharpBehaviour
     private int HEALTH_STRING = Animator.StringToHash("health");
     private int MACH10_STRING = Animator.StringToHash("mach10");
     private int FUEL_STRING = Animator.StringToHash("fuel");
-    [SerializeField] private bool PrintAnimHashNamesOnStart;
+    public bool PrintAnimHashNamesOnStart;
 
     public void SFEXT_L_EntityStart()
     {

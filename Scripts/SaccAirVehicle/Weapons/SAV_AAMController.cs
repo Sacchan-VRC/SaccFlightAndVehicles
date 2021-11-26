@@ -7,53 +7,53 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_AAMController : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour AAMLauncherControl;
+    public UdonSharpBehaviour AAMLauncherControl;
     public SaccEntity EntityControl;
     [Tooltip("Missile will explode after this time")]
-    [SerializeField] private float MaxLifetime = 12;
+    public float MaxLifetime = 12;
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
-    [SerializeField] private float ExplosionLifeTime = 10;
+    public float ExplosionLifeTime = 10;
     [Tooltip("Strength of the effect of countermeasures on the missile")]
-    [SerializeField] private float FlareEffect = 10;
+    public float FlareEffect = 10;
     [Range(0, 90f)]
     [Tooltip("If the missile and target vehicle are facing towards each other, multiply rotation speed by HighAspectRotSpeedMulti with this nose angle (facing perfectly towards each other = 0 degrees, which is the same as disabled) Set 0 for any non-heatseeker missiles")]
-    [SerializeField] private float HighAspectTrackAngle = 60;
+    public float HighAspectTrackAngle = 60;
     [Tooltip("See above")]
-    [SerializeField] private float HighAspectRotSpeedMulti = .5f;
+    public float HighAspectRotSpeedMulti = .5f;
     [Tooltip("Name of integer to +1 on the target plane while chasing it")]
-    [SerializeField] private string AnimINTName = "missilesincoming";
+    public string AnimINTName = "missilesincoming";
     [Tooltip("Play a random one of these explosion sounds")]
-    [SerializeField] private AudioSource[] ExplosionSounds;
+    public AudioSource[] ExplosionSounds;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from collider with own plane")]
-    [SerializeField] private float ColliderActiveDistance = 45;
+    public float ColliderActiveDistance = 45;
     [Tooltip("Speed missile can rotate in degrees per second")]
-    [SerializeField] private float RotSpeed = 180;
+    public float RotSpeed = 180;
     [Range(1.01f, 2f)]
     [Tooltip("Amount the target direction vector is extended when calculating missile rotation. Lower number = more aggressive drifting missile, but more likely to oscilate")]
-    [SerializeField] private float TargetVectorExtension = 1.2f;
+    public float TargetVectorExtension = 1.2f;
     [Tooltip("Maxmimum extrapolation distance in seconds for target interception, to prevent distant missiles getting confused too easily")]
-    [SerializeField] private float MaximumExtrapTime = 3f;
+    public float MaximumExtrapTime = 3f;
     [Tooltip("If target vehicle has afterburner on, multiply rotation speed by this value")]
-    [SerializeField] private float AfterBurnerTrackMulti = 2f;
+    public float AfterBurnerTrackMulti = 2f;
     [Tooltip("Missile rotates weaker if target's throttle is low, this value is the throttle at which lowering throttle more doesn't do anything")]
-    [SerializeField] private float TargetMinThrottleTrack = .3f;
+    public float TargetMinThrottleTrack = .3f;
     [Tooltip("When passing target, if within this range, explode")]
-    [SerializeField] private float ProximityExplodeDistance = 20;
+    public float ProximityExplodeDistance = 20;
     [Tooltip("Lockhack stops the missile from being able to lose lock before a certain amount of time has passed after it starts tracking for people who didn't fire it. It ensures the missile tracks its target in cases where the firer's position is desynced badly. Very necessary when using VRC_ObjectSync.")]
-    [SerializeField] private float LockHackTime = .1f;
+    public float LockHackTime = .1f;
     [Tooltip("How long after launch the missile should start tracking")]
-    [SerializeField] private float FlyStraightTime = .3f;
+    public float FlyStraightTime = .3f;
     [Tooltip("Strength of the forces applied to the sides of the missiles as it drifts through the air when it turns")]
-    [SerializeField] private float AirPhysicsStrength = .8f;
+    public float AirPhysicsStrength = .8f;
     [Tooltip("Missile predicts movement of target and tries to intercept rather than flying towards targets current position")]
-    [SerializeField] private bool PredictiveChase = true;
+    public bool PredictiveChase = true;
     [Range(0, 90f)]
     [Tooltip("Closeness in degrees to perpendicular the missile must be to be notched 0 = no notching")]
-    [SerializeField] private float NotchAngle = 0;
+    public float NotchAngle = 0;
 
     [Range(-90f, 90f)]
     [Tooltip("Degrees above the missile's horizon at which notching the missile becomes impossible")]
-    [SerializeField] private float NotchHorizon = 5;
+    public float NotchHorizon = 5;
     private UdonSharpBehaviour TargetSAVControl;
     private Animator TargetAnimator;
     SaccEntity TargetEntityControl;

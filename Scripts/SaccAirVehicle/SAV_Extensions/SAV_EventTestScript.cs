@@ -8,7 +8,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_EventTestScript : UdonSharpBehaviour
 {
-    [SerializeField] private Text DebugText;
+    public Text DebugText;
     private int NumEvents = 77;
     private string[] Event;
     private int[] Ints;

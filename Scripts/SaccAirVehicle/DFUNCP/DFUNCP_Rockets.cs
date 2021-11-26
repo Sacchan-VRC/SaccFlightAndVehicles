@@ -7,19 +7,19 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNCP_Rockets : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private GameObject Rocket;
+    public UdonSharpBehaviour SAVControl;
+    public GameObject Rocket;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
-    [SerializeField] private float FullReloadTimeSec = 8;
-    [SerializeField] private int NumRocket = 4;
+    public float FullReloadTimeSec = 8;
+    public int NumRocket = 4;
     [Tooltip("How often rocket fires if the trigger is held down")]
-    [SerializeField] private float RocketHoldDelay = 0.5f;
+    public float RocketHoldDelay = 0.5f;
     [Tooltip("Minimum time between firing rockets")]
-    [SerializeField] private float RocketDelay = 0f;
-    [SerializeField] private Transform[] RocketLaunchPoints;
+    public float RocketDelay = 0f;
+    public Transform[] RocketLaunchPoints;
     [Tooltip("Transform of which its X scale scales with ammo")]
-    [SerializeField] private Transform AmmoBar;
-    [SerializeField] private KeyCode LaunchRocketKey = KeyCode.C;
+    public Transform AmmoBar;
+    public KeyCode LaunchRocketKey = KeyCode.C;
     private bool UseLeftTrigger = false;
     private float Trigger;
     private bool TriggerLastFrame = true;

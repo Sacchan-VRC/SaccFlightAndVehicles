@@ -9,30 +9,30 @@ using VRC.Udon;
 public class DFUNC_Bomb : UdonSharpBehaviour
 {
     [SerializeField] public UdonSharpBehaviour SAVControl;
-    [SerializeField] private Animator BombAnimator;
+    public Animator BombAnimator;
     public GameObject Bomb;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
-    [SerializeField] private float FullReloadTimeSec = 8;
-    [SerializeField] private Text HUDText_Bomb_ammo;
+    public float FullReloadTimeSec = 8;
+    public Text HUDText_Bomb_ammo;
     public int NumBomb = 4;
     [Tooltip("Delay between bomb drops when holding the trigger")]
-    [SerializeField] private float BombHoldDelay = 0.5f;
+    public float BombHoldDelay = 0.5f;
     [Tooltip("Minimum delay between bomb drops")]
-    [SerializeField] private float BombDelay = 0f;
+    public float BombDelay = 0f;
     [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
-    [SerializeField] private Transform[] BombLaunchPoints;
+    public Transform[] BombLaunchPoints;
     [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
-    [SerializeField] private bool AllowFiringWhenGrounded = false;
-    [SerializeField] private bool DoAnimBool = false;
+    public bool AllowFiringWhenGrounded = false;
+    public bool DoAnimBool = false;
     [Tooltip("Animator bool that is true when this function is selected")]
-    [SerializeField] private string AnimBoolName = "BombSelected";
+    public string AnimBoolName = "BombSelected";
     [Tooltip("Animator float that represents how many bombs are left")]
-    [SerializeField] private string AnimFloatName = "bombs";
+    public string AnimFloatName = "bombs";
     [Tooltip("Animator trigger that is set when a bomb is dropped")]
-    [SerializeField] private string AnimFiredTriggerName = "bomblaunched";
+    public string AnimFiredTriggerName = "bomblaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
-    [SerializeField] private bool AnimBoolStayTrueOnExit;
-    [SerializeField] private Camera AtGCam;
+    public bool AnimBoolStayTrueOnExit;
+    public Camera AtGCam;
     public GameObject AtGScreen;
     [UdonSynced, FieldChangeCallback(nameof(BombFire))] private short _BombFire;
     public short BombFire

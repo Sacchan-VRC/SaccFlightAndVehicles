@@ -7,17 +7,17 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Catapult : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
-    [SerializeField] private GameObject Dial_Funcon;
+    public GameObject Dial_Funcon;
     [Tooltip("Oneshot sound played when attaching to catapult")]
-    [SerializeField] private AudioSource CatapultLock;
+    public AudioSource CatapultLock;
     [Tooltip("Maximum angular difference between vehicle and catapult allowed when attaching")]
-    [SerializeField] private float MaxAttachAngle = 15;
+    public float MaxAttachAngle = 15;
     [Tooltip("Layer to check for catapult triggers on")]
-    [SerializeField] private int CatapultLayer = 24;
+    public int CatapultLayer = 24;
     [Tooltip("Reference to the landing gear function so we can tell it to be disabled when on a catapult")]
-    [SerializeField] private UdonSharpBehaviour GearFunc;
+    public UdonSharpBehaviour GearFunc;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;

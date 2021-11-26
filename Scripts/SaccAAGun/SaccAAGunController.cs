@@ -8,67 +8,67 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SaccAAGunController : UdonSharpBehaviour
 {
-    [SerializeField] private SaccEntity EntityControl;
+    public SaccEntity EntityControl;
     [Tooltip("The part of the AAGun that aims")]
     public Transform Rotator;
-    [SerializeField] private SAAG_HUDController HUDControl;
-    [SerializeField] private VRCStation AAGunSeat;
+    public SAAG_HUDController HUDControl;
+    public VRCStation AAGunSeat;
     [Tooltip("Missile object to be duplicated and enabled when a missile is fired")]
-    [SerializeField] private GameObject AAM;
+    public GameObject AAM;
     [Tooltip("Sound that plays when targeting an enemy")]
-    [SerializeField] private AudioSource AAMLocking;
+    public AudioSource AAMLocking;
     [Tooltip("Sound that plays when locked onto a target")]
-    [SerializeField] private AudioSource AAMLockedOn;
+    public AudioSource AAMLockedOn;
     [Tooltip("Joystick object that moves around in to show rotation inputs")]
-    [SerializeField] private Transform JoyStick;
+    public Transform JoyStick;
     [Tooltip("When destroyed, will reappear after this many seconds")]
-    [SerializeField] private float RespawnDelay = 20;
+    public float RespawnDelay = 20;
     [Tooltip("Vehicle is un-destroyable for this long after spawning")]
-    [SerializeField] private float InvincibleAfterSpawn = 1;
+    public float InvincibleAfterSpawn = 1;
     public float Health = 100f;
     [Tooltip("Rotation strength")]
-    [SerializeField] private float TurnSpeedMulti = 6;
+    public float TurnSpeedMulti = 6;
     [Tooltip("Rotation slowdown per frame")]
     [Range(0, 1)]
-    [SerializeField] private float TurnFriction = .04f;
+    public float TurnFriction = .04f;
     [Tooltip("Angle above the horizon that this gun can look")]
-    [SerializeField] private float UpAngleMax = 89;
+    public float UpAngleMax = 89;
     [Tooltip("Angle below the horizon that this gun can look")]
-    [SerializeField] private float DownAngleMax = 35;
+    public float DownAngleMax = 35;
     [Tooltip("Lerp rotational inputs by this amount when used in desktop mode so the aim isn't too twitchy")]
-    [SerializeField] private float TurningResponseDesktop = 2f;
+    public float TurningResponseDesktop = 2f;
     [Tooltip("HP repairs every x seconds")]
-    [SerializeField] private float HPRepairDelay = 5f;
+    public float HPRepairDelay = 5f;
     [Tooltip("HP will start repairing this long after being hit")]
-    [SerializeField] private float HPRepairHitTimer = 10f;
+    public float HPRepairHitTimer = 10f;
     [Tooltip("HP repairs by this amount every HPRepairDelay seconds")]
-    [SerializeField] private float HPRepairAmount = 5f;
+    public float HPRepairAmount = 5f;
     public float MissileReloadTime = 10;
     [Tooltip("How long gun can fire for before running out of ammo in seconds")]
     public float MGAmmoSeconds = 4;
     [Tooltip("How fast ammo reloads")]
-    [SerializeField] private float MGReloadSpeed = 1;
+    public float MGReloadSpeed = 1;
     [Tooltip("How long after stopping firing before ammo starts recharging")]
-    [SerializeField] private float MGReloadDelay = 2;
+    public float MGReloadDelay = 2;
     public int NumAAM = 4;
-    [SerializeField] private float AAMMaxTargetDistance = 6000;
+    public float AAMMaxTargetDistance = 6000;
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
-    [SerializeField] private float AAMLockAngle = 20;
+    public float AAMLockAngle = 20;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
-    [SerializeField] private float AAMLockTime = 1.5f;
+    public float AAMLockTime = 1.5f;
     [Tooltip("Minimum time between missile launches")]
-    [SerializeField] private float AAMLaunchDelay = .5f;
+    public float AAMLaunchDelay = .5f;
     [Tooltip("Point missile is launched from, flips on local X each time fired")]
-    [SerializeField] private Transform AAMLaunchPoint;
+    public Transform AAMLaunchPoint;
     [Tooltip("Layer to spherecast to find all triggers on to use as AAM targets")]
-    [SerializeField] private LayerMask AAMTargetsLayer;
+    public LayerMask AAMTargetsLayer;
     [Tooltip("Tick this to disable target tracking, prediction, and missiles (WW2 flak?)")]
-    [SerializeField] private bool DisableAAMTargeting;
+    public bool DisableAAMTargeting;
     [Tooltip("Layer vehicles to shoot at are on (for raycast to check for line of sight)")]
-    [SerializeField] private float PlaneHitBoxLayer = 17;//walkthrough
+    public float PlaneHitBoxLayer = 17;//walkthrough
     [Tooltip("Multiplies how much damage is taken from bullets")]
-    [SerializeField] private float BulletDamageTaken = 10f;
-    [SerializeField] private bool PredictDamage = true;
+    public float BulletDamageTaken = 10f;
+    public bool PredictDamage = true;
     private float PredictedHealth;
     private float LastHitTime;
     private float MGAmmoRecharge = 0;

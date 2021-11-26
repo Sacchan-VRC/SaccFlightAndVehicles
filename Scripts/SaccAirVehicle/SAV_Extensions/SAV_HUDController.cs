@@ -9,23 +9,23 @@ using UnityEngine.UI;
 public class SAV_HUDController : UdonSharpBehaviour
 {
     [Tooltip("Transform of the pilot seat's target eye position, HUDController is automatically moved to this position in Start() to ensure perfect alignment. Not required")]
-    [SerializeField] private Transform PilotSeatAdjusterTarget;
-    [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private Animator HUDAnimator;
-    [SerializeField] private Text HUDText_G;
-    [SerializeField] private Text HUDText_mach;
-    [SerializeField] private Text HUDText_altitude;
-    [SerializeField] private Text HUDText_knots;
-    [SerializeField] private Text HUDText_knotsairspeed;
-    [SerializeField] private Text HUDText_angleofattack;
+    public Transform PilotSeatAdjusterTarget;
+    public UdonSharpBehaviour SAVControl;
+    public Animator HUDAnimator;
+    public Text HUDText_G;
+    public Text HUDText_mach;
+    public Text HUDText_altitude;
+    public Text HUDText_knots;
+    public Text HUDText_knotsairspeed;
+    public Text HUDText_angleofattack;
     [Tooltip("Hud element that points toward the gruond")]
-    [SerializeField] private Transform DownIndicator;
+    public Transform DownIndicator;
     [Tooltip("Hud element that shows pitch angle")]
-    [SerializeField] private Transform ElevationIndicator;
+    public Transform ElevationIndicator;
     [Tooltip("Hud element that shows yaw angle")]
-    [SerializeField] private Transform HeadingIndicator;
+    public Transform HeadingIndicator;
     [Tooltip("Hud element that shows vehicle's direction of movement")]
-    [SerializeField] private Transform VelocityIndicator;
+    public Transform VelocityIndicator;
     private SaccEntity EntityControl;
     [Tooltip("Local distance projected forward for objects that move dynamically, only adjust if the hud is moved forward in order to make it appear smaller")]
     public float distance_from_head = 1.333f;

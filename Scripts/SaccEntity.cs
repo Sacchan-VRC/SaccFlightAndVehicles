@@ -15,9 +15,9 @@ public class SaccEntity : UdonSharpBehaviour
     [Tooltip("Function dial scripts that you wish to be on the right dial")]
     public UdonSharpBehaviour[] Dial_Functions_R;
     [Tooltip("Should there be a function at the top middle of the function dial[ ]? Or a divider[x]? Useful for adjusting function positions with an odd number of functions")]
-    [SerializeField] private bool LeftDialDivideStraightUp = false;
+    public bool LeftDialDivideStraightUp = false;
     [Tooltip("See above")]
-    [SerializeField] private bool RightDialDivideStraightUp = false;
+    public bool RightDialDivideStraightUp = false;
     [Tooltip("Layer to spherecast to find all triggers on to use as AAM targets")]
     public LayerMask AAMTargetsLayer = 1 << 25;//layer 25
     [Tooltip("Object that is enabled when entering vehicle in any seat")]
@@ -27,9 +27,9 @@ public class SaccEntity : UdonSharpBehaviour
     [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
     public Transform CenterOfMass;
     [Tooltip("Oneshot sound played each time function selection changes")]
-    [SerializeField] private AudioSource SwitchFunctionSound;
-    [SerializeField] private Transform LStickDisplayHighlighter;
-    [SerializeField] private Transform RStickDisplayHighlighter;
+    public AudioSource SwitchFunctionSound;
+    public Transform LStickDisplayHighlighter;
+    public Transform RStickDisplayHighlighter;
     [Tooltip("Any objects in this list get set inactive after 10 seconds, used to disable AAMTarget object for vehicles that should never be targetable but that should be in the targets list for the camera etc")]
     public GameObject[] DisableAfter10Seconds;
     [System.NonSerializedAttribute] public bool InEditor = true;

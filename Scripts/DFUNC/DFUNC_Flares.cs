@@ -8,17 +8,17 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Flares : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     public int NumFlares = 60;
     [Tooltip("Speed to launch flare particles at")]
-    [SerializeField] private float FlareLaunchSpeed = 100;
-    [SerializeField] private ParticleSystem[] FlareParticles;
+    public float FlareLaunchSpeed = 100;
+    public ParticleSystem[] FlareParticles;
     [Tooltip("How long a flare has an effect for")]
-    [SerializeField] private float FlareActiveTime = 4f;
+    public float FlareActiveTime = 4f;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
-    [SerializeField] private float FullReloadTimeSec = 15;
-    [SerializeField] private AudioSource FlareLaunch;
-    [SerializeField] private Text HUDText_flare_ammo;
+    public float FullReloadTimeSec = 15;
+    public AudioSource FlareLaunch;
+    public Text HUDText_flare_ammo;
     private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;

@@ -9,12 +9,12 @@ public class DFUNC_Smoke : UdonSharpBehaviour
 {
     [SerializeField] UdonSharpBehaviour SAVControl;
     [Tooltip("Material to change the color value of to match smoke color")]
-    [SerializeField] private Material SmokeColorIndicatorMaterial;
-    [SerializeField] private ParticleSystem[] DisplaySmoke;
+    public Material SmokeColorIndicatorMaterial;
+    public ParticleSystem[] DisplaySmoke;
     [Tooltip("HUD Smoke indicator")]
-    [SerializeField] private GameObject HUD_SmokeOnIndicator;
+    public GameObject HUD_SmokeOnIndicator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
-    [SerializeField] private GameObject Dial_Funcon;
+    public GameObject Dial_Funcon;
     [UdonSynced, FieldChangeCallback(nameof(SmokeOn))] private bool _smokeon;
     public bool SmokeOn
     {

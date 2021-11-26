@@ -7,13 +7,13 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SAV_WaterTrigger : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     [Tooltip("Damage applied to vehicle per second while vehicle is underwater")]
-    [SerializeField] private float WaterDamageSec = 10;
+    public float WaterDamageSec = 10;
     [Tooltip("Strength of force slowing down the vehicle when it's underwater")]
-    [SerializeField] private float WaterSlowDown = 3;
+    public float WaterSlowDown = 3;
     [Tooltip("Strength of force slowing down the vehicle's rotation when it's underwater")]
-    [SerializeField] private float WaterSlowDownRot = 3;
+    public float WaterSlowDownRot = 3;
     private SaccEntity EntityControl;
     private Rigidbody VehicleRigidbody;
     private bool CFOverridden;

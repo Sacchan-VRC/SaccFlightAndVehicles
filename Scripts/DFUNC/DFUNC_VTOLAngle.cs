@@ -7,7 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class DFUNC_VTOLAngle : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private float VTOLDefault;
     private Transform ControlsRoot;

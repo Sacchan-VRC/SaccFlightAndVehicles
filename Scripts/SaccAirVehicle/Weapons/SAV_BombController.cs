@@ -7,22 +7,22 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_BombController : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour BombLauncherControl;
+    public UdonSharpBehaviour BombLauncherControl;
     [Tooltip("Bomb will explode after this time")]
-    [SerializeField] private float MaxLifetime = 40;
+    public float MaxLifetime = 40;
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
-    [SerializeField] private float ExplosionLifeTime = 10;
+    public float ExplosionLifeTime = 10;
     [Tooltip("Play a random one of these explosion sounds")]
-    [SerializeField] private AudioSource[] ExplosionSounds;
-    [SerializeField] private float LaunchSpeed = 0;
+    public AudioSource[] ExplosionSounds;
+    public float LaunchSpeed = 0;
     [Tooltip("Spawn bomb at a random angle up to this number")]
-    [SerializeField] private float AngleRandomization = 1;
+    public float AngleRandomization = 1;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent bomb from colliding with own plane")]
-    [SerializeField] private float ColliderActiveDistance = 30;
+    public float ColliderActiveDistance = 30;
     [Tooltip("How much the bomb's nose is pushed towards direction of movement")]
-    [SerializeField] private float StraightenFactor = .1f;
+    public float StraightenFactor = .1f;
     [Tooltip("Amount of drag bomb has when moving horizontally/vertically")]
-    [SerializeField] private float AirPhysicsStrength = .1f;
+    public float AirPhysicsStrength = .1f;
     [Tooltip("Used for making rockets, should probably disable air physics and angle randomization when making rockets.")]
     private SaccEntity EntityControl;
     private ConstantForce BombConstant;

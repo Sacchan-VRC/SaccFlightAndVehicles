@@ -10,9 +10,9 @@ public class DFUNC_Cruise : UdonSharpBehaviour
 {
     [SerializeField] UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
-    [SerializeField] private GameObject Dial_Funcon;
-    [SerializeField] private bool AllowCruiseGrounded;
-    [SerializeField] private Text HUDText_knotstarget;
+    public GameObject Dial_Funcon;
+    public bool AllowCruiseGrounded;
+    public Text HUDText_knotstarget;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;

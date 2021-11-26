@@ -7,19 +7,19 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNCP_Minigun : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
-    [SerializeField] private Transform VehicleTransform;
-    [SerializeField] private Transform Minigun;
+    public UdonSharpBehaviour SAVControl;
+    public Transform VehicleTransform;
+    public Transform Minigun;
     [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
-    [SerializeField] private Transform GunDamageParticle_Parent;
+    public Transform GunDamageParticle_Parent;
     [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
     [Tooltip("How long it takes to fully reload from empty in seconds")]
-    [SerializeField] private float FullReloadTimeSec = 20;
-    [SerializeField] private string AnimatorFiringStringName;
-    [SerializeField] private Animator GunAnimator;
+    public float FullReloadTimeSec = 20;
+    public string AnimatorFiringStringName;
+    public Animator GunAnimator;
     [Tooltip("Transform of which its X scale scales with ammo")]
-    [SerializeField] private Transform AmmoBar;
-    [SerializeField] private KeyCode MinigunFireKey = KeyCode.Space;
+    public Transform AmmoBar;
+    public KeyCode MinigunFireKey = KeyCode.Space;
     [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
     private bool InVR;
     private VRCPlayerApi localPlayer;

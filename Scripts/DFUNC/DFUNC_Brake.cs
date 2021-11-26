@@ -7,24 +7,24 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Brake : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     [Tooltip("Looping sound to play while brake is active")]
-    [SerializeField] private AudioSource Airbrake_snd;
+    public AudioSource Airbrake_snd;
     [Tooltip("Will Crash if not set")]
-    [SerializeField] private Animator BrakeAnimator;
+    public Animator BrakeAnimator;
     [Tooltip("Because you have to hold the break, and the keyboardcontrols script can only send events, this option is here.")]
-    [SerializeField] private KeyCode KeyboardControl = KeyCode.B;
+    public KeyCode KeyboardControl = KeyCode.B;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None)] public float BrakeInput;
     private Rigidbody VehicleRigidbody;
     private bool HasAirBrake;
-    [SerializeField] private float AirbrakeStrength = 4f;
-    [SerializeField] private float GroundBrakeStrength = 6f;
+    public float AirbrakeStrength = 4f;
+    public float GroundBrakeStrength = 6f;
     [Tooltip("Water brake functionality requires that floatscript is being used")]
-    [SerializeField] private float WaterBrakeStrength = 1f;
-    [SerializeField] private bool NoPilotAlwaysGroundBrake = true;
+    public float WaterBrakeStrength = 1f;
+    public bool NoPilotAlwaysGroundBrake = true;
     [Tooltip("Speed below which the ground break works meters/s")]
-    [SerializeField] private float GroundBrakeSpeed = 40f;
+    public float GroundBrakeSpeed = 40f;
     //other functions can set this +1 to disable breaking
     [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
     private SaccEntity EntityControl;

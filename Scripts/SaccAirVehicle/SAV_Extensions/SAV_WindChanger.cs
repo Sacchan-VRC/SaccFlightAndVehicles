@@ -9,17 +9,17 @@ using VRC.Udon;
 public class SAV_WindChanger : UdonSharpBehaviour
 {
     [Tooltip("List of SaccAirVehicles to be effected by this WindChnager")]
-    [SerializeField] private UdonSharpBehaviour[] SaccAirVehicles;
-    [SerializeField] private GameObject WindMenu;
-    [SerializeField] private Slider WindStrengthSlider;
-    [SerializeField] private Text WindStr_text;
-    [SerializeField] private Slider WindGustStrengthSlider;
-    [SerializeField] private Text WindGustStrength_text;
-    [SerializeField] private Slider WindGustinessSlider;
-    [SerializeField] private Text WindGustiness_text;
-    [SerializeField] private Slider WindTurbulanceScaleSlider;
-    [SerializeField] private Text WindTurbulanceScale_text;
-    [SerializeField] private AudioSource WindApplySound;
+    public UdonSharpBehaviour[] SaccAirVehicles;
+    public GameObject WindMenu;
+    public Slider WindStrengthSlider;
+    public Text WindStr_text;
+    public Slider WindGustStrengthSlider;
+    public Text WindGustStrength_text;
+    public Slider WindGustinessSlider;
+    public Text WindGustiness_text;
+    public Slider WindTurbulanceScaleSlider;
+    public Text WindTurbulanceScale_text;
+    public AudioSource WindApplySound;
     /* [UdonSynced(UdonSyncMode.None)] */
     private float WindStrength;
     /* [UdonSynced(UdonSyncMode.None)] */

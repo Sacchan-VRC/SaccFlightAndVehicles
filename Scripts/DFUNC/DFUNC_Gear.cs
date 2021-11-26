@@ -7,12 +7,12 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Gear : UdonSharpBehaviour
 {
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
-    [SerializeField] private GameObject Dial_Funcon;
-    [SerializeField] private Animator GearAnimator;
+    public GameObject Dial_Funcon;
+    public Animator GearAnimator;
     [Tooltip("Multiply drag by this amount while gear is down")]
-    [SerializeField] private float LandingGearDragMulti = 1.3f;
+    public float LandingGearDragMulti = 1.3f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;

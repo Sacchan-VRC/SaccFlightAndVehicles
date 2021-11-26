@@ -8,17 +8,17 @@ using VRC.Udon;
 public class DFUNC_Flaps : UdonSharpBehaviour
 {
     [SerializeField] UdonSharpBehaviour SAVControl;
-    [SerializeField] private Animator FlapsAnimator;
+    public Animator FlapsAnimator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
-    [SerializeField] private GameObject Dial_Funcon;
-    [SerializeField] private string AnimatorBool = "flaps";
-    [SerializeField] private bool DefaultFlapsOff = false;
+    public GameObject Dial_Funcon;
+    public string AnimatorBool = "flaps";
+    public bool DefaultFlapsOff = false;
     [Tooltip("Multiply Vehicle's drag by this amount while flaps are enabled")]
-    [SerializeField] private float FlapsDragMulti = 1.4f;
+    public float FlapsDragMulti = 1.4f;
     [Tooltip("Multiply Vehicle's lift by this amount while flaps are enabled")]
-    [SerializeField] private float FlapsLiftMulti = 1.35f;
+    public float FlapsLiftMulti = 1.35f;
     [Tooltip("Add this much to aircraft's Max Lift by this amount while flaps are enabled")]
-    [SerializeField] private float FlapsExtraMaxLift = 0;
+    public float FlapsExtraMaxLift = 0;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool Flaps = false;

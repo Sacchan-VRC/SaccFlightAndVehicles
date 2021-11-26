@@ -7,49 +7,49 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_FloatScript : UdonSharpBehaviour
 {
-    [SerializeField] private Rigidbody VehicleRigidbody;
-    [SerializeField] private UdonSharpBehaviour SAVControl;
+    public Rigidbody VehicleRigidbody;
+    public UdonSharpBehaviour SAVControl;
     [Tooltip("Transforms at which floating forces are calculate, recomd using 4 in a rectangle centered around the center of mass")]
-    [SerializeField] private Transform[] FloatPoints;
+    public Transform[] FloatPoints;
     [Tooltip("Layers to raycast against to check for 'water'")]
-    [SerializeField] private LayerMask FloatLayers = 16;
+    public LayerMask FloatLayers = 16;
     private Transform VehicleTransform;
     [Tooltip("Multiplier for the forces pushing up")]
-    [SerializeField] private float FloatForce = 5;
+    public float FloatForce = 5;
     [Tooltip("Max possible value to increase force by based on depth. Prevent objects from moving way too fast if dragged to the bottom of the water")]
-    [SerializeField] private float MaxDepthForce = 25;
+    public float MaxDepthForce = 25;
     [Tooltip("Value that the floating forces are multiplied by while vehicle is moving down in water. Higher = more stable floating")]
-    [SerializeField] private float Compressing = 25;
+    public float Compressing = 25;
     [Tooltip("Prevent extra force from compression becoming too high if the object is teleported deep underwater")]
-    [SerializeField] private float MaxCompressingForce = 25;
+    public float MaxCompressingForce = 25;
     [Tooltip("Physical size of the simulated spherical float in meters")]
-    [SerializeField] private float FloatRadius = .6f;
+    public float FloatRadius = .6f;
     [Tooltip("Strength of drag force applied by perpendicular movement in water (applied at floats)")]
-    [SerializeField] private float WaterSidewaysDrag = 1f;
+    public float WaterSidewaysDrag = 1f;
     [Tooltip("Strength of drag force applied by forward movement in water (applied at floats)")]
-    [SerializeField] private float WaterForwardDrag = .05f;
+    public float WaterForwardDrag = .05f;
     [Tooltip("Strength of force slowing rotation in water")]
-    [SerializeField] private float WaterRotDrag = 5;
+    public float WaterRotDrag = 5;
     [Tooltip("Strength of drag force slowing down the vehicle (applied at center of mass, causes no rotation)")]
-    [SerializeField] private float WaterVelDrag = 0f;
-    [SerializeField] private float WaveHeight = .6f;
+    public float WaterVelDrag = 0f;
+    public float WaveHeight = .6f;
     [Tooltip("Size of wave noise pattern. Smaller Number = bigger pattern")]
-    [SerializeField] private float WaveScale = .04f;
+    public float WaveScale = .04f;
     [Tooltip("How fast waves scroll across the sea")]
-    [SerializeField] private float WaveSpeed = 12;
+    public float WaveSpeed = 12;
     [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
-    [SerializeField] private bool DoOnLand = false;
+    public bool DoOnLand = false;
     [Tooltip("If a player takes ownership of the vehicle while its floats are below the water, the new owner will not know they are below the water and it will fall through the water. Move the vehicle up by this amount to prevent this from happening.")]
     public float MoveUpOnTakeOwnership = 2f;
     [Tooltip("Disable the totally non-physical ground rotation functionality")]
-    [SerializeField] private bool DisableTaxiRotation = false;
+    public bool DisableTaxiRotation = false;
     [Header("HoverBike Only")]
     [Tooltip("If hoverbike, script is only active when being piloted, also adds steering effects when near the ground")]
     public bool HoverBike = false;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the rolling-into-a-turn extra turning ability")]
-    [SerializeField] private float HoverBikeTurningStrength = .2f;
+    public float HoverBikeTurningStrength = .2f;
     [Tooltip("If hoverbike, there are some 'unrealistic' turning physics when near the ground. This multiplies the strength of the drifing-at-90-degrees extra turning ability")]
-    [SerializeField] private float BackThrustStrength = 15;
+    public float BackThrustStrength = 15;
     [System.NonSerializedAttribute] public float SurfaceHeight;
     private float[] FloatDepth;
     private float[] FloatDepthLastFrame;
