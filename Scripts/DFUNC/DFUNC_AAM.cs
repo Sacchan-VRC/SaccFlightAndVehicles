@@ -293,14 +293,14 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
             if (TargetChecker.activeInHierarchy)
             {
-                SaccAirVehicle NextTargetSAVontrol = null;
+                SaccAirVehicle NextTargetSAVControl = null;
 
                 if (TargetCheckerParent)
                 {
-                    NextTargetSAVontrol = TargetCheckerParent.GetComponent<SaccAirVehicle>();
+                    NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
                 }
                 //if target SAVontroller is null then it's a dummy target (or hierarchy isn't set up properly)
-                if ((!NextTargetSAVontrol || (!NextTargetSAVontrol.Taxiing && !NextTargetSAVontrol.EntityControl.dead)))
+                if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
                 {
                     RaycastHit hitnext;
                     //raycast to check if it's behind something
@@ -314,7 +314,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                                     Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
 
                     if ((LineOfSightNext
-                        && hitnext.collider.gameObject.layer == OutsideVehicleLayer //did raycast hit an object on the layer planes are on?
+                        && hitnext.collider && hitnext.collider.gameObject.layer == OutsideVehicleLayer //did raycast hit an object on the layer planes are on?
                             && NextTargetAngle < AAMLockAngle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
@@ -325,7 +325,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         AAMCurrentTargetAngle = NextTargetAngle;
                         AAMTarget = AAMTargetChecker;
                         AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                        AAMCurrentTargetSAVControl = NextTargetSAVontrol;
+                        AAMCurrentTargetSAVControl = NextTargetSAVControl;
                         AAMLockTimer = 0;
                         AAMTargetedTimer = .99f;//don't send targeted this frame incase new target is found next frame
                     }
@@ -349,7 +349,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             RaycastHit hitcurrent;
             bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
             //used to make lock remain for .25 seconds after target is obscured
-            if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != OutsideVehicleLayer)
+            if (!LineOfSightCur || (hitcurrent.collider && hitcurrent.collider.gameObject.layer != OutsideVehicleLayer))
             { AAMTargetObscuredDelay += DeltaTime; }
             else
             { AAMTargetObscuredDelay = 0; }

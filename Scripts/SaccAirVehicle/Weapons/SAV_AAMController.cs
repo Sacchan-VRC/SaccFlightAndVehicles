@@ -240,6 +240,11 @@ public class SAV_AAMController : UdonSharpBehaviour
     { LockHack = false; }
     public void LifeTimeExplode()
     { if (!Exploding) { Explode(); } }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other && other.gameObject.layer == 4 /* water */)
+        { if (!Exploding) { Explode(); } }
+    }
     public void DestroySelf()
     { Destroy(gameObject); }
     private void OnCollisionEnter(Collision other)

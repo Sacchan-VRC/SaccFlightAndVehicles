@@ -311,7 +311,7 @@ public class StingerScript : UdonSharpBehaviour
                                     Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
 
                     if ((LineOfSightNext
-                        && hitnext.collider.gameObject.layer == VehicleLayer //did raycast hit an object on the layer planes are on?
+                        && hitnext.collider && hitnext.collider.gameObject.layer == VehicleLayer //did raycast hit an object on the layer planes are on?
                             && NextTargetAngle < AAMLockAngle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
@@ -346,7 +346,7 @@ public class StingerScript : UdonSharpBehaviour
             RaycastHit hitcurrent;
             bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
             //used to make lock remain for .25 seconds after target is obscured
-            if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != VehicleLayer)
+            if (!LineOfSightCur || (hitcurrent.collider && hitcurrent.collider.gameObject.layer != VehicleLayer))
             { AAMTargetObscuredDelay += DeltaTime; }
             else
             { AAMTargetObscuredDelay = 0; }

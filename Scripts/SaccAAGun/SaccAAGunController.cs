@@ -508,7 +508,7 @@ public class SaccAAGunController : UdonSharpBehaviour
                 Debug.Log(string.Concat("LowerAngle ", NextTargetAngle < AAMCurrentTargetAngle));
                 Debug.Log(string.Concat("CurrentTargTaxiing ", !AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)); */
                 if ((LineOfSightNext
-                    && hitnext.collider.gameObject.layer == PlaneHitBoxLayer
+                    && hitnext.collider && hitnext.collider.gameObject.layer == PlaneHitBoxLayer
                         && NextTargetAngle < Lock_Angle
                             && NextTargetDistance < AAMMaxTargetDistance
                                 && NextTargetAngle < AAMCurrentTargetAngle)
@@ -547,7 +547,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         RaycastHit hitcurrent;
         bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore);
         //used to make lock remain for .25 seconds after target is obscured
-        if (LineOfSightCur == false || hitcurrent.collider.gameObject.layer != PlaneHitBoxLayer)
+        if (!LineOfSightCur || (hitcurrent.collider && hitcurrent.collider.gameObject.layer != PlaneHitBoxLayer))
         { AAMTargetObscuredDelay += DeltaTime; }
         else
         { AAMTargetObscuredDelay = 0; }

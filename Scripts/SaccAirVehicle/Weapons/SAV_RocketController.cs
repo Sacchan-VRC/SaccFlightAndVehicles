@@ -45,11 +45,11 @@ public class SAV_RocketController : UdonSharpBehaviour
     public void DestroySelf()
     { Destroy(gameObject); }
     private void OnCollisionEnter(Collision other)
+    { if (!Exploding) { Explode(); } }
+    private void OnTriggerEnter(Collider other)
     {
-        if (!Exploding)
-        {
-            Explode();
-        }
+        if (other && other.gameObject.layer == 4 /* water */)
+        { if (!Exploding) { Explode(); } }
     }
     private void Explode()
     {
