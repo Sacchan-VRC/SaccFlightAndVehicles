@@ -35,7 +35,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     [UdonSynced(UdonSyncMode.None)] private short O_RotationY;
     [UdonSynced(UdonSyncMode.None)] private short O_RotationZ;
     //sending velocity improves quality but will cause laggy movment if someone has very low fps.
-    //[UdonSynced(UdonSyncMode.None)] private Vector3 O_CurVel = Vector3.zero;
+    [UdonSynced(UdonSyncMode.None)] private Vector3 O_CurVel = Vector3.zero;
     private Vector3 O_Rotation;
     private Quaternion O_Rotation_Q = Quaternion.identity;
     private Vector3 O_LastCurVel = Vector3.zero;
@@ -217,7 +217,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                     O_RotationY = (short)Mathf.Clamp(rot.y, short.MinValue, short.MaxValue);
                     O_RotationZ = (short)Mathf.Clamp(rot.z, short.MinValue, short.MaxValue);
 
-                    //O_CurVel = VehicleRigid.velocity;
+                    O_CurVel = VehicleRigid.velocity;
                     //update time is a double so that it can interact with (int)Networking.GetServerTimeInMilliseconds() without innacuracy
                     //update time is the Networking.GetServerTimeInMilliseconds() taken from SFEXT_L_EntityStart() + real time as float since that to make
                     //the sub-millisecond error constant to eliminate jitter
@@ -305,10 +305,10 @@ public class SAV_SyncScript : UdonSharpBehaviour
             Ping = (float)(L_UpdateTime - O_UpdateTime);
             //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
             Vector3 CurrentVelocity;
-            //if (O_CurVel.sqrMagnitude == 0)
-            CurrentVelocity = (O_Position - O_LastPosition) * speednormalizer;
-            /* else
-            { CurrentVelocity = O_CurVel; } */
+            if (O_CurVel.sqrMagnitude == 0)
+            { CurrentVelocity = (O_Position - O_LastPosition) * speednormalizer; }
+            else
+            { CurrentVelocity = O_CurVel; }
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             //and if the updates aren't being recieved at the expected time (by more than 50%), don't bother with acceleration as it could be huge
             if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || updatedelta > updateInterval * 1.5f || IdleUpdateMode)
