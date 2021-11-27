@@ -1011,16 +1011,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     //and add wind
                     sidespeed = Vector3.Dot(AirVel, VehicleTransform.right);
                     downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
-                    PitchDown = (downspeed < 0) ? true : false;//air is hitting plane from above
-                    if (PitchDown)
-                    {
-                        downspeed *= PitchDownLiftMulti;
-                        SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift * PitchDownLiftMulti);
-                    }
-                    else
-                    {
-                        SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift);
-                    }
+                    PitchDown = downspeed < 0;//air is hitting plane from above?
+                    SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift);
+
                     rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
                     //thrust vectoring airplanes have a minimum rotation control
@@ -1049,7 +1042,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                     //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
                     Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Sideways
-                            (downspeed * ExtraLift * SpeedLiftFactor * AoALiftPitch),// Y Up
+                            ((PitchDown ? downspeed * PitchDownLiftMulti : downspeed) * ExtraLift * SpeedLiftFactor * AoALiftPitch),// Y Up
                             0);//Z Forward
 
                     float GroundEffectAndVelLift = 0;
