@@ -31,8 +31,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     private Rigidbody VehicleRigidbody;
     private float InVehicleThrustVolumeFactor;
     private Animator VehicleAnimator;
-    private float PlaneCatapultBackDistance;
-    private float PlaneCatapultUpDistance;
+    private Vector3 PlaneCatapultOffset;
     private Quaternion PlaneCatapultRotDif;
     private Quaternion CatapultRotLastFrame;
     private Vector3 CatapultPosLastFrame;
@@ -155,14 +154,15 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                                 VehicleTransform.rotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
 
                                 //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
-                                PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
+                                float PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
                                 VehicleTransform.position = CatapultTransform.position;
                                 VehicleTransform.position -= CatapultTransform.up * PlaneCatapultUpDistance;
 
                                 //move the plane back so that the catapult is aligned to the catapult detector
-                                PlaneCatapultBackDistance = VehicleTransform.InverseTransformDirection(VehicleTransform.position - transform.position).z;
+                                float PlaneCatapultBackDistance = VehicleTransform.InverseTransformDirection(VehicleTransform.position - transform.position).z;
                                 VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
 
+                                PlaneCatapultOffset = -(CatapultTransform.up * PlaneCatapultUpDistance) + (CatapultTransform.forward * PlaneCatapultBackDistance);
                                 PlaneCatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(VehicleTransform.rotation);
 
                                 if (!DisableGearToggle && GearFunc)
@@ -230,10 +230,8 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 if (CatapultDeadTimer == 0) { EntityControl.dead = false; }
             }
 
-            VehicleTransform.rotation = PlaneCatapultRotDif * CatapultTransform.rotation;
-            VehicleTransform.position = CatapultTransform.position;
-            VehicleTransform.position -= CatapultTransform.up * PlaneCatapultUpDistance;
-            VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
+            VehicleRigidbody.MoveRotation(PlaneCatapultRotDif * CatapultTransform.rotation);
+            VehicleRigidbody.MovePosition(CatapultTransform.position + PlaneCatapultOffset);
             VehicleRigidbody.velocity = Vector3.zero;
             VehicleRigidbody.angularVelocity = Vector3.zero;
             Quaternion CatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(CatapultRotLastFrame);

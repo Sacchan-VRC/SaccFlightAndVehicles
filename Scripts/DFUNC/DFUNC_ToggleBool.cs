@@ -7,7 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_ToggleBool : UdonSharpBehaviour
 {
-    [Tooltip("Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing\n If this isn't empty, the only other setting that does anything here is Dial_Funcon")]
+    [Tooltip("Not required. Put another ToggleBool object in this slot to make this toggle a secondary toggle that toggles the same thing\n If this isn't empty, the only other setting that does anything here is Dial_Funcon")]
     public UdonSharpBehaviour MasterToggle;
     public Animator BoolAnimator;
     [Tooltip("Object enabled when function is active (used on MFD)")]

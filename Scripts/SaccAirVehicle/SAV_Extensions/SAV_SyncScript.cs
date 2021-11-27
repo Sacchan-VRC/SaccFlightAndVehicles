@@ -92,7 +92,6 @@ public class SAV_SyncScript : UdonSharpBehaviour
             VehicleRigid.Sleep();
         }
         else { IsOwner = true; }//play mode in editor
-        nextUpdateTime = Time.realtimeSinceStartup + Random.Range(0f, updateInterval);
         SmoothingTimeDivider = 1f / updateInterval;
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
         dblStartupTimeMS = (double)StartupTimeMS * .001f;
@@ -125,7 +124,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
         gameObject.SetActive(true);
         if (IsOwner)
         { VehicleRigid.constraints = RigidbodyConstraints.None; }
-        nextUpdateTime = Time.realtimeSinceStartup;
+        nextUpdateTime = Time.realtimeSinceStartup + Random.Range(0f, updateInterval);
     }
     public void SFEXT_O_TakeOwnership()
     {
