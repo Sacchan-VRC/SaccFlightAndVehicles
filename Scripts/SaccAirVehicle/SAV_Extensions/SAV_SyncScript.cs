@@ -15,7 +15,9 @@ public class SAV_SyncScript : UdonSharpBehaviour
     public float updateInterval = 0.2f;
     [Tooltip("Delay between updates in seconds when the sync has entered idle mode")]
     public float IdleModeUpdateInterval = 3f;
-    [Tooltip("How quickly to lerp rotation to new extrapolated target rotation, it might help to reduce it in high-lag situations with planes that can roll quickly")]
+    [Tooltip("Freeze the vehicle's position when it's dead? Turn off for boats that sink etc")]
+    public bool FreezePositionOnDeath = true;
+    [Tooltip("How quickly to lerp rotation to new extrapolated target rotation, it might help to reduce this in high-lag situations with planes that can roll quickly")]
     public float RotationSyncAgressiveness = 10f;
     [Tooltip("Multiply velocity vectors recieved while in idle mode, useful for stopping sea vehicles from extrapolating above and below the water")]
     public float IdleModeVelMultiplier = .4f;
@@ -341,7 +343,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     }
     public void SFEXT_O_Explode()//all the things players see happen when the vehicle explodes
     {
-        if (IsOwner)
+        if (IsOwner && FreezePositionOnDeath)
         {
             VehicleRigid.drag = 9999;
             VehicleRigid.angularDrag = 9999;
@@ -353,6 +355,14 @@ public class SAV_SyncScript : UdonSharpBehaviour
         {
             VehicleRigid.drag = 0;
             VehicleRigid.angularDrag = 0;
+        }
+    }
+    public void SFEXT_O_MoveToSpawn()
+    {
+        if (IsOwner)
+        {
+            VehicleRigid.drag = 9999;
+            VehicleRigid.angularDrag = 9999;
         }
     }
 }

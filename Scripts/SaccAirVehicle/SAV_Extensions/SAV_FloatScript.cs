@@ -16,8 +16,14 @@ public class SAV_FloatScript : UdonSharpBehaviour
     private Transform VehicleTransform;
     [Tooltip("Multiplier for the forces pushing up")]
     public float FloatForce = 5;
+    [Tooltip("Multiplier for the forces pushing up when dead, set lower to make vehicle sink")]
+    public float DeadFloatForce = 5;
+    private float _floatForce;
     [Tooltip("Max possible value to increase force by based on depth. Prevent objects from moving way too fast if dragged to the bottom of the water")]
     public float MaxDepthForce = 25;
+    [Tooltip("Set a lower max depth force value to make the vehicle sink when dead")]
+    public float DeadMaxDepthForce = .4f;
+    private float _maxDepthForce;
     [Tooltip("Value that the floating forces are multiplied by while vehicle is moving down in water. Higher = more stable floating")]
     public float Compressing = 25;
     [Tooltip("Prevent extra force from compression becoming too high if the object is teleported deep underwater")]
@@ -73,6 +79,8 @@ public class SAV_FloatScript : UdonSharpBehaviour
     {
         FPLength = FloatPoints.Length;
         FloatDiameter = FloatRadius * 2;
+        _maxDepthForce = MaxDepthForce;
+        _floatForce = FloatForce;
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
@@ -120,6 +128,16 @@ public class SAV_FloatScript : UdonSharpBehaviour
     public void SFEXT_O_LoseOwnership()
     {
         if (!HoverBike) { gameObject.SetActive(false); }
+    }
+    public void SFEXT_O_Explode()
+    {
+        _maxDepthForce = DeadMaxDepthForce;
+        _floatForce = DeadFloatForce;
+    }
+    public void SFEXT_G_ReAppear()
+    {
+        _maxDepthForce = MaxDepthForce;
+        _floatForce = FloatForce;
     }
     public void SFEXT_O_PilotExit()
     {
@@ -170,7 +188,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
                     CompressionDifference = 0;
                 }
                 FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
-                FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], MaxDepthForce) * FloatForce) + CompressionDifference));
+                FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce) * _floatForce) + CompressionDifference));
                 //float is potentially below the top of the trigger, so fire a raycast from above the last known trigger height to check if it's still there
                 //the '+10': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
                 Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + 10, TopOfFloat.z);
@@ -213,7 +231,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         {
             depth += FloatDepth[i];
         }
-        float DepthMaxd = Mathf.Min(depth, MaxDepthForce);
+        float DepthMaxd = Mathf.Min(depth, _maxDepthForce);
         if (depth > 0)
         {//apply last calculated floating force for each floatpoint to respective floatpoint
             for (int i = 0; i != FloatPoints.Length; i++)

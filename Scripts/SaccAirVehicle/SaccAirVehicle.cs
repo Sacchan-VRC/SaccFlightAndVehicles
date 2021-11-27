@@ -472,7 +472,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         SendCustomEventDelayedFrames(nameof(SetCoM_ITR), 1);//this has to be delayed one frame because ?
         Spawnposition = VehicleTransform.position;
         Spawnrotation = VehicleTransform.rotation;
-        
+
         if (AtmosphereThinningStart > AtmosphereThinningEnd) { AtmosphereThinningEnd = (AtmosphereThinningStart + 1); }
         AtmoshpereFadeDistance = (AtmosphereThinningEnd + SeaLevel) - (AtmosphereThinningStart + SeaLevel); //for finding atmosphere thinning gradient
         AtmosphereHeightThing = (AtmosphereThinningStart + SeaLevel) / (AtmoshpereFadeDistance); //used to add back the height to the atmosphere after finding gradient
@@ -1220,17 +1220,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDownWater));
         }
     }
-    public void SetCoM_ITR()
-    {
-        VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
-        VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
-        if (InvertITRYaw)
-        {
-            Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
-            ITR.x *= -1;
-            VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
-        }
-    }
     public void ReAppear()
     {
         EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
@@ -1252,7 +1241,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         PlayerThrottle = 0;//for editor test mode
         EngineOutput = 0;//^
-                         //these could get set after death by lag, probably
+        VehicleRigidbody.angularVelocity = Vector3.zero;
+        VehicleRigidbody.velocity = Vector3.zero;
+        //these could get set after death by lag, probably
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
@@ -1266,6 +1257,17 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VehicleObjectSync.Respawn();
         }
         EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
+    }
+    public void SetCoM_ITR()
+    {
+        VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
+        VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
+        if (InvertITRYaw)
+        {
+            Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
+            ITR.x *= -1;
+            VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
+        }
     }
     public void TouchDown()
     {

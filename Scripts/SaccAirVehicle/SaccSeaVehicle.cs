@@ -294,9 +294,18 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         VelLiftStart = VelLift;
 
         CenterOfMass = EntityControl.CenterOfMass;
-        VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
-        VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
-
+        //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
+        Vector3 CoMOffset = CenterOfMass.position - VehicleTransform.position;
+        int c = VehicleTransform.childCount;
+        Transform[] MainObjChildren = new Transform[c];
+        for (int i = 0; i < c; i++)
+        {
+            VehicleTransform.GetChild(i).position -= CoMOffset;
+        }
+        VehicleTransform.position += CoMOffset;
+        SendCustomEventDelayedFrames(nameof(SetCoM), 1);//this has to be delayed one frame because ?
+        Spawnposition = VehicleTransform.position;
+        Spawnrotation = VehicleTransform.rotation;
 
         if (!HasAfterburner) { ThrottleAfterburnerPoint = 1; }
         ThrottleNormalizer = 1 / ThrottleAfterburnerPoint;
@@ -789,18 +798,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
 
         if (IsOwner)
         {
-            VehicleRigidbody.velocity = Vector3.zero;
-            VehicleRigidbody.angularVelocity = Vector3.zero;
-            if (!UsingManualSync)
-            {
-                VehicleRigidbody.drag = 9999;
-                VehicleRigidbody.angularDrag = 9999;
-            }
             Health = FullHealth;//turns off low health smoke
             Fuel = FullFuel;
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
-            SendCustomEventDelayedSeconds("MoveToSpawn", RespawnDelay - 3);
+            SendCustomEventDelayedSeconds(nameof(MoveToSpawn), RespawnDelay - 3);
             EntityControl.SendEventToExtensions("SFEXT_O_Explode");
         }
 
@@ -842,6 +844,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         PlayerThrottle = 0;//for editor test mode
         EngineOutput = 0;//^
+        VehicleRigidbody.angularVelocity = Vector3.zero;
+        VehicleRigidbody.velocity = Vector3.zero;
         Health = FullHealth;
         if (InEditor || UsingManualSync)
         {
@@ -852,6 +856,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             VehicleObjectSync.Respawn();
         }
         EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
+    }
+    public void SetCoM()
+    {
+        VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
+        VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
     }
     public void TouchDown()
     {
