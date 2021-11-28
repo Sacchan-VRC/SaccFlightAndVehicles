@@ -73,18 +73,26 @@ public class DFUNC_AGM : UdonSharpBehaviour
         {
             RaycastHit[] hits = Physics.SphereCastAll(value, 4000, Vector3.up, 4000, LockableLayers);
             float NearestDist = float.MaxValue;
-            foreach (RaycastHit hit in hits)
+            if (hits.Length > 0)
             {
-                if (hit.collider)
+                foreach (RaycastHit hit in hits)
                 {
-                    float tempdist = Vector3.Distance(value, hit.collider.transform.position);
-                    if (tempdist < NearestDist)
+                    if (hit.collider)
                     {
-                        NearestDist = tempdist;
-                        TrackedTransform = hit.collider.transform;
-                        TrackedObjectOffset = TrackedTransform.InverseTransformPoint(value);
+                        float tempdist = Vector3.Distance(value, hit.collider.transform.position);
+                        if (tempdist < NearestDist)
+                        {
+                            NearestDist = tempdist;
+                            TrackedTransform = hit.collider.transform;
+                            TrackedObjectOffset = TrackedTransform.InverseTransformPoint(value);
+                        }
                     }
                 }
+            }
+            else
+            {//extreme lag/late joiners if object targeted was in air/sea/not near anything
+                TrackedTransform = transform;
+                TrackedObjectOffset = TrackedTransform.InverseTransformPoint(value);
             }
             _AGMTarget = value;
         }
