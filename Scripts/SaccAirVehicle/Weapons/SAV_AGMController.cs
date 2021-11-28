@@ -30,7 +30,8 @@ public class SAV_AGMController : UdonSharpBehaviour
     public float AirPhysicsStrength = 3f;
     private bool StartTrack = false;
     private Transform VehicleCenterOfMass;
-    private Vector3 Target;
+    private Transform TargetTransform;
+    private Vector3 TargetOffset;
     private bool ColliderActive = false;
     private bool Exploding = false;
     private bool IsOwner = false;
@@ -40,7 +41,8 @@ public class SAV_AGMController : UdonSharpBehaviour
     private void Start()
     {
         VehicleCenterOfMass = EntityControl.CenterOfMass;
-        Target = (Vector3)AGMLauncherControl.GetProgramVariable("AGMTarget");
+        TargetTransform = (Transform)AGMLauncherControl.GetProgramVariable("TrackedTransform");
+        TargetOffset = (Vector3)AGMLauncherControl.GetProgramVariable("TrackedObjectOffset");
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
         AGMRigid = gameObject.GetComponent<Rigidbody>();
         MissileConstant = GetComponent<ConstantForce>();
@@ -57,6 +59,7 @@ public class SAV_AGMController : UdonSharpBehaviour
         float downspeed = Vector3.Dot(AGMRigid.velocity, transform.up);
         float ConstantRelativeForce = MissileConstant.relativeForce.z;
         Vector3 NewConstantRelativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, ConstantRelativeForce);
+        Vector3 missileToTargetVector = TargetTransform.TransformPoint(TargetOffset) - transform.position;
         MissileConstant.relativeForce = NewConstantRelativeForce;
         float DeltaTime = Time.deltaTime;
         if (!ColliderActive)
@@ -67,9 +70,8 @@ public class SAV_AGMController : UdonSharpBehaviour
                 ColliderActive = true;
             }
         }
-        if (StartTrack && Vector3.Angle(transform.forward, (Target - transform.position)) < LockAngle)
+        if (StartTrack && Vector3.Angle(transform.forward, missileToTargetVector) < LockAngle)
         {
-            Vector3 missileToTargetVector = Target - transform.position;
             Vector3 TargetDirNormalized = missileToTargetVector.normalized * TargetVectorExtension;
             Vector3 MissileVelNormalized = AGMRigid.velocity.normalized;
             Vector3 MissileForward = transform.forward;

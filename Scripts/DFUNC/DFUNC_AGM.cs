@@ -25,6 +25,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public AudioSource AGMLock;
     [Tooltip("Sound that plays when the AGM unlocks")]
     public AudioSource AGMUnlock;
+    public LayerMask LockableLayers = 2049;
     [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
     public bool AllowFiringWhenGrounded = false;
     [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
@@ -54,6 +55,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] public bool IsOwner;
+    [System.NonSerializedAttribute] public Transform TrackedTransform;
+    [System.NonSerializedAttribute] public Vector3 TrackedObjectOffset;
     private int AGMUnlocking = 0;
     private float AGMUnlockTimer;
     private float AGMRotDif;
@@ -61,9 +64,32 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private float TriggerTapTime;
     [System.NonSerializedAttribute] public int FullAGMs;
     public Transform AGMLaunchPoint;
-    public LayerMask AGMTargetsLayer;
+    public LayerMask AGMTargetsLayer = 67108864;
     private float FullAGMsDivider;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public Vector3 AGMTarget;
+    [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(AGMTarget))] public Vector3 _AGMTarget;
+    public Vector3 AGMTarget
+    {
+        set
+        {
+            RaycastHit[] hits = Physics.SphereCastAll(value, 4000, Vector3.up, 4000, LockableLayers);
+            float NearestDist = float.MaxValue;
+            foreach (RaycastHit hit in hits)
+            {
+                if (hit.collider)
+                {
+                    float tempdist = Vector3.Distance(value, hit.collider.transform.position);
+                    if (tempdist < NearestDist)
+                    {
+                        NearestDist = tempdist;
+                        TrackedTransform = hit.collider.transform;
+                        TrackedObjectOffset = TrackedTransform.InverseTransformPoint(value);
+                    }
+                }
+            }
+            _AGMTarget = value;
+        }
+        get => _AGMTarget;
+    }
     private VRCPlayerApi localPlayer;
     private bool InVR;
     private bool InEditor;
@@ -80,6 +106,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
+        TrackedTransform = transform;//avoid null
         FullAGMs = NumAGM;
         reloadspeed = FullAGMs / FullReloadTimeSec;
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
@@ -334,18 +361,17 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 else
                 {
                     float newzoom = 80;
-                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 3.5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
             }
             else
             {
                 AtGScreen.SetActive(true);
                 AtGCam.gameObject.SetActive(true);
-                AtGCam.transform.LookAt(AGMTarget, EntityControl.transform.up);
-
+                AtGCam.transform.LookAt(TrackedTransform.TransformPoint(TrackedObjectOffset), EntityControl.transform.up);
                 RaycastHit camhit;
                 Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
-                //dolly zoom //Mathf.Atan(40 <--the 40 is the height of the camera frustrum at the target distance
+                //dolly zoom //Mathf.Atan(60 <--the 60 is the height of the camera frustrum at the target distance
                 AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * SmoothDeltaTime), 0.3f);
             }
         }
