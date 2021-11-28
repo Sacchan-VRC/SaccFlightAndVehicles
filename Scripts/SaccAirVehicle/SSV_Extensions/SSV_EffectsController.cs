@@ -141,6 +141,7 @@ public class SSV_EffectsController : UdonSharpBehaviour
     {
         DoEffects = 6f; //wake up if was asleep
         VehicleAnimator.SetTrigger("reappear");
+        VehicleAnimator.SetBool("dead", false);
     }
     public void SFEXT_G_AfterburnerOn()
     {
@@ -187,6 +188,7 @@ public class SSV_EffectsController : UdonSharpBehaviour
     public void SFEXT_G_Explode()//old EffectsExplode()
     {
         VehicleAnimator.SetTrigger("explode");
+        VehicleAnimator.SetBool("dead", true);
         VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
         VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);

@@ -178,6 +178,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     {
         DoEffects = 6f; //wake up if was asleep
         VehicleAnimator.SetTrigger("reappear");
+        VehicleAnimator.SetBool("dead", false);
     }
     public void SFEXT_G_AfterburnerOn()
     {
@@ -229,6 +230,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public void SFEXT_G_Explode()//old EffectsExplode()
     {
         VehicleAnimator.SetTrigger("explode");
+        VehicleAnimator.SetBool("dead", true);
         VehicleAnimator.SetInteger("missilesincoming", 0);
         VehicleAnimator.SetFloat(PITCHINPUT_STRING, .5f);
         VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);
