@@ -60,8 +60,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
         FullGunAmmoInSeconds = GunAmmoInSeconds;
+        reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
         if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
 
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");

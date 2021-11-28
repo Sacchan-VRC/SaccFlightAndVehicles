@@ -43,6 +43,8 @@ public class SAV_FloatScript : UdonSharpBehaviour
     public float WaveScale = .04f;
     [Tooltip("How fast waves scroll across the sea")]
     public float WaveSpeed = 12;
+    [Tooltip("How high above the last hit surface the raycast starts from. Needed for large waves or any non-solid hoverable surface")]
+    public float RayCastHeight = 2;
     [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
     public bool DoOnLand = false;
     [Tooltip("If a player takes ownership of the vehicle while its floats are below the water, the new owner will not know they are below the water and it will fall through the water. Move the vehicle up by this amount to prevent this from happening.")]
@@ -191,7 +193,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
                 FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce) * _floatForce) + CompressionDifference));
                 //float is potentially below the top of the trigger, so fire a raycast from above the last known trigger height to check if it's still there
                 //the '+10': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
-                Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + 10, TopOfFloat.z);
+                Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + RayCastHeight, TopOfFloat.z);
                 if (Physics.Raycast(checksurface, -Vector3.up, out hit, 14, FloatLayers, QueryTriggerInteraction.Collide))
                 {
                     if (DoOnLand || hit.collider.isTrigger)
