@@ -208,8 +208,9 @@ public class SAV_SyncScript : UdonSharpBehaviour
                         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ExitIdleMode)); }
                     }
                     IdleUpdateMode_Last = IdleUpdateMode;
-                    O_Position = VehicleRigid.position;//send position
-                    O_Rotation_Q = VehicleRigid.rotation;
+                    //never use rigidbody values for position or rotation because the interpolation/extrapolation from update is needed for it to be smooth
+                    O_Position = VehicleTransform.position;
+                    O_Rotation_Q = VehicleTransform.rotation;
                     //convert each euler angle to shorts to save bandwidth
                     Vector3 rot = O_Rotation_Q.eulerAngles;
                     rot = new Vector3(rot.x > 180 ? rot.x - 360 : rot.x,
@@ -266,15 +267,16 @@ public class SAV_SyncScript : UdonSharpBehaviour
                   IdleUpdateMode ? Time.smoothDeltaTime : Time.smoothDeltaTime * RotationSyncAgressiveness);
 
                 //Set position to a lerp(interpolation) of last 2 extrapolations  
-                VehicleRigid.MovePosition(Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider));
-                VehicleRigid.MoveRotation(RotationLerper);
+                //never set position using rigidbody.position because it's 1 frame lagged due to waiting for a physics update before setting
+                VehicleTransform.SetPositionAndRotation(
+                    Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider),
+                       RotationLerper);
             }
             else
             {
                 //interpolation is over, just move position and rotation towards last extrapolation
                 RotationLerper = Quaternion.Slerp(RotationLerper, PredictedRotation, Time.smoothDeltaTime * SmoothingTimeDivider);
-                VehicleRigid.MovePosition(PredictedPosition);
-                VehicleRigid.MoveRotation(RotationLerper);
+                VehicleTransform.SetPositionAndRotation(PredictedPosition, RotationLerper);
             }
         }
     }
