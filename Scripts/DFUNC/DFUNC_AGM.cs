@@ -25,7 +25,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public AudioSource AGMLock;
     [Tooltip("Sound that plays when the AGM unlocks")]
     public AudioSource AGMUnlock;
-    public LayerMask LockableLayers = 2049;
+    public LayerMask LockableLayers = 133121;
     [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
     public bool AllowFiringWhenGrounded = false;
     [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
@@ -71,7 +71,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         set
         {
-            RaycastHit[] hits = Physics.SphereCastAll(value, 4000, Vector3.up, 4000, LockableLayers);
+            RaycastHit[] hits = Physics.SphereCastAll(value, 100, Vector3.up, 0, LockableLayers);
             float NearestDist = float.MaxValue;
             if (hits.Length > 0)
             {
@@ -281,7 +281,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
                                     float angle = Vector3.Angle(AtGCam.transform.forward, targetdirection);
                                     if (angle < targetangle)
                                     {
-                                        //enable for others so they sync the variable
                                         targetangle = angle;
                                         AGMTarget = target.collider.transform.position;
                                     }
