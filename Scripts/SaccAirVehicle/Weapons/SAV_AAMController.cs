@@ -24,6 +24,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     public string AnimINTName = "missilesincoming";
     [Tooltip("Play a random one of these explosion sounds")]
     public AudioSource[] ExplosionSounds;
+    [Tooltip("Play a random one of these explosion sounds when hitting water")]
+    public AudioSource[] WaterExplosionSounds;
     [Tooltip("Distance from own plane to enable the missile's collider, to prevent missile from colliding with own plane")]
     public float ColliderActiveDistance = 45;
     [Tooltip("Speed missile can rotate in degrees per second")]
@@ -85,6 +87,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     private float HighAspectTrack;
     private float NotchHorizonDot;
     private float NotchLimitDot;
+    private bool hitwater;
     private ConstantForce MissileConstant;
     void Start()
     {
@@ -219,6 +222,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                     if (TargetDistance < ProximityExplodeDistance)//missile flew past the target, but is within proximity explode range?
                     {
                         SplashHit = true;
+                        hitwater = false;
                         Explode();
                     }
                     UnlockTime += DeltaTime;
@@ -244,11 +248,17 @@ public class SAV_AAMController : UdonSharpBehaviour
     public void DisbaleLockHack()
     { LockHack = false; }
     public void LifeTimeExplode()
-    { if (!Exploding) { Explode(); } }
+    { if (!Exploding) { hitwater = false; Explode(); } }
     private void OnTriggerEnter(Collider other)
     {
         if (other && other.gameObject.layer == 4 /* water */)
-        { if (!Exploding) { Explode(); } }
+        {
+            if (!Exploding)
+            {
+                hitwater = true;
+                Explode();
+            }
+        }
     }
     public void DestroySelf()
     { Destroy(gameObject); }
@@ -266,6 +276,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                     //Debug.Log("DIRECTHIT");
                 }
             }
+            hitwater = false;
             Explode();
         }
     }
@@ -278,11 +289,20 @@ public class SAV_AAMController : UdonSharpBehaviour
         }
         Exploding = true;
         TargetLost = true;
-        if (ExplosionSounds.Length > 0)
+        if (hitwater && WaterExplosionSounds.Length > 0)
         {
-            int rand = Random.Range(0, ExplosionSounds.Length);
-            ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
-            ExplosionSounds[rand].Play();
+            int rand = Random.Range(0, WaterExplosionSounds.Length);
+            WaterExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
+            WaterExplosionSounds[rand].Play();
+        }
+        else
+        {
+            if (ExplosionSounds.Length > 0)
+            {
+                int rand = Random.Range(0, ExplosionSounds.Length);
+                ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
+                ExplosionSounds[rand].Play();
+            }
         }
         if (MissileIncoming)
         {
@@ -323,6 +343,7 @@ public class SAV_AAMController : UdonSharpBehaviour
             }
         }
         AAMani.SetTrigger("explode");
+        AAMani.SetBool("hitwater", hitwater);
         SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
     }
 }

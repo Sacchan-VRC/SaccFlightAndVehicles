@@ -14,6 +14,8 @@ public class SAV_BombController : UdonSharpBehaviour
     public float ExplosionLifeTime = 10;
     [Tooltip("Play a random one of these explosion sounds")]
     public AudioSource[] ExplosionSounds;
+    [Tooltip("Play a random one of these explosion sounds when hitting water")]
+    public AudioSource[] WaterExplosionSounds;
     public float LaunchSpeed = 0;
     [Tooltip("Spawn bomb at a random angle up to this number")]
     public float AngleRandomization = 1;
@@ -31,6 +33,7 @@ public class SAV_BombController : UdonSharpBehaviour
     private bool ColliderActive = false;
     private CapsuleCollider BombCollider;
     private Transform VehicleCenterOfMass;
+    private bool hitwater;
     private bool IsOwner;
 
     private void Start()
@@ -64,15 +67,21 @@ public class SAV_BombController : UdonSharpBehaviour
         BombConstant.relativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0);
     }
     public void LifeTimeExplode()
-    { if (!Exploding) { Explode(); } }
+    { if (!Exploding) { hitwater = false; Explode(); } }
     public void DestroySelf()
     { Destroy(gameObject); }
     private void OnCollisionEnter(Collision other)
-    { if (!Exploding) { Explode(); } }
+    { if (!Exploding) { hitwater = false; Explode(); } }
     private void OnTriggerEnter(Collider other)
     {
         if (other && other.gameObject.layer == 4 /* water */)
-        { if (!Exploding) { Explode(); } }
+        {
+            if (!Exploding)
+            {
+                hitwater = true;
+                Explode();
+            }
+        }
     }
     private void Explode()
     {
@@ -82,17 +91,27 @@ public class SAV_BombController : UdonSharpBehaviour
             BombRigid.velocity = Vector3.zero;
         }
         Exploding = true;
-        if (ExplosionSounds.Length > 0)
+        if (hitwater && WaterExplosionSounds.Length > 0)
         {
-            int rand = Random.Range(0, ExplosionSounds.Length);
-            ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
-            ExplosionSounds[rand].Play();
+            int rand = Random.Range(0, WaterExplosionSounds.Length);
+            WaterExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
+            WaterExplosionSounds[rand].Play();
+        }
+        else
+        {
+            if (ExplosionSounds.Length > 0)
+            {
+                int rand = Random.Range(0, ExplosionSounds.Length);
+                ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
+                ExplosionSounds[rand].Play();
+            }
         }
         BombCollider.enabled = false;
         Animator Bombani = GetComponent<Animator>();
         if (IsOwner)
         { Bombani.SetTrigger("explodeowner"); }
         else { Bombani.SetTrigger("explode"); }
+        Bombani.SetBool("hitwater", hitwater);
         SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
     }
 }

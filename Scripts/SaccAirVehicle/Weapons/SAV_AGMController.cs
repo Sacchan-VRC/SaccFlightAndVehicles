@@ -17,6 +17,8 @@ public class SAV_AGMController : UdonSharpBehaviour
     public float FlyStraightTime = .3f;
     [Tooltip("Play a random one of these explosion sounds")]
     public AudioSource[] ExplosionSounds;
+    [Tooltip("Play a random one of these explosion sounds when hitting water")]
+    public AudioSource[] WaterExplosionSounds;
     [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from colliding with own plane")]
     public float ColliderActiveDistance = 30;
     [Tooltip("Max angle able to track target at")]
@@ -42,6 +44,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     private CapsuleCollider AGMCollider;
     private Rigidbody AGMRigid;
     private ConstantForce MissileConstant;
+    private bool hitwater;
     private void Start()
     {
         VehicleCenterOfMass = EntityControl.CenterOfMass;
@@ -89,32 +92,48 @@ public class SAV_AGMController : UdonSharpBehaviour
     public void StartTracking()
     { StartTrack = true; }
     public void LifeTimeExplode()
-    { if (!Exploding) { Explode(); } }
+    { if (!Exploding) { hitwater = false; Explode(); } }
     public void DestroySelf()
     { Destroy(gameObject); }
     private void OnCollisionEnter(Collision other)
-    { if (!Exploding) { Explode(); } }
+    { if (!Exploding) { hitwater = false; Explode(); } }
     private void OnTriggerEnter(Collider other)
     {
         if (other && other.gameObject.layer == 4 /* water */)
-        { if (!Exploding) { Explode(); } }
+        {
+            if (!Exploding)
+            {
+                hitwater = true;
+                Explode();
+            }
+        }
     }
     private void Explode()
     {
         if (AGMRigid)
         { AGMRigid.constraints = RigidbodyConstraints.FreezePosition; }
         Exploding = true;
-        if (ExplosionSounds.Length > 0)
+        if (hitwater && WaterExplosionSounds.Length > 0)
         {
-            int rand = Random.Range(0, ExplosionSounds.Length);
-            ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
-            ExplosionSounds[rand].Play();
+            int rand = Random.Range(0, WaterExplosionSounds.Length);
+            WaterExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
+            WaterExplosionSounds[rand].Play();
+        }
+        else
+        {
+            if (ExplosionSounds.Length > 0)
+            {
+                int rand = Random.Range(0, ExplosionSounds.Length);
+                ExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
+                ExplosionSounds[rand].Play();
+            }
         }
         AGMCollider.enabled = false;
         Animator AGMani = gameObject.GetComponent<Animator>();
         if (IsOwner)
         { AGMani.SetTrigger("explodeowner"); }
         else { AGMani.SetTrigger("explode"); }
+        AGMani.SetBool("hitwater", hitwater);
         SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
     }
 }
