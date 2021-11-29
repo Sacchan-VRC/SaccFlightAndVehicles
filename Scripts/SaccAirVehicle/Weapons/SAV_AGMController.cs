@@ -59,8 +59,8 @@ public class SAV_AGMController : UdonSharpBehaviour
         float downspeed = Vector3.Dot(AGMRigid.velocity, transform.up);
         float ConstantRelativeForce = MissileConstant.relativeForce.z;
         Vector3 NewConstantRelativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, ConstantRelativeForce);
-        Vector3 missileToTargetVector = TargetTransform.TransformPoint(TargetOffset) - transform.position;
         MissileConstant.relativeForce = NewConstantRelativeForce;
+        Vector3 missileToTargetVector = TargetTransform.TransformPoint(TargetOffset) - transform.position;
         float DeltaTime = Time.deltaTime;
         if (!ColliderActive)
         {
