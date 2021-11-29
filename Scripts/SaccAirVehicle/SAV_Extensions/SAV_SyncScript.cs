@@ -166,6 +166,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     {
         ExitIdleMode();
         UpdatesSentWhileStill = 0;
+        //make it teleport instead of interpolating
         ExtrapolationDirection = Vector3.zero;
         LastExtrapolationDirection = Vector3.zero;
         VehicleTransform.position = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_LastPosition = O_Position;

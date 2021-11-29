@@ -84,7 +84,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                         {
                             NearestDist = tempdist;
                             TrackedTransform = hit.collider.transform;
-                            TrackedObjectOffset = TrackedTransform.InverseTransformPoint(value);
+                            TrackedObjectOffset = TrackedTransform.InverseTransformPoint(hit.collider.ClosestPoint(value));
                         }
                     }
                 }
