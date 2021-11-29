@@ -322,10 +322,9 @@ public class SAV_SyncScript : UdonSharpBehaviour
             O_CurVelLast = O_CurVel;
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             //and if the updates aren't being recieved at the expected time (by more than 50%), don't bother with acceleration as it could be huge
+            Acceleration = (CurrentVelocity - CurrentVelocityLast);//acceleration is difference in velocity
             if (IdleUpdateMode || Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero)
             { Acceleration = Vector3.zero; }
-            else
-            { Acceleration = (CurrentVelocity - CurrentVelocityLast); }//acceleration is difference in velocity
 
             //convert short back to angle (0-65536 to 0-360)
             O_Rotation_Q = Quaternion.Euler(new Vector3(O_RotationX, O_RotationY, O_RotationZ) * .0054931640625f);

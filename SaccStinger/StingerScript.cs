@@ -412,7 +412,6 @@ public class StingerScript : UdonSharpBehaviour
             GameObject NewAAM = VRCInstantiate(AAM);
             NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             NewAAM.SetActive(true);
-            NewAAM.GetComponent<Rigidbody>().velocity = StingerRigid.velocity + (NewAAM.transform.forward * 7);
         }
         if (StingerAnimator) { StingerAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
         if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }

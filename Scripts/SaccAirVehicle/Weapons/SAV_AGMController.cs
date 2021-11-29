@@ -28,6 +28,10 @@ public class SAV_AGMController : UdonSharpBehaviour
     public float TargetVectorExtension = 1.2f;
     [Tooltip("Strength of the forces applied to the sides of the missiles as it drifts through the air when it turns")]
     public float AirPhysicsStrength = 3f;
+    [Tooltip("This velocity is added to the missile when it spawns.")]
+    public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
+    [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
+    public bool ThrowSpaceVehicle = false;
     private bool StartTrack = false;
     private Transform VehicleCenterOfMass;
     private Transform TargetTransform;
@@ -46,6 +50,7 @@ public class SAV_AGMController : UdonSharpBehaviour
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
         AGMRigid = gameObject.GetComponent<Rigidbody>();
         MissileConstant = GetComponent<ConstantForce>();
+        AGMRigid.velocity += (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
 
         if (EntityControl.InEditor) { IsOwner = true; }
         else

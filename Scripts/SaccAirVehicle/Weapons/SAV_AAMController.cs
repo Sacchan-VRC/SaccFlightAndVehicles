@@ -24,7 +24,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     public string AnimINTName = "missilesincoming";
     [Tooltip("Play a random one of these explosion sounds")]
     public AudioSource[] ExplosionSounds;
-    [Tooltip("Distance from plane to enable the missile's collider, to prevent missile from collider with own plane")]
+    [Tooltip("Distance from own plane to enable the missile's collider, to prevent missile from colliding with own plane")]
     public float ColliderActiveDistance = 45;
     [Tooltip("Speed missile can rotate in degrees per second")]
     public float RotSpeed = 180;
@@ -54,6 +54,10 @@ public class SAV_AAMController : UdonSharpBehaviour
     [Range(-90f, 90f)]
     [Tooltip("Degrees above the missile's horizon at which notching the missile becomes impossible")]
     public float NotchHorizon = 5;
+    [Tooltip("This velocity is added to the missile when it spawns.")]
+    public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
+    [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
+    public bool ThrowSpaceVehicle = true;
     private UdonSharpBehaviour TargetSAVControl;
     private Animator TargetAnimator;
     SaccEntity TargetEntityControl;
@@ -96,6 +100,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         MissileConstant = GetComponent<ConstantForce>();
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
+        MissileRigid.velocity = MissileRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
         Target = AAMTargets[aamtarg].transform;
         NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
         NotchLimitDot = 1 - Mathf.Cos(NotchAngle * Mathf.Deg2Rad);

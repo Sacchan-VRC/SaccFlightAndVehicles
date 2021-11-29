@@ -14,7 +14,7 @@ public class SaccFlightMenu : MonoBehaviour
         SetLayerName(26, "AGMTargets");
         SetLayerName(27, "ReSupply");
         SetLayerName(28, "Racing");
-        SetLayerName(31, "OnBoardPlaneLayer");
+        SetLayerName(31, "OnBoardVehicleLayer");
     }
     private static void SetLayerName(int layer, string name)
     {
