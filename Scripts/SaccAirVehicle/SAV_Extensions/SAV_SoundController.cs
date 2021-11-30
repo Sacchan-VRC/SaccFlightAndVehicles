@@ -22,6 +22,8 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource ABOnOutside;
     [Tooltip("One shot sounds, a random one is played when vehicle touches the ground")]
     public AudioSource[] TouchDown;
+    [Tooltip("One shot sounds, a random one is played when vehicle touches the water (if it can float)")]
+    public AudioSource[] TouchDownWater;
     [Tooltip("Vehicle has to be moving faster than this to play the touchdown sound. Meters/s")]
     public float TouchDownSoundSpeed = 35;
     [Tooltip("'Wind' sound that gets louder with AoA and various other factors")]
@@ -64,6 +66,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool PlaneIdleNull = true;
     [System.NonSerializedAttribute] public bool ThrustNull = true;
     [System.NonSerializedAttribute] public bool TouchDownNull = true;
+    [System.NonSerializedAttribute] public bool TouchDownWaterNull = true;
     [System.NonSerializedAttribute] public bool SonicBoomNull = true;
     [System.NonSerializedAttribute] public bool ExplosionNull = true;
     [System.NonSerializedAttribute] public bool BulletHitNull = true;
@@ -123,6 +126,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         PlaneIdleNull = PlaneIdle.Length < 1;
         ThrustNull = Thrust.Length < 1;
         TouchDownNull = TouchDown.Length < 1;
+        TouchDownWaterNull = TouchDownWater.Length < 1;
         SonicBoomNull = SonicBoom.Length < 1;
         ExplosionNull = Explosion.Length < 1;
         BulletHitNull = BulletHit.Length < 1;
@@ -583,7 +587,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         { Taxiing = true; }
         if ((float)SAVControl.GetProgramVariable("Speed") > TouchDownSoundSpeed)
         {
-            PlayTouchDownSound();
+            PlayTouchDownWaterSound();
         }
     }
     public void SFEXT_G_TakeOff()
@@ -641,7 +645,14 @@ public class SAV_SoundController : UdonSharpBehaviour
             TouchDown[Random.Range(0, TouchDown.Length)].Play();
         }
     }
-    //called form DFUNC_Canopy Delayed by canopy close time when playing the canopy animation, can be used to close any door
+    public void PlayTouchDownWaterSound()
+    {
+        if (!TouchDownWaterNull)
+        {
+            TouchDownWater[Random.Range(0, TouchDownWater.Length)].Play();
+        }
+    }
+    //called by DFUNC_Canopy Delayed by canopy close time when playing the canopy animation, can be used to close any door
     public void DoorClose()
     {
         DoorsOpen -= 1;
