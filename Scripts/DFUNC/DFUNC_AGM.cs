@@ -71,7 +71,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     {
         set
         {
-            RaycastHit[] hits = Physics.SphereCastAll(value, 100, Vector3.up, 0, LockableLayers);
+            RaycastHit[] hits = Physics.SphereCastAll(value, 150, Vector3.up, 0, LockableLayers, QueryTriggerInteraction.Ignore);
             float NearestDist = float.MaxValue;
             if (hits.Length > 0)
             {
@@ -90,8 +90,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 }
             }
             else
-            {//extreme lag/late joiners if object targeted was in air/sea/not near anything
-                TrackedTransform = transform;
+            {//extreme lag/late joiners if object targeted was in air/sea/not near anything (or if trying to lock terrain apparently)
+                TrackedTransform = transform.root;//hopefully a non-moving object
                 TrackedObjectOffset = TrackedTransform.InverseTransformPoint(value);
             }
             _AGMTarget = value;
@@ -216,8 +216,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     private void RaycastLock()
     {
         RaycastHit lockpoint;
-        if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore))
-        {//enable for others so they sync the variable
+        if (Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out lockpoint, Mathf.Infinity, LockableLayers, QueryTriggerInteraction.Ignore))
+        {
             AGMTarget = lockpoint.point;
             AGMLocked = true;
             AGMUnlocking = 0;
