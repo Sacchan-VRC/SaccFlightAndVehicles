@@ -103,7 +103,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public bool InvertITRYaw = false;
     [Tooltip("Yawing added to the vehicle with changes in throttle")]
     public float AdverseYaw = 0;
-    [Tooltip("Rolling added to the vehicle with changes in throttle")]
+    [Tooltip("Rolling added to the vehicle with the throttle up flying below RotMultiMaxSpeed. Lower speed = more adverse roll.")]
     public float AdverseRoll = 0;
     [Tooltip("Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear. (Meters/second)")]
     public float RotMultiMaxSpeed = 220f;
@@ -1094,7 +1094,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
                     float outputdif = (EngineOutput - EngineOutputLastFrame) / DeltaTime;//divide by deltatime to counter the *deltatime added by the constantforce
                     float ADVYaw = outputdif * AdverseYaw;
-                    float ADVRoll = outputdif * AdverseRoll;
+                    float ADVRoll = (1 - rotlift) * AdverseRoll * EngineOutput;
                     EngineOutputLastFrame = EngineOutput;
                     //used to add rotation friction
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);

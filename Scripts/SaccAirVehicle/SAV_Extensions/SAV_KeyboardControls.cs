@@ -7,6 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_KeyboardControls : UdonSharpBehaviour
 {
+    [Header("Some functions may have their own keyboard controls options.")]
     public UdonSharpBehaviour Lfunc1;
     public KeyCode Lfunc1key;
     public UdonSharpBehaviour Lfunc2;

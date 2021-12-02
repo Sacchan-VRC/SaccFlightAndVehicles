@@ -9,8 +9,18 @@ Support:
 https://ko-fi.com/sacchanvrc
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.51
-Stopped using reserved2 layer
-SaccFlight menu started
+Stopped using reserved2 layer (planes falling through floor)
+SaccFlight menu started (Rename layers option)
+AGMs can lock moving targets
+Added splash effect for missiles hitting water
+'Throw' variable to give missiles initial launch speed
+Syncscript improvement (less jerky when watching someone crash/enter catapult)
+Syncscript now has a proper 'slow mode' that smooths properly
+Hoverbike stops hovering when out of fuel
+Added 'dead' bool to animators
+Stopped 'pitchdown' related physics from effecting yaw
+SS-1 (boat) now sinks with physics rather than animation
+All vehicles move their pivots to CoM on start, to improve rotation sync
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Modularization Update 1.5
 Split functionality of EngineController into many different scripts allowing for greater customization
@@ -218,7 +228,12 @@ Implemented (unrealistic) increased lift at higher speeds, you can now fall down
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-The most important change from 1.5 to 1.51 is that the OnboardVehicleLayer has changed from 19 to 31 due to VRChat update changing layer 19. Vehicles on set to 19 will fall into to the ground when entered.
+1.51 update stuff:
+The most important change from 1.5 to 1.51 is that the OnboardVehicleLayer has changed from 19 to 31 due to VRChat update changing layer 19. Vehicles set to 19 will fall into to the ground when entered.
+The weapon prefabs hierarchys have been updated to make them a little easier to customize (animations have changed to match), and the splash particle system has been added.
+The missile animator now has 2 layers, one for exploding, and one for changing active particle system if it hit land or water
+The 'Move origin to CoM' feature moves the SaccEntity object to the position of the CoM, and moves all of it's first children the oposite amount. DO NOT ANIMATE POSITION OF THE FIRST CHILDREN. IT WILL BRAKE.
+SC-1 had a first child animated in 1.5. I just added an extra empty and animated the child of that (and updated the animation references).
 
 Version 1.5 has the largest changes of any update so far. I intentionally disregarded compatability/ease of update in order to modularize and improve functionality as much as possible.
 Updating old projects with custom vehicles will be a challenge. Old animations can be reused but may require some adjustments.
@@ -261,6 +276,8 @@ The 'Respawn' animation is no longer needed as respawning is handled by delayed 
 Due to the new custom position syncing script, more network data is being used, and the maximum limit for number of vehicles has decreased.
 The limit is around 12 with default settings, probably more if you increase Update Interval.
 
+Esnya has made some addon scripts that may make your life easier. This document assumes you aren't using them, and I don't use them myself.
+https://github.com/esnya/EsnyaSFAddons
 ================================================================================================================
 
 Inside the /Prefabs folder are individual prefabs for each vehicle, you can place them and they should work right away.
@@ -270,7 +287,7 @@ I recommend using CyanEmu to test things inside of Unity editor.
 Open the example scene 'SaccFlightExample.unity' to see an example of vehicles set up to work with the Killsboard and racing scripts.
 
 Race set up:
-There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object you can remove this if you don't intend to use it. It should be disabled by default, it's enabled when a race is selected with the racebutton.
+There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object, you can remove this if you don't intend to use it. It should be disabled by default, it's enabled when a race is selected with the racebutton.
 The RaceToggleButton has a list of SaccRaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tell the racingtriggers to switch to the selected race.
 You must place a reference to every Race, and RacingTrigger(for each plane) inside the RaceToggleButton.
 Each race has its own script called SaccRaceCourseAndScoreBoard. This contains references for its race's checkpoints, and has text objects for displaying the times.
