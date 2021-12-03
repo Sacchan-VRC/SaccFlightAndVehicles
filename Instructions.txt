@@ -331,10 +331,12 @@ The Strength and Friction values for pitch, yaw, and roll are important, and bot
 Rot Multi Max Speed will need to be adjusted for planes with different speeds. It's the speed at which (in meters per second) the plane reaches maximum responsiveness.
 Vel Straighten Str Pitch/Yaw are Very important to the handling of the plane. They push the nose toward the velocity direction. (they also interact with pitch and yaw strength)
 Lift and Max Lift are also very important, and a bit tricky to tweak. If max lift is too high you can end up with a plane that can fly in circles extremely quickly.
-The Vel Lift/Max values are used to prevent the plane's nose from dropping constantly (coutner gravity). Find a Vel Lift Max value that keeps the nose steady, Max is 10 by default but technically should be 9.81 to counter gravity exactly
+The Vel Lift/Max values are used to prevent the plane's nose from dropping constantly (counter gravity). Find a Vel Lift Max value that keeps the nose steady, Max is 10 by default but technically should be 9.81 to counter gravity exactly
 Vel Lift value is used to decide how quickly the plane reaches Vel Lift Max.
-If you make a heavier plane with a greater rigidbody mass value, you will have to tweak all of the values a lot.
 Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue.
+
+If you use the 'Auto Adjust Values To Mass' option, you can set the rigidbody mass to any value you wish with no effect on the performance of the vehicle.
+Using this option you will notice a lot of the SaccAirVehicle's values change when entering play mode. If you wish to tweak values during play mode, set the rigidbody mass to 1 temporarily so that they don't change.
 
 Tips for VTOL Only aircraft:
 For helicopters, keep the VTOL Thrust Vec values at 1, and adjust Pitch Yaw and Roll Strength
@@ -346,13 +348,13 @@ the Vel Straighten values are just as important for the handling of helicopters 
 
 This file used to contain explanations of every variable in every script, that information is now contained in the tooltips of the variables. Hold the mouse still over a variable name in unity to see a description of what it does.
 
-The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with reserved2 layer. The plane is set to reserved2 you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
+The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with layer (OnBoardVehicleLayer(31)). The plane is set to OnBoardVehicleLayer you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
 
 The hud can be made to appear smaller by moving all children of the 'bigstuff' object +Z local. 'bigstuff' is a child of HudController.
 
 Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController or modular functions).
 Doing animations using the animator is most performant, so I've used it where possible. Some HUD stuff included.
-When making a custom plane, you must customize a number of the animations, I recommend duplicating the SF-1's animation controller, and replacing the animations that need replacing.
+When making a custom plane, you must customize a number of the animations, I recommend duplicating the SF-1's animation controller and animations, and modifying the animations that need changing.
 Likely to need replacing animations:
 AAMs
 AGMs
