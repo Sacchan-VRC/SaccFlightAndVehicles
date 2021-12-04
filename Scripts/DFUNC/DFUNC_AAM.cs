@@ -31,8 +31,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public string AnimFiredTriggerName = "aamlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     public bool AnimBoolStayTrueOnExit;
-    [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private short _AAMFire;
-    public short AAMFire
+    [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private ushort _AAMFire;
+    public ushort AAMFire
     {
         set
         {

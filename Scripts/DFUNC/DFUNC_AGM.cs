@@ -38,8 +38,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public string AnimFiredTriggerName = "agmlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     public bool AnimBoolStayTrueOnExit;
-    [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private short _AGMFire;
-    public short AGMFire
+    [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private ushort _AGMFire;
+    public ushort AGMFire
     {
         set
         {

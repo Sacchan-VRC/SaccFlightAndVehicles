@@ -34,8 +34,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public bool AnimBoolStayTrueOnExit;
     public Camera AtGCam;
     public GameObject AtGScreen;
-    [UdonSynced, FieldChangeCallback(nameof(BombFire))] private short _BombFire;
-    public short BombFire
+    [UdonSynced, FieldChangeCallback(nameof(BombFire))] private ushort _BombFire;
+    public ushort BombFire
     {
         set
         {

@@ -73,6 +73,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         CenterOfMass = EntityControl.CenterOfMass;
         OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
         GunRecoil *= VehicleRigidbody.mass;
+        GunDamageParticle.gameObject.SetActive(false);
 
         FindSelf();
 

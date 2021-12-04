@@ -7,6 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Catapult : UdonSharpBehaviour
 {
+    [Header("The position of this gameobject is important. It decides what point on the plane locks to the catapult.")]
     public UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;

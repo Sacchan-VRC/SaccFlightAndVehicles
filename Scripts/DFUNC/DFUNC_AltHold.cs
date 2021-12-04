@@ -24,7 +24,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     private float AltHoldPitchProportional = 1f;
     private float AltHoldPitchIntegral = 1f;
     private float AltHoldPitchIntegrator;
-    private float AltHoldPitchlastframeerror;
+    //private float AltHoldPitchlastframeerror;
     private float AltHoldRollProportional = -.005f;
     private bool Piloting;
     private bool InVR;
@@ -87,7 +87,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
         }
     }
-    public void SFEXT_O_JoystickGrabbed()
+    public void SFEXT_O_JoystickDropped()
     { AltHoldPitchIntegrator = 0; }
     public void ActivateAltHold()
     {
@@ -152,12 +152,11 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             AltHoldPitchIntegrator += error * DeltaTime;
             //AltHoldPitchIntegrator = Mathf.Clamp(AltHoldPitchIntegrator, AltHoldPitchIntegratorMin, AltHoldPitchIntegratorMax);
             //AltHoldPitchDerivator = (error - AltHoldPitchlastframeerror) / DeltaTime;
-            AltHoldPitchlastframeerror = error;
+            //AltHoldPitchlastframeerror = error;
             RotationInputs.x = AltHoldPitchProportional * error;
             RotationInputs.x += AltHoldPitchIntegral * AltHoldPitchIntegrator;
             //RotationInputs.x += AltHoldPitchDerivative * AltHoldPitchDerivator; //works but spazzes out real bad
             RotationInputs.x = Mathf.Clamp(RotationInputs.x, -1, 1);
-            AltHoldPitchlastframeerror = error;
 
             //Roll
             float ErrorRoll = VehicleTransform.localEulerAngles.z;
