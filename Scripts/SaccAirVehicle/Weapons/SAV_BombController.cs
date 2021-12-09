@@ -29,7 +29,7 @@ public class SAV_BombController : UdonSharpBehaviour
     private SaccEntity EntityControl;
     private ConstantForce BombConstant;
     private Rigidbody BombRigid;
-    private bool Exploding = false;
+    [System.NonSerializedAttribute] public bool Exploding = false;
     private bool ColliderActive = false;
     private CapsuleCollider BombCollider;
     private Transform VehicleCenterOfMass;

@@ -22,7 +22,7 @@ public class SAV_RocketController : UdonSharpBehaviour
     public float AngleRandomization = 0;
     private Rigidbody BombRigid;
     private SaccEntity EntityControl;
-    private bool Exploding = false;
+    [System.NonSerializedAttribute] public bool Exploding = false;
     private CapsuleCollider RocketCollider;
     private Transform VehicleCenterOfMass;
     private bool hitwater;

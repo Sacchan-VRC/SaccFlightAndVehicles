@@ -66,7 +66,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool LockHack = true;
     private Transform Target;
     private bool ColliderActive = false;
-    private bool Exploding = false;
+    [System.NonSerializedAttribute] public bool Exploding = false;
     private CapsuleCollider AAMCollider;
     private bool MissileIncoming = false;
     private Rigidbody MissileRigid;

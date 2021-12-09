@@ -114,6 +114,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
         CanopyBroken = false;
         CanopyAnimator.SetBool(AnimCanopyBroken, false);
         if ((bool)SAVControl.GetProgramVariable("IsOwner")) { SendCustomEventDelayedFrames(nameof(SendCanopyRepair), 1); }
+        if (CanopyOpen) { CanopyClosing(); }
     }
     private void Update()
     {

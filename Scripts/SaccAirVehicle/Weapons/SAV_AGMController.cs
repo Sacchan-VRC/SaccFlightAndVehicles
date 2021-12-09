@@ -39,7 +39,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     private Transform TargetTransform;
     private Vector3 TargetOffset;
     private bool ColliderActive = false;
-    private bool Exploding = false;
+    [System.NonSerializedAttribute] public bool Exploding = false;
     private bool IsOwner = false;
     private CapsuleCollider AGMCollider;
     private Rigidbody AGMRigid;

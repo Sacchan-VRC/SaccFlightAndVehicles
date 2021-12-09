@@ -10,7 +10,7 @@ public class SaccEntitySendEvent : UdonSharpBehaviour
     public SaccEntity EntityControl;
     [Tooltip("Name of event to send to the SaccEntity")]
     public string EventName;
-    private bool Global = false;
+    public bool Global = false;
     public override void Interact()
     {
         if (Global)
