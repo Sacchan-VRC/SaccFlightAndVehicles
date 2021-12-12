@@ -42,10 +42,12 @@ public class SaccRaceCourseAndScoreboard : UdonSharpBehaviour
     public void UpdateMyLastTime()
     {
         MyLastTime = string.Concat("My Last Time : ", MyPlaneType, " : ", MyTime);
+        UpdateTimes();
     }
     public void UpdateMyRecord()
     {
         MyRecord = string.Concat("My Record : ", MyPlaneType, " : ", MyTime);
+        UpdateTimes();
     }
     public void UpdateInstanceRecord()
     {
