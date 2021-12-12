@@ -13,7 +13,16 @@ public class SaccRaceCourseAndScoreboard : UdonSharpBehaviour
     [Tooltip("Parent of all objects related to this race, including scoreboard and checkpoints")]
     public GameObject RaceObjects;
     public Text TimeText;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public string InstanceRecord = "Instance Record : None";
+    [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(InstanceRecord))] private string _InstanceRecord = "Instance Record : None";
+    public string InstanceRecord
+    {
+        set
+        {
+            _InstanceRecord = value;
+            UpdateTimes();
+        }
+        get => _InstanceRecord;
+    }
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public float BestTime = 999999;
     [System.NonSerializedAttribute] public string MyRecord = "My Record : None";
     [System.NonSerializedAttribute] public string MyLastTime = "My Last Time : None";

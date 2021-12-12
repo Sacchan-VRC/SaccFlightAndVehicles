@@ -18,7 +18,6 @@ public class SaccRacingTrigger : UdonSharpBehaviour
     private int NextCheckpoint;
     private int FinalCheckpoint;
     private bool RaceOn;
-    private float RaceEndCheck = 0;
     private float RaceStartTime = 0;
     private float RaceTime;
     private Animator CurrentCheckPointAnimator;
@@ -26,7 +25,6 @@ public class SaccRacingTrigger : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private bool InEditor = false;
     private float LastTime;
-    private bool FinishedRace = true;
     private bool DoSubFrameTimeCheck;
     private LayerMask ThisObjLayer;
     private float LastFrameCheckpointDist;
@@ -53,39 +51,18 @@ public class SaccRacingTrigger : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null) { InEditor = true; }
     }
+    public void SendUpdateTimes()
+    { CurrentCourse.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "UpdateTimes"); }
+    public void SetTimerEmpty()
+    { TimeText_Cockpit.text = string.Empty; }
+    void Start()
+    { SetTimerEmpty(); }
     private void Update()
     {
         if (RaceOn)
         {
-            RaceEndCheck = 0;
             RaceTime = Time.time - RaceStartTime;
             TimeText_Cockpit.text = RaceTime.ToString();
-        }
-        else
-        {
-            bool TwoSecAfterRace = RaceEndCheck > 2f;
-            if (FinishedRace && TwoSecAfterRace)//send the record update event 2 seconds after finishing the race so that the record synced string has time to sync before updating
-            {
-                FinishedRace = false;
-                if (InEditor)
-                {
-                    CurrentCourse.UpdateTimes();
-                }
-                else
-                {
-                    CurrentCourse.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "UpdateTimes");
-                }
-                TimeText_Cockpit.text = LastTime.ToString();
-            }
-            else if (!TwoSecAfterRace)
-            {
-                RaceEndCheck += Time.deltaTime;
-                TimeText_Cockpit.text = LastTime.ToString();
-            }
-            else
-            {
-                TimeText_Cockpit.text = string.Empty;
-            }
         }
     }
     private void FixedUpdate()
@@ -143,7 +120,6 @@ public class SaccRacingTrigger : UdonSharpBehaviour
                 RaceTime = LastTime = (Time.time - RaceStartTime - subframetime);
                 RaceOn = false;
                 NextCheckpoint = 0;
-                FinishedRace = true;
 
                 if (Utilities.IsValid(CurrentCheckPointAnimator))
                 { CurrentCheckPointAnimator.SetBool("Current", false); }
@@ -171,6 +147,8 @@ public class SaccRacingTrigger : UdonSharpBehaviour
                     CurrentCourse.RequestSerialization();
                 }
                 RaceTime = 0;
+                TimeText_Cockpit.text = LastTime.ToString();
+                SendCustomEventDelayedSeconds(nameof(SetTimerEmpty), 2);
             }
             else if (NextCheckpoint == 0)//starting the race
             {
@@ -187,7 +165,6 @@ public class SaccRacingTrigger : UdonSharpBehaviour
 
                 //Debug.Log("Start Race!");
                 RaceStartTime = Time.time - subframetime;
-                FinishedRace = false;
                 RaceOn = true;
                 NextCheckpoint++;
                 ProgressCheckPointAnims();
@@ -236,10 +213,8 @@ public class SaccRacingTrigger : UdonSharpBehaviour
     public void SetUpNewRace()
     {
         if (!Initialized) { Initialize(); }
-        FinishedRace = false;//don't send time on disable unless race finished
         RaceOn = false;
         RaceTime = 0;
-        RaceEndCheck = 9999f;
         NextCheckpoint = 0;
         if (CheckDisallowedRace())
         {
@@ -252,23 +227,12 @@ public class SaccRacingTrigger : UdonSharpBehaviour
     {
         SetUpNewRace();
         StartCheckPointAnims();
+        SetTimerEmpty();
     }
     void OnDisable()
     {
         if (CurrentCourse)
         {
-            if (CurrentCourseSelection != -1 && FinishedRace)
-            {
-                FinishedRace = false;
-                if (InEditor)
-                {
-                    CurrentCourse.UpdateTimes();
-                }
-                else
-                {
-                    CurrentCourse.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "UpdateTimes");
-                }
-            }
             if (Utilities.IsValid(CurrentCheckPointAnimator))
             {
                 CurrentCheckPointAnimator.SetBool("Current", false);
