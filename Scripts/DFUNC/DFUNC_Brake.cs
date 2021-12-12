@@ -186,7 +186,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                         }
                     }
                 }
-                if (!HasAirBrake)
+                if (!HasAirBrake && !(bool)SAVControl.GetProgramVariable("Taxiing"))
                 {
                     BrakeInput = 0;
                 }
