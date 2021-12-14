@@ -121,7 +121,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
         float DeltaTime = Time.deltaTime;
         if (Selected)
         {
-            TimeSinceSerialization += DeltaTime;
             float Trigger;
             if (UseLeftTrigger)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
@@ -135,7 +134,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
                     firing = true;
                 }
                 GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
-
             }
             else
             {
@@ -144,11 +142,6 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
                     firing = false;
                 }
-            }
-            if (TimeSinceSerialization > 1f)
-            {
-                TimeSinceSerialization = 0;
-                RequestSerialization();
             }
         }
         else
@@ -172,6 +165,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             }
             if (TimeSinceSerialization > .3f)
             {
+                TimeSinceSerialization = 0;
                 GunRotation.x = Minigun.rotation.eulerAngles.x;
                 GunRotation.y = Minigun.rotation.eulerAngles.y;
                 RequestSerialization();

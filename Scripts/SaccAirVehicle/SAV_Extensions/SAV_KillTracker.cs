@@ -30,6 +30,7 @@ public class SAV_KillTracker : UdonSharpBehaviour
             EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
             EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotAKill");
         }
+        if (localPlayer.IsOwner(KillsBoard.gameObject)) { KillsBoard.PlaneDied(); }
     }
     public void SFEXT_O_PilotEnter()
     {

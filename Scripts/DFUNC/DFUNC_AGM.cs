@@ -185,6 +185,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
         TriggerLastFrame = true;
         func_active = true;
         gameObject.SetActive(true);
+        AtGScreen.SetActive(true);
+        AtGCam.gameObject.SetActive(true);
         if (DoAnimBool && !AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         if (!OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
@@ -354,8 +356,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
             float SmoothDeltaTime = Time.smoothDeltaTime;
             if (!AGMLocked)
             {
-                AtGScreen.SetActive(true);
-                AtGCam.gameObject.SetActive(true);
                 //if turning camera fast, zoom out
                 if (AGMRotDif < 2.5f)
                 {
@@ -373,8 +373,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
             }
             else
             {
-                AtGScreen.SetActive(true);
-                AtGCam.gameObject.SetActive(true);
                 AtGCam.transform.LookAt(TrackedTransform.TransformPoint(TrackedObjectOffset), EntityControl.transform.up);
                 RaycastHit camhit;
                 Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);

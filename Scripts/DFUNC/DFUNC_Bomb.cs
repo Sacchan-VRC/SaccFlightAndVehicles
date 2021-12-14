@@ -52,7 +52,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private float Trigger;
     private bool TriggerLastFrame;
     private int BombPoint = 0;
-    private float LastBombDropTime = 0f;
+    private float LastBombDropTime = -999f;
     [System.NonSerializedAttribute] public int FullBombs;
     private float FullBombsDivider;
     private Transform VehicleTransform;
@@ -80,12 +80,12 @@ public class DFUNC_Bomb : UdonSharpBehaviour
 
         FindSelf();
 
-        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
+        if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
     }
     public void SFEXT_O_PilotEnter()
     {
         Piloting = true;
-        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
+        if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
     }
     public void SFEXT_G_PilotExit()
     {
@@ -103,12 +103,11 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void SFEXT_P_PassengerEnter()
     {
-        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
+        if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
     }
     public void DFUNC_Selected()
     {
         TriggerLastFrame = true;
-        LastBombDropTime = Time.time;
         func_active = true;
         gameObject.SetActive(true);
         if (DoAnimBool && !AnimOn)
@@ -155,7 +154,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullBombs);
         BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
         BombPoint = 0;
-        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
+        if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
     }
     public void EnableForOthers()
     {
@@ -184,7 +183,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
                 {
                     if (NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
                     {
-                        LastBombDropTime = Time.time;
                         BombFire++;
                         RequestSerialization();
                         if ((bool)SAVControl.GetProgramVariable("IsOwner"))
@@ -206,6 +204,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     public void LaunchBomb()
     {
+        LastBombDropTime = Time.time;
         IsOwner = localPlayer.IsOwner(gameObject);
         if (NumBomb > 0) { NumBomb--; }
         BombAnimator.SetTrigger(AnimFiredTriggerName);
@@ -220,7 +219,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
         }
         BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
-        HUDText_Bomb_ammo.text = NumBomb.ToString("F0");
+        if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
     }
     private void FindSelf()
     {

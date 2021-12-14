@@ -71,7 +71,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private bool AAMHasTarget = false;
     [System.NonSerializedAttribute] public bool AAMLocked = false;
     private bool TriggerLastFrame;
-    private float AAMLastFiredTime = 0;
+    private float AAMLastFiredTime = -999;
     private float FullAAMsDivider;
     public GameObject AAM;
     public Transform AAMLaunchPoint;
@@ -224,7 +224,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
                     {
                         if (AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                         {
-                            AAMLastFiredTime = Time.time;
                             AAMFire++;//launch AAM using set
                             RequestSerialization();
                             if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
@@ -435,6 +434,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     }
     public void LaunchAAM()
     {
+        AAMLastFiredTime = Time.time;
         if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         if (AAMAnimator) { AAMAnimator.SetTrigger(AnimFiredTriggerName); }

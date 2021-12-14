@@ -1351,7 +1351,7 @@ PrefabInstance:
     - target: {fileID: 2934804654147666134, guid: cdbe5544d54d9df4db8c46ca91add0b2,
         type: 3}
       propertyPath: m_RootOrder
-      value: 8
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 2934804654147666134, guid: cdbe5544d54d9df4db8c46ca91add0b2,
         type: 3}
@@ -2203,8 +2203,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: -179.99998, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -398, y: -74.5}
-  m_SizeDelta: {x: 622.75, y: 407.3}
+  m_AnchoredPosition: {x: -398, y: -71.1}
+  m_SizeDelta: {x: 622.75, y: 483.2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1006777695
 MonoBehaviour:
@@ -2247,7 +2247,9 @@ MonoBehaviour:
 
 
     The Killsboard only works
-    for pilots. Passengers and gunners do not contribute to kills in any way.'
+    for pilots. Passengers and gunners count as kill for thepilot if they are using
+    particle weapons, they don''t count if they are using spawned object weapons
+    (missiles/rockets).'
 --- !u!222 &1006777696
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2327,7 +2329,7 @@ PrefabInstance:
     - target: {fileID: 8333115238204019076, guid: b15ac940e1c4d934f81546cc3bed689d,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 8333115238204019076, guid: b15ac940e1c4d934f81546cc3bed689d,
         type: 3}
@@ -3443,7 +3445,7 @@ PrefabInstance:
     - target: {fileID: 4371473018670842013, guid: a6c0823150e40ac4b88e3eebf0f4931a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 4371473018670842013, guid: a6c0823150e40ac4b88e3eebf0f4931a,
         type: 3}
@@ -4042,7 +4044,7 @@ PrefabInstance:
     - target: {fileID: 7105509205813945998, guid: 63a3d81b3d854164b80641346d0f0843,
         type: 3}
       propertyPath: m_RootOrder
-      value: 10
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 7105509205813945998, guid: 63a3d81b3d854164b80641346d0f0843,
         type: 3}
@@ -5564,7 +5566,7 @@ PrefabInstance:
     - target: {fileID: 914079681766072833, guid: 28c8c7914fa9c4d4da592e668b84715a,
         type: 3}
       propertyPath: m_RootOrder
-      value: 9
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 914079681766072833, guid: 28c8c7914fa9c4d4da592e668b84715a,
         type: 3}
@@ -11247,8 +11249,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 31.14, y: 1.99}
-  m_SizeDelta: {x: 790, y: 84}
+  m_AnchoredPosition: {x: 31.14, y: 1.832}
+  m_SizeDelta: {x: 790, y: 126}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!224 &892708019451022848
 RectTransform:
@@ -18674,7 +18676,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 790, y: 84}
+  m_SizeDelta: {x: 790, y: 126}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &6196008758826689133
 GameObject:
@@ -18737,7 +18739,9 @@ MonoBehaviour:
   m_Text: '"Best Killing Spree: ", TopKiller, " : ", TopKills, "
 
     My Best Killing
-    Spree: ", MyBestKills'
+    Spree: ", MyBestKills
+
+    "Destroyed Vehicles: ", DeadVehicles'
 --- !u!23 &6239871389244401402
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -121578,9 +121582,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7139963914960175663}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 6.6, z: 5.3}
-  m_LocalScale: {x: 123.02907, y: 103.04704, z: 123.029045}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 10.5524645, z: 5.2997346}
+  m_LocalScale: {x: 123.02906, y: 154.5705, z: 123.02904}
   m_Children: []
   m_Father: {fileID: 892708019345692747}
   m_RootOrder: 1

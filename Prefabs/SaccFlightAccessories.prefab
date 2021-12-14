@@ -240,9 +240,9 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 347344449797415136}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 6.6, z: 5.3}
-  m_LocalScale: {x: 123.02907, y: 103.04704, z: 123.029045}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.00034267007, y: 10.9117985, z: 5.2997346}
+  m_LocalScale: {x: 123.02905, y: 154.57056, z: 123.02903}
   m_Children: []
   m_Father: {fileID: 7757368446971673220}
   m_RootOrder: 1
@@ -1337,8 +1337,8 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3618811167092048034}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0.00068534}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7757368446971673220}
@@ -1346,8 +1346,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 790, y: 84}
+  m_AnchoredPosition: {x: 0.000052452087, y: 0.000020503998}
+  m_SizeDelta: {x: 790, y: 126}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3618811167092048033
 CanvasRenderer:
@@ -1392,7 +1392,9 @@ MonoBehaviour:
   m_Text: '"Best Killing Spree: ", TopKiller, " : ", TopKills, "
 
     My Best Killing
-    Spree: ", MyBestKills'
+    Spree: ", MyBestKills
+
+    "Destroyed Vehicles: ", DeadVehicles'
 --- !u!1 &3762311638892371747
 GameObject:
   m_ObjectHideFlags: 0
@@ -1638,7 +1640,7 @@ Camera:
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 534768407
+    m_Bits: 533195543
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 8c3c2b7b38de3c342bfb9c0ca8275fa3, type: 2}
   m_TargetDisplay: 0
@@ -2995,8 +2997,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 10.249998, y: 1.99}
-  m_SizeDelta: {x: 790, y: 84}
+  m_AnchoredPosition: {x: 10.249998, y: 1.966}
+  m_SizeDelta: {x: 790, y: 126}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!223 &7757368446971673224
 Canvas:
