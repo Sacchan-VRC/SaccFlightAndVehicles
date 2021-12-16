@@ -187,6 +187,7 @@ public class SaccEntity : UdonSharpBehaviour
     void OnParticleCollision(GameObject other)
     {
         if (!other || dead) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
+
         LastHitParticle = other;
         SendEventToExtensions("SFEXT_L_BulletHit");
 

@@ -111,13 +111,14 @@ public class DFUNC_Flares : UdonSharpBehaviour
         int d = FlareParticles.Length;
         for (int x = 0; x < d; x++)
         {
-            //this is to make flare particles inherit the velocity of the aircraft they were launched from (inherit doesn't work because non-owners don't have access to rigidbody velocity.)
-            var emitParams = new ParticleSystem.EmitParams();
-            Vector3 curspd = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
-            emitParams.velocity = curspd + (FlareParticles[x].transform.forward * FlareLaunchSpeed);
-            FlareParticles[x].Emit(emitParams, 1);
+            /*      //this is to make flare particles inherit the velocity of the aircraft they were launched from (inherit doesn't work because non-owners don't have access to rigidbody velocity.)
+                 var emitParams = new ParticleSystem.EmitParams();
+                 Vector3 curspd = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+                 emitParams.velocity = curspd + (FlareParticles[x].transform.forward * FlareLaunchSpeed);
+                 FlareParticles[x].Emit(emitParams, 1); */
+            FlareParticles[x].Emit(1);
         }
-        { SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") + 1); }
+        SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") + 1);
         SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
         EntityControl.SendEventToExtensions("SFEXT_G_LaunchFlare");
     }
