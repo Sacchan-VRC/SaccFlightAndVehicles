@@ -152,6 +152,10 @@ public class SAV_SyncScript : UdonSharpBehaviour
         Piloting = true;
         if (IdleUpdateMode) { nextUpdateTime = 0; }
     }
+    public void SFEXT_G_PilotEnter()
+    {
+        if (IdleUpdateMode) { ExitIdleMode(); }
+    }
     public void SFEXT_O_PilotExit()
     { Piloting = false; }
     public void SFEXT_L_OwnershipTransfer()
