@@ -8,7 +8,6 @@ using VRC.Udon;
 public class SAV_AAMController : UdonSharpBehaviour
 {
     public UdonSharpBehaviour AAMLauncherControl;
-    public SaccEntity EntityControl;
     [Tooltip("Missile will explode after this time")]
     public float MaxLifetime = 12;
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
@@ -60,6 +59,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
     [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
     public bool ThrowSpaceVehicle = true;
+    private SaccEntity EntityControl;
     private UdonSharpBehaviour TargetSAVControl;
     private Animator TargetAnimator;
     SaccEntity TargetEntityControl;
@@ -91,6 +91,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     private ConstantForce MissileConstant;
     void Start()
     {
+        EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
         //whatever script is launching the missiles must contain all of these variables
         if (EntityControl.InEditor) { IsOwner = true; }
         else
@@ -98,7 +99,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
         GameObject[] AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
         int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
-        VehicleCenterOfMass = (Transform)AAMLauncherControl.GetProgramVariable("CenterOfMass");
+        VehicleCenterOfMass = EntityControl.CenterOfMass;
 
         MissileConstant = GetComponent<ConstantForce>();
         MissileRigid = GetComponent<Rigidbody>();

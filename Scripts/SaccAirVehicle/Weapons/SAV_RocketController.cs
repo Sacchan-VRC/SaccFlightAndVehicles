@@ -30,7 +30,7 @@ public class SAV_RocketController : UdonSharpBehaviour
 
     private void Start()
     {
-        EntityControl = (SaccEntity)((UdonSharpBehaviour)LauncherControl.GetProgramVariable("SAVControl")).GetProgramVariable("EntityControl");
+        EntityControl = (SaccEntity)LauncherControl.GetProgramVariable("EntityControl");
         VehicleCenterOfMass = EntityControl.CenterOfMass;
         RocketCollider = GetComponent<CapsuleCollider>();
         BombRigid = GetComponent<Rigidbody>();

@@ -63,6 +63,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private bool func_active = false;
     private int DialPosition = -999;
     private VRCPlayerApi localPlayer;
+    [System.NonSerializedAttribute] public Transform CenterOfMass;
     [System.NonSerializedAttribute] public bool IsOwner;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -74,6 +75,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         reloadspeed = FullBombs / FullReloadTimeSec;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         BombAnimator = EntityControl.GetComponent<Animator>();
+        CenterOfMass = EntityControl.CenterOfMass;
         VehicleTransform = EntityControl.transform;
         BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
         localPlayer = Networking.LocalPlayer;

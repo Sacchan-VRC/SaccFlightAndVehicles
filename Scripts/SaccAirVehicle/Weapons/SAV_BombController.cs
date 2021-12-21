@@ -16,6 +16,7 @@ public class SAV_BombController : UdonSharpBehaviour
     public AudioSource[] ExplosionSounds;
     [Tooltip("Play a random one of these explosion sounds when hitting water")]
     public AudioSource[] WaterExplosionSounds;
+    [Tooltip("Bomb flies forward with this much extra speed, can be used to make guns/shells")]
     public float LaunchSpeed = 0;
     [Tooltip("Spawn bomb at a random angle up to this number")]
     public float AngleRandomization = 1;
@@ -25,7 +26,6 @@ public class SAV_BombController : UdonSharpBehaviour
     public float StraightenFactor = .1f;
     [Tooltip("Amount of drag bomb has when moving horizontally/vertically")]
     public float AirPhysicsStrength = .1f;
-    [Tooltip("Used for making rockets, should probably disable air physics and angle randomization when making rockets.")]
     private SaccEntity EntityControl;
     private ConstantForce BombConstant;
     private Rigidbody BombRigid;
@@ -35,13 +35,12 @@ public class SAV_BombController : UdonSharpBehaviour
     private Transform VehicleCenterOfMass;
     private bool hitwater;
     private bool IsOwner;
-
     private void Start()
     {
+        EntityControl = (SaccEntity)BombLauncherControl.GetProgramVariable("EntityControl");
         BombCollider = GetComponent<CapsuleCollider>();
         BombRigid = GetComponent<Rigidbody>();
         BombConstant = GetComponent<ConstantForce>();
-        EntityControl = (SaccEntity)((UdonSharpBehaviour)BombLauncherControl.GetProgramVariable("SAVControl")).GetProgramVariable("EntityControl");
         VehicleCenterOfMass = EntityControl.CenterOfMass;
         transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
         if (EntityControl.InEditor) { IsOwner = true; }

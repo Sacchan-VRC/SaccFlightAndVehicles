@@ -57,7 +57,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     public float AAMLockTime = 1.5f;
     [Tooltip("Minimum time between missile launches")]
-    public float AAMLaunchDelay = .5f;
+    public float AAMLaunchDelay = 0f;
     [Tooltip("Point missile is launched from, flips on local X each time fired")]
     public Transform AAMLaunchPoint;
     [Tooltip("Layer to spherecast to find all triggers on to use as AAM targets")]

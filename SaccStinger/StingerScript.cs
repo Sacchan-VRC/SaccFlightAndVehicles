@@ -8,36 +8,36 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class StingerScript : UdonSharpBehaviour
 {
-    [SerializeField] private SaccEntity EntityControl;
-    [SerializeField] private Transform HUD;
-    [SerializeField] private float AAMMaxTargetDistance;
-    [SerializeField] private int VehicleLayer = 17;
-    [SerializeField] private Animator StingerAnimator;
-    [SerializeField] private GameObject AAM;
-    [SerializeField] private Transform AAMLaunchPoint;
-    [SerializeField] private AudioSource AAMTargeting;
-    [SerializeField] private int NumAAM = 6;
+    public SaccEntity EntityControl;
+    public Transform HUD;
+    public float AAMMaxTargetDistance;
+    public int VehicleLayer = 17;
+    public Animator StingerAnimator;
+    public GameObject AAM;
+    public Transform AAMLaunchPoint;
+    public AudioSource AAMTargeting;
+    public int NumAAM = 6;
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
-    [SerializeField] private float AAMLockAngle = 15;
+    public float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
-    [SerializeField] private float AAMLockTime = 2.5f;
+    public float AAMLockTime = 2.5f;
     [Tooltip("Minimum time between missile launches")]
-    [SerializeField] private float AAMLaunchDelay = 0.5f;
+    public float AAMLaunchDelay = 0.5f;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
-    [SerializeField] private float FullReloadTimeSec = 10;
-    [SerializeField] private AudioSource AAMTargetLock;
+    public float FullReloadTimeSec = 10;
+    public AudioSource AAMTargetLock;
     [Tooltip("Animator trigger that is set true when a missile is launched")]
-    [SerializeField] private string AnimFiredTriggerName = "aamlaunched";
+    public string AnimFiredTriggerName = "aamlaunched";
     [Tooltip("Animator float that represents how many missiles are left")]
-    [SerializeField] private string AnimFloatName = "AAMs";
+    public string AnimFloatName = "AAMs";
     [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private short _AAMFire;
     //hud stuff
-    [SerializeField] private Text HUDText_AAM_ammo;
+    public Text HUDText_AAM_ammo;
     [Tooltip("Hud element to highlight current target")]
-    [SerializeField] private Transform AAMTargetIndicator;
-    [SerializeField] private AudioSource FireSound;
+    public Transform AAMTargetIndicator;
+    public AudioSource FireSound;
     [Tooltip("Require re-lock after firing?")]
-    [SerializeField] private bool LoseLockAfterShot = true;
+    public bool LoseLockAfterShot = true;
     private float distance_from_head = 1.333333f;
     private VRC.SDK3.Components.VRCObjectSync StingerObjectSync;
     private VRC_Pickup StingerPickup;

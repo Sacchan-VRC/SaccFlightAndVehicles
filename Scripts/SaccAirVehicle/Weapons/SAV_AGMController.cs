@@ -8,7 +8,6 @@ using VRC.Udon;
 public class SAV_AGMController : UdonSharpBehaviour
 {
     public UdonSharpBehaviour AGMLauncherControl;
-    public SaccEntity EntityControl;
     [Tooltip("Missile will explode after this time")]
     public float MaxLifetime = 35;
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
@@ -34,6 +33,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
     [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
     public bool ThrowSpaceVehicle = false;
+    private SaccEntity EntityControl;
     private bool StartTrack = false;
     private Transform VehicleCenterOfMass;
     private Transform TargetTransform;
@@ -47,6 +47,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     private bool hitwater;
     private void Start()
     {
+        EntityControl = (SaccEntity)AGMLauncherControl.GetProgramVariable("EntityControl");
         VehicleCenterOfMass = EntityControl.CenterOfMass;
         TargetTransform = (Transform)AGMLauncherControl.GetProgramVariable("TrackedTransform");
         TargetOffset = (Vector3)AGMLauncherControl.GetProgramVariable("TrackedObjectOffset");

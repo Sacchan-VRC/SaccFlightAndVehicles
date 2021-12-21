@@ -51,7 +51,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     private float boolToggleTime;
     private bool AnimOn = false;
-    private SaccEntity EntityControl;
+    [System.NonSerializedAttribute] public SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] public bool IsOwner;
