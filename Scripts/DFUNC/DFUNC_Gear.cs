@@ -13,6 +13,9 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public Animator GearAnimator;
     [Tooltip("Multiply drag by this amount while gear is down")]
     public float LandingGearDragMulti = 1.3f;
+    public bool AllowToggleGrounded = true;
+    [Tooltip("Distance to check down from CenterOfMass to decide if it's clear to open the gear")]
+    public float GearCheckDistance = 2f;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
@@ -20,12 +23,14 @@ public class DFUNC_Gear : UdonSharpBehaviour
     private bool DragApplied = false;
     private bool IsOwner = false;
     private bool DisableGroundDetector = false;
+    private Transform CenterOfMass;
     [System.NonSerializedAttribute] public int DisableGearToggle = 0;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        CenterOfMass = EntityControl.CenterOfMass;
         LandingGearDragMulti -= 1;//to match how the old values worked
         SetGearDown();
         if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
@@ -136,13 +141,17 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void ToggleGear()
     {
-        if (!GearUp)
+        if (AllowToggleGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing"))
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearUp));
-        }
-        else
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearDown));
+            if (!GearUp)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearUp));
+            }
+            else
+            {
+                if (AllowToggleGrounded || !Physics.Raycast(CenterOfMass.position, -EntityControl.transform.up, GearCheckDistance, 133121/* Default, Environment, and Walkthrough */))
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetGearDown)); }
+            }
         }
     }
     public void SFEXT_O_OnPlayerJoined()

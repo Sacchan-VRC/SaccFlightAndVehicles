@@ -27,6 +27,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     [Tooltip("Only for SeaPlanes/Vehicles with floatscript")]
     public bool AllowToggleOnWater = true;
     [Tooltip("Send Events to sound script for opening a door?")]
+    [Space(10)]
     public bool OpensDoor = false;
     [Header("Door Only:")]
     [Tooltip("If this toggle opens a door, it will change the sound to the outside sounds using the soundcontroller")]
