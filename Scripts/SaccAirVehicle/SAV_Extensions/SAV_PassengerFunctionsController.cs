@@ -322,6 +322,10 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     {
         SendEventToExtensions_Gunner("SFEXTP_G_TouchDown");
     }
+    public void SFEXT_G_TouchDownWater()
+    {
+        SendEventToExtensions_Gunner("SFEXTP_G_TouchDownWater");
+    }
     public void SFEXT_G_TakeOff()
     {
         SendEventToExtensions_Gunner("SFEXTP_G_TakeOff");

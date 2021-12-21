@@ -22,6 +22,10 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
     public GameObject[] ToggleObjects;
     [Tooltip("Particle systems to turn on/off emission with the toggle")]
     public ParticleSystem[] ToggleEmission;
+    public bool AllowToggleFlying = true;
+    public bool AllowToggleGrounded = true;
+    [Tooltip("Only for SeaPlanes/Vehicles with floatscript")]
+    public bool AllowToggleOnWater = true;
     [Tooltip("Send Events to sound script for opening a door?")]
     public bool OpensDoor = false;
     [Header("Door Only:")]
@@ -29,10 +33,11 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
     public UdonBehaviour SoundControl;
     [Tooltip("How long it takes for the sound to change after toggle to closed")]
     public float DoorCloseTime = 2;
+    [System.NonSerializedAttribute] public bool AnimOn = false;
+    [System.NonSerializedAttribute] public float ToggleTime;
     private ParticleSystem.EmissionModule[] ToggleEmission_em;
     private int ParticleLength;
-    private bool AnimOn = false;
-    private float ToggleTime;
+    private bool ToggleAllowed = true;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private bool sound_DoorOpen;
@@ -108,6 +113,29 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
+        if (ToggleAllowed)
+        { Toggle(); }
+    }
+    private void Update()
+    {
+        float Trigger;
+        if (UseLeftTrigger)
+        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+        else
+        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+        if (Trigger > 0.75)
+        {
+            if (!TriggerLastFrame)
+            {
+                if (ToggleAllowed)
+                { Toggle(); }
+            }
+            TriggerLastFrame = true;
+        }
+        else { TriggerLastFrame = false; }
+    }
+    private void Toggle()
+    {
         if (IsSecondary)
         {
             if (Time.time - (float)MasterToggle.GetProgramVariable("ToggleTime") > ToggleMinDelay)
@@ -132,46 +160,6 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
                 { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
             }
         }
-    }
-    private void Update()
-    {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-        if (Trigger > 0.75)
-        {
-            if (!TriggerLastFrame)
-            {
-                if (IsSecondary)
-                {
-                    if (Time.time - (float)MasterToggle.GetProgramVariable("ToggleTime") > ToggleMinDelay)
-                    {
-                        if ((bool)MasterToggle.GetProgramVariable("AnimOn"))
-                        {
-                            MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff));
-                        }
-                        else
-                        {
-                            MasterToggle.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn));
-                        }
-                    }
-                }
-                else
-                {
-                    if (Time.time - ToggleTime > ToggleMinDelay)
-                    {
-                        if (AnimOn)
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
-                        else
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
-                    }
-                }
-            }
-            TriggerLastFrame = true;
-        }
-        else { TriggerLastFrame = false; }
     }
     public void SetBoolOn()
     {
@@ -212,6 +200,24 @@ public class DFUNCP_ToggleBool : UdonSharpBehaviour
             else if (OnDefault && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
         }
+    }
+    public void SFEXTP_G_TakeOff()
+    {
+        ToggleAllowed = AllowToggleFlying;
+        if (AnimOn && !AllowToggleFlying)
+        { Toggle(); }
+    }
+    public void SFEXTP_G_TouchDown()
+    {
+        ToggleAllowed = AllowToggleGrounded;
+        if (AnimOn && !AllowToggleGrounded)
+        { Toggle(); }
+    }
+    public void SFEXTP_G_TouchDownWater()
+    {
+        ToggleAllowed = AllowToggleOnWater;
+        if (AnimOn && !AllowToggleOnWater)
+        { Toggle(); }
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
