@@ -20,6 +20,8 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     public float ToggleMinDelay;
     [Tooltip("Objects to turn on/off with the toggle")]
     public GameObject[] ToggleObjects;
+    [Tooltip("Particle systems to turn on/off emission with the toggle")]
+    public ParticleSystem[] ToggleEmission;
     [Tooltip("Send Events to sound script for opening a door?")]
     public bool OpensDoor = false;
     [Header("Door Only:")]
@@ -29,6 +31,8 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     public float DoorCloseTime = 2;
     [System.NonSerializedAttribute] public bool AnimOn = false;
     [System.NonSerializedAttribute] public float ToggleTime;
+    private ParticleSystem.EmissionModule[] ToggleEmission_em;
+    private int ParticleLength;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private bool sound_DoorOpen;
@@ -52,6 +56,10 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
             foreach (GameObject funcon in Dial_Funcon)
             { funcon.SetActive(OnDefault); }
         }
+        ParticleLength = ToggleEmission.Length;
+        ToggleEmission_em = new ParticleSystem.EmissionModule[ParticleLength];
+        for (int i = 0; i < ParticleLength; i++)
+        { ToggleEmission_em[i] = ToggleEmission[i].emission; }
     }
     public void SFEXT_O_OnPlayerJoined()
     {
@@ -175,6 +183,8 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         { SoundControl.SendCustomEvent("DoorOpen"); }
         foreach (GameObject obj in ToggleObjects)
         { obj.SetActive(true); }
+        for (int i = 0; i < ParticleLength; i++)
+        { ToggleEmission_em[i].enabled = true; }
     }
     public void SetBoolOff()
     {
@@ -188,6 +198,8 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); }
         foreach (GameObject obj in ToggleObjects)
         { obj.SetActive(false); }
+        for (int i = 0; i < ParticleLength; i++)
+        { ToggleEmission_em[i].enabled = false; }
     }
     public void SFEXT_G_RespawnButton()
     {

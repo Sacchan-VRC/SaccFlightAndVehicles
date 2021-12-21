@@ -10,8 +10,6 @@ public class DFUNC_Flares : UdonSharpBehaviour
 {
     public UdonSharpBehaviour SAVControl;
     public int NumFlares = 60;
-    [Tooltip("Speed to launch flare particles at")]
-    public float FlareLaunchSpeed = 100;
     public ParticleSystem[] FlareParticles;
     [Tooltip("How long a flare has an effect for")]
     public float FlareActiveTime = 4f;
@@ -19,19 +17,23 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public float FullReloadTimeSec = 15;
     public AudioSource FlareLaunch;
     public Text HUDText_flare_ammo;
+    [Tooltip("Launch one particle system per click, cycling through, instead of all at once")]
+    public bool SequentialLaunch = false;
     private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;
     private bool func_active;
     private bool TriggerLastFrame;
-    [UdonSynced, FieldChangeCallback(nameof(sendlaunchflare))] private bool _SendLaunchFlare;
     private SaccEntity EntityControl;
-    public bool sendlaunchflare
+    private float FlareLaunchTime;
+    [UdonSynced, FieldChangeCallback(nameof(sendlaunchflare))] private short _SendLaunchFlare = -1;
+    public short sendlaunchflare
     {
         set
         {
-            LaunchFlare();
             _SendLaunchFlare = value;
+            if (value > -1)
+            { LaunchFlare(); }
         }
         get => _SendLaunchFlare;
     }
@@ -45,6 +47,11 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         func_active = false;
+        if (SequentialLaunch)
+        {
+            _SendLaunchFlare = -1;
+            RequestSerialization();
+        }
     }
     public void SFEXT_L_EntityStart()
     {
@@ -57,9 +64,22 @@ public class DFUNC_Flares : UdonSharpBehaviour
     { gameObject.SetActive(true); }
     public void SFEXT_G_PilotExit()
     { gameObject.SetActive(false); }
+    public void SFEXT_O_PilotEnter()
+    {
+        if (SequentialLaunch)
+        {
+            _SendLaunchFlare = -1;
+            RequestSerialization();
+        }
+    }
     public void SFEXT_O_PilotExit()
     {
         func_active = false;
+        if (SequentialLaunch)
+        {
+            _SendLaunchFlare = -1;
+            RequestSerialization();
+        }
     }
     public void SFEXT_G_RespawnButton()
     {
@@ -94,8 +114,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
                 {
                     if (NumFlares > 0)
                     {
-                        sendlaunchflare = !sendlaunchflare;
-                        RequestSerialization();
+                        Send_LaunchFlare();
                     }
                 }
                 TriggerLastFrame = true;
@@ -103,32 +122,84 @@ public class DFUNC_Flares : UdonSharpBehaviour
             else { TriggerLastFrame = false; }
         }
     }
+    public void SetsendlaunchflareZero()
+    {
+        sendlaunchflare = 0;
+        RequestSerialization();
+    }
     public void LaunchFlare()
     {
+        FlareLaunchTime = Time.time;
         NumFlares--;
         FlareLaunch.Play();
         if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
         int d = FlareParticles.Length;
-        for (int x = 0; x < d; x++)
+        if (SequentialLaunch)
         {
-            /*      //this is to make flare particles inherit the velocity of the aircraft they were launched from (inherit doesn't work because non-owners don't have access to rigidbody velocity.)
-                 var emitParams = new ParticleSystem.EmitParams();
-                 Vector3 curspd = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
-                 emitParams.velocity = curspd + (FlareParticles[x].transform.forward * FlareLaunchSpeed);
-                 FlareParticles[x].Emit(emitParams, 1); */
-            FlareParticles[x].Emit(1);
+            if (_SendLaunchFlare > -1 && _SendLaunchFlare < FlareParticles.Length)
+            {
+                if (FlareParticles[_SendLaunchFlare])
+                {
+                    if (FlareParticles[_SendLaunchFlare].emission.burstCount > 0)
+                    {
+                        FlareParticles[_SendLaunchFlare].Emit((int)FlareParticles[_SendLaunchFlare].emission.GetBurst(0).count.constant);
+                    }
+                    else
+                    { FlareParticles[_SendLaunchFlare].Emit(1); }
+                }
+            }
+        }
+        else
+        {
+            for (int x = 0; x < d; x++)
+            {
+                /*      //this is to make flare particles inherit the velocity of the aircraft they were launched from (inherit doesn't work because non-owners don't have access to rigidbody velocity.)
+                     var emitParams = new ParticleSystem.EmitParams();
+                     Vector3 curspd = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+                     emitParams.velocity = curspd + (FlareParticles[x].transform.forward * FlareLaunchSpeed);
+                     FlareParticles[x].Emit(emitParams, 1); */
+
+                if (FlareParticles[x].emission.burstCount > 0)
+                {
+                    FlareParticles[x].Emit((int)FlareParticles[x].emission.GetBurst(0).count.constant);
+                }
+                else
+                { FlareParticles[x].Emit(1); }
+            }
         }
         SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") + 1);
         SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
         EntityControl.SendEventToExtensions("SFEXT_G_LaunchFlare");
     }
-    public void KeyboardInput()
+    public void Send_LaunchFlare()
     {
-        if (NumFlares > 0)
+        if (SequentialLaunch)
         {
-            sendlaunchflare = !sendlaunchflare;
+            if (_SendLaunchFlare + 1 == FlareParticles.Length || Time.time - FlareLaunchTime > 5)
+            { sendlaunchflare = 0; }
+            else
+            {
+                sendlaunchflare++;
+            }
+            if (sendlaunchflare == 0) { SendCustomEventDelayedSeconds(nameof(CheckForReset), 5); }
+        }
+        else
+        {
+            sendlaunchflare++;
+        }
+        RequestSerialization();
+    }
+    public void CheckForReset()
+    {
+        if (sendlaunchflare == 0)
+        {
+            sendlaunchflare = -1;
             RequestSerialization();
         }
+    }
+    public void KeyboardInput()
+    {
+        Send_LaunchFlare();
     }
     public void RemoveFlare()
     {

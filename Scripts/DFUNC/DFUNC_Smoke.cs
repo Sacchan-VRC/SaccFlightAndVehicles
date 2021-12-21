@@ -15,6 +15,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     public GameObject HUD_SmokeOnIndicator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;
+    public bool AllowChangeColor = true;
     [UdonSynced, FieldChangeCallback(nameof(SmokeOn))] private bool _smokeon;
     public bool SmokeOn
     {
@@ -33,7 +34,6 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     private bool SetSmokeLastFrame;
     private Vector3 SmokeZeroPoint;
     private ParticleSystem.EmissionModule[] DisplaySmokeem;
-    private bool DisplaySmokeNull = true;
     [UdonSynced, System.NonSerializedAttribute] public Vector3 SmokeColor = Vector3.one;
     [System.NonSerializedAttribute] private Vector3 SmokeColorLast = Vector3.one;
     [System.NonSerializedAttribute] public bool localSmoking = false;
@@ -55,7 +55,6 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
         int NumSmokes = DisplaySmoke.Length;
-        if (NumSmokes > 0) DisplaySmokeNull = false;
         DisplaySmokeem = new ParticleSystem.EmissionModule[NumSmokes];
 
         for (int x = 0; x < DisplaySmokeem.Length; x++)
@@ -140,7 +139,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                         SmokeHoldTime = 0;
                     }
                     SmokeHoldTime += Time.deltaTime;
-                    if (SmokeHoldTime > .4f)
+                    if (SmokeHoldTime > .4f && AllowChangeColor)
                     {
                         //VR set smoke color
                         Vector3 SmokeDifference = (SmokeZeroPoint - HandPosSmoke) * -(float)SAVControl.GetProgramVariable("ThrottleSensitivity");
@@ -152,36 +151,38 @@ public class DFUNC_Smoke : UdonSharpBehaviour
                 }
                 else { TriggerLastFrame = false; }
             }
-            if (localSmoking)
+            if (AllowChangeColor)
             {
-                int keypad7 = Input.GetKey(KeyCode.Keypad7) ? 1 : 0;
-                int Keypad4 = Input.GetKey(KeyCode.Keypad4) ? 1 : 0;
-                int Keypad8 = Input.GetKey(KeyCode.Keypad8) ? 1 : 0;
-                int Keypad5 = Input.GetKey(KeyCode.Keypad5) ? 1 : 0;
-                int Keypad9 = Input.GetKey(KeyCode.Keypad9) ? 1 : 0;
-                int Keypad6 = Input.GetKey(KeyCode.Keypad6) ? 1 : 0;
-                SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * DeltaTime), 0, 1);
-                SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
-                SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
-                if (SmokeColor != SmokeColorLast && (Time.time - LastSerialization > .5f))
+                if (localSmoking)
                 {
-                    RequestSerialization();
-                    LastSerialization = Time.time;
+                    int keypad7 = Input.GetKey(KeyCode.Keypad7) ? 1 : 0;
+                    int Keypad4 = Input.GetKey(KeyCode.Keypad4) ? 1 : 0;
+                    int Keypad8 = Input.GetKey(KeyCode.Keypad8) ? 1 : 0;
+                    int Keypad5 = Input.GetKey(KeyCode.Keypad5) ? 1 : 0;
+                    int Keypad9 = Input.GetKey(KeyCode.Keypad9) ? 1 : 0;
+                    int Keypad6 = Input.GetKey(KeyCode.Keypad6) ? 1 : 0;
+                    SmokeColor.x = Mathf.Clamp(SmokeColor.x + ((keypad7 - Keypad4) * DeltaTime), 0, 1);
+                    SmokeColor.y = Mathf.Clamp(SmokeColor.y + ((Keypad8 - Keypad5) * DeltaTime), 0, 1);
+                    SmokeColor.z = Mathf.Clamp(SmokeColor.z + ((Keypad9 - Keypad6) * DeltaTime), 0, 1);
+                    if (SmokeColor != SmokeColorLast && (Time.time - LastSerialization > .5f))
+                    {
+                        RequestSerialization();
+                        LastSerialization = Time.time;
+                    }
+                    SmokeColorLast = SmokeColor;
                 }
-                SmokeColorLast = SmokeColor;
+                //Smoke Color Indicator
+                SmokeColorIndicatorMaterial.color = SmokeColor_Color;
             }
-            //Smoke Color Indicator
-            SmokeColorIndicatorMaterial.color = SmokeColor_Color;
         }
-        if (localSmoking && !DisplaySmokeNull)
+        if (localSmoking && AllowChangeColor)
         {
             //everyone does this while smoke is active
             SmokeColor_Color = new Color(SmokeColor.x, SmokeColor.y, SmokeColor.z);
-            Color SmokeCol = SmokeColor_Color;
             foreach (ParticleSystem smoke in DisplaySmoke)
             {
                 var main = smoke.main;
-                main.startColor = new ParticleSystem.MinMaxGradient(SmokeCol, SmokeCol * .8f);
+                main.startColor = new ParticleSystem.MinMaxGradient(SmokeColor_Color, SmokeColor_Color * .8f);
             }
         }
     }

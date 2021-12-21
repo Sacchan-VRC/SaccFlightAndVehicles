@@ -21,8 +21,8 @@ public class SaccScoreboard_Kills : UdonSharpBehaviour
         }
         get => _topKills;
     }
-    [System.NonSerializedAttribute, UdonSynced, FieldChangeCallback(nameof(DeadVehicles))] public uint _deadvehicles = 0;
-    public uint DeadVehicles
+    [System.NonSerializedAttribute, UdonSynced, FieldChangeCallback(nameof(DeadVehicles))] public ushort _deadvehicles = 0;
+    public ushort DeadVehicles
     {
         set
         {
@@ -46,7 +46,7 @@ public class SaccScoreboard_Kills : UdonSharpBehaviour
     }
     public void UpdateScores()
     {
-        Scores.text = string.Concat("Instance Best Killing Spree: ", TopKiller, " : ", TopKills, "\nMy Best Killing Spree: ", MyBestKills, "\nDestroyed Planes: ", DeadVehicles);
+        Scores.text = string.Concat("Instance Best Killing Spree: ", TopKiller, " : ", TopKills, "\nMy Best Killing Spree: ", MyBestKills, "\nDestroyed Vehicles: ", DeadVehicles);
     }
     public void UpdateTopKiller()
     {
