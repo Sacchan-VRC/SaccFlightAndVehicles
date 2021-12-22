@@ -15,7 +15,12 @@ public class SAV_HUDController : UdonSharpBehaviour
     public Text HUDText_G;
     public Text HUDText_mach;
     public Text HUDText_altitude;
+
+    [Tooltip("Meters * (default=feet)")]
+    public float AltitudeConversion = 3.28084f;
     public Text HUDText_knots;
+    [Tooltip("Meters * (default=knots)")]
+    public float SpeedConversion = 1.9438445f;
     public Text HUDText_knotsairspeed;
     public Text HUDText_angleofattack;
     [Tooltip("Hud element that points toward the gruond")]
@@ -122,9 +127,9 @@ public class SAV_HUDController : UdonSharpBehaviour
             { maxGs = (float)SAVControl.GetProgramVariable("VertGs"); }
             HUDText_G.text = string.Concat(((float)SAVControl.GetProgramVariable("VertGs")).ToString("F1"), "\n", maxGs.ToString("F1"));
             HUDText_mach.text = (((float)SAVControl.GetProgramVariable("Speed")) / 343f).ToString("F2");
-            HUDText_altitude.text = string.Concat((((Vector3)SAVControl.GetProgramVariable("CurrentVel")).y * 60 * 3.28084f).ToString("F0"), "\n", ((CenterOfMass.position.y - SeaLevel) * 3.28084f).ToString("F0"));
-            HUDText_knots.text = (((float)SAVControl.GetProgramVariable("Speed")) * 1.9438445f).ToString("F0");
-            HUDText_knotsairspeed.text = (((float)SAVControl.GetProgramVariable("AirSpeed")) * 1.9438445f).ToString("F0");
+            HUDText_altitude.text = string.Concat((((Vector3)SAVControl.GetProgramVariable("CurrentVel")).y * 60 * AltitudeConversion).ToString("F0"), "\n", ((CenterOfMass.position.y - SeaLevel) * AltitudeConversion).ToString("F0"));
+            HUDText_knots.text = (((float)SAVControl.GetProgramVariable("Speed")) * SpeedConversion).ToString("F0");
+            HUDText_knotsairspeed.text = (((float)SAVControl.GetProgramVariable("AirSpeed")) * SpeedConversion).ToString("F0");
 
             if ((float)SAVControl.GetProgramVariable("Speed") < 2)
             {
