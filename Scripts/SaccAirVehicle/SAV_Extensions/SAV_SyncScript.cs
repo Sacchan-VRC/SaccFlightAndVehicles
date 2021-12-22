@@ -5,6 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
+[DefaultExecutionOrder(10)]
 public class SAV_SyncScript : UdonSharpBehaviour
 {
     // whispers to Zwei, "it's okay"

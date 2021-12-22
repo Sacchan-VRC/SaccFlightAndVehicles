@@ -49,7 +49,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
         func_active = false;
         if (SequentialLaunch)
         {
-            _SendLaunchFlare = -1;
+            _SendLaunchFlare = (short)-1;
             RequestSerialization();
         }
     }
@@ -68,7 +68,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     {
         if (SequentialLaunch)
         {
-            _SendLaunchFlare = -1;
+            _SendLaunchFlare = (short)-1;
             RequestSerialization();
         }
     }
@@ -77,7 +77,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
         func_active = false;
         if (SequentialLaunch)
         {
-            _SendLaunchFlare = -1;
+            _SendLaunchFlare = (short)-1;
             RequestSerialization();
         }
     }
@@ -193,7 +193,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     {
         if (sendlaunchflare == 0)
         {
-            sendlaunchflare = -1;
+            sendlaunchflare = (short)-1;
             RequestSerialization();
         }
     }
