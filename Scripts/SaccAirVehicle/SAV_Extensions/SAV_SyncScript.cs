@@ -153,15 +153,13 @@ public class SAV_SyncScript : UdonSharpBehaviour
         if (IdleUpdateMode) { nextUpdateTime = 0; }
     }
     public void SFEXT_G_PilotEnter()
-    {
-        if (IdleUpdateMode) { ExitIdleMode(); }
-    }
+    { if (IdleUpdateMode) { ExitIdleMode(); } }
+    public void SFEXT_G_TakeOff()
+    { if (IdleUpdateMode) { ExitIdleMode(); } }
+    public void SFEXT_L_OwnershipTransfer()
+    { if (IdleUpdateMode) { ExitIdleMode(); } }
     public void SFEXT_O_PilotExit()
     { Piloting = false; }
-    public void SFEXT_L_OwnershipTransfer()
-    {
-        ExitIdleMode();
-    }
     public void SFEXT_O_RespawnButton()
     {
         nextUpdateTime = 0;

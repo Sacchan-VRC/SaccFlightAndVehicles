@@ -5,6 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+[DefaultExecutionOrder(5)]//after dfuncs that can set values used by this
 public class SaccAirVehicle : UdonSharpBehaviour
 {
     [Tooltip("Base object reference")]
