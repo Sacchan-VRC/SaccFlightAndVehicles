@@ -40,15 +40,20 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource[] BulletHit;
     [Tooltip("Sound that plays when vehicle is hit by a missile")]
     public AudioSource[] MissileHit;
-    [Tooltip("Sounds played when vehicle is rolling along the ground. Also works for seaplanes")]
+    [Tooltip("Sound played when vehicle is rolling along the ground")]
     public AudioSource Rolling;
-    [Tooltip("Maximum volume rolling sound reaches when moving forward quickly")]
+    [Tooltip("Sound played when vehicle is skimming along water")]
     [Range(0.0f, 1f)]
     public float RollingMaxVol = 1;
     [Tooltip("How quickly the rolling sound reaches max volume as speed increases. Higher = faster")]
     public float RollingVolCurve = .03f;
-    [Tooltip("If ticked, will lerp Rolling volume on touchdown. For seaplanes water touchdown")]
-    public bool Rolling_Seaplane;
+    [Tooltip("Maximum volume rolling sound reaches when moving forward quickly")]
+    public AudioSource Rolling_Water;
+    [Range(0.0f, 1f)]
+    [Tooltip("Maximum volume rolling sound reaches when moving forward quickly")]
+    public float RollingMaxVol_Water = .3f;
+    [Tooltip("How quickly the rolling sound reaches max volume as speed increases. Higher = faster")]
+    public float RollingVolCurve_Water = .004f;
     [Tooltip("Oneshot sound sound played each time vehicle recieves a resupply event")]
     public AudioSource ReSupply;
     [Tooltip("Looping Sound that plays when vehicle is being targeted by a missile")]
@@ -73,7 +78,10 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool MissileHitNULL = true;
     private SaccEntity EntityControl;
     //public Transform testcamera;
-    private float IdleDoppleTemp;
+    private AudioSource _rolling;
+    private float _rollingVolCurve;
+    private float _rollingMaxVol;
+    private bool RollingOnWater;
     [System.NonSerializedAttribute] public float Doppler = 1;
     float LastFrameDist;
     [System.NonSerializedAttribute] public float ThisFrameDist = 0;
@@ -120,6 +128,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     private bool Taxiing;
     private bool Occupied;
     private bool NoFuel;
+    private bool DoRollingSwap;
     public void SFEXT_L_EntityStart()
     {
         MissileHitNULL = MissileHit.Length < 1;
@@ -193,6 +202,18 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             DopplerSounds_InitialVolumes[x] = DopplerSounds_TargetVolumes[x] = DopplerSounds[x].volume;
         }
+        if (Rolling)
+        {
+            _rolling = Rolling;
+            _rollingVolCurve = RollingVolCurve;
+            _rollingMaxVol = RollingMaxVol;
+        }
+        else if (Rolling_Water)
+        {
+            _rolling = Rolling_Water;
+            _rollingVolCurve = RollingVolCurve_Water;
+            _rollingMaxVol = RollingMaxVol_Water;
+        }
         DoSound = 20;
     }
     private void Update()
@@ -205,7 +226,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                 if (PlaneDistant) { PlaneDistant.Stop(); }
                 if (PlaneWind) { PlaneWind.Stop(); }
                 if (PlaneInside) { PlaneInside.Stop(); }
-                if (Rolling) { Rolling.Stop(); }
+                if (_rolling) { _rolling.Stop(); }
                 if (!ThrustNull)
                 {
                     foreach (AudioSource thrust in Thrust)
@@ -291,12 +312,12 @@ public class SAV_SoundController : UdonSharpBehaviour
         //Piloting = true in editor play mode
         if (InVehicle && AllDoorsClosed)
         {
-            if (!Rolling_Seaplane && Rolling)
+            if (!RollingOnWater && _rolling)
             {
                 if (Taxiing)
-                { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
+                { _rolling.volume = Mathf.Lerp(_rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
                 else
-                { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
+                { _rolling.volume = Mathf.Lerp(_rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
             }
             if ((Piloting || (Passenger && Occupied)) && !NoFuel) //you're piloting or someone is piloting and you're a passenger
             {
@@ -346,12 +367,12 @@ public class SAV_SoundController : UdonSharpBehaviour
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * DeltaTime);
             PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, .72f * DeltaTime);
         }
-        if (Rolling_Seaplane && Rolling)
+        if (RollingOnWater && _rolling)
         {
             if (Taxiing)
-            { Rolling.volume = Mathf.Lerp(Rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
+            { _rolling.volume = Mathf.Lerp(_rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
             else
-            { Rolling.volume = Mathf.Lerp(Rolling.volume, 0, 5f * DeltaTime); }
+            { _rolling.volume = Mathf.Lerp(_rolling.volume, 0, 5f * DeltaTime); }
         }
         float PlaneIdlePitchDopple = PlaneIdlePitch;
         float dopplemin = Mathf.Min(Doppler, 2.25f);
@@ -526,9 +547,9 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (AllDoorsClosed)
         { SetSoundsOutside(); }
     }
-    public void SFEXT_G_PilotExit()//old WakeUp
+    public void SFEXT_G_PilotExit()
     { Occupied = false; }
-    public void SFEXT_G_PilotEnter()//old WakeUp
+    public void SFEXT_G_PilotEnter()
     {
         Occupied = true;
         DoSound = 0f;
@@ -536,10 +557,10 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             ResetSounds();
         }
-        if (Rolling_Seaplane && Rolling)
+        if (RollingOnWater && _rolling)
         {
-            Rolling.Play();
-            Rolling.volume = 0;
+            _rolling.Play();
+            _rolling.volume = 0;
         }
         foreach (AudioSource thrust in Thrust)
         {
@@ -575,16 +596,45 @@ public class SAV_SoundController : UdonSharpBehaviour
     { NoFuel = true; }
     public void SFEXT_G_TouchDown()
     {
-        { Taxiing = true; }
+        Taxiing = true;
+        RollingOnWater = false;
+        if (_rolling == Rolling_Water)
+        {
+            if (_rolling) { _rolling.Stop(); }
+            _rolling = Rolling;
+        }
+        if (_rolling)
+        {
+            _rollingVolCurve = RollingVolCurve;
+            _rollingMaxVol = RollingMaxVol;
+            if (Piloting)
+            {
+                _rolling.Play();
+                _rolling.volume = (float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve;
+            }
+        }
         if ((float)SAVControl.GetProgramVariable("Speed") > TouchDownSoundSpeed)
         {
             PlayTouchDownSound();
         }
-        if (!Rolling_Seaplane && Rolling) { Rolling.volume = (float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve; }
     }
     public void SFEXT_G_TouchDownWater()
     {
-        { Taxiing = true; }
+        Taxiing = true;
+        RollingOnWater = true;
+        if (_rolling == Rolling)
+        {
+            if (_rolling) { _rolling.Stop(); }
+            _rolling = Rolling_Water;
+        }
+        if (_rolling)
+        {
+            _rollingVolCurve = RollingVolCurve_Water;
+            _rollingMaxVol = RollingMaxVol_Water;
+            _rolling.volume = 0;
+            _rolling = Rolling_Water;
+            _rolling.Play();
+        }
         if ((float)SAVControl.GetProgramVariable("Speed") > TouchDownSoundSpeed)
         {
             PlayTouchDownWaterSound();
@@ -690,10 +740,10 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
         PlaneThrustVolume *= InVehicleThrustVolumeFactor;
 
-        if (!Rolling_Seaplane && Rolling)
+        if (!RollingOnWater && _rolling)
         {
-            Rolling.Play();
-            Rolling.volume = 0;
+            _rolling.Play();
+            _rolling.volume = 0;
         }
 
         foreach (AudioSource thrust in Thrust)
@@ -716,7 +766,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     private void SetSoundsOutside()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
     {
         if (RadarLocked) { RadarLocked.Stop(); }
-        if (!Rolling_Seaplane && Rolling) { Rolling.Stop(); }
+        if (!RollingOnWater && _rolling) { _rolling.Stop(); }
         if (PlaneInside) { PlaneInside.Stop(); }
         if (PlaneWind) { PlaneWind.Stop(); }
 
