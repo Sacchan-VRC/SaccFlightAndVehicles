@@ -12,6 +12,8 @@ public class DFUNC_Brake : UdonSharpBehaviour
     public AudioSource Airbrake_snd;
     [Tooltip("Will Crash if not set")]
     public Animator BrakeAnimator;
+    [Tooltip("Position the ground brake force will be applied at")]
+    public Transform GroundBrakeForcePosition;
     [Tooltip("Because you have to hold the break, and the keyboardcontrols script can only send events, this option is here.")]
     public KeyCode KeyboardControl = KeyCode.B;
     private bool UseLeftTrigger = false;
@@ -19,9 +21,9 @@ public class DFUNC_Brake : UdonSharpBehaviour
     private Rigidbody VehicleRigidbody;
     private bool HasAirBrake;
     public float AirbrakeStrength = 4f;
-    public float GroundBrakeStrength = 6f;
+    public float GroundBrakeStrength = 540f;
     [Tooltip("Water brake functionality requires that floatscript is being used")]
-    public float WaterBrakeStrength = 1f;
+    public float WaterBrakeStrength = 90f;
     public bool NoPilotAlwaysGroundBrake = true;
     [Tooltip("Speed below which the ground break works meters/s")]
     public float GroundBrakeSpeed = 40f;
@@ -53,6 +55,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
         { gameObject.SetActive(false); }
         else
         { gameObject.SetActive(true); }
+        if (!GroundBrakeForcePosition) { GroundBrakeForcePosition = EntityControl.CenterOfMass; }
     }
     public void DFUNC_Selected()
     {
@@ -174,15 +177,16 @@ public class DFUNC_Brake : UdonSharpBehaviour
                         float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
                         if (BrakeInput > 0 && RBSpeed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
                         {
-                            VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), BrakeInput * BrakeStrength * DeltaTime);
+                            Vector3 speed = (VehicleRigidbody.GetPointVelocity(GroundBrakeForcePosition.position) - gdhr.velocity).normalized;
+                            VehicleRigidbody.AddForceAtPosition(-speed * BrakeInput * BrakeStrength * DeltaTime, GroundBrakeForcePosition.position, ForceMode.Acceleration);
                         }
                     }
                     else
                     {
                         if (BrakeInput > 0 && Speed < GroundBrakeSpeed * BrakeInput && DisableGroundBrake == 0)
                         {
-                            VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, BrakeInput * BrakeStrength * DeltaTime);
-                            // VehicleRigidbody.velocity += -CurrentVel.normalized * BrakeInput * GroundBrakeStrength * DeltaTime;
+                            Vector3 speed = VehicleRigidbody.GetPointVelocity(GroundBrakeForcePosition.position).normalized;
+                            VehicleRigidbody.AddForceAtPosition(-speed * BrakeInput * BrakeStrength * DeltaTime, GroundBrakeForcePosition.position, ForceMode.Acceleration);
                         }
                     }
                 }
@@ -231,22 +235,26 @@ public class DFUNC_Brake : UdonSharpBehaviour
             }
             else
             {
-                //outside of vehicle, ground brake always max
-                Rigidbody gdhr = null;
-                { gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody"); }
-                if (gdhr)
+                if (Taxiing)
                 {
-                    float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
-                    if (Taxiing && RBSpeed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                    //outside of vehicle, ground brake always max
+                    Rigidbody gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody");
+                    if (gdhr)
                     {
-                        VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), GroundBrakeStrength * DeltaTime);
+                        float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
+                        if (RBSpeed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                        {
+                            Vector3 speed = (VehicleRigidbody.GetPointVelocity(GroundBrakeForcePosition.position) - gdhr.velocity).normalized;
+                            VehicleRigidbody.AddForceAtPosition(-speed * BrakeStrength * DeltaTime, GroundBrakeForcePosition.position, ForceMode.Acceleration);
+                        }
                     }
-                }
-                else
-                {
-                    if (Taxiing && Speed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                    else
                     {
-                        VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, GroundBrakeStrength * DeltaTime);
+                        if (Speed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                        {
+                            Vector3 speed = VehicleRigidbody.GetPointVelocity(GroundBrakeForcePosition.position).normalized;
+                            VehicleRigidbody.AddForceAtPosition(-speed * BrakeStrength * DeltaTime, GroundBrakeForcePosition.position, ForceMode.Acceleration);
+                        }
                     }
                 }
             }
