@@ -333,6 +333,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float TaxiFullTurningSpeedDivider;
     private float vtolangledif;
+    private Vector3 VRJoystickPosLastHaptic;
     [System.NonSerializedAttribute] public bool LowFuelLastFrame;
     [System.NonSerializedAttribute] public bool NoFuelLastFrame;
     Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
@@ -647,9 +648,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
                     //MouseX = Input.GetAxisRaw("Mouse X");
                     //MouseY = Input.GetAxisRaw("Mouse Y");
-                    Vector3 JoystickPosYaw;
-                    Vector3 JoystickPos;
-                    Vector2 VRPitchRoll;
+                    Vector3 VRJoystickPos = Vector3.zero;
 
                     float ThrottleGrip;
                     float JoyStickGrip;
@@ -674,36 +673,44 @@ public class SaccAirVehicle : UdonSharpBehaviour
                             EntityControl.SendEventToExtensions("SFEXT_O_JoystickGrabbed");
                             VehicleRotDif = Quaternion.identity;
                             if (SwitchHandsJoyThrottle)
-                            { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the plane when it was pressed
-                            else
-                            { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }
-                        }
-                        //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
-                        Quaternion JoystickDifference;
-                        if (SwitchHandsJoyThrottle)
-                        { JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
-                        else { JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
-
-                        JoystickPosYaw = (JoystickDifference * ControlsRoot.forward);//angles to vector
-                        JoystickPosYaw.y = 0;
-                        JoystickPos = (JoystickDifference * ControlsRoot.up);
-                        VRPitchRoll = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;
-
-                        JoystickGripLastFrame = true;
-                        //making a circular joy stick square
-                        //pitch and roll
-                        if (Mathf.Abs(VRPitchRoll.x) > Mathf.Abs(VRPitchRoll.y))
-                        {
-                            if (Mathf.Abs(VRPitchRoll.x) > 0)
                             {
-                                float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.x);
-                                VRPitchRoll *= temp;
+                                JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation;
+                                localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35);
+                            }//rotation of the controller relative to the plane when it was pressed
+                            else
+                            {
+                                JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
+                                localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35);
                             }
                         }
-                        else if (Mathf.Abs(VRPitchRoll.y) > 0)
+                        JoystickGripLastFrame = true;
+                        //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
+                        Quaternion JoystickDifference;
+                        JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
+                            (SwitchHandsJoyThrottle ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation
+                                                    : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation)
+                        * Quaternion.Inverse(JoystickZeroPoint);
+
+
+                        Vector3 JoystickPosYaw = (JoystickDifference * ControlsRoot.forward);//angles to vector
+                        JoystickPosYaw.y = 0;
+                        Vector3 JoystickPos = (JoystickDifference * ControlsRoot.up) * 1.41421f;
+                        JoystickPos.y = 0;
+
+                        //making a circular joy stick square
+                        //pitch and roll
+                        if (Mathf.Abs(JoystickPos.x) > Mathf.Abs(JoystickPos.z))
                         {
-                            float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.y);
-                            VRPitchRoll *= temp;
+                            if (Mathf.Abs(JoystickPos.x) > 0)
+                            {
+                                float temp = JoystickPos.magnitude / Mathf.Abs(JoystickPos.x);
+                                JoystickPos *= temp;
+                            }
+                        }
+                        else if (Mathf.Abs(JoystickPos.z) > 0)
+                        {
+                            float temp = JoystickPos.magnitude / Mathf.Abs(JoystickPos.z);
+                            JoystickPos *= temp;
                         }
                         //yaw
                         if (Mathf.Abs(JoystickPosYaw.x) > Mathf.Abs(JoystickPosYaw.z))
@@ -719,14 +726,19 @@ public class SaccAirVehicle : UdonSharpBehaviour
                             float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.z);
                             JoystickPosYaw *= temp;
                         }
-
+                        VRJoystickPos = (new Vector3(JoystickPos.z, JoystickPosYaw.x, JoystickPos.x));
                     }
                     else
                     {
-                        JoystickPosYaw.x = 0;
-                        VRPitchRoll = Vector3.zero;
+                        VRJoystickPos = Vector3.zero;
                         if (JoystickGripLastFrame)//first frame you let go of joystick
-                        { EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped"); }
+                        {
+                            EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped");
+                            if (SwitchHandsJoyThrottle)
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                            else
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                        }
                         JoystickGripLastFrame = false;
                     }
 
@@ -744,8 +756,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     {
                         Vector3 handdistance;
                         if (SwitchHandsJoyThrottle)
-                        { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
-                        else { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
+                        {
+                            handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
+                        }
+                        else
+                        {
+                            handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                        }
                         handdistance = ControlsRoot.InverseTransformDirection(handdistance);
 
                         float HandThrottleAxis;
@@ -760,6 +777,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
                         if (!ThrottleGripLastFrame)
                         {
+                            if (SwitchHandsJoyThrottle)
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                            else
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
                             EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
                             ThrottleZeroPoint = HandThrottleAxis;
                             TempThrottle = PlayerThrottle;
@@ -786,6 +807,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         if (ThrottleGripLastFrame)
                         {
                             EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                            if (SwitchHandsJoyThrottle)
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                            else
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
                         }
                         ThrottleGripLastFrame = false;
                     }
@@ -900,30 +925,31 @@ public class SaccAirVehicle : UdonSharpBehaviour
                                 LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                                 LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                                 RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                                RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                                //RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                             }
-                            VRPitchRoll = LStickPos;
-                            JoystickPosYaw.x = RStickPos.x;
+                            VRJoystickPos.x = LStickPos.x;
+                            VRJoystickPos.y = LStickPos.y;
+                            VRJoystickPos.z = RStickPos.x;
                             //make stick input square
-                            if (Mathf.Abs(VRPitchRoll.x) > Mathf.Abs(VRPitchRoll.y))
+                            if (Mathf.Abs(VRJoystickPos.x) > Mathf.Abs(VRJoystickPos.y))
                             {
-                                if (Mathf.Abs(VRPitchRoll.x) > 0)
+                                if (Mathf.Abs(VRJoystickPos.x) > 0)
                                 {
-                                    float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.x);
-                                    VRPitchRoll *= temp;
+                                    float temp = VRJoystickPos.magnitude / Mathf.Abs(VRJoystickPos.x);
+                                    VRJoystickPos *= temp;
                                 }
                             }
-                            else if (Mathf.Abs(VRPitchRoll.y) > 0)
+                            else if (Mathf.Abs(VRJoystickPos.y) > 0)
                             {
-                                float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.y);
-                                VRPitchRoll *= temp;
+                                float temp = VRJoystickPos.magnitude / Mathf.Abs(VRJoystickPos.y);
+                                VRJoystickPos *= temp;
                             }
                         }
 
-                        RotationInputs.x = Mathf.Clamp(VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
-                        RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits;
+                        RotationInputs.x = Mathf.Clamp(VRJoystickPos.x + Wi + Si + downi + upi, -1, 1) * Limits;
+                        RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.y, -1, 1) * Limits;
                         //roll isn't subject to flight limits
-                        RotationInputs.z = Mathf.Clamp(((VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
+                        RotationInputs.z = Mathf.Clamp(((VRJoystickPos.z + Ai + Di + lefti + righti) * -1), -1, 1);
                     }
 
                     //ability to adjust input to be more precise at low amounts. 'exponant'
