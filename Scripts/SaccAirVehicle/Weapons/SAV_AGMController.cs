@@ -45,22 +45,38 @@ public class SAV_AGMController : UdonSharpBehaviour
     private Rigidbody AGMRigid;
     private ConstantForce MissileConstant;
     private bool hitwater;
-    private void Start()
+    private bool initialized;
+    private int LifeTimeExplodesSent;
+    private void Initialize()
     {
+        initialized = true;
         EntityControl = (SaccEntity)AGMLauncherControl.GetProgramVariable("EntityControl");
         VehicleCenterOfMass = EntityControl.CenterOfMass;
-        TargetTransform = (Transform)AGMLauncherControl.GetProgramVariable("TrackedTransform");
-        TargetOffset = (Vector3)AGMLauncherControl.GetProgramVariable("TrackedObjectOffset");
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
         AGMRigid = gameObject.GetComponent<Rigidbody>();
         MissileConstant = GetComponent<ConstantForce>();
+    }
+    public void ThrowMissile()
+    {
         AGMRigid.velocity += (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
-
+    }
+    private void OnEnable()
+    {
+        if (!initialized) { Initialize(); }
+        TargetTransform = (Transform)AGMLauncherControl.GetProgramVariable("TrackedTransform");
+        TargetOffset = (Vector3)AGMLauncherControl.GetProgramVariable("TrackedObjectOffset");
         if (EntityControl.InEditor) { IsOwner = true; }
         else
         { IsOwner = (bool)AGMLauncherControl.GetProgramVariable("IsOwner"); }
         SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+        LifeTimeExplodesSent++;
         SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
+        SendCustomEventDelayedFrames(nameof(ThrowMissile), 1);//doesn't work if done this frame
+
+        //LateUpdate runs one time after MoveBackToPool so these must be here
+        ColliderActive = false;
+        MissileConstant.relativeTorque = Vector3.zero;
+        MissileConstant.relativeForce = Vector3.zero;
     }
     void LateUpdate()
     {
@@ -93,9 +109,26 @@ public class SAV_AGMController : UdonSharpBehaviour
     public void StartTracking()
     { StartTrack = true; }
     public void LifeTimeExplode()
-    { if (!Exploding) { hitwater = false; Explode(); } }
-    public void DestroySelf()
-    { Destroy(gameObject); }
+    {
+        //prevent the delayed event from a previous life causing explosion
+        if (LifeTimeExplodesSent == 1)
+        {
+            if (!Exploding && gameObject.activeSelf)//active = not in pool
+            { hitwater = false; Explode(); }
+        }
+        LifeTimeExplodesSent--;
+    }
+    public void MoveBackToPool()
+    {
+        gameObject.SetActive(false);
+        transform.SetParent(AGMLauncherControl.transform);
+        AGMCollider.enabled = false;
+        AGMRigid.constraints = RigidbodyConstraints.None;
+        AGMRigid.angularVelocity = Vector3.zero;
+        transform.localPosition = Vector3.zero;
+        StartTrack = false;
+        Exploding = false;
+    }
     private void OnCollisionEnter(Collision other)
     { if (!Exploding) { hitwater = false; Explode(); } }
     private void OnTriggerEnter(Collider other)
@@ -135,6 +168,6 @@ public class SAV_AGMController : UdonSharpBehaviour
         { AGMani.SetTrigger("explodeowner"); }
         else { AGMani.SetTrigger("explode"); }
         AGMani.SetBool("hitwater", hitwater);
-        SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
+        SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
     }
 }

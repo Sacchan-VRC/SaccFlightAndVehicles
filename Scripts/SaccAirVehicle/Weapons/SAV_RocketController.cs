@@ -20,33 +20,56 @@ public class SAV_RocketController : UdonSharpBehaviour
     public AudioSource[] WaterExplosionSounds;
     [Tooltip("Spawn bomb at a random angle up to this number of degrees")]
     public float AngleRandomization = 0;
-    private Rigidbody BombRigid;
+    private Rigidbody RocketRigid;
     private SaccEntity EntityControl;
     [System.NonSerializedAttribute] public bool Exploding = false;
     private CapsuleCollider RocketCollider;
     private Transform VehicleCenterOfMass;
     private bool hitwater;
     private bool IsOwner;
-
-    private void Start()
+    private bool initialized;
+    private int LifeTimeExplodesSent;
+    private void Initialize()
     {
+        initialized = true;
         EntityControl = (SaccEntity)LauncherControl.GetProgramVariable("EntityControl");
         VehicleCenterOfMass = EntityControl.CenterOfMass;
         RocketCollider = GetComponent<CapsuleCollider>();
-        BombRigid = GetComponent<Rigidbody>();
+        RocketRigid = GetComponent<Rigidbody>();
+    }
+    private void OnEnable()
+    {
+        if (!initialized) { Initialize(); }
         transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
         if (EntityControl.InEditor) { IsOwner = true; }
         else
         { IsOwner = (bool)LauncherControl.GetProgramVariable("IsOwner"); }
         SendCustomEventDelayedSeconds(nameof(EnableCollider), ColliderEnableDelay);
         SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+        LifeTimeExplodesSent++;
     }
     public void EnableCollider()
     { RocketCollider.enabled = true; }
     public void LifeTimeExplode()
-    { if (!Exploding) { hitwater = false; Explode(); } }
-    public void DestroySelf()
-    { Destroy(gameObject); }
+    {
+        //prevent the delayed event from a previous life causing explosion
+        if (LifeTimeExplodesSent == 1)
+        {
+            if (!Exploding && gameObject.activeSelf)//active = not in pool
+            { hitwater = false; Explode(); }
+        }
+        LifeTimeExplodesSent--;
+    }
+    public void MoveBackToPool()
+    {
+        gameObject.SetActive(false);
+        transform.SetParent(LauncherControl.transform);
+        RocketCollider.enabled = false;
+        RocketRigid.constraints = RigidbodyConstraints.None;
+        RocketRigid.angularVelocity = Vector3.zero;
+        transform.localPosition = Vector3.zero;
+        Exploding = false;
+    }
     private void OnCollisionEnter(Collision other)
     { if (!Exploding) { hitwater = false; Explode(); } }
     private void OnTriggerEnter(Collider other)
@@ -62,10 +85,10 @@ public class SAV_RocketController : UdonSharpBehaviour
     }
     private void Explode()
     {
-        if (BombRigid)
+        if (RocketRigid)
         {
-            BombRigid.constraints = RigidbodyConstraints.FreezePosition;
-            BombRigid.velocity = Vector3.zero;
+            RocketRigid.constraints = RigidbodyConstraints.FreezePosition;
+            RocketRigid.velocity = Vector3.zero;
         }
         Exploding = true;
         if (hitwater && WaterExplosionSounds.Length > 0)
@@ -89,6 +112,6 @@ public class SAV_RocketController : UdonSharpBehaviour
         { Rocketani.SetTrigger("explodeowner"); }
         else { Rocketani.SetTrigger("explode"); }
         Rocketani.SetBool("hitwater", hitwater);
-        SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
+        SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
     }
 }

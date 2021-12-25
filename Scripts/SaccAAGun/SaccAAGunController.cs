@@ -102,6 +102,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     private float FullAAMsDivider;
     private float FullHealthDivider;
     private bool LTriggerLastFrame;
+    private int NumChildrenStart;
     [System.NonSerializedAttribute] public bool DoAAMTargeting = false;
     [System.NonSerializedAttribute] public int FullAAMs;
     [System.NonSerializedAttribute] public float AAMReloadTimer;
@@ -187,6 +188,20 @@ public class SaccAAGunController : UdonSharpBehaviour
         NumAAMTargets = EntityControl.NumAAMTargets;
         if (NumAAMTargets != 0 && !DisableAAMTargeting) { DoAAMTargeting = true; }
         gameObject.SetActive(true);
+
+
+        NumChildrenStart = transform.childCount;
+        int NumToInstantiate = Mathf.Min(FullAAMs, 10);
+        for (int i = 0; i < NumToInstantiate; i++)
+        {
+            InstantiateWeapon();
+        }
+    }
+    private GameObject InstantiateWeapon()
+    {
+        GameObject NewWeap = VRCInstantiate(AAM);
+        NewWeap.transform.SetParent(transform);
+        return NewWeap;
     }
     void LateUpdate()
     {
@@ -616,7 +631,12 @@ public class SaccAAGunController : UdonSharpBehaviour
     {
         if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
         AAGunAnimator.SetTrigger("aamlaunched");
-        GameObject NewAAM = VRCInstantiate(AAM); ;
+        GameObject NewAAM;
+        if (transform.childCount - NumChildrenStart > 0)
+        { NewAAM = transform.GetChild(NumChildrenStart).gameObject; }
+        else
+        { NewAAM = InstantiateWeapon(); }
+        NewAAM.transform.SetParent(null);
         if (!(NumAAM % 2 == 0))
         {
             //invert local x coordinates of launch point, launch, then revert, for odd numbered shots

@@ -95,6 +95,7 @@ public class StingerScript : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private Rigidbody StingerRigid;
     private bool active = false;
+    private int NumChildrenStart;
     [System.NonSerializedAttribute] public Vector3 Spawnposition;
     [System.NonSerializedAttribute] public Quaternion Spawnrotation;
     public void SFEXT_L_EntityStart()
@@ -117,6 +118,19 @@ public class StingerScript : UdonSharpBehaviour
         Spawnposition = StingerTransform.position;
         Spawnrotation = StingerTransform.rotation;
         StingerPickup = (VRC_Pickup)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
+
+        NumChildrenStart = transform.childCount;
+        int NumToInstantiate = Mathf.Min(FullAAMs, 10);
+        for (int i = 0; i < NumToInstantiate; i++)
+        {
+            InstantiateWeapon();
+        }
+    }
+    private GameObject InstantiateWeapon()
+    {
+        GameObject NewWeap = VRCInstantiate(AAM);
+        NewWeap.transform.SetParent(transform);
+        return NewWeap;
     }
     public void SFEXT_O_OnPickup()
     {
@@ -409,7 +423,12 @@ public class StingerScript : UdonSharpBehaviour
         if (StingerAnimator) { StingerAnimator.SetTrigger(AnimFiredTriggerName); }
         if (AAM)
         {
-            GameObject NewAAM = VRCInstantiate(AAM);
+            GameObject NewAAM;
+            if (transform.childCount - NumChildrenStart > 0)
+            { NewAAM = transform.GetChild(NumChildrenStart).gameObject; }
+            else
+            { NewAAM = InstantiateWeapon(); }
+            NewAAM.transform.SetParent(null);
             NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             NewAAM.SetActive(true);
         }

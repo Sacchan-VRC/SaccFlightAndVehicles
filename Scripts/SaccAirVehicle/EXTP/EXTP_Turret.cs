@@ -43,6 +43,7 @@ public class EXTP_Turret : UdonSharpBehaviour
     public bool SendAnimTrigger = false;
     public Animator TurretAnimator;
     public string AnimTriggerName = "TurretFire";
+    [System.NonSerializedAttribute] public SaccEntity EntityControl;
     private float LastFireTime = 0f;
     private int FullAmmo;
     private float FullAmmoDivider;
@@ -77,6 +78,7 @@ public class EXTP_Turret : UdonSharpBehaviour
     private bool Occupied;
     private bool TriggerLastFrame = true;
     private bool Manning;
+    private int NumChildrenStart;
     Quaternion ControlsRotLastFrame;
     Quaternion JoystickZeroPoint;
     [System.NonSerializedAttribute] public bool IsOwner;//required by the bomb script, not actually related to being the owner of the object
@@ -86,6 +88,7 @@ public class EXTP_Turret : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         if (!ControlsRoot) { ControlsRoot = TurretRotatorHor; }
 
         nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
@@ -96,6 +99,19 @@ public class EXTP_Turret : UdonSharpBehaviour
         if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
         reloadspeed = FullAmmo / FullReloadTimeSec;
         if (SideAngleMax < 180) { ClampHor = true; }
+
+        NumChildrenStart = transform.childCount;
+        int NumToInstantiate = Mathf.Min(FullAmmo, 10);
+        for (int i = 0; i < NumToInstantiate; i++)
+        {
+            InstantiateWeapon();
+        }
+    }
+    private GameObject InstantiateWeapon()
+    {
+        GameObject NewWeap = VRCInstantiate(Projectile);
+        NewWeap.transform.SetParent(transform);
+        return NewWeap;
     }
     public void SFEXTP_O_UserEnter()
     {
@@ -132,7 +148,12 @@ public class EXTP_Turret : UdonSharpBehaviour
         if (Ammo > 0) { Ammo--; }
         for (int x = 0; x < fp; x++)
         {
-            GameObject proj = VRCInstantiate(Projectile);
+            GameObject proj;
+            if (transform.childCount - NumChildrenStart > 0)
+            { proj = transform.GetChild(NumChildrenStart).gameObject; }
+            else
+            { proj = InstantiateWeapon(); }
+            proj.transform.SetParent(null);
             proj.transform.SetPositionAndRotation(FirePoints[x].position, FirePoints[x].rotation);
             proj.SetActive(true);
             proj.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

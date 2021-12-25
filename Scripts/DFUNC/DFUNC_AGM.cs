@@ -66,6 +66,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public Transform AGMLaunchPoint;
     public LayerMask AGMTargetsLayer = 67108864;
     private float FullAGMsDivider;
+    private int NumChildrenStart;
     [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(AGMTarget))] public Vector3 _AGMTarget;
     public Vector3 AGMTarget
     {
@@ -128,6 +129,19 @@ public class DFUNC_AGM : UdonSharpBehaviour
         FindSelf();
 
         if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
+
+        NumChildrenStart = transform.childCount;
+        int NumToInstantiate = Mathf.Min(FullAGMs, 10);
+        for (int i = 0; i < NumToInstantiate; i++)
+        {
+            InstantiateWeapon();
+        }
+    }
+    private GameObject InstantiateWeapon()
+    {
+        GameObject NewWeap = VRCInstantiate(AGM);
+        NewWeap.transform.SetParent(transform);
+        return NewWeap;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -388,7 +402,12 @@ public class DFUNC_AGM : UdonSharpBehaviour
         if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
         if (AGM)
         {
-            GameObject NewAGM = VRCInstantiate(AGM);
+            GameObject NewAGM;
+            if (transform.childCount - NumChildrenStart > 0)
+            { NewAGM = transform.GetChild(NumChildrenStart).gameObject; }
+            else
+            { NewAGM = InstantiateWeapon(); }
+            NewAGM.transform.SetParent(null);
             NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.rotation);
             NewAGM.SetActive(true);
             NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

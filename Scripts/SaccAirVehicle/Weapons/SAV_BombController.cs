@@ -35,21 +35,38 @@ public class SAV_BombController : UdonSharpBehaviour
     private Transform VehicleCenterOfMass;
     private bool hitwater;
     private bool IsOwner;
-    private void Start()
+    private bool initialized;
+    private int LifeTimeExplodesSent;
+    private void Initialize()
     {
+        initialized = true;
         EntityControl = (SaccEntity)BombLauncherControl.GetProgramVariable("EntityControl");
         BombCollider = GetComponent<CapsuleCollider>();
         BombRigid = GetComponent<Rigidbody>();
         BombConstant = GetComponent<ConstantForce>();
         VehicleCenterOfMass = EntityControl.CenterOfMass;
         transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
+
+    }
+    public void AddLaunchSpeed()
+    {
+        BombRigid.velocity += transform.forward * LaunchSpeed;
+    }
+    private void OnEnable()
+    {
+        if (!initialized) { Initialize(); }
         if (EntityControl.InEditor) { IsOwner = true; }
         else
         { IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner"); }
         SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
-        BombRigid.velocity += transform.forward * LaunchSpeed;
-    }
+        LifeTimeExplodesSent++;
+        SendCustomEventDelayedFrames(nameof(AddLaunchSpeed), 1);//doesn't work if done this frame
 
+        //LateUpdate runs one time after MoveBackToPool so these must be here
+        ColliderActive = false;
+        BombConstant.relativeTorque = Vector3.zero;
+        BombConstant.relativeForce = Vector3.zero;
+    }
     void LateUpdate()
     {
         if (!ColliderActive)
@@ -66,9 +83,28 @@ public class SAV_BombController : UdonSharpBehaviour
         BombConstant.relativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0);
     }
     public void LifeTimeExplode()
-    { if (!Exploding) { hitwater = false; Explode(); } }
-    public void DestroySelf()
-    { Destroy(gameObject); }
+    {
+        //prevent the delayed event from a previous life causing explosion
+        if (LifeTimeExplodesSent == 1)
+        {
+            if (!Exploding && gameObject.activeSelf)//active = not in pool
+            { hitwater = false; Explode(); }
+        }
+        LifeTimeExplodesSent--;
+    }
+    public void MoveBackToPool()
+    {
+        gameObject.SetActive(false);
+        transform.SetParent(BombLauncherControl.transform);
+        BombCollider.enabled = false;
+        ColliderActive = false;
+        BombConstant.relativeTorque = Vector3.zero;
+        BombConstant.relativeForce = Vector3.zero;
+        BombRigid.constraints = RigidbodyConstraints.None;
+        BombRigid.angularVelocity = Vector3.zero;
+        transform.localPosition = Vector3.zero;
+        Exploding = false;
+    }
     private void OnCollisionEnter(Collision other)
     { if (!Exploding) { hitwater = false; Explode(); } }
     private void OnTriggerEnter(Collider other)
@@ -111,6 +147,6 @@ public class SAV_BombController : UdonSharpBehaviour
         { Bombani.SetTrigger("explodeowner"); }
         else { Bombani.SetTrigger("explode"); }
         Bombani.SetBool("hitwater", hitwater);
-        SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
+        SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
     }
 }

@@ -83,6 +83,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool IsOwner;
     [System.NonSerializedAttribute] public bool InEditor;
     private float reloadspeed;
+    private int NumChildrenStart;
     private bool LeftDial = false;
     private int DialPosition = -999;
     private VRCPlayerApi localPlayer;
@@ -113,6 +114,19 @@ public class DFUNC_AAM : UdonSharpBehaviour
         FindSelf();
 
         if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+
+        NumChildrenStart = transform.childCount;
+        int NumToInstantiate = Mathf.Min(FullAAMs, 10);
+        for (int i = 0; i < NumToInstantiate; i++)
+        {
+            InstantiateWeapon();
+        }
+    }
+    private GameObject InstantiateWeapon()
+    {
+        GameObject NewWeap = VRCInstantiate(AAM);
+        NewWeap.transform.SetParent(transform);
+        return NewWeap;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -440,7 +454,12 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (AAMAnimator) { AAMAnimator.SetTrigger(AnimFiredTriggerName); }
         if (AAM)
         {
-            GameObject NewAAM = VRCInstantiate(AAM);
+            GameObject NewAAM;
+            if (transform.childCount - NumChildrenStart > 0)
+            { NewAAM = transform.GetChild(NumChildrenStart).gameObject; }
+            else
+            { NewAAM = InstantiateWeapon(); }
+            NewAAM.transform.SetParent(null);
             NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

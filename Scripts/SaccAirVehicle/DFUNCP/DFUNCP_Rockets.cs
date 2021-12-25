@@ -30,6 +30,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     private Transform VehicleTransform;
     private float reloadspeed;
     private Vector3 AmmoBarScaleStart;
+    private int NumChildrenStart;
     private VRCPlayerApi localPlayer;
     private bool InVR;
     private bool IsOwner;
@@ -49,6 +50,19 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         {
             InVR = localPlayer.IsUserInVR();
         }
+
+        NumChildrenStart = transform.childCount;
+        int NumToInstantiate = Mathf.Min(FullRockets, 10);
+        for (int i = 0; i < NumToInstantiate; i++)
+        {
+            InstantiateWeapon();
+        }
+    }
+    private GameObject InstantiateWeapon()
+    {
+        GameObject NewWeap = VRCInstantiate(Rocket);
+        NewWeap.transform.SetParent(transform);
+        return NewWeap;
     }
     public void DFUNC_Selected()
     {
@@ -126,8 +140,12 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
         if (Rocket != null)
         {
-            GameObject NewRocket =  VRCInstantiate(Rocket);
-
+            GameObject NewRocket;
+            if (transform.childCount - NumChildrenStart > 0)
+            { NewRocket = transform.GetChild(NumChildrenStart).gameObject; }
+            else
+            { NewRocket = InstantiateWeapon(); }
+            NewRocket.transform.SetParent(null);
             NewRocket.transform.SetPositionAndRotation(RocketLaunchPoints[RocketPoint].position, RocketLaunchPoints[RocketPoint].rotation);
             NewRocket.SetActive(true);
             NewRocket.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

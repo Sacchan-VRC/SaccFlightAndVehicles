@@ -89,26 +89,49 @@ public class SAV_AAMController : UdonSharpBehaviour
     private float NotchLimitDot;
     private bool hitwater;
     private ConstantForce MissileConstant;
-    void Start()
+    private bool initialized;
+    private int LifeTimeExplodesSent;
+    void Initialize()
     {
         EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
         //whatever script is launching the missiles must contain all of these variables
-        if (EntityControl.InEditor) { IsOwner = true; }
-        else
-        { IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner"); }
         InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
-        GameObject[] AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
-        int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
         VehicleCenterOfMass = EntityControl.CenterOfMass;
-
         MissileConstant = GetComponent<ConstantForce>();
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
-        MissileRigid.velocity = MissileRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
-        Target = AAMTargets[aamtarg].transform;
+
         NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
         NotchLimitDot = 1 - Mathf.Cos(NotchAngle * Mathf.Deg2Rad);
         HighAspectTrack = Mathf.Cos(HighAspectTrackAngle * Mathf.Deg2Rad);
+
+    }
+    public void StartTracking()
+    {
+        StartTrack = true;
+    }
+    public void ThrowMissile()
+    {
+        MissileRigid.velocity = MissileRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
+    }
+    private void OnEnable()
+    {
+        if (!initialized) { Initialize(); }
+        if (EntityControl.InEditor) { IsOwner = true; }
+        else
+        { IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner"); }
+        int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
+        GameObject[] AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
+        Target = AAMTargets[aamtarg].transform;
+        SendCustomEventDelayedFrames(nameof(ThrowMissile), 1);//doesn't work if done this frame
+
+        //LateUpdate runs one time after MoveBackToPool so these must be here
+        ColliderActive = false;
+        MissileConstant.relativeTorque = Vector3.zero;
+        MissileConstant.relativeForce = Vector3.zero;
+        LockHack = true;
+        TargetLost = false;
+
         if (!Target)
         {
             TargetLost = true;
@@ -139,15 +162,12 @@ public class SAV_AAMController : UdonSharpBehaviour
             if (InEditor || IsOwner || LockHackTime == 0)
             { LockHack = false; }
             else
-            { SendCustomEventDelayedSeconds(nameof(DisbaleLockHack), FlyStraightTime + LockHackTime); }
+            { SendCustomEventDelayedSeconds(nameof(DisableLockHack), FlyStraightTime + LockHackTime); }
         }
         Initialized = true;
-        SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
         SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
-    }
-    public void StartTracking()
-    {
-        StartTrack = true;
+        SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+        LifeTimeExplodesSent++;
     }
     void FixedUpdate()
     {
@@ -246,10 +266,18 @@ public class SAV_AAMController : UdonSharpBehaviour
             TargDistlastframe = TargetDistance;
         }
     }
-    public void DisbaleLockHack()
+    public void DisableLockHack()
     { LockHack = false; }
     public void LifeTimeExplode()
-    { if (!Exploding) { hitwater = false; Explode(); } }
+    {
+        //prevent the delayed event from a previous life causing explosion
+        if (LifeTimeExplodesSent == 1)
+        {
+            if (!Exploding && gameObject.activeSelf)//active = not in pool
+            { hitwater = false; Explode(); }
+        }
+        LifeTimeExplodesSent--;
+    }
     private void OnTriggerEnter(Collider other)
     {
         if (other && other.gameObject.layer == 4 /* water */)
@@ -261,8 +289,21 @@ public class SAV_AAMController : UdonSharpBehaviour
             }
         }
     }
-    public void DestroySelf()
-    { Destroy(gameObject); }
+    public void MoveBackToPool()
+    {
+        gameObject.SetActive(false);
+        transform.SetParent(AAMLauncherControl.transform);
+        AAMCollider.enabled = false;
+        ColliderActive = false;
+        MissileConstant.relativeTorque = Vector3.zero;
+        MissileConstant.relativeForce = Vector3.zero;
+        MissileRigid.constraints = RigidbodyConstraints.None;
+        MissileRigid.angularVelocity = Vector3.zero;
+        transform.localPosition = Vector3.zero;
+        TargetSAVControl = null;
+        StartTrack = false;
+        Exploding = false;
+    }
     private void OnCollisionEnter(Collision other)
     {
         if (!Exploding)
@@ -345,6 +386,6 @@ public class SAV_AAMController : UdonSharpBehaviour
         }
         AAMani.SetTrigger("explode");
         AAMani.SetBool("hitwater", hitwater);
-        SendCustomEventDelayedSeconds(nameof(DestroySelf), ExplosionLifeTime);
+        SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
     }
 }

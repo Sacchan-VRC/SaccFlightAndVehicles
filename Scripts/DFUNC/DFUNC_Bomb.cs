@@ -62,6 +62,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     private bool OthersEnabled = false;
     private bool func_active = false;
     private int DialPosition = -999;
+    private int NumChildrenStart;
     private VRCPlayerApi localPlayer;
     [System.NonSerializedAttribute] public Transform CenterOfMass;
     [System.NonSerializedAttribute] public bool IsOwner;
@@ -83,6 +84,19 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         FindSelf();
 
         if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
+
+        NumChildrenStart = transform.childCount;
+        int NumToInstantiate = Mathf.Min(FullBombs, 10);
+        for (int i = 0; i < NumToInstantiate; i++)
+        {
+            InstantiateWeapon();
+        }
+    }
+    private GameObject InstantiateWeapon()
+    {
+        GameObject NewWeap = VRCInstantiate(Bomb);
+        NewWeap.transform.SetParent(transform);
+        return NewWeap;
     }
     public void SFEXT_O_PilotEnter()
     {
@@ -212,8 +226,12 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         BombAnimator.SetTrigger(AnimFiredTriggerName);
         if (Bomb)
         {
-            GameObject NewBomb = VRCInstantiate(Bomb);
-
+            GameObject NewBomb;
+            if (transform.childCount - NumChildrenStart > 0)
+            { NewBomb = transform.GetChild(NumChildrenStart).gameObject; }
+            else
+            { NewBomb = InstantiateWeapon(); }
+            NewBomb.transform.SetParent(null);
             NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, VehicleTransform.rotation);
             NewBomb.SetActive(true);
             NewBomb.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
