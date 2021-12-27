@@ -133,6 +133,8 @@ public class EXTP_Turret : UdonSharpBehaviour
         if (AmmoBar) { AmmoBar.gameObject.SetActive(false); }
         if (ViewCamera) { ViewCamera.gameObject.SetActive(false); }
         if (ViewCameraScreen) { ViewCameraScreen.gameObject.SetActive(false); }
+        RotationSpeedX = 0;
+        RotationSpeedY = 0;
     }
     public void Set_Active()
     {
