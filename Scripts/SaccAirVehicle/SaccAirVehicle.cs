@@ -47,6 +47,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public bool VerticalThrottle = false;
     [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
     public float ThrottleSensitivity = 6f;
+    [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
+    public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
     [Tooltip("How much more thrust the vehicle has when in full afterburner")]
     public float AfterburnerThrustMulti = 1.5f;
     [Tooltip("How quickly the vehicle throttles up after throttle is increased (Lerp)")]
@@ -689,44 +691,17 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
                             (SwitchHandsJoyThrottle ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation
                                                     : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation)
-                        * Quaternion.Inverse(JoystickZeroPoint);
+                        * Quaternion.Inverse(JoystickZeroPoint)
+                         * ControlsRoot.rotation;
 
-
-                        Vector3 JoystickPosYaw = (JoystickDifference * ControlsRoot.forward);//angles to vector
-                        JoystickPosYaw.y = 0;
-                        Vector3 JoystickPos = (JoystickDifference * ControlsRoot.up) * 1.41421f;
-                        JoystickPos.y = 0;
-
-                        //making a circular joy stick square
-                        //pitch and roll
-                        if (Mathf.Abs(JoystickPos.x) > Mathf.Abs(JoystickPos.z))
-                        {
-                            if (Mathf.Abs(JoystickPos.x) > 0)
-                            {
-                                float temp = JoystickPos.magnitude / Mathf.Abs(JoystickPos.x);
-                                JoystickPos *= temp;
-                            }
-                        }
-                        else if (Mathf.Abs(JoystickPos.z) > 0)
-                        {
-                            float temp = JoystickPos.magnitude / Mathf.Abs(JoystickPos.z);
-                            JoystickPos *= temp;
-                        }
-                        //yaw
-                        if (Mathf.Abs(JoystickPosYaw.x) > Mathf.Abs(JoystickPosYaw.z))
-                        {
-                            if (Mathf.Abs(JoystickPosYaw.x) > 0)
-                            {
-                                float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.x);
-                                JoystickPosYaw *= temp;
-                            }
-                        }
-                        else if (Mathf.Abs(JoystickPosYaw.z) > 0)
-                        {
-                            float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.z);
-                            JoystickPosYaw *= temp;
-                        }
-                        VRJoystickPos = (new Vector3(JoystickPos.z, JoystickPosYaw.x, JoystickPos.x));
+                        //create normalized vectors facing towards the 'forward' and 'up' directions of the joystick
+                        Vector3 JoystickPosYaw = (JoystickDifference * Vector3.forward);
+                        Vector3 JoystickPos = (JoystickDifference * Vector3.up);
+                        //use acos to convert the relevant elements of the array into angles(radians), re-center around zero, then normalize between 0-1 and multiply for desired deflection
+                        //the clamp is there because rotating a vector3 can cause it to go a miniscule amount beyond length 1, resulting in NaN (crashes vrc)
+                        VRJoystickPos.x = -(Mathf.Acos(Mathf.Clamp(JoystickPos.z, -1, 1)) - 1.5707963268f) * 0.63661990481259f * (90 / MaxJoyAngles.x);
+                        VRJoystickPos.y = -(Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * 0.63661990481259f * (90 / MaxJoyAngles.y);
+                        VRJoystickPos.z = -(Mathf.Acos(Mathf.Clamp(JoystickPos.x, -1, 1)) - 1.5707963268f) * 0.63661990481259f * (90 / MaxJoyAngles.z);
                     }
                     else
                     {
