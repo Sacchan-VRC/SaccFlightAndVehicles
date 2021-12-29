@@ -686,7 +686,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                             }
                         }
                         JoystickGripLastFrame = true;
-                        //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
+                        //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint, finally rotated by the vehicles rotation to turn it back to vehicle space
                         Quaternion JoystickDifference;
                         JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
                             (SwitchHandsJoyThrottle ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation
@@ -697,11 +697,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         //create normalized vectors facing towards the 'forward' and 'up' directions of the joystick
                         Vector3 JoystickPosYaw = (JoystickDifference * Vector3.forward);
                         Vector3 JoystickPos = (JoystickDifference * Vector3.up);
-                        //use acos to convert the relevant elements of the array into angles(radians), re-center around zero, then normalize between 0-1 and multiply for desired deflection
+                        //use acos to convert the relevant elements of the array into radians, re-center around zero, then normalize between -1 and 1 and multiply for desired deflection
                         //the clamp is there because rotating a vector3 can cause it to go a miniscule amount beyond length 1, resulting in NaN (crashes vrc)
-                        VRJoystickPos.x = -(Mathf.Acos(Mathf.Clamp(JoystickPos.z, -1, 1)) - 1.5707963268f) * 0.63661990481259f * (90 / MaxJoyAngles.x);
-                        VRJoystickPos.y = -(Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * 0.63661990481259f * (90 / MaxJoyAngles.y);
-                        VRJoystickPos.z = -(Mathf.Acos(Mathf.Clamp(JoystickPos.x, -1, 1)) - 1.5707963268f) * 0.63661990481259f * (90 / MaxJoyAngles.z);
+                        VRJoystickPos.x = -((Mathf.Acos(Mathf.Clamp(JoystickPos.z, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.x;
+                        VRJoystickPos.y = -((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
+                        VRJoystickPos.z = -((Mathf.Acos(Mathf.Clamp(JoystickPos.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.z;
                     }
                     else
                     {
@@ -1178,6 +1178,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
         if (IsOwner)
         {
+            VehicleConstantForce.relativeForce = Vector3.zero;
+            VehicleConstantForce.relativeTorque = Vector3.zero;
             VehicleRigidbody.velocity = Vector3.zero;
             VehicleRigidbody.angularVelocity = Vector3.zero;
             if (!UsingManualSync)

@@ -21,6 +21,8 @@ public class SaccAAGunController : UdonSharpBehaviour
     public AudioSource AAMLockedOn;
     [Tooltip("Joystick object that moves around in to show rotation inputs")]
     public Transform JoyStick;
+    [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
+    public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
     [Tooltip("When destroyed, will reappear after this many seconds")]
     public float RespawnDelay = 20;
     [Tooltip("Vehicle is un-destroyable for this long after spawning")]
@@ -225,9 +227,6 @@ public class SaccAAGunController : UdonSharpBehaviour
                     LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
                     RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                 }
-                Vector3 JoystickPosYaw;
-                Vector3 JoystickPos;
-
                 //virtual joystick
                 Vector2 VRPitchYawInput = Vector2.zero;
                 if (InVR)
@@ -241,19 +240,18 @@ public class SaccAAGunController : UdonSharpBehaviour
                             RotDif = Quaternion.identity;
                             JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
                         }
-                        //difference between the plane and the hand's rotation, and then the difference between that and the JoystickZeroPoint
-                        Quaternion JoystickDifference = (Quaternion.Inverse(Rotator.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint);
-                        JoystickPosYaw = (JoystickDifference * Rotator.forward);//angles to vector
-                        JoystickPosYaw.y = 0;
-                        JoystickPos = (JoystickDifference * Rotator.up);
-                        JoystickPos.y = 0;
-                        VRPitchYawInput = new Vector2(JoystickPos.z, JoystickPosYaw.x) * 1.41421f;
-
                         RGripLastFrame = true;
+                        //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint, finally rotated by the vehicles rotation to turn it back to vehicle space
+                        Quaternion JoystickDifference = (Quaternion.Inverse(Rotator.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint) * Rotator.rotation;
+                        //create normalized vectors facing towards the 'forward' and 'up' directions of the joystick
+                        Vector3 JoystickPosYaw = (JoystickDifference * Vector3.forward);
+                        //use acos to convert the relevant elements of the array into radians, re-center around zero, then normalize between -1 and 1 and multiply for desired deflection
+                        //the clamp is there because rotating a vector3 can cause it to go a miniscule amount beyond length 1, resulting in NaN (crashes vrc)
+                        VRPitchYawInput.x = ((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.y, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.x;
+                        VRPitchYawInput.y = -((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
                     }
                     else
                     {
-                        JoystickPosYaw.x = 0;
                         VRPitchYawInput = Vector3.zero;
                         RGripLastFrame = false;
                     }

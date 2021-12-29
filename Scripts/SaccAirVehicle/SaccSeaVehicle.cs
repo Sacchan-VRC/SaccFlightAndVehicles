@@ -38,6 +38,14 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float ThrottleStrength = 20f;
     [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
     public float ThrottleSensitivity = 6f;
+    [Tooltip("How many degrees to turn the wheel until it reaches max turning, in each direction")]
+    public float SteeringWheelDegrees = 360f;
+    [Tooltip("How long keyboard turning must be held down to reach full deflection")]
+    public float SteeringKeyboardSecsToMax = 1.5f;
+    [Tooltip("how fast steering wheel returns to neutral position 1 = 1 second, .2 = 5 seconds")]
+    public float SteeringReturnSpeed = 1f;
+    [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
+    public float SteeringReturnSpeedVR = .2f;
     [Tooltip("How much more thrust the vehicle has when in full afterburner")]
     public float AfterburnerThrustMulti = 1.5f;
     [Tooltip("How quickly the vehicle throttles up after throttle is increased (Lerp)")]
@@ -127,7 +135,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Transform CenterOfMass;
     private float LerpedYaw;
     [System.NonSerializedAttribute] public bool ThrottleGripLastFrame = false;
-    [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
+    [System.NonSerializedAttribute] public bool JoystickGripLastFrameR = false;
+    [System.NonSerializedAttribute] public bool JoystickGripLastFrameL = false;
     Quaternion JoystickZeroPoint;
     Quaternion VehicleRotLastFrame;
     [System.NonSerializedAttribute] public float PlayerThrottle;
@@ -209,8 +218,10 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float ThrottleOverride;
     [System.NonSerializedAttribute] public int JoystickOverridden = 0;
     [System.NonSerializedAttribute] public Vector3 JoystickOverride;
-
-
+    private float JoystickGrabValue;
+    private float JoystickValueLastFrame;
+    private float JoyStickValue;
+    Vector3 CompareAngleLastFrame;
     [System.NonSerializedAttribute] public int ReSupplied = 0;
     public void SFEXT_L_EntityStart()
     {
@@ -437,9 +448,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                     }
                     //MouseX = Input.GetAxisRaw("Mouse X");
                     //MouseY = Input.GetAxisRaw("Mouse Y");
-                    Vector3 JoystickPosYaw;
-                    Vector3 JoystickPos;
-                    Vector2 VRPitchRoll;
+                    float VRJoystickPos = 0;
 
                     float ThrottleGrip;
                     float JoyStickGrip;
@@ -453,13 +462,13 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         ThrottleGrip = LGrip;
                         JoyStickGrip = RGrip;
                     }
-                    //VR Joystick //should be improved/modularized
+                    //VR Joystick
                     if (JoyStickGrip > 0.75)
                     {
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                         VehicleRotLastFrame = ControlsRoot.rotation;
                         JoystickZeroPoint = VehicleRotDif * JoystickZeroPoint;//zero point rotates with the vehicle so it appears still to the pilot
-                        if (!JoystickGripLastFrame)//first frame you gripped joystick
+                        if (!JoystickGripLastFrameR)//first frame you gripped joystick
                         {
                             EntityControl.SendEventToExtensions("SFEXT_O_JoystickGrabbed");
                             VehicleRotDif = Quaternion.identity;
@@ -467,57 +476,33 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                             { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the vehicle when it was pressed
                             else
                             { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }
+                            JoyStickValue = YawInput * SteeringWheelDegrees;
+                            JoystickValueLastFrame = 0;
+                            CompareAngleLastFrame = Vector3.up;
+                            JoystickValueLastFrame = 0;
                         }
+                        JoystickGripLastFrameR = true;
                         //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
                         Quaternion JoystickDifference;
-                        if (SwitchHandsJoyThrottle)
-                        { JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
-                        else { JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint); }
+                        JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
+                            (SwitchHandsJoyThrottle ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation
+                                                    : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation)
+                        * Quaternion.Inverse(JoystickZeroPoint)
+                         * ControlsRoot.rotation;
 
-                        JoystickPosYaw = (JoystickDifference * ControlsRoot.forward);//angles to vector
-                        JoystickPosYaw.y = 0;
-                        JoystickPos = (JoystickDifference * ControlsRoot.up);
-                        VRPitchRoll = new Vector2(JoystickPos.x, JoystickPos.z) * 1.41421f;
-
-                        JoystickGripLastFrame = true;
-                        //making a circular joy stick square
-                        //pitch and roll
-                        if (Mathf.Abs(VRPitchRoll.x) > Mathf.Abs(VRPitchRoll.y))
-                        {
-                            if (Mathf.Abs(VRPitchRoll.x) > 0)
-                            {
-                                float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.x);
-                                VRPitchRoll *= temp;
-                            }
-                        }
-                        else if (Mathf.Abs(VRPitchRoll.y) > 0)
-                        {
-                            float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.y);
-                            VRPitchRoll *= temp;
-                        }
-                        //yaw
-                        if (Mathf.Abs(JoystickPosYaw.x) > Mathf.Abs(JoystickPosYaw.z))
-                        {
-                            if (Mathf.Abs(JoystickPosYaw.x) > 0)
-                            {
-                                float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.x);
-                                JoystickPosYaw *= temp;
-                            }
-                        }
-                        else if (Mathf.Abs(JoystickPosYaw.z) > 0)
-                        {
-                            float temp = JoystickPosYaw.magnitude / Mathf.Abs(JoystickPosYaw.z);
-                            JoystickPosYaw *= temp;
-                        }
-
+                        Vector3 JoystickPosYaw = (JoystickDifference * Vector3.up);
+                        Vector3 CompareAngle = Vector3.ProjectOnPlane(JoystickPosYaw, Vector3.forward);
+                        JoyStickValue += (Vector3.SignedAngle(CompareAngleLastFrame, CompareAngle, Vector3.forward));
+                        CompareAngleLastFrame = CompareAngle;
+                        JoystickValueLastFrame = JoyStickValue;
+                        VRJoystickPos = JoyStickValue / SteeringWheelDegrees;
                     }
                     else
                     {
-                        JoystickPosYaw.x = 0;
-                        VRPitchRoll = Vector3.zero;
-                        if (JoystickGripLastFrame)//first frame you let go of joystick
+                        VRJoystickPos = 0;
+                        if (JoystickGripLastFrameR)//first frame you let go of joystick
                         { EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped"); }
-                        JoystickGripLastFrame = false;
+                        JoystickGripLastFrameR = false;
                     }
 
                     if (HasAfterburner)
@@ -651,7 +636,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
                         }
                     }
-                    if (JoystickOverridden > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
+                    if (JoystickOverridden > 0 && !JoystickGripLastFrameR)//joystick override enabled, and player not holding joystick
                     {
                         YawInput = JoystickOverride.z;
                     }
@@ -663,33 +648,40 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                             Vector2 RStickPos = new Vector2(0, 0);
                             if (!InEditor)
                             {
-                                LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                                //LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                                 LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                                RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                                RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                                //RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                                //RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                             }
-                            VRPitchRoll = LStickPos;
-                            JoystickPosYaw.x = RStickPos.x;
-                            //make stick input square
-                            if (Mathf.Abs(VRPitchRoll.x) > Mathf.Abs(VRPitchRoll.y))
-                            {
-                                if (Mathf.Abs(VRPitchRoll.x) > 0)
-                                {
-                                    float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.x);
-                                    VRPitchRoll *= temp;
-                                }
-                            }
-                            else if (Mathf.Abs(VRPitchRoll.y) > 0)
-                            {
-                                float temp = VRPitchRoll.magnitude / Mathf.Abs(VRPitchRoll.y);
-                                VRPitchRoll *= temp;
-                            }
+                            VRJoystickPos = LStickPos.y;
                         }
 
                         /*                         RotationInputs.x = Mathf.Clamp(VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
                                                 RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits; */
                         //roll isn't subject to flight limits
-                        YawInput = Mathf.Clamp(((VRPitchRoll.x + Ai + Di + lefti + righti) * -1), -1, 1);
+                        float YawAddAmount = VRJoystickPos + (-(float)(Ai + Di + lefti + righti) * DeltaTime * SteeringKeyboardSecsToMax);
+                        if (InVR)
+                        {
+                            if (Mathf.Abs(YawAddAmount) > 0)
+                            {
+                                YawInput = Mathf.Clamp(YawAddAmount, -1, 1);
+                            }
+                            else
+                            {
+                                YawInput = Mathf.MoveTowards(YawInput, 0, SteeringReturnSpeedVR * DeltaTime);
+                            }
+                        }
+                        else
+                        {
+                            if (Mathf.Abs(YawAddAmount) > 0)
+                            {
+                                YawInput = Mathf.Clamp(YawInput + YawAddAmount, -1, 1);
+                            }
+                            else
+                            {
+                                YawInput = Mathf.MoveTowards(YawInput, 0, SteeringReturnSpeed * DeltaTime);
+                            }
+                        }
                     }
                     yaw = Mathf.Clamp(YawInput, -1, 1) * YawStrength;
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
@@ -767,7 +759,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti, ((((AirFriction) * ExtraDrag)) * 90) * DeltaTime);
             //apply thrust
             VehicleRigidbody.AddForceAtPosition(Thrust, ThrustPoint.position, ForceMode.Force);//deltatime is built into ForceMode.Force
-            //apply yawing using yaw moment
+                                                                                               //apply yawing using yaw moment
             VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
             //calc Gs
             float gravity = 9.81f * DeltaTime;
@@ -1101,7 +1093,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         Piloting = false;
         Taxiinglerper = 0;
         ThrottleGripLastFrame = false;
-        JoystickGripLastFrame = false;
+        JoystickGripLastFrameR = false;
         DoAAMTargeting = false;
         Yawing = Vector3.zero;
         localPlayer.SetVelocity(CurrentVel);
