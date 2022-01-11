@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class EXTP_Turret : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     [Tooltip("Transform to base your controls on, should be facing the same direction as the seat. If left empty it will be set to the Horizontal Rotator.")]
     public Transform ControlsRoot;
     public Transform TurretRotatorHor;
@@ -46,6 +45,7 @@ public class EXTP_Turret : UdonSharpBehaviour
     public Animator TurretAnimator;
     public string AnimTriggerName = "TurretFire";
     [System.NonSerializedAttribute] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private float LastFireTime = 0f;
     private int FullAmmo;
     private float FullAmmoDivider;
@@ -90,7 +90,8 @@ public class EXTP_Turret : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+        if (!SAVControl) SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccSeaVehicle>());
         if (!ControlsRoot) { ControlsRoot = TurretRotatorHor; }
 
         nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
@@ -145,7 +146,7 @@ public class EXTP_Turret : UdonSharpBehaviour
     }
     public void Set_NotActive() { gameObject.SetActive(false); }
     public void ManningFalse()
-    { Manning = false; }//if this is in SFEXTP_O_UserExit rather than here update runs for one frame with it false before it's disabled    
+    { Manning = false; }//if this is in SFEXTP_O_UserExit rather than here update runs for one frame with it false before it's disabled
     public void FireGun()
     {
         int fp = FirePoints.Length;

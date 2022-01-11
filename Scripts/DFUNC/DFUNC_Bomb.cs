@@ -8,7 +8,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Bomb : UdonSharpBehaviour
 {
-    [SerializeField] public UdonSharpBehaviour SAVControl;
     public Animator BombAnimator;
     public GameObject Bomb;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
@@ -45,9 +44,10 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         }
         get => _BombFire;
     }
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private float boolToggleTime;
     private bool AnimOn = false;
-    private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private float Trigger;
     private bool TriggerLastFrame;
@@ -74,7 +74,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         if (BombHoldDelay < BombDelay) { BombHoldDelay = BombDelay; }
         FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
         reloadspeed = FullBombs / FullReloadTimeSec;
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         BombAnimator = EntityControl.GetComponent<Animator>();
         CenterOfMass = EntityControl.CenterOfMass;
         VehicleTransform = EntityControl.transform;

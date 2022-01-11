@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Smoke : UdonSharpBehaviour
 {
-    [SerializeField] UdonSharpBehaviour SAVControl;
     [Tooltip("Material to change the color value of to match smoke color")]
     public Material SmokeColorIndicatorMaterial;
     public ParticleSystem[] DisplaySmoke;
@@ -26,7 +25,8 @@ public class DFUNC_Smoke : UdonSharpBehaviour
         }
         get => _smokeon;
     }
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private VRCPlayerApi localPlayer;
     private bool TriggerLastFrame;
@@ -51,7 +51,7 @@ public class DFUNC_Smoke : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
         int NumSmokes = DisplaySmoke.Length;

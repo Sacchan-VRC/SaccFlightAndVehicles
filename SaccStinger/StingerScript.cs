@@ -8,7 +8,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class StingerScript : UdonSharpBehaviour
 {
-    public SaccEntity EntityControl;
     public Transform HUD;
     public float AAMMaxTargetDistance;
     public int VehicleLayer = 17;
@@ -38,6 +37,7 @@ public class StingerScript : UdonSharpBehaviour
     public AudioSource FireSound;
     [Tooltip("Require re-lock after firing?")]
     public bool LoseLockAfterShot = true;
+    [System.NonSerialized] public SaccEntity EntityControl;
     private float distance_from_head = 1.333333f;
     private VRC.SDK3.Components.VRCObjectSync StingerObjectSync;
     private VRC_Pickup StingerPickup;

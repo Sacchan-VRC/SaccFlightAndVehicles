@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Gun : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     public Animator GunAnimator;
     [Tooltip("Animator bool that is true when the gun is firing")]
     public string GunFiringBoolName = "gunfiring";
@@ -31,7 +30,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public string AnimBoolName = "GunSelected";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     public bool AnimBoolStayTrueOnExit;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private float boolToggleTime;
     private bool AnimOn;
     private int AnimBool_STRING;
@@ -64,7 +64,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
         if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
 
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
         AAMTargets = EntityControl.AAMTargets;
@@ -231,7 +231,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private float AAMTargetObscuredDelay;
     private bool GUNHasTarget;
     private void FixedUpdate()//this is just the old  AAMTargeting adjusted slightly
-                              //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more 
+                              //there may unnecessary stuff in here because it doesn't need to do missile related stuff any more
     {
         if (Selected && HUDControl)
         {
@@ -403,7 +403,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 //normalize lerped relative target velocity vector and multiply by lerped speed
                 Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
                 Vector3 PredictedPos = (TargetDir
-                    + ((RelTargVelNormalized * GUN_TargetSpeedLerper)//Linear 
+                    + ((RelTargVelNormalized * GUN_TargetSpeedLerper)//Linear
                                                                      //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
                         + (TargetAccel * .125f * BulletHitTime)
                             + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop

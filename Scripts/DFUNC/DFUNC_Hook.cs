@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Hook : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;
     public AudioSource CableSnap;
@@ -17,8 +16,9 @@ public class DFUNC_Hook : UdonSharpBehaviour
     [Tooltip("Distance from the initial snag point that the cable will 'snap' and the vehicle will be released (and damaged) if it hasnt stopped")]
     public float HookedCableSnapDistance = 120f;
     [Tooltip("If this vehicle has a brake function, need a reference to it to disable it when this function is braking the vehicle")]
-    public UdonSharpBehaviour BrakeFunction;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
+    private UdonSharpBehaviour BrakeFunction;
     private bool UseLeftTrigger = false;
     public LayerMask HookCableLayer;
     private bool TriggerLastFrame;
@@ -36,7 +36,8 @@ public class DFUNC_Hook : UdonSharpBehaviour
     public void SFEXT_L_EntityStart()
     {
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+        BrakeFunction = EntityControl.GetExtention(GetUdonTypeName<DFUNC_Brake>());
         VehicleTransform = EntityControl.transform;
         VehicleAnimator = EntityControl.GetComponent<Animator>();
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();

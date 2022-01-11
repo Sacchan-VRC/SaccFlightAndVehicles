@@ -7,14 +7,14 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class SAV_WaterTrigger : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     [Tooltip("Damage applied to vehicle per second while vehicle is underwater")]
     public float WaterDamageSec = 10;
     [Tooltip("Strength of force slowing down the vehicle when it's underwater")]
     public float WaterSlowDown = 3;
     [Tooltip("Strength of force slowing down the vehicle's rotation when it's underwater")]
     public float WaterSlowDownRot = 3;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private Rigidbody VehicleRigidbody;
     private bool CFOverridden;
     private int WaterLayer = 0;
@@ -27,7 +27,8 @@ public class SAV_WaterTrigger : UdonSharpBehaviour
     {
         Initilized = true;
         WaterLayer = LayerMask.NameToLayer("Water");
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+        if (!SAVControl) SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccSeaVehicle>());
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         ThisCollider = gameObject.GetComponent<Collider>();
         VRCPlayerApi localPlayer = Networking.LocalPlayer;

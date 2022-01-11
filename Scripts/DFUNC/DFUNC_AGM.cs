@@ -8,7 +8,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_AGM : UdonSharpBehaviour
 {
-    [SerializeField] public UdonSharpBehaviour SAVControl;
     public Animator AGMAnimator;
     [Tooltip("Camera script that is used to see the target")]
     public GameObject AGM;
@@ -38,6 +37,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public string AnimFiredTriggerName = "agmlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     public bool AnimBoolStayTrueOnExit;
+    [System.NonSerializedAttribute] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private ushort _AGMFire;
     public ushort AGMFire
     {
@@ -51,7 +52,6 @@ public class DFUNC_AGM : UdonSharpBehaviour
     }
     private float boolToggleTime;
     private bool AnimOn = false;
-    [System.NonSerializedAttribute] public SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool AGMLocked;
     [System.NonSerializedAttribute] public bool IsOwner;
@@ -121,7 +121,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         VehicleTransform = EntityControl.transform;
         if (AGMAnimator) { AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider); }
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
@@ -382,7 +382,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 else
                 {
                     float newzoom = 80;
-                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out
                 }
             }
             else

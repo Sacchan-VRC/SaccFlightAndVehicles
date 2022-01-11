@@ -7,10 +7,10 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class DFUNC_Reverse : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     public float ReversingThrottleMultiplier = -.5f;
     public GameObject Dial_funcon;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private float StartThrottleStrength;
     private float StartABStrength;
     private float ReversingThrottleStrength;
@@ -22,7 +22,7 @@ public class DFUNC_Reverse : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         StartThrottleStrength = (float)SAVControl.GetProgramVariable("ThrottleStrength");
         StartABStrength = (float)SAVControl.GetProgramVariable("ThrottleStrengthAB");
         ReversingThrottleStrength = StartThrottleStrength * ReversingThrottleMultiplier;

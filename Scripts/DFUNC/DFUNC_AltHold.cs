@@ -7,14 +7,14 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_AltHold : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     public GameObject HudHold;
     public GameObject Dial_Funcon;
     [Tooltip("Limit Gs that can be pulled by the altitude hold auto pilot")]
     public float GLimiter = 12f;
     [Tooltip("Limit AoA that can be pulled by the altitude hold auto pilot")]
     public float AoALimiter = 15f;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     [System.NonSerializedAttribute] public bool AltHold;
@@ -36,7 +36,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         { InVR = localPlayer.IsUserInVR(); }
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
         VehicleTransform = EntityControl.transform;
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }

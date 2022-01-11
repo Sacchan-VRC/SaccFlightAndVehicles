@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Flaps : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     public Animator FlapsAnimator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;
@@ -19,7 +18,8 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     public float FlapsLiftMulti = 1.35f;
     [Tooltip("Add this much to aircraft's Max Lift by this amount while flaps are enabled")]
     public float FlapsExtraMaxLift = 0;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public bool Flaps = false;
     private bool TriggerLastFrame;
@@ -47,7 +47,7 @@ public class DFUNC_Flaps : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null) { InEditor = false; }
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         //to match how the old values worked
         FlapsDragMulti -= 1f;
         FlapsLiftMulti -= 1f;

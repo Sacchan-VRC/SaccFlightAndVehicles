@@ -8,7 +8,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Flares : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     public int NumFlares = 60;
     public ParticleSystem[] FlareParticles;
     [Tooltip("How long a flare has an effect for")]
@@ -24,7 +23,8 @@ public class DFUNC_Flares : UdonSharpBehaviour
     private float reloadspeed;
     private bool func_active;
     private bool TriggerLastFrame;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private float FlareLaunchTime;
     [UdonSynced, FieldChangeCallback(nameof(sendlaunchflare))] private short _SendLaunchFlare = -1;
     public short sendlaunchflare
@@ -58,7 +58,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
         FullFlares = NumFlares;
         reloadspeed = FullFlares / FullReloadTimeSec;
         if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
     }
     public void SFEXT_G_PilotEnter()
     { gameObject.SetActive(true); }

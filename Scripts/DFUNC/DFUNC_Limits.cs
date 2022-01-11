@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Limits : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     public GameObject HudLimit;
     public bool DefaultLimitsOn = true;
     [Tooltip("Object enabled when function is active (used on MFD)")]
@@ -16,7 +15,8 @@ public class DFUNC_Limits : UdonSharpBehaviour
     public float GLimiter = 12f;
     [Tooltip("Try to stop pilot pulling this much AoA")]
     public float AoALimiter = 15f;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private bool InVR;
@@ -30,7 +30,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         { InVR = localPlayer.IsUserInVR(); }
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         if (!DefaultLimitsOn) { SetLimitsOff(); }
     }
     public void DFUNC_Selected()

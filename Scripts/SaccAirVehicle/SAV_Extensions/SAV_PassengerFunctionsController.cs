@@ -24,6 +24,7 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     public Transform RStickDisplayHighlighter;
     [Tooltip("Oneshot sound played when switching functions")]
     public AudioSource SwitchFunctionSound;
+    [NonSerialized] public SaccEntity EntityControl;
     private int LStickNumFuncs;
     private int RStickNumFuncs;
     private float LStickFuncDegrees;
@@ -112,6 +113,20 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
 
 
         TellDFUNCsLR();
+
+        foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
+        {
+            if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
+        }
+        foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+        {
+            if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
+        }
+        foreach (UdonSharpBehaviour EXT in PassengerExtensions)
+        {
+            if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
+        }
+
         SendEventToExtensions_Gunner("SFEXTP_L_EntityStart");
     }
     private void Update()

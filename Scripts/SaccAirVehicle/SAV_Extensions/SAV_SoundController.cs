@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_SoundController : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     [Tooltip("Vehicle engine's 'Idle' sound, plays all the time vehicle is occupied, and pitches up with engine's output")]
     public AudioSource[] PlaneIdle;
     [Tooltip("Same as PlaneIdle but only plays when inside the vehicle with all doors closed")]
@@ -76,7 +75,8 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool ExplosionNull = true;
     [System.NonSerializedAttribute] public bool BulletHitNull = true;
     [System.NonSerializedAttribute] public bool MissileHitNULL = true;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     //public Transform testcamera;
     private AudioSource _rolling;
     private float _rollingVolCurve;
@@ -146,7 +146,9 @@ public class SAV_SoundController : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         { InEditor = false; }
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+        if (!SAVControl) SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccSeaVehicle>());
+
         CenterOfMass = EntityControl.CenterOfMass;
         if (PlaneInside)
         {

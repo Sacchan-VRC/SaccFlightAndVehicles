@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Gear : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;
     public Animator GearAnimator;
@@ -16,7 +15,8 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public bool AllowToggleGrounded = true;
     [Tooltip("Distance to check down from CenterOfMass to decide if it's clear to open the gear")]
     public float GearCheckDistance = 2f;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     [System.NonSerializedAttribute] public bool GearUp = false;
@@ -29,7 +29,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         CenterOfMass = EntityControl.CenterOfMass;
         LandingGearDragMulti -= 1;//to match how the old values worked
         SetGearDown();

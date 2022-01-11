@@ -1,4 +1,3 @@
-
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -8,8 +7,6 @@ using VRC.Udon;
 [DefaultExecutionOrder(5)]//after dfuncs that can set values used by this
 public class SaccAirVehicle : UdonSharpBehaviour
 {
-    [Tooltip("Base object reference")]
-    public SaccEntity EntityControl;
     [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
     public Transform VehicleMesh;
     [Tooltip("Layer to set the colliders to when entering vehicle")]
@@ -229,6 +226,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float AtmosphereThinningEnd = 19812; //65,000 feet
     [System.NonSerializedAttribute] public float AllGs;
 
+    [System.NonSerialized] public SaccEntity EntityControl;
 
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
     [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;

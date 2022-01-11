@@ -9,7 +9,6 @@ using VRC.Udon;
 public class SAV_SyncScript : UdonSharpBehaviour
 {
     // whispers to Zwei, "it's okay"
-    public UdonSharpBehaviour SAVControl;
     public Transform VehicleTransform;
     [Tooltip("Delay between updates in seconds")]
     [Range(0.05f, 1f)]
@@ -26,6 +25,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
     public float IdleMoveMentRange = .35f;
     [Tooltip("If vehicle rotates less than this many degrees since it's last update, it'll be considered to be idle")]
     public float IdleRotationRange = 5f;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private float nextUpdateTime = float.MaxValue;
     private int StartupTimeMS = 0;
     private double dblStartupTimeMS = 0;
@@ -78,6 +79,9 @@ public class SAV_SyncScript : UdonSharpBehaviour
     }
     public void SFEXT_L_EntityStart()
     {
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+        if (!SAVControl) SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccSeaVehicle>());
+
         VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
         Initialized = true;
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
@@ -269,7 +273,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                  Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),
                   IdleUpdateMode ? Time.smoothDeltaTime : Time.smoothDeltaTime * RotationSyncAgressiveness);
 
-                //Set position to a lerp(interpolation) of last 2 extrapolations  
+                //Set position to a lerp(interpolation) of last 2 extrapolations
                 //never set position using rigidbody.position because it's 1 frame lagged due to waiting for a physics update before setting
                 VehicleTransform.SetPositionAndRotation(
                     Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider),

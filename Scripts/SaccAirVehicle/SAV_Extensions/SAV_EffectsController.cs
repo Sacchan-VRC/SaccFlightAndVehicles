@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SAV_EffectsController : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     [Tooltip("Wing trails, emit when pulling Gs")]
     public TrailRenderer[] Trails;
     [Tooltip("How many Gs do you have to pull before the trails appear?")]
@@ -16,6 +15,8 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public ParticleSystem SplashParticle;
     [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
     public float PlaySplashSpeed = 7;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool TrailsOn;
     private bool HasTrails;
     private bool vapor;
@@ -46,6 +47,9 @@ public class SAV_EffectsController : UdonSharpBehaviour
 
     public void SFEXT_L_EntityStart()
     {
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+        if (!SAVControl) SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccSeaVehicle>());
+
         FullHealthDivider = 1f / (float)SAVControl.GetProgramVariable("Health");
         HasTrails = Trails.Length > 0;
 

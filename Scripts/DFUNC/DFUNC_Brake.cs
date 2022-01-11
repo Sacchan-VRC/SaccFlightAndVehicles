@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_Brake : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     [Tooltip("Looping sound to play while brake is active")]
     public AudioSource Airbrake_snd;
     [Tooltip("Will Crash if not set")]
@@ -29,7 +28,8 @@ public class DFUNC_Brake : UdonSharpBehaviour
     public float GroundBrakeSpeed = 40f;
     //other functions can set this +1 to disable breaking
     [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private float BrakeStrength;
     private int BRAKE_STRING = Animator.StringToHash("brake");
     private bool Braking;
@@ -45,7 +45,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         HasAirBrake = AirbrakeStrength != 0;
         RotMultiMaxSpeedDivider = 1 / (float)SAVControl.GetProgramVariable("RotMultiMaxSpeed");
@@ -170,7 +170,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                 if (Taxiing)
                 {
                     //ground brake checks if vehicle is on top of a rigidbody, and if it is, brakes towards its speed rather than zero
-                    //does not work if owner of vehicle does not own the rigidbody 
+                    //does not work if owner of vehicle does not own the rigidbody
                     Rigidbody gdhr = (Rigidbody)SAVControl.GetProgramVariable("GDHitRigidbody");
                     if (gdhr)
                     {

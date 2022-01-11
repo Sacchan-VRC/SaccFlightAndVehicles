@@ -7,7 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Canopy : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
     public UdonSharpBehaviour SoundControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;
@@ -27,7 +26,8 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     public string AnimCanopyBool = "canopyopen";
     [Tooltip("Name of animator boolean that is true when canopy is broken")]
     public string AnimCanopyBroken = "canopybroken";
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private Transform VehicleTransform;
@@ -47,7 +47,7 @@ public class DFUNC_Canopy : UdonSharpBehaviour
     {
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         VehicleTransform = EntityControl.transform;
         CanopyDragMulti -= 1;
         //crashes if not sent delayed because the order of events sent by SendCustomEvent are not maintained, (SaccEntity.SendEventToExtensions())

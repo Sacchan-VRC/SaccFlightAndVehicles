@@ -8,12 +8,12 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Cruise : UdonSharpBehaviour
 {
-    [SerializeField] UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;
     public bool AllowCruiseGrounded;
     public Text HUDText_knotstarget;
-    private SaccEntity EntityControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private Transform VehicleTransform;
@@ -44,7 +44,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
         { InVR = localPlayer.IsUserInVR(); }
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         VehicleTransform = EntityControl.transform;
         if (Dial_Funcon) Dial_Funcon.SetActive(false);

@@ -8,7 +8,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class DFUNC_AAM : UdonSharpBehaviour
 {
-    [SerializeField] public UdonSharpBehaviour SAVControl;
     public Animator AAMAnimator;
     public int NumAAM = 6;
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
@@ -61,9 +60,10 @@ public class DFUNC_AAM : UdonSharpBehaviour
         }
         get => _SendTargeted;
     }
+    [System.NonSerializedAttribute] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private float boolToggleTime;
     private bool AnimOn = false;
-    [System.NonSerializedAttribute] public SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     [System.NonSerializedAttribute] public int FullAAMs;
     private int NumAAMTargets;
@@ -94,7 +94,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         FullAAMs = NumAAM;
         reloadspeed = FullAAMs / FullReloadTimeSec;
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         NumAAMTargets = EntityControl.NumAAMTargets;
         AAMTargets = EntityControl.AAMTargets;
         CenterOfMass = (Transform)EntityControl.CenterOfMass;

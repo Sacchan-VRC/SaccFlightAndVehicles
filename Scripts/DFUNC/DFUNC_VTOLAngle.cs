@@ -7,7 +7,8 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class DFUNC_VTOLAngle : UdonSharpBehaviour
 {
-    public UdonSharpBehaviour SAVControl;
+    [System.NonSerialized] public SaccEntity EntityControl;
+    private UdonSharpBehaviour SAVControl;
     private bool UseLeftTrigger = false;
     private float VTOLDefault;
     private Transform ControlsRoot;
@@ -20,6 +21,7 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
     {
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         VTOLDefault = (float)SAVControl.GetProgramVariable("VTOLDefaultValue");
         ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         localPlayer = Networking.LocalPlayer;

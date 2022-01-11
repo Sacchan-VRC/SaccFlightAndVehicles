@@ -7,8 +7,6 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNC_Catapult : UdonSharpBehaviour
 {
-    [Header("The position of this gameobject is important. It decides what point on the plane locks to the catapult.")]
-    public UdonSharpBehaviour SAVControl;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject Dial_Funcon;
     [Tooltip("Oneshot sound played when attaching to catapult")]
@@ -18,8 +16,10 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     [Tooltip("Layer to check for catapult triggers on")]
     public int CatapultLayer = 24;
     [Tooltip("Reference to the landing gear function so we can tell it to be disabled when on a catapult")]
-    public UdonSharpBehaviour GearFunc;
-    private SaccEntity EntityControl;
+
+    private UdonSharpBehaviour SAVControl;
+    private UdonSharpBehaviour GearFunc;
+    [System.NonSerialized] public SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private bool Selected;
@@ -49,7 +49,8 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     {
         InEditor = Networking.LocalPlayer == null;
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        SAVControl = EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+        GearFunc = EntityControl.GetExtention(GetUdonTypeName<DFUNC_Gear>());
         VehicleTransform = EntityControl.transform;
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         VehicleAnimator = EntityControl.GetComponent<Animator>();
