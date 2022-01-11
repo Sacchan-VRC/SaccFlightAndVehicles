@@ -118,6 +118,20 @@ public class SaccEntity : UdonSharpBehaviour
         FindAAMTargets();
 
         TellDFUNCsLR();
+
+        foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
+        {
+            if (EXT) EXT.SetProgramVariable("EntityControl", this);
+        }
+        foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
+        {
+            if (EXT) EXT.SetProgramVariable("EntityControl", this);
+        }
+        foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+        {
+            if (EXT) EXT.SetProgramVariable("EntityControl", this);
+        }
+
         SendEventToExtensions("SFEXT_L_EntityStart");
 
 
@@ -593,5 +607,62 @@ public class SaccEntity : UdonSharpBehaviour
     {
         if (MySeat > -1 && MySeat < VehicleStations.Length)
         { VehicleStations[MySeat].ExitStation(localPlayer); }
+    }
+
+    // ToDo: Use static to better performance on U#1.0
+    // public static UdonSharpBehaviour GetExtention(SaccEntity entity, string udonTypeName)
+    public UdonSharpBehaviour GetExtention(string udonTypeName)
+    {
+        var entity = this;
+
+        foreach (var extention in entity.ExtensionUdonBehaviours)
+        {
+            if (extention && extention.GetUdonTypeName() == udonTypeName) return extention;
+        }
+        foreach (var extention in entity.Dial_Functions_L)
+        {
+            if (extention && extention.GetUdonTypeName() == udonTypeName) return extention;
+        }
+        foreach (var extention in entity.Dial_Functions_R)
+        {
+            if (extention && extention.GetUdonTypeName() == udonTypeName) return extention;
+        }
+        return null;
+    }
+
+    // ToDo: Use static to better performance on U#1.0
+    // public static UdonSharpBehaviour[] GetExtentions(SaccEntity entity, string udonTypeName)
+    public UdonSharpBehaviour[] GetExtentions(string udonTypeName)
+    {
+        var entity = this;
+
+        var result = new UdonSharpBehaviour[entity.ExtensionUdonBehaviours.Length + entity.Dial_Functions_L.Length + entity.Dial_Functions_R.Length];
+        var count = 0;
+        foreach (var extention in entity.ExtensionUdonBehaviours)
+        {
+            if (extention && extention.GetUdonTypeName() == udonTypeName)
+            {
+                result[count++] = extention;
+            }
+        }
+        foreach (var extention in entity.Dial_Functions_L)
+        {
+            if (extention && extention.GetUdonTypeName() == udonTypeName)
+            {
+                result[count++] = extention;
+            }
+        }
+        foreach (var extention in entity.Dial_Functions_R)
+        {
+            if (extention && extention.GetUdonTypeName() == udonTypeName)
+            {
+                result[count++] = extention;
+            }
+        }
+
+        var finalResult = new UdonSharpBehaviour[count];
+        System.Array.Copy(result, finalResult, count);
+
+        return finalResult;
     }
 }
