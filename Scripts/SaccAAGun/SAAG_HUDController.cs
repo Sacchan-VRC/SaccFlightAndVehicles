@@ -99,10 +99,27 @@ public class SAAG_HUDController : UdonSharpBehaviour
                 Vector3 PredictedPos = TargetDir
                     + (((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
                         //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
-                        + (-TargetAccel * .125f * BulletHitTime)//Acceleration
-                            + new Vector3(0, 9.81f * .5f * BulletHitTime, 0))//Bulletdrop
+                        + (TargetAccel * .125f * BulletHitTime))//Acceleration
                                 * BulletHitTime);
-                GUNLeadIndicator.position = transform.position + PredictedPos;
+
+                //refine the position of the prediction to account for if it's closer or further away from you than the target, (because bullet travel time will change)
+                Vector3 PredictionPosGlobal = transform.position + PredictedPos;
+                Vector3 TargetPos = AAGunControl.AAMTargets[AAGunControl.AAMTarget].transform.position;
+                float DistFromPrediction = Vector3.Distance(PredictionPosGlobal, transform.position);
+                float DistFromTarg = Vector3.Distance(TargetPos, transform.position);
+                float DistDiv = DistFromPrediction / DistFromTarg;
+                //convert the vector used to be the vector between the prediction and the target vehicle
+                PredictedPos = PredictionPosGlobal - TargetPos;
+                //multiply it by the ratio of the distance to the predicition and the distance to the target
+                PredictedPos *= DistDiv;
+
+                //use the distance to the new predicted position to add the bullet drop prediction
+                BulletHitTime = Vector3.Distance(transform.position, TargetPos + PredictedPos) / BulletSpeed;
+                Vector3 gravity = new Vector3(0, 9.81f * .5f * BulletHitTime * BulletHitTime, 0);//Bulletdrop
+                PredictedPos += gravity;
+
+                GUNLeadIndicator.position = TargetPos + PredictedPos;
+                //move lead indicator to match the distance of the rest of the hud
                 GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
 
                 RelativeTargetVelLastFrame = RelativeTargetVel;
