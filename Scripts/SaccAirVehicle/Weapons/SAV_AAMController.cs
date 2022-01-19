@@ -91,12 +91,14 @@ public class SAV_AAMController : UdonSharpBehaviour
     private ConstantForce MissileConstant;
     private bool initialized;
     private int LifeTimeExplodesSent;
+    private Animator MissileAnimator;
     void Initialize()
     {
         EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
         //whatever script is launching the missiles must contain all of these variables
         InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
         VehicleCenterOfMass = EntityControl.CenterOfMass;
+        MissileAnimator = GetComponent<Animator>();
         MissileConstant = GetComponent<ConstantForce>();
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
