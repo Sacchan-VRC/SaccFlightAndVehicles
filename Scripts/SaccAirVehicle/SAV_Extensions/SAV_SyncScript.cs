@@ -71,6 +71,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private bool Piloting;
     private float CurrentUpdateInterval;
     private int EnterIdleModeNumber;
+    private bool SyncEstablished;
     private void Start()
     {
         if (!Initialized)//shouldn't be active until entitystart
@@ -236,7 +237,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                 nextUpdateTime = (Time.realtimeSinceStartup + (IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
             }
         }
-        else//extrapolate and interpolate based on recieved data
+        else if (SyncEstablished) //extrapolate and interpolate based on recieved data
         {
             //Extrapolate position forward by amount that'd make it match the current position on the other client (assuming straight movement)
             //Do this for the last two updates recieved, and interpolate between them over the length of the Update Interval
@@ -269,7 +270,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                  Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),
                   IdleUpdateMode ? Time.smoothDeltaTime : Time.smoothDeltaTime * RotationSyncAgressiveness);
 
-                //Set position to a lerp(interpolation) of last 2 extrapolations  
+                //Set position to a lerp(interpolation) of last 2 extrapolations
                 //never set position using rigidbody.position because it's 1 frame lagged due to waiting for a physics update before setting
                 VehicleTransform.SetPositionAndRotation(
                     Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider),
@@ -298,6 +299,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
     }
     public override void OnDeserialization()
     {
+        SyncEstablished = true;
+
         if (O_UpdateTime != O_LastUpdateTime && !IsOwner)//only do anything if OnDeserialization was for this script
         {
             LastAcceleration = Acceleration;
