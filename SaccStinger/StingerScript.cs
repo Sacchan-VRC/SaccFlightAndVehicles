@@ -120,10 +120,13 @@ public class StingerScript : UdonSharpBehaviour
         StingerPickup = (VRC_Pickup)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
 
         NumChildrenStart = transform.childCount;
-        int NumToInstantiate = Mathf.Min(FullAAMs, 10);
-        for (int i = 0; i < NumToInstantiate; i++)
+        if (AAM)
         {
-            InstantiateWeapon();
+            int NumToInstantiate = Mathf.Min(FullAAMs, 10);
+            for (int i = 0; i < NumToInstantiate; i++)
+            {
+                InstantiateWeapon();
+            }
         }
     }
     private GameObject InstantiateWeapon()

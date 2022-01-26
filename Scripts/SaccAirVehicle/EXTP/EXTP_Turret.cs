@@ -103,10 +103,13 @@ public class EXTP_Turret : UdonSharpBehaviour
         if (SideAngleMax < 180) { ClampHor = true; }
 
         NumChildrenStart = transform.childCount;
-        int NumToInstantiate = Mathf.Min(FullAmmo, 10);
-        for (int i = 0; i < NumToInstantiate; i++)
+        if (Projectile)
         {
-            InstantiateWeapon();
+            int NumToInstantiate = Mathf.Min(FullAmmo, 10);
+            for (int i = 0; i < NumToInstantiate; i++)
+            {
+                InstantiateWeapon();
+            }
         }
     }
     private GameObject InstantiateWeapon()
@@ -249,8 +252,8 @@ public class EXTP_Turret : UdonSharpBehaviour
                     Quaternion JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint) * ControlsRoot.rotation;
                     //create normalized vectors facing towards the 'forward' and 'up' directions of the joystick
                     Vector3 JoystickPosYaw = (JoystickDifference * Vector3.forward);
-                        //use acos to convert the relevant elements of the array into radians, re-center around zero, then normalize between -1 and 1 and multiply for desired deflection
-                        //the clamp is there because rotating a vector3 can cause it to go a miniscule amount beyond length 1, resulting in NaN (crashes vrc)
+                    //use acos to convert the relevant elements of the array into radians, re-center around zero, then normalize between -1 and 1 and multiply for desired deflection
+                    //the clamp is there because rotating a vector3 can cause it to go a miniscule amount beyond length 1, resulting in NaN (crashes vrc)
                     VRPitchYawInput.x = ((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.y, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.x;
                     VRPitchYawInput.y = -((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
                 }

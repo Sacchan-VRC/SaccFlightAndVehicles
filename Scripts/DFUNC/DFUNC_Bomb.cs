@@ -86,10 +86,13 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
 
         NumChildrenStart = transform.childCount;
-        int NumToInstantiate = Mathf.Min(FullBombs, 10);
-        for (int i = 0; i < NumToInstantiate; i++)
+        if (Bomb)
         {
-            InstantiateWeapon();
+            int NumToInstantiate = Mathf.Min(FullBombs, 10);
+            for (int i = 0; i < NumToInstantiate; i++)
+            {
+                InstantiateWeapon();
+            }
         }
     }
     private GameObject InstantiateWeapon()

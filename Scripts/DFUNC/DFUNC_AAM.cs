@@ -116,10 +116,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
 
         NumChildrenStart = transform.childCount;
-        int NumToInstantiate = Mathf.Min(FullAAMs, 10);
-        for (int i = 0; i < NumToInstantiate; i++)
+        if (AAM)
         {
-            InstantiateWeapon();
+            int NumToInstantiate = Mathf.Min(FullAAMs, 10);
+            for (int i = 0; i < NumToInstantiate; i++)
+            {
+                InstantiateWeapon();
+            }
         }
     }
     private GameObject InstantiateWeapon()

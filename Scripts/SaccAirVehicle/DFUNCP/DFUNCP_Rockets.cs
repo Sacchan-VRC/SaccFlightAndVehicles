@@ -52,10 +52,13 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         }
 
         NumChildrenStart = transform.childCount;
-        int NumToInstantiate = Mathf.Min(FullRockets, 10);
-        for (int i = 0; i < NumToInstantiate; i++)
+        if (Rocket)
         {
-            InstantiateWeapon();
+            int NumToInstantiate = Mathf.Min(FullRockets, 10);
+            for (int i = 0; i < NumToInstantiate; i++)
+            {
+                InstantiateWeapon();
+            }
         }
     }
     private GameObject InstantiateWeapon()

@@ -131,10 +131,13 @@ public class DFUNC_AGM : UdonSharpBehaviour
         if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
 
         NumChildrenStart = transform.childCount;
-        int NumToInstantiate = Mathf.Min(FullAGMs, 10);
-        for (int i = 0; i < NumToInstantiate; i++)
+        if (AGM)
         {
-            InstantiateWeapon();
+            int NumToInstantiate = Mathf.Min(FullAGMs, 10);
+            for (int i = 0; i < NumToInstantiate; i++)
+            {
+                InstantiateWeapon();
+            }
         }
     }
     private GameObject InstantiateWeapon()
