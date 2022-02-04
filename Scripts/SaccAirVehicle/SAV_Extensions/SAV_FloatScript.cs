@@ -44,11 +44,11 @@ public class SAV_FloatScript : UdonSharpBehaviour
     [Tooltip("How fast waves scroll across the sea")]
     public float WaveSpeed = 12;
     [Tooltip("How high above the last hit surface the raycast starts from. Needed for large waves or any non-solid hoverable surface")]
+
+    [Range(1f, 19)]
     public float RayCastHeight = 2;
     [Tooltip("'Float' on solid objects (non-trigger) (used by hoverbikes)")]
     public bool DoOnLand = false;
-    [Tooltip("If a player takes ownership of the vehicle while its floats are below the water, the new owner will not know they are below the water and it will fall through the water. Move the vehicle up by this amount to prevent this from happening.")]
-    public float MoveUpOnTakeOwnership = 2f;
     [Tooltip("Disable the totally non-physical ground rotation functionality")]
     public bool DisableTaxiRotation = false;
     [Header("HoverBike Only")]
@@ -118,14 +118,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
     {
         if (!HoverBike) { gameObject.SetActive(true); }
 
-        Vector3 vehpos = VehicleTransform.position;
-        vehpos.y += MoveUpOnTakeOwnership;
-        VehicleTransform.position = vehpos;
-        for (int i = 0; i != FloatPoints.Length; i++)
-        {
-            FloatTouchWaterPoint[i] = float.MinValue;
-            FloatLastRayHitHeight[i] = float.MinValue;
-        }
+        InitializeDepth();
     }
     public void SFEXT_O_LoseOwnership()
     {
@@ -161,6 +154,88 @@ public class SAV_FloatScript : UdonSharpBehaviour
         if (!HoverBike && localPlayer.IsOwner(VehicleRigidbody.gameObject))
         { gameObject.SetActive(true); }
     }
+    public void InitializeDepth()
+    {
+        //local client doesn't have height of water so they need to find it when taking ownership
+        for (int i = 0; i < FPLength; i++)
+        {
+            FindDepth(i);
+        }
+    }
+    public void FindDepth(int i)
+    {
+        //find water level
+        RaycastHit checkhit;
+        if (Physics.Raycast(FloatPoints[i].position, Vector3.up, out checkhit, Mathf.Infinity, FloatLayers, QueryTriggerInteraction.Collide))
+        {
+            if (Physics.Raycast(checkhit.point, -Vector3.up, out checkhit, Mathf.Infinity, FloatLayers, QueryTriggerInteraction.Collide))
+            {
+                FloatLastRayHitHeight[i] = checkhit.point.y;
+                HitLandLast[i] = !checkhit.collider.isTrigger;
+            }
+            else
+            { FloatLastRayHitHeight[i] = float.MinValue; }
+        }
+        else
+        {
+            if (Physics.Raycast(FloatPoints[i].position + (Vector3.up * 100f), -Vector3.up, out checkhit, Mathf.Infinity, FloatLayers, QueryTriggerInteraction.Collide))
+            {
+                FloatLastRayHitHeight[i] = checkhit.point.y;
+                HitLandLast[i] = !checkhit.collider.isTrigger;
+            }
+            else
+            { FloatLastRayHitHeight[i] = float.MinValue; }
+        }
+
+
+        //rest is same as fixedupdate with some stuff removed
+        Vector3 Vel = VehicleRigidbody.velocity;
+        Vector3 TopOfFloat = FloatPoints[i].position + (Vector3.up * FloatRadius);
+        Vector3 Waves = Vector3.zero;
+        if (!HitLandLast[i])
+        {
+            float time = Time.time;
+            Waves.y = ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f);
+        }
+
+        RaycastHit hit;
+        FloatTouchWaterPoint[i] = FloatLastRayHitHeight[i] + FloatDiameter + Waves.y;
+        if (FloatTouchWaterPoint[i] > TopOfFloat.y && (DoOnLand || !HitLandLast[i]))
+        {
+            FloatDepth[i] = FloatTouchWaterPoint[i] - TopOfFloat.y;
+
+            FloatDepthLastFrame[i] = FloatDepth[i];
+            FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce) * _floatForce)));
+            Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[i] + RayCastHeight, TopOfFloat.z);
+            if (Physics.Raycast(checksurface, -Vector3.up, out hit, 20, FloatLayers, QueryTriggerInteraction.Collide))
+            {
+                if (DoOnLand || hit.collider.isTrigger)
+                { SurfaceHeight = FloatLastRayHitHeight[i] = hit.point.y; }
+            }
+            else
+            {
+                FloatLastRayHitHeight[i] = float.MinValue;
+            }
+        }
+        else
+        {
+            //In Air
+            FloatDepth[i] = 0;
+            FloatDepthLastFrame[i] = 0;
+            if (Vel.y > 0 || HitLandLast[i])
+            { FloatTouchWaterPoint[i] = float.MinValue; }
+            Vector3 checksurface = new Vector3(TopOfFloat.x, TopOfFloat.y + WaveHeight, TopOfFloat.z);
+            if (Physics.Raycast(TopOfFloat, -Vector3.up, out hit, 35, FloatLayers, QueryTriggerInteraction.Collide))
+            {
+                FloatTouchWaterPoint[i] = hit.point.y + FloatDiameter + Waves.y;
+                FloatLastRayHitHeight[i] = hit.point.y;
+            }
+            else
+            {
+                FloatLastRayHitHeight[i] = float.MinValue;
+            }
+        }
+    }
     private void FixedUpdate()
     {
         Vector3 Vel = VehicleRigidbody.velocity;
@@ -176,33 +251,29 @@ public class SAV_FloatScript : UdonSharpBehaviour
         //if touching/in water trace down from diameter above last water height at current xz to find water
         RaycastHit hit;
         FloatTouchWaterPoint[currentfloatpoint] = FloatLastRayHitHeight[currentfloatpoint] + FloatDiameter + Waves.y;
-        if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat.y)
+        if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat.y && (DoOnLand || !HitLandLast[currentfloatpoint]))
         {
-            //Touching or under water
-            if (DoOnLand || !HitLandLast[currentfloatpoint])
+            FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y;
+            float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]));
+            if (CompressionDifference > 0)
+            { CompressionDifference = Mathf.Min(CompressionDifference * Compressing, MaxCompressingForce); }
+            else
             {
-                FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y;
-                float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]));
-                if (CompressionDifference > 0)
-                { CompressionDifference = Mathf.Min(CompressionDifference * Compressing, MaxCompressingForce); }
-                else
-                {
-                    CompressionDifference = 0;
-                }
-                FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
-                FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce) * _floatForce) + CompressionDifference));
-                //float is potentially below the top of the trigger, so fire a raycast from above the last known trigger height to check if it's still there
-                //the '+10': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
-                Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + RayCastHeight, TopOfFloat.z);
-                if (Physics.Raycast(checksurface, -Vector3.up, out hit, 14, FloatLayers, QueryTriggerInteraction.Collide))
-                {
-                    if (DoOnLand || hit.collider.isTrigger)
-                    { SurfaceHeight = FloatLastRayHitHeight[currentfloatpoint] = hit.point.y; }
-                }
-                else
-                {
-                    FloatLastRayHitHeight[currentfloatpoint] = float.MinValue;
-                }
+                CompressionDifference = 0;
+            }
+            FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
+            FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce) * _floatForce) + CompressionDifference));
+            //float is potentially below the top of the trigger, so fire a raycast from above the last known trigger height to check if it's still there
+            //the '+10': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
+            Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + RayCastHeight, TopOfFloat.z);
+            if (Physics.Raycast(checksurface, -Vector3.up, out hit, 20, FloatLayers, QueryTriggerInteraction.Collide))
+            {
+                if (DoOnLand || hit.collider.isTrigger)
+                { SurfaceHeight = FloatLastRayHitHeight[currentfloatpoint] = hit.point.y; }
+            }
+            else
+            {
+                FloatLastRayHitHeight[currentfloatpoint] = float.MinValue;
             }
         }
         else
@@ -218,7 +289,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
             Vector3 checksurface = new Vector3(TopOfFloat.x, TopOfFloat.y + WaveHeight, TopOfFloat.z);
             if (Physics.Raycast(TopOfFloat, -Vector3.up, out hit, 35, FloatLayers, QueryTriggerInteraction.Collide))
             {
-                FloatTouchWaterPoint[currentfloatpoint] = hit.point.y + FloatDiameter;
+                FloatTouchWaterPoint[currentfloatpoint] = hit.point.y + FloatDiameter + Waves.y; ;
                 HitLandLast[currentfloatpoint] = !hit.collider.isTrigger;
                 FloatLastRayHitHeight[currentfloatpoint] = hit.point.y;
             }
@@ -229,7 +300,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         }
 
         depth = 0;
-        for (int i = 0; i != FloatDepth.Length; i++)
+        for (int i = 0; i != FPLength; i++)
         {
             depth += FloatDepth[i];
         }
