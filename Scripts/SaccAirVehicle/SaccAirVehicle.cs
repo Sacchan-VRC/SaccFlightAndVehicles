@@ -227,6 +227,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere reaches zero thickness. In meters. 19812 = 65,000~ feet")]
     public float AtmosphereThinningEnd = 19812; //65,000 feet
+    [Tooltip("Disables the assist feature to start moving with WheelColliders. DO NOT DISABLE until you do not have a specific extension,  it.")]
+    public bool DisableStickyWheelWorkarond = false;
     [System.NonSerializedAttribute] public float AllGs;
 
 
@@ -957,7 +959,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
 
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
-                    if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
+                    if (Speed < .2 && HasWheelColliders && ThrottleInput > 0 && !DisableStickyWheelWorkarond)
                     {
                         if (VTOLAngle > VTOL90Degrees)
                         { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
