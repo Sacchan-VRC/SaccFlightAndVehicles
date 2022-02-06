@@ -62,7 +62,8 @@ public class SaccVehicleSeat : UdonSharpBehaviour
             EntityControl.SeatedPlayers[ThisStationID] = player.playerId;
             if (player.isLocal)
             {
-                Networking.SetOwner(localPlayer, gameObject);
+                if (!localPlayer.IsOwner(gameObject))
+                { Networking.SetOwner(localPlayer, gameObject); }
                 EntityControl.MySeat = ThisStationID;
                 if (IsPilotSeat)
                 { EntityControl.PilotEnterVehicleLocal(); }

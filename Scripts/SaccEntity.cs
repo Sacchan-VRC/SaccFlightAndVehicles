@@ -371,8 +371,7 @@ public class SaccEntity : UdonSharpBehaviour
         if (RStickDisplayHighlighter)
         { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
 
-        if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
-        //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
+        if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }
         if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
 
         Networking.SetOwner(localPlayer, gameObject);

@@ -96,6 +96,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
             }
             else
             {
+                IsOwner = false;
+                VehicleRigid.Sleep();
                 VehicleRigid.drag = 9999;
                 VehicleRigid.angularDrag = 9999;
             }
