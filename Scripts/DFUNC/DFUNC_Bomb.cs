@@ -235,7 +235,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             else
             { NewBomb = InstantiateWeapon(); }
             NewBomb.transform.SetParent(null);
-            NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, VehicleTransform.rotation);
+            NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, BombLaunchPoints[BombPoint].rotation);
             NewBomb.SetActive(true);
             NewBomb.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
             BombPoint++;
