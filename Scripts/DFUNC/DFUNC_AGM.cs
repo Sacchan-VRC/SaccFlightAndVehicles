@@ -124,7 +124,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         if (AGMAnimator) { AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider); }
-        if (Dial_Funcon) Dial_Funcon.SetActive(false);
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
 
         FindSelf();
 
@@ -172,6 +172,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
         gameObject.SetActive(false);
         func_active = false;
         Piloting = false;
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
     }
     public void SFEXT_G_RespawnButton()
     {
