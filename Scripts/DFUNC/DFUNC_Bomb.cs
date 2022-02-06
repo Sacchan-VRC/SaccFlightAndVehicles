@@ -47,7 +47,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     }
     private float boolToggleTime;
     private bool AnimOn = false;
-    private SaccEntity EntityControl;
+    [System.NonSerializedAttribute] public SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private float Trigger;
     private bool TriggerLastFrame;

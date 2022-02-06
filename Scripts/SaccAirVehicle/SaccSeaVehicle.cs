@@ -212,6 +212,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int DisablePhysicsAndInputs = 0;
     [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
     [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
+    [System.NonSerializedAttribute] public int OverrideConstantForce = 0;//this is only here for compatability with DFUNCs designed for SaccAirVehicle
     [System.NonSerializedAttribute] public int DisableTaxiRotation = 0;
     [System.NonSerializedAttribute] public int DisableGroundDetection = 0;
     [System.NonSerializedAttribute] public int ThrottleOverridden = 0;
