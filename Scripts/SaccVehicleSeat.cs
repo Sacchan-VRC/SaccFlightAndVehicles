@@ -50,23 +50,6 @@ public class SaccVehicleSeat : UdonSharpBehaviour
             Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle in VR
             localPlayer.UseAttachedStation();
             Seat.localRotation = SeatStartRot;
-            Networking.SetOwner(localPlayer, gameObject);
-        }
-        if (!SeatInitialized) { InitializeSeat(); }
-        EntityControl.MySeat = ThisStationID;
-
-        if (IsPilotSeat)
-        { EntityControl.PilotEnterVehicleLocal(); }
-        else
-        { EntityControl.PassengerEnterVehicleLocal(); }
-        if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
-
-        if (AdjustSeat && TargetEyePosition)
-        {
-            CalibratedY = false;
-            CalibratedZ = false;
-            AdjustTime = 0;
-            SeatAdjustment();
         }
     }
     public override void OnStationEntered(VRCPlayerApi player)
@@ -79,6 +62,21 @@ public class SaccVehicleSeat : UdonSharpBehaviour
             EntityControl.SeatedPlayers[ThisStationID] = player.playerId;
             if (player.isLocal)
             {
+                Networking.SetOwner(localPlayer, gameObject);
+                EntityControl.MySeat = ThisStationID;
+                if (IsPilotSeat)
+                { EntityControl.PilotEnterVehicleLocal(); }
+                else
+                { EntityControl.PassengerEnterVehicleLocal(); }
+                if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
+
+                if (AdjustSeat && TargetEyePosition)
+                {
+                    CalibratedY = false;
+                    CalibratedZ = false;
+                    AdjustTime = 0;
+                    SeatAdjustment();
+                }
                 foreach (int crew in EntityControl.SeatedPlayers)
                 {//get get a fresh VRCPlayerAPI every time to prevent players who left leaving a broken one behind and causing crashes
                     VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
