@@ -10,7 +10,6 @@ public class SAV_SyncScript : UdonSharpBehaviour
 {
     // whispers to Zwei, "it's okay"
     public UdonSharpBehaviour SAVControl;
-    public Transform VehicleTransform;
     [Tooltip("Delay between updates in seconds")]
     [Range(0.05f, 1f)]
     public float updateInterval = 0.2f;
@@ -26,12 +25,13 @@ public class SAV_SyncScript : UdonSharpBehaviour
     public float IdleMoveMentRange = .35f;
     [Tooltip("If vehicle rotates less than this many degrees since it's last update, it'll be considered to be idle")]
     public float IdleRotationRange = 5f;
+    private Transform VehicleTransform;
     private float nextUpdateTime = float.MaxValue;
     private int StartupTimeMS = 0;
     private double dblStartupTimeMS = 0;
     private double StartupTime;
     [UdonSynced(UdonSyncMode.None)] private double O_UpdateTime;
-    [UdonSynced(UdonSyncMode.None)] private Vector3 O_Position = Vector3.zero;
+    [UdonSynced(UdonSyncMode.None)] private Vector3 O_Position;
     [UdonSynced(UdonSyncMode.None)] private short O_RotationX;
     [UdonSynced(UdonSyncMode.None)] private short O_RotationY;
     [UdonSynced(UdonSyncMode.None)] private short O_RotationZ;
@@ -54,11 +54,11 @@ public class SAV_SyncScript : UdonSharpBehaviour
     //make everyone think they're the owner for the first frame so that don't set the position to 0,0,0 before SFEXT_L_EntityStart runs
     private bool IsOwner = true;
     private Vector3 ExtrapolationDirection;
-    private Vector3 LastExtrapolationDirection;
-    private Vector3 L_PingAdjustedPosition;
+    private Vector3 LastExtrapolationDirection = Vector3.zero;
+    private Vector3 L_PingAdjustedPosition = Vector3.zero;
     private Vector3 L_LastPingAdjustedPosition;
     private Vector3 lerpedCurVel;
-    private Vector3 Acceleration;
+    private Vector3 Acceleration = Vector3.zero;
     private Vector3 LastAcceleration;
     private Vector3 O_LastPosition;
     private float SmoothingTimeDivider;
@@ -78,39 +78,19 @@ public class SAV_SyncScript : UdonSharpBehaviour
     }
     public void SFEXT_L_EntityStart()
     {
-        VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
         Initialized = true;
+        VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
+        VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
+        L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position = VehicleTransform.position;
+        O_LastRotation2 = O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         bool InEditor = localPlayer == null;
-        if (!InEditor && localPlayer.isMaster)
-        {
-            IsOwner = true;
-            VehicleRigid.WakeUp();
-            IsOwner = true;
-        }
-        else if (!InEditor)
-        {//late joiner
-            IsOwner = false;
-            VehicleRigid.Sleep();
-        }
-        else { IsOwner = true; }//play mode in editor
-        SmoothingTimeDivider = 1f / updateInterval;
-        StartupTimeMS = Networking.GetServerTimeInMilliseconds();
-        dblStartupTimeMS = (double)StartupTimeMS * .001f;
-        StartupTime = Time.realtimeSinceStartup;
-        CurrentUpdateInterval = updateInterval;
-        EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
-        //script is disabled for 5 seconds to make sure nothing moves before everything is initialized
-        SendCustomEventDelayedSeconds(nameof(ActivateScript), 5);
-        if (localPlayer == null)
-        {
-            VehicleRigid.drag = 0;
-            VehicleRigid.angularDrag = 0;
-        }
-        else
+        if (!InEditor)
         {
             if (localPlayer.isMaster)
             {
+                IsOwner = true;
+                VehicleRigid.WakeUp();
                 VehicleRigid.drag = 0;
                 VehicleRigid.angularDrag = 0;
             }
@@ -120,6 +100,21 @@ public class SAV_SyncScript : UdonSharpBehaviour
                 VehicleRigid.angularDrag = 9999;
             }
         }
+        else
+        {//play mode in editor
+            IsOwner = true;
+            VehicleRigid.WakeUp();
+            VehicleRigid.drag = 9999;
+            VehicleRigid.angularDrag = 9999;
+        }
+        SmoothingTimeDivider = 1f / updateInterval;
+        StartupTimeMS = Networking.GetServerTimeInMilliseconds();
+        dblStartupTimeMS = (double)StartupTimeMS * .001f;
+        StartupTime = Time.realtimeSinceStartup;
+        CurrentUpdateInterval = updateInterval;
+        EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
+        //script is disabled for 5 seconds to make sure nothing moves before everything is initialized
+        SendCustomEventDelayedSeconds(nameof(ActivateScript), 5);
     }
     public void ActivateScript()
     {
