@@ -20,6 +20,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     [Tooltip("Transform of which its X scale scales with ammo")]
     public Transform AmmoBar;
     public KeyCode LaunchRocketKey = KeyCode.C;
+    [System.NonSerializedAttribute] public SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private float Trigger;
     private bool TriggerLastFrame = true;
@@ -43,7 +44,8 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
         FullRocketsDivider = 1f / (NumRocket > 0 ? NumRocket : 10000000);
         if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
         if (RocketHoldDelay < RocketDelay) { RocketHoldDelay = RocketDelay; }
-        VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleTransform = EntityControl.transform;
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
