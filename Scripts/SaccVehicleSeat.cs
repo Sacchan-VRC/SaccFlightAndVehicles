@@ -57,7 +57,6 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because EntityControl might not have initialized
         if (player != null)
         {
-            if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
             //voice range change to allow talking inside cockpit (after VRC patch 1008)
             EntityControl.SeatedPlayers[ThisStationID] = player.playerId;
             if (player.isLocal)
@@ -91,6 +90,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
             {
                 SetVoiceInside(player);
             }
+            if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
         }
     }
     public override void OnStationExited(VRCPlayerApi player)

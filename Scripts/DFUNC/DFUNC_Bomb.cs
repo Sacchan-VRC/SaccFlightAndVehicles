@@ -88,7 +88,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         NumChildrenStart = transform.childCount;
         if (Bomb)
         {
-            int NumToInstantiate = Mathf.Min(FullBombs, 10);
+            int NumToInstantiate = Mathf.Min(FullBombs, 30);
             for (int i = 0; i < NumToInstantiate; i++)
             {
                 InstantiateWeapon();

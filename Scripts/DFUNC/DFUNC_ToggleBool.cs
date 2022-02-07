@@ -219,7 +219,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         { Toggle(); }
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
-    {
+    {//disable if owner leaves while piloting
         if (!IsSecondary)
         {
             if (PilotExitTurnOff && player.isLocal)

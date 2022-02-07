@@ -126,17 +126,11 @@ public class DFUNC_Brake : UdonSharpBehaviour
     }
     public void SFEXT_G_TouchDownWater()
     {
-        if ((bool)SAVControl.GetProgramVariable("Piloting") || NoPilotAlwaysGroundBrake)
-        {
-            BrakeStrength = WaterBrakeStrength;
-        }
+        BrakeStrength = WaterBrakeStrength;
     }
     public void SFEXT_G_TouchDown()
     {
-        if ((bool)SAVControl.GetProgramVariable("Piloting") || NoPilotAlwaysGroundBrake)
-        {
-            BrakeStrength = GroundBrakeStrength;
-        }
+        BrakeStrength = GroundBrakeStrength;
     }
     private void Update()
     {

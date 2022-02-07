@@ -117,7 +117,6 @@ public class SAV_FloatScript : UdonSharpBehaviour
     public void SFEXT_O_TakeOwnership()
     {
         if (!HoverBike) { gameObject.SetActive(true); }
-
         InitializeDepth();
     }
     public void SFEXT_O_LoseOwnership()
@@ -134,15 +133,20 @@ public class SAV_FloatScript : UdonSharpBehaviour
         _maxDepthForce = MaxDepthForce;
         _floatForce = FloatForce;
     }
-    public void SFEXT_O_PilotExit()
+    public void SFEXT_G_EngineOff()
     {
-        if (HoverBike) { gameObject.SetActive(false); }
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        if (HoverBike)
+        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
         {
-            gameObject.SetActive(true); for (int i = 0; i != FloatPoints.Length; i++)
+            if (HoverBike) { gameObject.SetActive(false); }
+        }
+    }
+    public void SFEXT_G_EngineOn()
+    {
+        Debug.Log("4");
+        if (HoverBike && ((bool)SAVControl.GetProgramVariable("Piloting")))
+        {
+            gameObject.SetActive(true);
+            for (int i = 0; i != FloatPoints.Length; i++)
             {
                 FloatTouchWaterPoint[i] = float.MinValue;
                 FloatLastRayHitHeight[i] = float.MinValue;
