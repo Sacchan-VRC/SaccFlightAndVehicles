@@ -64,6 +64,7 @@ public class SAV_RocketController : UdonSharpBehaviour
     }
     public void MoveBackToPool()
     {
+        RocketAnimator.WriteDefaultValues();
         gameObject.SetActive(false);
         transform.SetParent(LauncherControl.transform);
         RocketCollider.enabled = false;
