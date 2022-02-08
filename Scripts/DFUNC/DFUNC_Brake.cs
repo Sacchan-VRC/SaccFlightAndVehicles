@@ -28,7 +28,13 @@ public class DFUNC_Brake : UdonSharpBehaviour
     [Tooltip("Speed below which the ground break works meters/s")]
     public float GroundBrakeSpeed = 40f;
     //other functions can set this +1 to disable breaking
-    [System.NonSerializedAttribute] public int DisableGroundBrake = 0;
+    [System.NonSerializedAttribute] public bool _DisableGroundBrake;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableGroundBrake_))] public int DisableGroundBrake = 0;
+    public int DisableGroundBrake_
+    {
+        set { _DisableGroundBrake = value > 0; }
+        get => DisableGroundBrake;
+    }
     private SaccEntity EntityControl;
     private float BrakeStrength;
     private int BRAKE_STRING = Animator.StringToHash("brake");
@@ -169,7 +175,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                     if (gdhr)
                     {
                         float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
-                        if (BrakeInput > 0 && RBSpeed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                        if (BrakeInput > 0 && RBSpeed < GroundBrakeSpeed && !_DisableGroundBrake)
                         {
                             Vector3 speed = (VehicleRigidbody.GetPointVelocity(GroundBrakeForcePosition.position) - gdhr.velocity).normalized;
                             speed = Vector3.ProjectOnPlane(speed, EntityControl.transform.up);
@@ -181,7 +187,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
                     }
                     else
                     {
-                        if (BrakeInput > 0 && Speed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                        if (BrakeInput > 0 && Speed < GroundBrakeSpeed && !_DisableGroundBrake)
                         {
                             Vector3 speed = VehicleRigidbody.GetPointVelocity(GroundBrakeForcePosition.position);
                             speed = Vector3.ProjectOnPlane(speed, EntityControl.transform.up);
@@ -245,14 +251,14 @@ public class DFUNC_Brake : UdonSharpBehaviour
                     if (gdhr)
                     {
                         float RBSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") - gdhr.velocity).magnitude;
-                        if (RBSpeed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                        if (RBSpeed < GroundBrakeSpeed && !_DisableGroundBrake)
                         {
                             VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, gdhr.GetPointVelocity(EntityControl.CenterOfMass.position), BrakeStrength * DeltaTime);
                         }
                     }
                     else
                     {
-                        if (Speed < GroundBrakeSpeed && DisableGroundBrake == 0)
+                        if (Speed < GroundBrakeSpeed && !_DisableGroundBrake)
                         {
                             VehicleRigidbody.velocity = Vector3.MoveTowards(VehicleRigidbody.velocity, Vector3.zero, BrakeStrength * DeltaTime);
                         }

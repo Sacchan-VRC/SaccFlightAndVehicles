@@ -24,7 +24,13 @@ public class DFUNC_Gear : UdonSharpBehaviour
     private bool IsOwner = false;
     private bool DisableGroundDetector = false;
     private Transform CenterOfMass;
-    [System.NonSerializedAttribute] public int DisableGearToggle = 0;
+    [System.NonSerializedAttribute] public bool _DisableGearToggle;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableGearToggle_))] public int DisableGearToggle = 0;
+    public int DisableGearToggle_
+    {
+        set { _DisableGearToggle = value > 0; }
+        get => DisableGearToggle;
+    }
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -77,7 +83,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        if (DisableGearToggle == 0) { ToggleGear(); }
+        if (DisableGearToggle_ == 0) { ToggleGear(); }
     }
     private void Update()
     {
@@ -88,7 +94,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
         if (Trigger > 0.75)
         {
-            if (!TriggerLastFrame && DisableGearToggle == 0) { ToggleGear(); }
+            if (!TriggerLastFrame && DisableGearToggle_ == 0) { ToggleGear(); }
             TriggerLastFrame = true;
         }
         else { TriggerLastFrame = false; }

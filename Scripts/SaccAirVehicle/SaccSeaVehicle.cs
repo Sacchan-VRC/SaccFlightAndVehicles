@@ -209,6 +209,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
     [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
     [System.NonSerializedAttribute] public bool UsingManualSync;
+    private bool RepeatingWorldCheckAxis;
     bool FloatingLastFrame = false;
     bool GroundedLastFrame = false;
     private float VelLiftStart;
@@ -241,15 +242,52 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     //this stuff can be used by DFUNCs
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
     [System.NonSerializedAttribute] public float Limits = 1;
-    [System.NonSerializedAttribute] public int DisablePhysicsAndInputs = 0;
+    [System.NonSerializedAttribute] public bool _DisablePhysicsAndInputs;
+    [FieldChangeCallback(nameof(DisablePhysicsAndInputs_))] public int DisablePhysicsAndInputs = 0;
+    public int DisablePhysicsAndInputs_
+    {
+        set { _DisablePhysicsAndInputs = value > 0; }
+        get => DisablePhysicsAndInputs;
+    }
     [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
     [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
-    [System.NonSerializedAttribute] public int OverrideConstantForce = 0;//this is only here for compatability with DFUNCs designed for SaccAirVehicle
-    [System.NonSerializedAttribute] public int DisableTaxiRotation = 0;
-    [System.NonSerializedAttribute] public int DisableGroundDetection = 0;
-    [System.NonSerializedAttribute] public int ThrottleOverridden = 0;
+
+    [System.NonSerializedAttribute] public bool _OverrideConstantForce;//this is only here for compatability with DFUNCs designed for SaccAirVehicle
+    [FieldChangeCallback(nameof(OverrideConstantForce_))] public int OverrideConstantForce = 0;
+    public int OverrideConstantForce_
+    {
+        set { _OverrideConstantForce = value > 0; }
+        get => OverrideConstantForce;
+    }
+    [System.NonSerializedAttribute] public bool _DisableTaxiRotation;
+    [FieldChangeCallback(nameof(DisableTaxiRotation_))] public int DisableTaxiRotation = 0;
+    public int DisableTaxiRotation_
+    {
+        set { _DisableTaxiRotation = value > 0; }
+        get => DisableTaxiRotation;
+    }
+    [System.NonSerializedAttribute] public bool _DisableGroundDetection;
+    [FieldChangeCallback(nameof(DisableGroundDetection_))] public int DisableGroundDetection = 0;
+    public int DisableGroundDetection_
+    {
+        set { _DisableGroundDetection = value > 0; }
+        get => DisableGroundDetection;
+    }
+    [System.NonSerializedAttribute] public bool _ThrottleOverridden;
+    [FieldChangeCallback(nameof(ThrottleOverridden_))] public int ThrottleOverridden = 0;
+    public int ThrottleOverridden_
+    {
+        set { _ThrottleOverridden = value > 0; }
+        get => ThrottleOverridden;
+    }
     [System.NonSerializedAttribute] public float ThrottleOverride;
-    [System.NonSerializedAttribute] public int JoystickOverridden = 0;
+    [System.NonSerializedAttribute] public bool _JoystickOverridden;
+    [FieldChangeCallback(nameof(JoystickOverridden_))] public int JoystickOverridden = 0;
+    public int JoystickOverridden_
+    {
+        set { _JoystickOverridden = value > 0; }
+        get => JoystickOverridden;
+    }
     [System.NonSerializedAttribute] public Vector3 JoystickOverride;
     private float JoystickGrabValue;
     private float JoystickValueLastFrame;
@@ -367,7 +405,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         }
         if (!ControlsRoot)
         { ControlsRoot = VehicleTransform; }
-        if (!GroundDetector) { DisableGroundDetection++; }
+        if (!GroundDetector) { DisableGroundDetection_++; }
     }
     private void LateUpdate()
     {
@@ -395,7 +433,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             }
             else
             { FloatingLastFrame = false; }
-            if (DisableGroundDetection == 0)
+            if (!_DisableGroundDetection)
             {
                 RaycastHit GDHit;
                 if ((Physics.Raycast(GroundDetector.position, -GroundDetector.up, out GDHit, GroundDetectorRayDistance, GroundDetectorLayers, QueryTriggerInteraction.Ignore)))
@@ -432,35 +470,9 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                 //gotta do these this if we're piloting but it didn't get done(specifically, hovering extremely slowly in a VTOL craft will cause control issues we don't)
                 if (!VehicleMoving)
                 { WindAndAoA(); VehicleMoving = true; }
-                if (RepeatingWorld)
-                {
-                    if (CenterOfMass.position.z > RepeatingWorldDistance)
-                    {
-                        Vector3 vehpos = VehicleTransform.position;
-                        vehpos.z -= RepeatingWorldDistance * 2;
-                        VehicleTransform.position = vehpos;
-                    }
-                    else if (CenterOfMass.position.z < -RepeatingWorldDistance)
-                    {
-                        Vector3 vehpos = VehicleTransform.position;
-                        vehpos.z += RepeatingWorldDistance * 2;
-                        VehicleTransform.position = vehpos;
-                    }
-                    else if (CenterOfMass.position.x > RepeatingWorldDistance)
-                    {
-                        Vector3 vehpos = VehicleTransform.position;
-                        vehpos.x -= RepeatingWorldDistance * 2;
-                        VehicleTransform.position = vehpos;
-                    }
-                    else if (CenterOfMass.position.x < -RepeatingWorldDistance)
-                    {
-                        Vector3 vehpos = VehicleTransform.position;
-                        vehpos.x += RepeatingWorldDistance * 2;
-                        VehicleTransform.position = vehpos;
-                    }
-                }
+                DoRepeatingWorld();
 
-                if (DisablePhysicsAndInputs == 0)
+                if (!_DisablePhysicsAndInputs)
                 {
                     //collect inputs//inputs as ints
                     int Ai = Input.GetKey(KeyCode.A) ? -1 : 0;
@@ -590,7 +602,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                             ThrottleGripLastFrame = false;
                         }
 
-                        if (DisableTaxiRotation == 0 && Taxiing)
+                        if (!_DisableTaxiRotation && Taxiing)
                         {
                             AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                                               //rotate if trying to yaw
@@ -615,7 +627,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                             else
                                 PlayerThrottle = 1;
                         }
-                        if (ThrottleOverridden > 0 && !ThrottleGripLastFrame)
+                        if (ThrottleOverridden_ > 0 && !ThrottleGripLastFrame)
                         {
                             ThrottleInput = PlayerThrottle = ThrottleOverride;
                         }
@@ -641,40 +653,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                     {
                         ThrottleInput = PlayerThrottle = 0;
                     }
-                    Vector2 Throttles = UnpackThrottles(ThrottleInput);
-                    Fuel = Mathf.Max(Fuel -
-                                        ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
-                                            + (Throttles.y * FuelConsumptionAB)) * DeltaTime, 0);
-
-
-                    if (Fuel < LowFuel)
-                    {
-                        //max throttle scales down with amount of fuel below LowFuel
-                        ThrottleInput = ThrottleInput * Fuel * LowFuelDivider;
-                        if (!LowFuelLastFrame)
-                        {
-                            EntityControl.SendEventToExtensions("SFEXT_O_LowFuel");
-                            LowFuelLastFrame = true;
-                        }
-                        if (Fuel == 0 && !NoFuelLastFrame)
-                        {
-                            NoFuelLastFrame = true;
-                            EntityControl.SendEventToExtensions("SFEXT_O_NoFuel");
-                        }
-                    }
-
-                    if (HasAfterburner)
-                    {
-                        if (ThrottleInput > ThrottleAfterburnerPoint && !AfterburnerOn)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
-                        }
-                        else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
-                        }
-                    }
-                    if (JoystickOverridden > 0 && !JoystickGripLastFrameR)//joystick override enabled, and player not holding joystick
+                    FuelEvents();
+                    if (JoystickOverridden_ > 0 && !JoystickGripLastFrameR)//joystick override enabled, and player not holding joystick
                     {
                         YawInput = JoystickOverride.z;
                     }
@@ -739,9 +719,19 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                     StillWindMulti = Mathf.Min(Speed * .1f, 1);
                 }
                 else { StillWindMulti = 1; }
+                if (_EngineOn)
+                {
+                    //allow remote piloting using extensions?
+                    if (ThrottleOverridden_ > 0)
+                    { ThrottleInput = PlayerThrottle = ThrottleOverride; }
+                    FuelEvents();
+                }
+                if (JoystickOverridden_ > 0)
+                { RotationInputs = JoystickOverride; }
+                DoRepeatingWorld();
             }
 
-            if (DisablePhysicsAndInputs == 0)
+            if (!_DisablePhysicsAndInputs)
             {
                 //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
                 if (EngineOutput < ThrottleInput)
@@ -841,6 +831,10 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         {
             EntityControl.ExitStation();
         }
+        if (LowFuelLastFrame)
+        { SendNotLowFuel(); }
+        if (NoFuelLastFrame)
+        { SendNotNoFuel(); }
     }
     public void SFEXT_O_OnPlayerJoined()
     {
@@ -907,6 +901,94 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
         VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
     }
+    public void FuelEvents()
+    {
+        Vector2 Throttles = UnpackThrottles(ThrottleInput);
+        Fuel = Mathf.Max(Fuel -
+                            ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
+                                + (Throttles.y * FuelConsumptionAB)) * Time.deltaTime, 0);
+        if (Fuel < LowFuel)
+        {
+            //max throttle scales down with amount of fuel below LowFuel
+            ThrottleInput = ThrottleInput * Fuel * LowFuelDivider;
+            if (!LowFuelLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendLowFuel));
+            }
+            if (Fuel == 0 && !NoFuelLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNoFuel));
+            }
+        }
+        else
+        {
+            if (LowFuelLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
+            }
+        }
+        if (Fuel > 0)
+        {
+            if (NoFuelLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
+            }
+        }
+        if (HasAfterburner)
+        {
+            if (ThrottleInput > ThrottleAfterburnerPoint && !AfterburnerOn)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
+            }
+            else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
+            }
+        }
+    }
+    public void DoRepeatingWorld()
+    {
+        if (RepeatingWorld)
+        {
+            if (RepeatingWorldCheckAxis)
+            {
+                if (Mathf.Abs(CenterOfMass.position.z) > RepeatingWorldDistance)
+                {
+                    if (CenterOfMass.position.z > 0)
+                    {
+                        Vector3 vehpos = VehicleTransform.position;
+                        vehpos.z -= RepeatingWorldDistance * 2;
+                        VehicleTransform.position = vehpos;
+                    }
+                    else
+                    {
+                        Vector3 vehpos = VehicleTransform.position;
+                        vehpos.z += RepeatingWorldDistance * 2;
+                        VehicleTransform.position = vehpos;
+                    }
+                }
+            }
+            else
+            {
+                if (Mathf.Abs(CenterOfMass.position.x) > RepeatingWorldDistance)
+                {
+                    if (CenterOfMass.position.x > 0)
+                    {
+                        Vector3 vehpos = VehicleTransform.position;
+                        vehpos.x -= RepeatingWorldDistance * 2;
+                        VehicleTransform.position = vehpos;
+                    }
+                    else
+                    {
+                        Vector3 vehpos = VehicleTransform.position;
+                        vehpos.x += RepeatingWorldDistance * 2;
+                        VehicleTransform.position = vehpos;
+                    }
+                }
+            }
+            RepeatingWorldCheckAxis = !RepeatingWorldCheckAxis;//Check one axis per frame
+        }
+    }
     public void TouchDown()
     {
         //Debug.Log("TouchDown");
@@ -958,6 +1040,29 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
         }
     }
+    public void SendLowFuel()
+    {
+        LowFuelLastFrame = true;
+        EntityControl.SendEventToExtensions("SFEXT_G_LowFuel");
+    }
+    public void SendNotLowFuel()
+    {
+        LowFuelLastFrame = false;
+        EntityControl.SendEventToExtensions("SFEXT_G_NotLowFuel");
+    }
+    public void SendNoFuel()
+    {
+        NoFuelLastFrame = true;
+        EntityControl.SendEventToExtensions("SFEXT_G_NoFuel");
+        SetEngineOff();
+    }
+    public void SendNotNoFuel()
+    {
+        NoFuelLastFrame = false;
+        EntityControl.SendEventToExtensions("SFEXT_G_NotNoFuel");
+        if (EngineOnOnEnter && Occupied)
+        { SetEngineOn(); }
+    }
     public void SFEXT_O_ReSupply()
     {
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ReSupply));
@@ -979,13 +1084,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             Health = Mathf.Min(Health + (FullHealth / RepairTime), FullHealth);
             if (LowFuelLastFrame && Fuel > LowFuel)
             {
-                LowFuelLastFrame = false;
-                EntityControl.SendEventToExtensions("SFEXT_O_NotLowFuel");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
             }
             if (NoFuelLastFrame && Fuel > 0)
             {
-                NoFuelLastFrame = false;
-                EntityControl.SendEventToExtensions("SFEXT_O_NotNoFuel");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
             }
         }
     }
@@ -1024,6 +1127,10 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         EntityControl.dead = true;
         SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
         EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
+        if (LowFuelLastFrame)
+        { SendNotLowFuel(); }
+        if (NoFuelLastFrame)
+        { SendNotNoFuel(); }
     }
     public void SendBulletHit()
     {
@@ -1124,6 +1231,10 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                                             //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
         }
         GDHitRigidbody = null;
+        if (_EngineOn)
+        { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
+        else
+        { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0; }
 
         Piloting = true;
         if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
@@ -1140,7 +1251,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         Occupied = true;
         EntityControl.dead = false;//vehicle stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
-        if (EngineOnOnEnter)
+        if (EngineOnOnEnter && Fuel > 0)
         { EngineOn = true; }
     }
     public void SFEXT_G_PilotExit()
@@ -1185,7 +1296,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     }
     private void WindAndAoA()
     {
-        if (DisablePhysicsAndInputs != 0) { return; }
+        if (DisablePhysicsAndInputs_ != 0) { return; }
         float TimeGustiness = Time.time * WindGustiness;
         float gustx = TimeGustiness + (VehicleTransform.position.x * WindTurbulanceScale);
         float gustz = TimeGustiness + (VehicleTransform.position.z * WindTurbulanceScale);

@@ -227,8 +227,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere reaches zero thickness. In meters. 19812 = 65,000~ feet")]
     public float AtmosphereThinningEnd = 19812; //65,000 feet
-    [Tooltip("Disable the workaround for wheelcolliders that stops vehicles from sticking in place and being unable to move slowly.")]
-    public bool DisableStickyWheelWorkarond = false;
     [Tooltip("Set Engine On when entering the vehicle?")]
     public bool EngineOnOnEnter = true;
     [Tooltip("Set Engine Off when entering the vehicle?")]
@@ -280,7 +278,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         EngineOn = false;
     }
-    private bool RepeatingWorldCheckAxis;
     [System.NonSerializedAttribute] public float AllGs;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
     [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
@@ -364,6 +361,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool DoAAMTargeting;
     [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
     [System.NonSerializedAttribute] public bool UsingManualSync;
+    private bool RepeatingWorldCheckAxis;
     bool FloatingLastFrame = false;
     bool GroundedLastFrame = false;
     private float VelLiftStart;
@@ -387,7 +385,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float TaxiFullTurningSpeedDivider;
     private float vtolangledif;
-    private Vector3 VRJoystickPosLastHaptic;
     [System.NonSerializedAttribute] public bool LowFuelLastFrame;
     [System.NonSerializedAttribute] public bool NoFuelLastFrame;
     Vector3 VTOL180 = new Vector3(0, 0.01f, -1);//used as a rotation target for VTOL adjustment. Slightly below directly backward so that rotatetowards rotates on the correct axis
@@ -407,15 +404,58 @@ public class SaccAirVehicle : UdonSharpBehaviour
     //this stuff can be used by DFUNCs
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
     [System.NonSerializedAttribute] public float Limits = 1;
-    [System.NonSerializedAttribute] public int DisablePhysicsAndInputs = 0;
-    [System.NonSerializedAttribute] public int OverrideConstantForce = 0;
+    public bool _DisableStickyWheelWorkarond;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableStickyWheelWorkarond_))] public int DisableStickyWheelWorkarond = 0;
+    public int DisableStickyWheelWorkarond_
+    {
+        set { _DisableStickyWheelWorkarond = value > 0; }
+        get => DisableStickyWheelWorkarond;
+    }
+    [System.NonSerializedAttribute] public bool _DisablePhysicsAndInputs;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisablePhysicsAndInputs_))] public int DisablePhysicsAndInputs = 0;
+    public int DisablePhysicsAndInputs_
+    {
+        set { _DisablePhysicsAndInputs = value > 0; }
+        get => DisablePhysicsAndInputs;
+    }
+    [System.NonSerializedAttribute] public bool _OverrideConstantForce;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(OverrideConstantForce_))] public int OverrideConstantForce = 0;
+    public int OverrideConstantForce_
+    {
+        set { _OverrideConstantForce = value > 0; }
+        get => OverrideConstantForce;
+    }
     [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
     [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
-    [System.NonSerializedAttribute] public int DisableTaxiRotation = 0;
-    [System.NonSerializedAttribute] public int DisableGroundDetection = 0;
-    [System.NonSerializedAttribute] public int ThrottleOverridden = 0;
+    [System.NonSerializedAttribute] public bool _DisableTaxiRotation;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableTaxiRotation_))] public int DisableTaxiRotation = 0;
+    public int DisableTaxiRotation_
+    {
+        set { _DisableTaxiRotation = value > 0; }
+        get => DisableTaxiRotation;
+    }
+    [System.NonSerializedAttribute] public bool _DisableGroundDetection;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableGroundDetection_))] public int DisableGroundDetection = 0;
+    public int DisableGroundDetection_
+    {
+        set { _DisableGroundDetection = value > 0; }
+        get => DisableGroundDetection;
+    }
+    [System.NonSerializedAttribute] public bool _ThrottleOverridden;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(ThrottleOverridden_))] public int ThrottleOverridden = 0;
+    public int ThrottleOverridden_
+    {
+        set { _ThrottleOverridden = value > 0; }
+        get => ThrottleOverridden;
+    }
     [System.NonSerializedAttribute] public float ThrottleOverride;
-    [System.NonSerializedAttribute] public int JoystickOverridden = 0;
+    [System.NonSerializedAttribute] public bool _JoystickOverridden;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(JoystickOverridden_))] public int JoystickOverridden = 0;
+    public int JoystickOverridden_
+    {
+        set { _JoystickOverridden = value > 0; }
+        get => JoystickOverridden;
+    }
     [System.NonSerializedAttribute] public Vector3 JoystickOverride;
 
 
@@ -470,6 +510,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
         WheelCollider[] wc = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
         if (wc.Length != 0) { HasWheelColliders = true; }
+        if (_DisableStickyWheelWorkarond) { DisableStickyWheelWorkarond++; }
 
         if (AutoAdjustValuesToMass)
         {
@@ -567,7 +608,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         VTOLAngle = VTOLAngleInput = VTOLDefaultValue;
 
         if (GroundDetectorRayDistance == 0 || !GroundDetector)
-        { DisableGroundDetection++; }
+        { DisableGroundDetection_++; }
 
         if (GroundEffectEmpty == null)
         {
@@ -613,7 +654,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
             else
             { FloatingLastFrame = false; }
-            if (DisableGroundDetection == 0)
+            if (!_DisableGroundDetection)
             {
                 RaycastHit GDHit;
                 if ((Physics.Raycast(GroundDetector.position, -GroundDetector.up, out GDHit, GroundDetectorRayDistance, GroundDetectorLayers, QueryTriggerInteraction.Ignore)))
@@ -652,7 +693,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 { WindAndAoA(); VehicleMoving = true; }
                 DoRepeatingWorld();
 
-                if (DisablePhysicsAndInputs == 0)
+                if (!_DisablePhysicsAndInputs)
                 {
                     //collect inputs
                     int Wi = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
@@ -820,7 +861,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                             ThrottleGripLastFrame = false;
                         }
 
-                        if (DisableTaxiRotation == 0 && Taxiing)
+                        if (!_DisableTaxiRotation && Taxiing)
                         {
                             AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                                               //rotate if trying to yaw
@@ -847,7 +888,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                             else
                                 PlayerThrottle = 1;
                         }
-                        if (ThrottleOverridden > 0 && !ThrottleGripLastFrame)
+                        if (_ThrottleOverridden && !ThrottleGripLastFrame)
                         {
                             ThrottleInput = PlayerThrottle = ThrottleOverride;
                         }
@@ -875,7 +916,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
                     FuelEvents();
 
-                    if (JoystickOverridden > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
+                    if (_JoystickOverridden && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
                     {
                         RotationInputs = JoystickOverride;
                     }
@@ -948,7 +989,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
 
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
-                    if (Speed < .2 && HasWheelColliders && ThrottleInput > 0 && !DisableStickyWheelWorkarond)
+                    if (HasWheelColliders && Speed < .2 && ThrottleInput > 0 && !_DisableStickyWheelWorkarond)
                     {
                         if (VTOLAngle > VTOL90Degrees)
                         { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
@@ -984,16 +1025,16 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 if (_EngineOn)
                 {
                     //allow remote piloting using extensions?
-                    if (ThrottleOverridden > 0)
+                    if (_ThrottleOverridden)
                     { ThrottleInput = PlayerThrottle = ThrottleOverride; }
                     FuelEvents();
                 }
-                if (JoystickOverridden > 0)
+                if (_JoystickOverridden)
                 { RotationInputs = JoystickOverride; }
                 DoRepeatingWorld();
             }
 
-            if (DisablePhysicsAndInputs == 0)
+            if (!_DisablePhysicsAndInputs)
             {
                 //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
                 if (EngineOutput < ThrottleInput)
@@ -1042,7 +1083,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     VelLift = pitch = yaw = roll = 0;
                 }
 
-                if ((VehicleMoving) && OverrideConstantForce == 0)
+                if ((VehicleMoving) && !_OverrideConstantForce)
                 {
                     //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                     //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
@@ -1413,6 +1454,17 @@ public class SaccAirVehicle : UdonSharpBehaviour
             EntityControl.SendEventToExtensions("SFEXT_G_AfterburnerOff");
         }
     }
+    private void ToggleAfterburner()
+    {
+        if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint && Fuel > LowFuel)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
+        }
+        else if (AfterburnerOn)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
+        }
+    }
     public void SendLowFuel()
     {
         LowFuelLastFrame = true;
@@ -1435,17 +1487,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         EntityControl.SendEventToExtensions("SFEXT_G_NotNoFuel");
         if (EngineOnOnEnter && Occupied)
         { SetEngineOn(); }
-    }
-    private void ToggleAfterburner()
-    {
-        if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint && Fuel > LowFuel)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
-        }
-        else if (AfterburnerOn)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
-        }
     }
     public void SFEXT_O_ReSupply()
     {
@@ -1791,7 +1832,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     private void WindAndAoA()
     {
-        if (DisablePhysicsAndInputs != 0) { return; }
+        if (DisablePhysicsAndInputs_ != 0) { return; }
         Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
         float TimeGustiness = Time.time * WindGustiness;
         float gustx = TimeGustiness + (VehicleTransform.position.x * WindTurbulanceScale);
