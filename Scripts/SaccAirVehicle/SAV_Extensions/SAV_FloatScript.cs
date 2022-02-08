@@ -142,7 +142,6 @@ public class SAV_FloatScript : UdonSharpBehaviour
     }
     public void SFEXT_G_EngineOn()
     {
-        Debug.Log("4");
         if (HoverBike && ((bool)SAVControl.GetProgramVariable("Piloting")))
         {
             gameObject.SetActive(true);

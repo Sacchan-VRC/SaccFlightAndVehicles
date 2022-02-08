@@ -233,11 +233,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public bool EngineOnOnEnter = true;
     [Tooltip("Set Engine Off when entering the vehicle?")]
     public bool EngineOffOnExit = true;
-    [/* System.NonSerializedAttribute, */ FieldChangeCallback(nameof(EngineOn))] public bool _EngineOn = false;
+    [FieldChangeCallback(nameof(EngineOn))] public bool _EngineOn = false;
     public bool EngineOn
     {
         set
-        {       Debug.Log("3");
+        {
             if (value && !_EngineOn)
             {
                 EntityControl.SendEventToExtensions("SFEXT_G_EngineOn");
@@ -1374,11 +1374,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         NoFuelLastFrame = true;
         EntityControl.SendEventToExtensions("SFEXT_G_NoFuel");
+        SetEngineOff();
     }
     public void SendNotNoFuel()
     {
         NoFuelLastFrame = false;
         EntityControl.SendEventToExtensions("SFEXT_G_NotNoFuel");
+        if (EngineOnOnEnter && Occupied)
+        { SetEngineOn(); }
     }
     private void ToggleAfterburner()
     {
@@ -1653,13 +1656,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
         //setting this as a workaround because it doesnt work reliably in Start()
         if (!InEditor)
         {
-            InVR = localPlayer.IsUserInVR();//move me to start when they fix the bug
-                                            //https://feedback.vrchat.com/vrchat-udon-closed-alpha-bugs/p/vrcplayerapiisuserinvr-for-the-local-player-is-not-returned-correctly-when-calle
+            InVR = localPlayer.IsUserInVR();
         }
         VTOLAngleInput = VTOLAngle;
         GDHitRigidbody = null;
 
-        Debug.Log("1");
         Piloting = true;
         if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
@@ -1675,8 +1676,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         Occupied = true;
         EntityControl.dead = false;//vehicle stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
-        Debug.Log("2");
-        if (EngineOnOnEnter)
+        if (EngineOnOnEnter && Fuel > 0)
         { EngineOn = true; }
     }
     public void SFEXT_G_PilotExit()

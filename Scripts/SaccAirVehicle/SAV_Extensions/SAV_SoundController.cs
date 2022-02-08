@@ -127,7 +127,6 @@ public class SAV_SoundController : UdonSharpBehaviour
     private bool InWater;
     private bool Taxiing;
     private bool EngineOn;
-    private bool NoFuel;
     private bool DoRollingSwap;
     public void SFEXT_L_EntityStart()
     {
@@ -221,7 +220,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         float DeltaTime = Time.smoothDeltaTime;
         if (DoSound > 35f)
         {
-            if (!soundsoff && !InVehicle)//disable all the sounds that always play, re-enabled in pilotseat
+            if (!soundsoff && (!InVehicle || !AllDoorsClosed))//disable all the sounds that always play, re-enabled in pilotseat
             {
                 if (PlaneDistant) { PlaneDistant.Stop(); }
                 if (PlaneWind) { PlaneWind.Stop(); }
@@ -320,7 +319,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                 else
                 { _rolling.volume = Mathf.Lerp(_rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
             }
-            if ((Piloting || Passenger) && EngineOn && !NoFuel) //you're piloting or someone is piloting and you're a passenger
+            if ((Piloting || Passenger) && EngineOn) //you're piloting or someone is piloting and you're a passenger
             {
                 float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
                 if (PlaneInside)
@@ -348,7 +347,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                 }
             }
         }
-        else if (EngineOn && !NoFuel)//someone else is piloting
+        else if (EngineOn)//someone else is piloting
         {
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, .72f * DeltaTime);
             float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
@@ -595,10 +594,6 @@ public class SAV_SoundController : UdonSharpBehaviour
             BulletHit[rand].Play();
         }
     }
-    public void SFEXT_G_NotNoFuel()
-    { NoFuel = false; }
-    public void SFEXT_G_NoFuel()
-    { NoFuel = true; }
     public void SFEXT_G_TouchDown()
     {
         Taxiing = true;

@@ -8,7 +8,11 @@ using VRC.Udon;
 public class DFUNC_ToggleEngine : UdonSharpBehaviour
 {
     public UdonSharpBehaviour SAVControl;
-    public float ToggleMinDelay = 3f;
+    public float ToggleMinDelay = 0;
+    public float StartUpTime = 3f;
+    public AudioSource EngineStartupSound;
+    private int EngineStartCount;
+    private int EngineStartCancelCount;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private float ToggleTime;
@@ -37,6 +41,10 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineOff));
             }
+            else if (EngineStartCount > EngineStartCancelCount)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineStartupCancel));
+            }
             else
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineOn));
@@ -49,19 +57,45 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     { gameObject.SetActive(false); }
     public void SFEXT_O_PilotExit()
     { gameObject.SetActive(false); }
+    public void EngineStartup()
+    {
+        if (EngineStartupSound) { EngineStartupSound.Play(); }
+        EngineStartCount++;
+        SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), StartUpTime);
+    }
+    public void EngineStartupFinish()
+    {
+        EngineStartCount--;
+        if (EngineStartCount == 0 && EngineStartCancelCount == 0)
+        { SAVControl.SetProgramVariable("_EngineOn", true); }
+        else
+        { EngineStartCancelCount--; }
+    }
+    public void EngineStartupCancel()
+    {
+        if (EngineStartupSound) { EngineStartupSound.Stop(); }
+        EngineStartCancelCount++;
+    }
     public void EngineOn()
     {
         if (!(bool)SAVControl.GetProgramVariable("_EngineOn"))//don't bother setting if you're not a late joiner
         {
             ToggleTime = Time.time;
-            SAVControl.SetProgramVariable("_EngineOn", true);
+            if (StartUpTime == 0)
+            {
+                SAVControl.SetProgramVariable("_EngineOn", true);
+            }
+            else
+            {
+                EngineStartup();
+            }
         }
     }
     public void EngineOff()
     {
         if ((bool)SAVControl.GetProgramVariable("_EngineOn"))
         {
-            ToggleTime = Time.time;
+            ToggleTime = Time.time - StartUpTime;
             SAVControl.SetProgramVariable("_EngineOn", false);
         }
     }
