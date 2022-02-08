@@ -898,51 +898,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     {
                         ThrottleInput = PlayerThrottle = 0;
                     }
-                    Vector2 Throttles = UnpackThrottles(ThrottleInput);
-                    Fuel = Mathf.Max(Fuel -
-                                        ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
-                                            + (Throttles.y * FuelConsumptionAB)) * DeltaTime, 0);
+                    FuelEvents();
 
-
-                    if (Fuel < LowFuel)
-                    {
-                        //max throttle scales down with amount of fuel below LowFuel
-                        ThrottleInput = ThrottleInput * Fuel * LowFuelDivider;
-                        if (!LowFuelLastFrame)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendLowFuel));
-                        }
-                        if (Fuel == 0 && !NoFuelLastFrame)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNoFuel));
-                        }
-                    }
-                    else
-                    {
-                        if (LowFuelLastFrame)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
-                        }
-                    }
-                    if (Fuel > 0)
-                    {
-                        if (NoFuelLastFrame)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
-                        }
-                    }
-
-                    if (HasAfterburner)
-                    {
-                        if (ThrottleInput > ThrottleAfterburnerPoint && !AfterburnerOn)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
-                        }
-                        else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
-                        {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
-                        }
-                    }
                     if (JoystickOverridden > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
                     {
                         RotationInputs = JoystickOverride;
@@ -1049,6 +1006,19 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     StillWindMulti = Mathf.Min(Speed * .1f, 1);
                 }
                 else { StillWindMulti = 1; }
+                if (_EngineOn)
+                {
+                    //allow remote piloting using extensions?
+                    if (ThrottleOverridden > 0)
+                    {
+                        ThrottleInput = PlayerThrottle = ThrottleOverride;
+                    }
+                    if (JoystickOverridden > 0)
+                    {
+                        RotationInputs = JoystickOverride;
+                    }
+                    FuelEvents();
+                }
             }
 
             if (DisablePhysicsAndInputs == 0)
@@ -1341,6 +1311,51 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
             ITR.x *= -1;
             VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
+        }
+    }
+    public void FuelEvents()
+    {
+        Vector2 Throttles = UnpackThrottles(ThrottleInput);
+        Fuel = Mathf.Max(Fuel -
+                            ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
+                                + (Throttles.y * FuelConsumptionAB)) * Time.deltaTime, 0);
+        if (Fuel < LowFuel)
+        {
+            //max throttle scales down with amount of fuel below LowFuel
+            ThrottleInput = ThrottleInput * Fuel * LowFuelDivider;
+            if (!LowFuelLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendLowFuel));
+            }
+            if (Fuel == 0 && !NoFuelLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNoFuel));
+            }
+        }
+        else
+        {
+            if (LowFuelLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
+            }
+        }
+        if (Fuel > 0)
+        {
+            if (NoFuelLastFrame)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
+            }
+        }
+        if (HasAfterburner)
+        {
+            if (ThrottleInput > ThrottleAfterburnerPoint && !AfterburnerOn)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
+            }
+            else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
+            }
         }
     }
     public void TouchDown()
@@ -1683,6 +1698,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
         }
         VTOLAngleInput = VTOLAngle;
         GDHitRigidbody = null;
+        if (_EngineOn)
+        { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
+        else
+        { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0; }
 
         Piloting = true;
         if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions

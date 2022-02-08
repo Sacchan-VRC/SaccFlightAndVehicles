@@ -27,7 +27,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private float FullFuelDivider;
     private Vector3 OwnerRotationInputs;
     private VRCPlayerApi localPlayer;
-    private bool Occupied;
+    private bool EngineOn;
     private bool InVR;
     private bool InEditor = true;
     //animator strings that are sent every frame are converted to int for optimization
@@ -55,7 +55,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
         if (localPlayer == null)
         {
-            Occupied = true;
+            EngineOn = true;
             VehicleAnimator.SetBool("occupied", true);
         }
         else { InEditor = false; }
@@ -96,7 +96,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
         }
-        if (Occupied)
+        if (EngineOn)
         {
             DoEffects = 0f;
             VehicleAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
@@ -148,13 +148,19 @@ public class SAV_EffectsController : UdonSharpBehaviour
     {
         DoEffects = 0f;
         VehicleAnimator.SetBool("occupied", true);
-        Occupied = true;
+    }
+    public void SFEXT_G_EngineOn()
+    {
+        EngineOn = true;
+    }
+    public void SFEXT_G_EngineOff()
+    {
+        EngineOn = false;
     }
     public void SFEXT_G_PilotExit()
     {
         VehicleAnimator.SetBool("occupied", false);
         VehicleAnimator.SetInteger("missilesincoming", 0);
-        Occupied = false;
     }
     public void SFEXT_O_PilotEnter()
     {
