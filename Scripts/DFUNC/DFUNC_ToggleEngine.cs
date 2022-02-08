@@ -74,6 +74,7 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     {
         ToggleTime = Time.time;
         if (EngineStartupSound) { EngineStartupSound.Play(); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         EngineStartCount++;
         SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), StartUpTime);
     }
@@ -94,6 +95,7 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     public void EngineStartupCancel()
     {
         if (EngineStartupSound) { EngineStartupSound.Stop(); }
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         EngineStartCancelCount++;
     }
     public void SFEXT_G_ReAppear()
