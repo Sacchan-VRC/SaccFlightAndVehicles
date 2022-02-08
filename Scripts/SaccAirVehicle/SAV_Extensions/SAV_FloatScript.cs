@@ -116,12 +116,12 @@ public class SAV_FloatScript : UdonSharpBehaviour
     }
     public void SFEXT_O_TakeOwnership()
     {
-        if (!HoverBike) { gameObject.SetActive(true); }
+        if (!HoverBike || (HoverBike && (bool)SAVControl.GetProgramVariable("_EngineOn"))) { gameObject.SetActive(true); }
         InitializeDepth();
     }
     public void SFEXT_O_LoseOwnership()
     {
-        if (!HoverBike) { gameObject.SetActive(false); }
+        gameObject.SetActive(false);
     }
     public void SFEXT_O_Explode()
     {
