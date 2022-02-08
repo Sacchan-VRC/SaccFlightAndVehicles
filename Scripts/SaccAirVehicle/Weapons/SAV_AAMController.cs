@@ -127,13 +127,14 @@ public class SAV_AAMController : UdonSharpBehaviour
         Target = AAMTargets[aamtarg].transform;
         SendCustomEventDelayedFrames(nameof(ThrowMissile), 1);//doesn't work if done this frame
 
-        //LateUpdate runs one time after MoveBackToPool so these must be here
+        //FixedUpdate runs one time after MoveBackToPool so these must be here
         ColliderActive = false;
         MissileConstant.relativeTorque = Vector3.zero;
         MissileConstant.relativeForce = Vector3.zero;
         LockHack = true;
         TargetLost = false;
-
+        MissileIncoming = false;
+        UnlockTime = 0;
         if (!Target)
         {
             TargetLost = true;
@@ -293,6 +294,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     }
     public void MoveBackToPool()
     {
+        MissileAnimator.WriteDefaultValues();
         gameObject.SetActive(false);
         transform.SetParent(AAMLauncherControl.transform);
         AAMCollider.enabled = false;
