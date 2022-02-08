@@ -362,7 +362,6 @@ public class SAV_AAMController : UdonSharpBehaviour
         }
 
         AAMCollider.enabled = false;
-        Animator AAMani = GetComponent<Animator>();
         float DamageDist = 999f;
         if (TargetEntityControl && (DirectHit || SplashHit))
         {
@@ -389,8 +388,8 @@ public class SAV_AAMController : UdonSharpBehaviour
                 }
             }
         }
-        AAMani.SetTrigger("explode");
-        AAMani.SetBool("hitwater", hitwater);
+        MissileAnimator.SetTrigger("explode");
+        MissileAnimator.SetBool("hitwater", hitwater);
         SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
     }
 }
