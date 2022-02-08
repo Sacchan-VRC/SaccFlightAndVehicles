@@ -249,6 +249,25 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 Taxiinglerper = 0;
                 VehicleAnimator.SetBool("EngineOn", false);
             }
+            //disable thrust vectoring if engine off
+            if (value)
+            {
+                PitchThrustVecMulti = PitchThrustVecMultiStart;
+                YawThrustVecMulti = YawThrustVecMultiStart;
+                RollThrustVecMulti = RollThrustVecMultiStart;
+                ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
+                ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
+                ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+            }
+            else
+            {
+                PitchThrustVecMulti = 0;
+                YawThrustVecMulti = 0;
+                RollThrustVecMulti = 0;
+                ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
+                ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
+                ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+            }
             _EngineOn = value;
         }
         get => _EngineOn;
@@ -520,6 +539,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
             ReversingPitchStrengthZero = 1;
             ReversingYawStrengthZero = 1;
             ReversingRollStrengthZero = 1;
+            ReversingPitchStrengthZeroStart = 1;
+            ReversingYawStrengthZeroStart = 1;
+            ReversingRollStrengthZeroStart = 1;
         }
         else
         {
@@ -1006,7 +1028,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     {
                         if (!(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0) || VTOLOnly)//only SetVTOLValues if it'll do anything
                         {
-                            SetVTOLValues();
+                            SetVTOLRotValues();
                             if (!InVTOL)
                             { EntityControl.SendEventToExtensions("SFEXT_O_EnterVTOL"); }
                             InVTOL = true;
@@ -1057,6 +1079,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
                     //thrust vectoring airplanes have a minimum rotation control
+                    //AoALiftPitch is used here before being modified in the next block of code on purpose
                     float minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
                     pitch *= Mathf.Max(PitchThrustVecMulti * ThrustVecGrounded, minlifttemp);
                     yaw *= Mathf.Max(YawThrustVecMulti * ThrustVecGrounded, minlifttemp);
@@ -1788,7 +1811,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         }
         return Mathf.Min(speedliftfac * AoALiftPitch * VelLift, VelLiftMax);
     }
-    private void SetVTOLValues()
+    private void SetVTOLRotValues()
     {
         VTOLAngle = Mathf.MoveTowards(VTOLAngle, VTOLAngleInput, VTOLAngleDivider * Time.smoothDeltaTime);
         float SpeedForVTOL = (Mathf.Min(Speed / VTOLLoseControlSpeed, 1));
@@ -1796,24 +1819,46 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             if (VTOLOnly)
             {
-                VTOLAngle90 = 1;
-                PitchThrustVecMulti = 1;
-                YawThrustVecMulti = 1;
-                RollThrustVecMulti = 1;
+                if (_EngineOn)
+                {
+                    VTOLAngle90 = 1;
+                    PitchThrustVecMulti = 1;
+                    YawThrustVecMulti = 1;
+                    RollThrustVecMulti = 1;
+                }
+                else
+                {
+                    VTOLAngle90 = 1;
+                    PitchThrustVecMulti = 0;
+                    YawThrustVecMulti = 0;
+                    RollThrustVecMulti = 0;
+                }
             }
             else
             {
-                VTOLAngle90 = Mathf.Min(VTOLAngle / VTOL90Degrees, 1);//used to lerp values as vtol angle goes towards 90 degrees instead of max vtol angle which can be above 90
+                if (_EngineOn)
+                {
+                    VTOLAngle90 = Mathf.Min(VTOLAngle / VTOL90Degrees, 1);//used to lerp values as vtol angle goes towards 90 degrees instead of max vtol angle which can be above 90
+                    float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngle90;
+                    //the thrust vec values are linearly scaled up the slower you go while in VTOL, from 0 at VTOLLoseControlSpeed
+                    PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
+                    YawThrustVecMulti = Mathf.Lerp(YawThrustVecMultiStart, VTOLYawThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
+                    RollThrustVecMulti = Mathf.Lerp(RollThrustVecMultiStart, VTOLRollThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
 
-                float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngle90;
-                //the thrust vec values are linearly scaled up the slow you go while in VTOL, from 0 at VTOLLoseControlSpeed
-                PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
-                YawThrustVecMulti = Mathf.Lerp(YawThrustVecMultiStart, VTOLYawThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
-                RollThrustVecMulti = Mathf.Lerp(RollThrustVecMultiStart, VTOLRollThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
+                    ReversingPitchStrengthZero = 1;
+                    ReversingYawStrengthZero = 1;
+                    ReversingRollStrengthZero = 1;
+                }
+                else
+                {
+                    PitchThrustVecMulti = 0;
+                    YawThrustVecMulti = 0;
+                    RollThrustVecMulti = 0;
 
-                ReversingPitchStrengthZero = 1;
-                ReversingYawStrengthZero = 1;
-                ReversingRollStrengthZero = 1;
+                    ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
+                    ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
+                    ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+                }
             }
 
             if (!VTOLAllowAfterburner)
@@ -1824,13 +1869,26 @@ public class SaccAirVehicle : UdonSharpBehaviour
         }
         else
         {
-            PitchThrustVecMulti = PitchThrustVecMultiStart;
-            YawThrustVecMulti = YawThrustVecMultiStart;
-            RollThrustVecMulti = RollThrustVecMultiStart;
+            if (_EngineOn)
+            {
+                PitchThrustVecMulti = PitchThrustVecMultiStart;
+                YawThrustVecMulti = YawThrustVecMultiStart;
+                RollThrustVecMulti = RollThrustVecMultiStart;
 
-            ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
-            ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
-            ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+                ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
+                ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
+                ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+            }
+            else
+            {
+                PitchThrustVecMulti = 0;
+                YawThrustVecMulti = 0;
+                RollThrustVecMulti = 0;
+
+                ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
+                ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
+                ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+            }
         }
     }
     public Vector2 UnpackThrottles(float Throttle)

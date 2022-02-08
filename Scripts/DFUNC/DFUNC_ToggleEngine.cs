@@ -11,11 +11,21 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     public float ToggleMinDelay = 0;
     public float StartUpTime = 3f;
     public AudioSource EngineStartupSound;
+    public AudioSource EngineTurnOffSound;
+    public GameObject Dial_Funcon;
+    private SaccEntity EntityControl;
     private int EngineStartCount;
     private int EngineStartCancelCount;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private float ToggleTime;
+    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+    public void DFUNC_RightDial() { UseLeftTrigger = false; }
+    public void SFEXT_L_EntityStart()
+    {
+        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+    }
     private void Update()
     {
         float Trigger;
@@ -47,7 +57,10 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
             }
             else
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineOn));
+                if (StartUpTime == 0)
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineOn)); }
+                else
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineStartup)); }
             }
         }
     }
@@ -59,16 +72,23 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     { gameObject.SetActive(false); }
     public void EngineStartup()
     {
+        ToggleTime = Time.time;
         if (EngineStartupSound) { EngineStartupSound.Play(); }
         EngineStartCount++;
         SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), StartUpTime);
     }
     public void EngineStartupFinish()
     {
-        EngineStartCount--;
+        if (EngineStartCount > 0) { EngineStartCount--; }
         if (EngineStartCount == 0 && EngineStartCancelCount == 0)
-        { SAVControl.SetProgramVariable("_EngineOn", true); }
-        else
+        {
+            if (!EntityControl._dead)
+            {
+                if (EntityControl.IsOwner)
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(JustEngineOn)); }
+            }
+        }
+        if (EngineStartCancelCount > 0)
         { EngineStartCancelCount--; }
     }
     public void EngineStartupCancel()
@@ -76,20 +96,32 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
         if (EngineStartupSound) { EngineStartupSound.Stop(); }
         EngineStartCancelCount++;
     }
+    public void SFEXT_G_ReAppear()
+    {
+        EngineOff();
+        ResetStartup();
+    }
+    public void SFEXT_G_RespawnButton()
+    {
+        ResetStartup();
+    }
+    public void ResetStartup()
+    {
+        if (EngineStartCount > 0 && EngineStartCount != EngineStartCancelCount)
+        {
+            EngineStartCancelCount = EngineStartCount;
+        }
+        if (EngineStartupSound && EngineStartupSound.isPlaying) { EngineStartupSound.Stop(); }
+        if (EngineTurnOffSound && EngineTurnOffSound.isPlaying) { EngineTurnOffSound.Stop(); }
+    }
     public void EngineOn()
     {
-        if (!(bool)SAVControl.GetProgramVariable("_EngineOn"))//don't bother setting if you're not a late joiner
-        {
-            ToggleTime = Time.time;
-            if (StartUpTime == 0)
-            {
-                SAVControl.SetProgramVariable("_EngineOn", true);
-            }
-            else
-            {
-                EngineStartup();
-            }
-        }
+        ToggleTime = Time.time;
+        SAVControl.SetProgramVariable("_EngineOn", true);
+    }
+    public void JustEngineOn()
+    {
+        SAVControl.SetProgramVariable("_EngineOn", true);
     }
     public void EngineOff()
     {
@@ -97,14 +129,19 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
         {
             ToggleTime = Time.time - StartUpTime;
             SAVControl.SetProgramVariable("_EngineOn", false);
+            if (EngineTurnOffSound) { EngineTurnOffSound.Play(); }
         }
+    }
+    public void SFEXT_G_EngineOff()
+    {
+        if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+    }
+    public void SFEXT_G_EngineOn()
+    {
+        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
     }
     public void KeyboardInput()
     {
         ToggleEngine();
-    }
-    public void SFEXT_G_Explode()
-    {
-        EngineOff();
     }
 }
