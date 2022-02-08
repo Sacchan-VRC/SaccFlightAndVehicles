@@ -20,6 +20,7 @@ public class SAV_RocketController : UdonSharpBehaviour
     public AudioSource[] WaterExplosionSounds;
     [Tooltip("Spawn bomb at a random angle up to this number of degrees")]
     public float AngleRandomization = 0;
+    private Animator RocketAnimator;
     private Rigidbody RocketRigid;
     private SaccEntity EntityControl;
     [System.NonSerializedAttribute] public bool Exploding = false;
@@ -36,6 +37,7 @@ public class SAV_RocketController : UdonSharpBehaviour
         VehicleCenterOfMass = EntityControl.CenterOfMass;
         RocketCollider = GetComponent<CapsuleCollider>();
         RocketRigid = GetComponent<Rigidbody>();
+        RocketAnimator = GetComponent<Animator>();
     }
     private void OnEnable()
     {
@@ -107,11 +109,10 @@ public class SAV_RocketController : UdonSharpBehaviour
             }
         }
         RocketCollider.enabled = false;
-        Animator Rocketani = GetComponent<Animator>();
         if (IsOwner)
-        { Rocketani.SetTrigger("explodeowner"); }
-        else { Rocketani.SetTrigger("explode"); }
-        Rocketani.SetBool("hitwater", hitwater);
+        { RocketAnimator.SetTrigger("explodeowner"); }
+        else { RocketAnimator.SetTrigger("explode"); }
+        RocketAnimator.SetBool("hitwater", hitwater);
         SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
     }
 }

@@ -305,6 +305,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         MissileRigid.angularVelocity = Vector3.zero;
         transform.localPosition = Vector3.zero;
         TargetSAVControl = null;
+        TargetEntityControl = null;
         StartTrack = false;
         Exploding = false;
     }

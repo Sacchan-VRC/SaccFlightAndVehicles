@@ -33,6 +33,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
     [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
     public bool ThrowSpaceVehicle = false;
+    private Animator MissileAnimator;
     private SaccEntity EntityControl;
     private bool StartTrack = false;
     private Transform VehicleCenterOfMass;
@@ -55,6 +56,7 @@ public class SAV_AGMController : UdonSharpBehaviour
         AGMCollider = gameObject.GetComponent<CapsuleCollider>();
         AGMRigid = gameObject.GetComponent<Rigidbody>();
         MissileConstant = GetComponent<ConstantForce>();
+        MissileAnimator = gameObject.GetComponent<Animator>();
     }
     public void ThrowMissile()
     {
@@ -120,6 +122,7 @@ public class SAV_AGMController : UdonSharpBehaviour
     }
     public void MoveBackToPool()
     {
+        MissileAnimator.WriteDefaultValues();
         gameObject.SetActive(false);
         transform.SetParent(AGMLauncherControl.transform);
         AGMCollider.enabled = false;
@@ -163,11 +166,10 @@ public class SAV_AGMController : UdonSharpBehaviour
             }
         }
         AGMCollider.enabled = false;
-        Animator AGMani = gameObject.GetComponent<Animator>();
         if (IsOwner)
-        { AGMani.SetTrigger("explodeowner"); }
-        else { AGMani.SetTrigger("explode"); }
-        AGMani.SetBool("hitwater", hitwater);
+        { MissileAnimator.SetTrigger("explodeowner"); }
+        else { MissileAnimator.SetTrigger("explode"); }
+        MissileAnimator.SetBool("hitwater", hitwater);
         SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
     }
 }

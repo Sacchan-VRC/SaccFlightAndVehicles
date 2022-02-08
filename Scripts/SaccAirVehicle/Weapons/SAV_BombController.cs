@@ -26,6 +26,7 @@ public class SAV_BombController : UdonSharpBehaviour
     public float StraightenFactor = .1f;
     [Tooltip("Amount of drag bomb has when moving horizontally/vertically")]
     public float AirPhysicsStrength = .1f;
+    private Animator BombAnimator;
     private SaccEntity EntityControl;
     private ConstantForce BombConstant;
     private Rigidbody BombRigid;
@@ -46,7 +47,7 @@ public class SAV_BombController : UdonSharpBehaviour
         BombConstant = GetComponent<ConstantForce>();
         VehicleCenterOfMass = EntityControl.CenterOfMass;
         transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
-
+        BombAnimator = GetComponent<Animator>();
     }
     public void AddLaunchSpeed()
     {
@@ -94,6 +95,7 @@ public class SAV_BombController : UdonSharpBehaviour
     }
     public void MoveBackToPool()
     {
+        BombAnimator.WriteDefaultValues();
         gameObject.SetActive(false);
         transform.SetParent(BombLauncherControl.transform);
         BombCollider.enabled = false;
@@ -142,11 +144,10 @@ public class SAV_BombController : UdonSharpBehaviour
             }
         }
         BombCollider.enabled = false;
-        Animator Bombani = GetComponent<Animator>();
         if (IsOwner)
-        { Bombani.SetTrigger("explodeowner"); }
-        else { Bombani.SetTrigger("explode"); }
-        Bombani.SetBool("hitwater", hitwater);
+        { BombAnimator.SetTrigger("explodeowner"); }
+        else { BombAnimator.SetTrigger("explode"); }
+        BombAnimator.SetBool("hitwater", hitwater);
         SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
     }
 }
