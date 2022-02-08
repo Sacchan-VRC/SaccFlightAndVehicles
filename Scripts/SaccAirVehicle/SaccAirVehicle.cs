@@ -280,6 +280,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         EngineOn = false;
     }
+    private bool RepeatingWorldCheckAxis;
     [System.NonSerializedAttribute] public float AllGs;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
     [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
@@ -649,33 +650,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 //gotta do these this if we're piloting but it didn't get done(specifically, hovering extremely slowly in a VTOL craft will cause control issues we don't)
                 if (!VehicleMoving)
                 { WindAndAoA(); VehicleMoving = true; }
-                if (RepeatingWorld)
-                {
-                    if (CenterOfMass.position.z > RepeatingWorldDistance)
-                    {
-                        Vector3 vehpos = VehicleTransform.position;
-                        vehpos.z -= RepeatingWorldDistance * 2;
-                        VehicleTransform.position = vehpos;
-                    }
-                    else if (CenterOfMass.position.z < -RepeatingWorldDistance)
-                    {
-                        Vector3 vehpos = VehicleTransform.position;
-                        vehpos.z += RepeatingWorldDistance * 2;
-                        VehicleTransform.position = vehpos;
-                    }
-                    else if (CenterOfMass.position.x > RepeatingWorldDistance)
-                    {
-                        Vector3 vehpos = VehicleTransform.position;
-                        vehpos.x -= RepeatingWorldDistance * 2;
-                        VehicleTransform.position = vehpos;
-                    }
-                    else if (CenterOfMass.position.x < -RepeatingWorldDistance)
-                    {
-                        Vector3 vehpos = VehicleTransform.position;
-                        vehpos.x += RepeatingWorldDistance * 2;
-                        VehicleTransform.position = vehpos;
-                    }
-                }
+                DoRepeatingWorld();
 
                 if (DisablePhysicsAndInputs == 0)
                 {
@@ -1010,15 +985,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 {
                     //allow remote piloting using extensions?
                     if (ThrottleOverridden > 0)
-                    {
-                        ThrottleInput = PlayerThrottle = ThrottleOverride;
-                    }
-                    if (JoystickOverridden > 0)
-                    {
-                        RotationInputs = JoystickOverride;
-                    }
+                    { ThrottleInput = PlayerThrottle = ThrottleOverride; }
                     FuelEvents();
                 }
+                if (JoystickOverridden > 0)
+                { RotationInputs = JoystickOverride; }
+                DoRepeatingWorld();
             }
 
             if (DisablePhysicsAndInputs == 0)
@@ -1356,6 +1328,49 @@ public class SaccAirVehicle : UdonSharpBehaviour
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
             }
+        }
+    }
+    public void DoRepeatingWorld()
+    {
+        if (RepeatingWorld)
+        {
+            if (RepeatingWorldCheckAxis)
+            {
+                if (Mathf.Abs(CenterOfMass.position.z) > RepeatingWorldDistance)
+                {
+                    if (CenterOfMass.position.z > 0)
+                    {
+                        Vector3 vehpos = VehicleTransform.position;
+                        vehpos.z -= RepeatingWorldDistance * 2;
+                        VehicleTransform.position = vehpos;
+                    }
+                    else
+                    {
+                        Vector3 vehpos = VehicleTransform.position;
+                        vehpos.z += RepeatingWorldDistance * 2;
+                        VehicleTransform.position = vehpos;
+                    }
+                }
+            }
+            else
+            {
+                if (Mathf.Abs(CenterOfMass.position.x) > RepeatingWorldDistance)
+                {
+                    if (CenterOfMass.position.x > 0)
+                    {
+                        Vector3 vehpos = VehicleTransform.position;
+                        vehpos.x -= RepeatingWorldDistance * 2;
+                        VehicleTransform.position = vehpos;
+                    }
+                    else
+                    {
+                        Vector3 vehpos = VehicleTransform.position;
+                        vehpos.x += RepeatingWorldDistance * 2;
+                        VehicleTransform.position = vehpos;
+                    }
+                }
+            }
+            RepeatingWorldCheckAxis = !RepeatingWorldCheckAxis;//Check one axis per frame
         }
     }
     public void TouchDown()
