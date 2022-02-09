@@ -16,6 +16,8 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource[] Thrust;
     [Tooltip("Vehicle engine's sound for when it's distant, increases volume with engine's output")]
     public AudioSource PlaneDistant;
+    [Tooltip("Controls transition times between pitch and volume interpolation of engine sounds.")]
+    public float EngineOnResponse = 1.0f, EngineOffResponse = 1.0f;
     [Tooltip("One shot sound that plays when afterburner is toggled on, and you're inside the vehicle with all doors closed")]
     public AudioSource ABOnInside;
     [Tooltip("One shot sound that plays when afterburner is toggled on, and you're outside the vehicle")]
@@ -324,10 +326,10 @@ public class SAV_SoundController : UdonSharpBehaviour
                 float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
                 if (PlaneInside)
                 {
-                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (engineout * .4f) + .8f, 2.25f * DeltaTime);
-                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, PlaneInsideTargetVolume, .72f * DeltaTime);
+                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (engineout * .4f) + .8f, 2.25f * DeltaTime * EngineOnResponse);
+                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, PlaneInsideTargetVolume, .72f * DeltaTime * EngineOnResponse);
                 }
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume * InVehicleThrustVolumeFactor, 1.08f * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume * InVehicleThrustVolumeFactor, 1.08f * DeltaTime * EngineOnResponse);
                 if (PlaneWind)
                 {
                     PlaneWind.volume = Mathf.Min((float)SAVControl.GetProgramVariable("AngleOfAttack") * ((float)SAVControl.GetProgramVariable("Speed") * PlaneWindMaxVolSpeedDivider) * PlaneWindMultiplier, PlaneWindInitialVolume);
@@ -337,10 +339,10 @@ public class SAV_SoundController : UdonSharpBehaviour
             {
                 if (PlaneInside)
                 {
-                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * DeltaTime);
-                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * DeltaTime);
+                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * DeltaTime * EngineOffResponse);
+                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * DeltaTime * EngineOffResponse);
                 }
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime * EngineOffResponse);
                 if (PlaneWind)
                 {
                     PlaneWind.volume = Mathf.Min((float)SAVControl.GetProgramVariable("AngleOfAttack") * ((float)SAVControl.GetProgramVariable("Speed") * PlaneWindMaxVolSpeedDivider) * PlaneWindMultiplier, PlaneWindInitialVolume);
@@ -349,26 +351,26 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
         else if (EngineOn)//someone else is piloting
         {
-            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, .72f * DeltaTime);
+            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, .72f * DeltaTime * EngineOnResponse);
             float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
             if (Doppler > 50)
             {
-                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, 3 * DeltaTime);
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 3 * DeltaTime);
+                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, 3 * DeltaTime * EngineOnResponse);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 3 * DeltaTime * EngineOnResponse);
             }
             else
             {
-                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, engineout * PlaneDistantTargetVolume, .72f * DeltaTime);
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume, 1.08f * DeltaTime);
+                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, engineout * PlaneDistantTargetVolume, .72f * DeltaTime * EngineOnResponse);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume, 1.08f * DeltaTime * EngineOnResponse);
             }
-            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (engineout - 0.3f) + 1.3f, .54f * DeltaTime);
+            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (engineout - 0.3f) + 1.3f, .54f * DeltaTime * EngineOnResponse);
         }
         else//engine is off or its out of fuel
         {
-            PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime);
-            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, .09f * DeltaTime);
-            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * DeltaTime);
-            PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, .72f * DeltaTime);
+            PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime * EngineOffResponse);
+            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, .09f * DeltaTime * EngineOffResponse);
+            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * DeltaTime * EngineOffResponse);
+            PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, .72f * DeltaTime * EngineOffResponse);
         }
         if (RollingOnWater && _rolling)
         {
