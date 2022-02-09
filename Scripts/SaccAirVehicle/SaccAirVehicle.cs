@@ -1972,4 +1972,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         return new Vector2(Mathf.Min(Throttle, ThrottleAfterburnerPoint) * ThrottleNormalizer,
         Mathf.Max((Mathf.Max(Throttle, ThrottleAfterburnerPoint) - ThrottleAfterburnerPoint) * ABNormalizer, 0));
     }
+    public void SFEXT_G_EngineStartup()
+    {
+        VehicleAnimator.SetTrigger("EngineStartup");
+    }
 }

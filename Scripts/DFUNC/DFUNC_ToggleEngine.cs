@@ -1,4 +1,3 @@
-﻿
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -77,6 +76,7 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         EngineStartCount++;
         SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), StartUpTime);
+        EntityControl.SendEventToExtensions("SFEXT_G_EngineStartup");
     }
     public void EngineStartupFinish()
     {
