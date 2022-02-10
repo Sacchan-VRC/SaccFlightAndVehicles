@@ -407,12 +407,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
     //this stuff can be used by DFUNCs
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
     [System.NonSerializedAttribute] public float Limits = 1;
-    public bool _DisableStickyWheelWorkarond;
-    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableStickyWheelWorkarond_))] public int DisableStickyWheelWorkarond = 0;
-    public int DisableStickyWheelWorkarond_
+    public bool _DisableStickyWheelWorkaround;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableStickyWheelWorkaround_))] public int DisableStickyWheelWorkaround = 0;
+    public int DisableStickyWheelWorkaround_
     {
-        set { _DisableStickyWheelWorkarond = value > 0; }
-        get => DisableStickyWheelWorkarond;
+        set { _DisableStickyWheelWorkaround = value > 0; }
+        get => DisableStickyWheelWorkaround;
     }
     [System.NonSerializedAttribute] public bool _DisablePhysicsAndInputs;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisablePhysicsAndInputs_))] public int DisablePhysicsAndInputs = 0;
@@ -513,7 +513,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
         WheelCollider[] wc = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
         if (wc.Length != 0) { HasWheelColliders = true; }
-        if (_DisableStickyWheelWorkarond) { DisableStickyWheelWorkarond++; }
+        if (_DisableStickyWheelWorkaround) { DisableStickyWheelWorkaround++; }
 
         if (AutoAdjustValuesToMass)
         {
@@ -992,7 +992,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
 
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
-                    if (HasWheelColliders && Speed < .2 && ThrottleInput > 0 && !_DisableStickyWheelWorkarond)
+                    if (HasWheelColliders && Speed < .2 && ThrottleInput > 0 && !_DisableStickyWheelWorkaround)
                     {
                         if (VTOLAngle > VTOL90Degrees)
                         { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
