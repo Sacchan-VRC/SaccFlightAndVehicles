@@ -28,6 +28,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private Vector3 OwnerRotationInputs;
     private VRCPlayerApi localPlayer;
     private bool EngineOn;
+    private bool Occupied;
     private bool InVR;
     private bool InEditor = true;
     //animator strings that are sent every frame are converted to int for optimization
@@ -96,7 +97,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
         }
-        if (EngineOn)
+        if (Occupied)
         {
             DoEffects = 0f;
             VehicleAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
@@ -146,6 +147,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_PilotEnter()
     {
+        Occupied = true;
         DoEffects = 0f;
         VehicleAnimator.SetBool("occupied", true);
     }
@@ -159,6 +161,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     }
     public void SFEXT_G_PilotExit()
     {
+        Occupied = false;
         VehicleAnimator.SetBool("occupied", false);
         VehicleAnimator.SetInteger("missilesincoming", 0);
     }
