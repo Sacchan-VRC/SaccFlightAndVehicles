@@ -49,6 +49,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float ThrottleSensitivity = 6f;
     [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
     public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
+    [Tooltip("How far down you have to push the grip button to grab the joystick and throttle")]
+    public float GripSensitivity = .75f;
     [Tooltip("How much more thrust the vehicle has when in full afterburner")]
     public float AfterburnerThrustMulti = 1.5f;
     [Tooltip("How quickly the vehicle throttles up after throttle is increased (Lerp)")]
@@ -734,7 +736,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         JoyStickGrip = RGrip;
                     }
                     //VR Joystick                
-                    if (JoyStickGrip > 0.75)
+                    if (JoyStickGrip > GripSensitivity)
                     {
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                         VehicleRotLastFrame = ControlsRoot.rotation;
@@ -798,7 +800,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         else
                         { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
                         //VR Throttle
-                        if (ThrottleGrip > 0.75)
+                        if (ThrottleGrip > GripSensitivity)
                         {
                             Vector3 handdistance;
                             if (SwitchHandsJoyThrottle)

@@ -11,8 +11,8 @@ public class SaccFlight : UdonSharpBehaviour
     public float ThrustStrength = .33f;
     [Tooltip("Strength of extra thrust applied when trying to thrust in direction going against movement")]
     public float BackThrustStrength = .5f;
-    private float _thruststrength;
-    private float _backthruststrength;
+    [System.NonSerializedAttribute] public float _thruststrength;
+    [System.NonSerializedAttribute] public float _backthruststrength;
     private float controllertriggerR;
     private float controllertriggerL;
     private bool InVR = false;
