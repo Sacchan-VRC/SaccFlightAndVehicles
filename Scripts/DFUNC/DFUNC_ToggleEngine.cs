@@ -13,6 +13,12 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     public AudioSource EngineStartupSound;
     public AudioSource EngineTurnOffSound;
     public GameObject Dial_Funcon;
+    [Space(10)]
+    [Tooltip("AnimEngineStartupAnimBool is true when engine is starting, and remains true until engine is turned off")]
+    public bool DoEngineStartupAnimBool;
+    [Header("Only required if above is ticked")]
+    public Animator EngineAnimator;
+    public string AnimEngineStartupAnimBool = "EngineStarting";
     private SaccEntity EntityControl;
     private int EngineStartCount;
     private int EngineStartCancelCount;
@@ -72,11 +78,14 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     { gameObject.SetActive(false); }
     public void EngineStartup()
     {
+        EngineStartCount++;
         ToggleTime = Time.time;
         if (EngineStartupSound) { EngineStartupSound.Play(); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
-        EngineStartCount++;
         SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), StartUpTime);
+        if (DoEngineStartupAnimBool)
+        { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
+        EntityControl.SendEventToExtensions("SFEXT_G_EngineStartup");
     }
     public void EngineStartupFinish()
     {
@@ -94,9 +103,12 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     }
     public void EngineStartupCancel()
     {
+        EngineStartCancelCount++;
         if (EngineStartupSound) { EngineStartupSound.Stop(); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-        EngineStartCancelCount++;
+        if (DoEngineStartupAnimBool)
+        { EngineAnimator.SetBool(AnimEngineStartupAnimBool, false); }
+        EntityControl.SendEventToExtensions("SFEXT_G_EngineStartupCancel");
     }
     public void SFEXT_G_ReAppear()
     {
@@ -120,6 +132,8 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     {
         ToggleTime = Time.time;
         SAVControl.SetProgramVariable("_EngineOn", true);
+        if (DoEngineStartupAnimBool)
+        { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
     }
     public void JustEngineOn()
     {
@@ -137,10 +151,14 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     public void SFEXT_G_EngineOff()
     {
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+        if (DoEngineStartupAnimBool)
+        { EngineAnimator.SetBool(AnimEngineStartupAnimBool, false); }
     }
     public void SFEXT_G_EngineOn()
     {
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+        if (DoEngineStartupAnimBool)
+        { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
     }
     public void KeyboardInput()
     {
