@@ -267,6 +267,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
                 ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
                 ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+                if (HasAfterburner) { SetAfterburnerOff(); }
             }
             _EngineOn = value;
         }
@@ -1331,9 +1332,24 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void FuelEvents()
     {
         Vector2 Throttles = UnpackThrottles(ThrottleInput);
-        Fuel = Mathf.Max(Fuel -
-                            ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
-                                + (Throttles.y * FuelConsumptionAB)) * Time.deltaTime, 0);
+        if (EngineOn)
+        {
+            Fuel = Mathf.Max(Fuel -
+                  ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
+                      + (Throttles.y * FuelConsumptionAB)) * Time.deltaTime, 0);
+
+            if (HasAfterburner)
+            {
+                if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
+                }
+                else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
+                }
+            }
+        }
         if (Fuel < LowFuel)
         {
             //max throttle scales down with amount of fuel below LowFuel
@@ -1354,22 +1370,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotLowFuel));
             }
         }
-        if (Fuel > 0)
+        if (NoFuelLastFrame)
         {
-            if (NoFuelLastFrame)
+            if (Fuel > 0)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
-            }
-        }
-        if (HasAfterburner)
-        {
-            if (ThrottleInput > ThrottleAfterburnerPoint && !AfterburnerOn)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
-            }
-            else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
             }
         }
     }
