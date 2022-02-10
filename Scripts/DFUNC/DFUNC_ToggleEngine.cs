@@ -20,6 +20,7 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     public Animator EngineAnimator;
     public string AnimEngineStartupAnimBool = "EngineStarting";
     private SaccEntity EntityControl;
+    private bool NoFuel;
     private int EngineStartCount;
     private int EngineStartCancelCount;
     private bool UseLeftTrigger = false;
@@ -63,10 +64,13 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
             }
             else
             {
-                if (StartUpTime == 0)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineOn)); }
-                else
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineStartup)); }
+                if (!NoFuel)
+                {
+                    if (StartUpTime == 0)
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineOn)); }
+                    else
+                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineStartup)); }
+                }
             }
         }
     }
@@ -90,12 +94,17 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     public void EngineStartupFinish()
     {
         if (EngineStartCount > 0) { EngineStartCount--; }
-        if (EngineStartCount == 0 && EngineStartCancelCount == 0)
+        if (EntityControl.IsOwner)
         {
-            if (!EntityControl._dead)
+            if (!NoFuel)
             {
-                if (EntityControl.IsOwner)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(JustEngineOn)); }
+                if (EngineStartCount == 0 && EngineStartCancelCount == 0)
+                {
+                    if (!EntityControl._dead)
+                    {
+                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(JustEngineOn)); }
+                    }
+                }
             }
         }
         if (EngineStartCancelCount > 0)
@@ -160,6 +169,10 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
         if (DoEngineStartupAnimBool)
         { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
     }
+    public void SFEXT_G_NoFuel()
+    { NoFuel = true; }
+    public void SFEXT_G_NotNoFuel()
+    { NoFuel = false; }
     public void KeyboardInput()
     {
         ToggleEngine();
