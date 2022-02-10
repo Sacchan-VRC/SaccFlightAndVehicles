@@ -66,8 +66,63 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource UnderWater;
     [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
     public AudioSource[] DopplerSounds;
+    [Tooltip("Amount the outside thrust volume is multiplied by when you're inside the vehicle")]
+    public float InVehicleThrustVolumeFactor = .09f;
     [Tooltip("Only untick this if you have no door/canopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
     public bool AllDoorsClosed = true;
+    //You can use this to modify all of the engine sound volume and pitch change speeds at once, or change each one individually
+    //but if you do both carelessly it'll cause a discontinuous sound because of the 'Start' values being used for multiplication.
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(EngineLerpSpeedMultiplier))] public float _EngineLerpSpeedMultiplier = 1;
+    public float EngineLerpSpeedMultiplier
+    {
+        set
+        {
+            PlaneInsidePitchLerpValueOn = PlaneInsidePitchLerpValueOnStart * value;
+            PlaneInsidePitchLerpValueOff = PlaneInsidePitchLerpValueOffStart * value;
+            PlaneInsideVolLerpValueOn = PlaneInsideVolLerpValueOnStart * value;
+            PlaneInsideVolLerpValueOff = PlaneInsideVolLerpValueOffStart * value;
+            PlaneDistantVolLerpValueOn = PlaneDistantVolLerpValueOnStart * value;
+            PlaneDistantVolLerpValueOff = PlaneDistantVolLerpValueOffStart * value;
+            PlaneThrustVolLerpValueOn = PlaneThrustVolLerpValueOnStart * value;
+            PlaneThrustVolLerpValueOff = PlaneThrustVolLerpValueOffStart * value;
+            PlaneIdlePitchLerpValueOn = PlaneIdlePitchLerpValueOnStart * value;
+            PlaneIdlePitchLerpValueOff = PlaneIdlePitchLerpValueOffStart * value;
+            PlaneIdleVolLerpValueOff = PlaneIdleVolLerpValueOffStart * value;
+            PlaneIdleVolLerpValueOn = PlaneIdleVolLerpValueOnStart * value;
+            _EngineLerpSpeedMultiplier = value;
+        }
+        get => _EngineLerpSpeedMultiplier;
+    }
+    [Header("How fast sounds reach their new value On/Off = Engine Status")]
+    public float PlaneInsidePitchLerpValueOn = 2.25f;
+    public float PlaneInsidePitchLerpValueOff = .108f;
+    public float PlaneInsideVolLerpValueOn = .72f;
+    public float PlaneInsideVolLerpValueOff = .72f;
+    public float PlaneDistantVolLerpValueOn = .72f;
+    public float PlaneDistantVolLerpValueOff = .72f;
+    public float PlaneThrustVolLerpValueOn = 1.08f;
+    public float PlaneThrustVolLerpValueOff = 1.08f;
+    public float PlaneIdlePitchLerpValueOn = .54f;
+    public float PlaneIdlePitchLerpValueOff = .09f;
+    public float PlaneIdleVolLerpValueOff = .09f;
+    public float PlaneIdleVolLerpValueOn = .72f;
+    private float PlaneInsidePitchLerpValueOnStart;
+    private float PlaneInsidePitchLerpValueOffStart;
+    private float PlaneInsideVolLerpValueOnStart;
+    private float PlaneInsideVolLerpValueOffStart;
+    private float PlaneDistantVolLerpValueOnStart;
+    private float PlaneDistantVolLerpValueOffStart;
+    private float PlaneThrustVolLerpValueOnStart;
+    private float PlaneThrustVolLerpValueOffStart;
+    private float PlaneIdlePitchLerpValueOnStart;
+    private float PlaneIdlePitchLerpValueOffStart;
+    private float PlaneIdleVolLerpValueOffStart;
+    private float PlaneIdleVolLerpValueOnStart;
+
+
+
+
+
     [System.NonSerializedAttribute] public bool PlaneIdleNull = true;
     [System.NonSerializedAttribute] public bool ThrustNull = true;
     [System.NonSerializedAttribute] public bool TouchDownNull = true;
@@ -102,7 +157,6 @@ public class SAV_SoundController : UdonSharpBehaviour
     private float PlaneThrustTargetVolume;
     private float PlaneDistantTargetVolume;
     private float[] DopplerSounds_TargetVolumes;
-    private const float InVehicleThrustVolumeFactor = .09f;
     private float InVehicleThrustVolumeFactorReverse;
     private float PlaneWindMaxVolSpeedDivider;
     [System.NonSerializedAttribute] public float SonicBoomWave = 0f;
@@ -213,6 +267,19 @@ public class SAV_SoundController : UdonSharpBehaviour
             _rollingVolCurve = RollingVolCurve_Water;
             _rollingMaxVol = RollingMaxVol_Water;
         }
+        PlaneInsidePitchLerpValueOnStart = PlaneInsidePitchLerpValueOn;
+        PlaneInsidePitchLerpValueOffStart = PlaneInsidePitchLerpValueOff;
+        PlaneInsideVolLerpValueOnStart = PlaneInsideVolLerpValueOn;
+        PlaneInsideVolLerpValueOffStart = PlaneInsideVolLerpValueOff;
+        PlaneDistantVolLerpValueOnStart = PlaneDistantVolLerpValueOn;
+        PlaneDistantVolLerpValueOffStart = PlaneDistantVolLerpValueOff;
+        PlaneThrustVolLerpValueOnStart = PlaneThrustVolLerpValueOn;
+        PlaneThrustVolLerpValueOffStart = PlaneThrustVolLerpValueOff;
+        PlaneIdlePitchLerpValueOnStart = PlaneIdlePitchLerpValueOn;
+        PlaneIdlePitchLerpValueOffStart = PlaneIdlePitchLerpValueOff;
+        PlaneIdleVolLerpValueOffStart = PlaneIdleVolLerpValueOff;
+        PlaneIdleVolLerpValueOnStart = PlaneIdleVolLerpValueOn;
+
         DoSound = 20;
     }
     private void Update()
@@ -308,8 +375,7 @@ public class SAV_SoundController : UdonSharpBehaviour
             silentint = 1;
         }
 
-        //Piloting = true in editor play mode
-
+        //Piloting = true in editor play mode w/o cyanemu
         if (InVehicle && AllDoorsClosed)
         {
             if (!RollingOnWater && _rolling)
@@ -319,15 +385,15 @@ public class SAV_SoundController : UdonSharpBehaviour
                 else
                 { _rolling.volume = Mathf.Lerp(_rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
             }
-            if ((Piloting || Passenger) && EngineOn) //you're piloting or someone is piloting and you're a passenger
+            if ((Piloting || Passenger) && EngineOn)
             {
                 float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
                 if (PlaneInside)
                 {
-                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (engineout * .4f) + .8f, 2.25f * DeltaTime);
-                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, PlaneInsideTargetVolume, .72f * DeltaTime);
+                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (engineout * .4f) + .8f, PlaneInsidePitchLerpValueOn * DeltaTime);
+                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, PlaneInsideTargetVolume, PlaneInsideVolLerpValueOn * DeltaTime);
                 }
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume * InVehicleThrustVolumeFactor, 1.08f * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume * InVehicleThrustVolumeFactor, PlaneThrustVolLerpValueOn * DeltaTime);
                 if (PlaneWind)
                 {
                     PlaneWind.volume = Mathf.Min((float)SAVControl.GetProgramVariable("AngleOfAttack") * ((float)SAVControl.GetProgramVariable("Speed") * PlaneWindMaxVolSpeedDivider) * PlaneWindMultiplier, PlaneWindInitialVolume);
@@ -337,10 +403,10 @@ public class SAV_SoundController : UdonSharpBehaviour
             {
                 if (PlaneInside)
                 {
-                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, .108f * DeltaTime);
-                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, .72f * DeltaTime);
+                    PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, 0, PlaneInsidePitchLerpValueOff * DeltaTime);
+                    PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, PlaneInsideVolLerpValueOff * DeltaTime);
                 }
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, PlaneThrustVolLerpValueOff * DeltaTime);
                 if (PlaneWind)
                 {
                     PlaneWind.volume = Mathf.Min((float)SAVControl.GetProgramVariable("AngleOfAttack") * ((float)SAVControl.GetProgramVariable("Speed") * PlaneWindMaxVolSpeedDivider) * PlaneWindMultiplier, PlaneWindInitialVolume);
@@ -349,7 +415,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
         else if (EngineOn)//someone else is piloting
         {
-            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, .72f * DeltaTime);
+            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, PlaneIdleVolLerpValueOn * DeltaTime);
             float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
             if (Doppler > 50)
             {
@@ -358,17 +424,17 @@ public class SAV_SoundController : UdonSharpBehaviour
             }
             else
             {
-                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, engineout * PlaneDistantTargetVolume, .72f * DeltaTime);
-                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume, 1.08f * DeltaTime);
+                PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, engineout * PlaneDistantTargetVolume, PlaneDistantVolLerpValueOn * DeltaTime);
+                PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume, PlaneThrustVolLerpValueOn * DeltaTime);
             }
-            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (engineout - 0.3f) + 1.3f, .54f * DeltaTime);
+            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (engineout - 0.3f) + 1.3f, PlaneIdlePitchLerpValueOn * DeltaTime);
         }
-        else//engine is off or its out of fuel
+        else//engine is off
         {
-            PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, 1.08f * DeltaTime);
-            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, .09f * DeltaTime);
-            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, .09f * DeltaTime);
-            PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, .72f * DeltaTime);
+            PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, PlaneThrustVolLerpValueOff * DeltaTime);
+            PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, 0, PlaneIdlePitchLerpValueOff * DeltaTime);
+            PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, 0, PlaneIdleVolLerpValueOff * DeltaTime);
+            PlaneDistantVolume = Mathf.Lerp(PlaneDistantVolume, 0, PlaneDistantVolLerpValueOff * DeltaTime);
         }
         if (RollingOnWater && _rolling)
         {
@@ -607,7 +673,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             _rollingVolCurve = RollingVolCurve;
             _rollingMaxVol = RollingMaxVol;
-            if (Piloting)
+            if (AllDoorsClosed)
             {
                 _rolling.Play();
                 _rolling.volume = (float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve;
