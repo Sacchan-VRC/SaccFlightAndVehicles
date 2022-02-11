@@ -71,7 +71,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     [Tooltip("Only untick this if you have no door/canopy functionality on the vehicle, and you wish to create an open-cockpit vehicle")]
     public bool AllDoorsClosed = true;
     //You can use this to modify all of the engine sound volume and pitch change speeds at once, or change each one individually
-    //but if you do both carelessly it'll cause a discontinuous sound because of the 'Start' values being used for multiplication.
+    //but if you do things carelessly it'll cause a discontinuous sound because of the 'Start' values being used for multiplication.
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(EngineLerpSpeedMultiplier))] public float _EngineLerpSpeedMultiplier = 1;
     public float EngineLerpSpeedMultiplier
     {
@@ -106,18 +106,18 @@ public class SAV_SoundController : UdonSharpBehaviour
     public float PlaneIdlePitchLerpValueOff = .09f;
     public float PlaneIdleVolLerpValueOff = .09f;
     public float PlaneIdleVolLerpValueOn = .72f;
-    private float PlaneInsidePitchLerpValueOnStart;
-    private float PlaneInsidePitchLerpValueOffStart;
-    private float PlaneInsideVolLerpValueOnStart;
-    private float PlaneInsideVolLerpValueOffStart;
-    private float PlaneDistantVolLerpValueOnStart;
-    private float PlaneDistantVolLerpValueOffStart;
-    private float PlaneThrustVolLerpValueOnStart;
-    private float PlaneThrustVolLerpValueOffStart;
-    private float PlaneIdlePitchLerpValueOnStart;
-    private float PlaneIdlePitchLerpValueOffStart;
-    private float PlaneIdleVolLerpValueOffStart;
-    private float PlaneIdleVolLerpValueOnStart;
+   [System.NonSerializedAttribute] public float PlaneInsidePitchLerpValueOnStart;
+   [System.NonSerializedAttribute] public float PlaneInsidePitchLerpValueOffStart;
+   [System.NonSerializedAttribute] public float PlaneInsideVolLerpValueOnStart;
+   [System.NonSerializedAttribute] public float PlaneInsideVolLerpValueOffStart;
+   [System.NonSerializedAttribute] public float PlaneDistantVolLerpValueOnStart;
+   [System.NonSerializedAttribute] public float PlaneDistantVolLerpValueOffStart;
+   [System.NonSerializedAttribute] public float PlaneThrustVolLerpValueOnStart;
+   [System.NonSerializedAttribute] public float PlaneThrustVolLerpValueOffStart;
+   [System.NonSerializedAttribute] public float PlaneIdlePitchLerpValueOnStart;
+   [System.NonSerializedAttribute] public float PlaneIdlePitchLerpValueOffStart;
+   [System.NonSerializedAttribute] public float PlaneIdleVolLerpValueOffStart;
+   [System.NonSerializedAttribute] public float PlaneIdleVolLerpValueOnStart;
 
 
 
