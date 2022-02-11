@@ -113,7 +113,7 @@ public class DFUNC_Brake : UdonSharpBehaviour
     {
         if (!IsOwner)
         {
-            Airbrake_snd.Play();
+            if (Airbrake_snd) { Airbrake_snd.Play(); }
             gameObject.SetActive(true);
             NonLocalActiveDelay = 3;
         }

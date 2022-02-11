@@ -93,7 +93,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         }
         get => _EngineLerpSpeedMultiplier;
     }
-    [Header("How fast sounds reach their new value On/Off = Engine Status")]
+    [Header("How fast sounds reach their new value. On/Off = Engine Status")]
     public float PlaneInsidePitchLerpValueOn = 2.25f;
     public float PlaneInsidePitchLerpValueOff = .108f;
     public float PlaneInsideVolLerpValueOn = .72f;
@@ -673,7 +673,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             _rollingVolCurve = RollingVolCurve;
             _rollingMaxVol = RollingMaxVol;
-            if (AllDoorsClosed)
+            if (InVehicle && AllDoorsClosed)
             {
                 _rolling.Play();
                 _rolling.volume = (float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve;
@@ -787,7 +787,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         DoorsOpen += 1;
         if (DoorsOpen != 0)
         {
-            if (AllDoorsClosed && InVehicle)//only run exitplane if doors were closed before
+            if (InVehicle && AllDoorsClosed)//only run exitplane if doors were closed before
             { SetSoundsOutside(); }
             if ((bool)SAVControl.GetProgramVariable("IsOwner") && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
             { EntityControl.SendEventToExtensions("SFEXT_O_DoorsOpened"); }
