@@ -992,7 +992,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
 
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
-                    if (HasWheelColliders && Speed < .2 && ThrottleInput > 0 && !_DisableStickyWheelWorkaround)
+                    if (!_DisableStickyWheelWorkaround && HasWheelColliders && Speed < .2 && ThrottleInput > 0)
                     {
                         if (VTOLAngle > VTOL90Degrees)
                         { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
@@ -1031,6 +1031,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     if (_ThrottleOverridden)
                     { ThrottleInput = PlayerThrottle = ThrottleOverride; }
                     FuelEvents();
+                    //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
+                    if (!_DisableStickyWheelWorkaround && HasWheelColliders && Speed < .2 && ThrottleInput > 0)
+                    {
+                        if (VTOLAngle > VTOL90Degrees)
+                        { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
+                        else
+                        { VehicleRigidbody.velocity = VehicleTransform.forward * .25f; }
+                    }
                 }
                 if (_JoystickOverridden)
                 { RotationInputs = JoystickOverride; }
