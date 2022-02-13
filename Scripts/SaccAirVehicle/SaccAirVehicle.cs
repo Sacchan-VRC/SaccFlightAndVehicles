@@ -956,10 +956,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
                             }
                         }
 
-                        RotationInputs.x = Mathf.Clamp(VRJoystickPos.x + Wi + Si + downi + upi, -1, 1) * Limits;
-                        RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.y, -1, 1) * Limits;
+                        RotationInputs.x = Mathf.Clamp(VRJoystickPos.y + Wi + Si + downi + upi, -1, 1) * Limits;
+                        RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.z, -1, 1) * Limits;
                         //roll isn't subject to flight limits
-                        RotationInputs.z = Mathf.Clamp(((VRJoystickPos.z + Ai + Di + lefti + righti) * -1), -1, 1);
+                        RotationInputs.z = Mathf.Clamp(((VRJoystickPos.x + Ai + Di + lefti + righti) * -1), -1, 1);
                     }
 
                     //ability to adjust input to be more precise at low amounts. 'exponant'
