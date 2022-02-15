@@ -188,8 +188,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public bool AutoAdjustValuesToMass = true;
     [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
     public Transform ControlsRoot;
-    [Tooltip("Zero height of the calculation of atmosphere thickness and HUD altitude display")]
-    public float SeaLevel = -10f;
     [Tooltip("Wind speed on each axis")]
     public Vector3 Wind;
     [Tooltip("Strength of noise-based changes in wind strength")]
@@ -225,10 +223,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float MissileDamageTakenMultiplier = 1f;
     [Tooltip("Strength of force that pushes the vehicle when a missile hits it")]
     public float MissilePushForce = 1f;
+    [Tooltip("Zero height of the calculation of atmosphere thickness and HUD altitude display")]
+    public float SeaLevel = -10f;
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere starts thinning, In meters. 12192 = 40,000~ feet")]
     public float AtmosphereThinningStart = 12192f; //40,000 feet
     [Tooltip("Altitude above 'Sea Level' at which the atmosphere reaches zero thickness. In meters. 19812 = 65,000~ feet")]
     public float AtmosphereThinningEnd = 19812; //65,000 feet
+    [Tooltip("When in desktop mode, make the joystick input square? (for game controllers, disable for actual joysticks")]
+    public bool SquareJoyInput = true;
     [Tooltip("Set Engine On when entering the vehicle?")]
     public bool EngineOnOnEnter = true;
     [Tooltip("Set Engine Off when entering the vehicle?")]
@@ -238,20 +240,16 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         set
         {
-            if (value && !_EngineOn)
-            {
-                EntityControl.SendEventToExtensions("SFEXT_G_EngineOn");
-                VehicleAnimator.SetBool("EngineOn", true);
-            }
-            else if (!value && _EngineOn)
-            {
-                EntityControl.SendEventToExtensions("SFEXT_G_EngineOff");
-                Taxiinglerper = 0;
-                VehicleAnimator.SetBool("EngineOn", false);
-            }
             //disable thrust vectoring if engine off
             if (value)
             {
+                if (!_EngineOn)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_G_EngineOn");
+                    VehicleAnimator.SetBool("EngineOn", true);
+                }
+
+
                 PitchThrustVecMulti = PitchThrustVecMultiStart;
                 YawThrustVecMulti = YawThrustVecMultiStart;
                 RollThrustVecMulti = RollThrustVecMultiStart;
@@ -261,6 +259,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
             else
             {
+                if (_EngineOn)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_G_EngineOff");
+                    Taxiinglerper = 0;
+                    VehicleAnimator.SetBool("EngineOn", false);
+                }
+
+
                 PitchThrustVecMulti = 0;
                 YawThrustVecMulti = 0;
                 RollThrustVecMulti = 0;
@@ -937,29 +943,32 @@ public class SaccAirVehicle : UdonSharpBehaviour
                                 RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
                                 //RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                             }
-                            VRJoystickPos.x = LStickPos.x;
-                            VRJoystickPos.y = LStickPos.y;
-                            VRJoystickPos.z = RStickPos.x;
+                            VRJoystickPos.x = LStickPos.y;
+                            VRJoystickPos.y = RStickPos.x;
+                            VRJoystickPos.z = LStickPos.x;
                             //make stick input square
-                            if (Mathf.Abs(VRJoystickPos.x) > Mathf.Abs(VRJoystickPos.y))
+                            if (SquareJoyInput)
                             {
-                                if (Mathf.Abs(VRJoystickPos.x) > 0)
+                                if (Mathf.Abs(VRJoystickPos.x) > Mathf.Abs(VRJoystickPos.z))
                                 {
-                                    float temp = VRJoystickPos.magnitude / Mathf.Abs(VRJoystickPos.x);
+                                    if (Mathf.Abs(VRJoystickPos.x) > 0)
+                                    {
+                                        float temp = VRJoystickPos.magnitude / Mathf.Abs(VRJoystickPos.x);
+                                        VRJoystickPos *= temp;
+                                    }
+                                }
+                                else if (Mathf.Abs(VRJoystickPos.z) > 0)
+                                {
+                                    float temp = VRJoystickPos.magnitude / Mathf.Abs(VRJoystickPos.z);
                                     VRJoystickPos *= temp;
                                 }
                             }
-                            else if (Mathf.Abs(VRJoystickPos.y) > 0)
-                            {
-                                float temp = VRJoystickPos.magnitude / Mathf.Abs(VRJoystickPos.y);
-                                VRJoystickPos *= temp;
-                            }
                         }
 
-                        RotationInputs.x = Mathf.Clamp(VRJoystickPos.y + Wi + Si + downi + upi, -1, 1) * Limits;
-                        RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.z, -1, 1) * Limits;
+                        RotationInputs.x = Mathf.Clamp(VRJoystickPos.x + Wi + Si + downi + upi, -1, 1) * Limits;
+                        RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.y, -1, 1) * Limits;
                         //roll isn't subject to flight limits
-                        RotationInputs.z = Mathf.Clamp(((VRJoystickPos.x + Ai + Di + lefti + righti) * -1), -1, 1);
+                        RotationInputs.z = Mathf.Clamp(((VRJoystickPos.z + Ai + Di + lefti + righti) * -1), -1, 1);
                     }
 
                     //ability to adjust input to be more precise at low amounts. 'exponant'
@@ -1273,20 +1282,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TouchDownWater));
         }
         //sync engine status
-        if (Piloting)
-        {
-            if (EngineOnOnEnter && !_EngineOn)
-            { SendCustomEventDelayedSeconds(nameof(TurnEngineOffLaterJoiner), 10); }//doesn't work if done straight away because it executes before SFEXT_G_PilotEnter
-            else if (!EngineOnOnEnter && _EngineOn)
-            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn)); }
-        }
-        else if (_EngineOn)
+        if (_EngineOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn)); }
-    }
-    public void TurnEngineOffLaterJoiner()
-    {
-        if (!EngineOn)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff)); }
     }
     public void ReAppear()
     {
@@ -1494,14 +1491,16 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         NoFuelLastFrame = true;
         EntityControl.SendEventToExtensions("SFEXT_G_NoFuel");
-        SetEngineOff();
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
     }
     public void SendNotNoFuel()
     {
         NoFuelLastFrame = false;
         EntityControl.SendEventToExtensions("SFEXT_G_NotNoFuel");
         if (EngineOnOnEnter && Occupied)
-        { SetEngineOn(); }
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
+        }
     }
     public void SFEXT_O_ReSupply()
     {
@@ -1782,6 +1781,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
         VertGs = 0;
         AllGs = 0;
         LastFrameVel = CurrentVel;
+        if (EngineOnOnEnter && Fuel > 0)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
+        }
 
         SetCollidersLayer(OnboardVehicleLayer);
     }
@@ -1789,18 +1792,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         Occupied = true;
         EntityControl.dead = false;//vehicle stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
-        if (EngineOnOnEnter && Fuel > 0)
-        { EngineOn = true; }
     }
     public void SFEXT_G_PilotExit()
     {
         Occupied = false;
-        if (EngineOffOnExit)
-        {
-            EngineOn = false;
-            if (HasAfterburner)
-            { SetAfterburnerOff(); }
-        }
     }
     public void SFEXT_G_NotDead()
     { dead = false; }
@@ -1830,7 +1825,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Pitching = Vector3.zero;
         Yawing = Vector3.zero;
         localPlayer.SetVelocity(CurrentVel);
-
+        if (EngineOffOnExit)
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
+        }
         //set vehicle's collider's layers back
         SetCollidersLayer(VehicleLayer);
     }

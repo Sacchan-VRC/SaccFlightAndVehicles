@@ -5533,19 +5533,19 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: SeaLevel
+      Data: Wind
     - Name: $v
       Entry: 7
       Data: 279|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: SeaLevel
+      Data: Wind
     - Name: <UserType>k__BackingField
       Entry: 9
-      Data: 28
+      Data: 71
     - Name: <SystemType>k__BackingField
       Entry: 9
-      Data: 28
+      Data: 71
     - Name: <SyncMode>k__BackingField
       Entry: 7
       Data: System.Nullable`1[[UdonSharp.UdonSyncMode, UdonSharp.Runtime]], mscorlib
@@ -5568,68 +5568,6 @@ MonoBehaviour:
     - Name: 
       Entry: 7
       Data: 281|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
-    - Name: tooltip
-      Entry: 1
-      Data: Zero height of the calculation of atmosphere thickness and HUD altitude
-        display
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Wind
-    - Name: $v
-      Entry: 7
-      Data: 282|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
-    - Name: <Name>k__BackingField
-      Entry: 1
-      Data: Wind
-    - Name: <UserType>k__BackingField
-      Entry: 9
-      Data: 71
-    - Name: <SystemType>k__BackingField
-      Entry: 9
-      Data: 71
-    - Name: <SyncMode>k__BackingField
-      Entry: 7
-      Data: System.Nullable`1[[UdonSharp.UdonSyncMode, UdonSharp.Runtime]], mscorlib
-    - Name: 
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: <IsSerialized>k__BackingField
-      Entry: 5
-      Data: true
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 283|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 284|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
       Data: Wind speed on each axis
@@ -5659,10 +5597,71 @@ MonoBehaviour:
       Data: WindGustStrength
     - Name: $v
       Entry: 7
-      Data: 285|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 282|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
       Data: WindGustStrength
+    - Name: <UserType>k__BackingField
+      Entry: 9
+      Data: 28
+    - Name: <SystemType>k__BackingField
+      Entry: 9
+      Data: 28
+    - Name: <SyncMode>k__BackingField
+      Entry: 7
+      Data: System.Nullable`1[[UdonSharp.UdonSyncMode, UdonSharp.Runtime]], mscorlib
+    - Name: 
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: <IsSerialized>k__BackingField
+      Entry: 5
+      Data: true
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 283|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 284|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
+    - Name: tooltip
+      Entry: 1
+      Data: Strength of noise-based changes in wind strength
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: WindGustiness
+    - Name: $v
+      Entry: 7
+      Data: 285|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: <Name>k__BackingField
+      Entry: 1
+      Data: WindGustiness
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -5693,7 +5692,7 @@ MonoBehaviour:
       Data: 287|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Strength of noise-based changes in wind strength
+      Data: How often wind gust changes strength
     - Name: 
       Entry: 8
       Data: 
@@ -5717,13 +5716,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: WindGustiness
+      Data: WindTurbulanceScale
     - Name: $v
       Entry: 7
       Data: 288|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: WindGustiness
+      Data: WindTurbulanceScale
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -5754,7 +5753,7 @@ MonoBehaviour:
       Data: 290|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: How often wind gust changes strength
+      Data: Scale of world space gust cells, smaller number = larger cells
     - Name: 
       Entry: 8
       Data: 
@@ -5778,13 +5777,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: WindTurbulanceScale
+      Data: SoundBarrierStrength
     - Name: $v
       Entry: 7
       Data: 291|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: WindTurbulanceScale
+      Data: SoundBarrierStrength
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -5815,7 +5814,7 @@ MonoBehaviour:
       Data: 293|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Scale of world space gust cells, smaller number = larger cells
+      Data: Extra drag added when airspeed approaches the speed of sound
     - Name: 
       Entry: 8
       Data: 
@@ -5839,13 +5838,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: SoundBarrierStrength
+      Data: SoundBarrierWidth
     - Name: $v
       Entry: 7
       Data: 294|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: SoundBarrierStrength
+      Data: SoundBarrierWidth
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -5874,67 +5873,6 @@ MonoBehaviour:
     - Name: 
       Entry: 7
       Data: 296|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
-    - Name: tooltip
-      Entry: 1
-      Data: Extra drag added when airspeed approaches the speed of sound
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: SoundBarrierWidth
-    - Name: $v
-      Entry: 7
-      Data: 297|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
-    - Name: <Name>k__BackingField
-      Entry: 1
-      Data: SoundBarrierWidth
-    - Name: <UserType>k__BackingField
-      Entry: 9
-      Data: 28
-    - Name: <SystemType>k__BackingField
-      Entry: 9
-      Data: 28
-    - Name: <SyncMode>k__BackingField
-      Entry: 7
-      Data: System.Nullable`1[[UdonSharp.UdonSyncMode, UdonSharp.Runtime]], mscorlib
-    - Name: 
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: <IsSerialized>k__BackingField
-      Entry: 5
-      Data: true
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 298|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 299|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
       Data: Within how many meters per second of the speed of sound does the vehicle
@@ -5966,7 +5904,7 @@ MonoBehaviour:
       Data: Fuel
     - Name: $v
       Entry: 7
-      Data: 300|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 297|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
       Data: Fuel
@@ -5990,14 +5928,14 @@ MonoBehaviour:
       Data: true
     - Name: fieldAttributes
       Entry: 7
-      Data: 301|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 298|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 302|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
+      Data: 299|UdonSharp.UdonSyncedAttribute, UdonSharp.Runtime
     - Name: 
       Entry: 8
       Data: 
@@ -6024,10 +5962,71 @@ MonoBehaviour:
       Data: LowFuel
     - Name: $v
       Entry: 7
-      Data: 303|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 300|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
       Data: LowFuel
+    - Name: <UserType>k__BackingField
+      Entry: 9
+      Data: 28
+    - Name: <SystemType>k__BackingField
+      Entry: 9
+      Data: 28
+    - Name: <SyncMode>k__BackingField
+      Entry: 7
+      Data: System.Nullable`1[[UdonSharp.UdonSyncMode, UdonSharp.Runtime]], mscorlib
+    - Name: 
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: <IsSerialized>k__BackingField
+      Entry: 5
+      Data: true
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 301|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 302|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
+    - Name: tooltip
+      Entry: 1
+      Data: Amount of fuel at which throttle will start reducing
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: FuelConsumption
+    - Name: $v
+      Entry: 7
+      Data: 303|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: <Name>k__BackingField
+      Entry: 1
+      Data: FuelConsumption
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6058,7 +6057,7 @@ MonoBehaviour:
       Data: 305|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Amount of fuel at which throttle will start reducing
+      Data: Fuel consumed per second at max throttle, scales with throttle
     - Name: 
       Entry: 8
       Data: 
@@ -6082,13 +6081,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FuelConsumption
+      Data: FuelConsumptionABMulti
     - Name: $v
       Entry: 7
       Data: 306|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: FuelConsumption
+      Data: FuelConsumptionABMulti
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6119,7 +6118,8 @@ MonoBehaviour:
       Data: 308|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Fuel consumed per second at max throttle, scales with throttle
+      Data: Multiply FuelConsumption by this number when at full afterburner Scales
+        with afterburner level
     - Name: 
       Entry: 8
       Data: 
@@ -6143,13 +6143,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: FuelConsumptionABMulti
+      Data: RefuelTime
     - Name: $v
       Entry: 7
       Data: 309|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: FuelConsumptionABMulti
+      Data: RefuelTime
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6180,8 +6180,7 @@ MonoBehaviour:
       Data: 311|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Multiply FuelConsumption by this number when at full afterburner Scales
-        with afterburner level
+      Data: Number of resupply ticks it takes to refuel fully from zero
     - Name: 
       Entry: 8
       Data: 
@@ -6205,13 +6204,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RefuelTime
+      Data: RepairTime
     - Name: $v
       Entry: 7
       Data: 312|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: RefuelTime
+      Data: RepairTime
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6242,7 +6241,7 @@ MonoBehaviour:
       Data: 314|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Number of resupply ticks it takes to refuel fully from zero
+      Data: Number of resupply ticks it takes to repair fully from zero
     - Name: 
       Entry: 8
       Data: 
@@ -6266,13 +6265,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RepairTime
+      Data: RespawnDelay
     - Name: $v
       Entry: 7
       Data: 315|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: RepairTime
+      Data: RespawnDelay
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6303,7 +6302,7 @@ MonoBehaviour:
       Data: 317|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Number of resupply ticks it takes to repair fully from zero
+      Data: Time until vehicle reappears after exploding
     - Name: 
       Entry: 8
       Data: 
@@ -6327,13 +6326,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: RespawnDelay
+      Data: InvincibleAfterSpawn
     - Name: $v
       Entry: 7
       Data: 318|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: RespawnDelay
+      Data: InvincibleAfterSpawn
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6364,7 +6363,7 @@ MonoBehaviour:
       Data: 320|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Time until vehicle reappears after exploding
+      Data: Time after reappearing the vehicle is invincible for
     - Name: 
       Entry: 8
       Data: 
@@ -6388,13 +6387,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: InvincibleAfterSpawn
+      Data: BulletDamageTaken
     - Name: $v
       Entry: 7
       Data: 321|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: InvincibleAfterSpawn
+      Data: BulletDamageTaken
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6425,67 +6424,6 @@ MonoBehaviour:
       Data: 323|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Time after reappearing the vehicle is invincible for
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: userBehaviourSource
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: BulletDamageTaken
-    - Name: $v
-      Entry: 7
-      Data: 324|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
-    - Name: <Name>k__BackingField
-      Entry: 1
-      Data: BulletDamageTaken
-    - Name: <UserType>k__BackingField
-      Entry: 9
-      Data: 28
-    - Name: <SystemType>k__BackingField
-      Entry: 9
-      Data: 28
-    - Name: <SyncMode>k__BackingField
-      Entry: 7
-      Data: System.Nullable`1[[UdonSharp.UdonSyncMode, UdonSharp.Runtime]], mscorlib
-    - Name: 
-      Entry: 6
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: <IsSerialized>k__BackingField
-      Entry: 5
-      Data: true
-    - Name: fieldAttributes
-      Entry: 7
-      Data: 325|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
-        mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 326|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
-    - Name: tooltip
-      Entry: 1
       Data: Damage taken when hit by a bullet
     - Name: 
       Entry: 8
@@ -6513,7 +6451,7 @@ MonoBehaviour:
       Data: PredictDamage
     - Name: $v
       Entry: 7
-      Data: 327|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 324|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
       Data: PredictDamage
@@ -6537,14 +6475,14 @@ MonoBehaviour:
       Data: true
     - Name: fieldAttributes
       Entry: 7
-      Data: 328|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+      Data: 325|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
         mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 329|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
+      Data: 326|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
       Data: Locally destroy target if prediction thinks you killed them, should only
@@ -6575,10 +6513,71 @@ MonoBehaviour:
       Data: MissileDamageTakenMultiplier
     - Name: $v
       Entry: 7
-      Data: 330|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+      Data: 327|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
       Data: MissileDamageTakenMultiplier
+    - Name: <UserType>k__BackingField
+      Entry: 9
+      Data: 28
+    - Name: <SystemType>k__BackingField
+      Entry: 9
+      Data: 28
+    - Name: <SyncMode>k__BackingField
+      Entry: 7
+      Data: System.Nullable`1[[UdonSharp.UdonSyncMode, UdonSharp.Runtime]], mscorlib
+    - Name: 
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: <IsSerialized>k__BackingField
+      Entry: 5
+      Data: true
+    - Name: fieldAttributes
+      Entry: 7
+      Data: 328|System.Collections.Generic.List`1[[System.Attribute, mscorlib]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 329|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
+    - Name: tooltip
+      Entry: 1
+      Data: Multiply how much damage is done by missiles
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: userBehaviourSource
+      Entry: 6
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: MissilePushForce
+    - Name: $v
+      Entry: 7
+      Data: 330|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
+    - Name: <Name>k__BackingField
+      Entry: 1
+      Data: MissilePushForce
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6609,7 +6608,7 @@ MonoBehaviour:
       Data: 332|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Multiply how much damage is done by missiles
+      Data: Strength of force that pushes the vehicle when a missile hits it
     - Name: 
       Entry: 8
       Data: 
@@ -6633,13 +6632,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: MissilePushForce
+      Data: SeaLevel
     - Name: $v
       Entry: 7
       Data: 333|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: MissilePushForce
+      Data: SeaLevel
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 28
@@ -6670,7 +6669,8 @@ MonoBehaviour:
       Data: 335|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Strength of force that pushes the vehicle when a missile hits it
+      Data: Zero height of the calculation of atmosphere thickness and HUD altitude
+        display
     - Name: 
       Entry: 8
       Data: 

@@ -12,6 +12,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
     public Animator BoolAnimator;
     [Tooltip("Object enabled when function is active (used on MFD)")]
     public GameObject[] Dial_Funcon;
+    public bool DoAnimBool = true;
     public string AnimBoolName = "AnimBool";
     public bool OnDefault = false;
     [Tooltip("Set toggle to its default when exiting?")]
@@ -165,7 +166,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         if (AnimOn) { return; }
         ToggleTime = Time.time;
         AnimOn = true;
-        if (BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, true); }
+        if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, true); }
         foreach (GameObject funcon in Dial_Funcon)
         { funcon.SetActive(true); }
         if (OpensDoor)
@@ -180,7 +181,7 @@ public class DFUNC_ToggleBool : UdonSharpBehaviour
         if (!AnimOn) { return; }
         ToggleTime = Time.time;
         AnimOn = false;
-        if (BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, false); }
+        if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, false); }
         foreach (GameObject funcon in Dial_Funcon)
         { funcon.SetActive(false); }
         if (OpensDoor)

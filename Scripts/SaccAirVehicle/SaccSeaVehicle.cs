@@ -4,6 +4,7 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
+[UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
 public class SaccSeaVehicle : UdonSharpBehaviour
 {
     [Tooltip("Base object reference")]
@@ -243,7 +244,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
     [System.NonSerializedAttribute] public float Limits = 1;
     [System.NonSerializedAttribute] public bool _DisablePhysicsAndInputs;
-    [FieldChangeCallback(nameof(DisablePhysicsAndInputs_))] public int DisablePhysicsAndInputs = 0;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisablePhysicsAndInputs_))] public int DisablePhysicsAndInputs = 0;
     public int DisablePhysicsAndInputs_
     {
         set { _DisablePhysicsAndInputs = value > 0; }
@@ -253,28 +254,28 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
 
     [System.NonSerializedAttribute] public bool _OverrideConstantForce;//this is only here for compatability with DFUNCs designed for SaccAirVehicle
-    [FieldChangeCallback(nameof(OverrideConstantForce_))] public int OverrideConstantForce = 0;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(OverrideConstantForce_))] public int OverrideConstantForce = 0;
     public int OverrideConstantForce_
     {
         set { _OverrideConstantForce = value > 0; }
         get => OverrideConstantForce;
     }
     [System.NonSerializedAttribute] public bool _DisableTaxiRotation;
-    [FieldChangeCallback(nameof(DisableTaxiRotation_))] public int DisableTaxiRotation = 0;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableTaxiRotation_))] public int DisableTaxiRotation = 0;
     public int DisableTaxiRotation_
     {
         set { _DisableTaxiRotation = value > 0; }
         get => DisableTaxiRotation;
     }
     [System.NonSerializedAttribute] public bool _DisableGroundDetection;
-    [FieldChangeCallback(nameof(DisableGroundDetection_))] public int DisableGroundDetection = 0;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableGroundDetection_))] public int DisableGroundDetection = 0;
     public int DisableGroundDetection_
     {
         set { _DisableGroundDetection = value > 0; }
         get => DisableGroundDetection;
     }
     [System.NonSerializedAttribute] public bool _ThrottleOverridden;
-    [FieldChangeCallback(nameof(ThrottleOverridden_))] public int ThrottleOverridden = 0;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(ThrottleOverridden_))] public int ThrottleOverridden = 0;
     public int ThrottleOverridden_
     {
         set { _ThrottleOverridden = value > 0; }
@@ -282,7 +283,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     }
     [System.NonSerializedAttribute] public float ThrottleOverride;
     [System.NonSerializedAttribute] public bool _JoystickOverridden;
-    [FieldChangeCallback(nameof(JoystickOverridden_))] public int JoystickOverridden = 0;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(JoystickOverridden_))] public int JoystickOverridden = 0;
     public int JoystickOverridden_
     {
         set { _JoystickOverridden = value > 0; }
