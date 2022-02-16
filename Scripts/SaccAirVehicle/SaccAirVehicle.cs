@@ -949,19 +949,22 @@ public class SaccAirVehicle : UdonSharpBehaviour
                             //make stick input square
                             if (SquareJoyInput)
                             {
-                                if (Mathf.Abs(VRJoystickPos.x) > Mathf.Abs(VRJoystickPos.z))
+                                Vector2 LeftStick = new Vector2(VRJoystickPos.z, VRJoystickPos.x);
+                                if (Mathf.Abs(LeftStick.x) > Mathf.Abs(LeftStick.y))
                                 {
-                                    if (Mathf.Abs(VRJoystickPos.x) > 0)
+                                    if (Mathf.Abs(LeftStick.x) > 0)
                                     {
-                                        float temp = VRJoystickPos.magnitude / Mathf.Abs(VRJoystickPos.x);
-                                        VRJoystickPos *= temp;
+                                        float temp = LeftStick.magnitude / Mathf.Abs(LeftStick.x);
+                                        LeftStick *= temp;
                                     }
                                 }
-                                else if (Mathf.Abs(VRJoystickPos.z) > 0)
+                                else if (Mathf.Abs(LeftStick.y) > 0)
                                 {
-                                    float temp = VRJoystickPos.magnitude / Mathf.Abs(VRJoystickPos.z);
-                                    VRJoystickPos *= temp;
+                                    float temp = LeftStick.magnitude / Mathf.Abs(LeftStick.y);
+                                    LeftStick *= temp;
                                 }
+                                VRJoystickPos.z = LeftStick.x;
+                                VRJoystickPos.x = LeftStick.y;
                             }
                         }
 
@@ -1811,8 +1814,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         LerpedRoll = 0;
         LerpedYaw = 0;
         RotationInputs = Vector3.zero;
-        if (!_EngineOn)
-        { ThrottleInput = 0; }
         //reset everything
         Piloting = false;
         Taxiinglerper = 0;
@@ -1828,6 +1829,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         if (EngineOffOnExit)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
+            ThrottleInput = 0; ;
         }
         //set vehicle's collider's layers back
         SetCollidersLayer(VehicleLayer);
