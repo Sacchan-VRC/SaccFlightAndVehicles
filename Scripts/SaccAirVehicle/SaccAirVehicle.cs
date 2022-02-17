@@ -979,29 +979,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     RotationInputs.y = RotationInputs.y > 0 ? Mathf.Pow(RotationInputs.y, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.y), StickInputPower);
                     RotationInputs.z = RotationInputs.z > 0 ? Mathf.Pow(RotationInputs.z, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.z), StickInputPower); */
 
-                    //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
-                    if ((Vector3.Dot(AirVel, VehicleTransform.forward) > 0))//normal, moving forward
-                    {
-                        ReversingPitchStrength = 1;
-                        ReversingYawStrength = 1;
-                        ReversingRollStrength = 1;
-                    }
-                    else//moving backward. The 'Zero' values are set in start(). Explanation there.
-                    {
-                        ReversingPitchStrength = ReversingPitchStrengthZero;
-                        ReversingYawStrength = ReversingYawStrengthZero;
-                        ReversingRollStrength = ReversingRollStrengthZero;
-                    }
-
-                    pitch = Mathf.Clamp(RotationInputs.x, -1, 1) * PitchStrength * ReversingPitchStrength;
-                    yaw = Mathf.Clamp(-RotationInputs.y, -1, 1) * YawStrength * ReversingYawStrength;
-                    roll = RotationInputs.z * RollStrength * ReversingRollStrength;
-
-
-                    if (pitch > 0)
-                    {
-                        pitch *= PitchDownStrMulti;
-                    }
+                    SetRotInputs();
 
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
                     if (!_DisableStickyWheelWorkaround && HasWheelColliders && Speed < .2 && ThrottleInput > 0)
@@ -1053,7 +1031,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
                 }
                 if (_JoystickOverridden)
-                { RotationInputs = JoystickOverride; }
+                {
+                    RotationInputs = JoystickOverride;
+                    //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
+                    SetRotInputs();
+                }
                 DoRepeatingWorld();
             }
 
@@ -1384,6 +1366,30 @@ public class SaccAirVehicle : UdonSharpBehaviour
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
             }
+        }
+    }
+    public void SetRotInputs()
+    {
+        if ((Vector3.Dot(AirVel, VehicleTransform.forward) > 0))//normal, moving forward
+        {
+            ReversingPitchStrength = 1;
+            ReversingYawStrength = 1;
+            ReversingRollStrength = 1;
+        }
+        else//moving backward. The 'Zero' values are set in start(). Explanation there.
+        {
+            ReversingPitchStrength = ReversingPitchStrengthZero;
+            ReversingYawStrength = ReversingYawStrengthZero;
+            ReversingRollStrength = ReversingRollStrengthZero;
+        }
+
+        pitch = Mathf.Clamp(RotationInputs.x, -1, 1) * PitchStrength * ReversingPitchStrength;
+        yaw = Mathf.Clamp(-RotationInputs.y, -1, 1) * YawStrength * ReversingYawStrength;
+        roll = Mathf.Clamp(RotationInputs.z, -1, 1) * RollStrength * ReversingRollStrength;
+
+        if (pitch > 0)
+        {
+            pitch *= PitchDownStrMulti;
         }
     }
     public void DoRepeatingWorld()

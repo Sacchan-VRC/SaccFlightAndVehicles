@@ -26,7 +26,8 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     private float AltHoldPitchIntegrator;
     //private float AltHoldPitchlastframeerror;
     private float AltHoldRollProportional = -.005f;
-    private bool Piloting;
+    private bool EngineOn;
+    private bool IsOwner;
     private bool InVR;
     private bool Selected;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -40,6 +41,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
         VehicleTransform = EntityControl.transform;
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+        IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
     }
     public void DFUNC_Selected()
     {
@@ -55,20 +57,23 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         gameObject.SetActive(false);
-        Piloting = true;
         if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
     }
     public void SFEXT_L_PassengerEnter()
     {
         if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
     }
-    public void SFEXT_O_PilotExit()
+    public void SFEXT_G_EngineOn()
+    {
+        EngineOn = true;
+    }
+    public void SFEXT_G_EngineOff()
     {
         gameObject.SetActive(false);
         Selected = false;
-        Piloting = false;
+        EngineOn = false;
         if (AltHold)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DeactivateAltHold)); }
+        { DeactivateAltHold(); }
     }
     public void SFEXT_G_TouchDown()
     {
@@ -96,7 +101,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") + 1);
         if (Dial_Funcon) { Dial_Funcon.SetActive(AltHold); }
         if (HudHold) { HudHold.SetActive(AltHold); }
-        if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOn"); }
+        if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOn"); }
     }
     public void DeactivateAltHold()
     {
@@ -109,10 +114,11 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         SAVControl.SetProgramVariable("JoystickOverride", Vector3.zero);
         RotationInputs = Vector3.zero;
         AltHoldPitchIntegrator = 0;
-        if (Piloting) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOff"); }
+        if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOff"); }
     }
     private void Update()
     {
+        Debug.Log(AltHold);
         if (Selected)
         {
             float Trigger;
@@ -125,22 +131,14 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             {
                 if (!TriggerLastFrame)
                 {
-                    if (AltHold)
-                    {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DeactivateAltHold));
-                    }
-                    else
-                    {
-                        if (!(bool)SAVControl.GetProgramVariable("Taxiing"))
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold)); }
-                    }
+                    ToggleAltHold();
                 }
                 TriggerLastFrame = true;
             }
             else { TriggerLastFrame = false; }
         }
 
-        if (AltHold && Piloting)
+        if (AltHold && IsOwner)
         {
             float DeltaTime = Time.deltaTime;
             Vector3 localAngularVelocity = VehicleTransform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
@@ -189,15 +187,27 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
+        ToggleAltHold();
+    }
+    private void ToggleAltHold()
+    {
         if (AltHold)
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DeactivateAltHold));
         }
         else
         {
-            if ((bool)SAVControl.GetProgramVariable("InVTOL") || (bool)SAVControl.GetProgramVariable("Taxiing")) { return; }
+            if ((bool)SAVControl.GetProgramVariable("InVTOL") || (bool)SAVControl.GetProgramVariable("Taxiing") || !EngineOn) { return; }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
             gameObject.SetActive(true);
         }
+    }
+    public void SFEXT_O_TakeOwnership()
+    {
+        IsOwner = true;
+    }
+    public void SFEXT_O_LoseOwnership()
+    {
+        IsOwner = false;
     }
 }

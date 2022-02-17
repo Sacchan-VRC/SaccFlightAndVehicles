@@ -53,6 +53,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
         VehicleTransform = EntityControl.transform;
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         VehicleAnimator = EntityControl.GetComponent<Animator>();
+        IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
     }
     public void DFUNC_Selected()
     {

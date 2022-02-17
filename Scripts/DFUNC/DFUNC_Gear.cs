@@ -41,7 +41,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         SetGearDown();
         if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
-        IsOwner = localPlayer != null && localPlayer.isMaster;
+        IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
     }
     public void DFUNC_Selected()
     {
