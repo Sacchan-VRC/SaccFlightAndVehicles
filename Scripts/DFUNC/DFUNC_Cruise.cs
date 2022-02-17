@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class DFUNC_Cruise : UdonSharpBehaviour
 {
     [SerializeField] UdonSharpBehaviour SAVControl;
@@ -31,6 +31,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     private bool func_active;
     private bool Selected;
     private bool Piloting;
+    private bool EngineOn;
     private bool InVTOL;
     private bool InReverse;
     private bool InVR;
@@ -74,10 +75,18 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
-        gameObject.SetActive(false);
         Piloting = false;
         TriggerTapTime = 1;
         Selected = false;
+    }
+    public void SFEXT_G_EngineOn()
+    {
+        EngineOn = true;
+    }
+    public void SFEXT_G_EngineOff()
+    {
+        EngineOn = false;
+        gameObject.SetActive(false);
         func_active = false;
         if (Cruise)
         {
@@ -112,7 +121,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     { InReverse = false; }
     private void LateUpdate()
     {
-        if (Piloting)
+        if (EngineOn)
         {
             if (InVR)
             {
@@ -258,5 +267,12 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         Cruise = false;
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
+    }
+    public void SFEXT_O_LoseOwnership()
+    {
+        gameObject.SetActive(false);
+        func_active = false;
+        if (Cruise)
+        { SetCruiseOff(); }
     }
 }

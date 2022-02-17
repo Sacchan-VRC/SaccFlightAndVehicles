@@ -118,7 +118,6 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     }
     private void Update()
     {
-        Debug.Log(AltHold);
         if (Selected)
         {
             float Trigger;
