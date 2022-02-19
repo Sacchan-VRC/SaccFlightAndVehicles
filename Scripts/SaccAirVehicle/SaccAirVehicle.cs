@@ -1577,11 +1577,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
         //these two make it invincible and unable to be respawned again for 5s
         EntityControl.dead = true;
         SendCustomEventDelayedSeconds(nameof(NotDead), InvincibleAfterSpawn);
-        EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
         if (LowFuelLastFrame)
         { SendNotLowFuel(); }
         if (NoFuelLastFrame)
         { SendNotNoFuel(); }
+        EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
     }
     public void SendBulletHit()
     {
@@ -1749,10 +1749,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         IsOwner = true;
         VehicleRigidbody.velocity = CurrentVel;
-        if (_EngineOn)
+        if (_EngineOn && EntityControl.Piloting)
         { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
         else
-        { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0; }
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
+            PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;
+        }
         if (!UsingManualSync)
         {
             VehicleRigidbody.drag = 0;
