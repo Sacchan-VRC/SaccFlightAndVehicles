@@ -59,6 +59,10 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         gameObject.SetActive(false);
         if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
     }
+    public void SFEXT_O_PilotExit()
+    {
+        Selected = false;
+    }
     public void SFEXT_L_PassengerEnter()
     {
         if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
@@ -120,21 +124,24 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     {
         if (Selected)
         {
-            float Trigger;
-            if (UseLeftTrigger)
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-            else
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
-            if (Trigger > 0.75)
+            if (InVR)
             {
-                if (!TriggerLastFrame)
+                float Trigger;
+                if (UseLeftTrigger)
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                else
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+                if (Trigger > 0.75)
                 {
-                    ToggleAltHold();
+                    if (!TriggerLastFrame)
+                    {
+                        ToggleAltHold();
+                    }
+                    TriggerLastFrame = true;
                 }
-                TriggerLastFrame = true;
+                else { TriggerLastFrame = false; }
             }
-            else { TriggerLastFrame = false; }
         }
 
         if (AltHold && IsOwner)
@@ -201,12 +208,19 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             gameObject.SetActive(true);
         }
     }
+    public void SFEXT_G_Explode()
+    {
+        gameObject.SetActive(false);
+    }
     public void SFEXT_O_TakeOwnership()
     {
         IsOwner = true;
+        if (AltHold)
+        { gameObject.SetActive(true); }
     }
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
+        gameObject.SetActive(false);
     }
 }

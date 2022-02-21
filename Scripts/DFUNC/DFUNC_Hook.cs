@@ -126,11 +126,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
         //slow down if hooked and on the ground
         if (Hooked && (bool)SAVControl.GetProgramVariable("Taxiing"))
         {
-            if (!DisableGroundBrake && BrakeFunction)
-            {
-                BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") + 1);
-                DisableGroundBrake = true;
-            }
+            DisableBrake();
             if (Vector3.Distance(VehicleTransform.position, HookedLoc) > HookedCableSnapDistance)//real planes take around 80-90 meters to stop on a carrier
             {
                 //if you go further than HookedBrakeMaxDistance you snap the cable and it hurts your plane by the % of the amount of time left of the 2 seconds it should have taken to stop you.
@@ -141,6 +137,7 @@ public class DFUNC_Hook : UdonSharpBehaviour
                     //SAVControl.Health -= ((-HookedDelta + 2) / 2) * SAVControl.FullHealth;
                 }
                 Hooked = false;
+                ReEnableBrake();
                 //if you catch a cable but go airborne before snapping it, keep your hook out and then land somewhere else
                 //you would hear the cablesnap sound when you touchdown, so limit it to within 5 seconds of hooking
                 //this results in 1 frame's worth of not being able to catch a cable if hook stays down after being 'hooked', not snapping and then trying to hook again
@@ -202,6 +199,18 @@ public class DFUNC_Hook : UdonSharpBehaviour
         {
             EntityControl.SendEventToExtensions("SFEXT_O_HookUp");
         }
+        ReEnableBrake();
+    }
+    public void DisableBrake()
+    {
+        if (!DisableGroundBrake && BrakeFunction)
+        {
+            BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") + 1);
+            DisableGroundBrake = true;
+        }
+    }
+    public void ReEnableBrake()
+    {
         if (DisableGroundBrake && BrakeFunction)
         {
             BrakeFunction.SetProgramVariable("DisableGroundBrake", (int)BrakeFunction.GetProgramVariable("DisableGroundBrake") - 1);
