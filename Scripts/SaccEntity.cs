@@ -14,6 +14,8 @@ public class SaccEntity : UdonSharpBehaviour
     public UdonSharpBehaviour[] Dial_Functions_L;
     [Tooltip("Function dial scripts that you wish to be on the right dial")]
     public UdonSharpBehaviour[] Dial_Functions_R;
+    [Tooltip("How far the stick has to be pushed to select a function")]
+    public float DialSensitivity = 0.7f;
     [Tooltip("Should there be a function at the top middle of the function dial[ ]? Or a divider[x]? Useful for adjusting function positions with an odd number of functions")]
     public bool LeftDialDivideStraightUp = false;
     [Tooltip("See above")]
@@ -250,7 +252,7 @@ public class SaccEntity : UdonSharpBehaviour
             //LStick Selection wheel
             if (LStickDoDial)
             {
-                if (InVR && LStickPos.magnitude > .7f)
+                if (InVR && LStickPos.magnitude > DialSensitivity)
                 {
                     float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
 
@@ -291,7 +293,7 @@ public class SaccEntity : UdonSharpBehaviour
             //RStick Selection wheel
             if (RStickDoDial)
             {
-                if (InVR && RStickPos.magnitude > .7f)
+                if (InVR && RStickPos.magnitude > DialSensitivity)
                 {
                     float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
 

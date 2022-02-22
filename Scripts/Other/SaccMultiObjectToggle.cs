@@ -8,8 +8,12 @@ using VRC.Udon;
 public class SaccMultiObjectToggle : UdonSharpBehaviour
 {
     public GameObject[] ToggleObjs;
-    [Tooltip("Not required, script to disable objects if player goes too far away")]
-    public GameObject Disabler;
+    [Tooltip("Another object that is enabled unless everything is disabled")]
+    public GameObject EnabledWithAll;
+    public bool DisableIfPlayerDistant;
+    [Tooltip("How distant?")]
+    public float DisableDistance = 15;
+    private bool CheckActive;
     public bool CanToggleToDisabled = false;
     public bool DisabledDefault = false;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(current))] public int _current = -1;
@@ -19,11 +23,19 @@ public class SaccMultiObjectToggle : UdonSharpBehaviour
         {
             if (value < 0 || value >= ToggleObjs.Length)//set this from another script if you want to disable all
             {
-                if (Disabler) { Disabler.SetActive(false); }
+                if (EnabledWithAll) { EnabledWithAll.SetActive(false); }
             }
             else
             {
-                if (Disabler) { Disabler.SetActive(true); }
+                if (EnabledWithAll) { EnabledWithAll.SetActive(true); }
+                if (DisableIfPlayerDistant)
+                {
+                    if (!CheckActive)
+                    {
+                        CheckActive = true;
+                        CheckDisable();
+                    }
+                }
             }
 
             for (int i = 0; i < ToggleObjs.Length; i++)
@@ -34,8 +46,25 @@ public class SaccMultiObjectToggle : UdonSharpBehaviour
         }
         get => _current;
     }
+    private VRCPlayerApi localPlayer;
+    public void CheckDisable()
+    {
+        if (CheckActive && localPlayer != null)
+        {
+            if (Vector3.Distance(localPlayer.GetPosition(), gameObject.transform.position) > DisableDistance)
+            {
+                current = -1;
+                CheckActive = false;
+            }
+            else
+            {
+                SendCustomEventDelayedSeconds(nameof(CheckDisable), 1);
+            }
+        }
+    }
     private void Start()
     {
+        localPlayer = Networking.LocalPlayer;
         if (DisabledDefault)
         { current = -1; }
         else

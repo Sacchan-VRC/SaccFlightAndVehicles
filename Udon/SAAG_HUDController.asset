@@ -14,7 +14,359 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   serializedUdonProgramAsset: {fileID: 11400000, guid: 6155c11e4eff54342b9584a0a5210f01,
     type: 2}
-  udonAssembly: 
+  udonAssembly: ".data_start\n    .export PilotSeatAdjusterTarget\n    .export AAGunControl\n   
+    .export ElevationIndicator\n    .export HeadingIndicator\n    .export AAMTargetIndicator\n   
+    .export GUNLeadIndicator\n    .export AAMReloadBar\n    .export MGAmmoBar\n   
+    .export HUDText_AAM_ammo\n    .export distance_from_head\n    .export BulletSpeed\n   
+    __refl_typeid: %SystemInt64, null\n    __refl_typename: %SystemString, null\n   
+    __intnl_returnJump_SystemUInt32_0: %SystemUInt32, null\n    PilotSeatAdjusterTarget:
+    %UnityEngineTransform, null\n    AAGunControl: %VRCUdonUdonBehaviour, null\n   
+    ElevationIndicator: %UnityEngineTransform, null\n    HeadingIndicator: %UnityEngineTransform,
+    null\n    AAMTargetIndicator: %UnityEngineTransform, null\n    GUNLeadIndicator:
+    %UnityEngineTransform, null\n    AAMReloadBar: %UnityEngineTransform, null\n   
+    MGAmmoBar: %UnityEngineTransform, null\n    HUDText_AAM_ammo: %UnityEngineUIText,
+    null\n    distance_from_head: %SystemSingle, null\n    GUN_TargetDirOld: %UnityEngineVector3,
+    null\n    GUN_TargetSpeedLerper: %SystemSingle, null\n    RelativeTargetVel:
+    %UnityEngineVector3, null\n    RelativeTargetVelLastFrame: %UnityEngineVector3,
+    null\n    BulletSpeed: %SystemSingle, null\n    BulletSpeedDivider: %SystemSingle,
+    null\n    AAMReloadBarDivider: %SystemSingle, null\n    MGReloadBarDivider: %SystemSingle,
+    null\n    Rotator: %UnityEngineTransform, null\n    backfacing: %UnityEngineQuaternion,
+    null\n    __const_SystemUInt32_0: %SystemUInt32, null\n    __const_SystemSingle_0:
+    %SystemSingle, null\n    __const_SystemString_0: %SystemString, null\n    __const_SystemString_1:
+    %SystemString, null\n    __this_UnityEngineTransform_0: %UnityEngineTransform,
+    this\n    __const_SystemString_2: %SystemString, null\n    __const_SystemString_3:
+    %SystemString, null\n    __const_SystemBoolean_0: %SystemBoolean, null\n    __const_SystemString_4:
+    %SystemString, null\n    __const_UnityEngineQuaternion_0: %UnityEngineQuaternion,
+    null\n    __const_SystemString_5: %SystemString, null\n    __const_SystemBoolean_1:
+    %SystemBoolean, null\n    __const_SystemString_6: %SystemString, null\n    __const_SystemString_7:
+    %SystemString, null\n    __const_SystemString_8: %SystemString, null\n    __const_SystemSingle_1:
+    %SystemSingle, null\n    __const_SystemSingle_2: %SystemSingle, null\n    __const_SystemString_9:
+    %SystemString, null\n    __const_SystemString_10: %SystemString, null\n    __const_SystemString_11:
+    %SystemString, null\n    __const_SystemString_12: %SystemString, null\n    __const_SystemSingle_3:
+    %SystemSingle, null\n    __const_SystemSingle_4: %SystemSingle, null\n    __const_SystemSingle_5:
+    %SystemSingle, null\n    __const_SystemSingle_6: %SystemSingle, null\n    __const_SystemSingle_7:
+    %SystemSingle, null\n    __intnl_SystemObject_0: %SystemObject, null\n    __intnl_SystemSingle_0:
+    %SystemSingle, null\n    __intnl_SystemObject_1: %SystemObject, null\n    __intnl_SystemSingle_1:
+    %SystemSingle, null\n    __intnl_SystemBoolean_0: %SystemBoolean, null\n    __intnl_SystemObject_2:
+    %SystemObject, null\n    __intnl_UnityEngineTransform_0: %UnityEngineTransform,
+    null\n    __intnl_UnityEngineVector3_0: %UnityEngineVector3, null\n    __lcl_SmoothDeltaTime_SystemSingle_0:
+    %SystemSingle, null\n    __intnl_SystemBoolean_1: %SystemBoolean, null\n    __intnl_SystemBoolean_2:
+    %SystemBoolean, null\n    __intnl_SystemBoolean_3: %SystemBoolean, null\n   
+    __intnl_SystemBoolean_4: %SystemBoolean, null\n    __intnl_SystemBoolean_5: %SystemBoolean,
+    null\n    __lcl_newrot_UnityEngineVector3_0: %UnityEngineVector3, null\n    __intnl_SystemSingle_2:
+    %SystemSingle, null\n    __intnl_UnityEngineQuaternion_0: %UnityEngineQuaternion,
+    null\n    __intnl_UnityEngineVector3_1: %UnityEngineVector3, null\n    __intnl_SystemBoolean_6:
+    %SystemBoolean, null\n    __intnl_SystemBoolean_7: %SystemBoolean, null\n   
+    __intnl_SystemObject_3: %SystemObject, null\n    __intnl_UnityEngineGameObject_0:
+    %UnityEngineGameObject, null\n    __intnl_SystemObject_4: %SystemObject, null\n   
+    __intnl_UnityEngineVector3_2: %UnityEngineVector3, null\n    __intnl_UnityEngineVector3_3:
+    %UnityEngineVector3, null\n    __intnl_UnityEngineVector3_4: %UnityEngineVector3,
+    null\n    __intnl_UnityEngineVector3_5: %UnityEngineVector3, null\n    __intnl_UnityEngineVector3_6:
+    %UnityEngineVector3, null\n    __intnl_SystemObject_5: %SystemObject, null\n   
+    __intnl_SystemInt32_0: %SystemInt32, null\n    __intnl_SystemString_0: %SystemString,
+    null\n    __intnl_SystemSingle_3: %SystemSingle, null\n    __lcl_TargetDir_UnityEngineVector3_0:
+    %UnityEngineVector3, null\n    __intnl_VRCUdonUdonBehaviour_0: %VRCUdonUdonBehaviour,
+    null\n    __lcl_RelativeTargetVel_UnityEngineVector3_0: %UnityEngineVector3,
+    null\n    __lcl_TargetAccel_UnityEngineVector3_0: %UnityEngineVector3, null\n   
+    __intnl_SystemSingle_4: %SystemSingle, null\n    __intnl_SystemSingle_5: %SystemSingle,
+    null\n    __lcl_BulletHitTime_SystemSingle_0: %SystemSingle, null\n    __intnl_SystemSingle_6:
+    %SystemSingle, null\n    __lcl_RelTargVelNormalized_UnityEngineVector3_0: %UnityEngineVector3,
+    null\n    __lcl_PredictedPos_UnityEngineVector3_0: %UnityEngineVector3, null\n   
+    __lcl_PredictionPosGlobal_UnityEngineVector3_0: %UnityEngineVector3, null\n   
+    __lcl_TargetPos_UnityEngineVector3_0: %UnityEngineVector3, null\n    __intnl_UnityEngineGameObjectArray_0:
+    %UnityEngineGameObjectArray, null\n    __intnl_SystemObject_6: %SystemObject,
+    null\n    __intnl_UnityEngineGameObject_1: %UnityEngineGameObject, null\n   
+    __intnl_UnityEngineTransform_1: %UnityEngineTransform, null\n    __lcl_DistFromPrediction_SystemSingle_0:
+    %SystemSingle, null\n    __intnl_UnityEngineVector3_7: %UnityEngineVector3, null\n   
+    __lcl_DistFromTarg_SystemSingle_0: %SystemSingle, null\n    __intnl_UnityEngineVector3_8:
+    %UnityEngineVector3, null\n    __lcl_DistDiv_SystemSingle_0: %SystemSingle, null\n   
+    __intnl_UnityEngineVector3_9: %UnityEngineVector3, null\n    __intnl_UnityEngineVector3_10:
+    %UnityEngineVector3, null\n    __intnl_SystemSingle_7: %SystemSingle, null\n   
+    __lcl_gravity_UnityEngineVector3_0: %UnityEngineVector3, null\n    __intnl_SystemSingle_8:
+    %SystemSingle, null\n    __intnl_SystemSingle_9: %SystemSingle, null\n    __intnl_UnityEngineVector3_11:
+    %UnityEngineVector3, null\n    __intnl_UnityEngineVector3_12: %UnityEngineVector3,
+    null\n    __intnl_UnityEngineVector3_13: %UnityEngineVector3, null\n    __intnl_UnityEngineVector3_14:
+    %UnityEngineVector3, null\n    __intnl_VRCUdonUdonBehaviour_1: %VRCUdonUdonBehaviour,
+    null\n    __intnl_UnityEngineQuaternion_1: %UnityEngineQuaternion, null\n.data_end\n.code_start\n   
+    .export _start\n    _start:\n        PUSH, __const_SystemUInt32_0\n# \n# SAAG_HUDController.Start()\n#
+    \n        PUSH, __const_SystemSingle_0\n        PUSH, BulletSpeed\n        PUSH,
+    BulletSpeedDivider\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, AAGunControl\n        PUSH, __const_SystemString_0\n        PUSH, __intnl_SystemObject_0\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_0\n        PUSH, __intnl_SystemSingle_0\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, __const_SystemSingle_0\n       
+    PUSH, __intnl_SystemSingle_0\n        PUSH, AAMReloadBarDivider\n        EXTERN,
+    \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, AAGunControl\n        PUSH, __const_SystemString_1\n        PUSH, __intnl_SystemObject_1\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_1\n        PUSH, __intnl_SystemSingle_1\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, __const_SystemSingle_0\n       
+    PUSH, __intnl_SystemSingle_1\n        PUSH, MGReloadBarDivider\n        EXTERN,
+    \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, PilotSeatAdjusterTarget\n        PUSH, __intnl_SystemBoolean_0\n       
+    EXTERN, \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_0\n        JUMP_IF_FALSE, 0x00000130\n        PUSH,
+    PilotSeatAdjusterTarget\n        PUSH, __intnl_UnityEngineVector3_0\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __this_UnityEngineTransform_0\n        PUSH, __intnl_UnityEngineVector3_0\n       
+    EXTERN, \"UnityEngineTransform.__set_position__UnityEngineVector3__SystemVoid\"\n       
+    PUSH, AAGunControl\n        PUSH, __const_SystemString_2\n        PUSH, __intnl_SystemObject_2\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_2\n        PUSH, __intnl_UnityEngineTransform_0\n       
+    COPY\n        PUSH, __intnl_UnityEngineTransform_0\n        PUSH, Rotator\n       
+    EXTERN, \"UnityEngineComponent.__get_transform__UnityEngineTransform\"\n       
+    PUSH, __intnl_returnJump_SystemUInt32_0\n        COPY\n        JUMP_INDIRECT,
+    __intnl_returnJump_SystemUInt32_0\n    .export _update\n    _update:\n       
+    PUSH, __const_SystemUInt32_0\n# \n# SAAG_HUDController.Update()\n# \n       
+    PUSH, __lcl_SmoothDeltaTime_SystemSingle_0\n        EXTERN, \"UnityEngineTime.__get_smoothDeltaTime__SystemSingle\"\n       
+    PUSH, AAMTargetIndicator\n        PUSH, __intnl_SystemBoolean_1\n        EXTERN,
+    \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_1\n        JUMP_IF_FALSE, 0x000003dc\n        PUSH,
+    AAGunControl\n        PUSH, __const_SystemString_3\n        PUSH, __intnl_SystemObject_3\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_3\n        PUSH, __intnl_SystemBoolean_2\n       
+    COPY\n        PUSH, __intnl_SystemBoolean_2\n        JUMP_IF_FALSE, 0x000003ac\n       
+    PUSH, AAMTargetIndicator\n        PUSH, __intnl_UnityEngineGameObject_0\n       
+    EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n       
+    PUSH, __intnl_UnityEngineGameObject_0\n        PUSH, __const_SystemBoolean_0\n       
+    EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n       
+    PUSH, __this_UnityEngineTransform_0\n        PUSH, __intnl_UnityEngineVector3_1\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, AAGunControl\n        PUSH, __const_SystemString_4\n        PUSH, __intnl_SystemObject_4\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_4\n        PUSH, __intnl_UnityEngineVector3_2\n       
+    COPY\n        PUSH, __intnl_UnityEngineVector3_1\n        PUSH, __intnl_UnityEngineVector3_2\n       
+    PUSH, __intnl_UnityEngineVector3_3\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, AAMTargetIndicator\n        PUSH, __intnl_UnityEngineVector3_3\n       
+    EXTERN, \"UnityEngineTransform.__set_position__UnityEngineVector3__SystemVoid\"\n       
+    PUSH, AAMTargetIndicator\n        PUSH, __intnl_UnityEngineVector3_4\n       
+    EXTERN, \"UnityEngineTransform.__get_localPosition__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_4\n        PUSH, __intnl_UnityEngineVector3_5\n       
+    EXTERN, \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_5\n        PUSH, distance_from_head\n       
+    PUSH, __intnl_UnityEngineVector3_6\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, AAMTargetIndicator\n        PUSH, __intnl_UnityEngineVector3_6\n       
+    EXTERN, \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n       
+    PUSH, AAMTargetIndicator\n        PUSH, __const_UnityEngineQuaternion_0\n       
+    EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n       
+    PUSH, AAGunControl\n        PUSH, __const_SystemString_5\n        PUSH, __intnl_SystemObject_5\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_5\n        PUSH, __intnl_SystemBoolean_3\n       
+    COPY\n        PUSH, __intnl_SystemBoolean_3\n        JUMP_IF_FALSE, 0x000003a4\n       
+    PUSH, AAMTargetIndicator\n        PUSH, backfacing\n        EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n       
+    JUMP, 0x000003DC\n        PUSH, AAMTargetIndicator\n        PUSH, __intnl_UnityEngineGameObject_0\n       
+    EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n       
+    PUSH, __intnl_UnityEngineGameObject_0\n        PUSH, __const_SystemBoolean_1\n       
+    EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n       
+    PUSH, HUDText_AAM_ammo\n        PUSH, __intnl_SystemBoolean_2\n        EXTERN,
+    \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_2\n        JUMP_IF_FALSE, 0x00000474\n        PUSH,
+    AAGunControl\n        PUSH, __const_SystemString_6\n        PUSH, __intnl_SystemObject_3\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_3\n        PUSH, __intnl_SystemInt32_0\n        EXTERN,
+    \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, __intnl_SystemInt32_0\n       
+    PUSH, __const_SystemString_7\n        PUSH, __intnl_SystemString_0\n        EXTERN,
+    \"SystemInt32.__ToString__SystemString__SystemString\"\n        PUSH, HUDText_AAM_ammo\n       
+    PUSH, __intnl_SystemString_0\n        EXTERN, \"UnityEngineUIText.__set_text__SystemString__SystemVoid\"\n       
+    PUSH, AAMReloadBar\n        PUSH, __intnl_SystemBoolean_3\n        EXTERN, \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_3\n        JUMP_IF_FALSE, 0x00000534\n        PUSH,
+    AAGunControl\n        PUSH, __const_SystemString_8\n        PUSH, __intnl_SystemObject_3\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_3\n        PUSH, __intnl_SystemSingle_2\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, __intnl_SystemSingle_2\n       
+    PUSH, AAMReloadBarDivider\n        PUSH, __intnl_SystemSingle_3\n        EXTERN,
+    \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __intnl_SystemSingle_3\n        PUSH, __const_SystemSingle_1\n        PUSH,
+    __const_SystemSingle_2\n        PUSH, __intnl_UnityEngineVector3_1\n        EXTERN,
+    \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, AAMReloadBar\n        PUSH, __intnl_UnityEngineVector3_1\n        EXTERN,
+    \"UnityEngineTransform.__set_localScale__UnityEngineVector3__SystemVoid\"\n       
+    PUSH, MGAmmoBar\n        PUSH, __intnl_SystemBoolean_4\n        EXTERN, \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_4\n        JUMP_IF_FALSE, 0x000005f4\n        PUSH,
+    AAGunControl\n        PUSH, __const_SystemString_1\n        PUSH, __intnl_SystemObject_3\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_3\n        PUSH, __intnl_SystemSingle_2\n        EXTERN,
+    \"SystemConvert.__ToSingle__SystemObject__SystemSingle\"\n        PUSH, __intnl_SystemSingle_2\n       
+    PUSH, MGReloadBarDivider\n        PUSH, __intnl_SystemSingle_3\n        EXTERN,
+    \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __intnl_SystemSingle_3\n        PUSH, __const_SystemSingle_1\n        PUSH,
+    __const_SystemSingle_2\n        PUSH, __intnl_UnityEngineVector3_1\n        EXTERN,
+    \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, MGAmmoBar\n        PUSH, __intnl_UnityEngineVector3_1\n        EXTERN,
+    \"UnityEngineTransform.__set_localScale__UnityEngineVector3__SystemVoid\"\n       
+    PUSH, GUNLeadIndicator\n        PUSH, __intnl_SystemBoolean_5\n        EXTERN,
+    \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_5\n        JUMP_IF_FALSE, 0x00000e68\n        PUSH,
+    AAGunControl\n        PUSH, __const_SystemString_3\n        PUSH, __intnl_SystemObject_3\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_3\n        PUSH, __intnl_SystemBoolean_6\n       
+    COPY\n        PUSH, __intnl_SystemBoolean_6\n        JUMP_IF_FALSE, 0x00000e38\n       
+    PUSH, GUNLeadIndicator\n        PUSH, __intnl_UnityEngineGameObject_0\n       
+    EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n       
+    PUSH, __intnl_UnityEngineGameObject_0\n        PUSH, __const_SystemBoolean_0\n       
+    EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n       
+    PUSH, AAGunControl\n        PUSH, __const_SystemString_9\n        PUSH, __intnl_SystemObject_4\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_4\n        PUSH, __intnl_VRCUdonUdonBehaviour_0\n       
+    COPY\n        PUSH, __intnl_VRCUdonUdonBehaviour_0\n        PUSH, __intnl_SystemBoolean_7\n       
+    EXTERN, \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_7\n        JUMP_IF_FALSE, 0x000007ac\n        PUSH,
+    AAGunControl\n        PUSH, __const_SystemString_9\n        PUSH, __intnl_SystemObject_5\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_5\n        PUSH, __intnl_VRCUdonUdonBehaviour_1\n       
+    COPY\n        PUSH, __intnl_VRCUdonUdonBehaviour_1\n        PUSH, __const_SystemString_10\n       
+    PUSH, __intnl_SystemObject_6\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_6\n        PUSH, __intnl_UnityEngineTransform_1\n       
+    COPY\n        PUSH, __intnl_UnityEngineTransform_1\n        PUSH, __intnl_UnityEngineVector3_1\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __this_UnityEngineTransform_0\n        PUSH, __intnl_UnityEngineVector3_2\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_1\n        PUSH, __intnl_UnityEngineVector3_2\n       
+    PUSH, __lcl_TargetDir_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    JUMP, 0x000008A0\n        PUSH, AAGunControl\n        PUSH, __const_SystemString_11\n       
+    PUSH, __intnl_SystemObject_5\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_5\n        PUSH, __intnl_UnityEngineGameObjectArray_0\n       
+    COPY\n        PUSH, AAGunControl\n        PUSH, __const_SystemString_12\n       
+    PUSH, __intnl_SystemObject_6\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_6\n        PUSH, __intnl_SystemInt32_0\n        EXTERN,
+    \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, __intnl_UnityEngineGameObjectArray_0\n       
+    PUSH, __intnl_SystemInt32_0\n        PUSH, __intnl_UnityEngineGameObject_1\n       
+    EXTERN, \"SystemObjectArray.__Get__SystemInt32__SystemObject\"\n        PUSH,
+    __intnl_UnityEngineGameObject_1\n        PUSH, __intnl_UnityEngineTransform_1\n       
+    EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n       
+    PUSH, __intnl_UnityEngineTransform_1\n        PUSH, __intnl_UnityEngineVector3_1\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __this_UnityEngineTransform_0\n        PUSH, __intnl_UnityEngineVector3_2\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_1\n        PUSH, __intnl_UnityEngineVector3_2\n       
+    PUSH, __lcl_TargetDir_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, GUN_TargetDirOld\n        PUSH, __lcl_TargetDir_UnityEngineVector3_0\n       
+    PUSH, __const_SystemSingle_3\n        PUSH, GUN_TargetDirOld\n        EXTERN,
+    \"UnityEngineVector3.__Lerp__UnityEngineVector3_UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, __lcl_TargetDir_UnityEngineVector3_0\n        PUSH, GUN_TargetDirOld\n       
+    PUSH, __lcl_RelativeTargetVel_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, __lcl_RelativeTargetVel_UnityEngineVector3_0\n        PUSH, RelativeTargetVelLastFrame\n       
+    PUSH, __lcl_TargetAccel_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, __lcl_RelativeTargetVel_UnityEngineVector3_0\n        PUSH, __intnl_SystemSingle_2\n       
+    EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\n        PUSH, __intnl_SystemSingle_2\n       
+    PUSH, __const_SystemSingle_4\n        PUSH, __intnl_SystemSingle_3\n        EXTERN,
+    \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __intnl_SystemSingle_3\n        PUSH, __lcl_SmoothDeltaTime_SystemSingle_0\n       
+    PUSH, __intnl_SystemSingle_4\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __const_SystemSingle_5\n        PUSH, __lcl_SmoothDeltaTime_SystemSingle_0\n       
+    PUSH, __intnl_SystemSingle_5\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, GUN_TargetSpeedLerper\n        PUSH, __intnl_SystemSingle_4\n        PUSH,
+    __intnl_SystemSingle_5\n        PUSH, GUN_TargetSpeedLerper\n        EXTERN,
+    \"UnityEngineMathf.__Lerp__SystemSingle_SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __lcl_TargetDir_UnityEngineVector3_0\n        PUSH, __intnl_SystemSingle_6\n       
+    EXTERN, \"UnityEngineVector3.__get_magnitude__SystemSingle\"\n        PUSH, __intnl_SystemSingle_6\n       
+    PUSH, BulletSpeed\n        PUSH, __lcl_BulletHitTime_SystemSingle_0\n       
+    EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __lcl_RelativeTargetVel_UnityEngineVector3_0\n        PUSH, __lcl_RelTargVelNormalized_UnityEngineVector3_0\n       
+    EXTERN, \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\n       
+    PUSH, __lcl_RelTargVelNormalized_UnityEngineVector3_0\n        PUSH, GUN_TargetSpeedLerper\n       
+    PUSH, __intnl_UnityEngineVector3_1\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, __lcl_TargetAccel_UnityEngineVector3_0\n        PUSH, __const_SystemSingle_6\n       
+    PUSH, __intnl_UnityEngineVector3_2\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_2\n        PUSH, __lcl_BulletHitTime_SystemSingle_0\n       
+    PUSH, __intnl_UnityEngineVector3_3\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_1\n        PUSH, __intnl_UnityEngineVector3_3\n       
+    PUSH, __intnl_UnityEngineVector3_4\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_4\n        PUSH, __lcl_BulletHitTime_SystemSingle_0\n       
+    PUSH, __intnl_UnityEngineVector3_5\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, __lcl_TargetDir_UnityEngineVector3_0\n        PUSH, __intnl_UnityEngineVector3_5\n       
+    PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, __this_UnityEngineTransform_0\n        PUSH, __intnl_UnityEngineVector3_6\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_6\n        PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n       
+    PUSH, __lcl_PredictionPosGlobal_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, AAGunControl\n        PUSH, __const_SystemString_11\n        PUSH, __intnl_SystemObject_5\n       
+    EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_5\n        PUSH, __intnl_UnityEngineGameObjectArray_0\n       
+    COPY\n        PUSH, AAGunControl\n        PUSH, __const_SystemString_12\n       
+    PUSH, __intnl_SystemObject_6\n        EXTERN, \"VRCUdonCommonInterfacesIUdonEventReceiver.__GetProgramVariable__SystemString__SystemObject\"\n       
+    PUSH, __intnl_SystemObject_6\n        PUSH, __intnl_SystemInt32_0\n        EXTERN,
+    \"SystemConvert.__ToInt32__SystemObject__SystemInt32\"\n        PUSH, __intnl_UnityEngineGameObjectArray_0\n       
+    PUSH, __intnl_SystemInt32_0\n        PUSH, __intnl_UnityEngineGameObject_1\n       
+    EXTERN, \"SystemObjectArray.__Get__SystemInt32__SystemObject\"\n        PUSH,
+    __intnl_UnityEngineGameObject_1\n        PUSH, __intnl_UnityEngineTransform_1\n       
+    EXTERN, \"UnityEngineGameObject.__get_transform__UnityEngineTransform\"\n       
+    PUSH, __intnl_UnityEngineTransform_1\n        PUSH, __lcl_TargetPos_UnityEngineVector3_0\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __this_UnityEngineTransform_0\n        PUSH, __intnl_UnityEngineVector3_7\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __lcl_PredictionPosGlobal_UnityEngineVector3_0\n        PUSH, __intnl_UnityEngineVector3_7\n       
+    PUSH, __lcl_DistFromPrediction_SystemSingle_0\n        EXTERN, \"UnityEngineVector3.__Distance__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n       
+    PUSH, __this_UnityEngineTransform_0\n        PUSH, __intnl_UnityEngineVector3_8\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __lcl_TargetPos_UnityEngineVector3_0\n        PUSH, __intnl_UnityEngineVector3_8\n       
+    PUSH, __lcl_DistFromTarg_SystemSingle_0\n        EXTERN, \"UnityEngineVector3.__Distance__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n       
+    PUSH, __lcl_DistFromPrediction_SystemSingle_0\n        PUSH, __lcl_DistFromTarg_SystemSingle_0\n       
+    PUSH, __lcl_DistDiv_SystemSingle_0\n        EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __lcl_PredictionPosGlobal_UnityEngineVector3_0\n        PUSH, __lcl_TargetPos_UnityEngineVector3_0\n       
+    PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Subtraction__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n        PUSH, __lcl_DistDiv_SystemSingle_0\n       
+    PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, __this_UnityEngineTransform_0\n        PUSH, __intnl_UnityEngineVector3_9\n       
+    EXTERN, \"UnityEngineTransform.__get_position__UnityEngineVector3\"\n       
+    PUSH, __lcl_TargetPos_UnityEngineVector3_0\n        PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n       
+    PUSH, __intnl_UnityEngineVector3_10\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_9\n        PUSH, __intnl_UnityEngineVector3_10\n       
+    PUSH, __intnl_SystemSingle_7\n        EXTERN, \"UnityEngineVector3.__Distance__UnityEngineVector3_UnityEngineVector3__SystemSingle\"\n       
+    PUSH, __intnl_SystemSingle_7\n        PUSH, BulletSpeed\n        PUSH, __lcl_BulletHitTime_SystemSingle_0\n       
+    EXTERN, \"SystemSingle.__op_Division__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __const_SystemSingle_7\n        PUSH, __lcl_BulletHitTime_SystemSingle_0\n       
+    PUSH, __intnl_SystemSingle_8\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __intnl_SystemSingle_8\n        PUSH, __lcl_BulletHitTime_SystemSingle_0\n       
+    PUSH, __intnl_SystemSingle_9\n        EXTERN, \"SystemSingle.__op_Multiplication__SystemSingle_SystemSingle__SystemSingle\"\n       
+    PUSH, __const_SystemSingle_2\n        PUSH, __intnl_SystemSingle_9\n        PUSH,
+    __const_SystemSingle_2\n        PUSH, __lcl_gravity_UnityEngineVector3_0\n       
+    EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n        PUSH, __lcl_gravity_UnityEngineVector3_0\n       
+    PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, __lcl_TargetPos_UnityEngineVector3_0\n        PUSH, __lcl_PredictedPos_UnityEngineVector3_0\n       
+    PUSH, __intnl_UnityEngineVector3_11\n        EXTERN, \"UnityEngineVector3.__op_Addition__UnityEngineVector3_UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, GUNLeadIndicator\n        PUSH, __intnl_UnityEngineVector3_11\n       
+    EXTERN, \"UnityEngineTransform.__set_position__UnityEngineVector3__SystemVoid\"\n       
+    PUSH, GUNLeadIndicator\n        PUSH, __intnl_UnityEngineVector3_12\n       
+    EXTERN, \"UnityEngineTransform.__get_localPosition__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_12\n        PUSH, __intnl_UnityEngineVector3_13\n       
+    EXTERN, \"UnityEngineVector3.__get_normalized__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_13\n        PUSH, distance_from_head\n       
+    PUSH, __intnl_UnityEngineVector3_14\n        EXTERN, \"UnityEngineVector3.__op_Multiply__UnityEngineVector3_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, GUNLeadIndicator\n        PUSH, __intnl_UnityEngineVector3_14\n       
+    EXTERN, \"UnityEngineTransform.__set_localPosition__UnityEngineVector3__SystemVoid\"\n       
+    PUSH, __lcl_RelativeTargetVel_UnityEngineVector3_0\n        PUSH, RelativeTargetVelLastFrame\n       
+    COPY\n        JUMP, 0x00000E68\n        PUSH, GUNLeadIndicator\n        PUSH,
+    __intnl_UnityEngineGameObject_0\n        EXTERN, \"UnityEngineComponent.__get_gameObject__UnityEngineGameObject\"\n       
+    PUSH, __intnl_UnityEngineGameObject_0\n        PUSH, __const_SystemBoolean_1\n       
+    EXTERN, \"UnityEngineGameObject.__SetActive__SystemBoolean__SystemVoid\"\n       
+    PUSH, Rotator\n        PUSH, __intnl_UnityEngineQuaternion_0\n        EXTERN,
+    \"UnityEngineTransform.__get_rotation__UnityEngineQuaternion\"\n        PUSH,
+    __intnl_UnityEngineQuaternion_0\n        PUSH, __intnl_UnityEngineVector3_1\n       
+    EXTERN, \"UnityEngineQuaternion.__get_eulerAngles__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_1\n        PUSH, __intnl_SystemSingle_2\n       
+    EXTERN, \"UnityEngineVector3.__get_y__SystemSingle\"\n        PUSH, __const_SystemSingle_2\n       
+    PUSH, __intnl_SystemSingle_2\n        PUSH, __const_SystemSingle_2\n        PUSH,
+    __lcl_newrot_UnityEngineVector3_0\n        EXTERN, \"UnityEngineVector3.__ctor__SystemSingle_SystemSingle_SystemSingle__UnityEngineVector3\"\n       
+    PUSH, HeadingIndicator\n        PUSH, __intnl_SystemBoolean_6\n        EXTERN,
+    \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_6\n        JUMP_IF_FALSE, 0x00000f48\n        PUSH,
+    __lcl_newrot_UnityEngineVector3_0\n        PUSH, __intnl_UnityEngineVector3_2\n       
+    EXTERN, \"UnityEngineVector3.__op_UnaryNegation__UnityEngineVector3__UnityEngineVector3\"\n       
+    PUSH, __intnl_UnityEngineVector3_2\n        PUSH, __intnl_UnityEngineQuaternion_1\n       
+    EXTERN, \"UnityEngineQuaternion.__Euler__UnityEngineVector3__UnityEngineQuaternion\"\n       
+    PUSH, HeadingIndicator\n        PUSH, __intnl_UnityEngineQuaternion_1\n       
+    EXTERN, \"UnityEngineTransform.__set_localRotation__UnityEngineQuaternion__SystemVoid\"\n       
+    PUSH, ElevationIndicator\n        PUSH, __intnl_SystemBoolean_7\n        EXTERN,
+    \"UnityEngineObject.__op_Implicit__UnityEngineObject__SystemBoolean\"\n       
+    PUSH, __intnl_SystemBoolean_7\n        JUMP_IF_FALSE, 0x00000fa0\n        PUSH,
+    __lcl_newrot_UnityEngineVector3_0\n        PUSH, __intnl_UnityEngineQuaternion_1\n       
+    EXTERN, \"UnityEngineQuaternion.__Euler__UnityEngineVector3__UnityEngineQuaternion\"\n       
+    PUSH, ElevationIndicator\n        PUSH, __intnl_UnityEngineQuaternion_1\n       
+    EXTERN, \"UnityEngineTransform.__set_rotation__UnityEngineQuaternion__SystemVoid\"\n       
+    PUSH, __intnl_returnJump_SystemUInt32_0\n        COPY\n        JUMP_INDIRECT,
+    __intnl_returnJump_SystemUInt32_0\n.code_end\n"
   assemblyError: 
   sourceCsScript: {fileID: 11500000, guid: 795b8d29016146043aefe0d22e07ed5b, type: 3}
   behaviourSyncMode: 1
