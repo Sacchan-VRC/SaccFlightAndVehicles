@@ -1583,17 +1583,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
         { SendNotNoFuel(); }
         EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
     }
-    public void SendBulletHit()
-    {
-        EntityControl.SendEventToExtensions("SFEXT_G_BulletHit");
-    }
     public void SFEXT_L_BulletHit()
     {
         if (PredictDamage)
         {
             if (Time.time - LastHitTime > 2)
             {
-                PredictedHealth = Health - BulletDamageTaken;
+                PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
                 if (PredictedHealth <= 0)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
@@ -1601,7 +1597,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
             else
             {
-                PredictedHealth -= BulletDamageTaken;
+                PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
                 if (PredictedHealth <= 0)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
@@ -1609,7 +1605,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
             LastHitTime = Time.time;
         }
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBulletHit));
     }
     public void SFEXT_G_BulletHit()
     {
@@ -1618,7 +1613,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             LastHitTime = Time.time;
             if (IsOwner)
             {
-                Health -= BulletDamageTaken;
+                Health -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
                 if (PredictDamage && Health <= 0)//the attacker calls the explode function in this case
                 {
                     Health = 0.0911f;

@@ -205,7 +205,44 @@ public class SaccEntity : UdonSharpBehaviour
         if (!other || dead) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
 
         LastHitParticle = other;
-        SendEventToExtensions("SFEXT_L_BulletHit");
+        string pname = other.name;
+        int index = pname.LastIndexOf(':');
+        if (index > -1)
+        {
+            pname = pname.Substring(index);
+            if (pname.Length == 3)
+            {
+                if (pname[1] == 'x')
+                {
+                    if (pname[2] >= '0' && pname[2] <= '9')
+                    {
+                        //damage reduction using case:
+                        int dmg = pname[2] - 48;
+                        LastHitBulletDamageMulti = 1 / (float)(dmg);
+                        SendEventToExtensions("SFEXT_L_BulletHit");
+                        SendDamageEvent(dmg, false);
+                    }
+                }
+                else if (pname[1] >= '0' && pname[1] <= '9')
+                {
+                    if (pname[2] >= '0' && pname[2] <= '9')
+                    {
+                        //damage reduction using case:
+                        int dmg = 10 * (pname[1] - 48);
+                        dmg += pname[2] - 48;
+                        LastHitBulletDamageMulti = dmg == 1 ? 1 : Mathf.Pow(2, dmg);
+                        SendEventToExtensions("SFEXT_L_BulletHit");
+                        SendDamageEvent(dmg, true);
+                    }
+                }
+            }
+        }
+        else
+        {
+            LastHitBulletDamageMulti = 1;
+            SendEventToExtensions("SFEXT_L_BulletHit");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
+        }
 
         //Try to find the saccentity that shot at us
         GameObject EnemyObjs = other;
@@ -665,5 +702,202 @@ public class SaccEntity : UdonSharpBehaviour
         System.Array.Copy(result, finalResult, count);
 
         return finalResult;
+    }
+    public void SendDamageEvent(int dmg, bool More)
+    {
+        if (More)//More than default damage
+        {
+            switch (dmg)
+            {
+                case 2:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2x));
+                    break;
+                case 3:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4x));
+                    break;
+                case 4:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8x));
+                    break;
+                case 5:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage16x));
+                    break;
+                case 6:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage32x));
+                    break;
+                case 7:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage64x));
+                    break;
+                case 8:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage128x));
+                    break;
+                case 9:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage256x));
+                    break;
+                case 10:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage512x));
+                    break;
+                case 11:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage1024x));
+                    break;
+                case 12:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2048x));
+                    break;
+                case 13:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4096x));
+                    break;
+                case 14:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8192x));
+                    break;
+                default:
+                    if (dmg != 1) { Debug.LogWarning("Invalid bullet damage, using default"); }
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
+                    break;
+            }
+        }
+        else
+        {
+            switch (dmg)
+            {
+                case 2:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageHalf));
+                    break;
+                case 3:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageThird));
+                    break;
+                case 4:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageQuarter));
+                    break;
+                case 5:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageFifth));
+                    break;
+                case 6:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSixth));
+                    break;
+                case 7:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSeventh));
+                    break;
+                case 8:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageEighth));
+                    break;
+                case 9:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageNinth));
+                    break;
+                default:
+                    if (dmg != 1) { Debug.LogWarning("Invalid bullet damage, using default"); }
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
+                    break;
+            }
+        }
+    }
+    [System.NonSerializedAttribute] public float LastHitBulletDamageMulti = 1;
+    public void BulletDamageNinth()
+    {
+        LastHitBulletDamageMulti = .11111111111111f;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamageEighth()
+    {
+        LastHitBulletDamageMulti = .125f;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamageSeventh()
+    {
+        LastHitBulletDamageMulti = .14285714285714f;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamageSixth()
+    {
+        LastHitBulletDamageMulti = .16666666666666f;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamageFifth()
+    {
+        LastHitBulletDamageMulti = .2f;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamageQuarter()
+    {
+        LastHitBulletDamageMulti = .25f;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamageThird()
+    {
+        LastHitBulletDamageMulti = .33333333333333f;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamageHalf()
+    {
+        LastHitBulletDamageMulti = .5f;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamageDefault()
+    {
+        LastHitBulletDamageMulti = 1;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage2x()
+    {
+        LastHitBulletDamageMulti = 2;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage4x()
+    {
+        LastHitBulletDamageMulti = 4;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage8x()
+    {
+        LastHitBulletDamageMulti = 8;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage16x()
+    {
+        LastHitBulletDamageMulti = 16;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage32x()
+    {
+        LastHitBulletDamageMulti = 32;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage64x()
+    {
+        LastHitBulletDamageMulti = 64;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage128x()
+    {
+        LastHitBulletDamageMulti = 128;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage256x()
+    {
+        LastHitBulletDamageMulti = 256;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage512x()
+    {
+        LastHitBulletDamageMulti = 512;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage1024x()
+    {
+        LastHitBulletDamageMulti = 1024;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage2048x()
+    {
+        LastHitBulletDamageMulti = 2048;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage4096x()
+    {
+        LastHitBulletDamageMulti = 4096;
+        SendEventToExtensions("SFEXT_G_BulletHit");
+    }
+    public void BulletDamage8192x()
+    {
+        LastHitBulletDamageMulti = 8192;
+        SendEventToExtensions("SFEXT_G_BulletHit");
     }
 }
