@@ -11,8 +11,10 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public SaccEntity EntityControl;
     [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
     public Transform VehicleMesh;
-    [Tooltip("Layer to set the colliders to when entering vehicle")]
+    [Tooltip("Layer to set the VehicleMesh and it's children to when entering vehicle")]
     public int OnboardVehicleLayer = 31;
+    [Tooltip("Change all children of VehicleMesh, or just the objects with colliders?")]
+    public bool OnlyChangeColliders = false;
     [Tooltip("Position Thrust force is applied at")]
     public Transform ThrustPoint;
     [Tooltip("Position yawing forces are applied at")]
@@ -1288,10 +1290,21 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         if (VehicleMesh)
         {
-            Transform[] children = VehicleMesh.GetComponentsInChildren<Transform>();
-            foreach (Transform child in children)
+            if (OnlyChangeColliders)
             {
-                child.gameObject.layer = NewLayer;
+                Collider[] children = VehicleMesh.GetComponentsInChildren<Collider>(true);
+                foreach (Collider child in children)
+                {
+                    child.gameObject.layer = NewLayer;
+                }
+            }
+            else
+            {
+                Transform[] children = VehicleMesh.GetComponentsInChildren<Transform>(true);
+                foreach (Transform child in children)
+                {
+                    child.gameObject.layer = NewLayer;
+                }
             }
         }
     }
