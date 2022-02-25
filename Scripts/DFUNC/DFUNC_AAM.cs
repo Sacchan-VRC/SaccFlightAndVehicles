@@ -31,6 +31,11 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public string AnimFiredTriggerName = "aamlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     public bool AnimBoolStayTrueOnExit;
+    [Tooltip("Make it only possible to lock if the angle you are looking at the back of the enemy plane is less than HighAspectPreventLock (for heatseekers)")]
+    public bool HighAspectPreventLock;
+    [Tooltip("Angle beyond which aspect is too high to lock")]
+    public float HighAspectAngle = 85;
+    private float HighAspectPreventLockAngleDot;
     [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private ushort _AAMFire;
     public ushort AAMFire
     {
@@ -102,6 +107,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
+        HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
 
         //HUD
         if (HUDControl)
@@ -334,8 +340,10 @@ public class DFUNC_AAM : UdonSharpBehaviour
                             && NextTargetAngle < AAMLockAngle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
+                                        && (!HighAspectPreventLock || (NextTargetSAVControl && Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot))
                                         || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
-                                            || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
+                                            || !AAMTargets[AAMTarget].activeInHierarchy)//same as above but if the target is destroyed
+                                            )
                     {
                         //found new target
                         AAMCurrentTargetAngle = NextTargetAngle;
@@ -374,7 +382,10 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 && (AAMTargetObscuredDelay < .25f)
                     && AAMCurrentTargetDistance < AAMMaxTargetDistance
                         && AAMTargets[AAMTarget].activeInHierarchy
-                            && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
+                            && (!AAMCurrentTargetSAVControl ||
+                                (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead &&
+                                (!HighAspectPreventLock || (AAMCurrentTargetSAVControl && Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot))))
+                                )
             {
                 if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                 {
