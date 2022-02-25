@@ -83,7 +83,11 @@ public class DFUNC_AAM : UdonSharpBehaviour
     float TimeSinceSerialization;
     private bool func_active = false;
     private bool Pilot = false;
+    [Tooltip("Sound that plays when missile is selected, but has no target")]
+    public AudioSource AAMIdle;
+    [Tooltip("Sound that plays when missile is has a target but no lock")]
     public AudioSource AAMTargeting;
+    [Tooltip("Sound that plays when missile has a lock on a target")]
     public AudioSource AAMTargetLock;
     [System.NonSerializedAttribute] public bool IsOwner;
     [System.NonSerializedAttribute] public bool InEditor;
@@ -160,8 +164,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
         AAMHasTarget = false;
         AAMLocked = false;
         func_active = false;
-        AAMTargeting.gameObject.SetActive(false);
-        AAMTargetLock.gameObject.SetActive(false);
+        if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
+        if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
+        if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
         AAMTargetIndicator.localRotation = Quaternion.identity;
     }
     public void SFEXT_P_PassengerEnter()
@@ -210,8 +215,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void DFUNC_Deselected()
     {
         TriggerLastFrame = true;
-        AAMTargeting.gameObject.SetActive(false);
-        AAMTargetLock.gameObject.SetActive(false);
+        if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
+        if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
+        if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
         AAMLockTimer = 0;
         AAMHasTarget = false;
         AAMLocked = false;
@@ -260,20 +266,23 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
 
             //sound
-            if (AAMLockTimer > 0 && !AAMLocked)
+            if (!AAMLocked && AAMLockTimer > 0)
             {
-                AAMTargeting.gameObject.SetActive(true);
-                AAMTargetLock.gameObject.SetActive(false);
+                if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
+                if (AAMTargeting && NumAAM > 0) { AAMTargeting.gameObject.SetActive(true); }
+                if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
             }
             else if (AAMLocked)
             {
-                AAMTargeting.gameObject.SetActive(false);
-                AAMTargetLock.gameObject.SetActive(true);
+                if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
+                if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
+                if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(true); }
             }
             else
             {
-                AAMTargeting.gameObject.SetActive(false);
-                AAMTargetLock.gameObject.SetActive(false);
+                if (AAMIdle && NumAAM > 0) { AAMIdle.gameObject.SetActive(true); }
+                if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
+                if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
             }
             Hud();
         }
