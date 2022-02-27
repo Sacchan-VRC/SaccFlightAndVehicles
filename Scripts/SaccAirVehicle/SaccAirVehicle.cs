@@ -128,6 +128,16 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float HighPitchAoaMinControl = 0.2f;
     [Tooltip("See above")]
     public float HighYawAoaMinControl = 0.2f;
+    [Tooltip("Enable YawAoaRollForce and PitchAoaPitchForce forces used to make vehicle rotate when in a stall, Both curves must be initialized or script will crash.")]
+    public bool DoStallForces;
+    [Tooltip("Curve of strength of roll force incurred with Yaw AoA. Left side = 0 AoA, right side = 180 AoA. BOTH YawAoaRollForce AND PitchAoaPitchForce MUST HAVE MORE THAN 0 KEYFRAMES FOR EITHER TO WORK")]
+    public AnimationCurve YawAoaRollForce; /* = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1)); */ //initializing it doesn't work
+    [Tooltip("Strength of above force")]
+    public float YawAoaRollForceMulti = 0;
+    [Tooltip("Curve of strength of pitch force incurred with Pitch AoA. Left side = 0 AoA, right side = 180 AoA. BOTH YawAoaRollForce AND PitchAoaPitchForce MUST HAVE MORE THAN 0 KEYFRAMES FOR EITHER TO WORK")]
+    public AnimationCurve PitchAoaPitchForce; /* = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1)); */
+    [Tooltip("Strength of above force")]
+    public float PitchAoaPitchForceMulti = 0;
     [Tooltip("When the plane is is at a high angle of attack you can give it a minimum amount of lift/drag, so that it doesn't just lose all air resistance.")]
     public float HighPitchAoaMinLift = 0.2f;
     [Tooltip("See above")]
@@ -293,6 +303,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
     [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
+    [System.NonSerializedAttribute] public float AngleOfAttackPitch;
+    [System.NonSerializedAttribute] public float AngleOfAttackYaw;
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
     [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VTOLAngle;
@@ -539,6 +551,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
             RollConstantFriction *= RBMass;
             VelStraightenStrPitch *= RBMass;
             VelStraightenStrYaw *= RBMass;
+            YawAoaRollForceMulti *= RBMass;
+            PitchAoaPitchForceMulti *= RBMass;
             Lift *= RBMass;
             MaxLift *= RBMass;
             VelLiftMax *= RBMass;
@@ -874,6 +888,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
                         if (!_DisableTaxiRotation && Taxiing)
                         {
+                            AngleOfAttackYaw = 0;
+                            AngleOfAttackPitch = 0;
                             AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
                                               //rotate if trying to yaw
                             float TaxiingStillMulti = 1;
@@ -1150,11 +1166,18 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     //used to add rotation friction
                     Vector3 localAngularVelocity = transform.InverseTransformDirection(VehicleRigidbody.angularVelocity);
 
+                    float pitchaoapitchforce = 0;
+                    float yawaoarollforce = 0;
+                    if (DoStallForces)
+                    {
+                        pitchaoapitchforce = ((AngleOfAttackYaw > 0 ? -1 : 1) * PitchAoaPitchForce.Evaluate(Mathf.Abs(AngleOfAttackPitch)) * PitchAoaPitchForceMulti) * rotlift;
+                        yawaoarollforce = ((AngleOfAttackYaw > 0 ? -1 : 1) * YawAoaRollForce.Evaluate(Mathf.Abs(AngleOfAttackYaw)) * YawAoaRollForceMulti) * rotlift;
+                    }
 
                     //roll + rotational frictions
-                    Vector3 FinalInputRot = new Vector3(((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw) - (localAngularVelocity.x * PitchConstantFriction)) * Atmosphere,// X Pitch
+                    Vector3 FinalInputRot = new Vector3((((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw) - (localAngularVelocity.x * PitchConstantFriction)) + pitchaoapitchforce) * Atmosphere,// X Pitch
                         (((-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw) - (localAngularVelocity.y * YawConstantFriction)) * Atmosphere,// Y Yaw
-                            ((LerpedRoll + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVRoll) - (localAngularVelocity.z * RollConstantFriction)) * Atmosphere);// Z Roll
+                            ((LerpedRoll + yawaoarollforce + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVRoll) - (localAngularVelocity.z * RollConstantFriction)) * Atmosphere);// Z Roll
 
                     //create values for use in fixedupdate (control input and straightening forces)
                     Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
@@ -1241,6 +1264,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Fuel = FullFuel;
             AoALiftPitch = 0;
             AoALiftYaw = 0;
+            AngleOfAttackYaw = 0;
+            AngleOfAttackPitch = 0;
             AngleOfAttack = 0;
             VelLift = VelLiftStart;
             VTOLAngle90 = 0;
@@ -1874,9 +1899,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         AirVel = VehicleRigidbody.velocity - (FinalWind * StillWindMulti);
         AirSpeed = AirVel.magnitude;
         Vector3 VecForward = VehicleTransform.forward;
-        float AngleOfAttackPitch = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.right);
-        float AngleOfAttackYaw = Vector3.SignedAngle(VecForward, AirVel, VehicleTransform.up);
-
+        AngleOfAttackPitch = Vector3.SignedAngle(VecForward, Vector3.ProjectOnPlane(AirVel, VehicleTransform.right), VehicleTransform.right);
+        AngleOfAttackYaw = Vector3.SignedAngle(VecForward, Vector3.ProjectOnPlane(AirVel, VehicleTransform.up), VehicleTransform.up);
         //angle of attack stuff, pitch and yaw are calculated seperately
         //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
         //the linear version is used for high aoa, and is 0 when at 90 degrees, and 1(multiplied by HighAoaMinControl) at 0. When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
@@ -1889,6 +1913,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
 
         AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
+
         AoALiftYaw = -AoALiftYaw + 1;
         AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
 
