@@ -12,14 +12,19 @@ public class SAV_AAMController : UdonSharpBehaviour
     public float MaxLifetime = 12;
     [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
     public float ExplosionLifeTime = 10;
-    [Tooltip("Strength of the effect of countermeasures on the missile")]
+    [Tooltip("Strength of the effect of countermeasures on the missile (ignore 'Flare', it's the effect of whatever countermeasure type this missile is effected by")]
     public float FlareEffect = 10;
-    [Range(0, 90f)]
+    [Range(0, 180f)]
     [Tooltip("If the missile and target vehicle are facing towards each other, multiply rotation speed by HighAspectRotSpeedMulti with this nose angle (facing perfectly towards each other = 0 degrees, which is the same as disabled) Set 0 for any non-heatseeker missiles")]
     public float HighAspectTrackAngle = 60;
     [Tooltip("See above")]
     public float HighAspectRotSpeedMulti = .5f;
-    [Tooltip("Name of integer to +1 on the target plane while chasing it")]
+    [Range(0, 2)]
+    [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
+    public int MissileType = 1;
+    [Tooltip("Send the target plane's animator an integer +1 whilst this missile is flying towards it")]
+    public bool SendAnimInt = true;
+    [Tooltip("Name of animator integer to +1 on the target plane while chasing it")]
     public string AnimINTName = "missilesincoming";
     [Tooltip("Play a random one of these explosion sounds")]
     public AudioSource[] ExplosionSounds;
@@ -59,6 +64,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
     [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
     public bool ThrowSpaceVehicle = true;
+    private string[] MissileTypes = { "MissilesIncomingHeat", "MissilesIncomingRadar", "MissilesIncomingOther" };
+    private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };
     private SaccEntity EntityControl;
     private UdonSharpBehaviour TargetSAVControl;
     private Animator TargetAnimator;
@@ -149,14 +156,14 @@ public class SAV_AAMController : UdonSharpBehaviour
                 TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
                 if (TargetSAVControl)
                 {
-                    if ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger"))
+                    if (SendAnimInt && ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger")))
                     {
-                        TargetSAVControl.SetProgramVariable("MissilesIncomingHeat", (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat") + 1);
+                        TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) + 1);
+                        MissileIncoming = true;
                     }
                     TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
                     TargetAnimator = (Animator)TargetSAVControl.GetProgramVariable("VehicleAnimator");
                     TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
-                    MissileIncoming = true;
                     TargetABPoint = (float)TargetSAVControl.GetProgramVariable("ThrottleAfterburnerPoint");
                     TargetThrottleNormalizer = 1 / TargetABPoint;
                 }
@@ -204,7 +211,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                 MissileToTargetVector = (TargetPos - transform.position).normalized;
                 Dumb = //Missile just flies straight if it's confused by flares or notched
                        //flare effect
-                    Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable("NumActiveFlares") * FlareEffect//if there are flares active, there's a chance it will not track per frame.
+                    Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable(CMTypes[MissileType]) * FlareEffect//if there are flares active, there's a chance it will not track per frame.
                     ||
                     //notching
                     Vector3.Dot(Vector3.up, MissileToTargetVector) < NotchHorizonDot

@@ -10,6 +10,9 @@ public class DFUNC_Flares : UdonSharpBehaviour
 {
     public UdonSharpBehaviour SAVControl;
     public int NumFlares = 60;
+    [Range(0, 2)]
+    [Tooltip("0 = Chaff(Radar), 1 = Flare(Heat), 2 = Other. Controls what variable is added to in SaccAirVehicle to count active countermeasures, (NumActiveFlares MissilesIncomingHeat, NumActiveChaff MissilesIncomingRadar, NumActiveOtherCM MissilesIncomingOther)")]
+    public int FlareType = 1;
     public ParticleSystem[] FlareParticles;
     [Tooltip("How long a flare has an effect for")]
     public float FlareActiveTime = 4f;
@@ -19,6 +22,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public Text HUDText_flare_ammo;
     [Tooltip("Launch one particle system per click, cycling through, instead of all at once")]
     public bool SequentialLaunch = false;
+    private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };
     private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;
@@ -167,7 +171,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
                 { FlareParticles[x].Emit(1); }
             }
         }
-        SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") + 1);
+        SAVControl.SetProgramVariable(CMTypes[FlareType], (int)SAVControl.GetProgramVariable(CMTypes[FlareType]) + 1);
         SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
         EntityControl.SendEventToExtensions("SFEXT_G_LaunchFlare");
     }
@@ -203,6 +207,6 @@ public class DFUNC_Flares : UdonSharpBehaviour
     }
     public void RemoveFlare()
     {
-        { SAVControl.SetProgramVariable("NumActiveFlares", (int)SAVControl.GetProgramVariable("NumActiveFlares") - 1); }
+        { SAVControl.SetProgramVariable(CMTypes[FlareType], (int)SAVControl.GetProgramVariable(CMTypes[FlareType]) - 1); }
     }
 }

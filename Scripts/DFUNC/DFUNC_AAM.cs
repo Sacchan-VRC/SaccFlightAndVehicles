@@ -15,6 +15,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     public float AAMLockTime = 1.5f;
+    [Tooltip("Make enemy aircraft's animator set the 'targeted' trigger?")]
+    public bool SendLockWarning = true;
     [Tooltip("Minimum time between missile launches")]
     public float AAMLaunchDelay = 0;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
@@ -405,7 +407,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         if (AAMCurrentTargetSAVControl)
                         {
                             //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
-                            if (AAMTargetedTimer > 1)
+                            if (SendLockWarning && AAMTargetedTimer > 1)
                             {
                                 sendtargeted = !sendtargeted;
                                 RequestSerialization();
