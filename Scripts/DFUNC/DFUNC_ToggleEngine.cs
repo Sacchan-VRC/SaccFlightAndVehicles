@@ -26,6 +26,7 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
     private float ToggleTime;
+    private float TriggerTapTime;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -44,17 +45,29 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
         {
             if (!TriggerLastFrame)
             {
-                ToggleEngine();
+                bool engon = (bool)SAVControl.GetProgramVariable("_EngineOn");
+                if (engon)
+                {
+                    if (Time.time - TriggerTapTime < 0.4f)
+                    {//double tap
+                        ToggleEngine(engon);
+                    }
+                }
+                else
+                {
+                    ToggleEngine(engon);
+                }
+                TriggerTapTime = Time.time;
             }
             TriggerLastFrame = true;
         }
         else { TriggerLastFrame = false; }
     }
-    public void ToggleEngine()
+    public void ToggleEngine(bool EngOn)
     {
         if (Time.time - ToggleTime > ToggleMinDelay)
         {
-            if ((bool)SAVControl.GetProgramVariable("_EngineOn"))
+            if (EngOn)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EngineOff));
             }
@@ -175,6 +188,6 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     { NoFuel = false; }
     public void KeyboardInput()
     {
-        ToggleEngine();
+        ToggleEngine((bool)SAVControl.GetProgramVariable("_EngineOn"));
     }
 }
