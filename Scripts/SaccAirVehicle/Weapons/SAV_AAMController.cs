@@ -104,6 +104,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     private ConstantForce MissileConstant;
     private bool initialized;
     private int LifeTimeExplodesSent;
+    private GameObject PitBullIndicator;
     private Animator MissileAnimator;
     GameObject[] AAMTargets;
     void Initialize()
@@ -117,6 +118,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
         MissileType = (int)AAMLauncherControl.GetProgramVariable("MissileType");
+        PitBullIndicator = (GameObject)AAMLauncherControl.GetProgramVariable("PitBullIndicator");
 
         DoPitBull = PitBullDistance > 0f;
         NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
@@ -209,17 +211,28 @@ public class SAV_AAMController : UdonSharpBehaviour
             Vector3 Position = transform.position;
             Vector3 TargetPos = Target.position;
             float TargetDistance = Vector3.Distance(Position, TargetPos);
-            if (DoPitBull && !PitBull)
+            if (DoPitBull)
             {
-                if (TargetDistance < PitBullDistance)
-                { PitBull = true; }
-            }
-            /*             else
+                if (!PitBull)
+                {
+                    if (TargetDistance < PitBullDistance)
+                    {
+                        PitBull = true;
+                        if (PitBullIndicator)
                         {
-                            //TODO
-                            //Search through targets 1 per frame or slower and chase closest/lowest angle target instead
-                            //don't forget to send lock alarm to new target and cancel old one
-                        } */
+                            PitBullIndicator.SetActive(true);
+                            SendCustomEventDelayedSeconds(nameof(DisablePitBullIndicator), 1);
+                        }
+                    }
+                }
+                /*else
+                {
+                //TODO
+                //Search through targets 1 per frame or slower and chase closest/lowest angle target instead
+                //don't forget to send lock alarm to new target and cancel old one
+                 } */
+            }
+
             float EngineTrack;
             float AspectTrack;
             bool Dumb;
@@ -303,6 +316,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     }
     public void DisableLockHack()
     { LockHack = false; }
+    public void DisablePitBullIndicator()
+    { PitBullIndicator.SetActive(false); }
     public void LifeTimeExplode()
     {
         //prevent the delayed event from a previous life causing explosion

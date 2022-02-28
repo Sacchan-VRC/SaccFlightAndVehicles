@@ -10,6 +10,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
 {
     [SerializeField] public UdonSharpBehaviour SAVControl;
     public Animator AAMAnimator;
+    [Range(0, 2)]
+    [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
+    public int MissileType = 1;
     public int NumAAM = 6;
     [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
     public float AAMLockAngle = 15;
@@ -19,19 +22,18 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public float LockTimeABDivide = 2f;
     [Tooltip("Heatseekers only: If target's engine throttle is 0%, what is the minimum number to divide lock time by, to prevent infinite lock time. (AAMLockTime / value)")]
     public float LockTimeMinDivide = .2f;
-    [Range(0, 2)]
-    [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
-    public int MissileType = 1;
-    [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
-    public bool AllowNoAmmoLock = false;
-    [Tooltip("Make enemy aircraft's animator set the 'targeted' trigger?")]
-    public bool SendLockWarning = true;
     [Tooltip("Minimum time between missile launches")]
     public float AAMLaunchDelay = 0;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     public float FullReloadTimeSec = 10;
+    [Tooltip("Make enemy aircraft's animator set the 'targeted' trigger?")]
+    public bool SendLockWarning = true;
     [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
     public bool AllowFiringWhenGrounded = false;
+    [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
+    public bool AllowNoAmmoLock = false;
+    [Tooltip("GameObject that is enabled by the missile script for 1 second when the missile enters pitbull mode to let the pilot know he no longer has to track the target. Use if creating FOX-3 missiles.")]
+    public GameObject PitBullIndicator;
     [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
     public bool DoAnimBool = false;
     [Tooltip("Animator bool that is true when this function is selected")]
@@ -46,6 +48,15 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public bool HighAspectPreventLock;
     [Tooltip("Angle beyond which aspect is too high to lock")]
     public float HighAspectAngle = 85;
+    [Tooltip("Object that is cloned and fired at the enemy")]
+    public GameObject AAM;
+    public Transform AAMLaunchPoint;
+    [Tooltip("Sound that plays when missile is selected, but has no target")]
+    public AudioSource AAMIdle;
+    [Tooltip("Sound that plays when missile is has a target but no lock")]
+    public AudioSource AAMTargeting;
+    [Tooltip("Sound that plays when missile has a lock on a target")]
+    public AudioSource AAMTargetLock;
     private float HighAspectPreventLockAngleDot;
     [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private ushort _AAMFire;
     public ushort AAMFire
@@ -89,17 +100,9 @@ public class DFUNC_AAM : UdonSharpBehaviour
     private bool TriggerLastFrame;
     private float AAMLastFiredTime = -999;
     private float FullAAMsDivider;
-    public GameObject AAM;
-    public Transform AAMLaunchPoint;
     float TimeSinceSerialization;
     private bool func_active = false;
     private bool Pilot = false;
-    [Tooltip("Sound that plays when missile is selected, but has no target")]
-    public AudioSource AAMIdle;
-    [Tooltip("Sound that plays when missile is has a target but no lock")]
-    public AudioSource AAMTargeting;
-    [Tooltip("Sound that plays when missile has a lock on a target")]
-    public AudioSource AAMTargetLock;
     [System.NonSerializedAttribute] public bool IsOwner;
     [System.NonSerializedAttribute] public bool InEditor;
     private float reloadspeed;
@@ -388,13 +391,16 @@ public class DFUNC_AAM : UdonSharpBehaviour
                                             || !AAMTargets[AAMTarget].activeInHierarchy//switch target if current target is destroyed
                                             )
                     {
-                        //found new target
-                        AAMCurrentTargetAngle = NextTargetAngle;
-                        AAMTarget = AAMTargetChecker;
-                        AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                        AAMCurrentTargetSAVControl = NextTargetSAVControl;
-                        AAMLockTimer = 0;
-                        AAMTargetedTimer = .99f;//don't send targeted this frame incase new target is found next frame
+                        if (!TriggerLastFrame)
+                        {
+                            //found new target
+                            AAMCurrentTargetAngle = NextTargetAngle;
+                            AAMTarget = AAMTargetChecker;
+                            AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+                            AAMCurrentTargetSAVControl = NextTargetSAVControl;
+                            AAMLockTimer = 0;
+                            AAMTargetedTimer = .99f;//don't send targeted this frame incase new target is found next frame
+                        }
                     }
                 }
             }
@@ -477,7 +483,6 @@ public class DFUNC_AAM : UdonSharpBehaviour
                     } */
         }
     }
-
 
 
     //hud stuff

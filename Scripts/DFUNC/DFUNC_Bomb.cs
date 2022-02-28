@@ -210,7 +210,6 @@ public class DFUNC_Bomb : UdonSharpBehaviour
                 }
                 else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
                 {///launch every BombHoldDelay
-                    LastBombDropTime = Time.time;
                     BombFire++;
                     RequestSerialization();
                     if ((bool)SAVControl.GetProgramVariable("IsOwner"))
