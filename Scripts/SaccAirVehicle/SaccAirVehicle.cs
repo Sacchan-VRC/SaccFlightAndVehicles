@@ -702,7 +702,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
 
             //synced variables because rigidbody values aren't accessable by non-owner players
-            CurrentVel = VehicleRigidbody.velocity;
+            CurrentVel = VehicleRigidbody.velocity;//CurrentVel is set by SAV_SyncScript for non owners
             Speed = CurrentVel.magnitude;
             bool VehicleMoving = false;
             if (Speed > .1f)//don't bother doing all this for vehicles that arent moving and it therefore wont even effect

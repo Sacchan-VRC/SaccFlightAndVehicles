@@ -81,8 +81,10 @@ public class SAV_HUDController : UdonSharpBehaviour
         {
             Vector3 currentvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
             if (currentvel.magnitude < 2)
+            { currentvel = -Vector3.up * 2; }//straight down instead of spazzing out when moving very slow
+            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
             {
-                currentvel = -Vector3.up * 2;//straight down instead of spazzing out when moving very slow
+                VelocityIndicator.position = transform.position + currentvel;
             }
             else
             {
@@ -96,14 +98,6 @@ public class SAV_HUDController : UdonSharpBehaviour
                     Vel_UpdateTime = tim;
                 }
                 Vel_PredictedCurVel = currentvel + (Vel_NormalizedExtrapDir * (Time.time - Vel_UpdateTime));
-            }
-
-            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
-            {
-                VelocityIndicator.position = transform.position + currentvel;
-            }
-            else
-            {
                 Vel_Lerper = Vector3.Lerp(Vel_Lerper, Vel_PredictedCurVel, 9f * Time.smoothDeltaTime);
                 VelocityIndicator.position = transform.position + Vel_Lerper;
             }
