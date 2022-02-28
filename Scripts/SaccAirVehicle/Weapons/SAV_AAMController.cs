@@ -14,6 +14,10 @@ public class SAV_AAMController : UdonSharpBehaviour
     public float ExplosionLifeTime = 10;
     [Tooltip("Strength of the effect of countermeasures on the missile (ignore 'Flare', it's the effect of whatever countermeasure type this missile is effected by")]
     public float FlareEffect = 10;
+    [Tooltip("For simulating FOX-1/3 missiles")]
+    public bool RequireParentLock = false;
+    [Tooltip("For simulating FOX-3. Missile will not require parent vehicle lock after it is closer to target than this distance. Unlike a real FOX-3, it will only chase it's original target in pitbull mode. Meters, 0 for disabled")]
+    public float PitBullDistance = 0;
     [Range(0, 180f)]
     [Tooltip("If the missile and target vehicle are facing towards each other, multiply rotation speed by HighAspectRotSpeedMulti with this nose angle (facing perfectly towards each other = 0 degrees, which is the same as disabled) Set 0 for any non-heatseeker missiles")]
     public float HighAspectTrackAngle = 60;
@@ -42,6 +46,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     public float TargetMinThrottleTrack = .3f;
     [Tooltip("When passing target, if within this range, explode")]
     public float ProximityExplodeDistance = 20;
+    [Tooltip("How long after being unable to track the target this missile gives up completely and will never track again")]
+    public float UnlockTime = .1f;
     [Tooltip("Lockhack stops the missile from being able to lose lock before a certain amount of time has passed after it starts tracking for people who didn't fire it. It ensures the missile tracks its target in cases where the firer's position is desynced badly. Very necessary when using VRC_ObjectSync.")]
     public float LockHackTime = .1f;
     [Tooltip("How long after launch the missile should start tracking")]
@@ -69,6 +75,8 @@ public class SAV_AAMController : UdonSharpBehaviour
     private Animator TargetAnimator;
     SaccEntity TargetEntityControl;
     private bool LockHack = true;
+    private bool PitBull = false;
+    private bool DoPitBull = false;
     private Transform Target;
     private bool ColliderActive = false;
     [System.NonSerializedAttribute] public bool Exploding = false;
@@ -77,7 +85,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     private Rigidbody MissileRigid;
     private float TargDistlastframe = 999999999;
     private bool TargetLost = false;
-    private float UnlockTime;
+    private float UnlockTimer;
     private float TargetABPoint;
     private float TargetThrottleNormalizer;
     Vector3 TargetPosLastFrame;
@@ -97,6 +105,7 @@ public class SAV_AAMController : UdonSharpBehaviour
     private bool initialized;
     private int LifeTimeExplodesSent;
     private Animator MissileAnimator;
+    GameObject[] AAMTargets;
     void Initialize()
     {
         EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
@@ -109,10 +118,10 @@ public class SAV_AAMController : UdonSharpBehaviour
         AAMCollider = GetComponent<CapsuleCollider>();
         MissileType = (int)AAMLauncherControl.GetProgramVariable("MissileType");
 
+        DoPitBull = PitBullDistance > 0f;
         NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
         NotchLimitDot = 1 - Mathf.Cos(NotchAngle * Mathf.Deg2Rad);
         HighAspectTrack = Mathf.Cos(HighAspectTrackAngle * Mathf.Deg2Rad);
-
     }
     public void StartTracking()
     {
@@ -129,7 +138,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         else
         { IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner"); }
         int aamtarg = (int)AAMLauncherControl.GetProgramVariable("AAMTarget");
-        GameObject[] AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
+        AAMTargets = (GameObject[])AAMLauncherControl.GetProgramVariable("AAMTargets");
         Target = AAMTargets[aamtarg].transform;
         SendCustomEventDelayedFrames(nameof(ThrowMissile), 1);//doesn't work if done this frame
 
@@ -140,7 +149,8 @@ public class SAV_AAMController : UdonSharpBehaviour
         LockHack = true;
         TargetLost = false;
         MissileIncoming = false;
-        UnlockTime = 0;
+        PitBull = false;
+        UnlockTimer = 0;
         if (!Target)
         {
             TargetLost = true;
@@ -162,7 +172,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                     }
                     TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
                     TargetAnimator = (Animator)TargetSAVControl.GetProgramVariable("VehicleAnimator");
-                    TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
+                    TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
                     TargetABPoint = (float)TargetSAVControl.GetProgramVariable("ThrottleAfterburnerPoint");
                     TargetThrottleNormalizer = 1 / TargetABPoint;
                 }
@@ -199,6 +209,17 @@ public class SAV_AAMController : UdonSharpBehaviour
             Vector3 Position = transform.position;
             Vector3 TargetPos = Target.position;
             float TargetDistance = Vector3.Distance(Position, TargetPos);
+            if (DoPitBull && !PitBull)
+            {
+                if (TargetDistance < PitBullDistance)
+                { PitBull = true; }
+            }
+            /*             else
+                        {
+                            //TODO
+                            //Search through targets 1 per frame or slower and chase closest/lowest angle target instead
+                            //don't forget to send lock alarm to new target and cancel old one
+                        } */
             float EngineTrack;
             float AspectTrack;
             bool Dumb;
@@ -213,9 +234,13 @@ public class SAV_AAMController : UdonSharpBehaviour
                     Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable(CMTypes[MissileType]) * FlareEffect//if there are flares active, there's a chance it will not track per frame.
                     ||
                     //notching
-                    Vector3.Dot(Vector3.up, MissileToTargetVector) < NotchHorizonDot
-                    && Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, MissileToTargetVector)) < NotchLimitDot;//if the target is traveling perpendicular to the direction the missile is looking at it from, it is 'notching' the missile
-
+                    //if the target is traveling perpendicular to the direction the missile is looking at it from, it is 'notching' the missile
+                    (Vector3.Dot(Vector3.up, MissileToTargetVector) < NotchHorizonDot
+                    && Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, MissileToTargetVector)) < NotchLimitDot)
+                    ||
+                    //FOX-1
+                    ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")] || !AAMLauncherControl.gameObject.activeSelf))
+                    ;
                 AspectTrack = Vector3.Dot(MissileToTargetVector, -TargetEntityControl.transform.forward) > HighAspectTrack ? HighAspectRotSpeedMulti : 1;
                 EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle
             }
@@ -223,10 +248,11 @@ public class SAV_AAMController : UdonSharpBehaviour
             {
                 EngineTrack = 1;
                 AspectTrack = 1;
-                Dumb = false;
+                Dumb = //FOX-1
+                    ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")] || !AAMLauncherControl.gameObject.activeSelf));
             }
             if (EngineTrack > 1) { EngineTrack = AfterBurnerTrackMulti; }//if AB on, faster rotation
-            if (Target.gameObject.activeInHierarchy && UnlockTime < .1f)
+            if (Target.gameObject.activeInHierarchy && UnlockTimer < UnlockTime)
             {
                 if (!Dumb && Vector3.Dot(MissileToTargetVector, MissileRigid.velocity) > 0 || LockHack)
                 {
@@ -237,7 +263,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                         MissileToTargetVector = TargetPredictedPos - Position;
                     }
                     //else using the already set targdirection
-                    UnlockTime = 0;
+                    UnlockTimer = 0;
                     //turn towards the target
                     Vector3 TargetDirNormalized = MissileToTargetVector.normalized * TargetVectorExtension;
                     Vector3 MissileVelNormalized = MissileRigid.velocity.normalized;
@@ -255,7 +281,7 @@ public class SAV_AAMController : UdonSharpBehaviour
                         hitwater = false;
                         Explode();
                     }
-                    UnlockTime += DeltaTime;
+                    UnlockTimer += DeltaTime;
                 }
             }
             else
@@ -266,8 +292,8 @@ public class SAV_AAMController : UdonSharpBehaviour
                     //just flew past the target, stop missile warning sound
                     if ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger"))
                     {
-                        TargetSAVControl.SetProgramVariable("MissilesIncomingHeat", (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat") - 1);
-                        TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
+                        TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) - 1);
+                        TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
                     }
                     MissileIncoming = false;
                 }
@@ -361,9 +387,9 @@ public class SAV_AAMController : UdonSharpBehaviour
         {
             if ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger"))
             {
-                TargetSAVControl.SetProgramVariable("MissilesIncomingHeat", (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat") - 1);
+                TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) - 1);
             }
-            TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable("MissilesIncomingHeat"));
+            TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
             MissileIncoming = false;
         }
 

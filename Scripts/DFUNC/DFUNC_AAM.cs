@@ -22,6 +22,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [Range(0, 2)]
     [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
     public int MissileType = 1;
+    [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
+    public bool AllowNoAmmoLock = false;
     [Tooltip("Make enemy aircraft's animator set the 'targeted' trigger?")]
     public bool SendLockWarning = true;
     [Tooltip("Minimum time between missile launches")]
@@ -182,6 +184,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
         if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
         if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
+        AAMTargetIndicator.gameObject.SetActive(false);
         AAMTargetIndicator.localRotation = Quaternion.identity;
     }
     public void SFEXT_P_PassengerEnter()
@@ -280,11 +283,11 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 {
                     if (!TriggerLastFrame)
                     {
-                        if (AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
+                        if (NumAAM > 0 && AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                         {
                             AAMFire++;//launch AAM using set
                             RequestSerialization();
-                            if (NumAAM == 0) { AAMLockTimer = 0; AAMLocked = false; }
+                            if (NumAAM == 0 && !AllowNoAmmoLock) { AAMLockTimer = 0; AAMLocked = false; }
                             EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
                         }
                     }
@@ -298,7 +301,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             if (!AAMLocked && AAMLockTimer > 0)
             {
                 if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
-                if (AAMTargeting && NumAAM > 0) { AAMTargeting.gameObject.SetActive(true); }
+                if (AAMTargeting && (NumAAM > 0 || AllowNoAmmoLock)) { AAMTargeting.gameObject.SetActive(true); }
                 if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
             }
             else if (AAMLocked)
@@ -309,7 +312,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             }
             else
             {
-                if (AAMIdle && NumAAM > 0) { AAMIdle.gameObject.SetActive(true); }
+                if (AAMIdle && (NumAAM > 0 || AllowNoAmmoLock)) { AAMIdle.gameObject.SetActive(true); }
                 if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
                 if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
             }
@@ -432,7 +435,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                 {
                     AAMHasTarget = true;
-                    if (AAMCurrentTargetAngle < AAMLockAngle && NumAAM > 0)
+                    if (AAMCurrentTargetAngle < AAMLockAngle && (NumAAM > 0 || AllowNoAmmoLock))
                     {
                         AAMLockTimer += DeltaTime;
                         if (AAMCurrentTargetSAVControl)
