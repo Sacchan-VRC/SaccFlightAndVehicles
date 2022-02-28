@@ -19,9 +19,6 @@ public class SAV_AAMController : UdonSharpBehaviour
     public float HighAspectTrackAngle = 60;
     [Tooltip("See above")]
     public float HighAspectRotSpeedMulti = .5f;
-    [Range(0, 2)]
-    [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
-    public int MissileType = 1;
     [Tooltip("Send the target plane's animator an integer +1 whilst this missile is flying towards it")]
     public bool SendAnimInt = true;
     [Tooltip("Name of animator integer to +1 on the target plane while chasing it")]
@@ -64,9 +61,10 @@ public class SAV_AAMController : UdonSharpBehaviour
     public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
     [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
     public bool ThrowSpaceVehicle = true;
-    private string[] MissileTypes = { "MissilesIncomingHeat", "MissilesIncomingRadar", "MissilesIncomingOther" };
-    private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };
+    private string[] MissileTypes = { "MissilesIncomingHeat", "MissilesIncomingRadar", "MissilesIncomingOther" };//names of variables in SaccAirVehicle
+    private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
     private SaccEntity EntityControl;
+    private int MissileType = 1;
     private UdonSharpBehaviour TargetSAVControl;
     private Animator TargetAnimator;
     SaccEntity TargetEntityControl;
@@ -109,6 +107,7 @@ public class SAV_AAMController : UdonSharpBehaviour
         MissileConstant = GetComponent<ConstantForce>();
         MissileRigid = GetComponent<Rigidbody>();
         AAMCollider = GetComponent<CapsuleCollider>();
+        MissileType = (int)AAMLauncherControl.GetProgramVariable("MissileType");
 
         NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
         NotchLimitDot = 1 - Mathf.Cos(NotchAngle * Mathf.Deg2Rad);

@@ -15,6 +15,13 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     public float AAMLockTime = 1.5f;
+    [Tooltip("Heatseekers only: How much faster is locking if the target has afterburner on? (AAMLockTime / value)")]
+    public float LockTimeABDivide = 2f;
+    [Tooltip("Heatseekers only: If target's engine throttle is 0%, what is the minimum number to divide lock time by, to prevent infinite lock time. (AAMLockTime / value)")]
+    public float LockTimeMinDivide = .2f;
+    [Range(0, 2)]
+    [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
+    public int MissileType = 1;
     [Tooltip("Make enemy aircraft's animator set the 'targeted' trigger?")]
     public bool SendLockWarning = true;
     [Tooltip("Minimum time between missile launches")]
@@ -114,6 +121,12 @@ public class DFUNC_AAM : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
         HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
+
+        if (LockTimeABDivide <= 0)
+        { LockTimeABDivide = 0.0001f; }
+        if (LockTimeMinDivide <= 0)
+        { LockTimeMinDivide = 0.0001f; }
+
 
         //HUD
         if (HUDControl)
@@ -244,9 +257,23 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
             if (NumAAMTargets != 0)
             {
-
-                if (AAMLockTimer > AAMLockTime && AAMHasTarget) { AAMLocked = true; }
-                else { AAMLocked = false; }
+                if (MissileType == 0)//heatseekers check engine output of target
+                {
+                    if (AAMCurrentTargetSAVControl ?//if target is SaccAirVehicle, adjust lock time based on throttle status 
+                    AAMLockTimer > AAMLockTime /
+                    (AAMCurrentTargetSAVControl.AfterburnerOn ?
+                                LockTimeABDivide
+                                :
+                                Mathf.Clamp(AAMCurrentTargetSAVControl.EngineOutput / AAMCurrentTargetSAVControl.ThrottleAfterburnerPoint, LockTimeMinDivide, 1))
+                    : AAMLockTimer > AAMLockTime && AAMHasTarget)//target is not a SaccAirVehicle
+                    { AAMLocked = true; }
+                    else { AAMLocked = false; }
+                }
+                else
+                {
+                    if (AAMLockTimer > AAMLockTime && AAMHasTarget) { AAMLocked = true; }
+                    else { AAMLocked = false; }
+                }
 
                 //firing AAM
                 if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
@@ -352,8 +379,10 @@ public class DFUNC_AAM : UdonSharpBehaviour
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
                                         && (!HighAspectPreventLock || (NextTargetSAVControl && Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot))
-                                        || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
-                                            || !AAMTargets[AAMTarget].activeInHierarchy)//same as above but if the target is destroyed
+                                        || (AAMCurrentTargetSAVControl &&//null check
+                                                                    (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
+                                                                    (MissileType == 0 && !AAMCurrentTargetSAVControl.EngineOn)))//switch target if heatseeker and current target's engine is off
+                                            || !AAMTargets[AAMTarget].activeInHierarchy//switch target if current target is destroyed
                                             )
                     {
                         //found new target
@@ -395,8 +424,10 @@ public class DFUNC_AAM : UdonSharpBehaviour
                         && AAMTargets[AAMTarget].activeInHierarchy
                             && (!AAMCurrentTargetSAVControl ||
                                 (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead &&
-                                (!HighAspectPreventLock || (AAMCurrentTargetSAVControl && Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot))))
-                                )
+                                    (MissileType != 0 || AAMCurrentTargetSAVControl.EngineOn)))//heatseekers cant lock if engine off
+                                &&
+                                    (!HighAspectPreventLock || (AAMCurrentTargetSAVControl && Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot))
+                                    )
             {
                 if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                 {

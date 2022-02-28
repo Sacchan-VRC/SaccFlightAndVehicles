@@ -11,7 +11,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public UdonSharpBehaviour SAVControl;
     public int NumFlares = 60;
     [Range(0, 2)]
-    [Tooltip("0 = Chaff(Radar), 1 = Flare(Heat), 2 = Other. Controls what variable is added to in SaccAirVehicle to count active countermeasures, (NumActiveFlares MissilesIncomingHeat, NumActiveChaff MissilesIncomingRadar, NumActiveOtherCM MissilesIncomingOther)")]
+    [Tooltip("1 = Flare(Heat), 1 = Chaff(Radar), 2 = Other. Controls what variable is added to in SaccAirVehicle to count active countermeasures, (NumActiveFlares MissilesIncomingHeat, NumActiveChaff MissilesIncomingRadar, NumActiveOtherCM MissilesIncomingOther)")]
     public int FlareType = 1;
     public ParticleSystem[] FlareParticles;
     [Tooltip("How long a flare has an effect for")]
@@ -22,7 +22,7 @@ public class DFUNC_Flares : UdonSharpBehaviour
     public Text HUDText_flare_ammo;
     [Tooltip("Launch one particle system per click, cycling through, instead of all at once")]
     public bool SequentialLaunch = false;
-    private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };
+    private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
     private bool UseLeftTrigger = false;
     private int FullFlares;
     private float reloadspeed;
