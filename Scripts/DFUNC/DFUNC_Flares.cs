@@ -203,7 +203,10 @@ public class DFUNC_Flares : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        Send_LaunchFlare();
+        if (NumFlares > 0)
+        {
+            Send_LaunchFlare();
+        }
     }
     public void RemoveFlare()
     {
