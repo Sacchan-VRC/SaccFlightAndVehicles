@@ -65,7 +65,13 @@ public class SAV_KeyboardControls : UdonSharpBehaviour
             float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
             if (pgup + pgdn != 0)
             {
-                SAVControl.SetProgramVariable("VTOLAngleInput", Mathf.Clamp((float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime)), 0, 1));
+                float NewVTOL = (float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime));
+
+                if (NewVTOL > 0)
+                { NewVTOL = NewVTOL - Mathf.Floor(NewVTOL); }
+                else
+                { NewVTOL = 1 - (Mathf.Abs(NewVTOL) - Mathf.Ceil(NewVTOL)); }
+                SAVControl.SetProgramVariable("VTOLAngleInput", NewVTOL);
             }
         }
 

@@ -57,7 +57,12 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
                 VTOLTemp = (float)SAVControl.GetProgramVariable("VTOLAngle");
             }
             float VTOLAngleDifference = (VTOLZeroPoint - handpos.z) * -ThrottleSensitivity;
-            SAVControl.SetProgramVariable("VTOLAngleInput", Mathf.Clamp(VTOLTemp + VTOLAngleDifference, 0, 1));
+            VTOLTemp += VTOLAngleDifference;
+            if (VTOLTemp > 0)
+            { VTOLTemp = VTOLTemp - Mathf.Floor(VTOLTemp); }
+            else
+            { VTOLTemp = 1 - (Mathf.Abs(VTOLTemp) - Mathf.Ceil(VTOLTemp)); }
+            SAVControl.SetProgramVariable("VTOLAngleInput", VTOLTemp);
 
             TriggerLastFrame = true;
         }
