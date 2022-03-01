@@ -375,6 +375,15 @@ public class SaccEntity : UdonSharpBehaviour
             { if (!InEditor) ExitStation(); }
         }
     }
+    private void OnEnable()
+    {
+        ConstantForce cf = GetComponent<ConstantForce>();
+        if (cf)
+        {
+            cf.relativeForce = Vector3.zero;
+            cf.relativeTorque = Vector3.zero;
+        }
+    }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
         if (player.isLocal)

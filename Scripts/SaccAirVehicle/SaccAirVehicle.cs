@@ -1315,6 +1315,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 VehicleRigidbody.drag = 0;
                 VehicleRigidbody.angularDrag = 0;
             }
+            VehicleConstantForce.relativeForce = Vector3.zero;
+            VehicleConstantForce.relativeTorque = Vector3.zero;
         }
     }
     public void NotDead()
@@ -1617,6 +1619,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         if (NoFuelLastFrame)
         { SendNotNoFuel(); }
         EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
+        VehicleConstantForce.relativeForce = Vector3.zero;
+        VehicleConstantForce.relativeTorque = Vector3.zero;
     }
     public void SFEXT_L_BulletHit()
     {
