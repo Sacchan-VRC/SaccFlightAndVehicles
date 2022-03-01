@@ -43,6 +43,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float ThrottleSensitivity = 6f;
     [Tooltip("How many degrees to turn the wheel until it reaches max turning, in each direction")]
     public float SteeringWheelDegrees = 360f;
+    [Tooltip("How far down you have to push the grip button to grab the joystick and throttle")]
+    public float GripSensitivity = .75f;
     [Tooltip("How long keyboard turning must be held down to reach full deflection")]
     public float SteeringKeyboardSecsToMax = 1.5f;
     [Tooltip("how fast steering wheel returns to neutral position 1 = 1 second, .2 = 5 seconds")]
@@ -510,7 +512,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         JoyStickGrip = RGrip;
                     }
                     //VR Joystick
-                    if (JoyStickGrip > 0.75)
+                    if (JoyStickGrip > GripSensitivity)
                     {
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                         VehicleRotLastFrame = ControlsRoot.rotation;
@@ -564,7 +566,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         else
                         { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
                         //VR Throttle
-                        if (ThrottleGrip > 0.75)
+                        if (ThrottleGrip > GripSensitivity)
                         {
                             Vector3 handdistance;
                             if (SwitchHandsJoyThrottle)
