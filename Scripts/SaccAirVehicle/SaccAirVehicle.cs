@@ -217,6 +217,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float LowFuel = 125;
     [Tooltip("Fuel consumed per second at max throttle, scales with throttle")]
     public float FuelConsumption = 1;
+    [Tooltip("Fuel consumed per second at max throttle, scales with throttle")]
+    public float MinFuelConsumption = .25f;
     [Tooltip("Multiply FuelConsumption by this number when at full afterburner Scales with afterburner level")]
     public float FuelConsumptionABMulti = 3f;
     [Tooltip("Number of resupply ticks it takes to refuel fully from zero")]
@@ -315,7 +317,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Transform VehicleTransform;
     [System.NonSerializedAttribute] public float VTOLAngleForward90;//dot converted to angle, 0=0 90=1 max 1, for adjusting values that change with engine angle
     [System.NonSerializedAttribute] public float VTOLAngleForwardDot;
-    [System.NonSerializedAttribute] public bool VTOLAngleForward;
+    [System.NonSerializedAttribute] public bool VTOLAngleForward = true;
     private VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
     private GameObject VehicleGameObj;
     [System.NonSerializedAttribute] public Transform CenterOfMass;
@@ -808,135 +810,125 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         JoystickGripLastFrame = false;
                     }
 
-                    if (_EngineOn)
+                    if (HasAfterburner && !AfterburnerOn)
                     {
-                        if (HasAfterburner)
+                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint); }
+                    }
+                    else
+                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
+                    //VR Throttle
+                    if (ThrottleGrip > GripSensitivity)
+                    {
+                        Vector3 handdistance;
+                        if (SwitchHandsJoyThrottle)
                         {
-                            if (AfterburnerOn)
-                            { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
-                            else
-                            { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint); }
+                            handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
                         }
                         else
-                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
-                        //VR Throttle
-                        if (ThrottleGrip > GripSensitivity)
                         {
-                            Vector3 handdistance;
+                            handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                        }
+                        handdistance = ControlsRoot.InverseTransformDirection(handdistance);
+
+                        float HandThrottleAxis;
+                        if (VerticalThrottle)
+                        {
+                            HandThrottleAxis = handdistance.y;
+                        }
+                        else
+                        {
+                            HandThrottleAxis = handdistance.z;
+                        }
+
+                        if (!ThrottleGripLastFrame)
+                        {
                             if (SwitchHandsJoyThrottle)
-                            {
-                                handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position;
-                            }
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
                             else
-                            {
-                                handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                            }
-                            handdistance = ControlsRoot.InverseTransformDirection(handdistance);
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                            EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
+                            ThrottleZeroPoint = HandThrottleAxis;
+                            TempThrottle = PlayerThrottle;
+                            HandDistanceZLastFrame = 0;
+                        }
+                        float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
+                        ThrottleDifference *= ThrottleSensitivity;
+                        bool VTOLandAB_Disallowed = (!VTOLAllowAfterburner && VTOLAngle != 0);/*don't allow VTOL AB disabled vehicles, false if attemping to*/
 
-                            float HandThrottleAxis;
-                            if (VerticalThrottle)
-                            {
-                                HandThrottleAxis = handdistance.y;
-                            }
-                            else
-                            {
-                                HandThrottleAxis = handdistance.z;
-                            }
-
-                            if (!ThrottleGripLastFrame)
-                            {
-                                if (SwitchHandsJoyThrottle)
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
-                                else
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
-                                EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
-                                ThrottleZeroPoint = HandThrottleAxis;
-                                TempThrottle = PlayerThrottle;
-                                HandDistanceZLastFrame = 0;
-                            }
-                            float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
-                            ThrottleDifference *= ThrottleSensitivity;
-                            bool VTOLandAB_Disallowed = (!VTOLAllowAfterburner && VTOLAngle != 0);/*don't allow VTOL AB disabled vehicles, false if attemping to*/
-
-                            //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
-                            if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !VTOLandAB_Disallowed && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/&& !VTOLandAB_Disallowed) || !HasAfterburner))
-                            {
-                                PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
-                            }
-                            else
-                            {
-                                PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
-                            }
-                            HandDistanceZLastFrame = HandThrottleAxis;
-                            ThrottleGripLastFrame = true;
+                        //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
+                        if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !VTOLandAB_Disallowed && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/&& !VTOLandAB_Disallowed) || !HasAfterburner))
+                        {
+                            PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
                         }
                         else
                         {
-                            if (ThrottleGripLastFrame)
-                            {
-                                EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
-                                if (SwitchHandsJoyThrottle)
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
-                                else
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
-                            }
-                            ThrottleGripLastFrame = false;
+                            PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
                         }
-
-                        if (!_DisableTaxiRotation && Taxiing)
-                        {
-                            AngleOfAttackYaw = 0;
-                            AngleOfAttackPitch = 0;
-                            AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
-                                              //rotate if trying to yaw
-                            float TaxiingStillMulti = 1;
-                            if (DisallowTaxiRotationWhileStill)
-                            { TaxiingStillMulti = Mathf.Min(Speed * TaxiFullTurningSpeedDivider, 1); }
-                            Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
-                            VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
-
-                            StillWindMulti = Mathf.Min(Speed * .1f, 1);
-                            ThrustVecGrounded = 0;
-                        }
-                        else
-                        {
-                            StillWindMulti = 1;
-                            ThrustVecGrounded = 1;
-                            Taxiinglerper = 0;
-                        }
-                        //keyboard control for afterburner
-                        if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner && (VTOLAngle == 0 || VTOLAllowAfterburner))
-                        {
-                            if (AfterburnerOn)
-                                PlayerThrottle = ThrottleAfterburnerPoint;
-                            else
-                                PlayerThrottle = 1;
-                        }
-                        if (_ThrottleOverridden && !ThrottleGripLastFrame)
-                        {
-                            ThrottleInput = PlayerThrottle = ThrottleOverride;
-                        }
-                        else//if cruise control disabled, use inputs
-                        {
-                            if (!InVR)
-                            {
-                                float LTrigger = 0;
-                                float RTrigger = 0;
-                                if (!InEditor)
-                                {
-                                    LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                                    RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
-                                }
-                                if (LTrigger > .05f)//axis throttle input for people who wish to use it //.05 deadzone so it doesn't take effect for keyboard users with something plugged in
-                                { ThrottleInput = LTrigger; }
-                                else { ThrottleInput = PlayerThrottle; }
-                            }
-                            else { ThrottleInput = PlayerThrottle; }
-                        }
+                        HandDistanceZLastFrame = HandThrottleAxis;
+                        ThrottleGripLastFrame = true;
                     }
                     else
                     {
-                        ThrottleInput = PlayerThrottle = 0;
+                        if (ThrottleGripLastFrame)
+                        {
+                            EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                            if (SwitchHandsJoyThrottle)
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                            else
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                        }
+                        ThrottleGripLastFrame = false;
+                    }
+
+                    if (!_DisableTaxiRotation && Taxiing && _EngineOn)
+                    {
+                        AngleOfAttackYaw = 0;
+                        AngleOfAttackPitch = 0;
+                        AngleOfAttack = 0;//prevent stall sound and aoavapor when on ground
+                                          //rotate if trying to yaw
+                        float TaxiingStillMulti = 1;
+                        if (DisallowTaxiRotationWhileStill)
+                        { TaxiingStillMulti = Mathf.Min(Speed * TaxiFullTurningSpeedDivider, 1); }
+                        Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
+                        VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
+
+                        StillWindMulti = Mathf.Min(Speed * .1f, 1);
+                        ThrustVecGrounded = 0;
+                    }
+                    else
+                    {
+                        StillWindMulti = 1;
+                        ThrustVecGrounded = 1;
+                        Taxiinglerper = 0;
+                    }
+                    //keyboard control for afterburner
+                    if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner && (VTOLAngle == 0 || VTOLAllowAfterburner))
+                    {
+                        if (AfterburnerOn)
+                            PlayerThrottle = ThrottleAfterburnerPoint;
+                        else
+                            PlayerThrottle = 1;
+                    }
+                    if (_ThrottleOverridden && !ThrottleGripLastFrame)
+                    {
+                        ThrottleInput = PlayerThrottle = ThrottleOverride;
+                    }
+                    else//if cruise control disabled, use inputs
+                    {
+                        if (!InVR)
+                        {
+                            float LTrigger = 0;
+                            float RTrigger = 0;
+                            if (!InEditor)
+                            {
+                                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                            }
+                            if (LTrigger > .05f)//axis throttle input for people who wish to use it //.05 deadzone so it doesn't take effect for keyboard users with something plugged in
+                            { ThrottleInput = LTrigger; }
+                            else { ThrottleInput = PlayerThrottle; }
+                        }
+                        else { ThrottleInput = PlayerThrottle; }
                     }
                     FuelEvents();
 
@@ -997,7 +989,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     SetRotInputs();
 
                     //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
-                    if (!_DisableStickyWheelWorkaround && HasWheelColliders && Speed < .2 && ThrottleInput > 0)
+                    if (!_DisableStickyWheelWorkaround && _EngineOn && HasWheelColliders && Speed < .2 && ThrottleInput > 0)
                     {
                         if (VTOLAngleForward)
                         { VehicleRigidbody.velocity = VehicleTransform.forward * .25f; }
@@ -1057,11 +1049,17 @@ public class SaccAirVehicle : UdonSharpBehaviour
             if (!_DisablePhysicsAndInputs)
             {
                 //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
-                if (EngineOutput < ThrottleInput)
-                { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * DeltaTime); }
+                if (_EngineOn)
+                {
+                    if (EngineOutput < ThrottleInput)
+                    { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * DeltaTime); }
+                    else
+                    { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); }
+                }
                 else
-                { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); }
-
+                {
+                    EngineOutput = Mathf.Lerp(EngineOutput, 0, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime);
+                }
                 float sidespeed = 0;
                 float downspeed = 0;
                 float SpeedLiftFactor = 0;
@@ -1358,23 +1356,23 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     public void FuelEvents()
     {
-        Vector2 Throttles = UnpackThrottles(ThrottleInput);
-        if (EngineOn)
+        if (_EngineOn)
         {
+            Vector2 Throttles = UnpackThrottles(ThrottleInput);
             Fuel = Mathf.Max(Fuel -
-                  ((Mathf.Max(Throttles.x, 0.25f) * FuelConsumption)
-                      + (Throttles.y * FuelConsumptionAB)) * Time.deltaTime, 0);
-
-            if (HasAfterburner)
+                    ((Mathf.Max(Throttles.x, MinFuelConsumption) * FuelConsumption)
+                        + (Throttles.y * FuelConsumptionAB))
+                            * Time.deltaTime, 0);
+        }
+        if (HasAfterburner)
+        {
+            if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
             {
-                if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
-                }
-                else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
-                }
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
+            }
+            else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
             }
         }
         if (Fuel < LowFuel)
@@ -1512,15 +1510,21 @@ public class SaccAirVehicle : UdonSharpBehaviour
             EntityControl.SendEventToExtensions("SFEXT_G_AfterburnerOff");
         }
     }
-    private void ToggleAfterburner()
+    //for use by Extensions
+    public void ToggleAfterburner()
     {
-        if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint && Fuel > LowFuel)
+        if (HasAfterburner && _EngineOn)
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
-        }
-        else if (AfterburnerOn)
-        {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
+            if (AfterburnerOn)
+            {
+                ThrottleInput = PlayerThrottle = ThrottleAfterburnerPoint;
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
+            }
+            else
+            {
+                ThrottleInput = PlayerThrottle = 1;
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
+            }
         }
     }
     public void SendLowFuel()

@@ -862,15 +862,18 @@ public class SAV_SoundController : UdonSharpBehaviour
     }
     public void SFEXT_G_AfterburnerOn()
     {
-        if (InVehicle && AllDoorsClosed)
+        if (EngineOn)
         {
-            if (ABOnInside)
-                ABOnInside.Play();
-        }
-        else
-        {
-            if (ABOnOutside)
-                ABOnOutside.Play();
+            if (InVehicle && AllDoorsClosed)
+            {
+                if (ABOnInside)
+                    ABOnInside.Play();
+            }
+            else
+            {
+                if (ABOnOutside)
+                    ABOnOutside.Play();
+            }
         }
     }
 }
