@@ -23,6 +23,8 @@ public class SaccAAGunController : UdonSharpBehaviour
     public Transform JoyStick;
     [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
     public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
+    [Tooltip("Joystick controlled by left hand?")]
+    public bool SwitchHandsJoyThrottle = false;
     [Tooltip("When destroyed, will reappear after this many seconds")]
     public float RespawnDelay = 20;
     [Tooltip("Vehicle is un-destroyable for this long after spawning")]
@@ -100,7 +102,7 @@ public class SaccAAGunController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool InVR;
     Quaternion AAGunRotLastFrame;
     Quaternion JoystickZeroPoint;
-    [System.NonSerializedAttribute] public bool RGripLastFrame = false;
+    [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
     private float FullAAMsDivider;
     private float FullHealthDivider;
     private bool LTriggerLastFrame;
@@ -235,12 +237,16 @@ public class SaccAAGunController : UdonSharpBehaviour
                     {
                         Quaternion RotDif = Rotator.rotation * Quaternion.Inverse(AAGunRotLastFrame);//difference in vehicle's rotation since last frame
                         JoystickZeroPoint = RotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
-                        if (!RGripLastFrame)//first frame you gripped joystick
+                        if (!JoystickGripLastFrame)//first frame you gripped joystick
                         {
                             RotDif = Quaternion.identity;
                             JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
+                            if (SwitchHandsJoyThrottle)
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                            else
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
                         }
-                        RGripLastFrame = true;
+                        JoystickGripLastFrame = true;
                         //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint, finally rotated by the vehicles rotation to turn it back to vehicle space
                         Quaternion JoystickDifference = (Quaternion.Inverse(Rotator.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint) * Rotator.rotation;
                         //create normalized vectors facing towards the 'forward' and 'up' directions of the joystick
@@ -252,8 +258,16 @@ public class SaccAAGunController : UdonSharpBehaviour
                     }
                     else
                     {
+                        if (JoystickGripLastFrame)//first frame you let go of joystick
+                        {
+                            EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped");
+                            if (SwitchHandsJoyThrottle)
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                            else
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                        }
                         VRPitchYawInput = Vector3.zero;
-                        RGripLastFrame = false;
+                        JoystickGripLastFrame = false;
                     }
                     AAGunRotLastFrame = Rotator.rotation;
                 }
