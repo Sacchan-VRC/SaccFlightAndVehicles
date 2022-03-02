@@ -40,41 +40,10 @@ public class SAV_KeyboardControls : UdonSharpBehaviour
     public KeyCode Rfunc7key;
     public UdonSharpBehaviour Rfunc8;
     public KeyCode Rfunc8key;
-    [Header("SAVControl only required for DoVTOL")]
-    [SerializeField] UdonSharpBehaviour SAVControl;
-    public bool DoVTOL;
     private string KeyboardInput = "KeyboardInput";
     private float VTOLAngleDivider;
-    private void Start()
-    {
-        if (SAVControl)
-        {
-            float vtolangledif = (float)SAVControl.GetProgramVariable("VTOLMaxAngle") - (float)SAVControl.GetProgramVariable("VTOLMinAngle");
-            VTOLAngleDivider = (float)SAVControl.GetProgramVariable("VTOLAngleTurnRate") / vtolangledif;
-        }
-        else
-        {
-            DoVTOL = false;
-        }
-    }
     void Update()
     {
-        if (DoVTOL)
-        {
-            float pgup = Input.GetKey(KeyCode.PageUp) ? 1 : 0;
-            float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
-            if (pgup + pgdn != 0)
-            {
-                float NewVTOL = (float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime));
-
-                if (NewVTOL > 0)
-                { NewVTOL = NewVTOL - Mathf.Floor(NewVTOL); }
-                else
-                { NewVTOL = 1 - (Mathf.Abs(NewVTOL) - Mathf.Ceil(NewVTOL)); }
-                SAVControl.SetProgramVariable("VTOLAngleInput", NewVTOL);
-            }
-        }
-
         if (Input.GetKeyDown(Lfunc1key))
         {
             if (Lfunc1) Lfunc1.SendCustomEvent(KeyboardInput);

@@ -287,7 +287,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
                 ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
                 ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
-                if (HasAfterburner) { SetAfterburnerOff(); }
             }
             _EngineOn = value;
         }
@@ -302,14 +301,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
         EngineOn = false;
     }
     [System.NonSerializedAttribute] public float AllGs;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
     [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
     [System.NonSerializedAttribute] public float AngleOfAttackPitch;
     [System.NonSerializedAttribute] public float AngleOfAttackYaw;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VTOLAngle;
+    [System.NonSerializedAttribute] public float VTOLAngle;
 
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
     [System.NonSerializedAttribute] public ConstantForce VehicleConstantForce;
@@ -338,7 +337,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Taxiing = false;
     [System.NonSerializedAttribute] public bool Floating = false;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
     [System.NonSerializedAttribute] public bool Piloting = false;
     [System.NonSerializedAttribute] public bool Passenger = false;
     [System.NonSerializedAttribute] public bool InEditor = true;
@@ -392,6 +391,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private bool RepeatingWorldCheckAxis;
     bool FloatingLastFrame = false;
     bool GroundedLastFrame = false;
+    bool VTOL360;
     private float VelLiftStart;
     private int VehicleLayer;
     private float VelLiftMaxStart;
@@ -404,7 +404,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool InVTOL;
     [System.NonSerializedAttribute] public bool VTOLenabled;
     [System.NonSerializedAttribute] public float VTOLAngleInput;
-    private float VTOL90Degrees;//1=(90 degrees OR maxVTOLAngle if it's lower than 90) used for transition thrust values
     private float ThrottleNormalizer;
     private float VTOLAngleDivider;
     private float ABNormalizer;
@@ -621,7 +620,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
 
         if (VTOLOnly) { VTOLenabled = true; }
-        VTOL90Degrees = Mathf.Min(90 / VTOLMaxAngle, 1);
+        VTOL360 = VTOLMinAngle == 0f && VTOLMaxAngle == 360f;
 
         if (!HasAfterburner) { ThrottleAfterburnerPoint = 1; }
         ThrottleNormalizer = 1 / ThrottleAfterburnerPoint;
@@ -1961,15 +1960,31 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     private void SetVTOLRotValues()
     {
-        if (VTOLAngle > VTOLAngleInput)
+        if (VTOL360)
         {
-            if (Mathf.Abs(VTOLAngle - VTOLAngleInput) > .5f)
-            { VTOLAngleInput += 1; }
+            //set value to between 0 and 1
+            if (VTOLAngleInput >= 0)
+            { VTOLAngleInput = VTOLAngleInput - Mathf.Floor(VTOLAngleInput); }
+            else
+            {
+                float AbsIn = Mathf.Abs(VTOLAngleInput);
+                VTOLAngleInput = 1 - (AbsIn - Mathf.Floor(AbsIn));
+            }
+            //set value above or below current VTOLAngle to make it interpolate in the shortest direction
+            if (VTOLAngle > VTOLAngleInput)
+            {
+                if (Mathf.Abs(VTOLAngle - VTOLAngleInput) > .5f)
+                { VTOLAngleInput += 1; }
+            }
+            else
+            {
+                if (Mathf.Abs(VTOLAngle - VTOLAngleInput) > .5f)
+                { VTOLAngleInput -= 1; }
+            }
         }
         else
         {
-            if (Mathf.Abs(VTOLAngle - VTOLAngleInput) > .5f)
-            { VTOLAngleInput -= 1; }
+            VTOLAngleInput = Mathf.Clamp(VTOLAngleInput, 0, 1);
         }
         VTOLAngle = Mathf.MoveTowards(VTOLAngle, VTOLAngleInput, VTOLAngleDivider * Time.smoothDeltaTime);
         if (VTOLAngle < 0) { VTOLAngle++; }
