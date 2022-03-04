@@ -29,6 +29,8 @@ public class StingerScript : UdonSharpBehaviour
     public float LockTimeMinDivide = .2f;
     [Tooltip("Minimum time between missile launches")]
     public float AAMLaunchDelay = 0.5f;
+    [Tooltip("Make enemy aircraft's animator set the 'targeted' trigger?")]
+    public bool SendLockWarning = true;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
     public float FullReloadTimeSec = 10;
     public AudioSource AAMTargetLock;
@@ -44,10 +46,17 @@ public class StingerScript : UdonSharpBehaviour
     public AudioSource FireSound;
     [Tooltip("Require re-lock after firing?")]
     public bool LoseLockAfterShot = true;
+    [Tooltip("Make it only possible to lock if the angle you are looking at the back of the enemy plane is less than HighAspectPreventLock (for heatseekers)")]
+    public bool HighAspectPreventLock;
+    [Tooltip("Angle beyond which aspect is too high to lock")]
+    public float HighAspectAngle = 85;
+    [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
+    public bool AllowNoAmmoLock = false;
     [Tooltip("GameObject that is enabled by the missile script for 1 second when the missile enters pitbull mode to let the pilot know he no longer has to track the target. Use if creating FOX-3 missiles.")]
     public GameObject PitBullIndicator;
     [Tooltip("Fired projectiles will be parented to this object, use if you happen to have some kind of moving origin system")]
     public Transform WorldParent;
+    private float HighAspectPreventLockAngleDot;
     private bool TriggerLastFrame;
     private float distance_from_head = 1.333333f;
     private VRC.SDK3.Components.VRCObjectSync StingerObjectSync;
@@ -129,6 +138,7 @@ public class StingerScript : UdonSharpBehaviour
         Spawnposition = StingerTransform.position;
         Spawnrotation = StingerTransform.rotation;
         StingerPickup = (VRC_Pickup)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
+        HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
 
         NumChildrenStart = transform.childCount;
         if (AAM)
@@ -244,12 +254,11 @@ public class StingerScript : UdonSharpBehaviour
         if (NumAAMTargets != 0)
         {
             //firing AAM
-            if (AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
+            if (NumAAM > 0 && AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
             {
-                AAMLastFiredTime = Time.time;
                 AAMFire++;//launch AAM using set
                 RequestSerialization();
-                if (NumAAM == 0 || LoseLockAfterShot) { AAMLockTimer = 0; AAMLocked = false; }
+                if (LoseLockAfterShot || (NumAAM == 0 && !AllowNoAmmoLock)) { AAMLockTimer = 0; AAMLocked = false; }
                 EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
             }
         }
@@ -280,20 +289,20 @@ public class StingerScript : UdonSharpBehaviour
                 else { AAMLocked = false; }
             }
             //sound
-            if (AAMLockTimer > 0 && !AAMLocked)
+            if (!AAMLocked && AAMLockTimer > 0)
             {
-                AAMTargeting.gameObject.SetActive(true);
-                AAMTargetLock.gameObject.SetActive(false);
+                if (AAMTargeting && (NumAAM > 0 || AllowNoAmmoLock)) { AAMTargeting.gameObject.SetActive(true); }
+                if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
             }
             else if (AAMLocked)
             {
-                AAMTargeting.gameObject.SetActive(false);
-                AAMTargetLock.gameObject.SetActive(true);
+                if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
+                if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(true); }
             }
             else
             {
-                AAMTargeting.gameObject.SetActive(false);
-                AAMTargetLock.gameObject.SetActive(false);
+                if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
+                if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
             }
             Hud();
         }
@@ -338,14 +347,14 @@ public class StingerScript : UdonSharpBehaviour
 
             if (TargetChecker.activeInHierarchy)
             {
-                SaccAirVehicle NextTargetSAVontrol = null;
+                SaccAirVehicle NextTargetSAVControl = null;
 
                 if (TargetCheckerParent)
                 {
-                    NextTargetSAVontrol = TargetCheckerParent.GetComponent<SaccAirVehicle>();
+                    NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
                 }
                 //if target SAVontroller is null then it's a dummy target (or hierarchy isn't set up properly)
-                if ((!NextTargetSAVontrol || (!NextTargetSAVontrol.Taxiing && !NextTargetSAVontrol.EntityControl.dead)))
+                if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
                 {
                     RaycastHit hitnext;
                     //raycast to check if it's behind something
@@ -363,8 +372,12 @@ public class StingerScript : UdonSharpBehaviour
                             && NextTargetAngle < AAMLockAngle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
-                                        || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
-                                            || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
+                                        && (!HighAspectPreventLock || (NextTargetSAVControl && Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot))
+                                        || (AAMCurrentTargetSAVControl &&//null check
+                                                                    (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
+                                                                    (MissileType == 0 && !AAMCurrentTargetSAVControl.EngineOn)))//switch target if heatseeker and current target's engine is off
+                                            || !AAMTargets[AAMTarget].activeInHierarchy//same as above but if the target is destroyed
+                                            )
                     {
                         if (!TriggerLastFrame)
                         {
@@ -372,7 +385,7 @@ public class StingerScript : UdonSharpBehaviour
                             AAMCurrentTargetAngle = NextTargetAngle;
                             AAMTarget = AAMTargetChecker;
                             AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                            AAMCurrentTargetSAVControl = NextTargetSAVontrol;
+                            AAMCurrentTargetSAVControl = NextTargetSAVControl;
                             AAMLockTimer = 0;
                             AAMTargetedTimer = 99f;//send targeted straight away
                         }
@@ -405,24 +418,29 @@ public class StingerScript : UdonSharpBehaviour
             if ((AAMTargetObscuredDelay < .25f)
                     && AAMCurrentTargetDistance < AAMMaxTargetDistance
                         && AAMTargets[AAMTarget].activeInHierarchy
-                            && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
+                            && (!AAMCurrentTargetSAVControl ||
+                                (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead &&
+                                    (MissileType != 0 || AAMCurrentTargetSAVControl.EngineOn)))//heatseekers cant lock if engine off
+                                &&
+                                    (!HighAspectPreventLock || !AAMCurrentTargetSAVControl || Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot)
+                                    )
             {
                 if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                 {
                     AAMHasTarget = true;
-                    if (AAMCurrentTargetAngle < AAMLockAngle && NumAAM > 0)
+                    if (AAMCurrentTargetAngle < AAMLockAngle && (NumAAM > 0 || AllowNoAmmoLock))
                     {
                         AAMLockTimer += DeltaTime;
                         if (AAMCurrentTargetSAVControl)
                         {
                             //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
-                            AAMTargetedTimer += DeltaTime;
-                            if (AAMTargetedTimer > 1)
+                            if (SendLockWarning && AAMTargetedTimer > 1)
                             {
                                 sendtargeted = !sendtargeted;
                                 RequestSerialization();
                                 AAMTargetedTimer = 0;
                             }
+                            AAMTargetedTimer += DeltaTime;
                         }
                     }
                     else

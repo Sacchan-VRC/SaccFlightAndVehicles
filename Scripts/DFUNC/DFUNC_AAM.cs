@@ -386,7 +386,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                             && NextTargetAngle < AAMLockAngle
                                 && NextTargetAngle < AAMCurrentTargetAngle)
                                     && NextTargetDistance < AAMMaxTargetDistance
-                                        && (!HighAspectPreventLock || (NextTargetSAVControl && Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot))
+                                        && (!HighAspectPreventLock || !NextTargetSAVControl || Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot)
                                         || (AAMCurrentTargetSAVControl &&//null check
                                                                     (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
                                                                     (MissileType == 0 && !AAMCurrentTargetSAVControl.EngineOn)))//switch target if heatseeker and current target's engine is off
@@ -437,7 +437,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                                 (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead &&
                                     (MissileType != 0 || AAMCurrentTargetSAVControl.EngineOn)))//heatseekers cant lock if engine off
                                 &&
-                                    (!HighAspectPreventLock || (AAMCurrentTargetSAVControl && Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot))
+                                    (!HighAspectPreventLock || !AAMCurrentTargetSAVControl || Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot)
                                     )
             {
                 if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
