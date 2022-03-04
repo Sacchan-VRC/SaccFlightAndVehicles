@@ -20,6 +20,8 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     [Tooltip("Transform of which its X scale scales with ammo")]
     public Transform AmmoBar;
     public KeyCode LaunchRocketKey = KeyCode.C;
+    [Tooltip("Fired projectiles will be parented to this object, use if you happen to have some kind of moving origin system")]
+    public Transform WorldParent;
     [System.NonSerializedAttribute] public SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private float Trigger;
@@ -150,7 +152,8 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
             { NewRocket = transform.GetChild(NumChildrenStart).gameObject; }
             else
             { NewRocket = InstantiateWeapon(); }
-            NewRocket.transform.SetParent(null);
+            if (WorldParent) { NewRocket.transform.SetParent(WorldParent); }
+            else { NewRocket.transform.SetParent(null); }
             NewRocket.transform.SetPositionAndRotation(RocketLaunchPoints[RocketPoint].position, RocketLaunchPoints[RocketPoint].rotation);
             NewRocket.SetActive(true);
             NewRocket.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

@@ -38,6 +38,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public string AnimFiredTriggerName = "agmlaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     public bool AnimBoolStayTrueOnExit;
+    [Tooltip("Fired AGMs will be parented to this object, use if you happen to have some kind of moving origin system")]
+    public Transform WorldParent;
     [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private ushort _AGMFire;
     public ushort AGMFire
     {
@@ -411,7 +413,8 @@ public class DFUNC_AGM : UdonSharpBehaviour
             { NewAGM = transform.GetChild(NumChildrenStart).gameObject; }
             else
             { NewAGM = InstantiateWeapon(); }
-            NewAGM.transform.SetParent(null);
+            if (WorldParent) { NewAGM.transform.SetParent(WorldParent); }
+            else { NewAGM.transform.SetParent(null); }
             NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.rotation);
             NewAGM.SetActive(true);
             NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

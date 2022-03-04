@@ -45,6 +45,8 @@ public class EXTP_Turret : UdonSharpBehaviour
     public bool SendAnimTrigger = false;
     public Animator TurretAnimator;
     public string AnimTriggerName = "TurretFire";
+    [Tooltip("Fired projectiles will be parented to this object, use if you happen to have some kind of moving origin system")]
+    public Transform WorldParent;
     [System.NonSerializedAttribute] public SaccEntity EntityControl;
     private float LastFireTime = 0f;
     private int FullAmmo;
@@ -160,7 +162,8 @@ public class EXTP_Turret : UdonSharpBehaviour
             { proj = transform.GetChild(NumChildrenStart).gameObject; }
             else
             { proj = InstantiateWeapon(); }
-            proj.transform.SetParent(null);
+            if (WorldParent) { proj.transform.SetParent(WorldParent); }
+            else { proj.transform.SetParent(null); }
             proj.transform.SetPositionAndRotation(FirePoints[x].position, FirePoints[x].rotation);
             proj.SetActive(true);
             proj.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

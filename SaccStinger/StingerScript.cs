@@ -38,6 +38,8 @@ public class StingerScript : UdonSharpBehaviour
     public AudioSource FireSound;
     [Tooltip("Require re-lock after firing?")]
     public bool LoseLockAfterShot = true;
+    [Tooltip("Fired projectiles will be parented to this object, use if you happen to have some kind of moving origin system")]
+    public Transform WorldParent;
     private float distance_from_head = 1.333333f;
     private VRC.SDK3.Components.VRCObjectSync StingerObjectSync;
     private VRC_Pickup StingerPickup;
@@ -77,7 +79,7 @@ public class StingerScript : UdonSharpBehaviour
     private bool Holding = false;
     private int FullAAMs;
     private int NumAAMTargets;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     private int AAMTargetChecker;
     private float AAMLockTimer = 0;
     private bool AAMHasTarget = false;
@@ -431,7 +433,8 @@ public class StingerScript : UdonSharpBehaviour
             { NewAAM = transform.GetChild(NumChildrenStart).gameObject; }
             else
             { NewAAM = InstantiateWeapon(); }
-            NewAAM.transform.SetParent(null);
+            if (WorldParent) { NewAAM.transform.SetParent(WorldParent); }
+            else { NewAAM.transform.SetParent(null); }
             NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             NewAAM.SetActive(true);
         }

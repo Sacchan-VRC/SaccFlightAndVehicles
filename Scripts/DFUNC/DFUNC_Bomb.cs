@@ -32,6 +32,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     public string AnimFiredTriggerName = "bomblaunched";
     [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
     public bool AnimBoolStayTrueOnExit;
+    [Tooltip("Dropped bombs will be parented to this object, use if you happen to have some kind of moving origin system")]
+    public Transform WorldParent;
     public Camera AtGCam;
     public GameObject AtGScreen;
     [UdonSynced, FieldChangeCallback(nameof(BombFire))] private ushort _BombFire;
@@ -233,7 +235,8 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             { NewBomb = transform.GetChild(NumChildrenStart).gameObject; }
             else
             { NewBomb = InstantiateWeapon(); }
-            NewBomb.transform.SetParent(null);
+            if (WorldParent) { NewBomb.transform.SetParent(WorldParent); }
+            else { NewBomb.transform.SetParent(null); }
             NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, BombLaunchPoints[BombPoint].rotation);
             NewBomb.SetActive(true);
             NewBomb.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");

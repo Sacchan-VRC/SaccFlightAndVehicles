@@ -57,6 +57,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public AudioSource AAMTargeting;
     [Tooltip("Sound that plays when missile has a lock on a target")]
     public AudioSource AAMTargetLock;
+    [Tooltip("Fired AAMs will be parented to this object, use if you happen to have some kind of moving origin system")]
+    public Transform WorldParent;
     private float HighAspectPreventLockAngleDot;
     [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private ushort _AAMFire;
     public ushort AAMFire
@@ -328,7 +330,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     [Tooltip("Max distance an enemy can be targeted at")]
     public float AAMMaxTargetDistance = 6000;
     [System.NonSerializedAttribute] public GameObject[] AAMTargets;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
+    [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
     private int AAMTargetChecker = 0;
     [System.NonSerializedAttribute] public Transform CenterOfMass;
     private Transform VehicleTransform;
@@ -523,7 +525,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
             { NewAAM = transform.GetChild(NumChildrenStart).gameObject; }
             else
             { NewAAM = InstantiateWeapon(); }
-            NewAAM.transform.SetParent(null);
+            if (WorldParent) { NewAAM.transform.SetParent(WorldParent); }
+            else { NewAAM.transform.SetParent(null); }
             NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
