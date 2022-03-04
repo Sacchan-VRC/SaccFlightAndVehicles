@@ -511,6 +511,10 @@ public class SaccEntity : UdonSharpBehaviour
     {
         SendEventToExtensions("SFEXT_O_OnPickupUseDown");
     }
+    public override void OnPickupUseUp()
+    {
+        SendEventToExtensions("SFEXT_O_OnPickupUseUp");
+    }
     private void FindAAMTargets()
     {
         //get array of AAM Targets

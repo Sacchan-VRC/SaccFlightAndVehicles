@@ -10,6 +10,8 @@ public class StingerScript : UdonSharpBehaviour
 {
     public SaccEntity EntityControl;
     public Transform HUD;
+    [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
+    public int MissileType = 1;
     public float AAMMaxTargetDistance;
     public int VehicleLayer = 17;
     public Animator StingerAnimator;
@@ -21,6 +23,10 @@ public class StingerScript : UdonSharpBehaviour
     public float AAMLockAngle = 15;
     [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
     public float AAMLockTime = 2.5f;
+    [Tooltip("Heatseekers only: How much faster is locking if the target has afterburner on? (AAMLockTime / value)")]
+    public float LockTimeABDivide = 2f;
+    [Tooltip("Heatseekers only: If target's engine throttle is 0%, what is the minimum number to divide lock time by, to prevent infinite lock time. (AAMLockTime / value)")]
+    public float LockTimeMinDivide = .2f;
     [Tooltip("Minimum time between missile launches")]
     public float AAMLaunchDelay = 0.5f;
     [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
@@ -38,8 +44,11 @@ public class StingerScript : UdonSharpBehaviour
     public AudioSource FireSound;
     [Tooltip("Require re-lock after firing?")]
     public bool LoseLockAfterShot = true;
+    [Tooltip("GameObject that is enabled by the missile script for 1 second when the missile enters pitbull mode to let the pilot know he no longer has to track the target. Use if creating FOX-3 missiles.")]
+    public GameObject PitBullIndicator;
     [Tooltip("Fired projectiles will be parented to this object, use if you happen to have some kind of moving origin system")]
     public Transform WorldParent;
+    private bool TriggerLastFrame;
     private float distance_from_head = 1.333333f;
     private VRC.SDK3.Components.VRCObjectSync StingerObjectSync;
     private VRC_Pickup StingerPickup;
@@ -231,6 +240,7 @@ public class StingerScript : UdonSharpBehaviour
     }
     public void SFEXT_O_OnPickupUseDown()
     {
+        TriggerLastFrame = true;
         if (NumAAMTargets != 0)
         {
             //firing AAM
@@ -244,12 +254,31 @@ public class StingerScript : UdonSharpBehaviour
             }
         }
     }
+    public void SFEXT_O_OnPickupUseUp()
+    {
+        TriggerLastFrame = false;
+    }
     void Update()
     {
         if (Holding)
         {
-            if (AAMLockTimer > AAMLockTime && AAMHasTarget) { AAMLocked = true; }
-            else { AAMLocked = false; }
+            if (MissileType == 1)//heatseekers check engine output of target
+            {
+                if (AAMCurrentTargetSAVControl ?//if target is SaccAirVehicle, adjust lock time based on throttle status 
+                AAMLockTimer > AAMLockTime /
+                (AAMCurrentTargetSAVControl.AfterburnerOn ?
+                            LockTimeABDivide
+                            :
+                            Mathf.Clamp(AAMCurrentTargetSAVControl.EngineOutput / AAMCurrentTargetSAVControl.ThrottleAfterburnerPoint, LockTimeMinDivide, 1))
+                : AAMLockTimer > AAMLockTime && AAMHasTarget)//target is not a SaccAirVehicle
+                { AAMLocked = true; }
+                else { AAMLocked = false; }
+            }
+            else
+            {
+                if (AAMLockTimer > AAMLockTime && AAMHasTarget) { AAMLocked = true; }
+                else { AAMLocked = false; }
+            }
             //sound
             if (AAMLockTimer > 0 && !AAMLocked)
             {
@@ -337,13 +366,16 @@ public class StingerScript : UdonSharpBehaviour
                                         || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing)//prevent being unable to switch target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                                             || !AAMTargets[AAMTarget].activeInHierarchy))//same as above but if the target is destroyed
                     {
-                        //found new target
-                        AAMCurrentTargetAngle = NextTargetAngle;
-                        AAMTarget = AAMTargetChecker;
-                        AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                        AAMCurrentTargetSAVControl = NextTargetSAVontrol;
-                        AAMLockTimer = 0;
-                        AAMTargetedTimer = 99f;//send targeted straight away
+                        if (!TriggerLastFrame)
+                        {
+                            //found new target
+                            AAMCurrentTargetAngle = NextTargetAngle;
+                            AAMTarget = AAMTargetChecker;
+                            AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+                            AAMCurrentTargetSAVControl = NextTargetSAVontrol;
+                            AAMLockTimer = 0;
+                            AAMTargetedTimer = 99f;//send targeted straight away
+                        }
                     }
                 }
             }

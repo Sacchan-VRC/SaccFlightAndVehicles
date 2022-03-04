@@ -265,7 +265,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
 
             if (NumAAMTargets != 0)
             {
-                if (MissileType == 0)//heatseekers check engine output of target
+                if (MissileType == 1)//heatseekers check engine output of target
                 {
                     if (AAMCurrentTargetSAVControl ?//if target is SaccAirVehicle, adjust lock time based on throttle status 
                     AAMLockTimer > AAMLockTime /
