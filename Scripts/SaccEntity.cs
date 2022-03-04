@@ -52,6 +52,20 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int RStickNumFuncs;
     [System.NonSerializedAttribute] public bool LStickDoDial;
     [System.NonSerializedAttribute] public bool RStickDoDial;
+    [System.NonSerializedAttribute] public bool _DisableLeftDial;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableLeftDial_))] public int DisableLeftDial = 0;
+    public int DisableLeftDial_
+    {
+        set { _DisableLeftDial = value > 0; }
+        get => DisableLeftDial;
+    }
+    [System.NonSerializedAttribute] public bool _DisableRightDial;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableRightDial_))] public int DisableRightDial = 0;
+    public int DisableRightDial_
+    {
+        set { _DisableRightDial = value > 0; }
+        get => DisableRightDial;
+    }
     [System.NonSerializedAttribute] public bool[] LStickNULL;
     [System.NonSerializedAttribute] public bool[] RStickNULL;
     [System.NonSerializedAttribute] public int RStickSelection = -1;
@@ -142,6 +156,8 @@ public class SaccEntity : UdonSharpBehaviour
         RStickNumFuncs = Dial_Functions_R.Length;
         LStickDoDial = LStickNumFuncs > 1;
         RStickDoDial = RStickNumFuncs > 1;
+        DisableLeftDial_ = 0;
+        DisableRightDial_ = 0;
         LStickFuncDegrees = 360 / Mathf.Max((float)LStickNumFuncs, 1);
         RStickFuncDegrees = 360 / Mathf.Max((float)RStickNumFuncs, 1);
         LStickFuncDegreesDivider = 1 / LStickFuncDegrees;
@@ -287,7 +303,7 @@ public class SaccEntity : UdonSharpBehaviour
             }
 
             //LStick Selection wheel
-            if (LStickDoDial)
+            if (LStickDoDial && !_DisableLeftDial)
             {
                 if (InVR && LStickPos.magnitude > DialSensitivity)
                 {
@@ -328,7 +344,7 @@ public class SaccEntity : UdonSharpBehaviour
             }
 
             //RStick Selection wheel
-            if (RStickDoDial)
+            if (RStickDoDial && !_DisableRightDial)
             {
                 if (InVR && RStickPos.magnitude > DialSensitivity)
                 {

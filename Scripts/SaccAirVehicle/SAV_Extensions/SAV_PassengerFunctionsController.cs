@@ -44,8 +44,22 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
     private bool RightDialOnlyOne;
     private bool LeftDialEmpty;
     private bool RightDialEmpty;
-    private bool DoFuncsL;
-    private bool DoFuncsR;
+    private bool LStickDoDial;
+    private bool RStickDoDial;
+    [System.NonSerializedAttribute] public bool _DisableLeftDial;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableLeftDial_))] public int DisableLeftDial = 0;
+    public int DisableLeftDial_
+    {
+        set { _DisableLeftDial = value > 0; }
+        get => DisableLeftDial;
+    }
+    [System.NonSerializedAttribute] public bool _DisableRightDial;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableRightDial_))] public int DisableRightDial = 0;
+    public int DisableRightDial_
+    {
+        set { _DisableRightDial = value > 0; }
+        get => DisableRightDial;
+    }
     public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
@@ -77,8 +91,10 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
         if (RStickNumFuncs == 1) { RightDialOnlyOne = true; }
         if (LStickNumFuncs == 0) { LeftDialEmpty = true; }
         if (RStickNumFuncs == 0) { RightDialEmpty = true; }
-        if (LeftDialEmpty || LeftDialOnlyOne) { DoFuncsL = false; } else { DoFuncsL = true; }
-        if (RightDialEmpty || RightDialOnlyOne) { DoFuncsR = false; } else { DoFuncsR = true; }
+        if (LeftDialEmpty || LeftDialOnlyOne) { LStickDoDial = false; } else { LStickDoDial = true; }
+        if (RightDialEmpty || RightDialOnlyOne) { RStickDoDial = false; } else { RStickDoDial = true; }
+        DisableLeftDial_ = 0;
+        DisableRightDial_ = 0;
         //work out angle to check against for function selection because straight up is the middle of a function (if *DialDivideStraightUp isn't true)
         Vector3 angle = new Vector3(0, 0, -1);
         if (LStickNumFuncs > 1)
@@ -123,7 +139,7 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
         LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
         RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
         RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-        if (DoFuncsL)
+        if (LStickDoDial && !_DisableLeftDial)
         {
             //LStick Selection wheel
             if (InVR && LStickPos.magnitude > .7f)
@@ -162,7 +178,7 @@ public class SAV_PassengerFunctionsController : UdonSharpBehaviour
             LStickSelectionLastFrame = LStickSelection;
         }
 
-        if (DoFuncsR)
+        if (RStickDoDial && !_DisableRightDial)
         {
             //RStick Selection wheel
             if (InVR && RStickPos.magnitude > .7f)
