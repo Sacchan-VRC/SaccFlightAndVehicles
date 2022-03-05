@@ -72,6 +72,16 @@ public class SAV_SoundController : UdonSharpBehaviour
     public bool AllDoorsClosed = true;
     [Tooltip("If ticked, don't turn down the volume of the engine sounds when user throttles down")]
     public bool IsHelicopter = false;
+    [Header("FOr use with Engine Toggle functionality")]
+    public bool DoEngineLerpSpeedMultiplierChanges = true;
+    public float EngineStartingLerpSpeedMulti = .3f;
+    public float EngineOffLerpSpeedMulti = 1;
+    public AudioSource EngineStartup;
+    public AudioSource EngineStartupCancel;
+    public AudioSource EngineTurnOff;
+    public AudioSource EngineStartupInside;
+    public AudioSource EngineStartupCancelInside;
+    public AudioSource EngineTurnOffInside;
     //You can use this to modify all of the engine sound volume and pitch change speeds at once, or change each one individually
     //but if you do things carelessly it'll cause a discontinuous sound because of the 'Start' values being used for multiplication.
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(EngineLerpSpeedMultiplier))] public float _EngineLerpSpeedMultiplier = 1;
@@ -182,7 +192,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     private int DoorsOpen = 0;
     private bool InWater;
     private bool Taxiing;
-    private bool EngineOn;
+    private bool EngineStarted;
     private bool DoRollingSwap;
     public void SFEXT_L_EntityStart()
     {
@@ -282,6 +292,8 @@ public class SAV_SoundController : UdonSharpBehaviour
         PlaneIdleVolLerpValueOffStart = PlaneIdleVolLerpValueOff;
         PlaneIdleVolLerpValueOnStart = PlaneIdleVolLerpValueOn;
 
+        EngineLerpSpeedMultiplier = _EngineLerpSpeedMultiplier;//initialize this
+
         DoSound = 20;
     }
     private void Update()
@@ -309,7 +321,7 @@ public class SAV_SoundController : UdonSharpBehaviour
             }
             return;
         }
-        if (EngineOn) { DoSound = 0f; }
+        if (EngineStarted) { DoSound = 0f; }
         else { DoSound += DeltaTime; }
 
 
@@ -387,7 +399,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                 else
                 { _rolling.volume = Mathf.Lerp(_rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
             }
-            if ((Piloting || Passenger) && EngineOn)
+            if ((Piloting || Passenger) && EngineStarted)
             {
                 float engineout = IsHelicopter ? ((float)SAVControl.GetProgramVariable("EngineOutput") * .5f) + .5f : (float)SAVControl.GetProgramVariable("EngineOutput");
                 if (PlaneInside)
@@ -415,7 +427,7 @@ public class SAV_SoundController : UdonSharpBehaviour
                 }
             }
         }
-        else if (EngineOn)//someone else is piloting
+        else if (EngineStarted)//someone else is piloting
         {
             PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, PlaneIdleVolLerpValueOn * DeltaTime);
             float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
@@ -620,9 +632,36 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (AllDoorsClosed)
         { SetSoundsOutside(); }
     }
+    public void SFEXT_G_EngineStartup()
+    {
+        if (DoEngineLerpSpeedMultiplierChanges)
+        { EngineLerpSpeedMultiplier = EngineStartingLerpSpeedMulti; }
+        EngineStarted = true;
+        if (AllDoorsClosed)
+        { if (EngineStartupInside) { EngineStartupInside.Play(); } }
+        else
+        { if (EngineStartup) { EngineStartup.Play(); } }
+        EngineSoundsOn();
+    }
+    public void SFEXT_G_EngineStartupCancel()
+    {
+        if (DoEngineLerpSpeedMultiplierChanges)
+        { EngineLerpSpeedMultiplier = EngineOffLerpSpeedMulti; }
+        EngineStarted = false;
+        if (AllDoorsClosed)
+        { if (EngineStartupCancelInside) { EngineStartupCancelInside.Play(); } }
+        else
+        { if (EngineStartupCancel) { EngineStartupCancel.Play(); } }
+    }
     public void SFEXT_G_EngineOn()
     {
-        EngineOn = true;
+        if (DoEngineLerpSpeedMultiplierChanges)
+        { EngineLerpSpeedMultiplier = 1; }
+        EngineStarted = true;
+        EngineSoundsOn();
+    }
+    public void EngineSoundsOn()
+    {
         DoSound = 0f;
         if (soundsoff)
         {
@@ -653,7 +692,13 @@ public class SAV_SoundController : UdonSharpBehaviour
         soundsoff = false;
     }
     public void SFEXT_G_EngineOff()
-    { EngineOn = false; }
+    {
+        EngineStarted = false;
+        if (AllDoorsClosed)
+        { if (EngineTurnOffInside) { EngineTurnOffInside.Play(); } }
+        else
+        { if (EngineTurnOff) { EngineTurnOff.Play(); } }
+    }
     public void SFEXT_G_BulletHit()
     {
         if (!BulletHitNull)
@@ -756,6 +801,9 @@ public class SAV_SoundController : UdonSharpBehaviour
             idle.pitch = 0;
             idle.volume = 0;
         }
+        if (EngineStartup && EngineStartup.isPlaying) { EngineStartup.Stop(); }
+        if (EngineStartupCancel && EngineStartupCancel.isPlaying) { EngineStartupCancel.Stop(); }
+        if (EngineTurnOff && EngineTurnOff.isPlaying) { EngineTurnOff.Stop(); }
     }
     public void PlayTouchDownSound()
     {
@@ -802,6 +850,9 @@ public class SAV_SoundController : UdonSharpBehaviour
     {
         //change stuff when you get in/canopy closes
         if (ABOnOutside) { ABOnOutside.Stop(); }
+        if (EngineStartup) { EngineStartup.Stop(); }
+        if (EngineStartupCancel) { EngineStartupCancel.Stop(); }
+        if (EngineTurnOff) { EngineTurnOff.Stop(); }
         if (PlaneInside && !PlaneIdleNull)
         {
             PlaneInside.pitch = PlaneIdle[0].pitch * .8f;
@@ -838,6 +889,9 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (!RollingOnWater && _rolling) { _rolling.Stop(); }
         if (PlaneInside) { PlaneInside.Stop(); }
         if (PlaneWind) { PlaneWind.Stop(); }
+        if (EngineStartupInside) { EngineStartupInside.Stop(); }
+        if (EngineStartupCancelInside) { EngineStartupCancelInside.Stop(); }
+        if (EngineTurnOffInside) { EngineTurnOffInside.Stop(); }
 
         if (!EntityControl.dead && !soundsoff)
         {
@@ -862,7 +916,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     }
     public void SFEXT_G_AfterburnerOn()
     {
-        if (EngineOn)
+        if (EngineStarted)
         {
             if (InVehicle && AllDoorsClosed)
             {

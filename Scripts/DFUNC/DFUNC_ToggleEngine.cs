@@ -8,10 +8,8 @@ using VRC.Udon;
 public class DFUNC_ToggleEngine : UdonSharpBehaviour
 {
     public UdonSharpBehaviour SAVControl;
-    public float ToggleMinDelay = 0;
-    public float StartUpTime = 3f;
-    public AudioSource EngineStartupSound;
-    public AudioSource EngineTurnOffSound;
+    public float ToggleMinDelay = 6f;
+    public float StartUpTime = 5f;
     public GameObject Dial_Funcon;
     [Space(10)]
     [Tooltip("AnimEngineStartupAnimBool is true when engine is starting, and remains true until engine is turned off")]
@@ -97,7 +95,6 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     {
         EngineStartCount++;
         ToggleTime = Time.time;
-        if (EngineStartupSound) { EngineStartupSound.Play(); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
         SendCustomEventDelayedSeconds(nameof(EngineStartupFinish), StartUpTime);
         if (DoEngineStartupAnimBool)
@@ -126,7 +123,6 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
     public void EngineStartupCancel()
     {
         EngineStartCancelCount++;
-        if (EngineStartupSound) { EngineStartupSound.Stop(); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         if (DoEngineStartupAnimBool)
         { EngineAnimator.SetBool(AnimEngineStartupAnimBool, false); }
@@ -147,8 +143,6 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
         {
             EngineStartCancelCount = EngineStartCount;
         }
-        if (EngineStartupSound && EngineStartupSound.isPlaying) { EngineStartupSound.Stop(); }
-        if (EngineTurnOffSound && EngineTurnOffSound.isPlaying) { EngineTurnOffSound.Stop(); }
     }
     public void EngineOn()
     {
@@ -167,7 +161,6 @@ public class DFUNC_ToggleEngine : UdonSharpBehaviour
         {
             ToggleTime = Time.time - StartUpTime;
             SAVControl.SetProgramVariable("_EngineOn", false);
-            if (EngineTurnOffSound) { EngineTurnOffSound.Play(); }
         }
     }
     public void SFEXT_G_EngineOff()
