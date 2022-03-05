@@ -3812,13 +3812,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: YawAoaRollForce
+      Data: PitchAoaPitchForce
     - Name: $v
       Entry: 7
       Data: 194|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: YawAoaRollForce
+      Data: PitchAoaPitchForce
     - Name: <UserType>k__BackingField
       Entry: 7
       Data: 195|System.RuntimeType, mscorlib
@@ -3855,9 +3855,9 @@ MonoBehaviour:
       Data: 197|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Curve of strength of roll force incurred with Yaw AoA. Left side = 0
-        AoA, right side = 180 AoA. BOTH YawAoaRollForce AND PitchAoaPitchForce MUST
-        HAVE MORE THAN 0 KEYFRAMES FOR EITHER TO WORK
+      Data: Curve of strength of pitch force incurred with Pitch AoA. Left side =
+        -180 AoA(Pitch Down, right side = 180 AoA(Pitch Up). BOTH YawAoaRollForce
+        AND PitchAoaPitchForce MUST HAVE MORE THAN 0 KEYFRAMES TO AVOID CRASH
     - Name: 
       Entry: 8
       Data: 
@@ -3881,13 +3881,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: YawAoaRollForceMulti
+      Data: PitchAoaPitchForceMulti
     - Name: $v
       Entry: 7
       Data: 198|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: YawAoaRollForceMulti
+      Data: PitchAoaPitchForceMulti
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 32
@@ -3942,13 +3942,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PitchAoaPitchForce
+      Data: YawAoaRollForce
     - Name: $v
       Entry: 7
       Data: 201|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: PitchAoaPitchForce
+      Data: YawAoaRollForce
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 195
@@ -3979,9 +3979,9 @@ MonoBehaviour:
       Data: 203|UnityEngine.TooltipAttribute, UnityEngine.CoreModule
     - Name: tooltip
       Entry: 1
-      Data: Curve of strength of pitch force incurred with Pitch AoA. Left side =
-        0 AoA, right side = 180 AoA. BOTH YawAoaRollForce AND PitchAoaPitchForce
-        MUST HAVE MORE THAN 0 KEYFRAMES FOR EITHER TO WORK
+      Data: Curve of strength of roll force incurred with Yaw AoA. Left side = 0
+        AoA, right side = 180 AoA (Symmetrical). BOTH YawAoaRollForce AND PitchAoaPitchForce
+        MUST HAVE MORE THAN 0 KEYFRAMES TO AVOID CRASH
     - Name: 
       Entry: 8
       Data: 
@@ -4005,13 +4005,13 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: PitchAoaPitchForceMulti
+      Data: YawAoaRollForceMulti
     - Name: $v
       Entry: 7
       Data: 204|UdonSharp.Compiler.FieldDefinition, UdonSharp.Editor
     - Name: <Name>k__BackingField
       Entry: 1
-      Data: PitchAoaPitchForceMulti
+      Data: YawAoaRollForceMulti
     - Name: <UserType>k__BackingField
       Entry: 9
       Data: 32
