@@ -97,7 +97,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
         }
-        if (EngineOn)
+        if (Occupied || EngineOn)
         {
             DoEffects = 0f;
             VehicleAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
