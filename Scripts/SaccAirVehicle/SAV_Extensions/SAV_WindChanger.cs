@@ -5,10 +5,11 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+[UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
 public class SAV_WindChanger : UdonSharpBehaviour
 {
     [Tooltip("List of SaccAirVehicles to be effected by this WindChnager")]
+    public bool DefaultSynced = false;
     public UdonSharpBehaviour[] SaccAirVehicles;
     public GameObject WindMenu;
     public Slider WindStrengthSlider;
@@ -19,86 +20,246 @@ public class SAV_WindChanger : UdonSharpBehaviour
     public Text WindGustiness_text;
     public Slider WindTurbulanceScaleSlider;
     public Text WindTurbulanceScale_text;
+    public Toggle WindSyncedToggle;
     public AudioSource WindApplySound;
-    /* [UdonSynced(UdonSyncMode.None)] */
-    private float WindStrength;
-    /* [UdonSynced(UdonSyncMode.None)] */
-    private float WindGustStrength;
-    /* [UdonSynced(UdonSyncMode.None)] */
-    private float WindGustiness;
-    /* [UdonSynced(UdonSyncMode.None)] */
-    private float WindTurbulanceScale;
+    [FieldChangeCallback(nameof(WindStrength))] private float _windStrength;
+
+    public float WindStrength
+    {
+        set
+        {
+            if (SyncedWind)
+            {
+                WindStrenth_3 = (gameObject.transform.rotation * Vector3.forward) * value;
+                WindStrengthSlider.value = value;
+                WindStr_text.text = WindStrengthSlider.value.ToString("F1");
+                WindStrengthLocal = value;
+                WindSound();
+            }
+            _windStrength = value;
+        }
+        get => _windStrength;
+    }
+    [UdonSynced, FieldChangeCallback(nameof(WindStrenth_3))] private Vector3 _windStrenth_3;
+    public Vector3 WindStrenth_3
+    {
+        set
+        {
+            if (SyncedWind)
+            {
+                foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
+                {
+                    if (vehicle)
+                    {
+                        vehicle.SetProgramVariable("Wind", value);
+                    }
+                }
+                WindStrengthSlider.value = WindStrenth_3.magnitude;
+                WindStr_text.text = WindStrengthSlider.value.ToString("F1");
+                WindStrengthLocal = WindStrengthSlider.value;
+                WindSound();
+            }
+            _windStrenth_3 = value;
+        }
+        get => _windStrenth_3;
+    }
+
+    [UdonSynced, FieldChangeCallback(nameof(WindGustStrength))] private float _windGustStrength;
+
+    public float WindGustStrength
+    {
+        set
+        {
+            if (SyncedWind)
+            {
+                foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
+                {
+                    if (vehicle)
+                    {
+                        vehicle.SetProgramVariable("WindGustStrength", value);
+                    }
+                }
+
+                WindGustStrengthSlider.value = value;
+                WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
+                WindGustStrengthLocal = value;
+                WindSound();
+            }
+            _windGustStrength = value;
+        }
+        get => _windGustStrength;
+    }
+    [UdonSynced, FieldChangeCallback(nameof(WindGustiness))] private float _windGustiness = 0.03f;
+
+    public float WindGustiness
+    {
+        set
+        {
+            if (SyncedWind)
+            {
+                foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
+                {
+                    if (vehicle)
+                    {
+                        vehicle.SetProgramVariable("WindGustiness", value);
+                    }
+                }
+
+                WindGustinessSlider.value = value;
+                WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
+                WindGustinessLocal = value;
+                WindSound();
+            }
+            _windGustiness = value;
+        }
+        get => _windGustiness;
+    }
+    [UdonSynced, FieldChangeCallback(nameof(WindTurbulanceScale))] private float _windTurbulanceScale = 0.0001f;
+
+    public float WindTurbulanceScale
+    {
+        set
+        {
+            if (SyncedWind)
+            {
+                foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
+                {
+                    if (vehicle)
+                    {
+                        vehicle.SetProgramVariable("WindTurbulanceScale", value);
+                    }
+                }
+                WindTurbulanceScaleSlider.value = value;
+                WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
+                WindTurbulanceScaleLocal = value;
+                WindSound();
+            }
+            _windTurbulanceScale = value;
+        }
+        get => _windTurbulanceScale;
+    }
+    private float WindStrengthLocal;
+    private float WindGustStrengthLocal;
+    private float WindGustinessLocal = 0.03f;
+    private float WindTurbulanceScaleLocal = 0.0001f;
     private VRCPlayerApi localPlayer;
     private bool menuactive;
+    [FieldChangeCallback(nameof(SyncedWind))] private bool _syncedWind = false;
+    public bool SyncedWind
+    {
+        set
+        {
+            if (value)
+            {
+                WindSound();
+                foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
+                {
+                    if (vehicle)
+                    {
+                        vehicle.SetProgramVariable("Wind", _windStrenth_3);
+                        vehicle.SetProgramVariable("WindGustStrength", _windGustStrength);
+                        vehicle.SetProgramVariable("WindGustiness", _windGustiness);
+                        vehicle.SetProgramVariable("WindTurbulanceScale", _windTurbulanceScale);
+                    }
+                }
+            }
+            _syncedWind = value;
+        }
+        get => _syncedWind;
+    }
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
+        WindMenu.SetActive(false);
+        if (DefaultSynced)
+        { SendCustomEventDelayedSeconds(nameof(SyncDefault), 10); }
     }
-    private void Update()
+    public void SyncDefault()
+    { WindSyncedToggle.isOn = true; }
+    public void ToggleSyncedWind()
     {
-        /*    if (localPlayer.IsOwner(gameObject))
-           { */
+        SyncedWind = !SyncedWind;
+        if (SyncedWind)
+        {
+            WindStrengthSlider.value = WindStrengthLocal;
+            WindStr_text.text = WindStrengthSlider.value.ToString("F1");
+            WindGustStrengthSlider.value = WindGustStrengthLocal;
+            WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
+            WindGustinessSlider.value = WindGustinessLocal;
+            WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
+            WindTurbulanceScaleSlider.value = WindTurbulanceScaleLocal;
+            WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
+        }
+    }
+    public void UpdateValues()
+    {
+        WindStrengthLocal = WindStrengthSlider.value;
+        WindStr_text.text = WindStrengthSlider.value.ToString("F1");
+
+        WindGustStrengthLocal = WindGustStrengthSlider.value;
+        WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
+
+        WindGustinessLocal = WindGustinessSlider.value;
+        WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
+
+        WindTurbulanceScaleLocal = WindTurbulanceScaleSlider.value;
+        WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
+    }
+    public void DisableLoop()
+    {
         if (menuactive)
         {
-            WindStrength = WindStrengthSlider.value;
-            WindStr_text.text = WindStrengthSlider.value.ToString("F1");
-
-            WindGustStrength = WindGustStrengthSlider.value;
-            WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
-
-            WindGustiness = WindGustinessSlider.value;
-            WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
-
-            WindTurbulanceScale = WindTurbulanceScaleSlider.value;
-            WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
-
-            if (Vector3.Distance(transform.position, localPlayer.GetPosition()) > 3)
+            if (Vector3.Distance(transform.position, localPlayer.GetPosition()) > 5)
             {
                 WindMenu.SetActive(false);
                 menuactive = false;
             }
+            SendCustomEventDelayedSeconds(nameof(DisableLoop), 1);
         }
-        /*    }
-           else
-           {
-               WindStrengthSlider.value = WindStrength;
-               WindGustStrengthSlider.value = WindGustStrength;
-               WindGustinessSlider.value = WindGustiness;
-               WindTurbulanceScaleSlider.value = WindTurbulanceScale;
-           } */
     }
     public override void OnPickup()
     {
         WindMenu.SetActive(true);
         menuactive = true;
+        DisableLoop();
     }
     public override void OnPickupUseDown()
     {
-        ApplyWindDir();
-        //SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ApplyWindDir");
+        if (SyncedWind)
+        {
+            if (!Networking.LocalPlayer.IsOwner(gameObject))
+            { Networking.SetOwner(Networking.LocalPlayer, gameObject); }
+            WindApplySound.Play();
+            WindStrength = WindStrengthLocal;
+            WindGustStrength = WindGustStrengthLocal;
+            WindGustiness = WindGustinessLocal;
+            WindTurbulanceScale = WindTurbulanceScaleLocal;
+            RequestSerialization();
+        }
+        else
+        {
+            UpdateValues();
+            ApplyWindDir();
+        }
+    }
+    public void WindSound()
+    {
+        if (!WindApplySound.isPlaying)
+        { WindApplySound.Play(); }
     }
     public void ApplyWindDir()
     {
         WindApplySound.Play();
-        Vector3 NewWindDir = (gameObject.transform.rotation * Vector3.forward) * WindStrength;
+        Vector3 NewWindDir = (gameObject.transform.rotation * Vector3.forward) * WindStrengthLocal;
         foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
         {
             if (vehicle)
             {
                 vehicle.SetProgramVariable("Wind", NewWindDir);
-                vehicle.SetProgramVariable("WindGustStrength", WindGustStrength);
-                vehicle.SetProgramVariable("WindGustiness", WindGustiness);
-                vehicle.SetProgramVariable("WindTurbulanceScale", WindTurbulanceScale);
+                vehicle.SetProgramVariable("WindGustStrength", WindGustStrengthLocal);
+                vehicle.SetProgramVariable("WindGustiness", WindGustinessLocal);
+                vehicle.SetProgramVariable("WindTurbulanceScale", WindTurbulanceScaleLocal);
             }
         }
     }
-    /*     private void OnPickup()
-        {
-            WindMenu.SetActive(true);
-        }
-
-        private void OnOwnershipTransferred()
-        {
-            WindMenu.SetActive(false);
-        } */
 }
