@@ -284,6 +284,8 @@ Inside the /Prefabs folder are individual prefabs for each vehicle, you can plac
 
 I recommend using CyanEmu to test things inside of Unity editor.
 
+If your udon object's references are missing in a new project, make sure you have used the VRC SDK control panel to set up the project settings for VRC.
+
 Open the example scene 'SaccFlightExample.unity' to see an example of vehicles set up to work with the Killsboard and racing scripts.
 
 Race set up:
@@ -319,8 +321,8 @@ The 'SaccFlight' script will always crash when testing in editor, because it's l
 Making your own vehicles:
 
 When making a new vehicle, place the prefab that is closest in type to your desired vehicle and Unpack Prefab (not completely) and also unpack prefab on the mesh if necessary. Now your objective is to replace the mesh (PlaneBody on the SF-1) completely.
-I recommend just disabling it at first, and placing your mesh next to it on the hierarchy. The first thing you should do is set the VehicleMesh to your new mesh in the SaccAirVehicle script.
-Next add colliders to your mesh, any collider types are fine. If your vehicle has wheels, i recommend copying the wheel colliders from the SF-1, and adjusting the size to fit your wheels.
+I recommend just disabling it at first(delete it once you're done using it as a reference), and placing your mesh next to it on the hierarchy. The first thing you should do is set the VehicleMesh to your new mesh in the SaccAirVehicle script. (Set it to the armature if you're using a skinned mesh)
+Next add colliders to your mesh(or armature), any collider types are fine. If your vehicle has wheels, i recommend copying the wheel colliders from the SF-1, and adjusting the size to fit your wheels.
 Now go through the entire hierarchy and move all the empties, effects, and sounds to the proper position for your new vehicle.
 Finally, duplicate the Animator for the vehicle prefab you used, rename it, place it in a new folder, apply it to your vehicle, and go through each layer and replace any animations that need replacing.
 When you're done look at the EffectsController and SoundController, and make sure no array references are empty (the ones that you can change the length of), they're likely to crash if any are.
@@ -330,7 +332,7 @@ If it's having trouble taking off, try adjusting the center of mass and pitch mo
 The Strength and Friction values for pitch, yaw, and roll are important, and both play off each other. You may need to set them to very high values, especially if you make a large plane.
 Rot Multi Max Speed will need to be adjusted for planes with different speeds. It's the speed at which (in meters per second) the plane reaches maximum responsiveness.
 Vel Straighten Str Pitch/Yaw are Very important to the handling of the plane. They push the nose toward the velocity direction. (they also interact with pitch and yaw strength)
-Lift and Max Lift are also very important, and a bit tricky to tweak. If max lift is too high you can end up with a plane that can fly in circles extremely quickly.
+Lift and Max Lift are also very important, and a bit tricky to tweak. If max lift is too high you can end up with a plane that can fly in circles extremely quickly. Reducing Max Lift will make the plane bleed much more speed in turns which is more realistic. Try around 3.
 The Vel Lift/Max values are used to prevent the plane's nose from dropping constantly (counter gravity). Find a Vel Lift Max value that keeps the nose steady, Max is 10 by default but technically should be 9.81 to counter gravity exactly
 Vel Lift value is used to decide how quickly the plane reaches Vel Lift Max.
 Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue.
