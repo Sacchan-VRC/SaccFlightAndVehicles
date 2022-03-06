@@ -192,6 +192,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     private int DoorsOpen = 0;
     private bool InWater;
     private bool Taxiing;
+    private bool EngineOn;
     private bool EngineStarted;
     private bool DoRollingSwap;
     public void SFEXT_L_EntityStart()
@@ -658,6 +659,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (DoEngineLerpSpeedMultiplierChanges)
         { EngineLerpSpeedMultiplier = 1; }
         EngineStarted = true;
+        EngineOn = true;
         EngineSoundsOn();
     }
     public void EngineSoundsOn()
@@ -694,6 +696,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     public void SFEXT_G_EngineOff()
     {
         EngineStarted = false;
+        EngineOn = false;
         if (AllDoorsClosed)
         { if (EngineTurnOffInside) { EngineTurnOffInside.Play(); } }
         else
@@ -916,7 +919,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     }
     public void SFEXT_G_AfterburnerOn()
     {
-        if (EngineStarted)
+        if (EngineOn)
         {
             if (InVehicle && AllDoorsClosed)
             {
