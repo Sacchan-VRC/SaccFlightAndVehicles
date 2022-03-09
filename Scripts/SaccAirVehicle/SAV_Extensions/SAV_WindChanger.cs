@@ -22,6 +22,7 @@ public class SAV_WindChanger : UdonSharpBehaviour
     public Text WindTurbulanceScale_text;
     public Toggle WindSyncedToggle;
     public AudioSource WindApplySound;
+    private bool UpdatingValuesFromOther;
     [FieldChangeCallback(nameof(WindStrength))] private float _windStrength;
 
     public float WindStrength
@@ -31,8 +32,6 @@ public class SAV_WindChanger : UdonSharpBehaviour
             if (SyncedWind)
             {
                 WindStrenth_3 = (gameObject.transform.rotation * Vector3.forward) * value;
-                WindStrengthSlider.value = value;
-                WindStr_text.text = WindStrengthSlider.value.ToString("F1");
                 WindStrengthLocal = value;
                 WindSound();
             }
@@ -54,9 +53,11 @@ public class SAV_WindChanger : UdonSharpBehaviour
                         vehicle.SetProgramVariable("Wind", value);
                     }
                 }
-                WindStrengthSlider.value = WindStrenth_3.magnitude;
-                WindStr_text.text = WindStrengthSlider.value.ToString("F1");
-                WindStrengthLocal = WindStrengthSlider.value;
+                if (!UpdatingValuesFromOther)
+                {
+                    UpdatingValuesFromOther = true;
+                    SendCustomEventDelayedSeconds(nameof(UpdateValuesFromOther), 1);
+                }
                 WindSound();
             }
             _windStrenth_3 = value;
@@ -79,10 +80,11 @@ public class SAV_WindChanger : UdonSharpBehaviour
                         vehicle.SetProgramVariable("WindGustStrength", value);
                     }
                 }
-
-                WindGustStrengthSlider.value = value;
-                WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
-                WindGustStrengthLocal = value;
+                if (!UpdatingValuesFromOther)
+                {
+                    UpdatingValuesFromOther = true;
+                    SendCustomEventDelayedSeconds(nameof(UpdateValuesFromOther), 1);
+                }
                 WindSound();
             }
             _windGustStrength = value;
@@ -104,10 +106,11 @@ public class SAV_WindChanger : UdonSharpBehaviour
                         vehicle.SetProgramVariable("WindGustiness", value);
                     }
                 }
-
-                WindGustinessSlider.value = value;
-                WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
-                WindGustinessLocal = value;
+                if (!UpdatingValuesFromOther)
+                {
+                    UpdatingValuesFromOther = true;
+                    SendCustomEventDelayedSeconds(nameof(UpdateValuesFromOther), 1);
+                }
                 WindSound();
             }
             _windGustiness = value;
@@ -129,9 +132,11 @@ public class SAV_WindChanger : UdonSharpBehaviour
                         vehicle.SetProgramVariable("WindTurbulanceScale", value);
                     }
                 }
-                WindTurbulanceScaleSlider.value = value;
-                WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
-                WindTurbulanceScaleLocal = value;
+                if (!UpdatingValuesFromOther)
+                {
+                    UpdatingValuesFromOther = true;
+                    SendCustomEventDelayedSeconds(nameof(UpdateValuesFromOther), 1);
+                }
                 WindSound();
             }
             _windTurbulanceScale = value;
@@ -152,6 +157,7 @@ public class SAV_WindChanger : UdonSharpBehaviour
             if (value)
             {
                 WindSound();
+                UpdateValuesFromOther();
                 foreach (UdonSharpBehaviour vehicle in SaccAirVehicles)
                 {
                     if (vehicle)
@@ -179,17 +185,22 @@ public class SAV_WindChanger : UdonSharpBehaviour
     public void ToggleSyncedWind()
     {
         SyncedWind = !SyncedWind;
-        if (SyncedWind)
-        {
-            WindStrengthSlider.value = WindStrengthLocal;
-            WindStr_text.text = WindStrengthSlider.value.ToString("F1");
-            WindGustStrengthSlider.value = WindGustStrengthLocal;
-            WindGustStrength_text.text = WindGustStrengthSlider.value.ToString("F1");
-            WindGustinessSlider.value = WindGustinessLocal;
-            WindGustiness_text.text = WindGustinessSlider.value.ToString("F3");
-            WindTurbulanceScaleSlider.value = WindTurbulanceScaleLocal;
-            WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
-        }
+    }
+    public void UpdateValuesFromOther()
+    {
+        UpdatingValuesFromOther = false;
+        WindStrengthLocal = _windStrenth_3.magnitude;
+        WindStrengthSlider.value = WindStrengthLocal;
+        WindStr_text.text = WindStrengthLocal.ToString("F1");
+        WindGustStrengthLocal = _windGustStrength;
+        WindGustStrengthSlider.value = _windGustStrength;
+        WindGustStrength_text.text = _windGustStrength.ToString("F1");
+        WindGustinessLocal = _windGustiness;
+        WindGustinessSlider.value = _windGustiness;
+        WindGustiness_text.text = _windGustiness.ToString("F3");
+        WindTurbulanceScaleLocal = _windTurbulanceScale;
+        WindTurbulanceScaleSlider.value = _windTurbulanceScale;
+        WindTurbulanceScale_text.text = _windTurbulanceScale.ToString("F5");
     }
     public void UpdateValues()
     {
@@ -205,7 +216,7 @@ public class SAV_WindChanger : UdonSharpBehaviour
         WindTurbulanceScaleLocal = WindTurbulanceScaleSlider.value;
         WindTurbulanceScale_text.text = WindTurbulanceScaleSlider.value.ToString("F5");
     }
-    public void DisableLoop()
+    public void ProximityDisableLoop()
     {
         if (menuactive)
         {
@@ -214,14 +225,19 @@ public class SAV_WindChanger : UdonSharpBehaviour
                 WindMenu.SetActive(false);
                 menuactive = false;
             }
-            SendCustomEventDelayedSeconds(nameof(DisableLoop), 1);
+            SendCustomEventDelayedSeconds(nameof(ProximityDisableLoop), 1);
         }
     }
     public override void OnPickup()
     {
+        if (!menuactive)
+        {
+            menuactive = true;
+            ProximityDisableLoop();
+            if (_syncedWind)
+            { UpdateValuesFromOther(); }
+        }
         WindMenu.SetActive(true);
-        menuactive = true;
-        DisableLoop();
     }
     public override void OnPickupUseDown()
     {
