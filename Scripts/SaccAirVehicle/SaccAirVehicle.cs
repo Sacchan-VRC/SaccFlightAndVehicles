@@ -425,9 +425,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int NumActiveFlares;
     [System.NonSerializedAttribute] public int NumActiveChaff;
     [System.NonSerializedAttribute] public int NumActiveOtherCM;
+    [System.NonSerializedAttribute] public bool UseAtmospherePositionOffset = false;
+    [System.NonSerializedAttribute] public float AtmospherePositionOffset = 0;//set UseAtmospherePositionOffset true to use this for floating origin system
+    [System.NonSerializedAttribute] public float Limits = 1;//specially used by limits function
     //this stuff can be used by DFUNCs
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
-    [System.NonSerializedAttribute] public float Limits = 1;
+    //the bools exists to save externs every frame
     public bool _DisableStickyWheelWorkaround;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableStickyWheelWorkaround_))] public int DisableStickyWheelWorkaround = 0;
     public int DisableStickyWheelWorkaround_
@@ -1904,8 +1907,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
     }
     private void WindAndAoA()
     {
-        if (DisablePhysicsAndInputs_ != 0) { return; }
-        Atmosphere = Mathf.Clamp(-(CenterOfMass.position.y / AtmoshpereFadeDistance) + 1 + AtmosphereHeightThing, 0, 1);
+        if (_DisablePhysicsAndInputs) { return; }
+        float AtmosPos = CenterOfMass.position.y;
+        if (UseAtmospherePositionOffset) { AtmosPos += AtmospherePositionOffset; }//saves one extern if not using it
+        Atmosphere = Mathf.Clamp((1 - (AtmosPos / AtmoshpereFadeDistance)) + AtmosphereHeightThing, 0, 1);
         float TimeGustiness = Time.time * WindGustiness;
         float gustx = TimeGustiness + (VehicleTransform.position.x * WindTurbulanceScale);
         float gustz = TimeGustiness + (VehicleTransform.position.z * WindTurbulanceScale);

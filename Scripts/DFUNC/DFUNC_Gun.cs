@@ -52,7 +52,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     private bool Selected = false;
     private float reloadspeed;
     private bool LeftDial = false;
-    private bool Piloting = false;
     private bool InVehicle = false;
     private int DialPosition = -999;
     private Vector3 AmmoBarScaleStart;
@@ -107,7 +106,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_O_PilotEnter()
     {
         GunDamageParticle.gameObject.SetActive(true);
-        Piloting = true;
         InVehicle = true;
     }
     public void SFEXT_G_PilotExit()
@@ -117,7 +115,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotExit()
     {
-        Piloting = false;
         InVehicle = false;
         RequestSerialization();
         if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
