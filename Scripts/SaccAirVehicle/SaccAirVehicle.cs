@@ -130,12 +130,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float HighYawAoaMinControl = 0.2f;
     [Tooltip("Enable YawAoaRollForce and PitchAoaPitchForce forces used to make vehicle rotate when in a stall, Both curves must be initialized or script will crash.")]
     public bool DoStallForces;
-    [Tooltip("Curve of strength of pitch force incurred with Pitch AoA. Left side = -180 AoA(Pitch Down, right side = 180 AoA(Pitch Up). BOTH YawAoaRollForce AND PitchAoaPitchForce MUST HAVE MORE THAN 0 KEYFRAMES TO AVOID CRASH")]
-    public AnimationCurve PitchAoaPitchForce; /* = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1)); */
+    [Tooltip("Curve of strength of pitch force incurred with Pitch AoA. Left side = -180 AoA(Pitch Down, right side = 180 AoA(Pitch Up).")]
+    public AnimationCurve PitchAoaPitchForce = AnimationCurve.Linear(-180, 0, 180, 0);
     [Tooltip("Strength of above force")]
     public float PitchAoaPitchForceMulti = 0;
-    [Tooltip("Curve of strength of roll force incurred with Yaw AoA. Left side = 0 AoA, right side = 180 AoA (Symmetrical). BOTH YawAoaRollForce AND PitchAoaPitchForce MUST HAVE MORE THAN 0 KEYFRAMES TO AVOID CRASH")]
-    public AnimationCurve YawAoaRollForce; /* = new AnimationCurve(new Keyframe(0, 0), new Keyframe(1, 1)); */ //initializing it doesn't work
+    [Tooltip("Curve of strength of roll force incurred with Yaw AoA. Left side = 0 AoA, right side = 180 AoA (Symmetrical).")]
+    public AnimationCurve YawAoaRollForce = AnimationCurve.Linear(0, 0, 180, 0);
     [Tooltip("Strength of above force")]
     public float YawAoaRollForceMulti = 0;
     [Tooltip("When the plane is is at a high angle of attack you can give it a minimum amount of lift/drag, so that it doesn't just lose all air resistance.")]
@@ -397,7 +397,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     private float VelLiftMaxStart;
     private bool HasAirBrake;//set to false if air brake strength is 0
     private float HandDistanceZLastFrame;
-    private float EngineAngle;
     private float PitchThrustVecMultiStart;
     private float YawThrustVecMultiStart;
     private float RollThrustVecMultiStart;
