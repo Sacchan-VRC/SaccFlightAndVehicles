@@ -193,6 +193,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     private bool InWater;
     private bool Taxiing;
     private bool EngineOn;
+    private bool Occupied;
     private bool EngineStarted;
     private bool DoRollingSwap;
     public void SFEXT_L_EntityStart()
@@ -322,7 +323,7 @@ public class SAV_SoundController : UdonSharpBehaviour
             }
             return;
         }
-        if (EngineStarted) { DoSound = 0f; }
+        if (EngineStarted || Occupied) { DoSound = 0f; }
         else { DoSound += DeltaTime; }
 
 
@@ -602,6 +603,10 @@ public class SAV_SoundController : UdonSharpBehaviour
             }
         }
     }
+    public void SFEXT_G_PilotEnter()
+    { Occupied = true; }
+    public void SFEXT_G_PilotExit()
+    { Occupied = false; }
     public void SFEXT_O_PilotEnter()
     {
         Piloting = true;
