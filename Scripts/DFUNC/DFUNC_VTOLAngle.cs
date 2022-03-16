@@ -17,6 +17,8 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
     private VRCPlayerApi localPlayer;
     private bool TriggerLastFrame;
     private bool IsOwner;
+    private bool InVR;
+    private bool Selected;
     private bool UpdatingVar;
     private bool UpdatingVR;
     private bool UpdatingKeyb;
@@ -36,75 +38,93 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
         ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
         localPlayer = Networking.LocalPlayer;
         ThrottleSensitivity = (float)SAVControl.GetProgramVariable("ThrottleSensitivity");
+        InVR = (bool)SAVControl.GetProgramVariable("InVR");
         SAVControl.SetProgramVariable("VTOLenabled", true);
         VTOL360 = (bool)SAVControl.GetProgramVariable("VTOL360");
         IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
         float vtolangledif = (float)SAVControl.GetProgramVariable("VTOLMaxAngle") - (float)SAVControl.GetProgramVariable("VTOLMinAngle");
         VTOLAngleDivider = (float)SAVControl.GetProgramVariable("VTOLAngleTurnRate") / vtolangledif;
     }
+    public void SFEXT_O_PilotEnter()
+    {
+        TriggerLastFrame = false;
+        gameObject.SetActive(true);
+        VTOLMover = VTOLAngleLast = NewVTOLAngle = VTOLAngle;
+        RequestSerialization();
+    }
     public void SFEXT_G_PilotEnter()
     {
-        VTOLMover = VTOLAngle;
-        TriggerLastFrame = false;
         gameObject.SetActive(true);
     }
     public void SFEXT_G_PilotExit()
     {
         gameObject.SetActive(false);
     }
+    public void DFUNC_Selected()
+    {
+        Selected = true;
+    }
+    public void DFUNC_Deselected()
+    {
+        Selected = false;
+        RequestSerialization();
+    }
     private void LateUpdate()
     {
         if (IsOwner)
         {
-            VTOLAngle = (float)SAVControl.GetProgramVariable("VTOLAngle");
-            float pgup = Input.GetKey(KeyCode.PageUp) ? 1 : 0;
-            float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
-            if (pgup + pgdn != 0)
+            if (!InVR || Selected)
             {
-                UpdatingKeyb = true;
-                float NewVTOL = (float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime));
-                SAVControl.SetProgramVariable("VTOLAngleInput", NewVTOL);
-            }
-            float Trigger;
-            if (UseLeftTrigger)
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-            else
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-            if (Trigger > 0.75)
-            {
-                UpdatingVR = true;
-                Vector3 handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
-                handpos = ControlsRoot.InverseTransformDirection(handpos);
-
-                if (!TriggerLastFrame)
+                VTOLAngle = (float)SAVControl.GetProgramVariable("VTOLAngle");
+                float pgup = Input.GetKey(KeyCode.PageUp) ? 1 : 0;
+                float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
+                if (pgup + pgdn != 0)
                 {
-                    VTOLZeroPoint = handpos.z;
-                    VTOLTemp = VTOLAngle;
+                    UpdatingKeyb = true;
+                    float NewVTOL = (float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime));
+                    SAVControl.SetProgramVariable("VTOLAngleInput", NewVTOL);
                 }
-                float newvtol = VTOLTemp + ((VTOLZeroPoint - handpos.z) * -ThrottleSensitivity);
-                SAVControl.SetProgramVariable("VTOLAngleInput", newvtol);
-
-                TriggerLastFrame = true;
-            }
-            else { TriggerLastFrame = false; }
-
-            if (UpdatingVR || UpdatingKeyb)
-            {
-                if (!UpdatingVar) { UpdateTime = Time.time; }//prevent a tiny adjustment being sent that causes the movement to stutter 
-                if (Time.time - UpdateTime > SyncUpdateRate)
+                float Trigger;
+                if (UseLeftTrigger)
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                else
+                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                if (Trigger > 0.75)
                 {
-                    RequestSerialization();
-                    UpdateTime = Time.time;
+                    UpdatingVR = true;
+                    Vector3 handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                    handpos = ControlsRoot.InverseTransformDirection(handpos);
+
+                    if (!TriggerLastFrame)
+                    {
+                        VTOLZeroPoint = handpos.z;
+                        VTOLTemp = VTOLAngle;
+                    }
+                    float newvtol = VTOLTemp + ((VTOLZeroPoint - handpos.z) * -ThrottleSensitivity);
+                    SAVControl.SetProgramVariable("VTOLAngleInput", newvtol);
+
+                    TriggerLastFrame = true;
                 }
-                UpdatingVar = true;
-            }
-            else
-            {
-                if (UpdatingVar)
+                else { TriggerLastFrame = false; }
+
+                if (UpdatingVR || UpdatingKeyb)
                 {
-                    RequestSerialization();//make sure others recieve final position after finished adjusting
-                    UpdateTime = Time.time;
-                    UpdatingVar = false;
+                    if (!UpdatingVar) { UpdateTime = Time.time; }//prevent a tiny adjustment being sent that causes the movement to stutter 
+                    if (Time.time - UpdateTime > SyncUpdateRate)
+                    {
+                        RequestSerialization();
+                        UpdateTime = Time.time;
+                    }
+                    UpdatingVar = true;
+                }
+                else
+                {
+                    if (UpdatingVar)
+                    {
+                        RequestSerialization();//make sure others recieve final position after finished adjusting
+                        UpdateTime = Time.time;
+                        UpdatingVar = false;
+                    }
                 }
             }
         }
@@ -167,6 +187,16 @@ public class DFUNC_VTOLAngle : UdonSharpBehaviour
                 VTOLAngleLast = VTOLAngle;
             }
         }
+    }
+    public void SFEXT_G_Explode()
+    {
+        VTOLMover = VTOLAngleLast = VTOLAngle = NewVTOLAngle = VTOLDefault;
+        SAVControl.SetProgramVariable("VTOLAngle", VTOLDefault);
+    }
+    public void SFEXT_G_RespawnButton()
+    {
+        VTOLMover = VTOLAngleLast = VTOLAngle = NewVTOLAngle = VTOLDefault;
+        SAVControl.SetProgramVariable("VTOLAngle", VTOLDefault);
     }
     public void SFEXT_O_TakeOwnership()
     {
