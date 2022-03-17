@@ -25,6 +25,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
     public float IdleMoveMentRange = .35f;
     [Tooltip("If vehicle rotates less than this many degrees since it's last update, it'll be considered to be idle")]
     public float IdleRotationRange = 5f;
+    [Tooltip("Angle Difference between movement direction and rigidbody velocity that will cause the vehicle to teleport instead of interpolate")]
+    public float TeleportAngleDifference = 20;
     private Transform VehicleTransform;
     private float nextUpdateTime = float.MaxValue;
     private int StartupTimeMS = 0;
@@ -357,6 +359,22 @@ public class SAV_SyncScript : UdonSharpBehaviour
             O_LastRotation = O_Rotation_Q;
             O_LastPosition = O_Position;
             CurrentVelocityLast = CurrentVelocity;
+
+            //float MoveDot = Vector3.Dot(Movement, O_CurVel);
+            //if we're going one way but moved the other, we must have teleported.
+            //set values to the same thing for Current and Last to make teleportation instead of interpolation
+            if (Vector3.Angle(O_Position - O_LastPosition, O_CurVel) > TeleportAngleDifference
+            //|| MoveDot > 2 || MoveDot < 0//also teleport if we moved way faster than we should have //disabled because it probably makes very slow framerate people teleport all the time
+            )
+            {
+                L_LastUpdateTime = L_UpdateTime;
+                L_LastPingAdjustedPosition = L_PingAdjustedPosition;
+                LastExtrapolationDirection = ExtrapolationDirection;
+                LastCurAngMom = CurAngMom;
+                LastPing = Ping;
+                O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+                O_LastPosition = O_Position;
+            }
         }
     }
     public void SFEXT_O_Explode()//all the things players see happen when the vehicle explodes
