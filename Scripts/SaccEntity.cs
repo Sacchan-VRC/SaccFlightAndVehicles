@@ -219,10 +219,15 @@ public class SaccEntity : UdonSharpBehaviour
     void OnParticleCollision(GameObject other)
     {
         if (!other || dead) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
-
         LastHitParticle = other;
-        string pname = other.name;
-        int index = pname.LastIndexOf(':');
+
+        int index = -1;
+        string pname = string.Empty;
+        if (other.transform.childCount > 0)
+        {
+            pname = other.transform.GetChild(0).name;
+            index = pname.LastIndexOf(':');
+        }
         if (index > -1)
         {
             pname = pname.Substring(index);
