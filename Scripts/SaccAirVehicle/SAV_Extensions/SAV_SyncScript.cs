@@ -282,6 +282,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     }
     public void EnterIdleMode()
     {
+        if (IdleUpdateMode) { return; }
         IdleUpdateMode = true;
         CurrentUpdateInterval = IdleModeUpdateInterval;
         SmoothingTimeDivider = 1f / CurrentUpdateInterval;
@@ -289,9 +290,15 @@ public class SAV_SyncScript : UdonSharpBehaviour
     }
     public void ExitIdleMode()
     {
+        if (!IdleUpdateMode) { return; }
         IdleUpdateMode = false;
         CurrentUpdateInterval = updateInterval;
         SmoothingTimeDivider = 1f / CurrentUpdateInterval;
+    }
+    public void SFEXT_O_OnPlayerJoined()
+    {
+        if (IdleUpdateMode)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnterIdleMode)); }
     }
     public override void OnDeserialization()
     {
