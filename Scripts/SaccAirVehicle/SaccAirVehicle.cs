@@ -810,10 +810,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         }
                         JoystickGripLastFrame = false;
                     }
-
                     if (HasAfterburner && !AfterburnerOn)
                     {
-                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint); }
+                        PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint);
                     }
                     else
                     { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
@@ -906,9 +905,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner && (VTOLAngle == 0 || VTOLAllowAfterburner))
                     {
                         if (AfterburnerOn)
-                            PlayerThrottle = ThrottleAfterburnerPoint;
+                        { PlayerThrottle = ThrottleAfterburnerPoint; }
                         else
-                            PlayerThrottle = 1;
+                        { PlayerThrottle = 1; }
                     }
                     if (_ThrottleOverridden && !ThrottleGripLastFrame)
                     {
@@ -1365,21 +1364,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         + (Throttles.y * FuelConsumptionAB))
                             * Time.deltaTime, 0);
         }
-        if (HasAfterburner)
-        {
-            if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
-            }
-            else if (ThrottleInput <= ThrottleAfterburnerPoint && AfterburnerOn)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
-            }
-        }
         if (Fuel < LowFuel)
         {
             //max throttle scales down with amount of fuel below LowFuel
-            ThrottleInput = ThrottleInput * Fuel * LowFuelDivider;
+            ThrottleInput = Mathf.Min(ThrottleInput, Fuel * LowFuelDivider);
             if (!LowFuelLastFrame)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendLowFuel));
@@ -1401,6 +1389,17 @@ public class SaccAirVehicle : UdonSharpBehaviour
             if (Fuel > 0)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendNotNoFuel));
+            }
+        }
+        if (HasAfterburner)
+        {
+            if (!AfterburnerOn && ThrottleInput > ThrottleAfterburnerPoint)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
+            }
+            else if (AfterburnerOn && ThrottleInput <= ThrottleAfterburnerPoint)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
             }
         }
     }
@@ -1509,23 +1508,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         {
             AfterburnerOn = false;
             EntityControl.SendEventToExtensions("SFEXT_G_AfterburnerOff");
-        }
-    }
-    //for use by Extensions
-    public void ToggleAfterburner()
-    {
-        if (HasAfterburner && _EngineOn)
-        {
-            if (AfterburnerOn)
-            {
-                ThrottleInput = PlayerThrottle = ThrottleAfterburnerPoint;
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOff));
-            }
-            else
-            {
-                ThrottleInput = PlayerThrottle = 1;
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetAfterburnerOn));
-            }
         }
     }
     public void SendLowFuel()

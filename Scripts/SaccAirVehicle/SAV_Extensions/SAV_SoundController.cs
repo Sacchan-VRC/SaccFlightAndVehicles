@@ -5,6 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+[DefaultExecutionOrder(20)]//after SaccAirVehicle
 public class SAV_SoundController : UdonSharpBehaviour
 {
     public UdonSharpBehaviour SAVControl;
