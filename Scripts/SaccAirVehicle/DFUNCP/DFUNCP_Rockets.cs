@@ -112,7 +112,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     }
     public void UpdateAmmoVisuals()
     {
-        UpdateAmmoVisuals();
+        if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     private void Update()
     {

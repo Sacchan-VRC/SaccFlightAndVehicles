@@ -595,8 +595,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         }
         VehicleTransform.position += CoMOffset;
         SendCustomEventDelayedFrames(nameof(SetCoM_ITR), 1);//this has to be delayed one frame because ?
-        Spawnposition = VehicleTransform.position;
-        Spawnrotation = VehicleTransform.rotation;
+        Spawnposition = VehicleTransform.localPosition;
+        Spawnrotation = VehicleTransform.localRotation;
 
         if (AtmosphereThinningStart > AtmosphereThinningEnd) { AtmosphereThinningEnd = (AtmosphereThinningStart + 1); }
         AtmoshpereFadeDistance = (AtmosphereThinningEnd + SeaLevel) - (AtmosphereThinningStart + SeaLevel); //for finding atmosphere thinning gradient
@@ -1335,7 +1335,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Health = FullHealth;
         if (InEditor || UsingManualSync)
         {
-            VehicleTransform.SetPositionAndRotation(Spawnposition, Spawnrotation);
+            VehicleTransform.localPosition = Spawnposition;
+            VehicleTransform.localRotation = Spawnrotation;
         }
         else
         {
@@ -1580,7 +1581,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VTOLAngleInput = VTOLDefaultValue;
             if (InEditor || UsingManualSync)
             {
-                VehicleTransform.SetPositionAndRotation(Spawnposition, Spawnrotation);
+                VehicleTransform.localPosition = Spawnposition;
+                VehicleTransform.localRotation = Spawnrotation;
                 VehicleRigidbody.velocity = Vector3.zero;
             }
             else
