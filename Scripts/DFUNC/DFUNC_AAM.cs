@@ -376,7 +376,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
                 {
                     RaycastHit hitnext;
                     //raycast to check if it's behind something
-                    bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
+                    bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
 
                     /*                 Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
                                     if (hitnext.collider != null) Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsidePlaneLayer)));
@@ -385,10 +385,10 @@ public class DFUNC_AAM : UdonSharpBehaviour
                                     Debug.Log(string.Concat("InAngle_next ", NextTargetAngle < 70));
                                     Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
 
-                    if ((LineOfSightNext
+                    if (LineOfSightNext
                         && hitnext.collider && hitnext.collider.gameObject.layer == OutsideVehicleLayer //did raycast hit an object on the layer planes are on?
                             && NextTargetAngle < AAMLockAngle
-                                && NextTargetAngle < AAMCurrentTargetAngle)
+                                && NextTargetAngle < AAMCurrentTargetAngle
                                     && NextTargetDistance < AAMMaxTargetDistance
                                         && (!HighAspectPreventLock || !NextTargetSAVControl || Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot)
                                         || (AAMCurrentTargetSAVControl &&//null check
@@ -426,7 +426,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             //check if target is active, and if it's SaccAirVehicle is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
             //raycast to check if it's behind something
             RaycastHit hitcurrent;
-            bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133125 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
+            bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
             //used to make lock remain for .25 seconds after target is obscured
             if (!LineOfSightCur || (hitcurrent.collider && hitcurrent.collider.gameObject.layer != OutsideVehicleLayer))
             { AAMTargetObscuredDelay += DeltaTime; }
