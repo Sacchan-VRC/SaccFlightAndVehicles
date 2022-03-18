@@ -43,8 +43,8 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         set
         {
-            _firing = value;
             GunAnimator.SetBool(GunFiringBoolName, value);
+            _firing = value;
         }
         get => _firing;
     }
@@ -85,31 +85,33 @@ public class DFUNC_Gun : UdonSharpBehaviour
     }
     public void DFUNC_Selected()
     {
-        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active));
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Selected));
         Selected = true;
         if (DoAnimBool && !AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
     }
     public void DFUNC_Deselected()
     {
-        if (Selected)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
+        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected));
         Selected = false;
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
-    public void SFEXT_O_OnPlayerJoined()
-    {
-        if (Selected)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active)); }
-    }
     public void SFEXT_O_PilotEnter()
     {
-        GunDamageParticle.gameObject.SetActive(true);
         InVehicle = true;
+        GunDamageParticle.gameObject.SetActive(true);
+        gameObject.SetActive(true);
+        RequestSerialization();
+    }
+    public void SFEXT_G_PilotEnter()
+    {
+        Set_Active();
     }
     public void SFEXT_G_PilotExit()
     {
+        Set_Inactive();
+        Set_Unselected();
         if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
         { SetBoolOff(); }
     }
@@ -130,27 +132,34 @@ public class DFUNC_Gun : UdonSharpBehaviour
         if (GunAmmoInSeconds != FullGunAmmoInSeconds)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
-        if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+        UpdateAmmoVisuals();
     }
+    public void UpdateAmmoVisuals() { if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); } }
     public void SFEXT_G_RespawnButton()
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
-        if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+        UpdateAmmoVisuals();
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
-    public void Set_Active()
+    public void Set_Selected()
     {
         if (HudCrosshairGun) { HudCrosshairGun.SetActive(true); }
         if (HudCrosshair) { HudCrosshair.SetActive(false); }
-        gameObject.SetActive(true);
     }
-    public void Set_Inactive()
+    public void Set_Unselected()
     {
         if (HudCrosshairGun) { HudCrosshairGun.SetActive(false); }
         if (HudCrosshair) { HudCrosshair.SetActive(true); }
         if (TargetIndicator) { TargetIndicator.gameObject.SetActive(false); }
         if (GUNLeadIndicator) { GUNLeadIndicator.gameObject.SetActive(false); }
+    }
+    public void Set_Active()
+    {
+        gameObject.SetActive(true);
+    }
+    public void Set_Inactive()
+    {
         GunAnimator.SetBool(GunFiringBoolName, false);
         Firing = false;
         gameObject.SetActive(false);
@@ -210,7 +219,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
                 if (HUDControl)
                 { Hud(); }
             }
-            if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+            UpdateAmmoVisuals();
         }
     }
     private GameObject[] AAMTargets;

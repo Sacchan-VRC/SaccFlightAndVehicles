@@ -80,12 +80,11 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         BombAnimator = EntityControl.GetComponent<Animator>();
         CenterOfMass = EntityControl.CenterOfMass;
         VehicleTransform = EntityControl.transform;
-        BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
         localPlayer = Networking.LocalPlayer;
 
         FindSelf();
 
-        if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
+        UpdateAmmoVisuals();
 
         NumChildrenStart = transform.childCount;
         if (Bomb)
@@ -156,14 +155,14 @@ public class DFUNC_Bomb : UdonSharpBehaviour
     {
         BombPoint = 0;
         NumBomb = FullBombs;
-        BombAnimator.SetFloat(AnimFloatName, 1);
+        UpdateAmmoVisuals();
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
     public void SFEXT_G_RespawnButton()
     {
         NumBomb = FullBombs;
-        BombAnimator.SetFloat(AnimFloatName, 1);
+        UpdateAmmoVisuals();
         BombPoint = 0;
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
@@ -173,8 +172,12 @@ public class DFUNC_Bomb : UdonSharpBehaviour
         if (NumBomb != FullBombs)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullBombs);
-        BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
         BombPoint = 0;
+        UpdateAmmoVisuals();
+    }
+    public void UpdateAmmoVisuals()
+    {
+        BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
         if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
     }
     public void EnableForOthers()
@@ -243,8 +246,7 @@ public class DFUNC_Bomb : UdonSharpBehaviour
             BombPoint++;
             if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
         }
-        BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
-        if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
+        UpdateAmmoVisuals();
     }
     private void FindSelf()
     {

@@ -95,20 +95,24 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     {
         RocketPoint = 0;
         NumRocket = FullRockets;
-        if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+        UpdateAmmoVisuals();
     }
     public void SFEXTP_G_RespawnButton()
     {
         NumRocket = FullRockets;
         RocketPoint = 0;
-        if (AmmoBar) { AmmoBar.localScale = AmmoBarScaleStart; }
+        UpdateAmmoVisuals();
     }
     public void SFEXTP_G_ReSupply()
     {
         if (NumRocket != FullRockets) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumRocket = (int)Mathf.Min(NumRocket + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullRockets);
         RocketPoint = 0;
-        if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+        UpdateAmmoVisuals();
+    }
+    public void UpdateAmmoVisuals()
+    {
+        UpdateAmmoVisuals();
     }
     private void Update()
     {
@@ -144,7 +148,7 @@ public class DFUNCP_Rockets : UdonSharpBehaviour
     {
         IsOwner = localPlayer.IsOwner(gameObject);
         if (NumRocket > 0) { NumRocket--; }
-        if (AmmoBar) { AmmoBar.localScale = new Vector3((NumRocket * FullRocketsDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+        UpdateAmmoVisuals();
         if (Rocket != null)
         {
             GameObject NewRocket;

@@ -199,7 +199,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
     public void SFEXT_G_Explode()
     {
         NumAAM = FullAAMs;
-        if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, 1); }
+        UpdateAmmoVisuals();
         if (func_active)
         {
             DFUNC_Deselected();
@@ -212,13 +212,17 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (NumAAM != FullAAMs)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAAM = (int)Mathf.Min(NumAAM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAAMs);
+        UpdateAmmoVisuals();
+    }
+    public void UpdateAmmoVisuals()
+    {
         if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
         if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
     }
     public void SFEXT_G_RespawnButton()
     {
         NumAAM = FullAAMs;
-        if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, 1); }
+        UpdateAmmoVisuals();
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
@@ -531,8 +535,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             NewAAM.SetActive(true);
             NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
         }
-        if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
-        if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+        UpdateAmmoVisuals();
     }
     private void FindSelf()
     {

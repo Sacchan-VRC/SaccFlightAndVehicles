@@ -12,7 +12,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
     public Transform Minigun;
     [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
     public Transform GunDamageParticle_Parent;
-    [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
+    [SerializeField][UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
     [Tooltip("How long it takes to fully reload from empty in seconds")]
     public float FullReloadTimeSec = 20;
     public string AnimatorFiringStringName;
@@ -93,12 +93,14 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
         Selected = false;
         GunDamageParticle_Parent.gameObject.SetActive(false);
         gameObject.SetActive(false);
+        UpdateAmmoVisuals();
     }
     public void SFEXTP_G_RespawnButton()
     {
         GunAmmoInSeconds = FullGunAmmoInSeconds;
         Minigun.localRotation = Quaternion.identity;
         GunRotation = Vector2.zero;
+        UpdateAmmoVisuals();
     }
     public void SFEXTP_G_ReSupply()
     {
@@ -115,6 +117,11 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
             GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
         }
+        UpdateAmmoVisuals();
+    }
+    public void UpdateAmmoVisuals()
+    {
+        if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
     }
     private void LateUpdate()
     {
@@ -177,7 +184,7 @@ public class DFUNCP_Minigun : UdonSharpBehaviour
             Quaternion newrot = (Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0)));
             Minigun.rotation = Quaternion.Slerp(Minigun.rotation, newrot, 4 * DeltaTime);
         }
-        if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+        UpdateAmmoVisuals();
     }
     private void OnDisable()
     {

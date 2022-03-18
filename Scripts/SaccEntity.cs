@@ -50,8 +50,8 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float RStickFuncDegreesDivider;
     [System.NonSerializedAttribute] public int LStickNumFuncs;
     [System.NonSerializedAttribute] public int RStickNumFuncs;
-    [System.NonSerializedAttribute] public bool LStickDoDial;
-    [System.NonSerializedAttribute] public bool RStickDoDial;
+    [System.NonSerializedAttribute] public bool DoDialLeft;
+    [System.NonSerializedAttribute] public bool DoDialRight;
     [System.NonSerializedAttribute] public bool _DisableLeftDial;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableLeftDial_))] public int DisableLeftDial = 0;
     public int DisableLeftDial_
@@ -154,8 +154,8 @@ public class SaccEntity : UdonSharpBehaviour
         //Dial Stuff
         LStickNumFuncs = Dial_Functions_L.Length;
         RStickNumFuncs = Dial_Functions_R.Length;
-        LStickDoDial = LStickNumFuncs > 1;
-        RStickDoDial = RStickNumFuncs > 1;
+        DoDialLeft = LStickNumFuncs > 1;
+        DoDialRight = RStickNumFuncs > 1;
         DisableLeftDial_ = 0;
         DisableRightDial_ = 0;
         LStickFuncDegrees = 360 / Mathf.Max((float)LStickNumFuncs, 1);
@@ -308,7 +308,7 @@ public class SaccEntity : UdonSharpBehaviour
             }
 
             //LStick Selection wheel
-            if (LStickDoDial && !_DisableLeftDial)
+            if (DoDialLeft && !_DisableLeftDial)
             {
                 if (InVR && LStickPos.magnitude > DialSensitivity)
                 {
@@ -349,7 +349,7 @@ public class SaccEntity : UdonSharpBehaviour
             }
 
             //RStick Selection wheel
-            if (RStickDoDial && !_DisableRightDial)
+            if (DoDialRight && !_DisableRightDial)
             {
                 if (InVR && RStickPos.magnitude > DialSensitivity)
                 {

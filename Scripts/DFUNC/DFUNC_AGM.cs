@@ -125,12 +125,11 @@ public class DFUNC_AGM : UdonSharpBehaviour
         InEditor = localPlayer == null;
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
-        if (AGMAnimator) { AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider); }
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
 
         FindSelf();
 
-        if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
+        UpdateAmmoVisuals();
 
         NumChildrenStart = transform.childCount;
         if (AGM)
@@ -179,7 +178,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
     public void SFEXT_G_RespawnButton()
     {
         NumAGM = FullAGMs;
-        if (AGMAnimator) { AGMAnimator.SetFloat(AnimFloatName, 1); }
+        UpdateAmmoVisuals();
         if (DoAnimBool && AnimOn)
         { SetBoolOff(); }
     }
@@ -188,13 +187,17 @@ public class DFUNC_AGM : UdonSharpBehaviour
         if (NumAGM != FullAGMs)
         { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
         NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
+        UpdateAmmoVisuals();
+    }
+    public void UpdateAmmoVisuals()
+    {
         if (AGMAnimator) { AGMAnimator.SetFloat(AnimFloatName, (float)NumAGM * FullAGMsDivider); }
         if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
     }
     public void SFEXT_G_Explode()
     {
         NumAGM = FullAGMs;
-        if (AGMAnimator) { AGMAnimator.SetFloat(AnimFloatName, 1); }
+        UpdateAmmoVisuals();
         if (func_active)
         { DFUNC_Deselected(); }
         if (DoAnimBool && AnimOn)
