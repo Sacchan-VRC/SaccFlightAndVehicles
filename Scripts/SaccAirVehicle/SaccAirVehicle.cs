@@ -270,6 +270,13 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
                 ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
                 ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+
+                //replaces StickyWheelWorkaround
+                if (HasWheelColliders)
+                {
+                    foreach (WheelCollider wheel in VehicleWheelColliders)
+                    { wheel.motorTorque = 0.00000000000000000000000000000000001f; }
+                }
             }
             else
             {
@@ -287,6 +294,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
                 ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
                 ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
+
+                if (HasWheelColliders)
+                {
+                    foreach (WheelCollider wheel in VehicleWheelColliders)
+                    { wheel.motorTorque = 0; }
+                }
             }
             _EngineOn = value;
         }
@@ -410,6 +423,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float TaxiFullTurningSpeedDivider;
     private float vtolangledif;
+    [System.NonSerializedAttribute] public WheelCollider[] VehicleWheelColliders;
     [System.NonSerializedAttribute] public bool LowFuelLastFrame;
     [System.NonSerializedAttribute] public bool NoFuelLastFrame;
     [System.NonSerializedAttribute] public float ThrottleStrengthAB;
@@ -430,13 +444,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     //this stuff can be used by DFUNCs
     //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
     //the bools exists to save externs every frame
-    public bool _DisableStickyWheelWorkaround;
-    [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableStickyWheelWorkaround_))] public int DisableStickyWheelWorkaround = 0;
-    public int DisableStickyWheelWorkaround_
-    {
-        set { _DisableStickyWheelWorkaround = value > 0; }
-        get => DisableStickyWheelWorkaround;
-    }
     [System.NonSerializedAttribute] public bool _DisablePhysicsAndInputs;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisablePhysicsAndInputs_))] public int DisablePhysicsAndInputs = 0;
     public int DisablePhysicsAndInputs_
@@ -534,9 +541,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
         }
 
-        WheelCollider[] wc = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
-        if (wc.Length != 0) { HasWheelColliders = true; }
-        if (_DisableStickyWheelWorkaround) { DisableStickyWheelWorkaround++; }
+        VehicleWheelColliders = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
+        if (VehicleWheelColliders.Length != 0) { HasWheelColliders = true; }
 
         if (AutoAdjustValuesToMass)
         {
@@ -562,7 +568,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             AdverseRoll *= RBMass;
             AdverseYaw *= RBMass;
             GroundEffectLiftMax *= RBMass;
-            foreach (WheelCollider wheel in wc)
+            foreach (WheelCollider wheel in VehicleWheelColliders)
             {
                 JointSpring SusiSpring = wheel.suspensionSpring;
                 SusiSpring.spring *= RBMass;
@@ -988,15 +994,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
 
                     SetRotInputs();
 
-                    //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
-                    if (!_DisableStickyWheelWorkaround && _EngineOn && HasWheelColliders && Speed < .2 && ThrottleInput > 0)
-                    {
-                        if (VTOLAngleForward)
-                        { VehicleRigidbody.velocity = VehicleTransform.forward * .25f; }
-                        else
-                        { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
-                    }
-
                     if (VTOLenabled)
                     {
                         if (VTOLOnly || !(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0))//only SetVTOLValues if it'll do anything
@@ -1028,14 +1025,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     if (_ThrottleOverridden)
                     { ThrottleInput = PlayerThrottle = ThrottleOverride; }
                     FuelEvents();
-                    //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
-                    if (!_DisableStickyWheelWorkaround && HasWheelColliders && Speed < .2 && ThrottleInput > 0)
-                    {
-                        if (VTOLAngleForward)
-                        { VehicleRigidbody.velocity = VehicleTransform.forward * .25f; }
-                        else
-                        { VehicleRigidbody.velocity = VehicleTransform.forward * -.25f; }
-                    }
                 }
                 if (_JoystickOverridden)
                 {
