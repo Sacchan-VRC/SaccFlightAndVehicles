@@ -32,6 +32,8 @@ public class SaccEntity : UdonSharpBehaviour
     public AudioSource SwitchFunctionSound;
     public Transform LStickDisplayHighlighter;
     public Transform RStickDisplayHighlighter;
+    [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
+    public bool DoVoiceVolumeChange = true;
     [Tooltip("Any objects in this list get set inactive after 10 seconds, used to disable AAMTarget object for vehicles that should never be targetable but that should be in the targets list for the camera etc")]
     public GameObject[] DisableAfter10Seconds;
     [System.NonSerializedAttribute] public bool InEditor = true;

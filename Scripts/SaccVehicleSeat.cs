@@ -33,13 +33,16 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     private bool SeatInitialized = false;
     private bool InEditor = true;
     private VRCPlayerApi localPlayer;
+    private bool DoVoiceVolumeChange = true;
+    [System.NonSerializedAttribute] public VRCStation Station;
     private Transform Seat;
     private Quaternion SeatStartRot;
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null) { InEditor = false; }
-        Seat = ((VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation))).stationEnterPlayerLocation.transform;
+        Station = (VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation));
+        Seat = Station.stationEnterPlayerLocation.transform;
         SeatStartRot = Seat.localRotation;
         SeatStartPos = Seat.localPosition;
         if (InEditor && ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
@@ -58,7 +61,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         if (!SeatInitialized) { InitializeSeat(); }//can't do this in start because EntityControl might not have initialized
         if (player != null)
         {
-            //voice range change to allow talking inside cockpit (after VRC patch 1008)
+            DoVoiceVolumeChange = EntityControl.DoVoiceVolumeChange;
             EntityControl.SeatedPlayers[ThisStationID] = player.playerId;
             if (player.isLocal)
             {
@@ -79,18 +82,24 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                     AdjustTime = 0;
                     SeatAdjustment();
                 }
-                foreach (int crew in EntityControl.SeatedPlayers)
-                {//get get a fresh VRCPlayerAPI every time to prevent players who left leaving a broken one behind and causing crashes
-                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
-                    if (guy != null)
-                    {
-                        SetVoiceInside(guy);
+                if (DoVoiceVolumeChange)
+                {
+                    foreach (int crew in EntityControl.SeatedPlayers)
+                    {//get get a fresh VRCPlayerAPI every time to prevent players who left leaving a broken one behind and causing crashes
+                        VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
+                        if (guy != null)
+                        {
+                            SetVoiceInside(guy);
+                        }
                     }
                 }
             }
             else if (EntityControl.InVehicle)
             {
-                SetVoiceInside(player);
+                if (DoVoiceVolumeChange)
+                {
+                    SetVoiceInside(player);
+                }
             }
             if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
         }
@@ -115,21 +124,28 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         EntityControl.SeatedPlayers[ThisStationID] = -1;
         if (player != null)
         {
+            DoVoiceVolumeChange = EntityControl.DoVoiceVolumeChange;
             if (IsPilotSeat) { EntityControl.PilotExitVehicle(player); }
-            SetVoiceOutside(player);
+            if (DoVoiceVolumeChange)
+            {
+                SetVoiceOutside(player);
+            }
             if (player.isLocal)
             {
                 InSeat = false;
                 EntityControl.MySeat = -1;
                 if (!IsPilotSeat)
                 { EntityControl.PassengerExitVehicleLocal(); }
-                //undo voice distances of all players inside the vehicle
-                foreach (int crew in EntityControl.SeatedPlayers)
+                if (DoVoiceVolumeChange)
                 {
-                    VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
-                    if (guy != null)
+                    //undo voice distances of all players inside the vehicle
+                    foreach (int crew in EntityControl.SeatedPlayers)
                     {
-                        SetVoiceOutside(guy);
+                        VRCPlayerApi guy = VRCPlayerApi.GetPlayerById(crew);
+                        if (guy != null)
+                        {
+                            SetVoiceOutside(guy);
+                        }
                     }
                 }
                 if (ThisSeatOnly) { ThisSeatOnly.SetActive(false); }
