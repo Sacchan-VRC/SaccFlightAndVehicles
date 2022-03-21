@@ -10,12 +10,13 @@ public class SaccMultiObjectToggle : UdonSharpBehaviour
     public GameObject[] ToggleObjs;
     [Tooltip("Another object that is enabled unless everything is disabled")]
     public GameObject EnabledWithAll;
-    public bool DisableIfPlayerDistant;
+    public bool ResetIfPlayerDistant;
     [Tooltip("How distant?")]
     public float DisableDistance = 15;
     private bool CheckActive;
     public bool CanToggleToDisabled = false;
-    public bool DisabledDefault = false;
+    [Tooltip("0 = first page, -1 = disabled")]
+    public int DefaultPage = 0;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(current))] public int _current = -1;
     public int current
     {
@@ -28,7 +29,7 @@ public class SaccMultiObjectToggle : UdonSharpBehaviour
             else
             {
                 if (EnabledWithAll) { EnabledWithAll.SetActive(true); }
-                if (DisableIfPlayerDistant)
+                if (ResetIfPlayerDistant)
                 {
                     if (!CheckActive)
                     {
@@ -53,7 +54,7 @@ public class SaccMultiObjectToggle : UdonSharpBehaviour
         {
             if (Vector3.Distance(localPlayer.GetPosition(), gameObject.transform.position) > DisableDistance)
             {
-                current = -1;
+                current = DefaultPage;
                 CheckActive = false;
             }
             else
@@ -65,10 +66,7 @@ public class SaccMultiObjectToggle : UdonSharpBehaviour
     private void Start()
     {
         localPlayer = Networking.LocalPlayer;
-        if (DisabledDefault)
-        { current = -1; }
-        else
-        { current = 0; }
+        current = DefaultPage;
     }
     public override void Interact()
     {
@@ -85,5 +83,23 @@ public class SaccMultiObjectToggle : UdonSharpBehaviour
         }
         else
         { current++; }
+    }
+    public void SwitchBack()
+    {
+        if (CanToggleToDisabled)
+        {
+            if (current - 1 <= -2)
+            {
+                current = ToggleObjs.Length - 1;
+            }
+            else
+            { current--; }
+        }
+        else if (current - 1 <= -1)
+        {
+            current = ToggleObjs.Length - 1;
+        }
+        else
+        { current--; }
     }
 }
