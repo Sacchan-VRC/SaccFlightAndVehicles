@@ -644,11 +644,11 @@ public class SAV_SoundController : UdonSharpBehaviour
         if (DoEngineLerpSpeedMultiplierChanges)
         { EngineLerpSpeedMultiplier = EngineStartingLerpSpeedMulti; }
         EngineStarted = true;
+        EngineSoundsOn();
         if (AllDoorsClosed)
         { if (EngineStartupInside) { EngineStartupInside.Play(); } }
         else
         { if (EngineStartup) { EngineStartup.Play(); } }
-        EngineSoundsOn();
     }
     public void SFEXT_G_EngineStartupCancel()
     {
