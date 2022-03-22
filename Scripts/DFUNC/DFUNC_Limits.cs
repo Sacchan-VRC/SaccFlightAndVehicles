@@ -135,9 +135,9 @@ public class DFUNC_Limits : UdonSharpBehaviour
     public void SFEXT_G_TakeOff()
     { Grounded = false; }
     public void SFEXT_G_TouchDown()
-    { Grounded = true; }
+    { Grounded = true; SAVControl.SetProgramVariable("Limits", 1f); }
     public void SFEXT_G_TouchDownWater()
-    { Grounded = true; }
+    { Grounded = true; SAVControl.SetProgramVariable("Limits", 1f); }
     public void KeyboardInput()
     {
         ToggleLimits();
