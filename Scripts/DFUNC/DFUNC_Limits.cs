@@ -21,6 +21,7 @@ public class DFUNC_Limits : UdonSharpBehaviour
     private bool TriggerLastFrame;
     private bool InVR;
     private bool Piloting;
+    private bool Grounded = true;
     private bool Selected;
     [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -124,13 +125,19 @@ public class DFUNC_Limits : UdonSharpBehaviour
             }
             else { TriggerLastFrame = false; }
         }
-        if (FlightLimitsEnabled && Piloting)
+        if (FlightLimitsEnabled && Piloting && !Grounded)
         {
-            float GLimitStrength = Mathf.Clamp(-(Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs")) / GLimiter) + 1, 0, 1);
-            float AoALimitStrength = Mathf.Clamp(-(Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack")) / AoALimiter) + 1, 0, 1);
+            float GLimitStrength = Mathf.Clamp(1 - (Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs")) / GLimiter), 0, 1);
+            float AoALimitStrength = Mathf.Clamp(1 - (Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack")) / AoALimiter), 0, 1);
             SAVControl.SetProgramVariable("Limits", Mathf.Min(GLimitStrength, AoALimitStrength));
         }
     }
+    public void SFEXT_G_TakeOff()
+    { Grounded = false; }
+    public void SFEXT_G_TouchDown()
+    { Grounded = true; }
+    public void SFEXT_G_TouchDownWater()
+    { Grounded = true; }
     public void KeyboardInput()
     {
         ToggleLimits();
