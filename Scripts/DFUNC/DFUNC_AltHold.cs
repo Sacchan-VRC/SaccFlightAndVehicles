@@ -30,6 +30,7 @@ public class DFUNC_AltHold : UdonSharpBehaviour
     private bool IsOwner;
     private bool InVR;
     private bool Selected;
+    private bool JoyStickOveridden;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXT_L_EntityStart()
@@ -96,13 +97,33 @@ public class DFUNC_AltHold : UdonSharpBehaviour
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ActivateAltHold));
         }
     }
+    public void SFEXT_O_JoystickGrabbed()
+    {
+        AltHoldPitchIntegrator = 0;
+        if (JoyStickOveridden)
+        {
+            SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") - 1);
+            JoyStickOveridden = false;
+        }
+    }
     public void SFEXT_O_JoystickDropped()
-    { AltHoldPitchIntegrator = 0; }
+    {
+        AltHoldPitchIntegrator = 0;
+        if (!JoyStickOveridden && AltHold)
+        {
+            SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") + 1);
+            JoyStickOveridden = true;
+        }
+    }
     public void ActivateAltHold()
     {
         if (AltHold) { return; }
         AltHold = true;
-        SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") + 1);
+        if (!JoyStickOveridden)
+        {
+            SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") + 1);
+            JoyStickOveridden = true;
+        }
         if (Dial_Funcon) { Dial_Funcon.SetActive(AltHold); }
         if (HudHold) { HudHold.SetActive(AltHold); }
         if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOn"); }
@@ -114,7 +135,11 @@ public class DFUNC_AltHold : UdonSharpBehaviour
         AltHold = false;
         if (Dial_Funcon) { Dial_Funcon.SetActive(AltHold); }
         if (HudHold) { HudHold.SetActive(AltHold); }
-        SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") - 1);
+        if (JoyStickOveridden)
+        {
+            SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") - 1);
+            JoyStickOveridden = false;
+        }
         SAVControl.SetProgramVariable("JoystickOverride", Vector3.zero);
         RotationInputs = Vector3.zero;
         AltHoldPitchIntegrator = 0;

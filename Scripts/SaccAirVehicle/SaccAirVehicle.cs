@@ -450,6 +450,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && DisablePhysicsAndInputs == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_DisablePhysicsAndInputs_Activated");
+            }
+            else if (value == 0 && DisablePhysicsAndInputs > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_DisablePhysicsAndInputs_Deactivated");
+            }
             _DisablePhysicsAndInputs = value > 0;
             DisablePhysicsAndInputs = value;
         }
@@ -461,6 +469,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && OverrideConstantForce == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_OverrideConstantForce_Activated");
+            }
+            else if (value == 0 && OverrideConstantForce > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_OverrideConstantForce_Deactivated");
+            }
             _OverrideConstantForce = value > 0;
             OverrideConstantForce = value;
         }
@@ -474,6 +490,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && DisableTaxiRotation == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_DisableTaxiRotation_Activated");
+            }
+            else if (value == 0 && DisableTaxiRotation > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_DisableTaxiRotation_Deactivated");
+            }
             _DisableTaxiRotation = value > 0;
             DisableTaxiRotation = value;
         }
@@ -485,6 +509,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && DisableGroundDetection == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_DisableGroundDetection_Activated");
+            }
+            else if (value == 0 && DisableGroundDetection > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_DisableGroundDetection_Deactivated");
+            }
             _DisableGroundDetection = value > 0;
             DisableGroundDetection = value;
         }
@@ -496,6 +528,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && ThrottleOverridden == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_ThrottleOverridden_Activated");
+            }
+            else if (value == 0 && ThrottleOverridden > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_ThrottleOverridden_Deactivated");
+            }
             _ThrottleOverridden = value > 0;
             ThrottleOverridden = value;
         }
@@ -508,6 +548,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && JoystickOverridden == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_JoystickOverridden_Activated");
+            }
+            else if (value == 0 && JoystickOverridden > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_L_JoystickOverridden_Deactivated");
+            }
             _JoystickOverridden = value > 0;
             JoystickOverridden = value;
         }
@@ -939,7 +987,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         else
                         { PlayerThrottle = 1; }
                     }
-                    if (_ThrottleOverridden && !ThrottleGripLastFrame)
+                    if (_ThrottleOverridden)
                     {
                         ThrottleInput = PlayerThrottle = ThrottleOverride;
                     }
@@ -962,7 +1010,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     }
                     FuelEvents();
 
-                    if (_JoystickOverridden && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
+                    if (_JoystickOverridden)//joystick override enabled, and player not holding joystick
                     {
                         RotationInputs = JoystickOverride;
                     }

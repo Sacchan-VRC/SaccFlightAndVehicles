@@ -268,6 +268,22 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
     }
+    public void SFEXT_O_ThrottleDropped()
+    {
+        if (!CruiseThrottleOverridden && Cruise)
+        {
+            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
+            CruiseThrottleOverridden = false;
+        }
+    }
+    public void SFEXT_O_ThrottleGrabbed()
+    {
+        if (CruiseThrottleOverridden)
+        {
+            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
+            CruiseThrottleOverridden = false;
+        }
+    }
     public void SFEXT_O_LoseOwnership()
     {
         gameObject.SetActive(false);

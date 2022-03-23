@@ -158,10 +158,10 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AllGs;
 
 
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
     [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
 
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
@@ -185,7 +185,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool Taxiing = false;
     [System.NonSerializedAttribute] public bool Floating = false;
     [System.NonSerializedAttribute] public Vector3 RotationInputs;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float YawInput;
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float YawInput;
     [System.NonSerializedAttribute] public bool Piloting = false;
     [System.NonSerializedAttribute] public bool Passenger = false;
     [System.NonSerializedAttribute] public bool InEditor = true;
@@ -251,7 +251,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisablePhysicsAndInputs_))] public int DisablePhysicsAndInputs = 0;
     public int DisablePhysicsAndInputs_
     {
-        set { _DisablePhysicsAndInputs = value > 0; }
+        set
+        {
+            _DisablePhysicsAndInputs = value > 0;
+            DisablePhysicsAndInputs = value;
+        }
         get => DisablePhysicsAndInputs;
     }
     [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
@@ -261,28 +265,44 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(OverrideConstantForce_))] public int OverrideConstantForce = 0;
     public int OverrideConstantForce_
     {
-        set { _OverrideConstantForce = value > 0; }
+        set
+        {
+            _OverrideConstantForce = value > 0;
+            OverrideConstantForce = value;
+        }
         get => OverrideConstantForce;
     }
     [System.NonSerializedAttribute] public bool _DisableTaxiRotation;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableTaxiRotation_))] public int DisableTaxiRotation = 0;
     public int DisableTaxiRotation_
     {
-        set { _DisableTaxiRotation = value > 0; }
+        set
+        {
+            _DisableTaxiRotation = value > 0;
+            DisableTaxiRotation = value;
+        }
         get => DisableTaxiRotation;
     }
     [System.NonSerializedAttribute] public bool _DisableGroundDetection;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableGroundDetection_))] public int DisableGroundDetection = 0;
     public int DisableGroundDetection_
     {
-        set { _DisableGroundDetection = value > 0; }
+        set
+        {
+            _DisableGroundDetection = value > 0;
+            DisableGroundDetection = value;
+        }
         get => DisableGroundDetection;
     }
     [System.NonSerializedAttribute] public bool _ThrottleOverridden;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(ThrottleOverridden_))] public int ThrottleOverridden = 0;
     public int ThrottleOverridden_
     {
-        set { _ThrottleOverridden = value > 0; }
+        set
+        {
+            _ThrottleOverridden = value > 0;
+            ThrottleOverridden = value;
+        }
         get => ThrottleOverridden;
     }
     [System.NonSerializedAttribute] public float ThrottleOverride;
@@ -290,7 +310,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(JoystickOverridden_))] public int JoystickOverridden = 0;
     public int JoystickOverridden_
     {
-        set { _JoystickOverridden = value > 0; }
+        set
+        {
+            _JoystickOverridden = value > 0;
+            JoystickOverridden = value;
+        }
         get => JoystickOverridden;
     }
     [System.NonSerializedAttribute] public Vector3 JoystickOverride;
