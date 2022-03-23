@@ -253,6 +253,14 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && DisablePhysicsAndInputs == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_DisablePhysicsAndInputs_Activated");
+            }
+            else if (value == 0 && DisablePhysicsAndInputs > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_DisablePhysicsAndInputs_Deactivated");
+            }
             _DisablePhysicsAndInputs = value > 0;
             DisablePhysicsAndInputs = value;
         }
@@ -267,6 +275,14 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && OverrideConstantForce == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_OverrideConstantForce_Activated");
+            }
+            else if (value == 0 && OverrideConstantForce > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_OverrideConstantForce_Deactivated");
+            }
             _OverrideConstantForce = value > 0;
             OverrideConstantForce = value;
         }
@@ -278,6 +294,14 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && DisableTaxiRotation == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_DisableTaxiRotation_Activated");
+            }
+            else if (value == 0 && DisableTaxiRotation > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_DisableTaxiRotation_Deactivated");
+            }
             _DisableTaxiRotation = value > 0;
             DisableTaxiRotation = value;
         }
@@ -289,6 +313,14 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && DisableGroundDetection == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_DisableGroundDetection_Activated");
+            }
+            else if (value == 0 && DisableGroundDetection > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_DisableGroundDetection_Deactivated");
+            }
             _DisableGroundDetection = value > 0;
             DisableGroundDetection = value;
         }
@@ -300,6 +332,14 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && ThrottleOverridden == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_ThrottleOverridden_Activated");
+            }
+            else if (value == 0 && ThrottleOverridden > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_ThrottleOverridden_Deactivated");
+            }
             _ThrottleOverridden = value > 0;
             ThrottleOverridden = value;
         }
@@ -312,6 +352,14 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     {
         set
         {
+            if (value > 0 && JoystickOverridden == 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_JoystickOverridden_Activated");
+            }
+            else if (value == 0 && JoystickOverridden > 0)
+            {
+                EntityControl.SendEventToExtensions("SFEXT_O_JoystickOverridden_Deactivated");
+            }
             _JoystickOverridden = value > 0;
             JoystickOverridden = value;
         }
