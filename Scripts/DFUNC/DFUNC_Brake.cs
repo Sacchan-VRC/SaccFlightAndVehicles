@@ -32,7 +32,11 @@ public class DFUNC_Brake : UdonSharpBehaviour
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableGroundBrake_))] public int DisableGroundBrake = 0;
     public int DisableGroundBrake_
     {
-        set { _DisableGroundBrake = value > 0; }
+        set
+        {
+            _DisableGroundBrake = value > 0;
+            DisableGroundBrake = value;
+        }
         get => DisableGroundBrake;
     }
     private SaccEntity EntityControl;
