@@ -148,6 +148,8 @@ public class SAV_AAMController : UdonSharpBehaviour
         ColliderActive = false;
         MissileConstant.relativeTorque = Vector3.zero;
         MissileConstant.relativeForce = Vector3.zero;
+        DirectHit = false;
+        SplashHit = false;
         LockHack = true;
         TargetLost = false;
         MissileIncoming = false;
