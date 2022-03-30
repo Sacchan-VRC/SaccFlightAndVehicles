@@ -22,7 +22,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     [Tooltip("Multiply velocity vectors recieved while in idle mode, useful for stopping sea vehicles from extrapolating above and below the water")]
     public float IdleModeVelMultiplier = .4f;
     [Tooltip("If vehicle moves less than this distance since it's last update, it'll be considered to be idle, may need to be increased for vehicles that want to be idle on water. If the vehicle floats away sometimes, this value is probably too big")]
-    public float IdleMoveMentRange = .35f;
+    public float IdleMovementRange = .35f;
     [Tooltip("If vehicle rotates less than this many degrees since it's last update, it'll be considered to be idle")]
     public float IdleRotationRange = 5f;
     [Tooltip("Angle Difference between movement direction and rigidbody velocity that will cause the vehicle to teleport instead of interpolate")]
@@ -186,7 +186,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                 {
                     bool Still;
                     //check if the vehicle has moved enough from it's last sent location and rotation to bother exiting idle mode
-                    Still = !Piloting && (((VehicleTransform.position - O_Position).magnitude < IdleMoveMentRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
+                    Still = !Piloting && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
 
                     if (Still)
                     {

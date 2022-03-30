@@ -113,6 +113,7 @@ public class SaccEntity : UdonSharpBehaviour
         {
             InEditor = false;
             if (localPlayer.isMaster) { IsOwner = true; }
+            if (localPlayer.IsUserInVR()) { InVR = true; }
         }
         else
         {
@@ -121,12 +122,19 @@ public class SaccEntity : UdonSharpBehaviour
             InVehicle = true;
         }
 
-        if (!CenterOfMass)
+        if (CenterOfMass)
+        {
+            Rigidbody rb = GetComponent<Rigidbody>();
+            if (rb)
+            {
+                GetComponent<Rigidbody>().centerOfMass = transform.InverseTransformDirection(CenterOfMass.position - transform.position);//correct position if scaled}
+            }
+        }
+        else
         {
             CenterOfMass = gameObject.transform;
             Debug.Log(string.Concat(gameObject.name, ": ", "No Center Of Mass Set"));
         }
-
         VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
         SeatedPlayers = new int[VehicleStations.Length];
         for (int i = 0; i != SeatedPlayers.Length; i++)

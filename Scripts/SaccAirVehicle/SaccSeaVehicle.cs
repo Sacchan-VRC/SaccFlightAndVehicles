@@ -172,8 +172,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public Transform CenterOfMass;
     private float LerpedYaw;
     [System.NonSerializedAttribute] public bool ThrottleGripLastFrame = false;
-    [System.NonSerializedAttribute] public bool JoystickGripLastFrameR = false;
-    [System.NonSerializedAttribute] public bool JoystickGripLastFrameL = false;
+    [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
     Quaternion JoystickZeroPoint;
     Quaternion VehicleRotLastFrame;
     [System.NonSerializedAttribute] public float PlayerThrottle;
@@ -589,7 +588,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                         VehicleRotLastFrame = ControlsRoot.rotation;
                         JoystickZeroPoint = VehicleRotDif * JoystickZeroPoint;//zero point rotates with the vehicle so it appears still to the pilot
-                        if (!JoystickGripLastFrameR)//first frame you gripped joystick
+                        if (!JoystickGripLastFrame)//first frame you gripped joystick
                         {
                             EntityControl.SendEventToExtensions("SFEXT_O_JoystickGrabbed");
                             VehicleRotDif = Quaternion.identity;
@@ -602,7 +601,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                             CompareAngleLastFrame = Vector3.up;
                             JoystickValueLastFrame = 0;
                         }
-                        JoystickGripLastFrameR = true;
+                        JoystickGripLastFrame = true;
                         //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
                         Quaternion JoystickDifference;
                         JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
@@ -621,9 +620,9 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                     else
                     {
                         VRJoystickPos = 0;
-                        if (JoystickGripLastFrameR)//first frame you let go of joystick
+                        if (JoystickGripLastFrame)//first frame you let go of joystick
                         { EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped"); }
-                        JoystickGripLastFrameR = false;
+                        JoystickGripLastFrame = false;
                     }
 
                     if (_EngineOn)
@@ -731,7 +730,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         ThrottleInput = PlayerThrottle = 0;
                     }
                     FuelEvents();
-                    if (JoystickOverridden_ > 0 && !JoystickGripLastFrameR)//joystick override enabled, and player not holding joystick
+                    if (JoystickOverridden_ > 0 && !JoystickGripLastFrame)//joystick override enabled, and player not holding joystick
                     {
                         YawInput = JoystickOverride.z;
                     }
@@ -1352,7 +1351,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         Piloting = false;
         Taxiinglerper = 0;
         ThrottleGripLastFrame = false;
-        JoystickGripLastFrameR = false;
+        JoystickGripLastFrame = false;
         DoAAMTargeting = false;
         Yawing = Vector3.zero;
         localPlayer.SetVelocity(CurrentVel);

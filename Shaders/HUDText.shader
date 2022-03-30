@@ -9,6 +9,7 @@ Shader "SF-1/HUDText"
 		_StencilWriteMask ("Stencil Write Mask", Float) = 1
 		_StencilReadMask ("Stencil Read Mask", Float) = 1
 		_ColorMask ("Color Mask", Float) = 15
+		_Brightness("Brightness", Range(0,1)) = 1
 	}
 
 	SubShader
@@ -34,7 +35,7 @@ Shader "SF-1/HUDText"
 		Lighting Off
 		ZWrite Off
 		ZTest Off
-		Blend SrcAlpha OneMinusSrcAlpha
+		Blend SrcAlpha One
 
 		Pass
 		{
@@ -65,6 +66,7 @@ Shader "SF-1/HUDText"
 			fixed4 _Color;
 			fixed4 _TextureSampleAdd;
 			float4 _ClipRect;
+			float _Brightness;
 
 			v2f vert(appdata_t IN)
 			{
@@ -82,8 +84,7 @@ Shader "SF-1/HUDText"
 
 			fixed4 frag(v2f IN) : SV_Target
 			{
-				half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
-				return color;
+				return (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color * _Brightness;
 			}
 			ENDCG
 		}

@@ -7,8 +7,8 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: MFD_funcon
-  m_Shader: {fileID: 4800000, guid: 3a68587b5aafbd5418ba9f1e11e672e0, type: 3}
+  m_Name: Guide_HUDText
+  m_Shader: {fileID: 4800000, guid: e5a014a3e0d89c747b6eaef9dc584324, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -40,7 +40,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 3803fec4c7b065042891595e749524cc, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -57,8 +57,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _Brightness: 1
-    - _BumpDepth: -2
     - _BumpScale: 1
+    - _ColorMask: 255
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
@@ -72,9 +72,14 @@ Material:
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
-    - _StencilRef: 123.6
+    - _Stencil: 1
+    - _StencilComp: 3
+    - _StencilOp: 1
+    - _StencilReadMask: 1
+    - _StencilWriteMask: 1
     - _UVSec: 0
+    - _UseUIAlphaClip: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.101960786, g: 0.62352943, b: 0, a: 1}
+    - _Color: {r: 0, g: 1, b: 0, a: 0.59607846}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

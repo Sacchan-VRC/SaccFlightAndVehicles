@@ -405,6 +405,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool FloatingLastFrame = false;
     bool GroundedLastFrame = false;
     bool VTOL360;
+    [System.NonSerializedAttribute] public float VTOLAngleDegrees;
     private float VelLiftStart;
     private int VehicleLayer;
     private float VelLiftMaxStart;
@@ -712,6 +713,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         vtolangledif = VTOLMaxAngle - VTOLMinAngle;
         VTOLAngleDivider = VTOLAngleTurnRate / vtolangledif;
         VTOLAngle = VTOLAngleInput = VTOLDefaultValue;
+        VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
 
         if (GroundDetectorRayDistance == 0 || !GroundDetector)
         { DisableGroundDetection_++; }
@@ -744,6 +746,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 if (Health <= 0f)//vehicle is ded
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                    return;
                 }
             }
             else { GDamageToTake = 0; }
@@ -1182,12 +1185,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     if (VTOLenabled)
                     {
                         //float thrust = EngineOutput * ThrottleStrength * AfterburnerThrottle * AfterburnerThrustMulti * Atmosphere;
-                        float VTOLAngle2 = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
+                        VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
 
                         Vector3 VTOLInputAcc;//rotate and scale Vector for VTOL thrust
                         if (VTOLOnly)//just use regular thrust strength if vtol only, no transition to plane flight
                         {
-                            VTOLInputAcc = (Quaternion.SlerpUnclamped(Quaternion.identity, Quaternion.AngleAxis(180, Vector3.right), VTOLAngle2 * 0.0055555555555f /* / 180 */)
+                            VTOLInputAcc = (Quaternion.SlerpUnclamped(Quaternion.identity, Quaternion.AngleAxis(180, Vector3.right), VTOLAngleDegrees * 0.0055555555555f /* / 180 */)
                                 * Vector3.forward);
                             VTOLAngleForwardDot = Vector3.Dot(VTOLInputAcc, Vector3.forward);
                             VTOLAngleForward = VTOLAngleForwardDot > 0;
@@ -1197,7 +1200,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         else//vehicle can transition from plane-like flight to helicopter-like flight, with different thrust values for each, with a smooth transition between them
                         {
                             float downthrust = Thrust * VTOLThrottleStrengthMulti;
-                            VTOLInputAcc = (Quaternion.SlerpUnclamped(Quaternion.identity, Quaternion.AngleAxis(180, Vector3.right), VTOLAngle2 * 0.0055555555555f /* / 180 */)
+                            VTOLInputAcc = (Quaternion.SlerpUnclamped(Quaternion.identity, Quaternion.AngleAxis(180, Vector3.right), VTOLAngleDegrees * 0.0055555555555f /* / 180 */)
                                 * Vector3.forward);
                             VTOLAngleForwardDot = Vector3.Dot(VTOLInputAcc, Vector3.forward);
                             VTOLAngleForward = VTOLAngleForwardDot > 0;
@@ -1310,6 +1313,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Atmosphere = 1;//vehiclemoving optimization requires this to be here
         Pitching = Vector3.zero;
         Yawing = Vector3.zero;
+        VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
 
         EntityControl.SendEventToExtensions("SFEXT_G_Explode");
 
@@ -1640,6 +1644,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Fuel = FullFuel;
             VTOLAngle = VTOLDefaultValue;
             VTOLAngleInput = VTOLDefaultValue;
+            VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
             if (InEditor || UsingManualSync)
             {
                 VehicleTransform.localPosition = Spawnposition;
@@ -1863,6 +1868,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             InVR = localPlayer.IsUserInVR();
         }
         VTOLAngleInput = VTOLAngle;
+        VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
         GDHitRigidbody = null;
         if (_EngineOn)
         { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
@@ -2011,6 +2017,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     {
         if (VTOL360)
         {
+            //handle interpolations from 0.99 to 0.01 properly
             //set value to between 0 and 1
             if (VTOLAngleInput >= 0)
             { VTOLAngleInput = VTOLAngleInput - Mathf.Floor(VTOLAngleInput); }

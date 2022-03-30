@@ -1,11 +1,12 @@
 Shader "SF-1/MFD" {
     Properties{
         _Color ("Color", Color) = (0.5,0.5,0.5,0.0) 
+        _Brightness("Brightness", Range(0,1)) = 1
     }
     SubShader{
-      Tags { "RenderType" = "Opaque" }
+        Tags { "RenderType" = "Opaque" }
         
-                Pass
+        Pass
         {
             CGPROGRAM
             #pragma vertex vert
@@ -31,11 +32,11 @@ Shader "SF-1/MFD" {
             }
 
             fixed4 _Color;
+            float _Brightness;
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed4 col = _Color;
-                return col;
+                return _Color * _Brightness;
             }
             ENDCG
         }

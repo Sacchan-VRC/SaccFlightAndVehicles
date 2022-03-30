@@ -1,17 +1,18 @@
 Shader "SF-1/HUDStencil" {
     Properties{
-        _Color ("Color", Color) = (0.5,0.5,0.5,0.0) 
+        _Color ("Color", Color) = (0.5,0.5,0.5,0.0)
+        _Brightness("Brightness", Range(0,1)) = 1
     }
     SubShader{
         Tags {"Queue"="Transparent+2000" "RenderType"="Transparent" }
         ZTest Off
+        Blend SrcAlpha One
         
         Stencil{
             Ref 1
             Comp equal
             Pass Keep
         }
-        Blend SrcAlpha OneMinusSrcAlpha
         Pass
         {
             CGPROGRAM
@@ -38,11 +39,11 @@ Shader "SF-1/HUDStencil" {
             }
 
             fixed4 _Color;
+            float _Brightness;
 
             fixed4 frag (v2f i) : SV_Target
             {
-                fixed4 col = _Color;
-                return col;
+                return _Color * _Brightness;
             }
             ENDCG
         }
