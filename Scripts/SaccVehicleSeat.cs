@@ -113,7 +113,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     public override void OnPlayerLeft(VRCPlayerApi player)
     {
         if (!SeatInitialized) { InitializeSeat(); }
-        if (player.playerId == EntityControl.SeatedPlayers[ThisStationID])
+        if (Utilities.IsValid(player) && player.playerId == EntityControl.SeatedPlayers[ThisStationID])
         {
             PlayerExitPlane(player);
         }
