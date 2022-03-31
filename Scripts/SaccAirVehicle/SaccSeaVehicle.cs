@@ -381,8 +381,6 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             UsingManualSync = true;
         }
 
-        Spawnposition = VehicleTransform.localPosition;
-        Spawnrotation = VehicleTransform.localRotation;
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
@@ -462,8 +460,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         }
         VehicleTransform.position += CoMOffset;
         SendCustomEventDelayedSeconds(nameof(SetCoM), Time.fixedDeltaTime);//this has to be delayed because ?
-        Spawnposition = VehicleTransform.position;
-        Spawnrotation = VehicleTransform.rotation;
+        Spawnposition = VehicleTransform.localPosition;
+        Spawnrotation = VehicleTransform.localRotation;
 
         if (!HasAfterburner) { ThrottleAfterburnerPoint = 1; }
         ThrottleNormalizer = 1 / ThrottleAfterburnerPoint;
