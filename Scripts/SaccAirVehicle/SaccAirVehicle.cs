@@ -195,6 +195,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float VTOLLoseControlSpeed = 120;
     [Tooltip("Strength of ground effect that doesn't depend on speed, and points in the direction of the thrust. Uses GroundEffectEmpty and GroundEffectMaxDistance. Only enabled if the vehicle has VTOL")]
     public float VTOLGroundEffectStrength = 4;
+    [Tooltip("Real angle offset from (0 == thrusting backwards) that the SFEXT_O_Enter/ExitVTOL is called. The event used for disabling cruise and flight limits")]
+    public float EnterVTOLEvent_Angle = 20;
     [Header("Other:")]
     [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders suspension values")]
     public bool AutoAdjustValuesToMass = true;
@@ -673,7 +675,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VehicleTransform.GetChild(i).position -= CoMOffset;
         }
         VehicleTransform.position += CoMOffset;
-        SendCustomEventDelayedFrames(nameof(SetCoM_ITR), 1);//this has to be delayed one frame because ?
+        SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
         Spawnposition = VehicleTransform.localPosition;
         Spawnrotation = VehicleTransform.localRotation;
 
@@ -1074,15 +1076,23 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         if (VTOLOnly || !(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0))//only SetVTOLValues if it'll do anything
                         {
                             SetVTOLRotValues();
+                        }
+                        if (VTOLAngleDegrees > EnterVTOLEvent_Angle && VTOLAngleDegrees < 360 - EnterVTOLEvent_Angle)
+                        {
                             if (!InVTOL)
-                            { EntityControl.SendEventToExtensions("SFEXT_O_EnterVTOL"); }
-                            InVTOL = true;
+                            {
+                                EntityControl.SendEventToExtensions("SFEXT_O_EnterVTOL");
+                                InVTOL = true;
+                            }
                         }
                         else
                         {
                             if (InVTOL)
-                            { EntityControl.SendEventToExtensions("SFEXT_O_ExitVTOL"); }
-                            InVTOL = false;
+                            {
+                                //check angle
+                                EntityControl.SendEventToExtensions("SFEXT_O_ExitVTOL");
+                                InVTOL = false;
+                            }
                         }
                     }
                 }
@@ -1185,8 +1195,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
                     if (VTOLenabled)
                     {
                         //float thrust = EngineOutput * ThrottleStrength * AfterburnerThrottle * AfterburnerThrustMulti * Atmosphere;
-                        VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);//vtol angle in degrees
-
                         Vector3 VTOLInputAcc;//rotate and scale Vector for VTOL thrust
                         if (VTOLOnly)//just use regular thrust strength if vtol only, no transition to plane flight
                         {
@@ -2045,6 +2053,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         VTOLAngle = Mathf.MoveTowards(VTOLAngle, VTOLAngleInput, VTOLAngleDivider * Time.smoothDeltaTime);
         if (VTOLAngle < 0) { VTOLAngle++; }
         else if (VTOLAngle > 1) { VTOLAngle--; }
+        VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
         float SpeedForVTOL = (Mathf.Min(Speed / VTOLLoseControlSpeed, 1));
         if (VTOLOnly || (VTOLAngle > 0 && SpeedForVTOL != 1))
         {

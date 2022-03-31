@@ -215,7 +215,6 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         {
             if (HUDText_knotstarget) { HUDText_knotstarget.text = ((SetSpeed) * 1.9438445f).ToString("F0"); }
         }
-        else { if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; } }
     }
     public void KeyboardInput()
     {
@@ -266,6 +265,7 @@ public class DFUNC_Cruise : UdonSharpBehaviour
         SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
         Cruise = false;
         if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+        if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; }
         EntityControl.SendEventToExtensions("SFEXT_O_CruiseDisabled");
     }
     public void SFEXT_O_ThrottleDropped()

@@ -381,8 +381,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             UsingManualSync = true;
         }
 
-        Spawnposition = VehicleTransform.position;
-        Spawnrotation = VehicleTransform.rotation;
+        Spawnposition = VehicleTransform.localPosition;
+        Spawnrotation = VehicleTransform.localRotation;
 
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
@@ -461,7 +461,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             VehicleTransform.GetChild(i).position -= CoMOffset;
         }
         VehicleTransform.position += CoMOffset;
-        SendCustomEventDelayedFrames(nameof(SetCoM), 1);//this has to be delayed one frame because ?
+        SendCustomEventDelayedSeconds(nameof(SetCoM), Time.fixedDeltaTime);//this has to be delayed because ?
         Spawnposition = VehicleTransform.position;
         Spawnrotation = VehicleTransform.rotation;
 
@@ -964,7 +964,8 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         Health = FullHealth;
         if (InEditor || UsingManualSync)
         {
-            VehicleTransform.SetPositionAndRotation(Spawnposition, Spawnrotation);
+            VehicleTransform.localPosition = Spawnposition;
+            VehicleTransform.localRotation = Spawnrotation;
         }
         else
         {
@@ -1174,14 +1175,15 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         {
             Networking.SetOwner(localPlayer, EntityControl.gameObject);
             EntityControl.TakeOwnerShipOfExtensions();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "ResetStatus");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
             IsOwner = true;
             //synced variables
             Health = FullHealth;
             Fuel = FullFuel;
             if (InEditor || UsingManualSync)
             {
-                VehicleTransform.SetPositionAndRotation(Spawnposition, Spawnrotation);
+                VehicleTransform.localPosition = Spawnposition;
+                VehicleTransform.localRotation = Spawnrotation;
                 VehicleRigidbody.velocity = Vector3.zero;
             }
             else
