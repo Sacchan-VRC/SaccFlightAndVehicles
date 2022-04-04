@@ -41,7 +41,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float ThrottleStrength = 20f;
     [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
     public float ThrottleSensitivity = 6f;
-    [Tooltip("How many degrees to turn the wheel until it reaches max turning, in each direction")]
+    [Tooltip("How many degrees to turn the wheel until it reaches max turning, in each direction, animation should match this")]
     public float SteeringWheelDegrees = 360f;
     [Tooltip("How far down you have to push the grip button to grab the joystick and throttle")]
     public float GripSensitivity = .75f;

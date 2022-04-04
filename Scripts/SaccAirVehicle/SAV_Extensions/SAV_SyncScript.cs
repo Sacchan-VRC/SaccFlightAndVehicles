@@ -73,11 +73,6 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private bool Piloting;
     private float CurrentUpdateInterval;
     private int EnterIdleModeNumber;
-    private void Start()
-    {
-        if (!Initialized)//shouldn't be active until entitystart
-        { gameObject.SetActive(false); }
-    }
     public void SFEXT_L_EntityStart()
     {
         Initialized = true;
