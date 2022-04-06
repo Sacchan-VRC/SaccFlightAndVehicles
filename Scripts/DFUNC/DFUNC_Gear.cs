@@ -16,6 +16,10 @@ public class DFUNC_Gear : UdonSharpBehaviour
     public bool AllowToggleGrounded = true;
     [Tooltip("Distance to check down from CenterOfMass to decide if it's clear to open the gear")]
     public float GearCheckDistance = 2f;
+    [Tooltip("If ticked, gear can only be toggled every TransitionLength")]
+    public bool AllowToggleDuringTransition = true;
+    public float TransitionLength = 5f;
+    private float TransitionTime;
     private SaccEntity EntityControl;
     private bool UseLeftTrigger = false;
     private bool TriggerLastFrame;
@@ -46,6 +50,7 @@ public class DFUNC_Gear : UdonSharpBehaviour
         if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
         VRCPlayerApi localPlayer = Networking.LocalPlayer;
         IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+
     }
     public void DFUNC_Selected()
     {
@@ -87,7 +92,13 @@ public class DFUNC_Gear : UdonSharpBehaviour
     }
     public void KeyboardInput()
     {
-        if (!_DisableGearToggle) { ToggleGear(); }
+        if (!_DisableGearToggle)
+        {
+            if (AllowToggleDuringTransition || (Time.time - TransitionTime) > TransitionLength)
+            {
+                ToggleGear();
+            }
+        }
     }
     private void Update()
     {
@@ -98,7 +109,13 @@ public class DFUNC_Gear : UdonSharpBehaviour
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
         if (Trigger > 0.75)
         {
-            if (!TriggerLastFrame && !_DisableGearToggle) { ToggleGear(); }
+            if (!TriggerLastFrame && !_DisableGearToggle)
+            {
+                if (AllowToggleDuringTransition || (Time.time - TransitionTime) > TransitionLength)
+                {
+                    ToggleGear();
+                }
+            }
             TriggerLastFrame = true;
         }
         else { TriggerLastFrame = false; }
@@ -122,10 +139,8 @@ public class DFUNC_Gear : UdonSharpBehaviour
             DragApplied = false;
         }
 
-        if (IsOwner)
-        {
-            EntityControl.SendEventToExtensions("SFEXT_O_GearUp");
-        }
+        EntityControl.SendEventToExtensions("SFEXT_G_GearUp");
+        TransitionTime = Time.time;
     }
     public void SetGearDown()
     {
@@ -144,10 +159,8 @@ public class DFUNC_Gear : UdonSharpBehaviour
             DragApplied = true;
         }
 
-        if (IsOwner)
-        {
-            EntityControl.SendEventToExtensions("SFEXT_O_GearDown");
-        }
+        EntityControl.SendEventToExtensions("SFEXT_G_GearDown");
+        TransitionTime = Time.time;
     }
     public void ToggleGear()
     {

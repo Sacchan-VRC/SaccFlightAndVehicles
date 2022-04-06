@@ -17,6 +17,17 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public ParticleSystem SplashParticle;
     [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
     public float PlaySplashSpeed = 7;
+    [Header("Wheel Posing/Rolling")]
+    [Header("Both Arrays must be the same length")]
+    [Tooltip("List of all wheel colliders to use")]
+    public WheelCollider[] WheelColliders;
+    [Tooltip("List of mesh objects or bones to rotate and position to the wheel collider pose")]
+    public Transform[] WheelVisuals;
+    [Tooltip("Wheel will only be animated after the gear has finished deploying. This number should match the animation length, and the value in DFUNC_Gear")]
+    public float GearTransitionTime = 5;
+    [Tooltip("Tick if this vehicle has no gear toggle functionality")]
+    public bool NoGearFunction = false;
+    private bool GearDown = false;
     private bool TrailsOn;
     private bool HasTrails;
     private bool vapor;
@@ -29,6 +40,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private Vector3 OwnerRotationInputs;
     private VRCPlayerApi localPlayer;
     private bool EngineOn;
+    private bool DoWheelPose = false;
     private bool Occupied;
     private bool InVR;
     private bool InEditor = true;
@@ -65,6 +77,10 @@ public class SAV_EffectsController : UdonSharpBehaviour
         if (PrintAnimHashNamesOnStart)
         { PrintStringHashes(); }
         DoEffects = 6f;
+        if (WheelVisuals.Length > 0 && WheelVisuals.Length == WheelColliders.Length)
+        { DoWheelPose = true; }
+        if (NoGearFunction)
+        { GearDown = true; }
     }
     private void Update()
     {
@@ -111,6 +127,21 @@ public class SAV_EffectsController : UdonSharpBehaviour
 
         VehicleAnimator.SetFloat(HEALTH_STRING, (float)SAVControl.GetProgramVariable("Health") * FullHealthDivider);
         VehicleAnimator.SetFloat(AOA_STRING, vapor ? Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack") * 0.00555555556f /* Divide by 180 */ ) : 0);
+
+        if (DoWheelPose)
+        {
+            if (GearDown)
+            {
+                for (int i = 0; i < WheelVisuals.Length; i++)
+                {
+                    Vector3 pos;
+                    Quaternion rot;
+                    WheelColliders[i].GetWorldPose(out pos, out rot);
+                    WheelVisuals[i].position = pos;
+                    WheelVisuals[i].rotation = rot;
+                }
+            }
+        }
     }
     private void LargeEffects()//large effects visible from a long distance
     {
@@ -145,6 +176,18 @@ public class SAV_EffectsController : UdonSharpBehaviour
         VehicleAnimator.SetFloat(MACH10_STRING, (float)SAVControl.GetProgramVariable("Speed") * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
         //("Gs", vapor ? EngineControl.Gs / 200 + .5f : 0) (.5 == 0 Gs, 1 == 100Gs, 0 == -100Gs)
         VehicleAnimator.SetFloat(GS_STRING, vapor ? ((float)SAVControl.GetProgramVariable("VertGs") * 0.005f) + 0.5f : 0.5f);
+    }
+    public void GearDownEvent()
+    {
+        GearDown = true;
+    }
+    public void SFEXT_G_GearDown()
+    {
+        SendCustomEventDelayedSeconds(nameof(GearDownEvent), GearTransitionTime);
+    }
+    public void SFEXT_G_GearUp()
+    {
+        GearDown = false;
     }
     public void SFEXT_G_PilotEnter()
     {

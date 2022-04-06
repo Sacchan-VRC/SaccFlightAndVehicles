@@ -28,12 +28,17 @@ public class SaccEntity : UdonSharpBehaviour
     public GameObject HoldingOnly;
     [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
     public Transform CenterOfMass;
-    [Tooltip("Oneshot sound played each time function selection changes")]
-    public AudioSource SwitchFunctionSound;
     public Transform LStickDisplayHighlighter;
     public Transform RStickDisplayHighlighter;
     [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
     public bool DoVoiceVolumeChange = true;
+    [Header("Selection Sound")]
+
+    [Tooltip("Oneshot sound played each time function selection changes")]
+    public AudioSource SwitchFunctionSound;
+    public bool PlaySelectSoundLeft = true;
+    public bool PlaySoundRight = true;
+    [Header("Other")]
     [Tooltip("Any objects in this list get set inactive after 10 seconds, used to disable AAMTarget object for vehicles that should never be targetable but that should be in the targets list for the camera etc")]
     public GameObject[] DisableAfter10Seconds;
     [System.NonSerializedAttribute] public bool InEditor = true;
@@ -344,7 +349,7 @@ public class SaccEntity : UdonSharpBehaviour
                             Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
-                    if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (PlaySelectSoundLeft && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
                     if (LStickDisplayHighlighter)
                     {
                         if (LStickSelection < 0)
@@ -385,7 +390,7 @@ public class SaccEntity : UdonSharpBehaviour
                             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
-                    if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (PlaySoundRight && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
                     if (RStickDisplayHighlighter)
                     {
                         if (RStickSelection < 0)

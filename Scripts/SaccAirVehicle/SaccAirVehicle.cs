@@ -645,6 +645,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             GroundEffectLiftMax *= RBMass;
             foreach (WheelCollider wheel in VehicleWheelColliders)
             {
+                wheel.mass *= RBMass;
                 JointSpring SusiSpring = wheel.suspensionSpring;
                 SusiSpring.spring *= RBMass;
                 SusiSpring.damper *= RBMass;

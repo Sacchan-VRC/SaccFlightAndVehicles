@@ -291,7 +291,7 @@ public class SAV_EventTestScript : UdonSharpBehaviour
         Ints[35]++;
         CompileString();
     }
-    public void SFEXT_O_GearDown()
+    public void SFEXT_G_GearDown()
     {
         Ints[36]++;
         CompileString();
