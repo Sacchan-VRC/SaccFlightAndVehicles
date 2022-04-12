@@ -201,6 +201,8 @@ public class SAV_WindChanger : UdonSharpBehaviour
         WindTurbulanceScaleLocal = _windTurbulanceScale;
         WindTurbulanceScaleSlider.value = _windTurbulanceScale;
         WindTurbulanceScale_text.text = _windTurbulanceScale.ToString("F5");
+
+        transform.rotation = Quaternion.FromToRotation(Vector3.forward, _windStrenth_3.normalized);
     }
     public void UpdateValues()
     {
