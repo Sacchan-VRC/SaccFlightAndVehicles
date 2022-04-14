@@ -165,7 +165,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                                 VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
 
                                 PlaneCatapultOffset = -(CatapultTransform.up * PlaneCatapultUpDistance) + (CatapultTransform.forward * PlaneCatapultBackDistance);
-                                PlaneCatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(VehicleTransform.rotation);
+                                PlaneCatapultRotDif = VehicleTransform.rotation * Quaternion.Inverse(CatapultTransform.rotation);
 
                                 if (!DisableGearToggle && GearFunc)
                                 {
@@ -203,7 +203,7 @@ public class DFUNC_Catapult : UdonSharpBehaviour
             }
         }
     }
-    private void Update()
+    private void LateUpdate()
     {
         if ((Piloting && OnCatapult) || Launching)
         {
@@ -232,13 +232,14 @@ public class DFUNC_Catapult : UdonSharpBehaviour
                 if (CatapultDeadTimer == 0) { EntityControl.dead = false; }
             }
 
-            VehicleRigidbody.MoveRotation(PlaneCatapultRotDif * CatapultTransform.rotation);
-            VehicleRigidbody.MovePosition(CatapultTransform.position + PlaneCatapultOffset);
+            VehicleTransform.rotation = PlaneCatapultRotDif * CatapultTransform.rotation;
+            VehicleTransform.position = CatapultTransform.position + PlaneCatapultOffset;
             VehicleRigidbody.velocity = Vector3.zero;
             VehicleRigidbody.angularVelocity = Vector3.zero;
             Quaternion CatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(CatapultRotLastFrame);
             if (Launching && !CatapultTransform.gameObject.activeInHierarchy)
             {
+                //catapult has finished it's animation, throw the plane
                 float DeltaTime = Time.deltaTime;
                 Launching = false;
                 DisableOverrides();
