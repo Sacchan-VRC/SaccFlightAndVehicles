@@ -180,6 +180,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     private float ThrottleZeroPoint;
     [System.NonSerializedAttribute] public float ThrottleInput = 0f;
     private float yaw = 0f;
+    private bool Initialized;
     [System.NonSerializedAttribute] public float FullHealth;
     [System.NonSerializedAttribute] public bool Taxiing = false;
     [System.NonSerializedAttribute] public bool Floating = false;
@@ -450,18 +451,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         VelLiftStart = VelLift;
 
         CenterOfMass = EntityControl.CenterOfMass;
-        //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
-        Vector3 CoMOffset = CenterOfMass.position - VehicleTransform.position;
-        int c = VehicleTransform.childCount;
-        Transform[] MainObjChildren = new Transform[c];
-        for (int i = 0; i < c; i++)
-        {
-            VehicleTransform.GetChild(i).position -= CoMOffset;
-        }
-        VehicleTransform.position += CoMOffset;
-        SendCustomEventDelayedSeconds(nameof(SetCoM), Time.fixedDeltaTime);//this has to be delayed because ?
-        Spawnposition = VehicleTransform.localPosition;
-        Spawnrotation = VehicleTransform.localRotation;
+        SetCoMMeshOffset();
 
         if (!HasAfterburner) { ThrottleAfterburnerPoint = 1; }
         ThrottleNormalizer = 1 / ThrottleAfterburnerPoint;
@@ -970,6 +960,26 @@ public class SaccSeaVehicle : UdonSharpBehaviour
             VehicleObjectSync.Respawn();
         }
         EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
+    }
+    public void SFEXT_L_CoMSet()
+    {
+        if (Initialized)
+        { SetCoMMeshOffset(); }
+    }
+    public void SetCoMMeshOffset()
+    {
+        //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
+        Vector3 CoMOffset = CenterOfMass.position - VehicleTransform.position;
+        int c = VehicleTransform.childCount;
+        Transform[] MainObjChildren = new Transform[c];
+        for (int i = 0; i < c; i++)
+        {
+            VehicleTransform.GetChild(i).position -= CoMOffset;
+        }
+        VehicleTransform.position += CoMOffset;
+        SendCustomEventDelayedSeconds(nameof(SetCoM), Time.fixedDeltaTime);//this has to be delayed because ?
+        Spawnposition = VehicleTransform.localPosition;
+        Spawnrotation = VehicleTransform.localRotation;
     }
     public void SetCoM()
     {

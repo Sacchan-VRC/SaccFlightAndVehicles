@@ -37,7 +37,7 @@ public class SaccEntity : UdonSharpBehaviour
     [Tooltip("Oneshot sound played each time function selection changes")]
     public AudioSource SwitchFunctionSound;
     public bool PlaySelectSoundLeft = true;
-    public bool PlaySoundRight = true;
+    public bool PlaySelectSoundRight = true;
     [Header("Other")]
     [Tooltip("Any objects in this list get set inactive after 10 seconds, used to disable AAMTarget object for vehicles that should never be targetable but that should be in the targets list for the camera etc")]
     public GameObject[] DisableAfter10Seconds;
@@ -129,11 +129,7 @@ public class SaccEntity : UdonSharpBehaviour
 
         if (CenterOfMass)
         {
-            Rigidbody rb = GetComponent<Rigidbody>();
-            if (rb)
-            {
-                GetComponent<Rigidbody>().centerOfMass = transform.InverseTransformDirection(CenterOfMass.position - transform.position);//correct position if scaled}
-            }
+            SetCoM();
         }
         else
         {
@@ -308,8 +304,8 @@ public class SaccEntity : UdonSharpBehaviour
     {
         if (Using)
         {
-            Vector2 LStickPos = new Vector2(0, 0);
-            Vector2 RStickPos = new Vector2(0, 0);
+            Vector2 LStickPos = Vector2.zero;
+            Vector2 RStickPos = Vector2.zero;
             float LTrigger = 0;
             float RTrigger = 0;
             if (!InEditor)
@@ -390,7 +386,7 @@ public class SaccEntity : UdonSharpBehaviour
                             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
-                    if (PlaySoundRight && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (PlaySelectSoundRight && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
                     if (RStickDisplayHighlighter)
                     {
                         if (RStickSelection < 0)
@@ -644,6 +640,16 @@ public class SaccEntity : UdonSharpBehaviour
         {
             if (obj) { obj.SetActive(false); }
         }
+    }
+    public void SetCoM()
+    {
+        //WARNING: Setting this will reset ITR in SaccAirVehicle etc.
+        Rigidbody rb = GetComponent<Rigidbody>();
+        if (rb)
+        {
+            GetComponent<Rigidbody>().centerOfMass = transform.InverseTransformDirection(CenterOfMass.position - transform.position);//correct position if scaled}
+        }
+        SendEventToExtensions("SFEXT_L_CoMSet");
     }
     public void TellDFUNCsLR()
     {

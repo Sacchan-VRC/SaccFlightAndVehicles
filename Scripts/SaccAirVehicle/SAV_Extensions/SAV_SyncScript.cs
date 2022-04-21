@@ -71,6 +71,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private bool IdleUpdateMode;
     private bool IdleUpdateMode_Last;
     private bool Piloting;
+    private bool Occupied;
     private float CurrentUpdateInterval;
     private int EnterIdleModeNumber;
     public void SFEXT_L_EntityStart()
@@ -148,7 +149,13 @@ public class SAV_SyncScript : UdonSharpBehaviour
         if (IdleUpdateMode) { nextUpdateTime = 0; }
     }
     public void SFEXT_G_PilotEnter()
-    { if (IdleUpdateMode) { ExitIdleMode(); } }
+    {
+        if (IdleUpdateMode)
+        { ExitIdleMode(); }
+        Occupied = true;
+    }
+    public void SFEXT_G_PilotExit()
+    { Occupied = false; }
     public void SFEXT_G_TakeOff()
     { if (IdleUpdateMode) { ExitIdleMode(); } }
     public void SFEXT_L_OwnershipTransfer()
@@ -279,7 +286,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     }
     public void EnterIdleMode()
     {
-        if (IdleUpdateMode) { return; }
+        if (IdleUpdateMode || Occupied) { return; }
         IdleUpdateMode = true;
         CurrentUpdateInterval = IdleModeUpdateInterval;
         SmoothingTimeDivider = 1f / CurrentUpdateInterval;

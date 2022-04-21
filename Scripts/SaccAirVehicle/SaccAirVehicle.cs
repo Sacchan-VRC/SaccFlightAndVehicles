@@ -390,7 +390,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float FullFuel;
     private float LowFuelDivider;
     private float LastResupplyTime = 0;
-    [System.NonSerializedAttribute] public bool IsAirVehicle = true;//checked by any script targeting/checking this vehicle to see if it is the kind of vehicle they're looking for
+    private bool Initialized;
+    [System.NonSerializedAttribute] public bool IsAirVehicle = true;//could be checked by any script targeting/checking this vehicle to see if it is the kind of vehicle they're looking for
     [System.NonSerializedAttribute] public bool dead = false;
     [System.NonSerializedAttribute] public float FullGunAmmo;
     //use these for whatever, Only MissilesIncomingHeat is used by the prefab
@@ -570,6 +571,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public int ReSupplied = 0;
     public void SFEXT_L_EntityStart()
     {
+        Initialized = true;
         VehicleGameObj = EntityControl.gameObject;
         VehicleTransform = EntityControl.transform;
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
@@ -667,18 +669,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         RollThrustVecMultiStart = RollThrustVecMulti;
 
         CenterOfMass = EntityControl.CenterOfMass;
-        //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
-        Vector3 CoMOffset = CenterOfMass.position - VehicleTransform.position;
-        int c = VehicleTransform.childCount;
-        Transform[] MainObjChildren = new Transform[c];
-        for (int i = 0; i < c; i++)
-        {
-            VehicleTransform.GetChild(i).position -= CoMOffset;
-        }
-        VehicleTransform.position += CoMOffset;
-        SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
-        Spawnposition = VehicleTransform.localPosition;
-        Spawnrotation = VehicleTransform.localRotation;
+        SetCoMMeshOffset();
 
         if (AtmosphereThinningStart > AtmosphereThinningEnd) { AtmosphereThinningEnd = (AtmosphereThinningStart + 1); }
         AtmoshpereFadeDistance = (AtmosphereThinningEnd + SeaLevel) - (AtmosphereThinningStart + SeaLevel); //for finding atmosphere thinning gradient
@@ -1417,6 +1408,26 @@ public class SaccAirVehicle : UdonSharpBehaviour
             VehicleObjectSync.Respawn();
         }
         EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
+    }
+    public void SFEXT_L_CoMSet()
+    {
+        if (Initialized)
+        { SetCoMMeshOffset(); }
+    }
+    public void SetCoMMeshOffset()
+    {
+        //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
+        Vector3 CoMOffset = CenterOfMass.position - VehicleTransform.position;
+        int c = VehicleTransform.childCount;
+        Transform[] MainObjChildren = new Transform[c];
+        for (int i = 0; i < c; i++)
+        {
+            VehicleTransform.GetChild(i).position -= CoMOffset;
+        }
+        VehicleTransform.position += CoMOffset;
+        SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
+        Spawnposition = VehicleTransform.localPosition;
+        Spawnrotation = VehicleTransform.localRotation;
     }
     public void SetCoM_ITR()
     {
