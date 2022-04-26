@@ -117,8 +117,8 @@ public class SaccEntity : UdonSharpBehaviour
         if (localPlayer != null)
         {
             InEditor = false;
-            if (localPlayer.isMaster) { IsOwner = true; }
-            if (localPlayer.IsUserInVR()) { InVR = true; }
+            IsOwner = localPlayer.isMaster;
+            InVR = localPlayer.IsUserInVR();
         }
         else
         {

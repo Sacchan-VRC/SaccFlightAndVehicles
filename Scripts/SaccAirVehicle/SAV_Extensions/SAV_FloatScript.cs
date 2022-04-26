@@ -81,7 +81,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
     {
         FPLength = FloatPoints.Length;
         FloatDiameter = FloatRadius * 2;
-        _maxDepthForce = MaxDepthForce;
+        _maxDepthForce = MaxDepthForce * 90;
         _floatForce = FloatForce;
 
         localPlayer = Networking.LocalPlayer;
@@ -125,12 +125,12 @@ public class SAV_FloatScript : UdonSharpBehaviour
     }
     public void SFEXT_O_Explode()
     {
-        _maxDepthForce = DeadMaxDepthForce;
+        _maxDepthForce = DeadMaxDepthForce * 90;
         _floatForce = DeadFloatForce;
     }
     public void SFEXT_G_ReAppear()
     {
-        _maxDepthForce = MaxDepthForce;
+        _maxDepthForce = MaxDepthForce * 90;
         _floatForce = FloatForce;
     }
     public void SFEXT_G_EngineOff()
@@ -208,7 +208,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
             FloatDepth[i] = FloatTouchWaterPoint[i] - TopOfFloat.y;
 
             FloatDepthLastFrame[i] = FloatDepth[i];
-            FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce) * _floatForce)));
+            FloatPointForce[currentfloatpoint] = Vector3.up * Time.deltaTime * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce * Time.deltaTime) * _floatForce)));
             Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[i] + RayCastHeight, TopOfFloat.z);
             if (Physics.Raycast(checksurface, -Vector3.up, out hit, 20, FloatLayers, QueryTriggerInteraction.Collide))
             {
@@ -256,7 +256,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
         FloatTouchWaterPoint[currentfloatpoint] = FloatLastRayHitHeight[currentfloatpoint] + FloatDiameter + Waves.y;
         if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat.y && (DoOnLand || !HitLandLast[currentfloatpoint]))
         {
-            FloatDepth[currentfloatpoint] = FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y;
+            FloatDepth[currentfloatpoint] = (FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y);
             float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]));
             if (CompressionDifference > 0)
             { CompressionDifference = Mathf.Min(CompressionDifference * Compressing, MaxCompressingForce); }
@@ -265,7 +265,7 @@ public class SAV_FloatScript : UdonSharpBehaviour
                 CompressionDifference = 0;
             }
             FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
-            FloatPointForce[currentfloatpoint] = Vector3.up * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce) * _floatForce) + CompressionDifference));
+            FloatPointForce[currentfloatpoint] = Vector3.up * Time.deltaTime * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce * Time.deltaTime) * _floatForce) + (CompressionDifference / Time.deltaTime / 90)));
             //float is potentially below the top of the trigger, so fire a raycast from above the last known trigger height to check if it's still there
             //the '+10': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
             Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + RayCastHeight, TopOfFloat.z);
@@ -307,12 +307,12 @@ public class SAV_FloatScript : UdonSharpBehaviour
         {
             depth += FloatDepth[i];
         }
-        float DepthMaxd = Mathf.Min(depth, _maxDepthForce);
+        float DepthMaxd = Mathf.Min(depth, _maxDepthForce * Time.deltaTime);
         if (depth > 0)
         {//apply last calculated floating force for each floatpoint to respective floatpoint
             for (int i = 0; i != FloatPoints.Length; i++)
             {
-                VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.Acceleration);
+                VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.VelocityChange);
             }
             VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * DepthMaxd * WaterRotDrag, ForceMode.Acceleration);
             VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * DepthMaxd * WaterVelDrag, ForceMode.Acceleration);
