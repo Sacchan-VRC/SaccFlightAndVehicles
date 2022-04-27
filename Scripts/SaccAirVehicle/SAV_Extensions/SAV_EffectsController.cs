@@ -23,6 +23,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public WheelCollider[] WheelColliders;
     [Tooltip("List of mesh objects or bones to rotate and position to the wheel collider pose")]
     public Transform[] WheelVisuals;
+    private Vector3[] WheelStartPos;
     private float[] WheelRotations;
     private float[] WheelRadii;
     [Tooltip("Wheel will only be animated after the gear has finished deploying. This number should match the animation length, and the value in DFUNC_Gear")]
@@ -86,9 +87,11 @@ public class SAV_EffectsController : UdonSharpBehaviour
             DoWheelPose = true;
             WheelRotations = new float[WheelColliders.Length];
             WheelRadii = new float[WheelColliders.Length];
+            WheelStartPos = new Vector3[WheelColliders.Length];
             for (int i = 0; i < WheelColliders.Length; i++)
             {
                 WheelRadii[i] = WheelColliders[i].radius * WheelColliders[i].transform.lossyScale.magnitude;
+                WheelStartPos[i] = WheelVisuals[i].localPosition;
             }
         }
         if (NoGearFunction)
@@ -310,6 +313,13 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
+        if (DoWheelPose)
+        {
+            for (int i = 0; i < WheelColliders.Length; i++)
+            {
+                WheelVisuals[i].localPosition = WheelStartPos[i];
+            }
+        }
     }
     public void SFEXT_G_RespawnButton()
     {
