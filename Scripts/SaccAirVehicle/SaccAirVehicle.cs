@@ -585,9 +585,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer == null)
         {
-            InEditor = true;
             Piloting = true;
-            IsOwner = true;
             Occupied = true;
             if (!UsingManualSync)
             {
@@ -597,11 +595,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
         }
         else
         {
-            InEditor = false;
             InVR = localPlayer.IsUserInVR();
             if (localPlayer.isMaster)
             {
-                IsOwner = true;
                 if (!UsingManualSync)
                 {
                     VehicleRigidbody.drag = 0;
@@ -617,6 +613,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 }
             }
         }
+        InEditor = EntityControl.InEditor;
+        IsOwner = EntityControl.IsOwner;
 
         VehicleWheelColliders = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
         if (VehicleWheelColliders.Length != 0) { HasWheelColliders = true; }

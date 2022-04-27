@@ -27534,7 +27534,7 @@ MonoBehaviour:
   FreezePositionOnDeath: 0
   RotationSyncAgressiveness: 10
   IdleModeVelMultiplier: 0.4
-  IdleMoveMentRange: 0.35
+  IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
 --- !u!114 &2849390445293511764
@@ -85417,7 +85417,7 @@ MonoBehaviour:
   - {fileID: -8217197830885070527}
   Dial_Functions_R: []
   DialSensitivity: 0.7
-  LeftDialDivideStraightUp: 0
+  LeftDialDivideStraightUp: 1
   RightDialDivideStraightUp: 0
   AAMTargetsLayer:
     serializedVersion: 2
@@ -85425,10 +85425,12 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 7105509204358593802}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 7105509205716476651}
-  SwitchFunctionSound: {fileID: 7105509204779129781}
   LStickDisplayHighlighter: {fileID: 7105509204838516648}
   RStickDisplayHighlighter: {fileID: 0}
   DoVoiceVolumeChange: 1
+  SwitchFunctionSound: {fileID: 7105509204779129781}
+  PlaySelectSoundLeft: 1
+  PlaySelectSoundRight: 1
   DisableAfter10Seconds:
   - {fileID: 7105509204727997883}
 --- !u!114 &7105509205546161465

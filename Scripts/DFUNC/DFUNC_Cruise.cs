@@ -272,8 +272,8 @@ public class DFUNC_Cruise : UdonSharpBehaviour
     {
         if (!CruiseThrottleOverridden && Cruise)
         {
-            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
-            CruiseThrottleOverridden = false;
+            SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
+            CruiseThrottleOverridden = true;
         }
     }
     public void SFEXT_O_ThrottleGrabbed()

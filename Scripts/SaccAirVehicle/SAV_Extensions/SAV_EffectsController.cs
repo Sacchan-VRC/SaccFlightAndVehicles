@@ -23,6 +23,8 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public WheelCollider[] WheelColliders;
     [Tooltip("List of mesh objects or bones to rotate and position to the wheel collider pose")]
     public Transform[] WheelVisuals;
+    private float[] WheelRotations;
+    private float[] WheelRadii;
     [Tooltip("Wheel will only be animated after the gear has finished deploying. This number should match the animation length, and the value in DFUNC_Gear")]
     public float GearTransitionTime = 5;
     [Tooltip("Tick if this vehicle has no gear toggle functionality")]
@@ -42,6 +44,8 @@ public class SAV_EffectsController : UdonSharpBehaviour
     private bool EngineOn;
     private bool DoWheelPose = false;
     private bool Occupied;
+    private bool IsOwner;
+    private bool Grounded;
     private bool InVR;
     private bool InEditor = true;
     //animator strings that are sent every frame are converted to int for optimization
@@ -78,7 +82,15 @@ public class SAV_EffectsController : UdonSharpBehaviour
         { PrintStringHashes(); }
         DoEffects = 6f;
         if (WheelVisuals.Length > 0 && WheelVisuals.Length == WheelColliders.Length)
-        { DoWheelPose = true; }
+        {
+            DoWheelPose = true;
+            WheelRotations = new float[WheelColliders.Length];
+            WheelRadii = new float[WheelColliders.Length];
+            for (int i = 0; i < WheelColliders.Length; i++)
+            {
+                WheelRadii[i] = WheelColliders[i].radius * WheelColliders[i].transform.lossyScale.magnitude;
+            }
+        }
         if (NoGearFunction)
         { GearDown = true; }
     }
@@ -93,7 +105,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     {
         Vector3 RotInputs = (Vector3)SAVControl.GetProgramVariable("RotationInputs");
         float DeltaTime = Time.deltaTime;
-        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+        if (IsOwner)
         {
             if (InVR)
             { OwnerRotationInputs = RotInputs; }//vr users use raw input
@@ -132,13 +144,26 @@ public class SAV_EffectsController : UdonSharpBehaviour
         {
             if (GearDown)
             {
-                for (int i = 0; i < WheelVisuals.Length; i++)
+                if (IsOwner)
                 {
-                    Vector3 pos;
-                    Quaternion rot;
-                    WheelColliders[i].GetWorldPose(out pos, out rot);
-                    WheelVisuals[i].position = pos;
-                    WheelVisuals[i].rotation = rot;
+                    for (int i = 0; i < WheelVisuals.Length; i++)
+                    {
+                        Vector3 pos;
+                        Quaternion rot;
+                        WheelColliders[i].GetWorldPose(out pos, out rot);
+                        WheelVisuals[i].position = pos;
+                        WheelVisuals[i].rotation = rot;
+                    }
+                }
+                else
+                {
+                    float VehSpeed = (float)SAVControl.GetProgramVariable("Speed");
+                    for (int i = 0; i < WheelVisuals.Length; i++)
+                    {
+                        WheelRotations[i] += VehSpeed / WheelRadii[i];
+                        Quaternion newrot = Quaternion.AngleAxis(WheelRotations[i], Vector3.right);
+                        WheelVisuals[i].localRotation = newrot;
+                    }
                 }
             }
         }
@@ -267,14 +292,24 @@ public class SAV_EffectsController : UdonSharpBehaviour
     {
         VehicleAnimator.SetBool("onground", false);
         VehicleAnimator.SetBool("onwater", false);
+        Grounded = false;
     }
     public void SFEXT_G_TouchDown()
     {
         VehicleAnimator.SetBool("onground", true);
+        Grounded = true;
     }
     public void SFEXT_G_TouchDownWater()
     {
         VehicleAnimator.SetBool("onwater", true);
+    }
+    public void SFEXT_O_TakeOwnership()
+    {
+        IsOwner = true;
+    }
+    public void SFEXT_O_LoseOwnership()
+    {
+        IsOwner = false;
     }
     public void SFEXT_G_RespawnButton()
     {
