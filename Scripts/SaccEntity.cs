@@ -706,7 +706,7 @@ public class SaccEntity : UdonSharpBehaviour
     // public static UdonSharpBehaviour GetExtention(SaccEntity entity, string udonTypeName)
     public UdonSharpBehaviour GetExtention(string udonTypeName)
     {
-        var entity = this;
+        SaccEntity entity = this;
 
         foreach (var extention in entity.ExtensionUdonBehaviours)
         {
@@ -727,7 +727,7 @@ public class SaccEntity : UdonSharpBehaviour
     // public static UdonSharpBehaviour[] GetExtentions(SaccEntity entity, string udonTypeName)
     public UdonSharpBehaviour[] GetExtentions(string udonTypeName)
     {
-        var entity = this;
+        SaccEntity entity = this;
 
         var result = new UdonSharpBehaviour[entity.ExtensionUdonBehaviours.Length + entity.Dial_Functions_L.Length + entity.Dial_Functions_R.Length];
         var count = 0;
