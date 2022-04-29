@@ -27,6 +27,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
     public float IdleRotationRange = 5f;
     [Tooltip("Angle Difference between movement direction and rigidbody velocity that will cause the vehicle to teleport instead of interpolate")]
     public float TeleportAngleDifference = 20;
+    [Tooltip("Maximum amount of extrapolation for high ping players, will brake formation flying for high ping players if set lower than their ping = 0.1 = 100ms, useful for dogfight worlds")]
+    public float MaxPingExtrapolationInSeconds = 999f;
     private Transform VehicleTransform;
     private float nextUpdateTime = float.MaxValue;
     private int StartupTimeMS = 0;
@@ -319,7 +321,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
             //local time update was recieved
             L_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
             //Ping is time between server time update was sent, and the local time the update was recieved
-            Ping = (float)(L_UpdateTime - O_UpdateTime);
+            Ping = Mathf.Min((float)(L_UpdateTime - O_UpdateTime), MaxPingExtrapolationInSeconds);
             //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
             Vector3 CurrentVelocity;
             bool SetVelZero = false;
