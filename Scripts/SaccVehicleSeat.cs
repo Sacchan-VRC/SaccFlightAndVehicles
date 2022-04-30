@@ -25,6 +25,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         get => _adjustedPos;
     }
     private float AdjustTime;
+    private float LastSerTime;
     private bool CalibratedY = false;
     private bool CalibratedZ = false;
     private bool InSeat = false;
@@ -81,6 +82,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                     CalibratedZ = false;
                     AdjustTime = 0;
                     SeatAdjustment();
+                    SeatAdjustmentSerialization();
                 }
                 if (DoVoiceVolumeChange)
                 {
@@ -182,20 +184,33 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     }
 
     //seat adjuster stuff
+    public void SeatAdjustmentSerialization()
+    {
+        if (InSeat)
+        {
+            if (!InEditor)
+            {
+                RequestSerialization();
+                if (EntityControl.InVehicle && (!CalibratedY || !CalibratedZ))
+                {
+                    SendCustomEventDelayedSeconds(nameof(SeatAdjustmentSerialization), .3f, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
+                }
+            }
+        }
+    }
     public void SeatAdjustment()
     {
         if (InSeat)
         {
             if (!InEditor)
             {
-                AdjustTime += .3f;
                 //find head relative position ingame
-                Vector3 TargetRelative = TargetEyePosition.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position);
+                Vector3 TargetRelative = TargetEyePosition.InverseTransformDirection(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position - TargetEyePosition.position);
                 if (!CalibratedY)
                 {
                     if (Mathf.Abs(TargetRelative.y) > 0.01f)
                     {
-                        Seat.position -= TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y);
+                        Seat.position -= TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y) * Time.deltaTime * 3.3333333f;
                     }
                     else
                     {
@@ -207,9 +222,9 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 }
                 if (!CalibratedZ)
                 {
-                    if (Mathf.Abs(TargetRelative.z) > 0.01f)
+                    if (Mathf.Abs(TargetRelative.z) > 0.005f)
                     {
-                        Seat.position -= TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z);
+                        Seat.position -= TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z) * Time.deltaTime * 3.3333333f;
                     }
                     else
                     {
@@ -227,10 +242,10 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 Vector3 newpos = Seat.localPosition;
                 _adjustedPos.x = newpos.y;
                 _adjustedPos.y = newpos.z;
-                RequestSerialization();
+                AdjustTime += Time.deltaTime;
                 if (EntityControl.InVehicle && (!CalibratedY || !CalibratedZ))
                 {
-                    SendCustomEventDelayedSeconds(nameof(SeatAdjustment), .3f, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
+                    SendCustomEventDelayedFrames(nameof(SeatAdjustment), 1, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
                 }
             }
         }
