@@ -236,7 +236,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 }
                 //remove floating point errors on x
                 Vector3 seatpos = Seat.localPosition;
-                seatpos.x = 0;
+                seatpos.x = SeatStartPos.x;
                 Seat.localPosition = seatpos;
                 //set synced variable
                 Vector3 newpos = Seat.localPosition;
@@ -266,7 +266,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
     {
         if (Seat)
         {
-            Vector3 newpos = (new Vector3(0, _adjustedPos.x, _adjustedPos.y));
+            Vector3 newpos = (new Vector3(SeatStartPos.x, _adjustedPos.x, _adjustedPos.y));
             Seat.localPosition = newpos;
         }
     }
