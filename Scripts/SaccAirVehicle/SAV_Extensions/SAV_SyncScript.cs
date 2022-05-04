@@ -29,6 +29,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
     public float TeleportAngleDifference = 20;
     [Tooltip("Maximum amount of extrapolation for high ping players, will brake formation flying for high ping players if set lower than their ping = 0.1 = 100ms, useful for dogfight worlds")]
     public float MaxPingExtrapolationInSeconds = 999f;
+    [Tooltip("Set maximum extrapolation to 0 for passengers to reduce uncomfortable movement, passengers will not see formation flying properly.")]
+    public bool PassengerComfortMode;
     private Transform VehicleTransform;
     private float nextUpdateTime = float.MaxValue;
     private int StartupTimeMS = 0;
@@ -76,6 +78,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private bool Occupied;
     private float CurrentUpdateInterval;
     private int EnterIdleModeNumber;
+    private float PrevMaxExtrap;
     public void SFEXT_L_EntityStart()
     {
         Initialized = true;
@@ -403,6 +406,21 @@ public class SAV_SyncScript : UdonSharpBehaviour
         {
             VehicleRigid.drag = 9999;
             VehicleRigid.angularDrag = 9999;
+        }
+    }
+    public void SFEXT_P_PassengerEnter()
+    {
+        if (PassengerComfortMode)
+        {
+            PrevMaxExtrap = MaxPingExtrapolationInSeconds;
+            MaxPingExtrapolationInSeconds = 0;
+        }
+    }
+    public void SFEXT_P_PassengerExit()
+    {
+        if (PassengerComfortMode)
+        {
+            MaxPingExtrapolationInSeconds = PrevMaxExtrap;
         }
     }
 }
