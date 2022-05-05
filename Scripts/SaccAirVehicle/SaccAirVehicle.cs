@@ -1916,6 +1916,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public void SFEXT_G_PilotExit()
     {
         Occupied = false;
+        RotationInputs = Vector3.zero;
     }
     public void SFEXT_G_NotDead()
     { dead = false; }
@@ -1930,7 +1931,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
         LerpedPitch = 0;
         LerpedRoll = 0;
         LerpedYaw = 0;
-        RotationInputs = Vector3.zero;
         //reset everything
         Piloting = false;
         Taxiinglerper = 0;

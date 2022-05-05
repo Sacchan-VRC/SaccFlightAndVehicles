@@ -23,8 +23,6 @@ public class SAAG_SyncScript : UdonSharpBehaviour
     private Vector3 O_LastCurVel = Vector3.zero;
     private Quaternion CurAngMom = Quaternion.identity;
     private Quaternion LastCurAngMom = Quaternion.identity;
-    private Quaternion O_LastRotation = Quaternion.identity;
-    private Quaternion O_LastRotation2 = Quaternion.identity;
     private Quaternion RotationLerper = Quaternion.identity;
     private int StartupTimeMS = 0;
     private int O_LastUpdateTime;
@@ -89,12 +87,19 @@ public class SAAG_SyncScript : UdonSharpBehaviour
     public void SFEXT_O_LoseOwnership()
     {
         IsOwner = false;
-        O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+    }
+    public void SFEXT_G_Explode()
+    {
+        O_LastGunRotation2 = O_LastGunRotation = Vector2.zero;
+        GunRotationSpeed = LastGunRotationSpeed = Vector2.zero;
     }
     public void SFEXT_G_PilotEnter()
     { gameObject.SetActive(true); }
     public void SFEXT_G_PilotExit()
-    { gameObject.SetActive(false); }
+    {
+        gameObject.SetActive(false);
+        GunRotationSpeed = LastGunRotationSpeed = Vector2.zero;
+    }
     private void Update()
     {
         if (IsOwner)//send data
@@ -155,12 +160,10 @@ public class SAAG_SyncScript : UdonSharpBehaviour
                 if (O_GunRotation.y > O_LastGunRotation.y)
                 {
                     O_LastGunRotation.y += 360;
-                    //NonOwnerRotLerper.y += 360;
                 }
                 else
                 {
                     O_LastGunRotation.y -= 360;
-                    //NonOwnerRotLerper.y -= 360;
                 }
             }
             GunRotationSpeed = (O_GunRotation - O_LastGunRotation) * speednormalizer;

@@ -141,6 +141,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
         IsOwner = false;
         L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
         RotationLerper = O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+        LastCurAngMom = CurAngMom = Quaternion.identity;
+        LastExtrapolationDirection = VehicleRigid.velocity;
         VehicleRigid.Sleep();
         VehicleRigid.constraints = RigidbodyConstraints.FreezePosition;
         VehicleRigid.drag = 9999;
