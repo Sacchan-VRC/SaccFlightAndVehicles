@@ -78,6 +78,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetBool("occupied", true);
         }
         else { InEditor = false; }
+        IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
 
         if (PrintAnimHashNamesOnStart)
         { PrintStringHashes(); }
