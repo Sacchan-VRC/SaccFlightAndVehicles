@@ -68,7 +68,8 @@ public class SAV_EffectsController : UdonSharpBehaviour
         FullHealthDivider = 1f / (float)SAVControl.GetProgramVariable("Health");
         HasTrails = Trails.Length > 0;
 
-        VehicleAnimator = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Animator>();
+        SaccEntity EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        VehicleAnimator = EntityControl.GetComponent<Animator>();
         localPlayer = Networking.LocalPlayer;
         float fuel = (float)SAVControl.GetProgramVariable("Fuel");
         FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
@@ -78,7 +79,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
             VehicleAnimator.SetBool("occupied", true);
         }
         else { InEditor = false; }
-        IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+        IsOwner = EntityControl.IsOwner;
 
         if (PrintAnimHashNamesOnStart)
         { PrintStringHashes(); }

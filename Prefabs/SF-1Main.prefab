@@ -31927,6 +31927,8 @@ MonoBehaviour:
   LandingGearDragMulti: 1.3
   AllowToggleGrounded: 1
   GearCheckDistance: 2
+  AllowToggleDuringTransition: 1
+  TransitionLength: 5
 --- !u!114 &4371473018557886276
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47554,8 +47556,8 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
-  m_Mass: 0.0001
-  m_WheelDampingRate: 0.0001
+  m_Mass: 0.1
+  m_WheelDampingRate: 1000
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1
@@ -47680,10 +47682,12 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 4371473019321031449}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 4371473018504201464}
-  SwitchFunctionSound: {fileID: 4371473019709341094}
   LStickDisplayHighlighter: {fileID: 4371473019650007483}
   RStickDisplayHighlighter: {fileID: 4371473018675036614}
   DoVoiceVolumeChange: 1
+  SwitchFunctionSound: {fileID: 4371473019709341094}
+  PlaySelectSoundLeft: 1
+  PlaySelectSoundRight: 1
   DisableAfter10Seconds: []
 --- !u!114 &4371473018401239850
 MonoBehaviour:
@@ -47752,8 +47756,8 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
-  m_Mass: 0.0001
-  m_WheelDampingRate: 0.0001
+  m_Mass: 0.1
+  m_WheelDampingRate: 1000
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1
@@ -47782,8 +47786,8 @@ WheelCollider:
     targetPosition: 0.5
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
-  m_Mass: 0.0001
-  m_WheelDampingRate: 0.0001
+  m_Mass: 0.1
+  m_WheelDampingRate: 1000
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1
@@ -53554,7 +53558,6 @@ MonoBehaviour:
   Dial_Funcon: {fileID: 5918980767570291255}
   AllowCruiseGrounded: 0
   HUDText_knotstarget: {fileID: 4371473020104552441}
-  AllowCruiseVTOLDegrees: 20
 --- !u!114 &4371473019124045700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87377,6 +87380,10 @@ MonoBehaviour:
   TrailGs: 4
   SplashParticle: {fileID: 8771412243284011448}
   PlaySplashSpeed: 7
+  WheelColliders: []
+  WheelVisuals: []
+  GearTransitionTime: 5
+  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &4371473019976013252
 MonoBehaviour:
@@ -93112,6 +93119,7 @@ MonoBehaviour:
   VTOLRollThrustVecMulti: 0.07
   VTOLLoseControlSpeed: 120
   VTOLGroundEffectStrength: 0.14
+  EnterVTOLEvent_Angle: 20
   AutoAdjustValuesToMass: 1
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}
@@ -104335,6 +104343,8 @@ MonoBehaviour:
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
+  MaxPingExtrapolationInSeconds: 999
+  PassengerComfortMode: 0
 --- !u!114 &8771412242316313159
 MonoBehaviour:
   m_ObjectHideFlags: 0
