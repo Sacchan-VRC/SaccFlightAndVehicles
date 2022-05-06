@@ -79,6 +79,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private float CurrentUpdateInterval;
     private int EnterIdleModeNumber;
     private float PrevMaxExtrap;
+    System.DateTime offsetDateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
     public void SFEXT_L_EntityStart()
     {
         Initialized = true;
@@ -115,7 +116,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
         SmoothingTimeDivider = 1f / updateInterval;
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
         dblStartupTimeMS = (double)StartupTimeMS * .001f;
-        StartupTime = Time.realtimeSinceStartup;
+        StartupTime = (System.DateTime.UtcNow - offsetDateTime).TotalSeconds;
+
         CurrentUpdateInterval = updateInterval;
         EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
         //script is disabled for 5 seconds to make sure nothing moves before everything is initialized
@@ -237,7 +239,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
                     //update time is a double so that it can interact with (int)Networking.GetServerTimeInMilliseconds() without innacuracy
                     //update time is the Networking.GetServerTimeInMilliseconds() taken from SFEXT_L_EntityStart() + real time as float since that to make
                     //the sub-millisecond error constant to eliminate jitter
-                    O_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);//send servertime of update
+                    O_UpdateTime = ((double)StartupTimeMS * .001f) + ((System.DateTime.UtcNow - offsetDateTime).TotalSeconds - StartupTime);//send servertime of update
                     RequestSerialization();
                     UpdateTime = Time.realtimeSinceStartup;
                 }
@@ -251,7 +253,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
             //The interpolation should reach 100% the current extrapolaton hopefully at the exact moment the next update is recieved, otherwise continue extrapolating the last update until an update comes
 
             //time since recieving last update
-            float TimeSinceUpdate = (float)((dblStartupTimeMS + ((double)Time.realtimeSinceStartup - StartupTime)) - L_UpdateTime);
+            float TimeSinceUpdate = (float)((dblStartupTimeMS + ((System.DateTime.UtcNow - offsetDateTime).TotalSeconds - StartupTime)) - L_UpdateTime);
             //extrapolated position based on time passed since update
             Vector3 PredictedPosition = L_PingAdjustedPosition
                  + (ExtrapolationDirection * TimeSinceUpdate);
@@ -263,7 +265,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
             if (TimeSinceUpdate < CurrentUpdateInterval)
             {
                 //time since recieving previous update
-                float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + ((double)Time.realtimeSinceStartup - StartupTime)) - L_LastUpdateTime);
+                float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + ((System.DateTime.UtcNow - offsetDateTime).TotalSeconds - StartupTime)) - L_LastUpdateTime);
                 //extrapolated position based on data from previous update using time passed since previous update
                 Vector3 OldPredictedPosition = L_LastPingAdjustedPosition
                     + (LastExtrapolationDirection * TimeSincePreviousUpdate);
@@ -324,7 +326,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
             float speednormalizer = 1 / updatedelta;
 
             //local time update was recieved
-            L_UpdateTime = ((double)StartupTimeMS * .001f) + ((double)Time.realtimeSinceStartup - StartupTime);
+            L_UpdateTime = ((double)StartupTimeMS * .001f) + ((System.DateTime.UtcNow - offsetDateTime).TotalSeconds - StartupTime);
             //Ping is time between server time update was sent, and the local time the update was recieved
             Ping = Mathf.Min((float)(L_UpdateTime - O_UpdateTime), MaxPingExtrapolationInSeconds);
             //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
