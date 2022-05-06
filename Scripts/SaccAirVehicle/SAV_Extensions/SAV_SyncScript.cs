@@ -32,7 +32,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     [Tooltip("Set maximum extrapolation to 0 for passengers to reduce uncomfortable movement, passengers will not see formation flying properly.")]
     public bool PassengerComfortMode;
     private Transform VehicleTransform;
-    private float nextUpdateTime = float.MaxValue;
+    private double nextUpdateTime = double.MaxValue;
     private int StartupTimeMS = 0;
     private double dblStartupTimeMS = 0;
     private double StartupTime;
@@ -68,7 +68,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private Vector3 LastAcceleration;
     private Vector3 O_LastPosition;
     private float SmoothingTimeDivider;
-    private float UpdateTime;
+    private double UpdateTime;
     private int UpdatesSentWhileStill;
     private Rigidbody VehicleRigid;
     private bool Initialized = false;
@@ -79,7 +79,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
     private float CurrentUpdateInterval;
     private int EnterIdleModeNumber;
     private float PrevMaxExtrap;
-    System.DateTime offsetDateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
+    System.Diagnostics.Stopwatch StartStopWatch = new System.Diagnostics.Stopwatch();//the most accurate timer AFAIK
     public void SFEXT_L_EntityStart()
     {
         Initialized = true;
@@ -116,7 +116,9 @@ public class SAV_SyncScript : UdonSharpBehaviour
         SmoothingTimeDivider = 1f / updateInterval;
         StartupTimeMS = Networking.GetServerTimeInMilliseconds();
         dblStartupTimeMS = (double)StartupTimeMS * .001f;
+        System.DateTime offsetDateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
         StartupTime = (System.DateTime.UtcNow - offsetDateTime).TotalSeconds;
+        StartStopWatch.Start();
 
         CurrentUpdateInterval = updateInterval;
         EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
@@ -128,7 +130,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
         gameObject.SetActive(true);
         if (IsOwner)
         { VehicleRigid.constraints = RigidbodyConstraints.None; }
-        nextUpdateTime = Time.realtimeSinceStartup + Random.Range(0f, updateInterval);
+        nextUpdateTime = StartStopWatch.Elapsed.TotalSeconds + (double)Random.Range(0f, updateInterval);
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -191,13 +193,12 @@ public class SAV_SyncScript : UdonSharpBehaviour
     {
         if (IsOwner)//send data
         {
-            if (Time.realtimeSinceStartup > nextUpdateTime)
+            if (StartStopWatch.Elapsed.TotalSeconds > nextUpdateTime - (Time.deltaTime * .5f))
             {
                 if (!Networking.IsClogged || Piloting)
                 {
-                    bool Still;
                     //check if the vehicle has moved enough from it's last sent location and rotation to bother exiting idle mode
-                    Still = !Piloting && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
+                    bool Still = !Piloting && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
 
                     if (Still)
                     {
@@ -239,11 +240,11 @@ public class SAV_SyncScript : UdonSharpBehaviour
                     //update time is a double so that it can interact with (int)Networking.GetServerTimeInMilliseconds() without innacuracy
                     //update time is the Networking.GetServerTimeInMilliseconds() taken from SFEXT_L_EntityStart() + real time as float since that to make
                     //the sub-millisecond error constant to eliminate jitter
-                    O_UpdateTime = ((double)StartupTimeMS * .001f) + ((System.DateTime.UtcNow - offsetDateTime).TotalSeconds - StartupTime);//send servertime of update
+                    O_UpdateTime = (dblStartupTimeMS) + (StartStopWatch.Elapsed.TotalSeconds);//send servertime of update
                     RequestSerialization();
-                    UpdateTime = Time.realtimeSinceStartup;
+                    UpdateTime = StartStopWatch.Elapsed.TotalSeconds;
                 }
-                nextUpdateTime = (Time.realtimeSinceStartup + (IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
+                nextUpdateTime = (StartStopWatch.Elapsed.TotalSeconds + (double)(IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
             }
         }
         else//extrapolate and interpolate based on recieved data
@@ -253,7 +254,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
             //The interpolation should reach 100% the current extrapolaton hopefully at the exact moment the next update is recieved, otherwise continue extrapolating the last update until an update comes
 
             //time since recieving last update
-            float TimeSinceUpdate = (float)((dblStartupTimeMS + ((System.DateTime.UtcNow - offsetDateTime).TotalSeconds - StartupTime)) - L_UpdateTime);
+            float TimeSinceUpdate = (float)((dblStartupTimeMS + (
+                    StartStopWatch.Elapsed.TotalSeconds)) - L_UpdateTime);
             //extrapolated position based on time passed since update
             Vector3 PredictedPosition = L_PingAdjustedPosition
                  + (ExtrapolationDirection * TimeSinceUpdate);
@@ -265,7 +267,8 @@ public class SAV_SyncScript : UdonSharpBehaviour
             if (TimeSinceUpdate < CurrentUpdateInterval)
             {
                 //time since recieving previous update
-                float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + ((System.DateTime.UtcNow - offsetDateTime).TotalSeconds - StartupTime)) - L_LastUpdateTime);
+                float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + (
+                        StartStopWatch.Elapsed.TotalSeconds)) - L_LastUpdateTime);
                 //extrapolated position based on data from previous update using time passed since previous update
                 Vector3 OldPredictedPosition = L_LastPingAdjustedPosition
                     + (LastExtrapolationDirection * TimeSincePreviousUpdate);
@@ -326,7 +329,7 @@ public class SAV_SyncScript : UdonSharpBehaviour
             float speednormalizer = 1 / updatedelta;
 
             //local time update was recieved
-            L_UpdateTime = ((double)StartupTimeMS * .001f) + ((System.DateTime.UtcNow - offsetDateTime).TotalSeconds - StartupTime);
+            L_UpdateTime = (dblStartupTimeMS) + (StartStopWatch.Elapsed.TotalSeconds);
             //Ping is time between server time update was sent, and the local time the update was recieved
             Ping = Mathf.Min((float)(L_UpdateTime - O_UpdateTime), MaxPingExtrapolationInSeconds);
             //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
