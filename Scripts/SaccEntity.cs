@@ -413,12 +413,17 @@ public class SaccEntity : UdonSharpBehaviour
     }
     private void OnEnable()
     {
+        SendEventToExtensions("SFEXT_L_OnEnable");
         ConstantForce cf = GetComponent<ConstantForce>();
         if (cf)
         {
             cf.relativeForce = Vector3.zero;
             cf.relativeTorque = Vector3.zero;
         }
+    }
+    private void OnDisable()
+    {
+        SendEventToExtensions("SFEXT_L_OnDisable");
     }
     public override void OnOwnershipTransferred(VRCPlayerApi player)
     {
@@ -551,6 +556,18 @@ public class SaccEntity : UdonSharpBehaviour
     {
         SendEventToExtensions("SFEXT_O_OnPickupUseUp");
     }
+    [System.NonSerialized] VRCPlayerApi LastPlayerCollisionEnter;
+    public override void OnPlayerCollisionEnter(VRCPlayerApi player)
+    {
+        LastPlayerCollisionEnter = player;
+        SendEventToExtensions("SFEXT_L_OnPlayerCollisionEnter");
+    }
+    [System.NonSerialized] VRCPlayerApi LastPlayerCollisionExit;
+    public override void OnPlayerCollisionExit(VRCPlayerApi player)
+    {
+        LastPlayerCollisionEnter = player;
+        SendEventToExtensions("SFEXT_L_OnPlayerCollisionExit");
+    }
     private void FindAAMTargets()
     {
         //get array of AAM Targets
@@ -654,6 +671,30 @@ public class SaccEntity : UdonSharpBehaviour
             GetComponent<Rigidbody>().centerOfMass = transform.InverseTransformDirection(CenterOfMass.position - transform.position);//correct position if scaled}
         }
         SendEventToExtensions("SFEXT_L_CoMSet");
+    }
+    [System.NonSerialized] public Collision LastCollisionEnter;
+    private void OnCollisionEnter(Collision Col)
+    {
+        LastCollisionEnter = Col;
+        SendEventToExtensions("SFEXT_L_OnCollisionEnter");
+    }
+    [System.NonSerialized] public Collider LastTriggerEnter;
+    private void OnTriggerEnter(Collider Trig)
+    {
+        LastTriggerEnter = Trig;
+        SendEventToExtensions("SFEXT_L_OnTriggerEnter");
+    }
+    [System.NonSerialized] public Collision LastCollisionExit;
+    private void OnCollisionExit(Collision Col)
+    {
+        LastCollisionExit = Col;
+        SendEventToExtensions("SFEXT_L_OnCollisionExit");
+    }
+    [System.NonSerialized] public Collider LastTriggerExit;
+    private void OnTriggerExit(Collider Trig)
+    {
+        LastTriggerExit = Trig;
+        SendEventToExtensions("SFEXT_L_OnTriggerExit");
     }
     public void TellDFUNCsLR()
     {
