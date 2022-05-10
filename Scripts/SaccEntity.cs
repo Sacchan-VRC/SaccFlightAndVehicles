@@ -403,9 +403,13 @@ public class SaccEntity : UdonSharpBehaviour
 
         if (InVehicle)
         {
-            if (Input.GetKeyDown(KeyCode.Return) || (InVR && Input.GetButtonDown("Oculus_CrossPlatform_Button4")))
+            if (Input.GetKeyDown(KeyCode.Return))
             { if (!InEditor) ExitStation(); }
         }
+    }
+    public override void InputJump(bool value, VRC.Udon.Common.UdonInputEventArgs args)
+    {
+        if (InVehicle && InVR && InVehicle && args.boolValue) { ExitStation(); }
     }
     private void OnEnable()
     {
