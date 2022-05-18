@@ -94,6 +94,11 @@ public class DFUNC_Gun : UdonSharpBehaviour
     {
         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected));
         Selected = false;
+        if (_firing)
+        {
+            Firing = false;
+            RequestSerialization();
+        }
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
@@ -118,7 +123,6 @@ public class DFUNC_Gun : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         InVehicle = false;
-        RequestSerialization();
         if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
         Selected = false;
         GunDamageParticle.gameObject.SetActive(false);

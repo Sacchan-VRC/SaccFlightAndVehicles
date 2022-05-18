@@ -210,7 +210,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 {
                     if (Mathf.Abs(TargetRelative.y) > 0.01f)
                     {
-                        Seat.position -= TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y) * Time.deltaTime * 3.3333333f;
+                        Seat.position -= TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y) * Time.deltaTime * 5f;
                     }
                     else
                     {
@@ -222,9 +222,9 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 }
                 if (!CalibratedZ)
                 {
-                    if (Mathf.Abs(TargetRelative.z) > 0.005f)
+                    if (Mathf.Abs(TargetRelative.z) > 0.01f)
                     {
-                        Seat.position -= TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z) * Time.deltaTime * 3.3333333f;
+                        Seat.position -= TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z) * Time.deltaTime * 5f;
                     }
                     else
                     {

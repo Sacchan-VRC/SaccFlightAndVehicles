@@ -767,7 +767,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     { Taxiing = false; }
     public void SFEXT_G_ReSupply()
     {
-        SendCustomEventDelayedFrames("ResupplySound", 1);
+        SendCustomEventDelayedFrames(nameof(ResupplySound), 1);
     }
     public void SFEXT_O_AfterburnerOn()
     {

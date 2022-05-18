@@ -353,6 +353,7 @@ This file used to contain explanations of every variable in every script, that i
 The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with layer (OnBoardVehicleLayer(31)). The plane is set to OnBoardVehicleLayer you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
 
 The hud can be made to appear smaller by moving all children of the 'bigstuff' object +Z local. 'bigstuff' is a child of HudController.
+The one exception is hud_elevation, it's position must be 0,0,0 in order for it to move correctly, the only resizing you can do to it and have its functionality remain correct is on the X axis.
 
 Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController or modular functions).
 Doing animations using the animator is most performant, so I've used it where possible. Some HUD stuff included.

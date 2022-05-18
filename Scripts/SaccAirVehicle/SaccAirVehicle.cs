@@ -733,8 +733,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
             if (!EntityControl.dead)
             {
                 //G/crash Damage
-                Health -= Mathf.Max((GDamageToTake) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
-                GDamageToTake = 0;
+                if (GDamageToTake > 0)
+                {
+                    Health -= Mathf.Max((GDamageToTake) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
+                    GDamageToTake = 0;
+                }
                 if (Health <= 0f)//vehicle is ded
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));

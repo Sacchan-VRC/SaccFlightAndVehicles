@@ -136,7 +136,7 @@ public class SaccEntity : UdonSharpBehaviour
             CenterOfMass = gameObject.transform;
             Debug.Log(string.Concat(gameObject.name, ": ", "No Center Of Mass Set"));
         }
-        VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation));
+        VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation), true);
         SeatedPlayers = new int[VehicleStations.Length];
         for (int i = 0; i != SeatedPlayers.Length; i++)
         {
