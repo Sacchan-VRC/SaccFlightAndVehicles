@@ -410,7 +410,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool VTOL360;
     [System.NonSerializedAttribute] public float VTOLAngleDegrees;
     private float VelLiftStart;
-    private int VehicleLayer;
     private float VelLiftMaxStart;
     private bool HasAirBrake;//set to false if air brake strength is 0
     private float HandDistanceZLastFrame;
@@ -652,8 +651,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 wheel.suspensionSpring = SusiSpring;
             }
         }
-        VehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
-        OutsideVehicleLayer = VehicleMesh.gameObject.layer;
+        OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
         VehicleAnimator = EntityControl.GetComponent<Animator>();
 
         FullHealth = Health;
@@ -1017,8 +1015,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         if (!InVR)
                         {
                             //allow stick flight in desktop mode
-                            Vector2 LStickPos = new Vector2(0, 0);
-                            Vector2 RStickPos = new Vector2(0, 0);
+                            Vector2 LStickPos = Vector2.zero;
+                            Vector2 RStickPos = Vector2.zero;
                             if (!InEditor)
                             {
                                 LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
@@ -1853,7 +1851,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
-        SetCollidersLayer(VehicleLayer);
+        SetCollidersLayer(OutsideVehicleLayer);
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -1952,7 +1950,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             ThrottleInput = 0; ;
         }
         //set vehicle's collider's layers back
-        SetCollidersLayer(VehicleLayer);
+        SetCollidersLayer(OutsideVehicleLayer);
     }
     public void SetCollidersLayer(int NewLayer)
     {
