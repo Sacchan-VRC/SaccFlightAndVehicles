@@ -351,7 +351,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         {
             float DeltaTime = Time.fixedDeltaTime;
             var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-            Vector3 HudControlPosition = HUDControl.transform.position;
+            Vector3 HudControlPosition = HUDControl ? HUDControl.transform.position : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
             float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
 
             //check 1 target per frame to see if it's infront of us and worthy of being our current target
@@ -502,7 +502,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
         if (AAMHasTarget)//GUN or AAM
         {
             AAMTargetIndicator.localScale = Vector3.one;
-            AAMTargetIndicator.position = HUDControl.transform.position + AAMCurrentTargetDirection;
+            AAMTargetIndicator.position = (HUDControl ? HUDControl.transform.position : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) + AAMCurrentTargetDirection;
             AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
             if (AAMLocked)
             {
@@ -549,6 +549,7 @@ public class DFUNC_AAM : UdonSharpBehaviour
             }
             x++;
         }
+        LeftDial = true;
         x = 0;
         foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_L)
         {
