@@ -199,6 +199,8 @@ MonoBehaviour:
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
+  MaxPingExtrapolationInSeconds: 999
+  PassengerComfortMode: 0
 --- !u!114 &1344609028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5633,6 +5635,10 @@ MonoBehaviour:
   TrailGs: 4
   SplashParticle: {fileID: 9050472816110490642}
   PlaySplashSpeed: 7
+  WheelColliders: []
+  WheelVisuals: []
+  GearTransitionTime: 5
+  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &914079681130734468
 MonoBehaviour:
@@ -31594,10 +31600,12 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 914079682251412346}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 914079682221963062}
-  SwitchFunctionSound: {fileID: 914079681947988394}
   LStickDisplayHighlighter: {fileID: 914079682671709442}
   RStickDisplayHighlighter: {fileID: 914079681684629900}
   DoVoiceVolumeChange: 1
+  SwitchFunctionSound: {fileID: 914079681947988394}
+  PlaySelectSoundLeft: 1
+  PlaySelectSoundRight: 1
   DisableAfter10Seconds: []
 --- !u!114 &914079681580794773
 MonoBehaviour:
@@ -37430,7 +37438,6 @@ MonoBehaviour:
   Dial_Funcon: {fileID: 4740379953325680123}
   AllowCruiseGrounded: 0
   HUDText_knotstarget: {fileID: 914079682464465488}
-  AllowCruiseVTOLDegrees: 20
 --- !u!114 &914079681764497231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42743,7 +42750,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967277
+  m_StaticEditorFlags: 4
   m_IsActive: 1
 --- !u!4 &914079681930388940
 Transform:
@@ -69914,7 +69921,7 @@ GameObject:
   - component: {fileID: -4141359670941694987}
   - component: {fileID: 914079682606670101}
   m_Layer: 31
-  m_Name: RacingTrigger
+  m_Name: RacingTrigger_SC1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -69977,6 +69984,7 @@ MonoBehaviour:
   DisabledRaces: []
   InstanceRecordDisallowedRaces: []
   TimeText_Cockpit: {fileID: 914079682061640570}
+  _TrackForward: 1
 --- !u!114 &914079682606670101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96286,6 +96294,7 @@ MonoBehaviour:
   VTOLRollThrustVecMulti: 0.07
   VTOLLoseControlSpeed: 120
   VTOLGroundEffectStrength: 0.14
+  EnterVTOLEvent_Angle: 20
   AutoAdjustValuesToMass: 1
   ControlsRoot: {fileID: 4526893258550676678}
   Wind: {x: 0, y: 0, z: 0}

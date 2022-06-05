@@ -332,9 +332,11 @@ MonoBehaviour:
   FreezePositionOnDeath: 1
   RotationSyncAgressiveness: 10
   IdleModeVelMultiplier: 0.4
-  IdleMoveMentRange: 0.35
+  IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
+  MaxPingExtrapolationInSeconds: 999
+  PassengerComfortMode: 0
 --- !u!114 &1538257256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36344,6 +36346,10 @@ MonoBehaviour:
   TrailGs: 4
   SplashParticle: {fileID: 6071313651886054200}
   PlaySplashSpeed: 7
+  WheelColliders: []
+  WheelVisuals: []
+  GearTransitionTime: 5
+  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &2934804654298486114
 MonoBehaviour:
@@ -96473,7 +96479,7 @@ GameObject:
   - component: {fileID: -6587860023187836529}
   - component: {fileID: 2934804655209591063}
   m_Layer: 31
-  m_Name: RacingTrigger
+  m_Name: RacingTrigger_SB1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96536,6 +96542,7 @@ MonoBehaviour:
   DisabledRaces: []
   InstanceRecordDisallowedRaces: []
   TimeText_Cockpit: {fileID: 2934804655584604371}
+  _TrackForward: 1
 --- !u!114 &2934804655209591063
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -96885,7 +96892,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967277
+  m_StaticEditorFlags: 4
   m_IsActive: 1
 --- !u!4 &2934804655299911391
 Transform:
@@ -99277,10 +99284,12 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 2934804654959112473}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 2934804654583356880}
-  SwitchFunctionSound: {fileID: 2934804655618455735}
   LStickDisplayHighlighter: {fileID: 2934804654926962886}
   RStickDisplayHighlighter: {fileID: 2934804655305527410}
   DoVoiceVolumeChange: 1
+  SwitchFunctionSound: {fileID: 2934804655618455735}
+  PlaySelectSoundLeft: 1
+  PlaySelectSoundRight: 1
   DisableAfter10Seconds: []
 --- !u!114 &2934804655656756585
 MonoBehaviour:
@@ -100105,6 +100114,7 @@ MonoBehaviour:
   VTOLRollThrustVecMulti: 0.07
   VTOLLoseControlSpeed: 120
   VTOLGroundEffectStrength: 4
+  EnterVTOLEvent_Angle: 20
   AutoAdjustValuesToMass: 1
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}

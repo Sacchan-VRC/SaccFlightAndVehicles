@@ -63,6 +63,8 @@ MonoBehaviour:
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
+  MaxPingExtrapolationInSeconds: 999
+  PassengerComfortMode: 0
 --- !u!114 &630903748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68207,7 +68209,7 @@ GameObject:
   - component: {fileID: -7604879119119929636}
   - component: {fileID: 8333115238126580769}
   m_Layer: 31
-  m_Name: RacingTrigger
+  m_Name: RacingTrigger_SH1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -68269,6 +68271,7 @@ MonoBehaviour:
   DisabledRaces: []
   InstanceRecordDisallowedRaces: []
   TimeText_Cockpit: {fileID: 8333115239988866555}
+  _TrackForward: 1
 --- !u!114 &8333115238126580769
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -68517,6 +68520,10 @@ MonoBehaviour:
   TrailGs: 4
   SplashParticle: {fileID: 1881236568729097790}
   PlaySplashSpeed: 7
+  WheelColliders: []
+  WheelVisuals: []
+  GearTransitionTime: 5
+  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &8333115238184276952
 MonoBehaviour:
@@ -86639,7 +86646,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967277
+  m_StaticEditorFlags: 4
   m_IsActive: 1
 --- !u!4 &8333115238970575353
 Transform:
@@ -113274,10 +113281,12 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 8333115239408584765}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 8333115239186322126}
-  SwitchFunctionSound: {fileID: 8333115238311187226}
   LStickDisplayHighlighter: {fileID: 4350446342770330499}
   RStickDisplayHighlighter: {fileID: 4350446342216349672}
   DoVoiceVolumeChange: 1
+  SwitchFunctionSound: {fileID: 8333115238311187226}
+  PlaySelectSoundLeft: 1
+  PlaySelectSoundRight: 1
   DisableAfter10Seconds: []
 --- !u!114 &8333115239819171336
 MonoBehaviour:

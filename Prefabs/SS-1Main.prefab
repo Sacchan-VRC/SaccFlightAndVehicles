@@ -27537,6 +27537,8 @@ MonoBehaviour:
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
+  MaxPingExtrapolationInSeconds: 999
+  PassengerComfortMode: 0
 --- !u!114 &2849390445293511764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -83314,7 +83316,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967277
+  m_StaticEditorFlags: 4
   m_IsActive: 1
 --- !u!4 &7105509204878781839
 Transform:
@@ -83872,7 +83874,7 @@ GameObject:
   - component: {fileID: 3295156043309113631}
   - component: {fileID: 7105509204995843357}
   m_Layer: 31
-  m_Name: RacingTrigger
+  m_Name: RacingTrigger_SS1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -83934,6 +83936,7 @@ MonoBehaviour:
   DisabledRaces: []
   InstanceRecordDisallowedRaces: []
   TimeText_Cockpit: {fileID: 7105509205096116042}
+  _TrackForward: 1
 --- !u!114 &7105509204995843357
 MonoBehaviour:
   m_ObjectHideFlags: 0
