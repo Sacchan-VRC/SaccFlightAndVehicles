@@ -314,11 +314,11 @@ public class SaccWheel : UdonSharpBehaviour
                     SkidVector = SideSkid;
 
                     Vector3 GripForce3;
-                    //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
-                    GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (Grip * SusForce.magnitude)) * Grip * SusForce.magnitude / 90f;
+                    GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (Grip * SusForce.magnitude)) * Grip * SusForce.magnitude;
 
                     //Add the Grip forces to the rigidbody
-                    CarRigid.AddForceAtPosition(GripForce3, SusOut.point, ForceMode.VelocityChange);
+                    //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
+                    CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
                     //forces used as output to change the speed of the tires and engine
                     GripForce = (GripForce3.magnitude * ForwardSideRatio);//could be merged with forceused, but i might want to add other stuff to forceused later.
                     forceused += GripForce;
