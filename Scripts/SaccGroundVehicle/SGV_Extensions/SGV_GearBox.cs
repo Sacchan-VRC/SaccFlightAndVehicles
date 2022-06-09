@@ -30,6 +30,7 @@ public class SGV_GearBox : UdonSharpBehaviour
             SGVControl.SetProgramVariable("CurrentGear", value);
             SGVControl.SetProgramVariable("GearRatio", GearRatios[value] * FinalDrive);
             _CurrentGear = value;
+            EntityControl.SendEventToExtensions("SFEXT_G_ChangeGear");
         }
         get => _CurrentGear;
     }

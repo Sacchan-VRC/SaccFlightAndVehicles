@@ -38,6 +38,7 @@ public class SGV_EffectsController : UdonSharpBehaviour
     public AudioSource[] BulletHit;
     [Tooltip("Oneshot sound sound played each time vehicle recieves a resupply event")]
     public AudioSource ReSupply;
+    public AudioSource GearChange;
     [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
     public Transform testcamera;
     private bool InEditor;
@@ -282,6 +283,11 @@ public class SGV_EffectsController : UdonSharpBehaviour
                 ReSupply.Play();
             }
         }
+    }
+    public void SFEXT_G_ChangeGear()
+    {
+        if (GearChange) { GearChange.Play(); }
+        VehicleAnimator.SetInteger("currentgear", (int)SGVControl.GetProgramVariable("CurrentGear"));
     }
     public void SFEXT_G_BulletHit()
     {
