@@ -36,7 +36,7 @@ public class SaccWheel : UdonSharpBehaviour
     public ParticleSystem[] SurfaceType_SkidParticles;
     public ParticleSystem.EmissionModule[] SurfaceType_SkidParticlesEM;
     public float[] SurfaceType_SkidParticles_NumParticles = { 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-    public float ClutchStrength = 20f;
+    public float ClutchStrength = .33f;
     [Tooltip("Lower number = less skid required for sound to start")]
     public float SkidSound_Min = 3f;
     [Tooltip("How quickly volume increases as skid speed increases")]
@@ -54,7 +54,7 @@ public class SaccWheel : UdonSharpBehaviour
     private AudioSource SkidSound;
     private ParticleSystem SkidParticle;
     private ParticleSystem.EmissionModule SkidParticleEM;
-    private Vector3 SkidVector;
+    private Vector3 SkidVectorFX;
     [UdonSynced(UdonSyncMode.Linear)] private float SkidLength;
     public int SurfaceType = -1;
     public int SurfaceTypeLast = 0;
@@ -101,6 +101,10 @@ public class SaccWheel : UdonSharpBehaviour
     public bool IsOwner = false;
     public bool Debugslip = false;
     public bool CurrentlyDistant = true;
+    //public bool DebugMove;
+    //public bool PrintDebugValues;
+    //public Vector3 DebugMoveSpeed = Vector3.zero;
+    //public bool DebugFreezeWheel = true;
     void Start()
     {
         WheelRenderer = (Renderer)SGVControl.GetProgramVariable("MainObjectRenderer");
@@ -159,227 +163,223 @@ public class SaccWheel : UdonSharpBehaviour
     }
     private void FixedUpdate()
     {
-        if (IsOwner)
+        if (!IsOwner || Sleeping) { return; }
+        // if (DebugMove)
+        // {
+        //     CarRigid.velocity = DebugMoveSpeed;
+        //     if (DebugFreezeWheel)
+        //     {
+        //         WheelRotationSpeedRPM = 0;
+        //         WheelRotationSpeedRPS = 0;
+        //         WheelRotationSpeedSurf = 0;
+        //     }
+        // }
+        RaycastHit SusOut;
+        float compression = 0f;
+        float ForwardSpeed = 0f;
+        float ForwardSideRatio = 0f;
+        float ForceUsed = 0f;
+        float ForwardSlip = 0f;
+        Vector3 SusForce = Vector3.zero;
+
+        if (IsDriveWheel && !GearNeutral)
         {
-            RaycastHit SusOut;
-            float compression = 0f;
-            float ForwardSpeed = 0f;
-            float ForwardSideRatio = 0f;
-            float GripForce = 0f;
-            float ForwardSlip = 0f;
-            Vector3 SusForce = Vector3.zero;
+            //I'm sure deltatime should be in the next line, but it behaves wrong if it is.
+            //This would imply the there should be something somewhere else to compensate, but I have no idea where.
+            //I've checked over this script a lot, and everything seems correct. It's close enough so I'm leaving it like this for now.
+            WheelRotationSpeedRPM = Mathf.Lerp(WheelRotationSpeedRPM, EngineRevs * _GearRatio, (1f - Clutch) * (1f - HandBrake) * ClutchStrength /* * Time.fixedDeltaTime * 90f */);
+            WheelRotationSpeedRPS = WheelRotationSpeedRPM / 60f;
+            WheelRotationSpeedSurf = WheelCircumference * WheelRotationSpeedRPS;
+        }
+        WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * Brake * BrakeStrength);
+        WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * HandBrake * HandBrakeStrength);
+        WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
+        WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
-            if (!Sleeping)
+        if (Physics.Raycast(WheelPoint.position + (WheelPoint.up * ExtraRayCastDistance), -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
+        {
+            Grounded = true;
+            //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop
+            if (Vector3.Angle(SusOut.normal, Vector3.up) < 20)
             {
-                float forceused = 0f;
-                if (IsDriveWheel && !GearNeutral)
+                SusDirection = Vector3.Lerp(Vector3.up, SusOut.normal, (SGVControl.VehicleSpeed / 1f));
+            }
+            else
+            {
+                SusDirection = SusOut.normal;
+            }
+
+            //last character of surface object is its type
+            int SurfLastChar = SusOut.collider.gameObject.name[SusOut.collider.gameObject.name.Length - 1];
+            if (SurfLastChar >= '0' && SurfLastChar <= '9')
+            {
+                if (SurfaceType != SurfLastChar - '0')
                 {
-                    WheelRotationSpeedRPM = Mathf.Lerp(WheelRotationSpeedRPM, EngineRevs * _GearRatio, (1f - Clutch) * (1f - HandBrake) * ClutchStrength * Time.deltaTime);
-                    WheelRotationSpeedRPS = WheelRotationSpeedRPM / 60f;
-                    WheelRotationSpeedSurf = WheelCircumference * WheelRotationSpeedRPS;
-                }
-                WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, Time.deltaTime * Brake * BrakeStrength);
-                WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0f, Time.deltaTime * HandBrake * HandBrakeStrength);
-                WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
-                WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-
-                if (Physics.Raycast(WheelPoint.position + (WheelPoint.up * ExtraRayCastDistance), -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
-                {
-                    Grounded = true;
-                    if (Vector3.Angle(SusOut.normal, Vector3.up) < 20)
-                    {
-                        SusDirection = Vector3.Lerp(Vector3.up, SusOut.normal, (SGVControl.VehicleSpeed / 1f));
-                    }
-                    else
-                    {
-                        SusDirection = SusOut.normal;
-                    }
-
-                    //last character of surface object is its type
-                    int SurfLastChar = SusOut.collider.gameObject.name[SusOut.collider.gameObject.name.Length - 1];
-                    if (SurfLastChar >= '0' && SurfLastChar <= '9')
-                    {
-                        if (SurfaceType != SurfLastChar - '0')
-                        {
-                            SurfaceTypeLast = SurfaceType;
-                            SurfaceType = SurfLastChar - '0';
-                            ChangeSurface();
-                        }
-                    }
-                    else
-                    {
-                        if (SurfaceType != 0)
-                        {
-                            SurfaceTypeLast = SurfaceType;
-                            SurfaceType = 0;
-                            ChangeSurface();
-                        }
-                    }
-                    //SUSPENSION//
-                    //Set compression amount
-                    compression = 1f - ((SusOut.distance - ExtraRayCastDistance) / SuspensionDistance);
-                    //Spring force: More compressed = more force
-                    Vector3 SpringForce = (SusDirection/* WheelPoint.up */ * compression * SpringForceMulti) * Time.deltaTime;
-                    float damping = (compression - compressionLast);
-                    if (compression > 1f)//bottomed out
-                    {
-                        damping *= DampingForce_BottomOutMulti;
-                    }
-                    if (damping < -MaxNegativeDamping)
-                    {
-                        damping = -MaxNegativeDamping;
-                    }
-                    //Damping force: The more the difference in compression between updates, the more force
-                    Vector3 DampingForce = SusDirection/* WheelPoint.up */ * (damping * DampingForceMulti);
-                    SusForce = SpringForce + DampingForce;//The total weight on this suspension
-                    //SusForce *= Vector3.Dot(SusOut.normal, WheelPoint.up);
-                    //limit sus force
-                    if (SusForce.magnitude > MaxSuspensionForce)
-                    {
-                        SusForce *= (MaxSuspensionForce) / ((SusForce).magnitude);
-                    }
-
-                    CarRigid.AddForceAtPosition(SusForce, WheelPoint.position, ForceMode.VelocityChange);
-                    compressionLast = compression;
-
-                    //stop grip force from being too strong
-                    // if (SusForce.magnitude > 1 /* 1f * */ /* Time.deltaTime */)
-                    // {
-                    //     SusForce *= (/* 1 * */ /* Time.deltaTime */1) / (SusForce.magnitude);
-                    // }
-
-                    //set wheel's visual position
-                    if (SusOut.distance > ExtraRayCastDistance)
-                    {
-                        WheelVisual.position = SusOut.point + WheelPoint.up * WheelRadius;
-                    }
-                    else
-                    {
-                        WheelVisual.position = WheelPoint.position + WheelPoint.up * WheelRadius;
-                    }
-                    //END OF SUSPENSION//
-
-                    //GRIP//
-                    //Wheel's velocity vector projected to the normal of the ground
-                    //WheelGroundSpeed is speed of the ground below the wheel
-                    Vector3 WheelGroundSpeed = Vector3.ProjectOnPlane(CarRigid.GetPointVelocity(SusOut.point), SusOut.normal);
-                    //Wheel's velocity vector projected to be only forward/black
-                    Vector3 WheelForwardSpeed = Vector3.ProjectOnPlane(WheelGroundSpeed, WheelPoint.right);
-                    float ForwardSpeed_abs = WheelForwardSpeed.magnitude;
-                    ForwardSpeed = ForwardSpeed_abs;
-                    if (Vector3.Dot(WheelForwardSpeed, WheelPoint.forward) < 0f)
-                    {
-                        ForwardSpeed = -ForwardSpeed;
-                    }
-                    ForwardSlip = ForwardSpeed - WheelRotationSpeedSurf;
-                    //Vector representing speed difference of wheel rotation and ground
-                    Vector3 ForwardSkid = Vector3.ProjectOnPlane(WheelPoint.forward, SusOut.normal).normalized * ForwardSlip;
-                    //How much the wheel is slipping (difference in speed of wheel rotation against the ground), as a vector3
-
-
-                    Vector3 SideSkid = Vector3.ProjectOnPlane(WheelGroundSpeed, WheelPoint.forward);
-                    SideSkid = Vector3.ProjectOnPlane(SideSkid, SusOut.normal);
-                    //unused
-                    // float SideSpeed_abs = SideSkid.magnitude;
-                    // float SideSpeed = SideSpeed_abs;
-                    // if (Vector3.Dot(SideSkid, WheelPoint.right) < 0f)
-                    // {
-                    //     SideSpeed = -SideSpeed;
-                    // }
-
-                    //add both skid axis together to get total skid
-                    Vector3 FullSkid = SideSkid + ForwardSkid;
-                    //enable to see the skid vector
-                    //if (VecDebug) { VecDebug.position = FullSkid + transform.position; }
-                    float FullSkidMag = FullSkid.magnitude;
-                    //float FullSkidSpeed = FullSkidSpeed_abs;
-
-                    //find out how much of the skid is on the forward axis 
-                    // float ForwardLen = ForwardSkid.magnitude;
-                    // float SideLen = SideSkid.magnitude;
-                    // float fullLen = ForwardLen + SideLen;
-                    if (FullSkid.magnitude != 0)
-                    {
-                        float multiplier = 1 / FullSkid.magnitude;
-                        ForwardSideRatio = Vector3.Dot(ForwardSkid * multiplier, FullSkid * multiplier);
-                        //these might produce different/more arcadey feel idk
-                        //ForwardSideRatio = ForwardLen / fullLen;
-                        //ForwardSideRatio = ForwardLen / FullSkidMag;
-                    }
-                    else
-                    { ForwardSideRatio = 0f; }
-
-                    //Skidvector is just used for effects, it has to take the forward after the grip forces
-                    //because we don't know how much of the forward skid will be gripped yet
-                    SkidVector = SideSkid;
-
-                    Vector3 GripForce3;
-                    GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (Grip * SusForce.magnitude)) * Grip * SusForce.magnitude;
-
-                    //Add the Grip forces to the rigidbody
-                    //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
-                    CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
-                    //forces used as output to change the speed of the tires and engine
-                    GripForce = (GripForce3.magnitude * ForwardSideRatio);//could be merged with forceused, but i might want to add other stuff to forceused later.
-                    forceused += GripForce;
-                }
-                else
-                {
-                    if (SkidSoundPlayingLast) { StopSkidSound(); }
-                    if (SkidParticlePlayingLast) { StopSkidParticle(); }
-                    //wheel not touching ground
-                    WheelVisual.position = WheelPoint.position - (WheelPoint.up * (SuspensionDistance - WheelRadius));
-                    Grounded = false;
-                    compressionLast = 0f;
-                }
-
-                //move wheel rotation speed towards its ground speed along its forward axis based on how much of it's forward skid that it gripped
-                if (HandBrake != 1f)
-                {
-                    float SlipGrip = Mathf.Abs(ForwardSlip) - (Mathf.Abs(GripForce / WheelWeight));
-                    if (SlipGrip > 0)//vehicle isn't fully gripping
-                    {
-                        if (ForwardSlip > 0)//wheels slipping forward or backward?
-                        {
-                            WheelRotationSpeedSurf += (GripForce / WheelWeight);
-                        }
-                        else
-                        {
-                            WheelRotationSpeedSurf -= (GripForce / WheelWeight);
-                        }
-                        WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
-                        WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-
-                        SkidVector += Vector3.forward * SlipGrip;
-                    }
-                    else
-                    {//vehicle is fully gripping
-                        WheelRotationSpeedSurf += ForwardSlip;
-                        WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
-                        WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-                    }
-                }
-                else
-                {
-                    SkidVector += Vector3.forward * Mathf.Abs(ForwardSlip);
-                }
-                SkidLength = SkidVector.magnitude;
-                //wheels slow down due to ?friction
-                WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, Time.deltaTime * WheelSlowDown);
-                WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
-                WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-
-                //move engine speed towards wheel speed
-                //lerp engine speed towards wheel speed if the handbrake is on
-                //it's weird that this works so well
-                if (IsDriveWheel && !GearNeutral)
-                {
-                    //Move engine speed toward wheel speed
-                    SGVControl.Revs = Mathf.MoveTowards(SGVControl.Revs, (WheelRotationSpeedRPM / _GearRatio), ((forceused * Mathf.Abs(_GearRatio)) * EngineInfluence * (1f - Clutch)));
-                    //lerp engine towards wheel speed of handbrake is being used
-                    SGVControl.Revs = Mathf.Lerp(SGVControl.Revs, (WheelRotationSpeedRPM / _GearRatio), HandBrake * (1f - Clutch) * 90f * Time.deltaTime);
+                    SurfaceTypeLast = SurfaceType;
+                    SurfaceType = SurfLastChar - '0';
+                    ChangeSurface();
                 }
             }
+            else
+            {
+                if (SurfaceType != 0)
+                {
+                    SurfaceTypeLast = SurfaceType;
+                    SurfaceType = 0;
+                    ChangeSurface();
+                }
+            }
+            //SUSPENSION//
+            compression = 1f - ((SusOut.distance - ExtraRayCastDistance) / SuspensionDistance);
+            //Spring force: More compressed = more force
+            Vector3 SpringForce = (SusDirection/* WheelPoint.up */ * compression * SpringForceMulti) * Time.fixedDeltaTime;
+            float damping = (compression - compressionLast);
+            compressionLast = compression;
+            if (compression > 1f)//bottomed out
+            {
+                damping *= DampingForce_BottomOutMulti;
+            }
+            if (damping < -MaxNegativeDamping)
+            {
+                damping = -MaxNegativeDamping;
+            }
+            //Damping force: The more the difference in compression between updates, the more force
+            Vector3 DampingForce = SusDirection/* WheelPoint.up */ * (damping * DampingForceMulti);
+            SusForce = SpringForce + DampingForce;//The total weight on this suspension
+            //limit sus force
+            if (SusForce.magnitude / Time.fixedDeltaTime > MaxSuspensionForce)
+            {
+                SusForce *= MaxSuspensionForce * Time.fixedDeltaTime / (SusForce).magnitude;
+            }
+
+            CarRigid.AddForceAtPosition(SusForce, WheelPoint.position, ForceMode.VelocityChange);
+
+            //set wheel's visual position
+            if (SusOut.distance > ExtraRayCastDistance)
+            {
+                WheelVisual.position = SusOut.point + WheelPoint.up * WheelRadius;
+            }
+            else
+            {
+                WheelVisual.position = WheelPoint.position + WheelPoint.up * WheelRadius;
+            }
+            //END OF SUSPENSION//
+
+            //GRIP//
+            //Wheel's velocity vector projected to the normal of the ground
+            //WheelGroundSpeed is speed of the ground below the wheel
+            Vector3 WheelGroundSpeed = Vector3.ProjectOnPlane(CarRigid.GetPointVelocity(SusOut.point), SusOut.normal);
+            //Wheel's velocity vector projected to be only forward/black
+            Vector3 WheelForwardSpeed = Vector3.ProjectOnPlane(WheelGroundSpeed, WheelPoint.right);
+            float ForwardSpeed_abs = WheelForwardSpeed.magnitude;
+            ForwardSpeed = ForwardSpeed_abs;
+            if (Vector3.Dot(WheelForwardSpeed, WheelPoint.forward) < 0f)
+            {
+                ForwardSpeed = -ForwardSpeed;
+            }
+            ForwardSlip = ForwardSpeed - WheelRotationSpeedSurf;
+            //How much the wheel is slipping (difference between speed of wheel rotation at it's surface, and the speed of the ground beneath it), as a vector3
+            Vector3 ForwardSkid = Vector3.ProjectOnPlane(WheelPoint.forward, SusOut.normal).normalized * ForwardSlip;
+
+            Vector3 SideSkid = Vector3.ProjectOnPlane(WheelGroundSpeed, WheelPoint.forward);
+            SideSkid = Vector3.ProjectOnPlane(SideSkid, SusOut.normal);
+
+            //add both skid axis together to get total 'skid'
+            Vector3 FullSkid = SideSkid + ForwardSkid;
+            //enable to see the skid vector
+            //if (VecDebug) { VecDebug.position = FullSkid + transform.position; }
+            float FullSkidMag = FullSkid.magnitude;
+
+            //find out how much of the skid is on the forward axis 
+            if (FullSkid.magnitude != 0)
+            {
+                ForwardSideRatio = Vector3.Dot(ForwardSkid / FullSkid.magnitude, FullSkid / FullSkid.magnitude);
+                //these might produce different/more arcadey feel idk
+                // float ForwardLen = ForwardSkid.magnitude;
+                // float SideLen = SideSkid.magnitude;
+                // float fullLen = ForwardLen + SideLen;
+                // ForwardSideRatio = ForwardLen / fullLen;
+                // ForwardSideRatio = ForwardLen / FullSkidMag;
+            }
+            else
+            { ForwardSideRatio = 0f; }
+
+            //SkidVectorFX is just used for effects, it has to take the forward after the grip forces
+            //because we don't know how much of the forward skid will be gripped yet
+            SkidVectorFX = SideSkid;
+
+            Vector3 GripForce3;
+            //SusForce has deltatime built in
+            GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))) * Grip * SusForce.magnitude;
+            //Add the Grip forces to the rigidbody
+            //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
+            CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
+            ForceUsed = (GripForce3.magnitude * ForwardSideRatio);
+            // if (PrintDebugValues)
+            // {
+            //     Debug.Log(string.Concat("ForwardSlip: ", ForwardSlip.ToString()));
+            //     Debug.Log(string.Concat("FORWARDSKIDMAG: ", ForwardSkid.magnitude.ToString()));
+            //     Debug.Log(string.Concat("SIDESKIDMAG: ", SideSkid.magnitude.ToString()));
+            //     Debug.Log(string.Concat("FULLSKIDMAG: ", FullSkidMag.ToString()));
+            //     Debug.Log(string.Concat("GripForce3.magnitude / Time.fixedDeltaTime: ", (GripForce3.magnitude / Time.fixedDeltaTime).ToString()));
+            //     Debug.Log(string.Concat("GripForce: ", (ForceUsed / Time.fixedDeltaTime).ToString()));
+            //     Debug.Log(string.Concat("SusForce.magnitude / Time.fixedDeltaTime: ", (SusForce.magnitude / Time.fixedDeltaTime).ToString()));//no delta problems
+            //     Debug.Log(string.Concat("(FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f): ", (FullSkidMag / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
+            //     Debug.Log(string.Concat("GRIPCRUVEEVAL : ", GripCurve.Evaluate((FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
+            // }
+        }
+        else
+        {
+            //wheel not touching ground
+            if (SkidSoundPlayingLast) { StopSkidSound(); }
+            if (SkidParticlePlayingLast) { StopSkidParticle(); }
+            WheelVisual.position = WheelPoint.position - (WheelPoint.up * (SuspensionDistance - WheelRadius));
+            Grounded = false;
+            compressionLast = 0f;
+        }
+
+        //move wheel rotation speed towards its ground speed along its forward axis based on how much of it's forward skid that it gripped
+        if (HandBrake != 1f)
+        {
+            float SlipGrip = (Mathf.Abs(ForwardSlip) * Time.fixedDeltaTime) - (ForceUsed / WheelWeight);
+
+            if (SlipGrip > 0)//vehicle isn't fully gripping
+            {
+                WheelRotationSpeedSurf += (ForceUsed / WheelWeight);
+                WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
+                WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
+
+                SkidVectorFX += Vector3.forward * SlipGrip / WheelWeight;
+            }
+            else//vehicle is fully gripping
+            {
+                WheelRotationSpeedSurf = ForwardSpeed;
+                WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
+                WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
+            }
+            // if (PrintDebugValues)
+            // {
+            //     Debug.Log(string.Concat("(Mathf.Abs(ForwardSlip)): ", ((Mathf.Abs(ForwardSlip))).ToString()));
+            //     Debug.Log(string.Concat("SlipGrip / Time.deltaTime: ", (SlipGrip / Time.deltaTime).ToString()));
+            // }
+        }
+        else
+        {
+            SkidVectorFX += (Vector3.forward * Mathf.Abs(ForwardSlip));
+        }
+        SkidLength = SkidVectorFX.magnitude;
+        //wheels slow down due to ?friction
+        WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, Time.fixedDeltaTime * WheelSlowDown);
+        WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
+        WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
+
+        //move engine speed towards wheel speed
+        //lerp engine speed towards wheel speed if the handbrake is on
+        if (IsDriveWheel && !GearNeutral)
+        {
+            SGVControl.Revs = Mathf.MoveTowards(SGVControl.Revs, (WheelRotationSpeedRPM / _GearRatio), ((ForceUsed * Mathf.Abs(_GearRatio)) * EngineInfluence * (1f - Clutch)));
+            //lerp engine towards wheel speed of handbrake is being used
+            SGVControl.Revs = Mathf.Lerp(SGVControl.Revs, (WheelRotationSpeedRPM / _GearRatio), HandBrake * (1f - Clutch) * 90f * Time.fixedDeltaTime);
         }
     }
     private void LateUpdate()
@@ -484,7 +484,7 @@ public class SaccWheel : UdonSharpBehaviour
     }
     private void RotateWheelOwner()
     {
-        WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
+        WheelRotation += WheelRotationSpeedRPS * 360f * Time.fixedDeltaTime;
         Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
         WheelVisual.localRotation = newrot;
     }
@@ -493,7 +493,7 @@ public class SaccWheel : UdonSharpBehaviour
         float speed = (float)SGVControl.GetProgramVariable("VehicleSpeed");
         WheelRotationSpeedRPS = speed / WheelCircumference;
         if ((bool)SGVControl.GetProgramVariable("MovingForward")) { WheelRotationSpeedRPS = -WheelRotationSpeedRPS; }
-        WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
+        WheelRotation += WheelRotationSpeedRPS * 360f * Time.fixedDeltaTime;
         Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
         WheelVisual.localRotation = newrot;
     }

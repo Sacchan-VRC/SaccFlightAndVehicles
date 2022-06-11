@@ -667,39 +667,37 @@ public class SaccGroundVehicle : UdonSharpBehaviour
     }
     private void FixedUpdate()
     {
-        if (IsOwner)
+        if (!IsOwner) { return; }
+        float DeltaTime = Time.fixedDeltaTime;
+        if (Piloting)
         {
-            float DeltaTime = Time.deltaTime;
-            if (Piloting)
+            Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, EngineSlowDown * DeltaTime), 0f);
+            if (!LimitingRev)
             {
-                Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, EngineSlowDown * DeltaTime), 0f);
-                if (!LimitingRev)
+                Revs += FinalThrottle * DriveSpeed * DeltaTime * EngineResponseCurve.Evaluate(Revs / RevLimiter);
+                if (Revs > RevLimiter)
                 {
-                    Revs += FinalThrottle * DriveSpeed * DeltaTime * EngineResponseCurve.Evaluate(Revs / RevLimiter);
-                    if (Revs > RevLimiter)
-                    {
-                        Revs = RevLimiter;
-                        LimitingRev = true;
-                        SendCustomEventDelayedSeconds(nameof(ReEnableRevs), RevLimiterDelay);
-                    }
-                }
-                for (int i = 0; i < DriveWheels.Length; i++)
-                {
-                    DriveWheels[i].SetProgramVariable("EngineRevs", Revs);
+                    Revs = RevLimiter;
+                    LimitingRev = true;
+                    SendCustomEventDelayedSeconds(nameof(ReEnableRevs), RevLimiterDelay);
                 }
             }
-            else
+            for (int i = 0; i < DriveWheels.Length; i++)
             {
-                Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, EngineSlowDown * DeltaTime), 0f);
+                DriveWheels[i].SetProgramVariable("EngineRevs", Revs);
             }
-
-            VehicleVel = VehicleRigidbody.velocity;
-            float gravity = 9.81f * DeltaTime;
-            LastFrameVel.y -= gravity; //add gravity
-            AllGs = Vector3.Distance(LastFrameVel, VehicleVel) / gravity;
-            GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
-            LastFrameVel = VehicleVel;
         }
+        else
+        {
+            Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, EngineSlowDown * DeltaTime), 0f);
+        }
+
+        VehicleVel = VehicleRigidbody.velocity;
+        float gravity = 9.81f * DeltaTime;
+        LastFrameVel.y -= gravity; //add gravity
+        AllGs = Vector3.Distance(LastFrameVel, VehicleVel) / gravity;
+        GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
+        LastFrameVel = VehicleVel;
     }
     public void Explode()
     {
