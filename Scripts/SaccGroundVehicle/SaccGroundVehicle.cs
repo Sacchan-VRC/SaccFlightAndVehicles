@@ -182,6 +182,9 @@ public class SaccGroundVehicle : UdonSharpBehaviour
     public float NumGroundedWheels = 0;
     public float CurrentDistance;
     public bool CurrentlyDistant = true;
+    private bool GrabToggle;
+    private int StickReleaseCount;
+    private float LastGripTime;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(HasFuel_))] public bool HasFuel = true;
     public bool HasFuel_
     {
@@ -223,7 +226,6 @@ public class SaccGroundVehicle : UdonSharpBehaviour
     public void SFEXT_L_EntityStart()
     {
         if (!Initialized) { Init(); }
-        Occupied = false;
 
         FullHealth = Health;
         FullFuel = Fuel;
@@ -757,6 +759,7 @@ public class SaccGroundVehicle : UdonSharpBehaviour
     [System.NonSerialized] public int DisableTaxiRotation;
     [System.NonSerializedAttribute] public float FullFuel;
     [System.NonSerialized] public bool Occupied;
+    [System.NonSerialized] public int NumPassengers;
     [System.NonSerializedAttribute] public bool IsOwner;
     [System.NonSerializedAttribute] public bool UsingManualSync = true;
     public void SFEXT_O_RespawnButton()//called when using respawn button
@@ -839,17 +842,16 @@ public class SaccGroundVehicle : UdonSharpBehaviour
     {
         LimitingRev = false;
         Occupied = true;
-        SetCollidersLayer(OnboardVehicleLayer);
     }
     public void SFEXT_G_PilotExit()
     {
         Occupied = false;
-        SetCollidersLayer(VehicleLayer);
     }
     public void SFEXT_O_PilotEnter()
     {
         Piloting = true;
         InVR = EntityControl.InVR;
+        SetCollidersLayer(OnboardVehicleLayer);
     }
     public void SFEXT_O_PilotExit()
     {
@@ -858,6 +860,7 @@ public class SaccGroundVehicle : UdonSharpBehaviour
         {
             DriveWheels[i].SetProgramVariable("EngineRevs", 0f);
         }
+        SetCollidersLayer(VehicleLayer);
         localPlayer.SetVelocity(CurrentVel);
     }
     public void SFEXT_P_PassengerEnter()
@@ -870,6 +873,14 @@ public class SaccGroundVehicle : UdonSharpBehaviour
         Passenger = false;
         localPlayer.SetVelocity(CurrentVel);
         SetCollidersLayer(VehicleLayer);
+    }
+    public void SFEXT_G_PassengerEnter()
+    {
+        NumPassengers++;
+    }
+    public void SFEXT_G_PassengerExit()
+    {
+        NumPassengers--;
     }
     public void SFEXT_L_FallAsleep()
     {

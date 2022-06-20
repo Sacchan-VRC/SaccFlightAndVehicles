@@ -34,6 +34,10 @@ public class SaccRaceToggleButton : UdonSharpBehaviour
         }
         SetRace();
     }
+    public override void Interact()
+    {
+        NextRace();
+    }
     public void NextRace()
     {
         if (CurrentCourseSelection != -1) { Races[CurrentCourseSelection].RaceObjects.SetActive(false); }

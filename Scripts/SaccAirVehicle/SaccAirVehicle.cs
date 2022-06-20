@@ -323,6 +323,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AngleOfAttackYaw;
     [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
+    [System.NonSerialized] public int NumPassengers;
     [System.NonSerializedAttribute] public float VTOLAngle;
 
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
@@ -1852,6 +1853,14 @@ public class SaccAirVehicle : UdonSharpBehaviour
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
         SetCollidersLayer(OutsideVehicleLayer);
+    }
+    public void SFEXT_G_PassengerEnter()
+    {
+        NumPassengers++;
+    }
+    public void SFEXT_G_PassengerExit()
+    {
+        NumPassengers--;
     }
     public void SFEXT_O_TakeOwnership()
     {

@@ -73,7 +73,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     public bool AllDoorsClosed = true;
     [Tooltip("If ticked, don't turn down the volume of the engine sounds when user throttles down")]
     public bool IsHelicopter = false;
-    [Header("FOr use with Engine Toggle functionality")]
+    [Header("For use with Engine Toggle functionality")]
     public bool DoEngineLerpSpeedMultiplierChanges = true;
     public float EngineStartingLerpSpeedMulti = .3f;
     public float EngineOffLerpSpeedMulti = 1;

@@ -163,6 +163,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
     [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
+    [System.NonSerialized] public int NumPassengers;
 
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
     [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
@@ -1287,6 +1288,14 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         Passenger = false;
         localPlayer.SetVelocity(CurrentVel);
         SetCollidersLayer(VehicleLayer);
+    }
+    public void SFEXT_G_PassengerEnter()
+    {
+        NumPassengers++;
+    }
+    public void SFEXT_G_PassengerExit()
+    {
+        NumPassengers--;
     }
     public void SFEXT_O_TakeOwnership()
     {

@@ -347,7 +347,7 @@ public class SAV_EffectsController : UdonSharpBehaviour
     public void PlayLockedAAM()
     {
         if ((bool)SAVControl.GetProgramVariable("Piloting") || (bool)SAVControl.GetProgramVariable("Passenger"))
-        { VehicleAnimator.SetTrigger("locked_aam"); }
+        { VehicleAnimator.SetTrigger("radarlocked"); }
     }
     private void PrintStringHashes()
     {

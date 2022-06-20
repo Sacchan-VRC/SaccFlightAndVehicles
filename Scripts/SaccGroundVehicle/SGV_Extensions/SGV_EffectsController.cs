@@ -83,6 +83,7 @@ public class SGV_EffectsController : UdonSharpBehaviour
         RevLimiter = (float)SGVControl.GetProgramVariable("RevLimiter");
         EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
         ExplosionNull = Explosion.Length < 1;
+        BulletHitNull = BulletHit.Length < 1;
 
         DoEffects = 0f;
         Sleeping = false;
