@@ -13,6 +13,7 @@ public class SGV_GearBox : UdonSharpBehaviour
     public float GearChangeDistance = .7f;
     public bool LeftController = false;
     public bool ClutchLeftController = true;
+    public bool ClutchEnabled = false;
     [Tooltip("Multiply all the gears at once")]
     public float FinalDrive = 1f;
     public float[] GearRatios = { -.04f, 0, .04f, .08f, .12f, .16f, .2f };
@@ -75,13 +76,16 @@ public class SGV_GearBox : UdonSharpBehaviour
                 // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
                 StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
             }
-            if (ClutchLeftController)
+            if (ClutchEnabled)
             {
-                Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
-            }
-            else
-            {
-                Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
+                if (ClutchLeftController)
+                {
+                    Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
+                }
+                else
+                {
+                    Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
+                }
             }
             if (StickPos.y > GearChangeDistance)
             {

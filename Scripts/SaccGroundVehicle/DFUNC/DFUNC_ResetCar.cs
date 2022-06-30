@@ -27,6 +27,7 @@ public class DFUNC_ResetCar : UdonSharpBehaviour
     public void DFUNC_Selected()
     {
         Selected = true;
+        TriggerLastFrame = true;
         gameObject.SetActive(true);
     }
     public void DFUNC_Deselected()

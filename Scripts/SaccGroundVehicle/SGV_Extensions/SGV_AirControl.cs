@@ -38,11 +38,8 @@ public class SGV_AirControl : UdonSharpBehaviour
     private int ROLL_STRING = Animator.StringToHash("roll");
     public float GripSensitivity = .75f;
     private VRCPlayerApi localPlayer;
-    public GameObject test1;
-    public GameObject test2;
-    public GameObject test3;
 
-    public void Start()
+    public void SFEXT_L_EntityStart()
     {
         EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
         VehicleRigidbody = (Rigidbody)SGVControl.GetProgramVariable("VehicleRigidbody");

@@ -196,7 +196,7 @@ public class SaccWheel : UdonSharpBehaviour
         WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
         WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
-        if (Physics.Raycast(WheelPoint.position + (WheelPoint.up * ExtraRayCastDistance), -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(WheelPoint.position + UpxExtraRayCastDist, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
         {
             Grounded = true;
             //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop
@@ -257,11 +257,11 @@ public class SaccWheel : UdonSharpBehaviour
             //set wheel's visual position
             if (SusOut.distance > ExtraRayCastDistance)
             {
-                WheelVisual.position = SusOut.point + WheelPoint.up * WheelRadius;
+                WheelVisual.position = SusOut.point + (WheelPoint.up * WheelRadius);
             }
             else
             {
-                WheelVisual.position = WheelPoint.position + WheelPoint.up * WheelRadius;
+                WheelVisual.position = WheelPoint.position + (WheelPoint.up * WheelRadius);
             }
             //END OF SUSPENSION//
 
@@ -339,7 +339,7 @@ public class SaccWheel : UdonSharpBehaviour
         }
 
         //move wheel rotation speed towards its ground speed along its forward axis based on how much of it's forward skid that it gripped
-        if (HandBrake != 1f)
+        if (Grounded && HandBrake != 1f)
         {
             float SlipGrip = (Mathf.Abs(ForwardSlip) * Time.fixedDeltaTime) - (ForceUsed / WheelWeight);
 
@@ -482,9 +482,11 @@ public class SaccWheel : UdonSharpBehaviour
         }
         SkidSoundPlayingLast = false;
     }
+    public bool printWheelRotSpeed;
     private void RotateWheelOwner()
     {
-        WheelRotation += WheelRotationSpeedRPS * 360f * Time.fixedDeltaTime;
+        if (printWheelRotSpeed) Debug.Log(WheelRotationSpeedRPS);
+        WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
         Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
         WheelVisual.localRotation = newrot;
     }
@@ -493,7 +495,7 @@ public class SaccWheel : UdonSharpBehaviour
         float speed = (float)SGVControl.GetProgramVariable("VehicleSpeed");
         WheelRotationSpeedRPS = speed / WheelCircumference;
         if ((bool)SGVControl.GetProgramVariable("MovingForward")) { WheelRotationSpeedRPS = -WheelRotationSpeedRPS; }
-        WheelRotation += WheelRotationSpeedRPS * 360f * Time.fixedDeltaTime;
+        WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
         Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
         WheelVisual.localRotation = newrot;
     }
@@ -512,7 +514,7 @@ public class SaccWheel : UdonSharpBehaviour
     private void Suspension_VisualOnly()
     {
         RaycastHit SusOut;
-        if (Physics.Raycast(WheelPoint.position + (UpxExtraRayCastDist), -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(WheelPoint.position + UpxExtraRayCastDist, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
         {
             Grounded = true;
             //last character of surface object is its type

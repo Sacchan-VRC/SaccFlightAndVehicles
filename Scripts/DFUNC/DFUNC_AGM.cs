@@ -82,7 +82,7 @@ public class DFUNC_AGM : UdonSharpBehaviour
                 {
                     if (hit.collider)
                     {
-                        float tempdist = Vector3.Distance(value, hit.collider.transform.position);
+                        float tempdist = Vector3.Distance(hit.collider.ClosestPoint(value), value);
                         if (tempdist < NearestDist)
                         {
                             NearestDist = tempdist;

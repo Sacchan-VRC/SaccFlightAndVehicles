@@ -43,7 +43,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null) { InEditor = false; }
         Station = (VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation));
-        Seat = Station.stationEnterPlayerLocation.transform;
+        Seat = Station.stationEnterPlayerLocation;
         SeatStartRot = Seat.localRotation;
         SeatStartPos = Seat.localPosition;
         if (InEditor && ThisSeatOnly) { ThisSeatOnly.SetActive(true); }

@@ -14,6 +14,10 @@ public class SaccEntity : UdonSharpBehaviour
     public UdonSharpBehaviour[] Dial_Functions_L;
     [Tooltip("Function dial scripts that you wish to be on the right dial")]
     public UdonSharpBehaviour[] Dial_Functions_R;
+    [Tooltip("Pointer on the dial")]
+    public Transform LStickDisplayHighlighter;
+    [Tooltip("Pointer on the dial")]
+    public Transform RStickDisplayHighlighter;
     [Tooltip("How far the stick has to be pushed to select a function")]
     public float DialSensitivity = 0.7f;
     [Tooltip("Should there be a function at the top middle of the function dial[ ]? Or a divider[x]? Useful for adjusting function positions with an odd number of functions")]
@@ -28,8 +32,6 @@ public class SaccEntity : UdonSharpBehaviour
     public GameObject HoldingOnly;
     [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
     public Transform CenterOfMass;
-    public Transform LStickDisplayHighlighter;
-    public Transform RStickDisplayHighlighter;
     [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
     public bool DoVoiceVolumeChange = true;
     [Header("Selection Sound")]

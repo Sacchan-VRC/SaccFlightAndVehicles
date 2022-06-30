@@ -68,7 +68,8 @@ public class SaccGroundVehicle : UdonSharpBehaviour
     public AnimationCurve EngineResponseCurve = AnimationCurve.Linear(0, 1, 1, 1);
     [System.NonSerialized] public Vector3 CurrentVel;
     // [System.NonSerializedAttribute] public bool ThrottleGripLastFrame = false;
-    [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
+    [System.NonSerializedAttribute] public bool WheelGripLastFrame = false;
+    [System.NonSerializedAttribute] public bool WheelGrippingLastFrame_toggle = false;
     [UdonSynced] public float Fuel = 900;
     [Tooltip("Fuel consumption per second at max revs")]
     public float FuelConsumption = 2;
@@ -182,8 +183,8 @@ public class SaccGroundVehicle : UdonSharpBehaviour
     public float NumGroundedWheels = 0;
     public float CurrentDistance;
     public bool CurrentlyDistant = true;
-    private bool GrabToggle;
-    private int StickReleaseCount;
+    private bool WheelGrabToggle;
+    private int WheelReleaseCount;
     private float LastGripTime;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(HasFuel_))] public bool HasFuel = true;
     public bool HasFuel_
@@ -475,14 +476,40 @@ public class SaccGroundVehicle : UdonSharpBehaviour
                     VRThrottlePos = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                 }
 
-
+                //Toggle gripping the steering wheel if double tap grab
+                bool Grabbing = SteeringWheelGrip > GripSensitivity;
+                if (Grabbing)
+                {
+                    if (!WheelGrippingLastFrame_toggle)
+                    {
+                        if (Time.time - LastGripTime < .25f)
+                        {
+                            WheelGrabToggle = true;
+                            WheelReleaseCount = 0;
+                        }
+                        LastGripTime = Time.time;
+                    }
+                    WheelGrippingLastFrame_toggle = true;
+                }
+                else
+                {
+                    if (WheelGrippingLastFrame_toggle)
+                    {
+                        WheelReleaseCount++;
+                        if (WheelReleaseCount > 1)
+                        {
+                            WheelGrabToggle = false;
+                        }
+                    }
+                    WheelGrippingLastFrame_toggle = false;
+                }
                 //VR SteeringWheel
-                if (SteeringWheelGrip > GripSensitivity)
+                if (Grabbing || WheelGrabToggle)
                 {
                     Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                     VehicleRotLastFrame = ControlsRoot.rotation;
                     JoystickZeroPoint = VehicleRotDif * JoystickZeroPoint;//zero point rotates with the vehicle so it appears still to the pilot
-                    if (!JoystickGripLastFrame)//first frame you gripped joystick
+                    if (!WheelGripLastFrame)//first frame you gripped joystick
                     {
                         EntityControl.SendEventToExtensions("SFEXT_O_WheelGrabbed");
                         VehicleRotDif = Quaternion.identity;
@@ -494,7 +521,7 @@ public class SaccGroundVehicle : UdonSharpBehaviour
                         JoystickValueLastFrame = 0f;
                         CompareAngleLastFrame = Vector3.up;
                     }
-                    JoystickGripLastFrame = true;
+                    WheelGripLastFrame = true;
                     //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
                     Quaternion JoystickDifference;
                     JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
@@ -513,12 +540,12 @@ public class SaccGroundVehicle : UdonSharpBehaviour
                 else
                 {
                     VRJoystickPos = 0f;
-                    if (JoystickGripLastFrame)//first frame you let go of wheel
+                    if (WheelGripLastFrame)//first frame you let go of wheel
                     {
                         AutoSteerLerper = YawInput;
                         EntityControl.SendEventToExtensions("SFEXT_O_WheelDropped");
                     }
-                    JoystickGripLastFrame = false;
+                    WheelGripLastFrame = false;
                 }
                 float SteerInput = -VRJoystickPos + Ai + Di;
                 //AUTOSTEER DRIFT FIX(BROKEN)
@@ -856,6 +883,9 @@ public class SaccGroundVehicle : UdonSharpBehaviour
     public void SFEXT_O_PilotExit()
     {
         Piloting = false;
+        WheelGrippingLastFrame_toggle = false;
+        WheelReleaseCount = 0;
+        WheelGrabToggle = false;
         for (int i = 0; i < DriveWheels.Length; i++)
         {
             DriveWheels[i].SetProgramVariable("EngineRevs", 0f);

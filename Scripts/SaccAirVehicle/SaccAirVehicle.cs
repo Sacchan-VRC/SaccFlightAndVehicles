@@ -427,6 +427,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float TaxiFullTurningSpeedDivider;
     private float vtolangledif;
+    [System.NonSerializedAttribute] public bool JoyStickGrippingLastFrame_toggle = false;
+    private bool GrabToggle;
+    private int JoyStickReleaseCount;
+    private float LastGripTime;
     [System.NonSerializedAttribute] public WheelCollider[] VehicleWheelColliders;
     [System.NonSerializedAttribute] public bool LowFuelLastFrame;
     [System.NonSerializedAttribute] public bool NoFuelLastFrame;
@@ -833,8 +837,35 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         ThrottleGrip = LGrip;
                         JoyStickGrip = RGrip;
                     }
-                    //VR Joystick                
-                    if (JoyStickGrip > GripSensitivity)
+                    //Toggle gripping the steering wheel if double tap grab
+                    bool Grabbing = JoyStickGrip > GripSensitivity;
+                    if (Grabbing)
+                    {
+                        if (!JoyStickGrippingLastFrame_toggle)
+                        {
+                            if (Time.time - LastGripTime < .25f)
+                            {
+                                GrabToggle = true;
+                                JoyStickReleaseCount = 0;
+                            }
+                            LastGripTime = Time.time;
+                        }
+                        JoyStickGrippingLastFrame_toggle = true;
+                    }
+                    else
+                    {
+                        if (JoyStickGrippingLastFrame_toggle)
+                        {
+                            JoyStickReleaseCount++;
+                            if (JoyStickReleaseCount > 1)
+                            {
+                                GrabToggle = false;
+                            }
+                        }
+                        JoyStickGrippingLastFrame_toggle = false;
+                    }
+                    //VR Joystick
+                    if (Grabbing || GrabToggle)
                     {
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                         VehicleRotLastFrame = ControlsRoot.rotation;
@@ -1946,6 +1977,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Taxiinglerper = 0;
         ThrottleGripLastFrame = false;
         JoystickGripLastFrame = false;
+        JoyStickGrippingLastFrame_toggle = false;
+        JoyStickReleaseCount = 0;
+        GrabToggle = false;
         DoAAMTargeting = false;
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
