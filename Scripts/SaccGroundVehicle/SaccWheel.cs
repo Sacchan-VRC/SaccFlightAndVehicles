@@ -76,7 +76,6 @@ public class SaccWheel : UdonSharpBehaviour
     private bool SkidParticlePlayingLast;
     private Vector3 SusDirection;
     private Renderer WheelRenderer;
-    private Vector3 UpxExtraRayCastDist;
     [FieldChangeCallback(nameof(GearRatio))] public float _GearRatio = 0f;
     public float GearRatio
     {
@@ -110,7 +109,6 @@ public class SaccWheel : UdonSharpBehaviour
         WheelRenderer = (Renderer)SGVControl.GetProgramVariable("MainObjectRenderer");
         WheelDiameter = WheelRadius * 2f;
         WheelCircumference = WheelDiameter * Mathf.PI;
-        UpxExtraRayCastDist = WheelPoint.up * ExtraRayCastDistance;
         GearRatio = _GearRatio;
         if (SurfaceType_SkidSounds.Length > 0)
         {
@@ -196,7 +194,7 @@ public class SaccWheel : UdonSharpBehaviour
         WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
         WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
-        if (Physics.Raycast(WheelPoint.position + UpxExtraRayCastDist, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
         {
             Grounded = true;
             //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop
@@ -514,7 +512,7 @@ public class SaccWheel : UdonSharpBehaviour
     private void Suspension_VisualOnly()
     {
         RaycastHit SusOut;
-        if (Physics.Raycast(WheelPoint.position + UpxExtraRayCastDist, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
+        if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
         {
             Grounded = true;
             //last character of surface object is its type
