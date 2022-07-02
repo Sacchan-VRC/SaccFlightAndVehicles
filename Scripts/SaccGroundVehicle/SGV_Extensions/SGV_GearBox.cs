@@ -11,6 +11,10 @@ public class SGV_GearBox : UdonSharpBehaviour
     public UdonSharpBehaviour SGVControl;
     [Tooltip("How far the stick has to be moved to change the gear")]
     public float GearChangeDistance = .7f;
+    public bool Automatic = false;
+    public float AutomaticGearChangeDelay = 1f;
+    public float GearChangeRevsUpper = .8f;
+    public float GearChangeRevsLower = .3f;
     public bool LeftController = false;
     public bool ClutchLeftController = true;
     public bool ClutchEnabled = false;
@@ -30,103 +34,170 @@ public class SGV_GearBox : UdonSharpBehaviour
         {
             SGVControl.SetProgramVariable("CurrentGear", value);
             SGVControl.SetProgramVariable("GearRatio", GearRatios[value] * FinalDrive);
+            if (value == NeutralGear)
+            { InNeutralGear = true; }
+            else { InNeutralGear = false; }
+            if (value == GearRatios.Length - 1)
+            { InMaxGear = true; }
+            else
+            { InMaxGear = false; }
+            if (value == 0)
+            { InMinGear = true; }
+            else
+            { InMinGear = false; }
             _CurrentGear = value;
             EntityControl.SendEventToExtensions("SFEXT_G_ChangeGear");
         }
         get => _CurrentGear;
     }
     [Header("Debug")]
+    [System.NonSerializedAttribute] public bool _ClutchOverrideOne = false;
     [System.NonSerializedAttribute] public float _ClutchOverride;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(ClutchOverride_))] public int ClutchOverride = 0;
     public int ClutchOverride_
     {
         set
         {
-            _ClutchOverride = value > 0 ? 1f : 0f;
+            if (value > 0)
+            {
+                _ClutchOverride = 1f;
+                _ClutchOverrideOne = true;
+            }
+            else
+            {
+                _ClutchOverride = 0f;
+                _ClutchOverrideOne = false;
+            }
             ClutchOverride = value;
         }
         get => ClutchOverride;
     }
     private int NeutralGear;
     private bool InNeutralGear = false;
+    private bool InMaxGear = false;
+    private bool InMinGear = false;
     private bool Piloting = false;
     private bool InVR = false;
     private bool StickUpLastFrame;
     private bool StickDownLastFrame;
+    [System.NonSerializedAttribute, FieldChangeCallback(nameof(AutomaticReversing))] public bool _AutomaticReversing = false;
+    public bool AutomaticReversing
+    {
+        set
+        {
+            SetGear(NeutralGear);
+            LastGearChangeTime = 0;
+            _AutomaticReversing = value;
+        }
+        get => _AutomaticReversing;
+    }
+    private float LastGearChangeTime;
+    private float RevLimiter;
     public void SFEXT_L_EntityStart()
     {
         EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
         InVR = EntityControl.InVR;
         SGVControl.SetProgramVariable("GearRatio", GearRatios[_CurrentGear]);
-        NeutralGear = _CurrentGear;
+        RevLimiter = (float)SGVControl.GetProgramVariable("RevLimiter");
+        for (int i = 0; i < GearRatios.Length; i++)
+        {
+            if (GearRatios[i] == 0f)
+            {
+                NeutralGear = i;
+                break;
+            }
+        }
+        CurrentGear = NeutralGear;
     }
     private void LateUpdate()
     {
         if (Piloting)
         {
-            Vector2 StickPos = Vector2.zero;
-            float Trigger = 0;
-            if (LeftController)
+            if (Automatic)
             {
-                // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                if (Time.time - LastGearChangeTime > AutomaticGearChangeDelay)
+                {
+                    float normRevs = (float)SGVControl.GetProgramVariable("Revs") / RevLimiter;
+                    if ((!AutomaticReversing && !InMaxGear && normRevs > GearChangeRevsUpper) || (AutomaticReversing && !InNeutralGear && normRevs < GearChangeRevsLower))
+                    {
+                        if (!_ClutchOverrideOne)
+                        {
+                            GearUp();
+                        }
+                    }
+                    else if ((!AutomaticReversing && !InNeutralGear && !InMinGear && normRevs < GearChangeRevsLower) || (AutomaticReversing && !InMinGear && normRevs > GearChangeRevsUpper))
+                    {
+                        GearDown();
+                    }
+                }
+                SGVControl.SetProgramVariable("Clutch", _ClutchOverride);
             }
             else
             {
-                // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-            }
-            if (ClutchEnabled)
-            {
-                if (ClutchLeftController)
+                Vector2 StickPos = Vector2.zero;
+                float Trigger = 0;
+                if (LeftController)
                 {
-                    Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
+                    // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                    StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
                 }
                 else
                 {
-                    Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
+                    // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                    StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
                 }
-            }
-            if (StickPos.y > GearChangeDistance)
-            {
-                if (!StickUpLastFrame)
+                if (StickPos.y > GearChangeDistance)
                 {
-                    //GEARUP
-                    GearUp();
-                    StickUpLastFrame = true;
+                    if (!StickUpLastFrame)
+                    {
+                        //GEARUP
+                        GearUp();
+                        StickUpLastFrame = true;
+                    }
                 }
-            }
-            else
-            {
-                StickUpLastFrame = false;
-            }
-            if (StickPos.y < -GearChangeDistance)
-            {
-                if (!StickDownLastFrame)
+                else
                 {
-                    //GEARDown
-                    GearDown();
-                    StickDownLastFrame = true;
+                    StickUpLastFrame = false;
                 }
-            }
-            else
-            {
-                StickDownLastFrame = false;
-            }
-            float kbclutch = Input.GetKey(KeyCode.C) ? 1f : 0f;
-            if (Trigger > UpperDeadZone)
-            { Trigger = 1f; }
-            if (Trigger < LowerDeadZone)
-            { Trigger = 0f; }
-            SGVControl.SetProgramVariable("Clutch", Mathf.Max(Trigger, kbclutch, _ClutchOverride));
+                if (StickPos.y < -GearChangeDistance)
+                {
+                    if (!StickDownLastFrame)
+                    {
+                        //GEARDown
+                        GearDown();
+                        StickDownLastFrame = true;
+                    }
+                }
+                else
+                {
+                    StickDownLastFrame = false;
+                }
+                if (ClutchEnabled)
+                {
+                    if (ClutchLeftController)
+                    {
+                        Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryHandTrigger");
+                    }
+                    else
+                    {
+                        Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
+                    }
+                }
+                float kbclutch = Input.GetKey(KeyCode.C) ? 1f : 0f;
+                if (Trigger > UpperDeadZone)
+                { Trigger = 1f; }
+                if (Trigger < LowerDeadZone)
+                { Trigger = 0f; }
+                SGVControl.SetProgramVariable("Clutch", Mathf.Max(Trigger, kbclutch, _ClutchOverride));
 
-            if (Input.GetKeyDown(KeyCode.E))
-            {
-                GearUp();
-            }
-            if (Input.GetKeyDown(KeyCode.Q))
-            {
-                GearDown();
+                if (Input.GetKeyDown(KeyCode.E))
+                {
+                    GearUp();
+                }
+                if (Input.GetKeyDown(KeyCode.Q))
+                {
+                    GearDown();
+                }
             }
         }
     }
@@ -135,6 +206,7 @@ public class SGV_GearBox : UdonSharpBehaviour
         if (_CurrentGear < GearRatios.Length - 1)
         {
             CurrentGear++;
+            LastGearChangeTime = Time.time;
             RequestSerialization();
         }
     }
@@ -143,8 +215,15 @@ public class SGV_GearBox : UdonSharpBehaviour
         if (_CurrentGear != 0)
         {
             CurrentGear--;
+            LastGearChangeTime = Time.time;
             RequestSerialization();
         }
+    }
+    public void SetGear(int newgear)
+    {
+        CurrentGear = Mathf.Clamp(newgear, 0, GearRatios.Length);
+        LastGearChangeTime = Time.time;
+        RequestSerialization();
     }
     public void SFEXT_O_PilotEnter()
     {

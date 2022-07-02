@@ -9,6 +9,7 @@ using VRC.Udon;
 public class SaccRacingTrigger : UdonSharpBehaviour
 {
     public string PlaneName;
+    [Tooltip("Set automatically on build if left empty")]
     public SaccRaceToggleButton Button;
     public GameObject[] DisabledRaces;
     public GameObject[] InstanceRecordDisallowedRaces;

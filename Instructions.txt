@@ -320,8 +320,8 @@ The 'SaccFlight' script will always crash when testing in editor, because it's l
 
 Making your own vehicles:
 
-When making a new vehicle, place the prefab that is closest in type to your desired vehicle and Unpack Prefab (not completely) and also unpack prefab on the mesh if necessary. Now your objective is to replace the mesh (PlaneBody on the SF-1) completely.
-I recommend just disabling it at first(delete it once you're done using it as a reference), and placing your mesh next to it on the hierarchy. The first thing you should do is set the VehicleMesh to your new mesh in the SaccAirVehicle script. (Set it to the armature if you're using a skinned mesh)
+When making a new vehicle, place the prefab that is closest in type to your desired vehicle and Unpack Prefab. Now your objective is to replace the mesh object (PlaneBody on the SF-1) completely.
+I recommend just disabling it at first(delete it once you're done using it as a reference), and placing your mesh next to it on the hierarchy. The first thing you should do is set the VehicleMesh to your new mesh in the SaccAirVehicle script.
 Next add colliders to your mesh(or armature), any collider types are fine. If your vehicle has wheels, i recommend copying the wheel colliders from the SF-1, and adjusting the size to fit your wheels.
 Now go through the entire hierarchy and move all the empties, effects, and sounds to the proper position for your new vehicle.
 Finally, duplicate the Animator for the vehicle prefab you used, rename it, place it in a new folder, apply it to your vehicle, and go through each layer and replace any animations that need replacing.

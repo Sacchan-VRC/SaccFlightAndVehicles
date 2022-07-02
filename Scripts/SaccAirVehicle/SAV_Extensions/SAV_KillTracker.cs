@@ -21,7 +21,6 @@ public class SAV_KillTracker : UdonSharpBehaviour
         if (localPlayer == null)
         { InEditor = true; }
     }
-
     public void SFEXT_G_Explode()
     {
         float time = Time.time;

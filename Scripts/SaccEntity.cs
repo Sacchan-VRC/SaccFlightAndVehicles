@@ -112,8 +112,10 @@ public class SaccEntity : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float PilotEnterTime;
     [System.NonSerializedAttribute] public bool Holding;
     //end of old Leavebutton stuff
+    public void Init() { Start(); }
     private void Start()
     {
+        if (Initialized) { return; }
         Initialized = true;
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null)
