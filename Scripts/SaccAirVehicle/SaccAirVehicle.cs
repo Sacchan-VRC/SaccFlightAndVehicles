@@ -51,6 +51,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float ThrottleSensitivity = 6f;
     [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
     public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
+    [Tooltip("Joystick pitch input to be a slider-style yoke.")]
+    public bool JoystickPushPullPitch = false;
+    [Tooltip("Joystick sensitivity for adove option.")]
+    public float JoystickPushPullDistance = 0.2f;
     [Tooltip("How far down you have to push the grip button to grab the joystick and throttle")]
     public float GripSensitivity = .75f;
     [Tooltip("How much more thrust the vehicle has when in full afterburner")]
@@ -349,6 +353,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
     Quaternion JoystickZeroPoint;
     Quaternion VehicleRotLastFrame;
+    private Vector3 JoystickZeroPosition;
     [System.NonSerializedAttribute] public float PlayerThrottle;
     private float TempThrottle;
     private float ThrottleZeroPoint;
@@ -876,6 +881,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                         VehicleRotLastFrame = ControlsRoot.rotation;
                         JoystickZeroPoint = VehicleRotDif * JoystickZeroPoint;//zero point rotates with the vehicle so it appears still to the pilot
+
                         if (!JoystickGripLastFrame)//first frame you gripped joystick
                         {
                             EntityControl.SendEventToExtensions("SFEXT_O_JoystickGrabbed");
@@ -891,7 +897,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
                                 localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35);
                             }
                         }
-                        JoystickGripLastFrame = true;
                         //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint, finally rotated by the vehicles rotation to turn it back to vehicle space
                         Quaternion JoystickDifference;
                         JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
@@ -908,6 +913,20 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         VRJoystickPos.x = -((Mathf.Acos(Mathf.Clamp(JoystickPos.z, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.x;
                         VRJoystickPos.y = -((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
                         VRJoystickPos.z = -((Mathf.Acos(Mathf.Clamp(JoystickPos.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.z;
+
+                        // Override pitch input for Push-Pull style York
+                        if (JoystickPushPullPitch)
+                        {
+                            Vector3 joystickPosition = ControlsRoot.InverseTransformPoint(localPlayer.GetTrackingData(SwitchHandsJoyThrottle ? VRCPlayerApi.TrackingDataType.LeftHand : VRCPlayerApi.TrackingDataType.RightHand).position);
+                            if (!JoystickGripLastFrame)
+                            {
+                                JoystickZeroPosition = joystickPosition;
+                                localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35);
+                            }
+                            VRJoystickPos.x = Mathf.Clamp((joystickPosition.z - JoystickZeroPosition.z) / JoystickPushPullDistance, -1.0f, 1.0f);
+                        }
+
+                        JoystickGripLastFrame = true;
                     }
                     else
                     {
