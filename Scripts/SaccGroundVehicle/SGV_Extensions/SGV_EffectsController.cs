@@ -8,16 +8,6 @@ using VRC.Udon;
 public class SGV_EffectsController : UdonSharpBehaviour
 {
     public UdonSharpBehaviour SGVControl;
-    private SaccEntity EntityControl;
-    private Animator VehicleAnimator;
-    private bool InWater;
-    private bool Occupied;
-    private bool Sleeping = true;
-    private float RevLimiter = 1;
-    private float DoEffects = 999f;
-    private UdonSharpBehaviour[] DriveWheels;
-    private UdonSharpBehaviour[] SteerWheels;
-    private UdonSharpBehaviour[] OtherWheels;
     [Tooltip("Engine sounds to set pitch and doppler, DO NOT ANIMATE PITCH IN THE REVS ANIMATION")]
     public AudioSource[] EngineSounds;
     private Transform[] EngineSoundsT;
@@ -53,6 +43,16 @@ public class SGV_EffectsController : UdonSharpBehaviour
     public AudioSource GearChange;
     [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
     public Transform testcamera;
+    private SaccEntity EntityControl;
+    private Animator VehicleAnimator;
+    private bool InWater;
+    private bool Occupied;
+    private bool Sleeping = true;
+    private float RevLimiter = 1;
+    private float DoEffects = 999f;
+    private UdonSharpBehaviour[] DriveWheels;
+    private UdonSharpBehaviour[] SteerWheels;
+    private UdonSharpBehaviour[] OtherWheels;
     private bool InEditor;
     private bool InVehicle;
     private int dopplecounter;
@@ -113,9 +113,9 @@ public class SGV_EffectsController : UdonSharpBehaviour
         SmallCrashNULL = SmallCrash.Length < 1;
         MediumCrashNULL = MediumCrash.Length < 1;
         BigCrashNULL = BigCrash.Length < 1;
-        SmallCrashInsideNULL = SmallCrash.Length < 1;
-        MediumCrashInsideNULL = MediumCrash.Length < 1;
-        BigCrashInsideNULL = BigCrash.Length < 1;
+        SmallCrashInsideNULL = SmallCrashInside.Length < 1;
+        MediumCrashInsideNULL = MediumCrashInside.Length < 1;
+        BigCrashInsideNULL = BigCrashInside.Length < 1;
 
         //save original positions of all the crash sounds because non-owners can't set them to the collision contact point
         SmallCrashPos = new Vector3[SmallCrash.Length];

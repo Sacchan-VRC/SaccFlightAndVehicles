@@ -162,12 +162,12 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool SmallCrashInsideNULL = true;
     [System.NonSerializedAttribute] public bool MediumCrashInsideNULL = true;
     [System.NonSerializedAttribute] public bool BigCrashInsideNULL = true;
-    public Vector3[] SmallCrashPos;
-    public Vector3[] SmallCrashInsidePos;
-    public Vector3[] MediumCrashPos;
-    public Vector3[] MediumCrashInsidePos;
-    public Vector3[] BigCrashPos;
-    public Vector3[] BigCrashInsidePos;
+    [System.NonSerializedAttribute] public Vector3[] SmallCrashPos;
+    [System.NonSerializedAttribute] public Vector3[] SmallCrashInsidePos;
+    [System.NonSerializedAttribute] public Vector3[] MediumCrashPos;
+    [System.NonSerializedAttribute] public Vector3[] MediumCrashInsidePos;
+    [System.NonSerializedAttribute] public Vector3[] BigCrashPos;
+    [System.NonSerializedAttribute] public Vector3[] BigCrashInsidePos;
     private SaccEntity EntityControl;
     //public Transform testcamera;
     private AudioSource _rolling;
@@ -236,9 +236,9 @@ public class SAV_SoundController : UdonSharpBehaviour
         SmallCrashNULL = SmallCrash.Length < 1;
         MediumCrashNULL = MediumCrash.Length < 1;
         BigCrashNULL = BigCrash.Length < 1;
-        SmallCrashInsideNULL = SmallCrash.Length < 1;
-        MediumCrashInsideNULL = MediumCrash.Length < 1;
-        BigCrashInsideNULL = BigCrash.Length < 1;
+        SmallCrashInsideNULL = SmallCrashInside.Length < 1;
+        MediumCrashInsideNULL = MediumCrashInside.Length < 1;
+        BigCrashInsideNULL = BigCrashInside.Length < 1;
 
         //save original positions of all the crash sounds because non-owners can't set them to the collision contact point
         SmallCrashPos = new Vector3[SmallCrash.Length];

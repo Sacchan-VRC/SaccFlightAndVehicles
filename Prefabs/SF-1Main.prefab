@@ -47734,6 +47734,8 @@ MonoBehaviour:
   - {fileID: 411729347685444119}
   - {fileID: -7714009359079849127}
   - {fileID: 2621677993132170529}
+  LStickDisplayHighlighter: {fileID: 4371473019650007483}
+  RStickDisplayHighlighter: {fileID: 4371473018675036614}
   DialSensitivity: 0.7
   LeftDialDivideStraightUp: 0
   RightDialDivideStraightUp: 0
@@ -47743,13 +47745,11 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 4371473019321031449}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 4371473018504201464}
-  LStickDisplayHighlighter: {fileID: 4371473019650007483}
-  RStickDisplayHighlighter: {fileID: 4371473018675036614}
   DoVoiceVolumeChange: 1
   SwitchFunctionSound: {fileID: 4371473019709341094}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
-  DisableAfter10Seconds: []
+  AAMTargets: []
 --- !u!114 &4371473018401239850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65520,6 +65520,12 @@ MonoBehaviour:
   - {fileID: 4371473019180008309}
   MissileHit:
   - {fileID: 877570519}
+  SmallCrash: []
+  MediumCrash: []
+  BigCrash: []
+  SmallCrashInside: []
+  MediumCrashInside: []
+  BigCrashInside: []
   Rolling: {fileID: 4371473019230276133}
   RollingMaxVol: 1
   RollingVolCurve: 0.03
@@ -65557,6 +65563,12 @@ MonoBehaviour:
   PlaneIdlePitchLerpValueOff: 0.09
   PlaneIdleVolLerpValueOff: 0.09
   PlaneIdleVolLerpValueOn: 0.72
+  SmallCrashPos: []
+  SmallCrashInsidePos: []
+  MediumCrashPos: []
+  MediumCrashInsidePos: []
+  BigCrashPos: []
+  BigCrashInsidePos: []
 --- !u!114 &4371473019549114405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93200,6 +93212,9 @@ MonoBehaviour:
   InvincibleAfterSpawn: 2.5
   BulletDamageTaken: 10
   PredictDamage: 1
+  SmallCrashSpeed: 1
+  MediumCrashSpeed: 8
+  BigCrashSpeed: 25
   MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080

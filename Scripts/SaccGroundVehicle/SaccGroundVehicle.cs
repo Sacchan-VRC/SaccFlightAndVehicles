@@ -786,10 +786,17 @@ public class SaccGroundVehicle : UdonSharpBehaviour
         Health = FullHealth;
         EntityControl.dead = false;
     }
-    /* [UdonSynced(UdonSyncMode.None)] */
     [System.NonSerializedAttribute] public float FullHealth;
+    //unused variables that are just here for compatability with SAV DFuncs.
     [System.NonSerialized] public int OverrideConstantForce;
+    [System.NonSerialized] public Vector3 CFRelativeForceOverride;
+    [System.NonSerialized] public Vector3 CFRelativeTorqueOverride;
+    [System.NonSerialized] public int DisablePhysicsAndInputs = 0;
     [System.NonSerialized] public int DisableTaxiRotation;
+    [System.NonSerialized] public int DisableGroundDetection;
+    [System.NonSerialized] public int ThrottleOverridden;
+    [System.NonSerialized] public int JoystickOverridden;
+    //end of compatability variables
     [System.NonSerializedAttribute] public float FullFuel;
     [System.NonSerialized] public bool Occupied;
     [System.NonSerialized] public int NumPassengers;
@@ -999,7 +1006,6 @@ public class SaccGroundVehicle : UdonSharpBehaviour
             Collision col = EntityControl.LastCollisionEnter;
             if (col == null) { return; }
             float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
-            Debug.Log(colmag);
             if (colmag > BigCrashSpeed)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBigCrash));

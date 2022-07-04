@@ -57207,18 +57207,15 @@ MonoBehaviour:
   - {fileID: 8463016218708147174}
   BigCrash:
   - {fileID: 5900808207512884170}
-  SmallCrashInside: []
-  MediumCrashInside: []
-  BigCrashInside: []
+  SmallCrashInside:
+  - {fileID: 1272157484027882113}
+  MediumCrashInside:
+  - {fileID: 8463016218708147174}
+  BigCrashInside:
+  - {fileID: 5900808207512884170}
   ReSupply: {fileID: 5529308117036114442}
   GearChange: {fileID: 0}
   testcamera: {fileID: 0}
-  SmallCrashPos: []
-  SmallCrashInsidePos: []
-  MediumCrashPos: []
-  MediumCrashInsidePos: []
-  BigCrashPos: []
-  BigCrashInsidePos: []
 --- !u!114 &7062232292374017793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57707,7 +57704,6 @@ MonoBehaviour:
   NumGroundedWheels: 0
   CurrentDistance: 0
   CurrentlyDistant: 0
-  MinCollisionSoundDelay: 0.1
 --- !u!114 &6141758679994110547
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58216,7 +58212,7 @@ MonoBehaviour:
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
-  DisableAfter10Seconds: []
+  AAMTargets: []
 --- !u!95 &6141758680382097274
 Animator:
   serializedVersion: 3

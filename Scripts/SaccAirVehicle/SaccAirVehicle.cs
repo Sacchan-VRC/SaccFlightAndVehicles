@@ -1803,7 +1803,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
             Collision col = EntityControl.LastCollisionEnter;
             if (col == null) { return; }
             float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
-            Debug.Log(colmag);
             if (colmag > BigCrashSpeed)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBigCrash));
