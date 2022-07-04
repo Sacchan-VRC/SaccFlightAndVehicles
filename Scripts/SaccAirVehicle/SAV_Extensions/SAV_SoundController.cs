@@ -41,6 +41,18 @@ public class SAV_SoundController : UdonSharpBehaviour
     public AudioSource[] BulletHit;
     [Tooltip("Sound that plays when vehicle is hit by a missile")]
     public AudioSource[] MissileHit;
+    [Tooltip("Sounds that can play when vehicle has a small crash")]
+    public AudioSource[] SmallCrash;
+    [Tooltip("Sounds that can play when vehicle has a medium crash")]
+    public AudioSource[] MediumCrash;
+    [Tooltip("Sounds that can play when vehicle has a big crash")]
+    public AudioSource[] BigCrash;
+    [Tooltip("Sounds that can play when vehicle has a small crash")]
+    public AudioSource[] SmallCrashInside;
+    [Tooltip("Sounds that can play when vehicle has a medium crash")]
+    public AudioSource[] MediumCrashInside;
+    [Tooltip("Sounds that can play when vehicle has a big crash")]
+    public AudioSource[] BigCrashInside;
     [Tooltip("Sound played when vehicle is rolling along the ground")]
     public AudioSource Rolling;
     [Tooltip("Sound played when vehicle is skimming along water")]
@@ -144,12 +156,25 @@ public class SAV_SoundController : UdonSharpBehaviour
     [System.NonSerializedAttribute] public bool ExplosionNull = true;
     [System.NonSerializedAttribute] public bool BulletHitNull = true;
     [System.NonSerializedAttribute] public bool MissileHitNULL = true;
+    [System.NonSerializedAttribute] public bool SmallCrashNULL = true;
+    [System.NonSerializedAttribute] public bool MediumCrashNULL = true;
+    [System.NonSerializedAttribute] public bool BigCrashNULL = true;
+    [System.NonSerializedAttribute] public bool SmallCrashInsideNULL = true;
+    [System.NonSerializedAttribute] public bool MediumCrashInsideNULL = true;
+    [System.NonSerializedAttribute] public bool BigCrashInsideNULL = true;
+    public Vector3[] SmallCrashPos;
+    public Vector3[] SmallCrashInsidePos;
+    public Vector3[] MediumCrashPos;
+    public Vector3[] MediumCrashInsidePos;
+    public Vector3[] BigCrashPos;
+    public Vector3[] BigCrashInsidePos;
     private SaccEntity EntityControl;
     //public Transform testcamera;
     private AudioSource _rolling;
     private float _rollingVolCurve;
     private float _rollingMaxVol;
     private bool RollingOnWater;
+    private bool IsOwner;
     [System.NonSerializedAttribute] public float Doppler = 1;
     float LastFrameDist;
     [System.NonSerializedAttribute] public float ThisFrameDist = 0;
@@ -199,6 +224,7 @@ public class SAV_SoundController : UdonSharpBehaviour
     private bool DoRollingSwap;
     public void SFEXT_L_EntityStart()
     {
+        IsOwner = EntityControl.IsOwner;
         MissileHitNULL = MissileHit.Length < 1;
         PlaneIdleNull = PlaneIdle.Length < 1;
         ThrustNull = Thrust.Length < 1;
@@ -207,6 +233,44 @@ public class SAV_SoundController : UdonSharpBehaviour
         SonicBoomNull = SonicBoom.Length < 1;
         ExplosionNull = Explosion.Length < 1;
         BulletHitNull = BulletHit.Length < 1;
+        SmallCrashNULL = SmallCrash.Length < 1;
+        MediumCrashNULL = MediumCrash.Length < 1;
+        BigCrashNULL = BigCrash.Length < 1;
+        SmallCrashInsideNULL = SmallCrash.Length < 1;
+        MediumCrashInsideNULL = MediumCrash.Length < 1;
+        BigCrashInsideNULL = BigCrash.Length < 1;
+
+        //save original positions of all the crash sounds because non-owners can't set them to the collision contact point
+        SmallCrashPos = new Vector3[SmallCrash.Length];
+        for (int i = 0; i < SmallCrashPos.Length; i++)
+        {
+            SmallCrashPos[i] = SmallCrash[i].transform.position;
+        }
+        SmallCrashInsidePos = new Vector3[SmallCrashInside.Length];
+        for (int i = 0; i < SmallCrashInsidePos.Length; i++)
+        {
+            SmallCrashInsidePos[i] = SmallCrashInside[i].transform.position;
+        }
+        MediumCrashPos = new Vector3[MediumCrash.Length];
+        for (int i = 0; i < MediumCrashPos.Length; i++)
+        {
+            MediumCrashPos[i] = MediumCrash[i].transform.position;
+        }
+        MediumCrashInsidePos = new Vector3[MediumCrashInside.Length];
+        for (int i = 0; i < MediumCrashInsidePos.Length; i++)
+        {
+            MediumCrashInsidePos[i] = MediumCrashInside[i].transform.position;
+        }
+        BigCrashPos = new Vector3[BigCrash.Length];
+        for (int i = 0; i < BigCrashPos.Length; i++)
+        {
+            BigCrashPos[i] = BigCrash[i].transform.position;
+        }
+        BigCrashInsidePos = new Vector3[BigCrashInside.Length];
+        for (int i = 0; i < BigCrashInsidePos.Length; i++)
+        {
+            BigCrashInsidePos[i] = BigCrashInside[i].transform.position;
+        }
 
         InVehicleThrustVolumeFactorReverse = 1 / InVehicleThrustVolumeFactor;
         PlaneWindMaxVolSpeedDivider = 1 / PlaneWindMaxVolSpeed;
@@ -769,10 +833,13 @@ public class SAV_SoundController : UdonSharpBehaviour
     {
         SendCustomEventDelayedFrames(nameof(ResupplySound), 1);
     }
-    public void SFEXT_O_AfterburnerOn()
+    public void SFEXT_O_TakeOwnership()
     {
-        if (!InWater)
-        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "PlayAfturburnersound"); }
+        IsOwner = true;
+    }
+    public void SFEXT_O_LoseOwnership()
+    {
+        IsOwner = false;
     }
     public void SFEXT_G_MissileHit25()
     { if (InVehicle && !MissileHitNULL) { PlayMissileHit(); } }
@@ -782,6 +849,81 @@ public class SAV_SoundController : UdonSharpBehaviour
     { if (InVehicle && !MissileHitNULL) { PlayMissileHit(); } }
     public void SFEXT_G_MissileHit100()
     { if (InVehicle && !MissileHitNULL) { PlayMissileHit(); } }
+    public void SFEXT_G_SmallCrash()
+    {
+        if (InVehicle)
+        {
+            if (SmallCrashInsideNULL) { return; }
+            int rand = Random.Range(0, SmallCrashInside.Length);
+            SmallCrashInside[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { SmallCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { SmallCrashInside[rand].transform.position = SmallCrashInsidePos[rand]; }
+            SmallCrashInside[rand].Play();
+        }
+        else
+        {
+            if (SmallCrashNULL) { return; }
+            int rand = Random.Range(0, SmallCrash.Length);
+            SmallCrash[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { SmallCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { SmallCrash[rand].transform.position = SmallCrashPos[rand]; }
+            SmallCrash[rand].Play();
+        }
+    }
+    public void SFEXT_G_MediumCrash()
+    {
+        if (InVehicle)
+        {
+            if (MediumCrashInsideNULL) { return; }
+            int rand = Random.Range(0, MediumCrashInside.Length);
+            MediumCrashInside[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { MediumCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { MediumCrashInside[rand].transform.position = MediumCrashInsidePos[rand]; }
+            MediumCrashInside[rand].Play();
+        }
+        else
+        {
+            if (MediumCrashNULL) { return; }
+            int rand = Random.Range(0, MediumCrash.Length);
+            MediumCrash[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { MediumCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { MediumCrash[rand].transform.position = MediumCrashPos[rand]; }
+            MediumCrash[rand].Play();
+        }
+    }
+    public void SFEXT_G_BigCrash()
+    {
+        if (InVehicle)
+        {
+            if (BigCrashInsideNULL) { return; }
+            int rand = Random.Range(0, BigCrashInside.Length);
+            BigCrashInside[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { BigCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { BigCrashInside[rand].transform.position = BigCrashInsidePos[rand]; }
+            BigCrashInside[rand].Play();
+        }
+        else
+        {
+            if (BigCrashNULL) { return; }
+            int rand = Random.Range(0, BigCrash.Length);
+            BigCrash[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { BigCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { BigCrash[rand].transform.position = BigCrashPos[rand]; }
+            BigCrash[rand].Play();
+        }
+    }
     public void PlayMissileHit()
     {
         int rand = Random.Range(0, MissileHit.Length);
@@ -837,7 +979,7 @@ public class SAV_SoundController : UdonSharpBehaviour
             AllDoorsClosed = true;
             if (InVehicle)
             { SetSoundsInside(); }
-            if ((bool)SAVControl.GetProgramVariable("IsOwner")) { EntityControl.SendEventToExtensions("SFEXT_O_DoorsClosed"); }
+            if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_DoorsClosed"); }
         }
         if (DoorsOpen < 0) Debug.LogWarning("DoorsOpen is negative");
         //Debug.Log("DoorClose");
@@ -849,7 +991,7 @@ public class SAV_SoundController : UdonSharpBehaviour
         {
             if (InVehicle && AllDoorsClosed)//only run exitplane if doors were closed before
             { SetSoundsOutside(); }
-            if ((bool)SAVControl.GetProgramVariable("IsOwner") && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
+            if (IsOwner && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
             { EntityControl.SendEventToExtensions("SFEXT_O_DoorsOpened"); }
             AllDoorsClosed = false;
         }

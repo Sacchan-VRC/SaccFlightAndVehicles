@@ -8,8 +8,8 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SaccRaceToggleButton : UdonSharpBehaviour
 {
-    [System.NonSerialized] public SaccRacingTrigger[] RacingTriggers;
-    [System.NonSerialized] public SaccRaceCourseAndScoreboard[] Races;
+    [HideInInspector] public SaccRacingTrigger[] RacingTriggers;
+    [HideInInspector] public SaccRaceCourseAndScoreboard[] Races;
     public Toggle ReverseToggle;
     [Tooltip("Can be used to set a default course -1 = none")]
     public int CurrentCourseSelection = -1;

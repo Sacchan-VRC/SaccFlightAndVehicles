@@ -36,6 +36,18 @@ public class SGV_EffectsController : UdonSharpBehaviour
     public AudioSource[] Explosion;
     [Tooltip("Sounds that can be played when vehicle gets hit by something")]
     public AudioSource[] BulletHit;
+    [Tooltip("Sounds that can play when vehicle has a small crash")]
+    public AudioSource[] SmallCrash;
+    [Tooltip("Sounds that can play when vehicle has a medium crash")]
+    public AudioSource[] MediumCrash;
+    [Tooltip("Sounds that can play when vehicle has a big crash")]
+    public AudioSource[] BigCrash;
+    [Tooltip("Sounds that can play when vehicle has a small crash")]
+    public AudioSource[] SmallCrashInside;
+    [Tooltip("Sounds that can play when vehicle has a medium crash")]
+    public AudioSource[] MediumCrashInside;
+    [Tooltip("Sounds that can play when vehicle has a big crash")]
+    public AudioSource[] BigCrashInside;
     [Tooltip("Oneshot sound sound played each time vehicle recieves a resupply event")]
     public AudioSource ReSupply;
     public AudioSource GearChange;
@@ -49,6 +61,19 @@ public class SGV_EffectsController : UdonSharpBehaviour
     private float ThisFrameDist;
     private float relativespeed;
     private bool HasFuel = true;
+    private bool IsOwner = true;
+    [System.NonSerializedAttribute] public bool SmallCrashNULL = true;
+    [System.NonSerializedAttribute] public bool MediumCrashNULL = true;
+    [System.NonSerializedAttribute] public bool BigCrashNULL = true;
+    [System.NonSerializedAttribute] public bool SmallCrashInsideNULL = true;
+    [System.NonSerializedAttribute] public bool MediumCrashInsideNULL = true;
+    [System.NonSerializedAttribute] public bool BigCrashInsideNULL = true;
+    [System.NonSerializedAttribute] public Vector3[] SmallCrashPos;
+    [System.NonSerializedAttribute] public Vector3[] SmallCrashInsidePos;
+    [System.NonSerializedAttribute] public Vector3[] MediumCrashPos;
+    [System.NonSerializedAttribute] public Vector3[] MediumCrashInsidePos;
+    [System.NonSerializedAttribute] public Vector3[] BigCrashPos;
+    [System.NonSerializedAttribute] public Vector3[] BigCrashInsidePos;
     private Transform CenterOfMass;
     private int REVS_STRING = Animator.StringToHash("revs");
     private int GROUNDED_STRING = Animator.StringToHash("grounded");
@@ -71,6 +96,7 @@ public class SGV_EffectsController : UdonSharpBehaviour
         OtherWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("OtherWheels");
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
+        IsOwner = EntityControl.IsOwner;
         EngineSoundsT = new Transform[EngineSounds.Length];
         for (int i = 0; i < EngineSounds.Length; i++)
         {
@@ -84,6 +110,45 @@ public class SGV_EffectsController : UdonSharpBehaviour
         EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
         ExplosionNull = Explosion.Length < 1;
         BulletHitNull = BulletHit.Length < 1;
+        SmallCrashNULL = SmallCrash.Length < 1;
+        MediumCrashNULL = MediumCrash.Length < 1;
+        BigCrashNULL = BigCrash.Length < 1;
+        SmallCrashInsideNULL = SmallCrash.Length < 1;
+        MediumCrashInsideNULL = MediumCrash.Length < 1;
+        BigCrashInsideNULL = BigCrash.Length < 1;
+
+        //save original positions of all the crash sounds because non-owners can't set them to the collision contact point
+        SmallCrashPos = new Vector3[SmallCrash.Length];
+        for (int i = 0; i < SmallCrashPos.Length; i++)
+        {
+            SmallCrashPos[i] = SmallCrash[i].transform.position;
+        }
+        SmallCrashInsidePos = new Vector3[SmallCrashInside.Length];
+        for (int i = 0; i < SmallCrashInsidePos.Length; i++)
+        {
+            SmallCrashInsidePos[i] = SmallCrashInside[i].transform.position;
+        }
+        MediumCrashPos = new Vector3[MediumCrash.Length];
+        for (int i = 0; i < MediumCrashPos.Length; i++)
+        {
+            MediumCrashPos[i] = MediumCrash[i].transform.position;
+        }
+        MediumCrashInsidePos = new Vector3[MediumCrashInside.Length];
+        for (int i = 0; i < MediumCrashInsidePos.Length; i++)
+        {
+            MediumCrashInsidePos[i] = MediumCrashInside[i].transform.position;
+        }
+        BigCrashPos = new Vector3[BigCrash.Length];
+        for (int i = 0; i < BigCrashPos.Length; i++)
+        {
+            BigCrashPos[i] = BigCrash[i].transform.position;
+        }
+        BigCrashInsidePos = new Vector3[BigCrashInside.Length];
+        for (int i = 0; i < BigCrashInsidePos.Length; i++)
+        {
+            BigCrashInsidePos[i] = BigCrashInside[i].transform.position;
+        }
+
 
         DoEffects = 0f;
         Sleeping = false;
@@ -267,10 +332,6 @@ public class SGV_EffectsController : UdonSharpBehaviour
         for (int i = 0; i < OtherWheels.Length; i++)
         { OtherWheels[i].SendCustomEvent("PlayerEnterVehicle"); }
     }
-    public void SFEXT_L_OnCollisionEnter()
-    {
-        WakeUp();
-    }
     public void SFEXT_G_ReSupply()
     {
         SendCustomEventDelayedFrames("ResupplySound", 1);
@@ -289,6 +350,90 @@ public class SGV_EffectsController : UdonSharpBehaviour
     {
         if (GearChange) { GearChange.Play(); }
         VehicleAnimator.SetInteger("currentgear", (int)SGVControl.GetProgramVariable("CurrentGear"));
+    }
+    public void SFEXT_L_OnCollisionEnter() { WakeUp(); }
+    public void SFEXT_G_SmallCrash()
+    {
+        if (InVehicle)
+        {
+            if (SmallCrashInsideNULL) { return; }
+            int rand = Random.Range(0, SmallCrashInside.Length);
+            SmallCrashInside[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { SmallCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { SmallCrashInside[rand].transform.position = SmallCrashInsidePos[rand]; }
+            SmallCrashInside[rand].Play();
+        }
+        else
+        {
+            if (SmallCrashNULL) { return; }
+            int rand = Random.Range(0, SmallCrash.Length);
+            SmallCrash[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { SmallCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { SmallCrash[rand].transform.position = SmallCrashPos[rand]; }
+            SmallCrash[rand].Play();
+        }
+    }
+    public void SFEXT_G_MediumCrash()
+    {
+        if (InVehicle)
+        {
+            if (MediumCrashInsideNULL) { return; }
+            int rand = Random.Range(0, MediumCrashInside.Length);
+            MediumCrashInside[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { MediumCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { MediumCrashInside[rand].transform.position = MediumCrashInsidePos[rand]; }
+            MediumCrashInside[rand].Play();
+        }
+        else
+        {
+            if (MediumCrashNULL) { return; }
+            int rand = Random.Range(0, MediumCrash.Length);
+            MediumCrash[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { MediumCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { MediumCrash[rand].transform.position = MediumCrashPos[rand]; }
+            MediumCrash[rand].Play();
+        }
+    }
+    public void SFEXT_G_BigCrash()
+    {
+        if (InVehicle)
+        {
+            if (BigCrashInsideNULL) { return; }
+            int rand = Random.Range(0, BigCrashInside.Length);
+            BigCrashInside[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { BigCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { BigCrashInside[rand].transform.position = BigCrashInsidePos[rand]; }
+            BigCrashInside[rand].Play();
+        }
+        else
+        {
+            if (BigCrashNULL) { return; }
+            int rand = Random.Range(0, BigCrash.Length);
+            BigCrash[rand].pitch = Random.Range(.8f, 1.2f);
+            if (IsOwner)
+            { BigCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
+            else
+            { BigCrash[rand].transform.position = BigCrashPos[rand]; }
+            BigCrash[rand].Play();
+        }
+    }
+    public void SFEXT_O_TakeOwnership()
+    {
+        IsOwner = true;
+    }
+    public void SFEXT_O_LoseOwnership()
+    {
+        IsOwner = false;
     }
     public void SFEXT_G_BulletHit()
     {

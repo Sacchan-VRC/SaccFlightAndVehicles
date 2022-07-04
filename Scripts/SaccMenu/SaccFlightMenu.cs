@@ -78,8 +78,7 @@ public static class PlayModeStateChanged
     {
         if (state == PlayModeStateChange.ExitingEditMode)
         {
-            SetObjectReferences.FindAndFillEmptyRefs();
-            SaccFlightMenu.SetUpReferenceCameraForFlight();
+            SetObjectReferences.SaccFlightSetup();
             EditorApplication.playModeStateChanged -= SetUpSaccFlightStuff;
         }
     }
@@ -90,11 +89,11 @@ public class SetObjectReferences : Editor, IVRCSDKBuildRequestedCallback
     const string TransformPrefix = ":campos";
     public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
     {
-        FindAndFillEmptyRefs();
+        SaccFlightSetup();
         return true;
     }
     [MenuItem("SaccFlight/Debug_OnBuild_SetReferences")]
-    public static void FindAndFillEmptyRefs()
+    public static void SaccFlightSetup()
     {
         SetUpCameras();
         SetUpRaceButtons();
@@ -102,6 +101,7 @@ public class SetObjectReferences : Editor, IVRCSDKBuildRequestedCallback
         SetUpWindChangers();
         SetUpPlanesMenu();
         DisableInVehicleOnlys();
+        SetEntityTargets();
         SaccFlightMenu.SetUpReferenceCameraForFlight();
     }
     public static void DisableInVehicleOnlys()
@@ -109,7 +109,35 @@ public class SetObjectReferences : Editor, IVRCSDKBuildRequestedCallback
         var SEs = GetAllSaccEntitys().ToArray();
         foreach (var se in SEs)
         {
-            if (se.InVehicleOnly.activeInHierarchy) { se.InVehicleOnly.SetActive(false); }
+            if (se.InVehicleOnly && se.InVehicleOnly.activeInHierarchy) { se.InVehicleOnly.SetActive(false); }
+            PrefabUtility.RecordPrefabInstancePropertyModifications(se);
+            EditorUtility.SetDirty(se);
+        }
+    }
+    public static void SetEntityTargets()
+    {
+        var SEs = GetAllSaccEntitys().ToArray();
+        foreach (var se in SEs)
+        {
+            var Targets = GetAllAAMTargets(se.AAMTargetsLayer);
+            //remove any AAMTargets that are child of this SaccEntity from list
+            foreach (var g in Targets)
+            {
+                bool breakNow = false;
+                Transform searchTransform = g.transform;
+                while (searchTransform)
+                {
+                    if (searchTransform.gameObject == se.gameObject)
+                    {
+                        Targets.Remove(g);
+                        breakNow = true;
+                        break;
+                    }
+                    searchTransform = searchTransform.parent;
+                }
+                if (breakNow) { break; }
+            }
+            se.AAMTargets = Targets.ToArray();
             PrefabUtility.RecordPrefabInstancePropertyModifications(se);
             EditorUtility.SetDirty(se);
         }
@@ -160,7 +188,7 @@ public class SetObjectReferences : Editor, IVRCSDKBuildRequestedCallback
     }
     public static void SetUpRaceButtons()
     {
-        var RacingTriggers = GetAllSaccRacingTriggers();
+        var RacingTriggers = GetAllSaccRacingTriggers().ToArray(); ;
         var RaceToggleButtons = GetAllSaccRaceToggleButtons().ToArray();
         if (RaceToggleButtons.Length > 0)
         {
@@ -177,7 +205,7 @@ public class SetObjectReferences : Editor, IVRCSDKBuildRequestedCallback
         var Races = GetAllSaccRaceCourseAndScoreboards().ToArray();
         foreach (SaccRaceToggleButton RTB in RaceToggleButtons)
         {
-            RTB.RacingTriggers = RacingTriggers.ToArray();
+            RTB.RacingTriggers = RacingTriggers;
             RTB.Races = Races;
             PrefabUtility.RecordPrefabInstancePropertyModifications(RTB);
             EditorUtility.SetDirty(RTB);
@@ -319,6 +347,45 @@ public class SetObjectReferences : Editor, IVRCSDKBuildRequestedCallback
         {
             var objs = g.GetComponentsInChildren<SaccFlight>(true);
             ls.AddRange(objs);
+        }
+        return ls;
+    }
+    static List<GameObject> GetAllAAMTargets(LayerMask layers)
+    {
+        var ls = new List<GameObject>();
+        var sceneobjs = GetAllSceneObjects();
+        int obs = 0;
+        List<int> LayerList = ListLayers(layers);
+        foreach (GameObject g in sceneobjs)
+        {
+            obs++;
+            if (LayerList.Contains(g.layer))
+            {
+                ls.Add(g);
+            }
+        }
+        return ls;
+    }
+    static List<GameObject> GetAllSceneObjects()
+    {
+        List<GameObject> objectsInScene = new List<GameObject>();
+
+        foreach (GameObject go in Resources.FindObjectsOfTypeAll(typeof(GameObject)) as GameObject[])
+        {
+            if (!EditorUtility.IsPersistent(go.transform.root.gameObject) && !(go.hideFlags == HideFlags.NotEditable || go.hideFlags == HideFlags.HideAndDontSave))
+                objectsInScene.Add(go);
+        }
+        return objectsInScene;
+    }
+    static List<int> ListLayers(LayerMask layerMask)//thx https://answers.unity.com/questions/1135055/how-to-get-all-layers-included-in-a-layermask.html
+    {
+        List<int> ls = new List<int>();
+        for (int i = 0; i < 32; i++)
+        {
+            if (layerMask == (layerMask | (1 << i)))
+            {
+                ls.Add(i);
+            }
         }
         return ls;
     }

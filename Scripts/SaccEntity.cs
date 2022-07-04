@@ -40,16 +40,13 @@ public class SaccEntity : UdonSharpBehaviour
     public AudioSource SwitchFunctionSound;
     public bool PlaySelectSoundLeft = true;
     public bool PlaySelectSoundRight = true;
-    [Header("Other")]
-    [Tooltip("Any objects in this list get set inactive after 10 seconds, used to disable AAMTarget object for vehicles that should never be targetable but that should be in the targets list for the camera etc")]
-    public GameObject[] DisableAfter10Seconds;
+    [Header("For debugging, auto filled on build")]
+    public GameObject[] AAMTargets;
     [System.NonSerializedAttribute] public bool InEditor = true;
     private VRCPlayerApi localPlayer;
     [System.NonSerializedAttribute] public bool Piloting;
     [System.NonSerializedAttribute] public int UsersID;
     [System.NonSerializedAttribute] public string UsersName;
-    [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
-    [System.NonSerializedAttribute] public int NumAAMTargets = 0;
     private Vector2 RStickCheckAngle;
     private Vector2 LStickCheckAngle;
     [System.NonSerializedAttribute] public GameObject LastHitParticle;
@@ -146,7 +143,6 @@ public class SaccEntity : UdonSharpBehaviour
         {
             SeatedPlayers[i] = -1;
         }
-        FindAAMTargets();
 
         TellDFUNCsLR();
 
@@ -213,8 +209,7 @@ public class SaccEntity : UdonSharpBehaviour
         {
             if (RightDialDivideStraightUp)
             {
-                RStickCheckAngle.x = 0;
-                RStickCheckAngle.y = -1;
+                RStickCheckAngle = Vector2.down;
             }
             else
             {
@@ -223,7 +218,6 @@ public class SaccEntity : UdonSharpBehaviour
                 RStickCheckAngle.y = angle.z;
             }
         }
-        SendCustomEventDelayedSeconds(nameof(Disable10), 10);
         //if in editor play mode without cyanemu
         if (InEditor)
         {
@@ -571,100 +565,6 @@ public class SaccEntity : UdonSharpBehaviour
     {
         LastPlayerCollisionEnter = player;
         SendEventToExtensions("SFEXT_L_OnPlayerCollisionExit");
-    }
-    private void FindAAMTargets()
-    {
-        //get array of AAM Targets
-        Collider[] aamtargs = Physics.OverlapSphere(transform.position, 1000000, AAMTargetsLayer, QueryTriggerInteraction.Collide);
-        int n = 0;
-
-        //work out which index in the aamtargs array is our own vehicle by finding which one has this script as it's parent
-        //allows for each team to have a different layer for AAMTargets
-        int self = -1;
-        n = 0;
-        foreach (Collider target in aamtargs)
-        {
-            if (target.transform.parent && target.transform.parent == transform)
-            {
-                self = n;
-            }
-            n++;
-        }
-        //populate AAMTargets list excluding our own vehicle
-        n = 0;
-        int foundself = 0;
-        foreach (Collider target in aamtargs)
-        {
-            if (n == self) { foundself = 1; n++; }
-            else
-            {
-                AAMTargets[n - foundself] = target.gameObject;
-                n++;
-            }
-        }
-        if (aamtargs.Length > 0)
-        {
-            if (foundself != 0)
-            {
-                NumAAMTargets = Mathf.Clamp(aamtargs.Length - 1, 0, 999);//one less because it found our own vehicle
-            }
-            else
-            {
-                NumAAMTargets = Mathf.Clamp(aamtargs.Length, 0, 999);
-            }
-        }
-        else { NumAAMTargets = 0; }
-
-
-        if (NumAAMTargets > 0)
-        {
-            n = 0;
-            //create a unique number based on position in the hierarchy in order to sort the AAMTargets array later, to make sure they're the in the same order on all clients 
-            float[] order = new float[NumAAMTargets];
-            for (int i = 0; AAMTargets[n]; i++)
-            {
-                Transform parent = AAMTargets[n].transform;
-                for (int x = 0; parent; x++)
-                {
-                    order[n] = float.Parse($"{(int)order[n]}{parent.transform.GetSiblingIndex()}");
-                    parent = parent.transform.parent;
-                }
-                n++;
-            }
-            //sort AAMTargets array based on order
-
-            SortTargets(AAMTargets, order);
-        }
-        else
-        {
-            Debug.LogWarning(string.Concat(gameObject.name, ": NO AAM TARGETS FOUND"));
-            AAMTargets[0] = gameObject;//this should prevent HUDController from crashing with a null reference while causing no ill effects
-        }
-    }
-    void SortTargets(GameObject[] Targets, float[] order)
-    {
-        for (int i = 1; i < order.Length; i++)
-        {
-            for (int j = 0; j < (order.Length - i); j++)
-            {
-                if (order[j] > order[j + 1])
-                {
-                    var h = order[j + 1];
-                    order[j + 1] = order[j];
-                    order[j] = h;
-                    var k = Targets[j + 1];
-                    Targets[j + 1] = Targets[j];
-                    Targets[j] = k;
-                }
-            }
-        }
-    }
-    public void Disable10()
-    {
-        foreach (GameObject obj in DisableAfter10Seconds)
-        {
-            if (obj) { obj.SetActive(false); }
-        }
     }
     public void SetCoM()
     {

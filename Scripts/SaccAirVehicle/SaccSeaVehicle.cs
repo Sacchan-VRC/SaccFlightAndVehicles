@@ -123,6 +123,12 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     public float BulletDamageTaken = 10f;
     [Tooltip("Locally destroy target if prediction thinks you killed them, should only ever cause problems if you have a system that repairs vehicles during a fight")]
     public bool PredictDamage = true;
+    [Tooltip("Impact speed that defines a small crash")]
+    public float SmallCrashSpeed = 1f;
+    [Tooltip("Impact speed that defines a medium crash")]
+    public float MediumCrashSpeed = 8f;
+    [Tooltip("Impact speed that defines a big crash")]
+    public float BigCrashSpeed = 25f;
     [Tooltip("Set Engine On when entering the vehicle?")]
     public bool EngineOnOnEnter = true;
     [Tooltip("Set Engine Off when entering the vehicle?")]
@@ -231,6 +237,10 @@ public class SaccSeaVehicle : UdonSharpBehaviour
     private float ABNormalizer;
     private float EngineOutputLastFrame;
     bool HasWheelColliders = false;
+    [System.NonSerializedAttribute] public bool JoyStickGrippingLastFrame_toggle = false;
+    private bool GrabToggle;
+    private int JoyStickReleaseCount;
+    private float LastGripTimeJoy;
     private float TaxiFullTurningSpeedDivider;
     private bool LowFuelLastFrame;
     private bool NoFuelLastFrame;
@@ -482,7 +492,7 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                 //G/crash Damage
                 if (GDamageToTake > 0)
                 {
-                    Health -= Mathf.Max((GDamageToTake) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
+                    Health -= GDamageToTake * DeltaTime * GDamage;//take damage of GDamage per second per G above MaxGs
                     GDamageToTake = 0;
                 }
                 if (Health <= 0f)//vehicle is ded
@@ -574,8 +584,35 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                         ThrottleGrip = LGrip;
                         JoyStickGrip = RGrip;
                     }
-                    //VR Joystick
-                    if (JoyStickGrip > GripSensitivity)
+                    //Toggle gripping the steering wheel if double tap grab
+                    bool Grabbing = JoyStickGrip > GripSensitivity;
+                    if (Grabbing)
+                    {
+                        if (!JoyStickGrippingLastFrame_toggle)
+                        {
+                            if (Time.time - LastGripTimeJoy < .25f)
+                            {
+                                GrabToggle = true;
+                                JoyStickReleaseCount = 0;
+                            }
+                            LastGripTimeJoy = Time.time;
+                        }
+                        JoyStickGrippingLastFrame_toggle = true;
+                    }
+                    else
+                    {
+                        if (JoyStickGrippingLastFrame_toggle)
+                        {
+                            JoyStickReleaseCount++;
+                            if (JoyStickReleaseCount > 1)
+                            {
+                                GrabToggle = false;
+                            }
+                        }
+                        JoyStickGrippingLastFrame_toggle = false;
+                    }
+                    //VR Steering wheel
+                    if (Grabbing || GrabToggle)
                     {
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                         VehicleRotLastFrame = ControlsRoot.rotation;
@@ -970,6 +1007,11 @@ public class SaccSeaVehicle : UdonSharpBehaviour
         if (Initialized)
         { SetCoMMeshOffset(); }
     }
+    private void OnEnable()
+    {
+        if (Initialized)
+        { SetCoMMeshOffset(); }
+    }
     public void SetCoMMeshOffset()
     {
         //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
@@ -1277,6 +1319,45 @@ public class SaccSeaVehicle : UdonSharpBehaviour
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
             }
         }
+    }
+    private float LastCollisionTime;
+    private float MinCollisionSoundDelay = 0.1f;
+    public void SFEXT_L_OnCollisionEnter()
+    {
+        if (!IsOwner) { return; }
+        LastCollisionTime = Time.time;
+        if (Time.time - LastCollisionTime < MinCollisionSoundDelay)
+        {
+            LastCollisionTime = Time.time;
+            Collision col = EntityControl.LastCollisionEnter;
+            if (col == null) { return; }
+            float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
+            Debug.Log(colmag);
+            if (colmag > BigCrashSpeed)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBigCrash));
+            }
+            else if (colmag > MediumCrashSpeed)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMediumCrash));
+            }
+            else if (colmag > SmallCrashSpeed)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendSmallCrash));
+            }
+        }
+    }
+    public void SendSmallCrash()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_SmallCrash");
+    }
+    public void SendMediumCrash()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_MediumCrash");
+    }
+    public void SendBigCrash()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_BigCrash");
     }
     public void SFEXT_P_PassengerEnter()
     {

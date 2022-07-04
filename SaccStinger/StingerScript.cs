@@ -123,8 +123,8 @@ public class StingerScript : UdonSharpBehaviour
         FullAAMs = NumAAM;
         reloadspeed = FullAAMs / FullReloadTimeSec;
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
-        NumAAMTargets = EntityControl.NumAAMTargets;
         AAMTargets = EntityControl.AAMTargets;
+        NumAAMTargets = AAMTargets.Length;
         CenterOfMass = EntityControl.CenterOfMass;
         StingerTransform = EntityControl.transform;
         StingerColliders = EntityControl.gameObject.GetComponents<Collider>();
@@ -160,7 +160,7 @@ public class StingerScript : UdonSharpBehaviour
     {
         Holding = true;
         if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
-        //Make sure SAVeControl.AAMCurrentTargetSAVControl is correct
+        //Make sure SAVControl.AAMCurrentTargetSAVControl is correct
         var Target = AAMTargets[AAMTarget];
         if (Target && Target.transform.parent)
         {

@@ -90,7 +90,7 @@ public class DFUNC_CarJump : UdonSharpBehaviour
     {
         if (TriggerLastFrame)
         {
-            VehicleRigidBody.AddForce(VehicleTransform.up * HoldJumpForce, ForceMode.Acceleration);
+            VehicleRigidBody.AddForce(VehicleTransform.up * HoldJumpForce * Time.deltaTime, ForceMode.VelocityChange);
 
             if (Time.time - JumpTime < MaxJumpLengthSecs)
             {

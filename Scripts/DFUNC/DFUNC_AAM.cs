@@ -120,8 +120,8 @@ public class DFUNC_AAM : UdonSharpBehaviour
         reloadspeed = FullAAMs / FullReloadTimeSec;
         FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
         EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-        NumAAMTargets = EntityControl.NumAAMTargets;
         AAMTargets = EntityControl.AAMTargets;
+        NumAAMTargets = AAMTargets.Length;
         CenterOfMass = (Transform)EntityControl.CenterOfMass;
         VehicleTransform = EntityControl.transform;
         OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");

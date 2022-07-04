@@ -7,6 +7,7 @@ using VRC.Udon;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class DFUNC_GearBoxReverse : UdonSharpBehaviour
 {
+    [Header("This function just toggles reverse on automatic gearboxes.")]
     public UdonSharpBehaviour GearBox;
     public GameObject Dial_funcon;
     private bool Reversing;

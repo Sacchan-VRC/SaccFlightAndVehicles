@@ -67,7 +67,7 @@ public class DFUNC_Gun : UdonSharpBehaviour
         VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
         FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
         AAMTargets = EntityControl.AAMTargets;
-        NumAAMTargets = EntityControl.NumAAMTargets;
+        NumAAMTargets = AAMTargets.Length;
         VehicleTransform = EntityControl.transform;
         CenterOfMass = EntityControl.CenterOfMass;
         OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
