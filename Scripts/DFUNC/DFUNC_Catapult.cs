@@ -136,20 +136,27 @@ public class DFUNC_Catapult : UdonSharpBehaviour
     }
     private void OnTriggerEnter(Collider other)
     {
+        Debug.Log("1");
         if (Piloting && !EntityControl.dead)
         {
+            Debug.Log("2");
             if (!OnCatapult)
             {
+                Debug.Log("3");
                 if (other)
                 {
+                    Debug.Log("4");
                     if (other.gameObject.layer == CatapultLayer)
                     {
+                        Debug.Log("5");
                         if (FindCatapultAnimator(other.gameObject))
                         {
+                            Debug.Log("6");
                             CatapultTransform = other.transform;
                             //Hit detected, check if the plane is facing in the right direction..
                             if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
                             {
+                                Debug.Log("7");
                                 CatapultPosLastFrame = CatapultTransform.position;
                                 //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
                                 //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels

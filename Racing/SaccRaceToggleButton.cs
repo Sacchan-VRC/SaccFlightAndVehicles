@@ -1,16 +1,20 @@
 ﻿
 using UdonSharp;
 using UnityEngine;
+using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SaccRaceToggleButton : UdonSharpBehaviour
 {
-    public SaccRacingTrigger[] RacingTriggers;
-    public SaccRaceCourseAndScoreboard[] Races;
+    [HideInInspector] public SaccRacingTrigger[] RacingTriggers;
+    [HideInInspector] public SaccRaceCourseAndScoreboard[] Races;
+    public Toggle ReverseToggle;
     [Tooltip("Can be used to set a default course -1 = none")]
     public int CurrentCourseSelection = -1;
+    private bool Reverse = false;
+    public GameObject EnableWhenNoneSelected;
     private void Start()
     {
         if (CurrentCourseSelection == -1) //-1 = all races disabled
@@ -32,10 +36,23 @@ public class SaccRaceToggleButton : UdonSharpBehaviour
     }
     public override void Interact()
     {
+        NextRace();
+    }
+    public void NextRace()
+    {
         if (CurrentCourseSelection != -1) { Races[CurrentCourseSelection].RaceObjects.SetActive(false); }
         if (CurrentCourseSelection == Races.Length - 1)
         { CurrentCourseSelection = -1; }
         else { CurrentCourseSelection++; }
+
+        SetRace();
+    }
+    public void PreviousRace()
+    {
+        if (CurrentCourseSelection != -1) { Races[CurrentCourseSelection].RaceObjects.SetActive(false); }
+        if (CurrentCourseSelection == -1)
+        { CurrentCourseSelection = Races.Length - 1; }
+        else { CurrentCourseSelection--; }
 
         SetRace();
     }
@@ -44,20 +61,19 @@ public class SaccRaceToggleButton : UdonSharpBehaviour
 
         if (CurrentCourseSelection != -1)//-1 = all races disabled
         {
+            if (EnableWhenNoneSelected) { EnableWhenNoneSelected.SetActive(false); }
             SaccRaceCourseAndScoreboard race = Races[CurrentCourseSelection].GetComponent<SaccRaceCourseAndScoreboard>();
             race.RaceObjects.SetActive(true);
             race.UpdateTimes();
 
-            if (CurrentCourseSelection == 0)
+            foreach (SaccRacingTrigger RaceTrig in RacingTriggers)
             {
-                foreach (SaccRacingTrigger RaceTrig in RacingTriggers)
-                {
-                    RaceTrig.gameObject.SetActive(true);
-                }
+                RaceTrig.gameObject.SetActive(true);
             }
         }
         else
         {
+            if (EnableWhenNoneSelected) { EnableWhenNoneSelected.SetActive(true); }
             foreach (SaccRacingTrigger RaceTrig in RacingTriggers)
             {
                 RaceTrig.gameObject.SetActive(false);
@@ -67,5 +83,25 @@ public class SaccRaceToggleButton : UdonSharpBehaviour
         {
             RaceTrig.SetUpNewRace();
         }
+    }
+    public void ToggleReverse()
+    {
+        if (!Reverse)
+        {
+            Reverse = true;
+            foreach (SaccRacingTrigger RaceTrig in RacingTriggers)
+            {
+                RaceTrig.SetProgramVariable("_TrackForward", false);
+            }
+        }
+        else
+        {
+            Reverse = false;
+            foreach (SaccRacingTrigger RaceTrig in RacingTriggers)
+            {
+                RaceTrig.SetProgramVariable("_TrackForward", true);
+            }
+        }
+        SetRace();
     }
 }

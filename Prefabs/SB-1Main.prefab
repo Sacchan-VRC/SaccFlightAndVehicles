@@ -332,9 +332,11 @@ MonoBehaviour:
   FreezePositionOnDeath: 1
   RotationSyncAgressiveness: 10
   IdleModeVelMultiplier: 0.4
-  IdleMoveMentRange: 0.35
+  IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
+  MaxPingExtrapolationInSeconds: 999
+  PassengerComfortMode: 0
 --- !u!114 &1538257256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14848,6 +14850,37 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!1 &997184153088028017
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8755847557074510833}
+  m_Layer: 17
+  m_Name: CameraPositions
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8755847557074510833
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 997184153088028017}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3523779920251681964}
+  m_Father: {fileID: 2934804655656756588}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1585201500621047788
 GameObject:
   m_ObjectHideFlags: 0
@@ -36344,6 +36377,10 @@ MonoBehaviour:
   TrailGs: 4
   SplashParticle: {fileID: 6071313651886054200}
   PlaySplashSpeed: 7
+  WheelColliders: []
+  WheelVisuals: []
+  GearTransitionTime: 5
+  NoGearFunction: 0
   PrintAnimHashNamesOnStart: 0
 --- !u!114 &2934804654298486114
 MonoBehaviour:
@@ -96473,7 +96510,7 @@ GameObject:
   - component: {fileID: -6587860023187836529}
   - component: {fileID: 2934804655209591063}
   m_Layer: 31
-  m_Name: RacingTrigger
+  m_Name: RacingTrigger_SB1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -96885,7 +96922,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 4294967277
+  m_StaticEditorFlags: 4
   m_IsActive: 1
 --- !u!4 &2934804655299911391
 Transform:
@@ -99180,6 +99217,7 @@ Transform:
   - {fileID: 2934804654584033639}
   - {fileID: 2934804655606403473}
   - {fileID: 1538257255}
+  - {fileID: 8755847557074510833}
   m_Father: {fileID: 2934804654147666134}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -99277,10 +99315,12 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 2934804654959112473}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 2934804654583356880}
-  SwitchFunctionSound: {fileID: 2934804655618455735}
   LStickDisplayHighlighter: {fileID: 2934804654926962886}
   RStickDisplayHighlighter: {fileID: 2934804655305527410}
   DoVoiceVolumeChange: 1
+  SwitchFunctionSound: {fileID: 2934804655618455735}
+  PlaySelectSoundLeft: 1
+  PlaySelectSoundRight: 1
   DisableAfter10Seconds: []
 --- !u!114 &2934804655656756585
 MonoBehaviour:
@@ -99907,6 +99947,36 @@ MonoBehaviour:
     m_VerticalOverflow: 0
     m_LineSpacing: 1
   m_Text: 60
+--- !u!1 &5379130896012276044
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3523779920251681964}
+  m_Layer: 17
+  m_Name: :campos (1)SB1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3523779920251681964
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5379130896012276044}
+  m_LocalRotation: {x: -0.09989579, y: -0.15481955, z: 0.0067255506, w: -0.98285633}
+  m_LocalPosition: {x: -2.7328084, y: 1.1826668, z: -3.1559927}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 8755847557074510833}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5934194373947756574
 GameObject:
   m_ObjectHideFlags: 0
@@ -100105,6 +100175,7 @@ MonoBehaviour:
   VTOLRollThrustVecMulti: 0.07
   VTOLLoseControlSpeed: 120
   VTOLGroundEffectStrength: 4
+  EnterVTOLEvent_Angle: 20
   AutoAdjustValuesToMass: 1
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}
@@ -111319,9 +111390,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: abafc62ab8d72774bb343f92656d05a0, type: 3}
---- !u!1 &2934804655585924166 stripped
+--- !u!1 &2934804655585924162 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 100004, guid: abafc62ab8d72774bb343f92656d05a0,
+  m_CorrespondingSourceObject: {fileID: 100000, guid: abafc62ab8d72774bb343f92656d05a0,
     type: 3}
   m_PrefabInstance: {fileID: 2934804655585956578}
   m_PrefabAsset: {fileID: 0}
@@ -111331,15 +111402,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 2934804655585956578}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2934804655585924160 stripped
+--- !u!1 &2934804655585924166 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 100002, guid: abafc62ab8d72774bb343f92656d05a0,
+  m_CorrespondingSourceObject: {fileID: 100004, guid: abafc62ab8d72774bb343f92656d05a0,
     type: 3}
   m_PrefabInstance: {fileID: 2934804655585956578}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2934804655585924162 stripped
+--- !u!1 &2934804655585924160 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 100000, guid: abafc62ab8d72774bb343f92656d05a0,
+  m_CorrespondingSourceObject: {fileID: 100002, guid: abafc62ab8d72774bb343f92656d05a0,
     type: 3}
   m_PrefabInstance: {fileID: 2934804655585956578}
   m_PrefabAsset: {fileID: 0}
@@ -113520,15 +113591,15 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: a18cdf3a6a3017543af0d876d0755d80, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: de7ee22aaa4618c4593fc30a93e58595, type: 3}
---- !u!4 &8101121279839179329 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 400000, guid: de7ee22aaa4618c4593fc30a93e58595,
-    type: 3}
-  m_PrefabInstance: {fileID: 8101121279839045825}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8101121279839145569 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 100000, guid: de7ee22aaa4618c4593fc30a93e58595,
+    type: 3}
+  m_PrefabInstance: {fileID: 8101121279839045825}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8101121279839179329 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 400000, guid: de7ee22aaa4618c4593fc30a93e58595,
     type: 3}
   m_PrefabInstance: {fileID: 8101121279839045825}
   m_PrefabAsset: {fileID: 0}

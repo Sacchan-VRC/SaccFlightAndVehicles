@@ -43,7 +43,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         localPlayer = Networking.LocalPlayer;
         if (localPlayer != null) { InEditor = false; }
         Station = (VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation));
-        Seat = Station.stationEnterPlayerLocation.transform;
+        Seat = Station.stationEnterPlayerLocation;
         SeatStartRot = Seat.localRotation;
         SeatStartPos = Seat.localPosition;
         if (InEditor && ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
@@ -104,6 +104,8 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 }
             }
             if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
+            else
+            { EntityControl.PassengerEnterVehicleGlobal(); }
         }
     }
     public override void OnStationExited(VRCPlayerApi player)
@@ -128,6 +130,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
         {
             DoVoiceVolumeChange = EntityControl.DoVoiceVolumeChange;
             if (IsPilotSeat) { EntityControl.PilotExitVehicle(player); }
+            else { EntityControl.PassengerExitVehicleGlobal(); }
             if (DoVoiceVolumeChange)
             {
                 SetVoiceOutside(player);
@@ -210,7 +213,7 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 {
                     if (Mathf.Abs(TargetRelative.y) > 0.01f)
                     {
-                        Seat.position -= TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y) * Time.deltaTime * 3.3333333f;
+                        Seat.position -= TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y);
                     }
                     else
                     {
@@ -222,9 +225,9 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 }
                 if (!CalibratedZ)
                 {
-                    if (Mathf.Abs(TargetRelative.z) > 0.005f)
+                    if (Mathf.Abs(TargetRelative.z) > 0.01f)
                     {
-                        Seat.position -= TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z) * Time.deltaTime * 3.3333333f;
+                        Seat.position -= TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z);
                     }
                     else
                     {
@@ -242,10 +245,11 @@ public class SaccVehicleSeat : UdonSharpBehaviour
                 Vector3 newpos = Seat.localPosition;
                 _adjustedPos.x = newpos.y;
                 _adjustedPos.y = newpos.z;
-                AdjustTime += Time.deltaTime;
+                AdjustTime += 0.3f;
+                RequestSerialization();
                 if (EntityControl.InVehicle && (!CalibratedY || !CalibratedZ))
                 {
-                    SendCustomEventDelayedFrames(nameof(SeatAdjustment), 1, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
+                    SendCustomEventDelayedSeconds(nameof(SeatAdjustment), .3f, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
                 }
             }
         }

@@ -239,6 +239,12 @@ public class SaccAirVehicle : UdonSharpBehaviour
     public float BulletDamageTaken = 10f;
     [Tooltip("Locally destroy target if prediction thinks you killed them, should only ever cause problems if you have a system that repairs vehicles during a fight")]
     public bool PredictDamage = true;
+    [Tooltip("Impact speed that defines a small crash")]
+    public float SmallCrashSpeed = 1f;
+    [Tooltip("Impact speed that defines a medium crash")]
+    public float MediumCrashSpeed = 8f;
+    [Tooltip("Impact speed that defines a big crash")]
+    public float BigCrashSpeed = 25f;
     [Tooltip("Multiply how much damage is done by missiles")]
     public float MissileDamageTakenMultiplier = 1f;
     [Tooltip("Strength of force that pushes the vehicle when a missile hits it")]
@@ -327,6 +333,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
     [System.NonSerializedAttribute] public float AngleOfAttackYaw;
     [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
     [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
+    [System.NonSerialized] public int NumPassengers;
     [System.NonSerializedAttribute] public float VTOLAngle;
 
     [System.NonSerializedAttribute] public Animator VehicleAnimator;
@@ -415,7 +422,6 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool VTOL360;
     [System.NonSerializedAttribute] public float VTOLAngleDegrees;
     private float VelLiftStart;
-    private int VehicleLayer;
     private float VelLiftMaxStart;
     private bool HasAirBrake;//set to false if air brake strength is 0
     private float HandDistanceZLastFrame;
@@ -432,6 +438,10 @@ public class SaccAirVehicle : UdonSharpBehaviour
     bool HasWheelColliders = false;
     private float TaxiFullTurningSpeedDivider;
     private float vtolangledif;
+    [System.NonSerializedAttribute] public bool JoyStickGrippingLastFrame_toggle = false;
+    private bool GrabToggle;
+    private int JoyStickReleaseCount;
+    private float LastGripTime;
     [System.NonSerializedAttribute] public WheelCollider[] VehicleWheelColliders;
     [System.NonSerializedAttribute] public bool LowFuelLastFrame;
     [System.NonSerializedAttribute] public bool NoFuelLastFrame;
@@ -657,8 +667,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
                 wheel.suspensionSpring = SusiSpring;
             }
         }
-        VehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
-        OutsideVehicleLayer = VehicleMesh.gameObject.layer;
+        OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
         VehicleAnimator = EntityControl.GetComponent<Animator>();
 
         FullHealth = Health;
@@ -738,8 +747,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
             if (!EntityControl.dead)
             {
                 //G/crash Damage
-                Health -= Mathf.Max((GDamageToTake) * DeltaTime * GDamage, 0f);//take damage of GDamage per second per G above MaxGs
-                GDamageToTake = 0;
+                if (GDamageToTake > 0)
+                {
+                    Health -= GDamageToTake * DeltaTime * GDamage;//take damage of GDamage per second per G above MaxGs
+                    GDamageToTake = 0;
+                }
                 if (Health <= 0f)//vehicle is ded
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
@@ -836,8 +848,35 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         ThrottleGrip = LGrip;
                         JoyStickGrip = RGrip;
                     }
+                    //Toggle gripping the steering wheel if double tap grab
+                    bool Grabbing = JoyStickGrip > GripSensitivity;
+                    if (Grabbing)
+                    {
+                        if (!JoyStickGrippingLastFrame_toggle)
+                        {
+                            if (Time.time - LastGripTime < .25f)
+                            {
+                                GrabToggle = true;
+                                JoyStickReleaseCount = 0;
+                            }
+                            LastGripTime = Time.time;
+                        }
+                        JoyStickGrippingLastFrame_toggle = true;
+                    }
+                    else
+                    {
+                        if (JoyStickGrippingLastFrame_toggle)
+                        {
+                            JoyStickReleaseCount++;
+                            if (JoyStickReleaseCount > 1)
+                            {
+                                GrabToggle = false;
+                            }
+                        }
+                        JoyStickGrippingLastFrame_toggle = false;
+                    }
                     //VR Joystick
-                    if (JoyStickGrip > GripSensitivity)
+                    if (Grabbing || GrabToggle)
                     {
                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
                         VehicleRotLastFrame = ControlsRoot.rotation;
@@ -1033,8 +1072,8 @@ public class SaccAirVehicle : UdonSharpBehaviour
                         if (!InVR)
                         {
                             //allow stick flight in desktop mode
-                            Vector2 LStickPos = new Vector2(0, 0);
-                            Vector2 RStickPos = new Vector2(0, 0);
+                            Vector2 LStickPos = Vector2.zero;
+                            Vector2 RStickPos = Vector2.zero;
                             if (!InEditor)
                             {
                                 LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
@@ -1431,6 +1470,11 @@ public class SaccAirVehicle : UdonSharpBehaviour
         if (Initialized)
         { SetCoMMeshOffset(); }
     }
+    private void OnEnable()
+    {
+        if (Initialized)
+        { SetCoMMeshOffset(); }
+    }
     public void SetCoMMeshOffset()
     {
         //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
@@ -1456,6 +1500,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             ITR.x *= -1;
             VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
         }
+        VehicleRigidbody.ResetInertiaTensor();
     }
     public void FuelEvents()
     {
@@ -1765,6 +1810,44 @@ public class SaccAirVehicle : UdonSharpBehaviour
             }
         }
     }
+    private float LastCollisionTime;
+    private float MinCollisionSoundDelay = 0.1f;
+    public void SFEXT_L_OnCollisionEnter()
+    {
+        if (!IsOwner) { return; }
+        LastCollisionTime = Time.time;
+        if (Time.time - LastCollisionTime < MinCollisionSoundDelay)
+        {
+            LastCollisionTime = Time.time;
+            Collision col = EntityControl.LastCollisionEnter;
+            if (col == null) { return; }
+            float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
+            if (colmag > BigCrashSpeed)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBigCrash));
+            }
+            else if (colmag > MediumCrashSpeed)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMediumCrash));
+            }
+            else if (colmag > SmallCrashSpeed)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendSmallCrash));
+            }
+        }
+    }
+    public void SendSmallCrash()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_SmallCrash");
+    }
+    public void SendMediumCrash()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_MediumCrash");
+    }
+    public void SendBigCrash()
+    {
+        EntityControl.SendEventToExtensions("SFEXT_G_BigCrash");
+    }
     //Add .001 to each value of damage taken to prevent float comparison bullshit
     public void SFEXT_L_MissileHit25()
     {
@@ -1869,7 +1952,15 @@ public class SaccAirVehicle : UdonSharpBehaviour
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
         MissilesIncomingOther = 0;
-        SetCollidersLayer(VehicleLayer);
+        SetCollidersLayer(OutsideVehicleLayer);
+    }
+    public void SFEXT_G_PassengerEnter()
+    {
+        NumPassengers++;
+    }
+    public void SFEXT_G_PassengerExit()
+    {
+        NumPassengers--;
     }
     public void SFEXT_O_TakeOwnership()
     {
@@ -1955,6 +2046,9 @@ public class SaccAirVehicle : UdonSharpBehaviour
         Taxiinglerper = 0;
         ThrottleGripLastFrame = false;
         JoystickGripLastFrame = false;
+        JoyStickGrippingLastFrame_toggle = false;
+        JoyStickReleaseCount = 0;
+        GrabToggle = false;
         DoAAMTargeting = false;
         MissilesIncomingHeat = 0;
         MissilesIncomingRadar = 0;
@@ -1968,7 +2062,7 @@ public class SaccAirVehicle : UdonSharpBehaviour
             ThrottleInput = 0; ;
         }
         //set vehicle's collider's layers back
-        SetCollidersLayer(VehicleLayer);
+        SetCollidersLayer(OutsideVehicleLayer);
     }
     public void SetCollidersLayer(int NewLayer)
     {

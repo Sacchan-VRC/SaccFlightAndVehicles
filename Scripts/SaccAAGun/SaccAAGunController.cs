@@ -87,9 +87,9 @@ public class SaccAAGunController : UdonSharpBehaviour
     private Vector3 StartRot;
     [System.NonSerializedAttribute] public bool InEditor = true;
     [System.NonSerializedAttribute] public bool IsOwner = false;
-    [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
-    [System.NonSerializedAttribute] public GameObject[] AAMTargets = new GameObject[80];
-    [System.NonSerializedAttribute] public int NumAAMTargets = 0;
+    [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.None)] public int AAMTarget = 0;
+    [HideInInspector] public GameObject[] AAMTargets;
+    [HideInInspector] public int NumAAMTargets = 0;
     private int AAMTargetChecker = 0;
     [System.NonSerializedAttribute] public bool AAMHasTarget = false;
     private float AAMTargetedTimer = 2f;
@@ -189,7 +189,7 @@ public class SaccAAGunController : UdonSharpBehaviour
         FullMGDivider = 1f / (MGAmmoFull > 0 ? MGAmmoFull : 10000000);
 
         AAMTargets = EntityControl.AAMTargets;
-        NumAAMTargets = EntityControl.NumAAMTargets;
+        NumAAMTargets = AAMTargets.Length;
         if (NumAAMTargets != 0 && !DisableAAMTargeting) { DoAAMTargeting = true; }
         gameObject.SetActive(true);
 

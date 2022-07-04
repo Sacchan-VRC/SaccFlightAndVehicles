@@ -10,7 +10,7 @@ public class SAV_WindChanger : UdonSharpBehaviour
 {
     [Tooltip("List of SaccAirVehicles to be effected by this WindChnager")]
     public bool DefaultSynced = false;
-    public UdonSharpBehaviour[] SaccAirVehicles;
+    [HideInInspector] public UdonSharpBehaviour[] SaccAirVehicles;
     public GameObject WindMenu;
     public Slider WindStrengthSlider;
     public Text WindStr_text;
