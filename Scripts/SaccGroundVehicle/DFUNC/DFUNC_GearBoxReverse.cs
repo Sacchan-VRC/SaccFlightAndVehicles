@@ -4,60 +4,63 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
-public class DFUNC_GearBoxReverse : UdonSharpBehaviour
+namespace SaccFlightAndVehicles
 {
-    [Header("This function just toggles reverse on automatic gearboxes.")]
-    public UdonSharpBehaviour GearBox;
-    public GameObject Dial_funcon;
-    private bool Reversing;
-    private bool UseLeftTrigger;
-    private bool TriggerLastFrame;
-    public void SFEXT_L_EntityStart()
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    public class DFUNC_GearBoxReverse : UdonSharpBehaviour
     {
-        gameObject.SetActive(false);
-        if (Dial_funcon) { Dial_funcon.SetActive(Reversing); }
-    }
-    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-    public void DFUNC_RightDial() { UseLeftTrigger = false; }
-    private void Update()
-    {
-        float Trigger;
-        if (UseLeftTrigger)
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-        else
-        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-        if (Trigger > 0.75)
+        [Header("This function just toggles reverse on automatic gearboxes.")]
+        public UdonSharpBehaviour GearBox;
+        public GameObject Dial_funcon;
+        private bool Reversing;
+        private bool UseLeftTrigger;
+        private bool TriggerLastFrame;
+        public void SFEXT_L_EntityStart()
         {
-            if (!TriggerLastFrame)
-            {
-                Toggle();
-            }
-            TriggerLastFrame = true;
+            gameObject.SetActive(false);
+            if (Dial_funcon) { Dial_funcon.SetActive(Reversing); }
         }
-        else { TriggerLastFrame = false; }
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        gameObject.SetActive(true);
-        Reversing = (bool)GearBox.GetProgramVariable("_AutomaticReversing");
-    }
-    public void SFEXT_O_PilotExit()
-    {
-        Debug.Log("SFEXT_O_PilotExit");
-        gameObject.SetActive(false);
-        if (Reversing)
-        { Toggle(); }
-        Debug.Log(Reversing);
-    }
-    public void Toggle()
-    {
-        Reversing = !(bool)GearBox.GetProgramVariable("_AutomaticReversing");
-        GearBox.SetProgramVariable("_AutomaticReversing", Reversing);
-        if (Dial_funcon) { Dial_funcon.SetActive(Reversing); }
-    }
-    public void KeyboardInput()
-    {
-        Toggle();
+        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        private void Update()
+        {
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            if (Trigger > 0.75)
+            {
+                if (!TriggerLastFrame)
+                {
+                    Toggle();
+                }
+                TriggerLastFrame = true;
+            }
+            else { TriggerLastFrame = false; }
+        }
+        public void SFEXT_O_PilotEnter()
+        {
+            gameObject.SetActive(true);
+            Reversing = (bool)GearBox.GetProgramVariable("_AutomaticReversing");
+        }
+        public void SFEXT_O_PilotExit()
+        {
+            Debug.Log("SFEXT_O_PilotExit");
+            gameObject.SetActive(false);
+            if (Reversing)
+            { Toggle(); }
+            Debug.Log(Reversing);
+        }
+        public void Toggle()
+        {
+            Reversing = !(bool)GearBox.GetProgramVariable("_AutomaticReversing");
+            GearBox.SetProgramVariable("_AutomaticReversing", Reversing);
+            if (Dial_funcon) { Dial_funcon.SetActive(Reversing); }
+        }
+        public void KeyboardInput()
+        {
+            Toggle();
+        }
     }
 }

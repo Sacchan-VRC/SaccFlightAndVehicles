@@ -4,57 +4,60 @@ using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
 
-[UdonBehaviourSyncMode(BehaviourSyncMode.None)]
-public class SAV_KillTracker : UdonSharpBehaviour
+namespace SaccFlightAndVehicles
 {
-    public UdonSharpBehaviour SAVControl;
-    private SaccEntity EntityControl;
-    [Tooltip("Leave empty if you just want to use the SFEXT_O_GotKilled and SFEXT_O_GotAKill events for something else")]
-    public SaccScoreboard_Kills KillsBoard;
-    private bool InEditor;
-    private VRCPlayerApi localPlayer;
-    public void SFEXT_L_EntityStart()
+    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    public class SAV_KillTracker : UdonSharpBehaviour
     {
-        EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-        gameObject.SetActive(false);//this object never needs to be active
-        localPlayer = Networking.LocalPlayer;
-        if (localPlayer == null)
-        { InEditor = true; }
-    }
-    public void SFEXT_G_Explode()
-    {
-        float time = Time.time;
-        if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 5 && ((time - EntityControl.PilotExitTime) < 5))))
+        public UdonSharpBehaviour SAVControl;
+        private SaccEntity EntityControl;
+        [Tooltip("Leave empty if you just want to use the SFEXT_O_GotKilled and SFEXT_O_GotAKill events for something else")]
+        public SaccScoreboard_Kills KillsBoard;
+        private bool InEditor;
+        private VRCPlayerApi localPlayer;
+        public void SFEXT_L_EntityStart()
         {
-            EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
-            EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotAKill");
+            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+            gameObject.SetActive(false);//this object never needs to be active
+            localPlayer = Networking.LocalPlayer;
+            if (localPlayer == null)
+            { InEditor = true; }
         }
-        if (localPlayer.IsOwner(KillsBoard.gameObject)) { KillsBoard.PlaneDied(); }
-    }
-    public void SFEXT_O_PilotEnter()
-    {
-        if (KillsBoard) { KillsBoard.MyKills = 0; }
-    }
-    public void SFEXT_O_GotAKill()
-    {
-        //Debug.Log("SFEXT_O_GotAKill");
-        if (KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))
+        public void SFEXT_G_Explode()
         {
-            KillsBoard.MyKills++;
-            if (KillsBoard.MyKills > KillsBoard.MyBestKills)
+            float time = Time.time;
+            if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 5 && ((time - EntityControl.PilotExitTime) < 5))))
             {
-                KillsBoard.MyBestKills = KillsBoard.MyKills;
+                EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
+                EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotAKill");
             }
-            if (KillsBoard.MyKills > KillsBoard.TopKills)
+            if (localPlayer.IsOwner(KillsBoard.gameObject)) { KillsBoard.PlaneDied(); }
+        }
+        public void SFEXT_O_PilotEnter()
+        {
+            if (KillsBoard) { KillsBoard.MyKills = 0; }
+        }
+        public void SFEXT_O_GotAKill()
+        {
+            //Debug.Log("SFEXT_O_GotAKill");
+            if (KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))
             {
-                if (InEditor)
+                KillsBoard.MyKills++;
+                if (KillsBoard.MyKills > KillsBoard.MyBestKills)
                 {
-                    KillsBoard.TopKiller = "Player";
-                    KillsBoard.TopKills = KillsBoard.MyKills;
+                    KillsBoard.MyBestKills = KillsBoard.MyKills;
                 }
-                else
+                if (KillsBoard.MyKills > KillsBoard.TopKills)
                 {
-                    KillsBoard.SendCustomEvent("UpdateTopKiller");
+                    if (InEditor)
+                    {
+                        KillsBoard.TopKiller = "Player";
+                        KillsBoard.TopKills = KillsBoard.MyKills;
+                    }
+                    else
+                    {
+                        KillsBoard.SendCustomEvent("UpdateTopKiller");
+                    }
                 }
             }
         }
