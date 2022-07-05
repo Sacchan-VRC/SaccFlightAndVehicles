@@ -12,6 +12,9 @@ namespace SaccFlightAndVehicles
     {
         public SaccEntity[] Vehicles;
         private SaccAirVehicle[] SaccAirVehicles;
+        private SaccSeaVehicle[] SaccSeaVehicles;
+        private SaccGroundVehicle[] SaccGroundVehicles;
+        private SGV_GearBox[] SGVGearBoxs;
         private SAV_SyncScript[] SAVSyncScripts;
         public Slider JoyStickSensitivitySlider;
         public Text JoyStickSensitivitySliderNumber;
@@ -19,16 +22,20 @@ namespace SaccFlightAndVehicles
         {
             if (PassengerComfortModeToggle) { PassengerComfortModeDefault = PassengerComfortModeToggle.isOn; }
             if (SwitchHandsToggle) { SwitchHandsDefault = SwitchHandsToggle.isOn; }
+            if (ClutchDisabledToggle) { ClutchDisabledDefault = ClutchDisabledToggle.isOn; }
             if (AutoEngineToggle) { AutoEngineDefault = AutoEngineToggle.isOn; }
             SaccAirVehicles = new SaccAirVehicle[Vehicles.Length];
+            SaccSeaVehicles = new SaccSeaVehicle[Vehicles.Length];
+            SaccGroundVehicles = new SaccGroundVehicle[Vehicles.Length];
+            SGVGearBoxs = new SGV_GearBox[Vehicles.Length];
             SAVSyncScripts = new SAV_SyncScript[Vehicles.Length];
             for (int i = 0; i < Vehicles.Length; i++)
             {
-                SaccAirVehicles[i] = (SaccAirVehicle)Vehicles[i].GetExtention("SaccAirVehicle");
-            }
-            for (int i = 0; i < Vehicles.Length; i++)
-            {
-                SAVSyncScripts[i] = (SAV_SyncScript)Vehicles[i].GetExtention("SAV_SyncScript");
+                SaccAirVehicles[i] = (SaccAirVehicle)Vehicles[i].GetExtention(GetUdonTypeName<SaccAirVehicle>());
+                SaccSeaVehicles[i] = (SaccSeaVehicle)Vehicles[i].GetExtention(GetUdonTypeName<SaccSeaVehicle>());
+                SaccGroundVehicles[i] = (SaccGroundVehicle)Vehicles[i].GetExtention(GetUdonTypeName<SaccGroundVehicle>());
+                SAVSyncScripts[i] = (SAV_SyncScript)Vehicles[i].GetExtention(GetUdonTypeName<SAV_SyncScript>());
+                SGVGearBoxs[i] = (SGV_GearBox)Vehicles[i].GetExtention(GetUdonTypeName<SGV_GearBox>());
             }
             Reset();
         }
@@ -54,6 +61,11 @@ namespace SaccFlightAndVehicles
                 if (SAV)
                 { SAV.SetProgramVariable("ThrottleSensitivity", sensvalue); }
             }
+            foreach (UdonSharpBehaviour SSV in SaccSeaVehicles)
+            {
+                if (SSV)
+                { SSV.SetProgramVariable("ThrottleSensitivity", sensvalue); }
+            }
         }
         public Slider GripSensitivitySlider;
         public Text GripSensitivitySliderNumber;
@@ -65,6 +77,16 @@ namespace SaccFlightAndVehicles
             {
                 if (SAV)
                 { SAV.SetProgramVariable("GripSensitivity", sensvalue); }
+            }
+            foreach (UdonSharpBehaviour SSV in SaccSeaVehicles)
+            {
+                if (SSV)
+                { SSV.SetProgramVariable("GripSensitivity", sensvalue); }
+            }
+            foreach (UdonSharpBehaviour SGV in SaccGroundVehicles)
+            {
+                if (SGV)
+                { SGV.SetProgramVariable("GripSensitivity", sensvalue); }
             }
         }
         public Slider DialSensSlider;
@@ -78,6 +100,18 @@ namespace SaccFlightAndVehicles
                 Vehicles[i].SetProgramVariable("DialSensitivity", DialSens);
             }
         }
+        public Toggle ClutchDisabledToggle;
+        private bool ClutchDisabledDefault;
+        private bool ClutchDisabled = false;
+        public void ToggleClutch()
+        {
+            ClutchDisabled = !ClutchDisabled;
+            foreach (UdonSharpBehaviour SGVg in SGVGearBoxs)
+            {
+                if (SGVg)
+                { SGVg.SetProgramVariable("ClutchDisabled", ClutchDisabled); }
+            }
+        }
         public Toggle SwitchHandsToggle;
         private bool SwitchHandsDefault;
         public void SwitchHands()
@@ -86,6 +120,16 @@ namespace SaccFlightAndVehicles
             {
                 if (SAV)
                 { SAV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SAV.GetProgramVariable("SwitchHandsJoyThrottle")); }
+            }
+            foreach (UdonSharpBehaviour SGV in SaccSeaVehicles)
+            {
+                if (SGV)
+                { SGV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SGV.GetProgramVariable("SwitchHandsJoyThrottle")); }
+            }
+            foreach (UdonSharpBehaviour SGV in SaccGroundVehicles)
+            {
+                if (SGV)
+                { SGV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SGV.GetProgramVariable("SwitchHandsJoyThrottle")); }
             }
         }
         public Toggle AutoEngineToggle;
@@ -99,6 +143,14 @@ namespace SaccFlightAndVehicles
                 {
                     SAV.SetProgramVariable("EngineOnOnEnter", AutoEngine);
                     SAV.SetProgramVariable("EngineOffOnExit", AutoEngine);
+                }
+            }
+            foreach (UdonSharpBehaviour SSV in SaccSeaVehicles)
+            {
+                if (SSV)
+                {
+                    SSV.SetProgramVariable("EngineOnOnEnter", AutoEngine);
+                    SSV.SetProgramVariable("EngineOffOnExit", AutoEngine);
                 }
             }
         }
@@ -132,6 +184,7 @@ namespace SaccFlightAndVehicles
             ThrottleSensitivitySlider.value = 6f;
             JoyStickSensitivitySlider.value = 45f;
             if (SwitchHandsToggle.isOn != SwitchHandsDefault) { SwitchHandsToggle.isOn = !SwitchHandsToggle.isOn; }
+            if (ClutchDisabledToggle.isOn != ClutchDisabledDefault) { ClutchDisabledToggle.isOn = !ClutchDisabledToggle.isOn; }
             AutoEngineToggle.isOn = AutoEngineDefault;
             PassengerComfortModeToggle.isOn = PassengerComfortModeDefault;
             SaccFlightStrengthSlider.value = .33f;

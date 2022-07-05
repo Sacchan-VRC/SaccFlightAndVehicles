@@ -22,6 +22,8 @@ namespace SaccFlightAndVehicles
         }
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        public void DFUNC_Selected() { gameObject.SetActive(true); }
+        public void DFUNC_Deselected() { gameObject.SetActive(false); }
         private void Update()
         {
             float Trigger;
@@ -41,16 +43,13 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
-            gameObject.SetActive(true);
             Reversing = (bool)GearBox.GetProgramVariable("_AutomaticReversing");
         }
         public void SFEXT_O_PilotExit()
         {
-            Debug.Log("SFEXT_O_PilotExit");
-            gameObject.SetActive(false);
             if (Reversing)
             { Toggle(); }
-            Debug.Log(Reversing);
+            gameObject.SetActive(false);
         }
         public void Toggle()
         {

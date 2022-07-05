@@ -28,8 +28,8 @@ namespace SaccFlightAndVehicles
         void Start()
         {
             VehicleRigidbody = VehicleTransform.GetComponent<Rigidbody>();
-            SGVControl = (SaccGroundVehicle)((SaccEntity)VehicleTransform.GetComponent<SaccEntity>()).GetExtention("SaccGroundVehicle");
-            GearBoxControl = (SGV_GearBox)((SaccEntity)VehicleTransform.GetComponent<SaccEntity>()).GetExtention("SGV_GearBox");
+            SGVControl = (SaccGroundVehicle)((SaccEntity)VehicleTransform.GetComponent<SaccEntity>()).GetExtention(GetUdonTypeName<SaccGroundVehicle>());
+            GearBoxControl = (SGV_GearBox)((SaccEntity)VehicleTransform.GetComponent<SaccEntity>()).GetExtention(GetUdonTypeName<SGV_GearBox>());
             if (GearBoxControl)
             {
                 for (int i = 0; i < GearBoxControl.GearRatios.Length; i++)

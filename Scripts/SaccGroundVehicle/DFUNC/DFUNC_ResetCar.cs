@@ -24,7 +24,7 @@ namespace SaccFlightAndVehicles
         {
             VehicleTransform = EntityControl.transform;
             InVR = EntityControl.InVR;
-            SGVControl = (SaccGroundVehicle)EntityControl.GetExtention("SaccGroundVehicle");
+            SGVControl = (SaccGroundVehicle)EntityControl.GetExtention(GetUdonTypeName<SaccGroundVehicle>());
         }
         public void DFUNC_Selected()
         {

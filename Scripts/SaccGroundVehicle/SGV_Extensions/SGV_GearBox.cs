@@ -19,7 +19,7 @@ namespace SaccFlightAndVehicles
         public float GearChangeRevsLower = .3f;
         public bool LeftController = false;
         public bool ClutchLeftController = true;
-        public bool ClutchEnabled = false;
+        public bool ClutchDisabled = false;
         [Tooltip("Multiply all the gears at once")]
         public float FinalDrive = 1f;
         public float[] GearRatios = { -.04f, 0, .04f, .08f, .12f, .16f, .2f };
@@ -174,7 +174,8 @@ namespace SaccFlightAndVehicles
                     {
                         StickDownLastFrame = false;
                     }
-                    if (ClutchEnabled)
+                    float kbclutch = 0;
+                    if (!ClutchDisabled)
                     {
                         if (ClutchLeftController)
                         {
@@ -184,8 +185,8 @@ namespace SaccFlightAndVehicles
                         {
                             Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                         }
+                        kbclutch = Input.GetKey(KeyCode.C) ? 1f : 0f;
                     }
-                    float kbclutch = Input.GetKey(KeyCode.C) ? 1f : 0f;
                     if (Trigger > UpperDeadZone)
                     { Trigger = 1f; }
                     if (Trigger < LowerDeadZone)
