@@ -10,7 +10,6 @@ public class SaccRaceToggleButton : UdonSharpBehaviour
 {
     [HideInInspector] public SaccRacingTrigger[] RacingTriggers;
     [HideInInspector] public SaccRaceCourseAndScoreboard[] Races;
-    public Toggle ReverseToggle;
     [Tooltip("Can be used to set a default course -1 = none")]
     public int CurrentCourseSelection = -1;
     private bool Reverse = false;

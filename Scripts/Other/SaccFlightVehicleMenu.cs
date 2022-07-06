@@ -24,6 +24,7 @@ namespace SaccFlightAndVehicles
             if (SwitchHandsToggle) { SwitchHandsDefault = SwitchHandsToggle.isOn; }
             if (ClutchDisabledToggle) { ClutchDisabledDefault = ClutchDisabledToggle.isOn; }
             if (AutoEngineToggle) { AutoEngineDefault = AutoEngineToggle.isOn; }
+            if (AutomaticGearsToggle) { AutomaticGearsDefault = AutomaticGearsToggle.isOn; }
             SaccAirVehicles = new SaccAirVehicle[Vehicles.Length];
             SaccSeaVehicles = new SaccSeaVehicle[Vehicles.Length];
             SaccGroundVehicles = new SaccGroundVehicle[Vehicles.Length];
@@ -121,15 +122,30 @@ namespace SaccFlightAndVehicles
                 if (SAV)
                 { SAV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SAV.GetProgramVariable("SwitchHandsJoyThrottle")); }
             }
-            foreach (UdonSharpBehaviour SGV in SaccSeaVehicles)
+            foreach (UdonSharpBehaviour SSV in SaccSeaVehicles)
             {
-                if (SGV)
-                { SGV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SGV.GetProgramVariable("SwitchHandsJoyThrottle")); }
+                if (SSV)
+                { SSV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SSV.GetProgramVariable("SwitchHandsJoyThrottle")); }
             }
             foreach (UdonSharpBehaviour SGV in SaccGroundVehicles)
             {
                 if (SGV)
                 { SGV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SGV.GetProgramVariable("SwitchHandsJoyThrottle")); }
+            }
+        }
+        public Toggle AutomaticGearsToggle;
+        private bool AutomaticGearsDefault;
+        public void ToggleAutomaticGears()
+        {
+            foreach (UdonSharpBehaviour SGV in SGVGearBoxs)
+            {
+                if (SGV)
+                {
+                    if ((bool)SGV.GetProgramVariable("AllowMenuToToggleAutomatic"))
+                    {
+                        SGV.SetProgramVariable("Automatic", !(bool)SGV.GetProgramVariable("Automatic"));
+                    }
+                }
             }
         }
         public Toggle AutoEngineToggle;
@@ -183,11 +199,11 @@ namespace SaccFlightAndVehicles
             DialSensSlider.value = .7f;
             ThrottleSensitivitySlider.value = 6f;
             JoyStickSensitivitySlider.value = 45f;
-            if (SwitchHandsToggle.isOn != SwitchHandsDefault) { SwitchHandsToggle.isOn = !SwitchHandsToggle.isOn; }
-            if (ClutchDisabledToggle.isOn != ClutchDisabledDefault) { ClutchDisabledToggle.isOn = !ClutchDisabledToggle.isOn; }
+            if (SwitchHandsToggle) { if (SwitchHandsToggle.isOn != SwitchHandsDefault) { SwitchHandsToggle.isOn = !SwitchHandsToggle.isOn; } }
+            if (ClutchDisabledToggle) { if (ClutchDisabledToggle.isOn != ClutchDisabledDefault) { ClutchDisabledToggle.isOn = !ClutchDisabledToggle.isOn; } }
+            if (AutomaticGearsToggle) { if (AutomaticGearsToggle.isOn != AutomaticGearsDefault) { AutomaticGearsToggle.isOn = !AutomaticGearsToggle.isOn; } }
             AutoEngineToggle.isOn = AutoEngineDefault;
             PassengerComfortModeToggle.isOn = PassengerComfortModeDefault;
-            SaccFlightStrengthSlider.value = .33f;
             SaccFlightStrengthSlider.value = .33f;
         }
     }

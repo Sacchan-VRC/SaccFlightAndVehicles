@@ -310,6 +310,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
             NextCheckPointAnimator = CurrentCourse.RaceCheckpoints[NextCheckpoint + TrackDirection].GetComponent<Animator>();
             if (Utilities.IsValid(NextCheckPointAnimator))
             {
+                NextCheckPointAnimator.SetBool("Reverse", !_TrackForward);
                 NextCheckPointAnimator.SetBool("Next", true);
             }
         }
@@ -324,6 +325,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
                 CurrentCheckPointAnimator = CurrentCourse.RaceCheckpoints[FirstCheckPoint].GetComponent<Animator>();
                 if (Utilities.IsValid(CurrentCheckPointAnimator))
                 {
+                    CurrentCheckPointAnimator.SetBool("Reverse", !_TrackForward);
                     CurrentCheckPointAnimator.SetBool("Current", true);
                 }
             }
@@ -332,6 +334,7 @@ public class SaccRacingTrigger : UdonSharpBehaviour
                 NextCheckPointAnimator = CurrentCourse.RaceCheckpoints[FirstCheckPoint + TrackDirection].GetComponent<Animator>();
                 if (Utilities.IsValid(NextCheckPointAnimator))
                 {
+                    NextCheckPointAnimator.SetBool("Reverse", !_TrackForward);
                     NextCheckPointAnimator.SetBool("Next", true);
                 }
             }

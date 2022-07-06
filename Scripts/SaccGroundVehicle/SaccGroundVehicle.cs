@@ -798,6 +798,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public int DisableGroundDetection;
         [System.NonSerialized] public int ThrottleOverridden;
         [System.NonSerialized] public int JoystickOverridden;
+        [System.NonSerialized] public bool Taxiing = false;
         //end of compatability variables
         [System.NonSerializedAttribute] public float FullFuel;
         [System.NonSerialized] public bool Occupied;

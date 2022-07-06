@@ -11,9 +11,15 @@ namespace SaccFlightAndVehicles
     public class SGV_GearBox : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SGVControl;
+        public KeyCode GearUpKey = KeyCode.E;
+        public KeyCode GearDownKey = KeyCode.Q;
+        public KeyCode ClutchKey = KeyCode.C;
         [Tooltip("How far the stick has to be moved to change the gear")]
         public float GearChangeDistance = .7f;
+        [Tooltip("Automatically change gears?")]
         public bool Automatic = false;
+        [Tooltip("Allow the vehicle menu option to toggle gear functionality between automatic and manual")]
+        public bool AllowMenuToToggleAutomatic = true;
         public float AutomaticGearChangeDelay = 1f;
         public float GearChangeRevsUpper = .8f;
         public float GearChangeRevsLower = .3f;
@@ -115,8 +121,60 @@ namespace SaccFlightAndVehicles
         {
             if (Piloting)
             {
+                Vector2 StickPos = Vector2.zero;
+                float Trigger = 0;
+                if (LeftController)
+                {
+                    // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                    StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                }
+                else
+                {
+                    // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                    StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                }
+                if (StickPos.y > GearChangeDistance)
+                {
+                    if (!StickUpLastFrame)
+                    {
+                        //GEARUP / forward gear
+                        if (Automatic)
+                        {
+                            if (_AutomaticReversing) { AutomaticReversing = false; }
+                        }
+                        else { GearUp(); }
+                        StickUpLastFrame = true;
+                    }
+                }
+                else
+                {
+                    StickUpLastFrame = false;
+                }
+                if (StickPos.y < -GearChangeDistance)
+                {
+                    if (!StickDownLastFrame)
+                    {
+                        //GEARDown / reverse gear
+                        if (Automatic)
+                        {
+                            if (!_AutomaticReversing) { AutomaticReversing = true; }
+                        }
+                        else
+                        { GearDown(); }
+                        StickDownLastFrame = true;
+                    }
+                }
+                else
+                {
+                    StickDownLastFrame = false;
+                }
                 if (Automatic)
                 {
+
+                    if (Input.GetKeyDown(GearUpKey))
+                    {
+                        AutomaticReversing = !AutomaticReversing;
+                    }
                     if (Time.time - LastGearChangeTime > AutomaticGearChangeDelay)
                     {
                         float normRevs = (float)SGVControl.GetProgramVariable("Revs") / RevLimiter;
@@ -136,44 +194,6 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    Vector2 StickPos = Vector2.zero;
-                    float Trigger = 0;
-                    if (LeftController)
-                    {
-                        // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                        StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                    }
-                    else
-                    {
-                        // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                        StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                    }
-                    if (StickPos.y > GearChangeDistance)
-                    {
-                        if (!StickUpLastFrame)
-                        {
-                            //GEARUP
-                            GearUp();
-                            StickUpLastFrame = true;
-                        }
-                    }
-                    else
-                    {
-                        StickUpLastFrame = false;
-                    }
-                    if (StickPos.y < -GearChangeDistance)
-                    {
-                        if (!StickDownLastFrame)
-                        {
-                            //GEARDown
-                            GearDown();
-                            StickDownLastFrame = true;
-                        }
-                    }
-                    else
-                    {
-                        StickDownLastFrame = false;
-                    }
                     float kbclutch = 0;
                     if (!ClutchDisabled)
                     {
@@ -185,7 +205,7 @@ namespace SaccFlightAndVehicles
                         {
                             Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                         }
-                        kbclutch = Input.GetKey(KeyCode.C) ? 1f : 0f;
+                        kbclutch = Input.GetKey(ClutchKey) ? 1f : 0f;
                     }
                     if (Trigger > UpperDeadZone)
                     { Trigger = 1f; }
@@ -193,11 +213,11 @@ namespace SaccFlightAndVehicles
                     { Trigger = 0f; }
                     SGVControl.SetProgramVariable("Clutch", Mathf.Max(Trigger, kbclutch, _ClutchOverride));
 
-                    if (Input.GetKeyDown(KeyCode.E))
+                    if (Input.GetKeyDown(GearUpKey))
                     {
                         GearUp();
                     }
-                    if (Input.GetKeyDown(KeyCode.Q))
+                    if (Input.GetKeyDown(GearDownKey))
                     {
                         GearDown();
                     }
@@ -236,6 +256,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             Piloting = false;
+            AutomaticReversing = false;
         }
         public void SFEXT_G_PilotEnter()
         {

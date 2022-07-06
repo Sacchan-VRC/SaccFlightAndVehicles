@@ -47,8 +47,6 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotExit()
         {
-            if (Reversing)
-            { Toggle(); }
             gameObject.SetActive(false);
         }
         public void Toggle()
