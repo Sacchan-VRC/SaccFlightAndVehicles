@@ -25,6 +25,7 @@ namespace SaccFlightAndVehicles
             if (ClutchDisabledToggle) { ClutchDisabledDefault = ClutchDisabledToggle.isOn; }
             if (AutoEngineToggle) { AutoEngineDefault = AutoEngineToggle.isOn; }
             if (AutomaticGearsToggle) { AutomaticGearsDefault = AutomaticGearsToggle.isOn; }
+            if (InvertVRGearChangeToggle) { InvertVRGearChangeDefault = InvertVRGearChangeToggle.isOn; }
             SaccAirVehicles = new SaccAirVehicle[Vehicles.Length];
             SaccSeaVehicles = new SaccSeaVehicle[Vehicles.Length];
             SaccGroundVehicles = new SaccGroundVehicle[Vehicles.Length];
@@ -137,14 +138,27 @@ namespace SaccFlightAndVehicles
         private bool AutomaticGearsDefault;
         public void ToggleAutomaticGears()
         {
-            foreach (UdonSharpBehaviour SGV in SGVGearBoxs)
+            foreach (UdonSharpBehaviour SGVg in SGVGearBoxs)
             {
-                if (SGV)
+                if (SGVg)
                 {
-                    if ((bool)SGV.GetProgramVariable("AllowMenuToToggleAutomatic"))
+                    if ((bool)SGVg.GetProgramVariable("AllowMenuToToggleAutomatic"))
                     {
-                        SGV.SetProgramVariable("Automatic", !(bool)SGV.GetProgramVariable("Automatic"));
+                        SGVg.SetProgramVariable("Automatic", !(bool)SGVg.GetProgramVariable("Automatic"));
                     }
+                }
+            }
+        }
+        public Toggle InvertVRGearChangeToggle;
+        private bool InvertVRGearChangeDefault;
+        public void ToggleInvertVRGearChange()
+        {
+            bool InvertVRGearChange = InvertVRGearChangeToggle.isOn;
+            foreach (UdonSharpBehaviour SGVg in SGVGearBoxs)
+            {
+                if (SGVg)
+                {
+                    SGVg.SetProgramVariable("InvertVRGearChangeDirection", InvertVRGearChange);
                 }
             }
         }
@@ -199,9 +213,10 @@ namespace SaccFlightAndVehicles
             DialSensSlider.value = .7f;
             ThrottleSensitivitySlider.value = 6f;
             JoyStickSensitivitySlider.value = 45f;
-            if (SwitchHandsToggle) { if (SwitchHandsToggle.isOn != SwitchHandsDefault) { SwitchHandsToggle.isOn = !SwitchHandsToggle.isOn; } }
-            if (ClutchDisabledToggle) { if (ClutchDisabledToggle.isOn != ClutchDisabledDefault) { ClutchDisabledToggle.isOn = !ClutchDisabledToggle.isOn; } }
-            if (AutomaticGearsToggle) { if (AutomaticGearsToggle.isOn != AutomaticGearsDefault) { AutomaticGearsToggle.isOn = !AutomaticGearsToggle.isOn; } }
+            if (SwitchHandsToggle) { if (SwitchHandsToggle.isOn != SwitchHandsDefault) { SwitchHandsToggle.isOn = SwitchHandsDefault; } }
+            if (ClutchDisabledToggle) { if (ClutchDisabledToggle.isOn != ClutchDisabledDefault) { ClutchDisabledToggle.isOn = ClutchDisabledDefault; } }
+            if (AutomaticGearsToggle) { if (AutomaticGearsToggle.isOn != AutomaticGearsDefault) { AutomaticGearsToggle.isOn = AutomaticGearsDefault; } }
+            if (InvertVRGearChangeToggle) { if (InvertVRGearChangeToggle.isOn != InvertVRGearChangeDefault) { InvertVRGearChangeToggle.isOn = InvertVRGearChangeDefault; } }
             AutoEngineToggle.isOn = AutoEngineDefault;
             PassengerComfortModeToggle.isOn = PassengerComfortModeDefault;
             SaccFlightStrengthSlider.value = .33f;

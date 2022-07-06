@@ -350,7 +350,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_ChangeGear()
         {
-            if (GearChange) { GearChange.Play(); }
+            if (GearChange) { GearChange.PlayOneShot(GearChange.clip); }
             VehicleAnimator.SetInteger("currentgear", (int)SGVControl.GetProgramVariable("CurrentGear"));
         }
         public void SFEXT_L_OnCollisionEnter() { WakeUp(); }
@@ -365,7 +365,7 @@ namespace SaccFlightAndVehicles
                 { SmallCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
                 { SmallCrashInside[rand].transform.position = SmallCrashInsidePos[rand]; }
-                SmallCrashInside[rand].Play();
+                SmallCrashInside[rand].PlayOneShot(SmallCrashInside[rand].clip);
             }
             else
             {
@@ -376,7 +376,7 @@ namespace SaccFlightAndVehicles
                 { SmallCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
                 { SmallCrash[rand].transform.position = SmallCrashPos[rand]; }
-                SmallCrash[rand].Play();
+                SmallCrash[rand].PlayOneShot(SmallCrash[rand].clip);
             }
         }
         public void SFEXT_G_MediumCrash()
@@ -390,7 +390,7 @@ namespace SaccFlightAndVehicles
                 { MediumCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
                 { MediumCrashInside[rand].transform.position = MediumCrashInsidePos[rand]; }
-                MediumCrashInside[rand].Play();
+                MediumCrashInside[rand].PlayOneShot(MediumCrashInside[rand].clip);
             }
             else
             {
@@ -401,7 +401,7 @@ namespace SaccFlightAndVehicles
                 { MediumCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
                 { MediumCrash[rand].transform.position = MediumCrashPos[rand]; }
-                MediumCrash[rand].Play();
+                MediumCrash[rand].PlayOneShot(MediumCrash[rand].clip);
             }
         }
         public void SFEXT_G_BigCrash()
@@ -415,7 +415,7 @@ namespace SaccFlightAndVehicles
                 { BigCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
                 { BigCrashInside[rand].transform.position = BigCrashInsidePos[rand]; }
-                BigCrashInside[rand].Play();
+                BigCrashInside[rand].PlayOneShot(BigCrashInside[rand].clip);
             }
             else
             {
@@ -426,7 +426,7 @@ namespace SaccFlightAndVehicles
                 { BigCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
                 { BigCrash[rand].transform.position = BigCrashPos[rand]; }
-                BigCrash[rand].Play();
+                BigCrash[rand].PlayOneShot(BigCrash[rand].clip);
             }
         }
         public void SFEXT_O_TakeOwnership()
@@ -443,7 +443,7 @@ namespace SaccFlightAndVehicles
             {
                 int rand = Random.Range(0, BulletHit.Length);
                 BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
-                BulletHit[rand].Play();
+                BulletHit[rand].PlayOneShot(BulletHit[rand].clip);
             }
         }
         public void SFEXT_G_ReAppear()

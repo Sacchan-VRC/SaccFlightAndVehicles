@@ -20,20 +20,28 @@ namespace SaccFlightAndVehicles
         public bool Automatic = false;
         [Tooltip("Allow the vehicle menu option to toggle gear functionality between automatic and manual")]
         public bool AllowMenuToToggleAutomatic = true;
-        public float AutomaticGearChangeDelay = 1f;
+        [Tooltip("How often the automatic mode can change gear")]
+        public float AutomaticGearChangeDelay = .25f;
+        [Tooltip("In automatic mode, when revs are above this percentage, the gear will increase")]
         public float GearChangeRevsUpper = .8f;
+        [Tooltip("In automatic mode, when revs are below this percentage, the gear will decrease")]
         public float GearChangeRevsLower = .3f;
-        public bool LeftController = false;
+        [Tooltip("Use left controller stick to change gear instead?")]
+        public bool GearsLeftController = false;
+        [Tooltip("Use the left controller grip for clutch? Disable for right")]
         public bool ClutchLeftController = true;
+        [Tooltip("Disable clutch input entirely")]
         public bool ClutchDisabled = false;
         [Tooltip("Multiply all the gears at once")]
         public float FinalDrive = 1f;
         public float[] GearRatios = { -.04f, 0, .04f, .08f, .12f, .16f, .2f };
-        [Tooltip("If input is above this amount, input is clamped to max")]
+        [Tooltip("If clutch input is above this amount, input is clamped to max")]
         public float UpperDeadZone = .95f;
-        [Tooltip("If input is bleow this amount, input is clamped to min")]
+        [Tooltip("If clutch input is bleow this amount, input is clamped to min")]
         public float LowerDeadZone = .05f;
         [Tooltip("Set this to your neutral gear")]
+        [System.NonSerialized]
+        public bool InvertVRGearChangeDirection;
         private SaccEntity EntityControl;
         [UdonSynced, FieldChangeCallback(nameof(CurrentGear))] public int _CurrentGear = 1;
         public int CurrentGear
@@ -123,7 +131,7 @@ namespace SaccFlightAndVehicles
             {
                 Vector2 StickPos = Vector2.zero;
                 float Trigger = 0;
-                if (LeftController)
+                if (GearsLeftController)
                 {
                     // StickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                     StickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
@@ -142,7 +150,7 @@ namespace SaccFlightAndVehicles
                         {
                             if (_AutomaticReversing) { AutomaticReversing = false; }
                         }
-                        else { GearUp(); }
+                        else { if (InvertVRGearChangeDirection) GearDown(); else GearUp(); }
                         StickUpLastFrame = true;
                     }
                 }
@@ -160,7 +168,7 @@ namespace SaccFlightAndVehicles
                             if (!_AutomaticReversing) { AutomaticReversing = true; }
                         }
                         else
-                        { GearDown(); }
+                        { if (InvertVRGearChangeDirection) GearUp(); else GearDown(); }
                         StickDownLastFrame = true;
                     }
                 }
