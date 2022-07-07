@@ -128,11 +128,11 @@ namespace SaccFlightAndVehicles
                 if (SSV)
                 { SSV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SSV.GetProgramVariable("SwitchHandsJoyThrottle")); }
             }
-            foreach (UdonSharpBehaviour SGV in SaccGroundVehicles)
+            /* foreach (UdonSharpBehaviour SGV in SaccGroundVehicles)
             {
                 if (SGV)
                 { SGV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SGV.GetProgramVariable("SwitchHandsJoyThrottle")); }
-            }
+            } */
         }
         public Toggle AutomaticGearsToggle;
         private bool AutomaticGearsDefault;
