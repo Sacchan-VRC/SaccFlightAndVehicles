@@ -107,7 +107,7 @@ namespace SaccFlightAndVehicles
             {
                 if ((float)SAVControl.GetProgramVariable("Health") == (float)SAVControl.GetProgramVariable("FullHealth"))
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(RepairCanopy));
+                    RepairCanopy();
                 }
             }
         }
