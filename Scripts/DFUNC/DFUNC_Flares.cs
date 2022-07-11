@@ -128,11 +128,6 @@ namespace SaccFlightAndVehicles
                 else { TriggerLastFrame = false; }
             }
         }
-        public void SetsendlaunchflareZero()
-        {
-            sendlaunchflare = 0;
-            RequestSerialization();
-        }
         public void LaunchFlare()
         {
             FlareLaunchTime = Time.time;

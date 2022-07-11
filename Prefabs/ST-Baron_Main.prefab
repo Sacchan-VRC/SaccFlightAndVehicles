@@ -57623,14 +57623,12 @@ MonoBehaviour:
   MinThrottle: 0.08
   DriveSpeedKeyboardMax: 1
   GripSensitivity: 0.75
-  SteeringWheelDegrees: 60
-  ThrottleDegrees: 50
+  SteeringWheelDegrees: 450
   SteeringKeyboardSecsToMax: 0.33333
   SteeringMaxSpeedDT: 50
   SteeringMaxSpeedDTDisabled: 0
   DesktopMinSteering: 0.06
   ThrottleReturnTimeDT: 0.0001
-  ThrottleReturnTimeVR: 0.1
   Drag: 0.02
   ControlsRoot: {fileID: 0}
   EngineResponseCurve:
@@ -57668,6 +57666,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   Fuel: 1800
   FuelConsumption: 2
+  SwitchHandsJoyThrottle: 0
+  SteeringHand_Left: 1
+  SteeringHand_Right: 1
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 5
@@ -57827,6 +57828,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6733660352721803929}
+  HeadXOffset: 0.25
 --- !u!114 &6141758680061051261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57980,6 +57982,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 6169200270901643276}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6141758679963414950}
+  HeadXOffset: 0.25
 --- !u!114 &6141758680273700199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58023,7 +58026,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &6141758680275868698
 Transform:
   m_ObjectHideFlags: 0
@@ -58521,6 +58524,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6733660353092015039}
+  HeadXOffset: 0.25
 --- !u!114 &6141758680559467796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58676,6 +58680,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6733660353753921584}
+  HeadXOffset: 0.25
 --- !u!114 &6141758681580453100
 MonoBehaviour:
   m_ObjectHideFlags: 0

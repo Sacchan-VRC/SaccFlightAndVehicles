@@ -1334,6 +1334,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 1778918461833538751}
+  HeadXOffset: 0.25
 --- !u!114 &1217889974125167124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1457,6 +1458,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 1778918460298135344}
+  HeadXOffset: 0.25
 --- !u!114 &1217889974575203308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1818,6 +1820,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 1171039762782402316}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 1217889975122693798}
+  HeadXOffset: 0.25
 --- !u!114 &1217889975416420967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1861,7 +1864,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1217889975477297946
 Transform:
   m_ObjectHideFlags: 0
@@ -2309,14 +2312,12 @@ MonoBehaviour:
   MinThrottle: 0.08
   DriveSpeedKeyboardMax: 1
   GripSensitivity: 0.75
-  SteeringWheelDegrees: 60
-  ThrottleDegrees: 50
+  SteeringWheelDegrees: 450
   SteeringKeyboardSecsToMax: 0.4
   SteeringMaxSpeedDT: 50
   SteeringMaxSpeedDTDisabled: 0
   DesktopMinSteering: 0.1
   ThrottleReturnTimeDT: 0.0001
-  ThrottleReturnTimeVR: 0.1
   Drag: 0.02
   ControlsRoot: {fileID: 0}
   EngineResponseCurve:
@@ -2354,6 +2355,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   Fuel: 1800
   FuelConsumption: 2
+  SwitchHandsJoyThrottle: 0
+  SteeringHand_Left: 1
+  SteeringHand_Right: 1
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 10
@@ -2513,6 +2517,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 1778918460924618137}
+  HeadXOffset: 0.25
 --- !u!114 &1217889975763254909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44476,6 +44481,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 5034242081659681147}
+  HeadXOffset: 0.25
 --- !u!114 &5034242081967368629
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -50190,6 +50196,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 5034242082607500282}
+  HeadXOffset: 0.25
 --- !u!114 &5034242082806762028
 MonoBehaviour:
   m_ObjectHideFlags: 0

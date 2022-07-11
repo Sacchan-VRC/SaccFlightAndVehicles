@@ -28,6 +28,8 @@ namespace SaccFlightAndVehicles
         private bool AirControlReady;
         private bool HoldingJoyStick;
         private bool WheelHeld = false;
+        private bool WheelHeldR = false;
+        private bool WheelHeldL = false;
         private bool JoyMoving;
         private float JoyOut = 0;
         private float JoyOutTarget = 0;
@@ -175,17 +177,31 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableJoystick));
             }
         }
-        public void SFEXT_O_WheelDropped()
+        public void SFEXT_O_WheelDroppedR()
         {
-            WheelHeld = false;
-            if (!Grounded)
+            WheelHeldR = false;
+            if (!WheelHeldL && !Grounded)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableJoystick));
             }
         }
-        public void SFEXT_O_WheelGrabbed()
+        public void SFEXT_O_WheelDroppedL()
         {
-            WheelHeld = true;
+            WheelHeldL = false;
+            if (!WheelHeldR && !Grounded)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableJoystick));
+            }
+        }
+        public void SFEXT_O_WheelGrabbedR()
+        {
+            WheelHeldR = true;
+            if (WheelHeldL) { WheelHeld = true; }
+        }
+        public void SFEXT_O_WheelGrabbedL()
+        {
+            WheelHeldL = true;
+            if (WheelHeldR) { WheelHeld = true; }
         }
         public void SFEXT_G_Explode()
         {

@@ -46,10 +46,10 @@ namespace SaccFlightAndVehicles
 
         [Tooltip("How far down you have to push the grip button to grab the joystick and throttle")]
         public float GripSensitivity = .75f;
-        [Tooltip("How many degrees to turn the wheel until it reaches max turning, in each direction, animation should match this")]
-        public float SteeringWheelDegrees = 360f;
-        [Tooltip("How much VR users must twist their hands to reach max throttle, animation should match this")]
-        public float ThrottleDegrees = 50f;
+        [Tooltip("How many degrees the wheel can turn away from neutral position (lock to lock / 2), animation should match this")]
+        public float SteeringWheelDegrees = 450f;
+        // [Tooltip("How much VR users must twist their hands to reach max throttle, animation should match this")]
+        // public float ThrottleDegrees = 50f;
         [Tooltip("How long keyboard turning must be held down to reach full deflection")]
         public float SteeringKeyboardSecsToMax = 0.22222222f;
 
@@ -61,8 +61,8 @@ namespace SaccFlightAndVehicles
         public float DesktopMinSteering = .2f;
         [Tooltip("how fast steering wheel returns to neutral position in destop mode 1 = 1 second, .2 = 5 seconds")]
         public float ThrottleReturnTimeDT = .0001f;
-        [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
-        public float ThrottleReturnTimeVR = .1f;
+        // [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
+        // public float ThrottleReturnTimeVR = .1f;
         public float Drag = .02f;
         [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
         public Transform ControlsRoot;
@@ -70,20 +70,19 @@ namespace SaccFlightAndVehicles
         public AnimationCurve EngineResponseCurve = AnimationCurve.Linear(0, 1, 1, 1);
         [System.NonSerialized] public Vector3 CurrentVel;
         // [System.NonSerializedAttribute] public bool ThrottleGripLastFrame = false;
-        [System.NonSerializedAttribute] public bool WheelGripLastFrame = false;
-        [System.NonSerializedAttribute] public bool WheelGrippingLastFrame_toggle = false;
         [UdonSynced] public float Fuel = 900;
         [Tooltip("Fuel consumption per second at max revs")]
         public float FuelConsumption = 2;
         /*     [Tooltip("Amount of fuel at which throttle will start reducing")]
             [System.NonSerializedAttribute] public float LowFuel = 125; */
-        [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
-        [System.NonSerializedAttribute] public float ThrottleSensitivity = 6f;
-        [Tooltip("Use the left hand to control the joystick and the right hand to control the throttle?")]
-        [System.NonSerializedAttribute] public bool SwitchHandsJoyThrottle = false;
-        [System.NonSerializedAttribute] public float PlayerThrottle;
-        [System.NonSerializedAttribute] public float VehicleSpeed;//set by syncscript if not owner
-        [System.NonSerializedAttribute] public bool MovingForward;
+        //[Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
+        //[System.NonSerializedAttribute] public float ThrottleSensitivity = 6f;
+        [Tooltip("Use the left hand trigger to control throttle?")]
+        public bool SwitchHandsJoyThrottle = false;
+        [Tooltip("Use the left hand grip to grab the steering wheel??")]
+        public bool SteeringHand_Left = true;
+        [Tooltip("Use the right hand grip to grab the steering wheel??")]
+        public bool SteeringHand_Right = true;
         [System.NonSerializedAttribute] public bool _HandBrakeOn;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(HandBrakeOn_))] public int HandBrakeOn = 0;
         public int HandBrakeOn_
@@ -105,7 +104,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Shape of the auto steer response curve, smaller number makes it sharper, around 0.5 might be realistic")]
         public bool Drift_AutoSteer;
         [Header("AutoSteer Enabled")]
-        [Tooltip("Put in the max degrees the wheels can steer to in order to make autosteer work properly")]
+        [Tooltip("Put in the max degrees the wheels can turn to in order to make autosteer work properly")]
         public float SteeringDegrees = 60;
         // public float AutoSteerCurve = 0f;
         public float AutoSteerStrength = 1f;
@@ -167,16 +166,36 @@ namespace SaccFlightAndVehicles
         private float LastHitTime;
         private float PredictedHealth;
         private int ReSupplied;
+        [System.NonSerializedAttribute] public float PlayerThrottle;
+        [System.NonSerializedAttribute] public float VehicleSpeed;//set by syncscript if not owner
+        [System.NonSerializedAttribute] public bool MovingForward;
         [System.NonSerialized] public float LastResupplyTime;
-        Quaternion VehicleRotLastFrame;
-        Quaternion VehicleRotLastFrameThrottle;
-        Quaternion JoystickZeroPoint;
-        Vector3 CompareAngleLastFrame;
-        Vector3 CompareAngleLastFrameThrottle;
+        //Quaternion VehicleRotLastFrameThrottle;
+        Quaternion VehicleRotLastFrameR;
+        [System.NonSerializedAttribute] public bool WheelGripLastFrameR = false;
+        [System.NonSerializedAttribute] public bool WheelGrippingLastFrame_toggleR = false;
+        Quaternion JoystickZeroPointR;
+        Vector3 CompareAngleLastFrameR;
+        private float JoystickValueLastFrameR;
+        private float JoyStickValueR;
+        private bool WheelGrabToggleR;
+        private int WheelReleaseCountR;
+        private float LastGripTimeR;
+        Quaternion VehicleRotLastFrameL;
+        [System.NonSerializedAttribute] public bool WheelGripLastFrameL = false;
+        [System.NonSerializedAttribute] public bool WheelGrippingLastFrame_toggleL = false;
+        Quaternion JoystickZeroPointL;
+        Vector3 CompareAngleLastFrameL;
+        private float JoystickValueLastFrameL;
+        private float JoyStickValueL;
+        private bool WheelGrabToggleL;
+        private int WheelReleaseCountL;
+        private float LastGripTimeL;
+        //Vector3 CompareAngleLastFrameThrottle;
+        float VRJoystickPosR = 0;
+        float VRJoystickPosL = 0;
         [System.NonSerializedAttribute] public float AllGs;
         [System.NonSerializedAttribute] public Vector3 LastFrameVel = Vector3.zero;
-        private float JoystickValueLastFrame;
-        private float JoyStickValue;
         private float FinalThrottle;
         private Vector3 Spawnposition;
         private Quaternion Spawnrotation;
@@ -191,9 +210,7 @@ namespace SaccFlightAndVehicles
         public float NumGroundedWheels = 0;
         public float CurrentDistance;
         public bool CurrentlyDistant = true;
-        private bool WheelGrabToggle;
-        private int WheelReleaseCount;
-        private float LastGripTime;
+        int HandsOnWheel;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(HasFuel_))] public bool HasFuel = true;
         public bool HasFuel_
         {
@@ -374,7 +391,6 @@ namespace SaccFlightAndVehicles
                     int Di = 0;
                     float LGrip = 0;
                     float RGrip = 0;
-                    float VRJoystickPos = 0;
                     if (!_DisableInput)
                     {
                         //inputs as ints
@@ -388,18 +404,11 @@ namespace SaccFlightAndVehicles
                             RGrip = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                         }
                     }
-                    float ThrottleGrip;
-                    float SteeringWheelGrip;
-                    if (SwitchHandsJoyThrottle)
-                    {
-                        SteeringWheelGrip = LGrip;
-                        ThrottleGrip = RGrip;
-                    }
-                    else
-                    {
-                        ThrottleGrip = LGrip;
-                        SteeringWheelGrip = RGrip;
-                    }
+                    //float ThrottleGrip;
+                    // if (SwitchHandsJoyThrottle)
+                    // { ThrottleGrip = RGrip; }
+                    // else
+                    // { ThrottleGrip = LGrip; }
                     if (EnableLeaning)
                     {
                         int Threei = Input.GetKey(KeyCode.Alpha3) ? -1 : 0;
@@ -485,77 +494,22 @@ namespace SaccFlightAndVehicles
                     }
 
                     //Toggle gripping the steering wheel if double tap grab
-                    bool Grabbing = SteeringWheelGrip > GripSensitivity;
-                    if (Grabbing)
-                    {
-                        if (!WheelGrippingLastFrame_toggle)
-                        {
-                            if (Time.time - LastGripTime < .25f)
-                            {
-                                WheelGrabToggle = true;
-                                WheelReleaseCount = 0;
-                            }
-                            LastGripTime = Time.time;
-                        }
-                        WheelGrippingLastFrame_toggle = true;
-                    }
-                    else
-                    {
-                        if (WheelGrippingLastFrame_toggle)
-                        {
-                            WheelReleaseCount++;
-                            if (WheelReleaseCount > 1)
-                            {
-                                WheelGrabToggle = false;
-                            }
-                        }
-                        WheelGrippingLastFrame_toggle = false;
-                    }
-                    //VR SteeringWheel
-                    if (Grabbing || WheelGrabToggle)
-                    {
-                        Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrame);//difference in vehicle's rotation since last frame
-                        VehicleRotLastFrame = ControlsRoot.rotation;
-                        JoystickZeroPoint = VehicleRotDif * JoystickZeroPoint;//zero point rotates with the vehicle so it appears still to the pilot
-                        if (!WheelGripLastFrame)//first frame you gripped joystick
-                        {
-                            EntityControl.SendEventToExtensions("SFEXT_O_WheelGrabbed");
-                            VehicleRotDif = Quaternion.identity;
-                            if (SwitchHandsJoyThrottle)
-                            { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the vehicle when it was pressed
-                            else
-                            { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }
-                            JoyStickValue = -YawInput * SteeringWheelDegrees;
-                            JoystickValueLastFrame = 0f;
-                            CompareAngleLastFrame = Vector3.up;
-                        }
-                        WheelGripLastFrame = true;
-                        //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
-                        Quaternion JoystickDifference;
-                        JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
-                            (SwitchHandsJoyThrottle ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation
-                                                    : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation)
-                        * Quaternion.Inverse(JoystickZeroPoint)
-                         * ControlsRoot.rotation;
+                    HandsOnWheel = 0;
+                    if (SteeringHand_Right)
+                    { RHandSteeringWheel(RGrip); }
+                    if (SteeringHand_Left)
+                    { LHandSteeringWheel(LGrip); }
 
-                        Vector3 JoystickPosYaw = (JoystickDifference * Vector3.up);
-                        Vector3 CompareAngle = Vector3.ProjectOnPlane(JoystickPosYaw, Vector3.forward);
-                        JoyStickValue += (Vector3.SignedAngle(CompareAngleLastFrame, CompareAngle, Vector3.forward));
-                        CompareAngleLastFrame = CompareAngle;
-                        JoystickValueLastFrame = JoyStickValue;
-                        VRJoystickPos = JoyStickValue / SteeringWheelDegrees;
+                    float VRSteerInput = 0;
+                    if (HandsOnWheel > 0)
+                    {
+                        VRSteerInput = (VRJoystickPosL + VRJoystickPosR) / (float)HandsOnWheel;
                     }
                     else
                     {
-                        VRJoystickPos = 0f;
-                        if (WheelGripLastFrame)//first frame you let go of wheel
-                        {
-                            AutoSteerLerper = YawInput;
-                            EntityControl.SendEventToExtensions("SFEXT_O_WheelDropped");
-                        }
-                        WheelGripLastFrame = false;
+                        AutoSteerLerper = YawInput;
                     }
-                    float SteerInput = -VRJoystickPos + Ai + Di;
+                    float SteerInput = -VRSteerInput + Ai + Di;
                     //AUTOSTEER DRIFT FIX(BROKEN)
                     //float AutoSteer = Vector3.SignedAngle(Quaternion.AngleAxis(SteeringDegrees * YawInput, VehicleTransform.up) * VehicleTransform.forward, Vector3.ProjectOnPlane(VehicleVel, VehicleTransform.up), VehicleTransform.up);
 
@@ -647,6 +601,7 @@ namespace SaccFlightAndVehicles
                             { YawInput = Mathf.MoveTowards(YawInput, 0f, (1f / SteeringReturnSpeedDT) * DeltaTime); }
                         }
                     }
+                    YawInput = Mathf.Clamp(YawInput, -1f, 1f);
 
                     if (InVR)
                     {
@@ -899,9 +854,9 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             Piloting = false;
-            WheelGrippingLastFrame_toggle = false;
-            WheelReleaseCount = 0;
-            WheelGrabToggle = false;
+            WheelGrippingLastFrame_toggleR = false;
+            WheelReleaseCountR = 0;
+            WheelGrabToggleR = false;
             for (int i = 0; i < DriveWheels.Length; i++)
             {
                 DriveWheels[i].SetProgramVariable("EngineRevs", 0f);
@@ -1097,6 +1052,153 @@ namespace SaccFlightAndVehicles
                         child.gameObject.layer = NewLayer;
                     }
                 }
+            }
+        }
+        void RHandSteeringWheel(float RGrip)
+        {
+            bool GrabbingR = RGrip > GripSensitivity;
+            if (GrabbingR)
+            {
+                if (!WheelGrippingLastFrame_toggleR)
+                {
+                    if (Time.time - LastGripTimeR < .25f)
+                    {
+                        WheelGrabToggleR = true;
+                        WheelReleaseCountR = 0;
+                    }
+                    LastGripTimeR = Time.time;
+                }
+                WheelGrippingLastFrame_toggleR = true;
+            }
+            else
+            {
+                if (WheelGrippingLastFrame_toggleR)
+                {
+                    WheelReleaseCountR++;
+                    if (WheelReleaseCountR > 1)
+                    {
+                        WheelGrabToggleR = false;
+                    }
+                }
+                WheelGrippingLastFrame_toggleR = false;
+            }
+            //VR SteeringWheel
+            if (GrabbingR || WheelGrabToggleR)
+            {
+                HandsOnWheel++;
+                Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrameR);//difference in vehicle's rotation since last frame
+                VehicleRotLastFrameR = ControlsRoot.rotation;
+                JoystickZeroPointR = VehicleRotDif * JoystickZeroPointR;//zero point rotates with the vehicle so it appears still to the pilot
+                if (!WheelGripLastFrameR)//first frame you gripped joystick
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_WheelGrabbedR");
+                    VehicleRotDif = Quaternion.identity;
+                    JoystickZeroPointR = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
+                    if (Drift_AutoSteer) { JoyStickValueR = 0; }
+                    else { JoyStickValueR = -YawInput * SteeringWheelDegrees; }
+                    JoystickValueLastFrameR = 0f;
+                    CompareAngleLastFrameR = Vector3.up;
+                }
+                WheelGripLastFrameR = true;
+                //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
+                Quaternion JoystickDifference;
+                JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation
+                    * Quaternion.Inverse(JoystickZeroPointR)
+                    * ControlsRoot.rotation;
+
+                Vector3 JoystickPosYaw = (JoystickDifference * Vector3.up);
+                Vector3 CompareAngle = Vector3.ProjectOnPlane(JoystickPosYaw, Vector3.forward);
+                JoyStickValueR += (Vector3.SignedAngle(CompareAngleLastFrameR, CompareAngle, Vector3.forward));
+                CompareAngleLastFrameR = CompareAngle;
+                JoystickValueLastFrameR = JoyStickValueR;
+                VRJoystickPosR = JoyStickValueR / SteeringWheelDegrees;
+            }
+            else
+            {
+                VRJoystickPosR = 0f;
+                if (WheelGripLastFrameR)//first frame you let go of wheel
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedR");
+                    WheelGripLastFrameL = false;
+                    //LHandSteeringWheel hasn't run yet so don't need to do anything else
+                }
+                WheelGripLastFrameR = false;
+            }
+        }
+        void LHandSteeringWheel(float LGrip)
+        {
+            //Toggle gripping the steering wheel if double tap grab
+            bool GrabbingL = LGrip > GripSensitivity;
+            if (GrabbingL)
+            {
+                if (!WheelGrippingLastFrame_toggleL)
+                {
+                    if (Time.time - LastGripTimeL < .25f)
+                    {
+                        WheelGrabToggleL = true;
+                        WheelReleaseCountL = 0;
+                    }
+                    LastGripTimeL = Time.time;
+                }
+                WheelGrippingLastFrame_toggleL = true;
+            }
+            else
+            {
+                if (WheelGrippingLastFrame_toggleL)
+                {
+                    WheelReleaseCountL++;
+                    if (WheelReleaseCountL > 1)
+                    {
+                        WheelGrabToggleL = false;
+                    }
+                }
+                WheelGrippingLastFrame_toggleL = false;
+            }
+            //VR SteeringWheel
+            if (GrabbingL || WheelGrabToggleL)
+            {
+                HandsOnWheel++;
+                Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrameL);//difference in vehicle's rotation since last frame
+                VehicleRotLastFrameL = ControlsRoot.rotation;
+                JoystickZeroPointL = VehicleRotDif * JoystickZeroPointL;//zero point rotates with the vehicle so it appears still to the pilot
+                if (!WheelGripLastFrameL)//first frame you gripped joystick
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_WheelGrabbedL");
+                    VehicleRotDif = Quaternion.identity;
+                    JoystickZeroPointL = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation;
+                    if (Drift_AutoSteer) { JoyStickValueL = 0; }
+                    else { JoyStickValueL = -YawInput * SteeringWheelDegrees; }
+                    JoystickValueLastFrameL = 0f;
+                    CompareAngleLastFrameL = Vector3.up;
+                }
+                WheelGripLastFrameL = true;
+                //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPointL
+                Quaternion JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation
+                   * Quaternion.Inverse(JoystickZeroPointL)
+                    * ControlsRoot.rotation;
+
+                Vector3 JoystickPosYaw = (JoystickDifference * Vector3.up);
+                Vector3 CompareAngle = Vector3.ProjectOnPlane(JoystickPosYaw, Vector3.forward);
+                JoyStickValueL += (Vector3.SignedAngle(CompareAngleLastFrameL, CompareAngle, Vector3.forward));
+                CompareAngleLastFrameL = CompareAngle;
+                JoystickValueLastFrameL = JoyStickValueL;
+                VRJoystickPosL = JoyStickValueL / SteeringWheelDegrees;
+            }
+            else
+            {
+                VRJoystickPosL = 0f;
+                if (WheelGripLastFrameL)//first frame you let go of wheel
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedL");
+                    if (WheelGripLastFrameR)
+                    {
+                        WheelGripLastFrameR = false;
+                        //regrab the right hand to stop the wheel position teleporting
+                        RHandSteeringWheel(Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger"));
+                        HandsOnWheel--;//remove one because we ran R twice
+                    }
+                }
+                WheelGripLastFrameL = false;
             }
         }
     }
