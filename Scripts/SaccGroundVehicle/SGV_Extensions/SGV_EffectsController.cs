@@ -123,32 +123,32 @@ namespace SaccFlightAndVehicles
             SmallCrashPos = new Vector3[SmallCrash.Length];
             for (int i = 0; i < SmallCrashPos.Length; i++)
             {
-                SmallCrashPos[i] = SmallCrash[i].transform.position;
+                SmallCrashPos[i] = SmallCrash[i].transform.localPosition;
             }
             SmallCrashInsidePos = new Vector3[SmallCrashInside.Length];
             for (int i = 0; i < SmallCrashInsidePos.Length; i++)
             {
-                SmallCrashInsidePos[i] = SmallCrashInside[i].transform.position;
+                SmallCrashInsidePos[i] = SmallCrashInside[i].transform.localPosition;
             }
             MediumCrashPos = new Vector3[MediumCrash.Length];
             for (int i = 0; i < MediumCrashPos.Length; i++)
             {
-                MediumCrashPos[i] = MediumCrash[i].transform.position;
+                MediumCrashPos[i] = MediumCrash[i].transform.localPosition;
             }
             MediumCrashInsidePos = new Vector3[MediumCrashInside.Length];
             for (int i = 0; i < MediumCrashInsidePos.Length; i++)
             {
-                MediumCrashInsidePos[i] = MediumCrashInside[i].transform.position;
+                MediumCrashInsidePos[i] = MediumCrashInside[i].transform.localPosition;
             }
             BigCrashPos = new Vector3[BigCrash.Length];
             for (int i = 0; i < BigCrashPos.Length; i++)
             {
-                BigCrashPos[i] = BigCrash[i].transform.position;
+                BigCrashPos[i] = BigCrash[i].transform.localPosition;
             }
             BigCrashInsidePos = new Vector3[BigCrashInside.Length];
             for (int i = 0; i < BigCrashInsidePos.Length; i++)
             {
-                BigCrashInsidePos[i] = BigCrashInside[i].transform.position;
+                BigCrashInsidePos[i] = BigCrashInside[i].transform.localPosition;
             }
 
 
@@ -364,7 +364,7 @@ namespace SaccFlightAndVehicles
                 if (IsOwner)
                 { SmallCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
-                { SmallCrashInside[rand].transform.position = SmallCrashInsidePos[rand]; }
+                { if (EntityControl.LastCollisionEnter != null) { SmallCrashInside[rand].transform.localPosition = SmallCrashInsidePos[rand]; } }
                 SmallCrashInside[rand].PlayOneShot(SmallCrashInside[rand].clip);
             }
             else
@@ -375,7 +375,7 @@ namespace SaccFlightAndVehicles
                 if (IsOwner)
                 { SmallCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
-                { SmallCrash[rand].transform.position = SmallCrashPos[rand]; }
+                { if (EntityControl.LastCollisionEnter != null) { SmallCrash[rand].transform.localPosition = SmallCrashPos[rand]; } }
                 SmallCrash[rand].PlayOneShot(SmallCrash[rand].clip);
             }
         }
@@ -389,7 +389,7 @@ namespace SaccFlightAndVehicles
                 if (IsOwner)
                 { MediumCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
-                { MediumCrashInside[rand].transform.position = MediumCrashInsidePos[rand]; }
+                { if (EntityControl.LastCollisionEnter != null) { MediumCrashInside[rand].transform.localPosition = MediumCrashInsidePos[rand]; } }
                 MediumCrashInside[rand].PlayOneShot(MediumCrashInside[rand].clip);
             }
             else
@@ -400,7 +400,7 @@ namespace SaccFlightAndVehicles
                 if (IsOwner)
                 { MediumCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
-                { MediumCrash[rand].transform.position = MediumCrashPos[rand]; }
+                { if (EntityControl.LastCollisionEnter != null) { MediumCrash[rand].transform.localPosition = MediumCrashPos[rand]; } }
                 MediumCrash[rand].PlayOneShot(MediumCrash[rand].clip);
             }
         }
@@ -414,7 +414,7 @@ namespace SaccFlightAndVehicles
                 if (IsOwner)
                 { BigCrashInside[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
-                { BigCrashInside[rand].transform.position = BigCrashInsidePos[rand]; }
+                { if (EntityControl.LastCollisionEnter != null) { BigCrashInside[rand].transform.localPosition = BigCrashInsidePos[rand]; } }
                 BigCrashInside[rand].PlayOneShot(BigCrashInside[rand].clip);
             }
             else
@@ -425,7 +425,7 @@ namespace SaccFlightAndVehicles
                 if (IsOwner)
                 { BigCrash[rand].transform.position = EntityControl.LastCollisionEnter.GetContact(0).point; }
                 else
-                { BigCrash[rand].transform.position = BigCrashPos[rand]; }
+                { if (EntityControl.LastCollisionEnter != null) { BigCrash[rand].transform.localPosition = BigCrashPos[rand]; } }
                 BigCrash[rand].PlayOneShot(BigCrash[rand].clip);
             }
         }

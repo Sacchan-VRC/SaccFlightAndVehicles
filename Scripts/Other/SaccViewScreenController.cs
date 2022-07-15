@@ -138,8 +138,10 @@ namespace SaccFlightAndVehicles
                     if (Vector3.Distance(localPlayer.GetPosition(), transform.position) > DisableDistance)
                     {
                         TurnOff();
+                        return;
                     }
                 }
+                UpdateChannelText();
                 SendCustomEventDelayedSeconds(nameof(ActiveUpdate), .3f);
             }
         }

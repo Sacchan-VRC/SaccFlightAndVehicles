@@ -180,28 +180,36 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_WheelDroppedR()
         {
             WheelHeldR = false;
-            if (!WheelHeldL && !Grounded)
+            if (!WheelHeldL)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableJoystick));
+                WheelHeld = false;
+                if (!Grounded)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableJoystick));
+                }
             }
         }
         public void SFEXT_O_WheelDroppedL()
         {
             WheelHeldL = false;
-            if (!WheelHeldR && !Grounded)
+            if (!WheelHeldR)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableJoystick));
+                WheelHeld = false;
+                if (!Grounded)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableJoystick));
+                }
             }
         }
         public void SFEXT_O_WheelGrabbedR()
         {
             WheelHeldR = true;
-            if (WheelHeldL) { WheelHeld = true; }
+            WheelHeld = true;
         }
         public void SFEXT_O_WheelGrabbedL()
         {
             WheelHeldL = true;
-            if (WheelHeldR) { WheelHeld = true; }
+            WheelHeld = true;
         }
         public void SFEXT_G_Explode()
         {
