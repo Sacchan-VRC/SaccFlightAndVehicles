@@ -1,12 +1,25 @@
 ﻿Sacchan's Flight and Vehicles Prefab
-FOR VRChat SDK3 WITH UDONSHARP: https://github.com/Merlin-san/UdonSharp/releases
-Usage instructions below changelog
+FOR VRChat SDK3 WITH UDONSHARP: USE VRC'S CREATOR COMPANION APP TO CREATE YOUR PROJECT
+Usage instructions are below changelog.
 
 Contact:
 https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
-Support:
+Please support me if you like this project:
 https://ko-fi.com/sacchanvrc
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Large Update 1.6
+Added ground vehicle code and 3 car prefabs
+Added some editor scripts to make life a bit easier
+New vehicle menu
+Small improvements to syncscript smoothness
+Can now turn full 180 degrees in desktop mode while in vehicles
+New vehicle guide
+Now possible to set gun damage
+A lot of missle code updates: notching, mimicing FOX-1-2-3 now possible
+Vehicles can now stay 'on' after exiting if 'Auto Engine Start' is disabled
+Weapons now use object pools
+-Hundreds of small fixes and updates
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Small Update 1.51
 Stopped using reserved2 layer (planes falling through floor)
@@ -228,50 +241,44 @@ Implemented (unrealistic) increased lift at higher speeds, you can now fall down
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-1.51 update stuff:
-The most important change from 1.5 to 1.51 is that the OnboardVehicleLayer has changed from 19 to 31 due to VRChat update changing layer 19. Vehicles set to 19 will fall into to the ground when entered.
-The weapon prefabs hierarchys have been updated to make them a little easier to customize (animations have changed to match), and the splash particle system has been added.
-The missile animator now has 2 layers, one for exploding, and one for changing active particle system if it hit land or water
-The 'Move origin to CoM' feature moves the SaccEntity object to the position of the CoM, and moves all of it's first children the oposite amount. DO NOT ANIMATE POSITION OF THE FIRST CHILDREN. IT WILL BRAKE.
-SC-1 had a first child animated in 1.5. I just added an extra empty and animated the child of that (and updated the animation references).
+1.6 Known Issues:
+The SaccWheel is not completely framerate dependant. Playing with a higher FixedUpdate rate will cause your vehicle to accelerate a bit faster. FixedUpdate rate is based on the VR headset's refresh rate.
+Racing with 90hz against someone with 144hz is not a fair race.
+This will be a high priority to fix for 1.61.
 
-Version 1.5 has the largest changes of any update so far. I intentionally disregarded compatability/ease of update in order to modularize and improve functionality as much as possible.
-Updating old projects with custom vehicles will be a challenge. Old animations can be reused but may require some adjustments.
-To upgrade old vehicles, i recommend just remaking them. Re-make the animator by copying it from the prefab again and re-add your animations to it.
-A number of layers have been removed from the animator and are now done in code.
-#Flares (as they are now launched per-click in code)
-#DisplaySmoke (it's a simple particle system that is more efficient to toggle in code)
-#TrailsGs (Trails are now done in an array in effectscontroller)
-#GunAmmo (now done in dfunc code)
+Migrating a 1.51 project to 1.6 info:
+For coders: Now using namespace SaccFlightAndVehicles.
+For the most part, things should work after just replacing the package.
+If your project is not currently using VRC Creator Companion, you should update to it.
+However, it seems that there are currently major issues with UdonSharp's handling of prefabs (Version 1.0.1). They will hopefully be fixed soon, check your UdonSharp version in Creator Companion.
+If you can't get things to work, try re-saving or breaking your prefabs.
 
-Modularization:
-EngineController has been renamed to SaccAirVehicle, it and many things it did are now modular scripts
-HitDetector is now named SaccEntity, and acts as the central object which contains references and sends events to all modular scripts, as well as handles the function dials
-Function dial functions are now each their own script, each referenced by SaccEntity.
-Modular scripts that use the event system must be referenced in the SaccEntity's 'Extension Udon Behaviours' array. Function dial scripts are also sent events.
-The SaccEntity also sends events related to being picked up, so can be used to make handheld weapons, the SaccStinger is an example of this.
-
-The extension scripts i've written for SaccAirVehicle(SAV_EffectsController, SAV_SoundController) are modular, it's possible to duplicate them, and add your own code to them.
-The same is true for SaccAirVehicle. The one caveat being that the AAM Function will not be able to read the target's variables(grounded, etc) if targeting a modified script because it only looks for SaccAirVehicle presently. Waiting for UdonSharp updates to fix this.
-
-Some new modular scripts:
+Explanation of some scripts:
+SaccEntity:
+Main object script, sends events, has rigidbody on it.
+SaccAirVehicle/SaccSeaVehicle/SaccGroundVehicle:
+Main vehicle control scripts
+SAV_EffectsController/SAV_SoundController:
+Visual effects and audio effects for SaccAirVehicle
+SGV_EffectsController:
+Both visual effects and audio effects for SaccGroundVehicle
+SaccWheel:
+Wheel physics AND effects+sounds for the wheel
 WaterTrigger:
 Tells the vehicle when it enters and leaves water
 SyncScript:
-The new position sync script
+The custom position sync script
 KillTracker:
 Not required, used to make the KillsBoard work. Can be used without the killboard if you want to use the events that it sends for something else.
 
 Function dials:
 SaccEntity has 2 arrays, one for left dial functions, and right dial functions.
-Any number of functions can be placed in each array. The code divides the dial up automatically for selection. (Not visually, just for control input)
-The order they are input into that array is the order they'll work on the dial, clockwise. First function is in straight up, unless the 'Left/RightDialDivideStraightUp' is ticked, in which case it's to the right of straight up. Look at the difference between the left and right dials in the SF-1 for an example of the difference.
+Any number of functions can be placed in each array. The code divides the dial up automatically for selection. (Not visually, just for control input, you must make the visuals yourself)
+The order they are input into that array is the order they'll work on the dial, clockwise. (First function is in straight up, unless the 'Left/RightDialDivideStraightUp' is ticked, in which case it's to the right of straight up. The ST-Baron's function dial uses this, if you need an example, the StickDisplay mesh is rotated negatively by half of a function)
 The visuals of the function dial must be set up manually. Look at the dials in the vehicle prefabs in order to understand how.
 The MFD.fbx file containts 12 divider meshes for function dials for dials with those number of functions. Named StickDisplay2-12 (the old default, 8, is just named 'StickDisplay')
 Function dial scripts contain a 'funcon' (function on) reference if they are toggles. It's the mesh that appears to highlight the function on the dial when it's enabled.
 To set the 'funcon' rotations, you can type '360/7' for example, into its Z rotation(if you have 7 functions). Then multiply the result by the dial position -1, then multiply by -1.
-
-The 'Respawn' animation is no longer needed as respawning is handled by delayed events rather than events triggered through an animation.
 
 Due to the new custom position syncing script, more network data is being used, and the maximum limit for number of vehicles has decreased.
 The limit is around 12 with default settings, probably more if you increase Update Interval.
@@ -281,22 +288,18 @@ https://github.com/esnya/EsnyaSFAddons
 ================================================================================================================
 
 Inside the /Prefabs folder are individual prefabs for each vehicle, you can place them and they should work right away.
-
-I recommend using CyanEmu to test things inside of Unity editor.
-
-If your udon object's references are missing in a new project, make sure you have used the VRC SDK control panel to set up the project settings for VRC.
-
 Open the example scene 'SaccFlightExample.unity' to see an example of vehicles set up to work with the Killsboard and racing scripts.
 
 Race set up:
-There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object, you can remove this if you don't intend to use it. It should be disabled by default, it's enabled when a race is selected with the racebutton.
-The RaceToggleButton has a list of SaccRaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tell the racingtriggers to switch to the selected race.
-You must place a reference to every Race, and RacingTrigger(for each plane) inside the RaceToggleButton.
+There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object, It should be disabled by default, it's enabled when a race is selected with the racebutton.
+The RaceToggleButton has a list of SaccRaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tells all racingtriggers to switch to the selected race.
+You must place a reference to every Race, inside the RaceToggleButton.
 Each race has its own script called SaccRaceCourseAndScoreBoard. This contains references for its race's checkpoints, and has text objects for displaying the times.
 The RacingTrigger detects checkpoints, tracks your time, and sends your time to the SaccRaceCourseAndScoreBoard script for the selected race when you finish.
+Race checkpoints have an animation that enables guidance objects when the checkpoint is next or after next.
 
 Killsboard set up:
-Place the killboard anywhere in the world, and drag it into each plane's Killtracker's Kills Board slot
+Place the killboard anywhere in the world, each vehicle that uses it must have its own SAV_KillTracker, referenced in it's SaccEntity's Extension Udon Behaviours list.
 
 Some of the animations use the 'Motion Time' feature (formerly 'Normalized Time'), which makes the animation be controlled by a float parameter (which is controlled by effectscontroller).
 float value 1(or more) = play the last frame of the animation
@@ -308,18 +311,11 @@ This variable can be used to do other things like F-14 wings moving back at a ce
 
 The angle of attack variable is 0 at 0 AoA, and 1 at 180.
 
-In Unity play mode without CyanEmu, (and on the VRC Upload screen after build), all vehicles will be controlled at the same time.
-You can test fly the vehicles by adding a camera to them. Recommend adding camera as child of the TargetEyeHeight of the PilotSeat.
-You can test buttons by clicking Interact in the inspector with the object selected(VehicleRespawner etc), some may crash when tested in the editor.
-You can also test the animator variables, but some are set every frame so you won't be able to change them without disabling the script.
-To test the gun damage to planes/objects in editor, you must enable the Gun_pilot object, as it's disabled by default (The Interact button on the pilotseat also enables it)
-However, it wont hit any other vehicles because they are all set to the onboard vehicle layer because you're controlling them all. I recommend using CyanEmu to test weapons.
-As all vehicles will react to inputs in the editor play mode. I recommend disabling vehicles that you aren't testing.
-The 'SaccFlight' script will always crash when testing in editor, because it's looking for the VRChat player. This doesnt matter.
-
+In Unity play mode testing using ClientSim, The SaccFlight script will cause your player to have 0 gravity (ClientSim bug). Just look straight down and hold F to fly down.
 
 Making your own vehicles:
 
+Aircraft:
 When making a new vehicle, place the prefab that is closest in type to your desired vehicle and Unpack Prefab. Now your objective is to replace the mesh object (PlaneBody on the SF-1) completely.
 I recommend just disabling it at first(delete it once you're done using it as a reference), and placing your mesh next to it on the hierarchy. The first thing you should do is set the VehicleMesh to your new mesh in the SaccAirVehicle script.
 Next add colliders to your mesh(or armature), any collider types are fine. If your vehicle has wheels, i recommend copying the wheel colliders from the SF-1, and adjusting the size to fit your wheels.
@@ -399,8 +395,46 @@ AGMs--------
 Bombs--------
 These 3 objects just contain meshes to visually represent how many missiles etc you have left. Controlled by the animator.
 
+Cars:
+Place the car prefab that matches closest with the car you want to create. You need to replace the mesh, animations, update the references and move everything into position.
+Break the prefab completely, and place your new vehicle's mesh above the current mesh object. Set the position and rotation of the new mesh to 0,0,0, set Y rotation to match the original vehicle if necessary.
+Disable the original vehicle mesh for now, we will copy some stuff from it soon.
+Add collder to your new mesh, and modify it to fit. Any number of colliders is fine, but you cannot use mesh colliders that are not set to Convex.
+Set mesh's main object to the Walkthrough layer (17)
+The next step is to set up the wheels, which require a specific rig setup to work.
+The hierarchy is as follows: The main wheel transform must be at the bottom of the tire, where it touches the ground, It should have a child that contains the mesh of the wheel.
+The main wheel's transform orientation should be as follows: With 'Pivot' and 'Local' transform options selected, and the move tool selected, The blue arrow should point towards the front of the car, red to the right, and green up.
+With this set up, the wheel's position you see in the editor will be the fully compressed suspension position. The ST-Baron is set up a bit weird because it was the first vehicle I created.
+Copy the wheel script from the original car, and paste it on to each of your wheel's main transforms, (front and back wheel settings are usually a bit different, so you can copy the back to the back, and the front to the front)
+Set each wheel's Wheel Point transform input to it's own gameobject, and Wheel Visual to the child object that contains the wheel mesh.
+Move the gameobjects named SkidAudio_Tarmac, SkidAudio_Grass, SkidParticle_Tarmac, SkidParticle_Grass from the original mesh's wheels into each of your wheels, and make sure the references for them are set up in the 'Surface Type_Skid Sounds', and the 'Surface Type_Skid Particles' arrays.
+You can now delete the original mesh object.
+In the SaccGroundVehicle Object, update the references for:
+Vehicle Mesh -> The mesh object you placed to replace the original
+Main Object Renderer -> Place the largest Mesh renderer/SkinnedMeshRenderer on your new mesh in this slot
+Drive Wheels -> Put all wheels that are used to accelerate the car in here, usually the back wheels.
+Steer Wheels -> Put all the wheels used for steering in here
+Other Wheels -> Put in any other wheels
+The functions for brake and handbrake also need to reference the wheels that they used. Go to DialFunctions/L/DFUNC_Brake and DFUNC_HandBrake and fix the missing references in the 'Brake Wheels_Front' and 'Brake Wheels_Back' arrays.
+In each Wheel script, set the wheel radius to match your car's wheels. You can experiment with suspension values too. I recommend doing so in play mode. Make sure you're sitting in the driver seat so that the physics doesn't fall asleep.
+Move the CoM object to where the center of mass for your new vehicle should be.
+If you test your vehicle now it should be able to drive forward, but the suspension may be strange, and it won't be able to steer.
+Steering is done through an animation. Duplicate the original vehicle's Animations folder and move it into your own folder.
+Rename the animation controller in that folder to the name of your vehicle, and apply it to your vehicle's animator (it's on the vehicle's main object, same object as the rigidbody).
+Go through each layer of the animator and replace each of the animation node's animations with the duplicates
+Go through each of the animations and set them up with your new mesh. Refer to the original prefabs to see how they should be. The 'SteeringWheel' animation contains the movement of the steeringwheel and wheels.
+Go through the whole hierarchy of the vehicle, and move everything to match the position of the new mesh. The eye position of seats is the 'TargetHeight' child object.
+
+
+
+Info about surface types for SaccWheel scripts:
+There's and array called 'Surface Type_Grips' with 10 entries. The object that the wheel is touching's name is checked,
+and if it ends with a number, that number becomes the new surface type.
+The grip of the wheel is multiplied by the corresponding element in this array, and the corresponding elements from the skid particles and sounds array are used for skids.
+
+
 Custom Layers:
-Plane colliders must be set to Walkthrough layer in order to be targeted by AAMs. (Raycast looks for this layer)
+Vehicle colliders must be set to Walkthrough layer in order to be targeted by AAMs. (Raycast looks for this layer)
 Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
 As layers can't be imported in a unitypackage you must set them up yourself.
 References to the layers will be retained and will work, but they will appear blank until named in Unity. Layers are as follows
@@ -412,6 +446,7 @@ References to the layers will be retained and will work, but they will appear bl
 28:Racing
 The trigger objects that you may need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of SaccAirVehicle(If it's not, it will not be treated like a vehicle(untargetable on ground etc).
 Note that the AAMTarget object on a plane MUST be a first child of the SaccAirVehicle object, or the code to play the radar lock warning tone will fail.
+
 
 This package also contains a few prefabs that can be used with the vehicles. Explanations follow.
 

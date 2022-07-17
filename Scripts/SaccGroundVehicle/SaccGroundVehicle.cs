@@ -13,12 +13,12 @@ namespace SaccFlightAndVehicles
         public SaccEntity EntityControl;
         [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
         public Transform VehicleMesh;
+        [Tooltip("Largest renderer on the vehicle, for optimization purposes, checking if visible")]
+        public Renderer MainObjectRenderer;
         [Tooltip("Change all children of VehicleMesh, or just the objects with colliders?")]
         public bool OnlyChangeColliders = false;
         [Tooltip("Layer to set the VehicleMesh and it's children to when entering vehicle")]
         public int OnboardVehicleLayer = 31;
-        [Tooltip("Largest renderer on the vehicle, for optimization purposes, checking if visible")]
-        public Renderer MainObjectRenderer;
         [UdonSynced] public float Health = 73f;
         public Animator VehicleAnimator;
         [System.NonSerialized] public Transform VehicleTransform;
@@ -141,7 +141,7 @@ namespace SaccFlightAndVehicles
         [Header("Debug")]
         [UdonSynced(UdonSyncMode.Linear)] public float Revs;
         public float Clutch;
-        private int VehicleLayer;
+        [System.NonSerialized] public int OutsideVehicleLayer;
         public bool EnableLeaning = false;
         public float RevLimiterDelay = .04f;
         private float ThrottleNormalizer;
@@ -256,7 +256,7 @@ namespace SaccFlightAndVehicles
             FullHealth = Health;
             FullFuel = Fuel;
 
-            VehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
+            OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
 
             IsOwner = EntityControl.IsOwner;
             SetWheelIsOwner();
@@ -287,6 +287,7 @@ namespace SaccFlightAndVehicles
             Initialized = true;
             VehicleRigidbody = EntityControl.gameObject.GetComponent<Rigidbody>();
             VehicleTransform = EntityControl.transform;
+            OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
         }
         private void Start()// awake function when
         {
@@ -861,7 +862,7 @@ namespace SaccFlightAndVehicles
             {
                 DriveWheels[i].SetProgramVariable("EngineRevs", 0f);
             }
-            SetCollidersLayer(VehicleLayer);
+            SetCollidersLayer(OutsideVehicleLayer);
             localPlayer.SetVelocity(CurrentVel);
         }
         public void SFEXT_P_PassengerEnter()
@@ -873,7 +874,7 @@ namespace SaccFlightAndVehicles
         {
             Passenger = false;
             localPlayer.SetVelocity(CurrentVel);
-            SetCollidersLayer(VehicleLayer);
+            SetCollidersLayer(OutsideVehicleLayer);
         }
         public void SFEXT_G_PassengerEnter()
         {

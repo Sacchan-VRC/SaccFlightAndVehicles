@@ -49,7 +49,6 @@ namespace SaccFlightAndVehicles
         private float RevLimiter;
         private bool Selected = false;
         private bool Piloting = false;
-        private bool InVehicle = false;
         private bool boostingLast = false;
         private bool UseLeftTrigger = false;
         private bool ApplyBoostForce = false;
@@ -177,7 +176,6 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
-            InVehicle = true;
         }
         public void SFEXT_G_PilotExit()
         {
@@ -190,15 +188,6 @@ namespace SaccFlightAndVehicles
         {
             Piloting = false;
             Selected = false;
-            InVehicle = false;
-        }
-        public void SFEXT_L_PassengerEnter()
-        {
-            InVehicle = true;
-        }
-        public void SFEXT_L_PassengerExit()
-        {
-            InVehicle = false;
         }
         private void FixedUpdate()
         {

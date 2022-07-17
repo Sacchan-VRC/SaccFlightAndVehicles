@@ -139,7 +139,14 @@ namespace SaccFlightAndVehicles
                     }
                     if (breakNow) { break; }
                 }
-                se.AAMTargets = Targets.ToArray();
+                if (Targets.Count > 0)
+                { se.AAMTargets = Targets.ToArray(); }
+                else
+                {
+                    //prevent null errors if there's only 1 vehicle in the scene by putting an object in the array
+                    se.AAMTargets = new GameObject[1];
+                    se.AAMTargets[0] = se.transform.root.gameObject;
+                }
                 PrefabUtility.RecordPrefabInstancePropertyModifications(se);
                 EditorUtility.SetDirty(se);
             }

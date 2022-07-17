@@ -191,8 +191,11 @@ namespace SaccFlightAndVehicles
             if (AAMIdle) { AAMIdle.gameObject.SetActive(false); }
             if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
             if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
-            AAMTargetIndicator.gameObject.SetActive(false);
-            AAMTargetIndicator.localRotation = Quaternion.identity;
+            if (AAMTargetIndicator)
+            {
+                AAMTargetIndicator.gameObject.SetActive(false);
+                AAMTargetIndicator.localRotation = Quaternion.identity;
+            }
         }
         public void SFEXT_P_PassengerEnter()
         {
@@ -236,7 +239,7 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Selected()
         {
             func_active = true;
-            AAMTargetIndicator.gameObject.SetActive(true);
+            if (AAMTargetIndicator) { AAMTargetIndicator.gameObject.SetActive(true); }
 
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -250,9 +253,12 @@ namespace SaccFlightAndVehicles
             AAMLockTimer = 0;
             AAMHasTarget = false;
             AAMLocked = false;
-            AAMTargetIndicator.localRotation = Quaternion.identity;
-            AAMTargetIndicator.localScale = Vector3.one;
-            AAMTargetIndicator.gameObject.SetActive(false);
+            if (AAMTargetIndicator)
+            {
+                AAMTargetIndicator.localRotation = Quaternion.identity;
+                AAMTargetIndicator.localScale = Vector3.one;
+                AAMTargetIndicator.gameObject.SetActive(false);
+            }
             func_active = false;
 
             if (DoAnimBool && AnimOn)
@@ -345,12 +351,14 @@ namespace SaccFlightAndVehicles
         private Vector3 AAMCurrentTargetDirection;
         private float AAMTargetedTimer = 2;
         private float AAMTargetObscuredDelay;
-        /* everywhere that GetComponent<SaccAirVehicle>() is used should be changed to UdonBehaviour for modularity's sake,
+        //public Transform TARGETDEBUG;
+        /* everywhere that GetComponent<SaccAirVehicle>() is used should be changed to UdonSharpBehaviour for modularity's sake,
         but it seems that it's impossible until further udon/sharp updates, because it currently doesn't support checking if a variable exists before trying to get it */
         private void FixedUpdate()//old AAMTargeting function
         {
             if (func_active)
             {
+                //TARGETDEBUG.position = AAMTargets[AAMTarget].transform.position;
                 float DeltaTime = Time.fixedDeltaTime;
                 var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                 Vector3 HudControlPosition = HUDControl ? HUDControl.transform.position : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
@@ -380,12 +388,15 @@ namespace SaccFlightAndVehicles
                         //raycast to check if it's behind something
                         bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
 
-                        /*                 Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
-                                        if (hitnext.collider != null) Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsidePlaneLayer)));
-                                        if (hitnext.collider != null) Debug.Log(string.Concat("RayCastLayer_next ", hitnext.collider.gameObject.layer));
-                                        Debug.Log(string.Concat("LowerAngle_next ", NextTargetAngle < AAMCurrentTargetAngle));
-                                        Debug.Log(string.Concat("InAngle_next ", NextTargetAngle < 70));
-                                        Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
+                        /*                         Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
+                                                if (hitnext.collider)
+                                                {
+                                                    Debug.Log(string.Concat("RayCastCorrectLayer_next ", (hitnext.collider.gameObject.layer == OutsideVehicleLayer)));
+                                                    Debug.Log(string.Concat("RayCastLayer_next ", hitnext.collider.gameObject.layer));
+                                                }
+                                                Debug.Log(string.Concat("LowerAngle_next ", NextTargetAngle < AAMCurrentTargetAngle));
+                                                Debug.Log(string.Concat("InAngle_next ", NextTargetAngle < 70));
+                                                Debug.Log(string.Concat("BelowMaxDist_next ", NextTargetDistance < AAMMaxTargetDistance)); */
 
                         if (LineOfSightNext
                             && hitnext.collider && hitnext.collider.gameObject.layer == OutsideVehicleLayer //did raycast hit an object on the layer planes are on?
@@ -477,18 +488,18 @@ namespace SaccFlightAndVehicles
                     AAMLockTimer = 0;
                     AAMHasTarget = false;
                 }
-                /*         if (HUDControl.gameObject.activeInHierarchy)
-                        {
-                            Debug.Log(string.Concat("AAMTarget ", AAMTarget));
-                            Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
-                            Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
-                            Debug.Log(string.Concat("LoS ", LineOfSightCur));
-                            Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsidePlaneLayer)));
-                            Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
-                            Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
-                            Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < Lock_Angle));
-                            Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance));
-                        } */
+                /*                 Debug.Log(string.Concat("AAMTarget ", AAMTarget));
+                                Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
+                                Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
+                                Debug.Log(string.Concat("LoS ", LineOfSightCur));
+                                if (hitcurrent.collider)
+                                {
+                                    Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsideVehicleLayer)));
+                                    Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
+                                }
+                                Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
+                                Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < AAMLockAngle));
+                                Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance)); */
             }
         }
 
@@ -501,21 +512,24 @@ namespace SaccFlightAndVehicles
         private void Hud()
         {
             //AAM Target Indicator
-            if (AAMHasTarget)//GUN or AAM
+            if (AAMTargetIndicator)
             {
-                AAMTargetIndicator.localScale = Vector3.one;
-                AAMTargetIndicator.position = (HUDControl ? HUDControl.transform.position : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) + AAMCurrentTargetDirection;
-                AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
-                if (AAMLocked)
+                if (AAMHasTarget)
                 {
-                    AAMTargetIndicator.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));//back of mesh is locked version
+                    AAMTargetIndicator.localScale = Vector3.one;
+                    AAMTargetIndicator.position = (HUDControl ? HUDControl.transform.position : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) + AAMCurrentTargetDirection;
+                    AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
+                    if (AAMLocked)
+                    {
+                        AAMTargetIndicator.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));//back of mesh is locked version
+                    }
+                    else
+                    {
+                        AAMTargetIndicator.localRotation = Quaternion.identity;
+                    }
                 }
-                else
-                {
-                    AAMTargetIndicator.localRotation = Quaternion.identity;
-                }
+                else AAMTargetIndicator.localScale = Vector3.zero;
             }
-            else AAMTargetIndicator.localScale = Vector3.zero;
             /////////////////
         }
         public void LaunchAAM()

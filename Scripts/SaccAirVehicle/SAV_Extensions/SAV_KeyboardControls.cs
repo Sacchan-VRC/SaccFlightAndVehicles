@@ -9,7 +9,8 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SAV_KeyboardControls : UdonSharpBehaviour
     {
-        [Header("Some functions may have their own keyboard controls options.")]
+        [Header("It doesn't matter which slot you put stuff in, L/R/numbers are just for organization")]
+        [Header("Some functions may have their own keyboard control options.")]
         public UdonSharpBehaviour Lfunc1;
         public KeyCode Lfunc1key;
         public UdonSharpBehaviour Lfunc2;
@@ -26,6 +27,10 @@ namespace SaccFlightAndVehicles
         public KeyCode Lfunc7key;
         public UdonSharpBehaviour Lfunc8;
         public KeyCode Lfunc8key;
+        public UdonSharpBehaviour Lfunc9;
+        public KeyCode Lfunc9key;
+        public UdonSharpBehaviour Lfunc10;
+        public KeyCode Lfunc10key;
         public UdonSharpBehaviour Rfunc1;
         public KeyCode Rfunc1key;
         public UdonSharpBehaviour Rfunc2;
@@ -42,6 +47,10 @@ namespace SaccFlightAndVehicles
         public KeyCode Rfunc7key;
         public UdonSharpBehaviour Rfunc8;
         public KeyCode Rfunc8key;
+        public UdonSharpBehaviour Rfunc9;
+        public KeyCode Rfunc9key;
+        public UdonSharpBehaviour Rfunc10;
+        public KeyCode Rfunc10key;
         private string KeyboardInput = "KeyboardInput";
         private float VTOLAngleDivider;
         void Update()
@@ -78,6 +87,14 @@ namespace SaccFlightAndVehicles
             {
                 if (Lfunc8) Lfunc8.SendCustomEvent(KeyboardInput);
             }
+            if (Input.GetKeyDown(Lfunc9key))
+            {
+                if (Lfunc9) Lfunc9.SendCustomEvent(KeyboardInput);
+            }
+            if (Input.GetKeyDown(Lfunc10key))
+            {
+                if (Lfunc10) Lfunc10.SendCustomEvent(KeyboardInput);
+            }
 
 
             if (Input.GetKeyDown(Rfunc1key))
@@ -111,6 +128,14 @@ namespace SaccFlightAndVehicles
             if (Input.GetKeyDown(Rfunc8key))
             {
                 if (Rfunc8) Rfunc8.SendCustomEvent(KeyboardInput);
+            }
+            if (Input.GetKeyDown(Rfunc9key))
+            {
+                if (Rfunc9) Rfunc9.SendCustomEvent(KeyboardInput);
+            }
+            if (Input.GetKeyDown(Rfunc10key))
+            {
+                if (Rfunc10) Rfunc10.SendCustomEvent(KeyboardInput);
             }
         }
     }

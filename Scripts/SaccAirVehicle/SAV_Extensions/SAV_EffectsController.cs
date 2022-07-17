@@ -48,7 +48,6 @@ namespace SaccFlightAndVehicles
         private bool DoWheelPose = false;
         private bool Occupied;
         private bool IsOwner;
-        private bool Grounded;
         private bool InVR;
         private bool InEditor = true;
         //animator strings that are sent every frame are converted to int for optimization
@@ -299,12 +298,10 @@ namespace SaccFlightAndVehicles
         {
             VehicleAnimator.SetBool("onground", false);
             VehicleAnimator.SetBool("onwater", false);
-            Grounded = false;
         }
         public void SFEXT_G_TouchDown()
         {
             VehicleAnimator.SetBool("onground", true);
-            Grounded = true;
         }
         public void SFEXT_G_TouchDownWater()
         {

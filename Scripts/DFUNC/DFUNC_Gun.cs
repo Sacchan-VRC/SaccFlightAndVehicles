@@ -33,6 +33,9 @@ namespace SaccFlightAndVehicles
         public string AnimBoolName = "GunSelected";
         [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
         public bool AnimBoolStayTrueOnExit;
+        [Tooltip("Allow gun to fire while vehicle is on the ground?")]
+        public bool AllowFiringGrounded = true;
+        private bool Grounded;
         private SaccEntity EntityControl;
         private float boolToggleTime;
         private bool AnimOn;
@@ -193,7 +196,7 @@ namespace SaccFlightAndVehicles
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                    if ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0)
+                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0))
                     {
                         if (!_firing)
                         {
@@ -205,11 +208,11 @@ namespace SaccFlightAndVehicles
                         GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
                         if (!GunRecoilEmpty)
                         {
-                            VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * Time.smoothDeltaTime, ForceMode.Force);
+                            VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * .01f * Time.deltaTime, ForceMode.Impulse);
                         }
                         else
                         {
-                            VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f/* so the strength is in a similar range as above*/, GunRecoilEmpty.position, ForceMode.Force);
+                            VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f * Time.deltaTime, GunRecoilEmpty.position, ForceMode.Impulse);
                         }
                     }
                     else
@@ -367,9 +370,9 @@ namespace SaccFlightAndVehicles
                         Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance)); */
             }
         }
-
-
-
+        public void SFEXT_G_TouchDown() { Grounded = true; }
+        public void SFEXT_G_TouchDownWater() { Grounded = true; }
+        public void SFEXT_G_TakeOff() { Grounded = false; }
         //hud stuff
         public Transform TargetIndicator;
         public Transform GUNLeadIndicator;

@@ -109,6 +109,12 @@ namespace SaccFlightAndVehicles
         void Start()
         {
             WheelRenderer = (Renderer)SGVControl.GetProgramVariable("MainObjectRenderer");
+            if (!WheelRenderer)
+            {
+                SaccEntity EC = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
+                WheelRenderer = (Renderer)EC.GetComponentInChildren(typeof(Renderer));
+                Debug.LogWarning(EC.gameObject.name + "'s SaccGroundVehicle's 'Main Object Renderer' is not set");
+            }
             WheelDiameter = WheelRadius * 2f;
             WheelCircumference = WheelDiameter * Mathf.PI;
             GearRatio = _GearRatio;

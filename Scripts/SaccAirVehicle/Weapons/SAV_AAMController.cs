@@ -18,7 +18,7 @@ namespace SaccFlightAndVehicles
         public float FlareEffect = 10;
         [Tooltip("For simulating FOX-1/3 missiles")]
         public bool RequireParentLock = false;
-        [Tooltip("For simulating FOX-3. Missile will not require parent vehicle lock after it is closer to target than this distance. Unlike a real FOX-3, it will only chase it's original target in pitbull mode. Meters, 0 for disabled")]
+        [Tooltip("For simulating FOX-3. Missile will not require parent vehicle lock after it is closer to target than this distance. Unlike a real FOX-3, it will only chase it's original target in pitbull mode. Meters. Set to 0 for FOX-1")]
         public float PitBullDistance = 0;
         [Range(0, 180f)]
         [Tooltip("If the missile and target vehicle are facing towards each other, multiply rotation speed by HighAspectRotSpeedMulti with this nose angle (facing perfectly towards each other = 0 degrees, which is the same as disabled) Set 0 for any non-heatseeker missiles")]

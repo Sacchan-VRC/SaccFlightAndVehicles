@@ -10,7 +10,6 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SaccFlightVehicleMenu : UdonSharpBehaviour
     {
-        public SaccEntity[] Vehicles;
         private SaccAirVehicle[] SaccAirVehicles;
         private SaccSeaVehicle[] SaccSeaVehicles;
         private SaccGroundVehicle[] SaccGroundVehicles;
@@ -265,5 +264,8 @@ namespace SaccFlightAndVehicles
             if (PassengerComfortModeToggle) { PassengerComfortModeToggle.isOn = PassengerComfortModeDefault; }
             if (SaccFlight) { SaccFlightStrengthSlider.value = SaccFlightStrengthDefault; }
         }
+        [Header("Debug")]
+        [Tooltip("Automatically filled, use this to check what is in the target list during play mode")]
+        public SaccEntity[] Vehicles;
     }
 }
