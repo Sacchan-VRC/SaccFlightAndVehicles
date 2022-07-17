@@ -14,7 +14,8 @@ namespace SaccFlightAndVehicles
         public Transform ControlsRoot;
         public Transform TurretRotatorHor;
         public Transform TurretRotatorVert;
-        public float TurnSpeedMulti = 6;
+        public float TurnSpeedMultiX = 6;
+        public float TurnSpeedMultiY = 6;
         [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
         public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
         [Tooltip("Lerp rotational inputs by this amount when used in desktop mode so the aim isn't too twitchy")]
@@ -279,8 +280,8 @@ namespace SaccFlightAndVehicles
                 float InputX = Mathf.Clamp((VRPitchYawInput.x + InputXKeyb), -1, 1);
                 float InputY = Mathf.Clamp((VRPitchYawInput.y + InputYKeyb), -1, 1);
 
-                InputX *= TurnSpeedMulti;
-                InputY *= TurnSpeedMulti;
+                InputX *= TurnSpeedMultiX;
+                InputY *= TurnSpeedMultiY;
 
                 RotationSpeedX += -(RotationSpeedX * TurnFriction) + (InputX);
                 RotationSpeedY += -(RotationSpeedY * TurnFriction) + (InputY);
