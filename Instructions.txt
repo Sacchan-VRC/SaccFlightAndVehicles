@@ -249,9 +249,14 @@ This will be a high priority to fix for 1.61.
 Migrating a 1.51 project to 1.6 info:
 For coders: Now using namespace SaccFlightAndVehicles.
 For the most part, things should work after just replacing the package.
-If your project is not currently using VRC Creator Companion, you should update to it.
-However, it seems that there are currently major issues with UdonSharp's handling of prefabs (Version 1.0.1). They will hopefully be fixed soon, check your UdonSharp version in Creator Companion.
-If you can't get things to work, try re-saving or breaking your prefabs.
+If your project is not currently using VRC Creator Companion, you should update to it to get the latest version of UdonSharp.
+It seems that there are currently some issues with UdonSharp's handling of prefabs (Version 1.0.1). They will hopefully be fixed soon, check your UdonSharp version in Creator Companion.
+If your vehicles are losing references when entering play mode, try editing or breaking the prefab.
+
+The SaccFlightMenu.cs editor script now sets up some things automatically when entering play mode, or building the scene. Things like the WindController no longer need you to manually assign all vehicles to them, it's done automatically.
+I have done this with everything that requires simple lists to be filled out, or if there's only one of something in a scene that should be always be used. Things should be a little less fiddly to set up now. I plan to add more editor script stuff in future.
+If you wish to run the code that does that stuff while in the editor, the option SaccFlight->Debug_OnBuild_SetReferences runs the function.
+If you haven't set up a reference camera in your VRCWorld when you try to build the scene, It will be done automatically, matching how it's set up in Test Pilots.
 
 Explanation of some scripts:
 SaccEntity:
@@ -302,8 +307,8 @@ Killsboard set up:
 Place the killboard anywhere in the world, each vehicle that uses it must have its own SAV_KillTracker, referenced in it's SaccEntity's Extension Udon Behaviours list.
 
 Some of the animations use the 'Motion Time' feature (formerly 'Normalized Time'), which makes the animation be controlled by a float parameter (which is controlled by effectscontroller).
-float value 1(or more) = play the last frame of the animation
 float value 0(or less) = play the first frame of the animation
+float value 1(or more) = play the last frame of the animation
 and everything in between accordingly.
 
 The MachVapor for example uses the mach10 variable. This variable = 1 at mach10, and 0 when not moving. The animation is 1000 frames long, and the MachVapor is enabled on frame 97 and disabled on frame 102, which corresponds to transitioning mach1.
@@ -425,18 +430,21 @@ Go through each layer of the animator and replace each of the animation node's a
 Go through each of the animations and set them up with your new mesh. Refer to the original prefabs to see how they should be. The 'SteeringWheel' animation contains the movement of the steeringwheel and wheels.
 Go through the whole hierarchy of the vehicle, and move everything to match the position of the new mesh. The eye position of seats is the 'TargetHeight' child object.
 
-
-
 Info about surface types for SaccWheel scripts:
 There's and array called 'Surface Type_Grips' with 10 entries. The object that the wheel is touching's name is checked,
 and if it ends with a number, that number becomes the new surface type.
 The grip of the wheel is multiplied by the corresponding element in this array, and the corresponding elements from the skid particles and sounds array are used for skids.
 
+How to animate engine pitch:
+In the 'Revs' animation, you will notice that the engine sound's audiosource's X Scale is animated. This is a workaround for setting engine pitch whilst also using doppler.
+The code takes the X scale of the audiosource, applies doppler, then sets it to the pitch of the sound.
+If you wish to blend different engine sounds, it's possible to do it in this animation.
+It's using motion time, so frame 0 = 0 revs, last frame = whatever revs SaccGroundVehicle's 'Rev Limiter' variable is set to.
 
 Custom Layers:
 Vehicle colliders must be set to Walkthrough layer in order to be targeted by AAMs. (Raycast looks for this layer)
 Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
-As layers can't be imported in a unitypackage you must set them up yourself.
+To rename the layers for SaccFlight, there is a menu option under SaccFlight->RenameLayers, clicking it will instantly change the layer names.
 References to the layers will be retained and will work, but they will appear blank until named in Unity. Layers are as follows
 23:Hook Cable
 24:Catapult
@@ -445,7 +453,7 @@ References to the layers will be retained and will work, but they will appear bl
 27:Resupply
 28:Racing
 The trigger objects that you may need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of SaccAirVehicle(If it's not, it will not be treated like a vehicle(untargetable on ground etc).
-Note that the AAMTarget object on a plane MUST be a first child of the SaccAirVehicle object, or the code to play the radar lock warning tone will fail.
+The AAMTarget object on a plane MUST be a first child of the SaccAirVehicle object, or the code to play the radar lock warning tone will fail.
 
 
 This package also contains a few prefabs that can be used with the vehicles. Explanations follow.

@@ -6,7 +6,7 @@ using VRC.Udon;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_CarJump : UdonSharpBehaviour
     {
         public SaccGroundVehicle SGVControl;
@@ -15,6 +15,8 @@ namespace SaccFlightAndVehicles
         public Animator JumpAnimator;
         public float MaxJumpLengthSecs = 0.2f;
         public KeyCode JumpKey;
+        public AudioSource JumpSound;
+        public string AnimatorTriggerName = string.Empty;
         private Rigidbody VehicleRigidBody;
         private Transform VehicleTransform;
         private bool Selected;
@@ -22,6 +24,7 @@ namespace SaccFlightAndVehicles
         private bool UseLeftTrigger;
         private bool TriggerLastFrame;
         private bool Jumping;
+        private bool DoAnimTrigger;
         private float JumpTime;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -30,6 +33,7 @@ namespace SaccFlightAndVehicles
             VehicleRigidBody = (Rigidbody)SGVControl.GetProgramVariable("VehicleRigidbody");
             InVR = (bool)SGVControl.GetProgramVariable("InVR");
             VehicleTransform = VehicleRigidBody.transform;
+            DoAnimTrigger = AnimatorTriggerName != string.Empty;
         }
         void Update()
         {
@@ -86,7 +90,8 @@ namespace SaccFlightAndVehicles
         }
         public void Jump_Event()
         {
-            if (JumpAnimator) { JumpAnimator.SetTrigger("jump"); }
+            if (JumpSound) { JumpSound.PlayOneShot(JumpSound.clip); }
+            if (DoAnimTrigger && JumpAnimator) { JumpAnimator.SetTrigger(AnimatorTriggerName); }
         }
         public void JumpLoop()
         {
