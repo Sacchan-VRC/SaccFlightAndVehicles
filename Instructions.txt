@@ -13,10 +13,10 @@ Added ground vehicle code and 3 car prefabs
 Added some editor scripts to make life a bit easier
 New vehicle menu
 Small improvements to syncscript smoothness
-Can now turn full 180 degrees in desktop mode while in vehicles
+Can now turn full 180 degrees in desktop mode while in vehicles (Thanks iffn!)
 New vehicle guide
 Now possible to set gun damage
-A lot of missle code updates: notching, mimicing FOX-1-2-3 now possible
+A lot of missile code updates: notching, mimicking FOX-1-2-3 now possible
 Vehicles can now stay 'on' after exiting if 'Auto Engine Start' is disabled
 Weapons now use object pools
 -Hundreds of small fixes and updates
@@ -351,7 +351,12 @@ the Vel Straighten values are just as important for the handling of helicopters 
 
 This file used to contain explanations of every variable in every script, that information is now contained in the tooltips of the variables. Hold the mouse still over a variable name in unity to see a description of what it does.
 
+Guns work by having one particle system of visible bullets, and one particle system of invisible bullets that actually do damage which is only enabled for the firer. The Visible one is known as Gunparticle_other, and the pilot's damage one is known as GunParticle_pilot. Make sure if you change one, you change the other!
 The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with layer (OnBoardVehicleLayer(31)). The plane is set to OnBoardVehicleLayer you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
+To make a gun do a different amount of damage, create a child empty game object under the 'GunParticle_pilot' particle system, and name it:
+Damage:02 (2x damage). Damage:03 (4x damage), Damage:04 (8x damage), Damage:05 (16x damage). All the way up to Damage:14 works.
+To do less damage use:
+Damage:x2 (half damage), Damage:x3 (one third damage), Damage:x4 (quarter damage), Damage:x5 (fifth damage), Up to Damage:x9 works (one ninth damage)
 
 The hud can be made to appear smaller by moving all children of the 'bigstuff' object +Z local. 'bigstuff' is a child of HudController.
 The one exception is hud_elevation, it's position must be 0,0,0 in order for it to move correctly, the only resizing you can do to it and have its functionality remain correct is on the X axis.
@@ -434,12 +439,16 @@ Info about surface types for SaccWheel scripts:
 There's and array called 'Surface Type_Grips' with 10 entries. The object that the wheel is touching's name is checked,
 and if it ends with a number, that number becomes the new surface type.
 The grip of the wheel is multiplied by the corresponding element in this array, and the corresponding elements from the skid particles and sounds array are used for skids.
+By default: 0 = Tarmac, 1 = Dirt/Grass, 2 = Ice. 4-9 are for you to define, but by default have same grip as tarmac. Any object without a number will be treated as tarmac.
+There's a menu item at 'SaccFlight->Make All Static Colliders Tarmac...' that will rename all static colliders so that they are tarmac, you will then have to rename all dirt/other manually.
 
 How to animate engine pitch:
 In the 'Revs' animation, you will notice that the engine sound's audiosource's X Scale is animated. This is a workaround for setting engine pitch whilst also using doppler.
-The code takes the X scale of the audiosource, applies doppler, then sets it to the pitch of the sound.
+The code takes the X scale of the audiosource, applies doppler, then sets it to the pitch of the sound. Never animate the pitch directly.
 If you wish to blend different engine sounds, it's possible to do it in this animation.
 It's using motion time, so frame 0 = 0 revs, last frame = whatever revs SaccGroundVehicle's 'Rev Limiter' variable is set to.
+
+
 
 Custom Layers:
 Vehicle colliders must be set to Walkthrough layer in order to be targeted by AAMs. (Raycast looks for this layer)

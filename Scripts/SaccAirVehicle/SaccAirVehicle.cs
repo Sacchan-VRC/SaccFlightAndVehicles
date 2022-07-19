@@ -1967,7 +1967,11 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
+            GDamageToTake = 0f;
+            VertGs = 0f;
+            AllGs = 0f;
             VehicleRigidbody.velocity = CurrentVel;
+            LastFrameVel = CurrentVel;
             if (_EngineOn && EntityControl.Piloting)
             { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
             else
@@ -2009,9 +2013,10 @@ namespace SaccFlightAndVehicles
             if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
             //hopefully prevents explosions when you enter the vehicle
-            VehicleRigidbody.velocity = CurrentVel;
+            GDamageToTake = 0f;
             VertGs = 0;
             AllGs = 0;
+            VehicleRigidbody.velocity = CurrentVel;
             LastFrameVel = CurrentVel;
             if (EngineOnOnEnter && Fuel > 0)
             {

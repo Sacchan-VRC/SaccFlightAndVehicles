@@ -13,7 +13,7 @@ namespace SaccFlightAndVehicles
 {
     public class SaccFlightMenu : MonoBehaviour
     {
-        [MenuItem("SaccFlight/RenameLayers")]
+        [MenuItem("SaccFlight/RenameLayers", false, 0)]
         private static void SetSaccFlightLayers()
         {
             SetLayerName(23, "Hook");
@@ -35,7 +35,7 @@ namespace SaccFlightAndVehicles
 
             tagManager.ApplyModifiedProperties();
         }
-        [MenuItem("SaccFlight/SetUpReferenceCameraForFlight")]
+        [MenuItem("SaccFlight/SetUpReferenceCameraForFlight", false, 1)]
         public static void SetUpReferenceCameraForFlight()
         {
             var Descrip = GetAllVRC_SceneDescriptors();
@@ -94,7 +94,7 @@ namespace SaccFlightAndVehicles
             SaccFlightSetup();
             return true;
         }
-        [MenuItem("SaccFlight/Debug_OnBuild_SetReferences")]
+        [MenuItem("SaccFlight/Debug_OnBuild_SetReferences", false, 1000)]
         public static void SaccFlightSetup()
         {
             SetUpCameras();
@@ -395,6 +395,58 @@ namespace SaccFlightAndVehicles
                 {
                     ls.Add(i);
                 }
+            }
+            return ls;
+        }
+    }
+    public class ColliderRenamer : EditorWindow
+    {
+        [MenuItem("SaccFlight/Make All Static Colliders Tarmac...", false, 2)]
+        public static void ShowWindow()
+        {
+            EditorWindow.GetWindow(typeof(ColliderRenamer));
+        }
+        void OnGUI()
+        {
+            GUILayout.Label("This button will add '_0' to the end of the names of every\n object that is set to static, has a collider\n and whos name ends with a number.\n This has the effect of making wheels see them as tarmac");
+            if (GUILayout.Button("RenameObjects"))
+            {
+                MakeAllStaticCollidersTarmac();
+            }
+        }
+        public static void MakeAllStaticCollidersTarmac()
+        {
+            var staticColliders = GetAllColliders();
+            foreach (Collider col in staticColliders)
+            {
+                if (col.gameObject.isStatic)
+                {
+                    if (col.gameObject.name.Length > 0)
+                    {
+                        int nameLastChar = col.gameObject.name[col.gameObject.name.Length - 1];
+                        if (nameLastChar >= '1' && nameLastChar <= '9')
+                        {
+                            char[] objname = col.gameObject.name.ToCharArray();
+                            char[] newname = new char[col.gameObject.name.Length + 2];
+                            for (int i = 0; i < objname.Length; i++)
+                            {
+                                newname[i] = objname[i];
+                            }
+                            newname[newname.Length - 2] = '_';
+                            newname[newname.Length - 1] = '0';
+                            col.gameObject.name = new string(newname);
+                        }
+                    }
+                }
+            }
+        }
+        static List<Collider> GetAllColliders()
+        {
+            var ls = new List<Collider>();
+            foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                var objs = g.GetComponentsInChildren<Collider>(true);
+                ls.AddRange(objs);
             }
             return ls;
         }

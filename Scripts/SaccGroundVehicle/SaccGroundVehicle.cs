@@ -791,6 +791,10 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
+            AllGs = 0;
+            GDamageToTake = 0f;
+            VehicleRigidbody.velocity = CurrentVel;
+            LastFrameVel = CurrentVel;
             SetWheelIsOwner();
         }
         public void SFEXT_O_LoseOwnership()
@@ -849,6 +853,10 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
+            GDamageToTake = 0f;
+            AllGs = 0f;
+            VehicleRigidbody.velocity = CurrentVel;
+            LastFrameVel = CurrentVel;
             InVR = EntityControl.InVR;
             SetCollidersLayer(OnboardVehicleLayer);
         }
@@ -887,7 +895,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_FallAsleep()
         {
             VehicleRigidbody.useGravity = false;
-            VehicleRigidbody.velocity = Vector3.zero;
+            CurrentVel = LastFrameVel = VehicleRigidbody.velocity = Vector3.zero;
             VehicleRigidbody.angularVelocity = Vector3.zero;
             VehicleSpeed = 0;
             Sleeping = true;
