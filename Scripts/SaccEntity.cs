@@ -111,6 +111,10 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float PilotEnterTime;
         [System.NonSerializedAttribute] public bool Holding;
         //end of old Leavebutton stuff
+
+        private bool RTriggerBoolLastFrame;
+        private bool LTriggerBoolLastFrame;
+
         public void Init() { Start(); }
         private void Start()
         {
@@ -357,6 +361,17 @@ namespace SaccFlightAndVehicles
                         }
                         LStickSelectionLastFrame = LStickSelection;
                     }
+
+                    if (InVR)
+                    {
+                        var TriggerBool = LTrigger > 0.75f;
+                        if (TriggerBool != LTriggerBoolLastFrame && LStickSelection > -1 && Dial_Functions_L[LStickSelection] != null)
+                        {
+                            if (TriggerBool) Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_TriggerPress");
+                            else Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_TriggerRelease");
+                        }
+                        LTriggerBoolLastFrame = TriggerBool;
+                    }
                 }
 
                 //RStick Selection wheel
@@ -397,6 +412,17 @@ namespace SaccFlightAndVehicles
                             }
                         }
                         RStickSelectionLastFrame = RStickSelection;
+                    }
+
+                    if (InVR)
+                    {
+                        var TriggerBool = RTrigger > 0.75f;
+                        if (TriggerBool != RTriggerBoolLastFrame && RStickSelection > -1 && Dial_Functions_R[RStickSelection] != null)
+                        {
+                            if (TriggerBool) Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_TriggerPress");
+                            else Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_TriggerRelease");
+                        }
+                        RTriggerBoolLastFrame = TriggerBool;
                     }
                 }
             }
