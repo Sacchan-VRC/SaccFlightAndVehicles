@@ -135,6 +135,17 @@ namespace SaccFlightAndVehicles
         public bool EngineOnOnEnter = true;
         [Tooltip("Set Engine Off when entering the vehicle?")]
         public bool EngineOffOnExit = true;
+        [Tooltip("Twist throttle like a motorbike?")]
+        public bool UseTwistThrottle;
+        public bool UseWSForAccelerate;
+        Quaternion VehicleRotLastFrameThrottle;
+        Quaternion ThrottleZeroPointTwist;
+        float ThrottleValue;
+        float ThrottleValueLastFrame;
+        Vector3 CompareAngleLastFrameThrottle;
+        float VRThrottlePos;
+        public float TwistThrottleDegrees = 40f;
+        private float ThrottleZeroPoint;
         [FieldChangeCallback(nameof(EngineOn))] public bool _EngineOn = false;
         public bool EngineOn
         {
@@ -186,7 +197,6 @@ namespace SaccFlightAndVehicles
         Quaternion VehicleRotLastFrame;
         [System.NonSerializedAttribute] public float PlayerThrottle;
         private float TempThrottle;
-        private float ThrottleZeroPoint;
         [System.NonSerializedAttribute] public float ThrottleInput = 0f;
         private float yaw = 0f;
         private bool Initialized;
@@ -559,10 +569,20 @@ namespace SaccFlightAndVehicles
                         int Di = Input.GetKey(KeyCode.D) ? 1 : 0;
                         int lefti = Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
                         int righti = Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
-                        bool Shift = Input.GetKey(KeyCode.LeftShift);
-                        bool Ctrl = Input.GetKey(KeyCode.LeftControl);
-                        int Shifti = Shift ? 1 : 0;
-                        int LeftControli = Ctrl ? 1 : 0;
+                        bool Accel;
+                        bool Decel;
+                        if (UseWSForAccelerate)
+                        {
+                            Accel = Input.GetKey(KeyCode.W);
+                            Decel = Input.GetKey(KeyCode.S);
+                        }
+                        else
+                        {
+                            Accel = Input.GetKey(KeyCode.LeftShift);
+                            Decel = Input.GetKey(KeyCode.LeftControl);
+                        }
+                        int AccelKeyi = Accel ? 1 : 0;
+                        int DecelKeyi = Decel ? 1 : 0;
                         float LGrip = 0;
                         float RGrip = 0;
                         if (!InEditor)
@@ -658,55 +678,103 @@ namespace SaccFlightAndVehicles
 
                         if (_EngineOn)
                         {
-                            if (HasAfterburner)
+                            //Throttle
+                            if (UseTwistThrottle)
                             {
-                                if (AfterburnerOn)
-                                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
+                                if (ThrottleGrip > GripSensitivity)
+                                {
+                                    Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrameThrottle);//difference in vehicle's rotation since last frame
+                                    VehicleRotLastFrameThrottle = ControlsRoot.rotation;
+                                    ThrottleZeroPointTwist = VehicleRotDif * ThrottleZeroPointTwist;//zero point rotates with the vehicle so it appears still to the pilot
+                                    if (!ThrottleGripLastFrame)//first frame you gripped Throttle
+                                    {
+                                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
+                                        VehicleRotDif = Quaternion.identity;
+                                        if (SwitchHandsJoyThrottle)
+                                        { ThrottleZeroPointTwist = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }//rotation of the controller relative to the vehicle when it was pressed
+                                        else
+                                        { ThrottleZeroPointTwist = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }
+                                        ThrottleValue = -ThrottleInput * TwistThrottleDegrees;
+                                        ThrottleValueLastFrame = 0;
+                                        CompareAngleLastFrameThrottle = Vector3.up;
+                                        ThrottleValueLastFrame = 0;
+                                    }
+                                    ThrottleGripLastFrame = true;
+                                    //difference between the vehicle and the hand's rotation, and then the difference between that and the ThrottleZeroPoint
+                                    Quaternion ThrottleDifference;
+                                    ThrottleDifference = Quaternion.Inverse(ControlsRoot.rotation) *
+                                        (SwitchHandsJoyThrottle ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation
+                                                                : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation)
+                                    * Quaternion.Inverse(ThrottleZeroPointTwist)
+                                     * ControlsRoot.rotation;
+
+                                    Vector3 ThrottlePosPitch = (ThrottleDifference * Vector3.up);
+                                    Vector3 CompareAngle = Vector3.ProjectOnPlane(ThrottlePosPitch, Vector3.right);
+                                    ThrottleValue += (Vector3.SignedAngle(CompareAngleLastFrameThrottle, CompareAngle, Vector3.right));
+                                    CompareAngleLastFrameThrottle = CompareAngle;
+                                    ThrottleValueLastFrame = ThrottleValue;
+                                    PlayerThrottle = Mathf.Clamp(-ThrottleValue / TwistThrottleDegrees, 0f, 1f);
+                                }
                                 else
-                                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint); }
+                                {
+                                    PlayerThrottle = Mathf.Max(AccelKeyi - DecelKeyi, 0);
+                                    if (ThrottleGripLastFrame)//first frame you let go of Throttle
+                                    { EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped"); }
+                                    ThrottleGripLastFrame = false;
+                                }
                             }
                             else
-                            { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
-                            //VR Throttle
-                            if (ThrottleGrip > GripSensitivity)
                             {
-                                Vector3 handdistance;
-                                if (SwitchHandsJoyThrottle)
-                                { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
-                                else { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
-                                handdistance = ControlsRoot.InverseTransformDirection(handdistance);
-
-                                float HandThrottleAxis = handdistance.z;
-
-                                if (!ThrottleGripLastFrame)
+                                if (HasAfterburner)
                                 {
-                                    EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
-                                    ThrottleZeroPoint = HandThrottleAxis;
-                                    TempThrottle = PlayerThrottle;
-                                    HandDistanceZLastFrame = 0;
+                                    if (AfterburnerOn)
+                                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * .5f * DeltaTime), 0, 1f); }
+                                    else
+                                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint); }
                                 }
-                                float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
-                                ThrottleDifference *= ThrottleSensitivity;
+                                else
+                                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * .5f * DeltaTime), 0, 1f); }
 
-                                //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
-                                if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/) || !HasAfterburner))
+                                if (ThrottleGrip > GripSensitivity)
                                 {
-                                    PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
+                                    Vector3 handdistance;
+                                    if (SwitchHandsJoyThrottle)
+                                    { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
+                                    else { handdistance = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
+                                    handdistance = ControlsRoot.InverseTransformDirection(handdistance);
+
+                                    float HandThrottleAxis = handdistance.z;
+
+                                    if (!ThrottleGripLastFrame)
+                                    {
+                                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
+                                        ThrottleZeroPoint = HandThrottleAxis;
+                                        TempThrottle = PlayerThrottle;
+                                        HandDistanceZLastFrame = 0;
+                                    }
+                                    float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
+                                    ThrottleDifference *= ThrottleSensitivity;
+
+                                    //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
+                                    if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/) || !HasAfterburner))
+                                    {
+                                        PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
+                                    }
+                                    else
+                                    {
+                                        PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
+                                    }
+                                    HandDistanceZLastFrame = HandThrottleAxis;
+                                    ThrottleGripLastFrame = true;
                                 }
                                 else
                                 {
-                                    PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
+                                    if (ThrottleGripLastFrame)
+                                    {
+                                        EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                                    }
+                                    ThrottleGripLastFrame = false;
                                 }
-                                HandDistanceZLastFrame = HandThrottleAxis;
-                                ThrottleGripLastFrame = true;
-                            }
-                            else
-                            {
-                                if (ThrottleGripLastFrame)
-                                {
-                                    EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
-                                }
-                                ThrottleGripLastFrame = false;
                             }
 
                             if (!_DisableTaxiRotation && Taxiing)
@@ -808,7 +876,10 @@ namespace SaccFlightAndVehicles
                                 }
                             }
                         }
-                        yaw = Mathf.Clamp(YawInput, -1, 1) * YawStrength;
+                        bool MovingForward = Vector3.Dot(AirVel, VehicleTransform.forward) > 0;
+                        //invert steering if moving backwards
+                        yaw = Mathf.Clamp(YawInput, -1, 1) * (MovingForward ? YawStrength : -YawStrength);
+
                         //wheel colliders are broken, this workaround stops the vehicle from being 'sticky' when you try to start moving it.
                         if (Speed < .2 && HasWheelColliders && ThrottleInput > 0)
                         {
@@ -1496,7 +1567,6 @@ namespace SaccFlightAndVehicles
             FinalWind = (FinalWind + Wind);
             AirVel = VehicleRigidbody.velocity - (FinalWind * StillWindMulti);
             AirSpeed = AirVel.magnitude;
-            Vector3 VecForward = VehicleTransform.forward;
         }
         public Vector2 UnpackThrottles(float Throttle)
         {
