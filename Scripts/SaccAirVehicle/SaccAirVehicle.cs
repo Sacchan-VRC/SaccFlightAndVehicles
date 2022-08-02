@@ -51,6 +51,8 @@ namespace SaccFlightAndVehicles
         public bool VerticalThrottle = false;
         [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
         public float ThrottleSensitivity = 6f;
+        [Tooltip("How long it takes to raech max throttle while holding the key on desktop")]
+        public float ThrottleSpeedDesktop = .5f;
         [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
         public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
         [Tooltip("Joystick pitch input to be a slider-style yoke.")]
@@ -945,10 +947,10 @@ namespace SaccFlightAndVehicles
                         }
                         if (HasAfterburner && !AfterburnerOn)
                         {
-                            PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint);
+                            PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * ThrottleSpeedDesktop * DeltaTime), 0, ThrottleAfterburnerPoint);
                         }
                         else
-                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * .5f * DeltaTime), 0, 1f); }
+                        { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((Shifti - LeftControli) * ThrottleSpeedDesktop * DeltaTime), 0, 1f); }
                         //VR Throttle
                         if (ThrottleGrip > GripSensitivity)
                         {
