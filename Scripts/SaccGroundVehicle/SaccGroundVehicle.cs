@@ -443,7 +443,7 @@ namespace SaccFlightAndVehicles
                         VehicleRigidbody.centerOfMass = transform.InverseTransformDirection(CenterOfMass.position - transform.position);//correct position if scaled}
                     }
 
-                    ///VR Throttle
+                    ///VR Twist Throttle
                     /*                 if (ThrottleGrip > GripSensitivity)
                                     {
                                         Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrameThrottle);//difference in vehicle's rotation since last frame
@@ -494,7 +494,6 @@ namespace SaccFlightAndVehicles
                         VRThrottlePos = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
                     }
 
-                    //Toggle gripping the steering wheel if double tap grab
                     HandsOnWheel = 0;
                     if (SteeringHand_Right)
                     { RHandSteeringWheel(RGrip); }
@@ -502,13 +501,16 @@ namespace SaccFlightAndVehicles
                     { LHandSteeringWheel(LGrip); }
 
                     float VRSteerInput = 0;
-                    if (HandsOnWheel > 0)
+                    if (InVR)
                     {
-                        VRSteerInput = (VRJoystickPosL + VRJoystickPosR) / (float)HandsOnWheel;
-                    }
-                    else
-                    {
-                        AutoSteerLerper = YawInput;
+                        if (HandsOnWheel > 0)
+                        {
+                            VRSteerInput = (VRJoystickPosL + VRJoystickPosR) / (float)HandsOnWheel;
+                        }
+                        else
+                        {
+                            AutoSteerLerper = YawInput;
+                        }
                     }
                     float SteerInput = -VRSteerInput + Ai + Di;
                     //AUTOSTEER DRIFT FIX(BROKEN)
@@ -571,6 +573,7 @@ namespace SaccFlightAndVehicles
                     {
                         float YawAddAmount = SteerInput * DeltaTime * (1f / SteeringKeyboardSecsToMax);
 
+                        float LStickPosX = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                         if (YawAddAmount != 0f)
                         {
                             if (SteeringMaxSpeedDTDisabled || _HandBrakeOn)//no steering limit when handbarke on
@@ -592,6 +595,18 @@ namespace SaccFlightAndVehicles
                                     SpeedSteeringLimitUpper = Mathf.Max(SpeedSteeringLimitUpper, AutoSteer + DesktopMinSteering);
                                 }
                                 YawInput = Mathf.Clamp(YawInput + YawAddAmount, SpeedSteeringLimitLower, SpeedSteeringLimitUpper);
+                            }
+                        }
+                        else if (LStickPosX != 0f)//controller input (relying on VRC's deadzone)
+                        {
+                            if (Drift_AutoSteer)
+                            {
+                                AutoSteerLerper = Mathf.Lerp(AutoSteerLerper, AutoSteer, VehicleSpeed * AutoSteerStrength * GroundedwheelsRatio * DeltaTime);
+                                YawInput = Mathf.Clamp(AutoSteerLerper + LStickPosX, -1f, 1f);
+                            }
+                            else
+                            {
+                                YawInput = LStickPosX;
                             }
                         }
                         else
@@ -1094,6 +1109,7 @@ namespace SaccFlightAndVehicles
             //VR SteeringWheel
             if (GrabbingR || WheelGrabToggleR)
             {
+                //Toggle gripping the steering wheel if double tap grab
                 HandsOnWheel++;
                 Quaternion VehicleRotDif = ControlsRoot.rotation * Quaternion.Inverse(VehicleRotLastFrameR);//difference in vehicle's rotation since last frame
                 VehicleRotLastFrameR = ControlsRoot.rotation;
