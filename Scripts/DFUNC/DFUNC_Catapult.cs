@@ -205,7 +205,7 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        private void LateUpdate()
+        private void Update()
         {
             if ((Piloting && OnCatapult) || Launching)
             {
