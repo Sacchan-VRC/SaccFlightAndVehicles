@@ -221,7 +221,7 @@ namespace SaccFlightAndVehicles
         public void FallAsleep()
         {
             Sleeping = true;
-            VehicleAnimator.SetFloat("throttle", 0);
+            VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
             VehicleAnimator.SetFloat(REVS_STRING, 0);
             EntityControl.SendEventToExtensions("SFEXT_L_FallAsleep");
 
