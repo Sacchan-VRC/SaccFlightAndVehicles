@@ -205,6 +205,8 @@ namespace SaccFlightAndVehicles
             if (DoAnimBool && AnimOn)
             { SetBoolOff(); }
         }
+        public void SFEXT_O_TakeOwnership() { IsOwner = true; }
+        public void SFEXT_O_LoseOwnership() { IsOwner = false; }
         public void DFUNC_Selected()
         {
             TriggerLastFrame = true;
@@ -286,7 +288,7 @@ namespace SaccFlightAndVehicles
                                 {
                                     AGMFire++;//launch AGM using set
                                     RequestSerialization();
-                                    if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                                    if (IsOwner)
                                     { EntityControl.SendEventToExtensions("SFEXT_O_AGMLaunch"); }
                                 }
                                 AGMUnlocking = 0;
@@ -410,7 +412,6 @@ namespace SaccFlightAndVehicles
         public void LaunchAGM()
         {
             if (NumAGM > 0) { NumAGM--; }
-            if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
             if (AGM)
             {
                 GameObject NewAGM;

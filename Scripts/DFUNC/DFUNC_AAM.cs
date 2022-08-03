@@ -130,6 +130,7 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
+            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
 
             if (LockTimeABDivide <= 0)
             { LockTimeABDivide = 0.0001f; }
@@ -236,6 +237,8 @@ namespace SaccFlightAndVehicles
             AAMLockTimer = 0;
             AAMTargetedTimer = 2;
         }
+        public void SFEXT_O_TakeOwnership() { IsOwner = true; }
+        public void SFEXT_O_LoseOwnership() { IsOwner = false; }
         public void DFUNC_Selected()
         {
             func_active = true;
@@ -535,7 +538,6 @@ namespace SaccFlightAndVehicles
         public void LaunchAAM()
         {
             AAMLastFiredTime = Time.time;
-            if (!InEditor) { IsOwner = localPlayer.IsOwner(gameObject); } else { IsOwner = true; }
             if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
             if (AAMAnimator) { AAMAnimator.SetTrigger(AnimFiredTriggerName); }
             if (AAM)

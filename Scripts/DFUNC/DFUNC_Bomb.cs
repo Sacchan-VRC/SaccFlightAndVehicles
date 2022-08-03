@@ -83,6 +83,7 @@ namespace SaccFlightAndVehicles
             CenterOfMass = EntityControl.CenterOfMass;
             VehicleTransform = EntityControl.transform;
             localPlayer = Networking.LocalPlayer;
+            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
 
             FindSelf();
 
@@ -177,6 +178,8 @@ namespace SaccFlightAndVehicles
             BombPoint = 0;
             UpdateAmmoVisuals();
         }
+        public void SFEXT_O_TakeOwnership() { IsOwner = true; }
+        public void SFEXT_O_LoseOwnership() { IsOwner = false; }
         public void UpdateAmmoVisuals()
         {
             BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
@@ -211,7 +214,7 @@ namespace SaccFlightAndVehicles
                         {
                             BombFire++;
                             RequestSerialization();
-                            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                            if (IsOwner)
                             { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                         }
                     }
@@ -219,7 +222,7 @@ namespace SaccFlightAndVehicles
                     {///launch every BombHoldDelay
                         BombFire++;
                         RequestSerialization();
-                        if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                        if (IsOwner)
                         { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                     }
                     TriggerLastFrame = true;
@@ -230,7 +233,6 @@ namespace SaccFlightAndVehicles
         public void LaunchBomb()
         {
             LastBombDropTime = Time.time;
-            IsOwner = localPlayer.IsOwner(gameObject);
             if (NumBomb > 0) { NumBomb--; }
             BombAnimator.SetTrigger(AnimFiredTriggerName);
             if (Bomb)
