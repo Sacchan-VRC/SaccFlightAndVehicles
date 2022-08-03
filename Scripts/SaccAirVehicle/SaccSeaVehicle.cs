@@ -50,7 +50,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("How far down you have to push the grip button to grab the joystick and throttle")]
         public float GripSensitivity = .75f;
         [Tooltip("How long keyboard turning must be held down to reach full deflection")]
-        public float SteeringKeyboardSecsToMax = 1.5f;
+        public float KeyboardSteeringSpeed = 1.5f;
         [Tooltip("how fast steering wheel returns to neutral position 1 = 1 second, .2 = 5 seconds")]
         public float SteeringReturnSpeed = 1f;
         [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
@@ -849,7 +849,7 @@ namespace SaccFlightAndVehicles
                             /*                         RotationInputs.x = Mathf.Clamp(VRPitchRoll.y + Wi + Si + downi + upi, -1, 1) * Limits;
                                                     RotationInputs.y = Mathf.Clamp(Qi + Ei + JoystickPosYaw.x, -1, 1) * Limits; */
                             //roll isn't subject to flight limits
-                            float YawAddAmount = VRJoystickPos + (-(float)(Ai + Di + lefti + righti) * DeltaTime * SteeringKeyboardSecsToMax);
+                            float YawAddAmount = VRJoystickPos + (-(float)(Ai + Di + lefti + righti) * DeltaTime * KeyboardSteeringSpeed);
                             if (InVR)
                             {
                                 if (Mathf.Abs(YawAddAmount) > 0)
