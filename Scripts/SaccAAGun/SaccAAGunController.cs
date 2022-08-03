@@ -16,6 +16,12 @@ namespace SaccFlightAndVehicles
         public VRCStation AAGunSeat;
         [Tooltip("Missile object to be duplicated and enabled when a missile is fired")]
         public GameObject AAM;
+        [Range(0, 2)]
+        [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
+        public int MissileType = 1;
+        [Tooltip("Audio source that plays when rotating")]
+        public AudioSource RotatingSound;
+        public float RotatingSoundMulti = .02f;
         [Tooltip("Sound that plays when targeting an enemy")]
         public AudioSource AAMLocking;
         [Tooltip("Sound that plays when locked onto a target")]
@@ -73,6 +79,7 @@ namespace SaccFlightAndVehicles
         public float PlaneHitBoxLayer = 17;//walkthrough
         [Tooltip("Multiplies how much damage is taken from bullets")]
         public float BulletDamageTaken = 10f;
+        public GameObject PitBullIndicator;
         public bool PredictDamage = true;
         private float PredictedHealth;
         private float LastHitTime;
@@ -106,6 +113,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool JoystickGripLastFrame = false;
         private float FullAAMsDivider;
         private float FullHealthDivider;
+        private float RotateSoundVol;
         private bool LTriggerLastFrame;
         private int NumChildrenStart;
         [System.NonSerializedAttribute] public bool DoAAMTargeting = false;
@@ -182,6 +190,7 @@ namespace SaccFlightAndVehicles
             FullHealth = Health;
             FullHealthDivider = 1f / (Health > 0 ? Health : 10000000);
             StartRot = Rotator.localRotation.eulerAngles;
+            if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
 
             FullAAMs = NumAAM;
             FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
@@ -388,6 +397,12 @@ namespace SaccFlightAndVehicles
                     {
                         AAMLocking.gameObject.SetActive(false);
                         AAMLockedOn.gameObject.SetActive(false);
+                    }
+                    if (RotatingSound)
+                    {
+                        float turnvol = new Vector2(RotationSpeedX, RotationSpeedY).magnitude * RotatingSoundMulti;
+                        RotatingSound.volume = Mathf.Min(turnvol, RotateSoundVol);
+                        RotatingSound.pitch = turnvol;
                     }
                 }
             }
@@ -706,6 +721,7 @@ namespace SaccFlightAndVehicles
                 InVR = localPlayer.IsUserInVR();//has to be set on enter otherwise Built And Test thinks you're in desktop
             }
             RequestSerialization();
+            if (RotatingSound) { RotatingSound.Play(); }
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -739,6 +755,7 @@ namespace SaccFlightAndVehicles
             AAMLocking.gameObject.SetActive(false);
             AAMLockedOn.gameObject.SetActive(false);
             AAGunAnimator.SetBool("inside", false);
+            if (RotatingSound) { RotatingSound.Play(); }
         }
         public void SFEXT_O_TakeOwnership()
         {

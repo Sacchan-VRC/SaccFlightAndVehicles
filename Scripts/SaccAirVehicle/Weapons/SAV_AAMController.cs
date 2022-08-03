@@ -321,7 +321,7 @@ namespace SaccFlightAndVehicles
         public void DisableLockHack()
         { LockHack = false; }
         public void DisablePitBullIndicator()
-        { PitBullIndicator.SetActive(false); }
+        { if (PitBullIndicator) { PitBullIndicator.SetActive(false); } }
         public void LifeTimeExplode()
         {
             //prevent the delayed event from a previous life causing explosion
