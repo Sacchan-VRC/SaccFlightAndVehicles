@@ -40,6 +40,7 @@ namespace SaccFlightAndVehicles
         private bool IsOwner;
         private bool initialized;
         private int LifeTimeExplodesSent;
+        private bool ColliderAlwaysActive;
         private void Initialize()
         {
             initialized = true;
@@ -50,6 +51,7 @@ namespace SaccFlightAndVehicles
             VehicleCenterOfMass = EntityControl.CenterOfMass;
             transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
             BombAnimator = GetComponent<Animator>();
+            ColliderAlwaysActive = ColliderActiveDistance == 0;
         }
         public void AddLaunchSpeed()
         {
@@ -58,6 +60,8 @@ namespace SaccFlightAndVehicles
         private void OnEnable()
         {
             if (!initialized) { Initialize(); }
+            if (ColliderAlwaysActive) { BombCollider.enabled = true; ColliderActive = true; }
+            else { ColliderActive = false; }
             if (EntityControl.InEditor) { IsOwner = true; }
             else
             { IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner"); }
@@ -65,8 +69,6 @@ namespace SaccFlightAndVehicles
             LifeTimeExplodesSent++;
             SendCustomEventDelayedFrames(nameof(AddLaunchSpeed), 1);//doesn't work if done this frame
 
-            //LateUpdate runs one time after MoveBackToPool so these must be here
-            ColliderActive = false;
             BombConstant.relativeTorque = Vector3.zero;
             BombConstant.relativeForce = Vector3.zero;
         }
