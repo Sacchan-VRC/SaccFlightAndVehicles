@@ -43,6 +43,8 @@ namespace SaccFlightAndVehicles
         public float ThrottleStrength = 20f;
         [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
         public float ThrottleSensitivity = 6f;
+        [Tooltip("How long it takes to raech max throttle while holding the key on desktop")]
+        public float ThrottleSpeedDesktop = .5f;
         [Tooltip("How many degrees to turn the wheel until it reaches max turning, in each direction, animation should match this")]
         public float SteeringWheelDegrees = 360f;
         [Tooltip("How far down you have to push the grip button to grab the joystick and throttle")]
@@ -723,12 +725,12 @@ namespace SaccFlightAndVehicles
                                 if (HasAfterburner)
                                 {
                                     if (AfterburnerOn)
-                                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * .5f * DeltaTime), 0, 1f); }
+                                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * ThrottleSpeedDesktop * DeltaTime), 0, 1f); }
                                     else
-                                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * .5f * DeltaTime), 0, ThrottleAfterburnerPoint); }
+                                    { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * ThrottleSpeedDesktop * DeltaTime), 0, ThrottleAfterburnerPoint); }
                                 }
                                 else
-                                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * .5f * DeltaTime), 0, 1f); }
+                                { PlayerThrottle = Mathf.Clamp(PlayerThrottle + ((AccelKeyi - DecelKeyi) * ThrottleSpeedDesktop * DeltaTime), 0, 1f); }
 
                                 if (ThrottleGrip > GripSensitivity)
                                 {
