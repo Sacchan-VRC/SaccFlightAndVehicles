@@ -96,14 +96,12 @@ namespace SaccFlightAndVehicles
                 if (localPlayer.isMaster)
                 {
                     IsOwner = true;
-                    VehicleRigid.WakeUp();
                     VehicleRigid.drag = 0;
                     VehicleRigid.angularDrag = 0;
                 }
                 else
                 {
                     IsOwner = false;
-                    VehicleRigid.Sleep();
                     VehicleRigid.drag = 9999;
                     VehicleRigid.angularDrag = 9999;
                 }
@@ -111,7 +109,6 @@ namespace SaccFlightAndVehicles
             else
             {//play mode in editor
                 IsOwner = true;
-                VehicleRigid.WakeUp();
                 VehicleRigid.drag = 9999;
                 VehicleRigid.angularDrag = 9999;
             }
@@ -130,15 +127,24 @@ namespace SaccFlightAndVehicles
         public void ActivateScript()
         {
             gameObject.SetActive(true);
+            VehicleRigid.constraints = RigidbodyConstraints.None;
             if (IsOwner)
-            { VehicleRigid.constraints = RigidbodyConstraints.None; }
+            {
+                VehicleRigid.isKinematic = false;
+                VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            }
+            else
+            {
+                VehicleRigid.isKinematic = true;
+                VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            }
             nextUpdateTime = StartStopWatch.Elapsed.TotalSeconds + (double)Random.Range(0f, updateInterval);
         }
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
-            VehicleRigid.WakeUp();
-            VehicleRigid.constraints = RigidbodyConstraints.None;
+            VehicleRigid.isKinematic = false;
+            VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             VehicleRigid.drag = 0;
             VehicleRigid.angularDrag = 0;
         }
@@ -149,8 +155,8 @@ namespace SaccFlightAndVehicles
             RotationLerper = O_LastRotation2 = O_LastRotation = O_Rotation_Q;
             LastCurAngMom = CurAngMom = Quaternion.identity;
             LastExtrapolationDirection = VehicleRigid.velocity;
-            VehicleRigid.Sleep();
-            VehicleRigid.constraints = RigidbodyConstraints.FreezePosition;
+            VehicleRigid.isKinematic = true;
+            VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
             VehicleRigid.drag = 9999;
             VehicleRigid.angularDrag = 9999;
             UpdatesSentWhileStill = 0;

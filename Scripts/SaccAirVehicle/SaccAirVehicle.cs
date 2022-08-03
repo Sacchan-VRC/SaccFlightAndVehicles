@@ -406,6 +406,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float FullFuel;
         private float LowFuelDivider;
         private float LastResupplyTime = 0;
+        [System.NonSerializedAttribute] public bool Asleep;
         private bool Initialized;
         [System.NonSerializedAttribute] public bool IsAirVehicle = true;//could be checked by any script targeting/checking this vehicle to see if it is the kind of vehicle they're looking for
         [System.NonSerializedAttribute] public bool dead = false;
@@ -793,23 +794,17 @@ namespace SaccFlightAndVehicles
                 if (Taxiing && !GroundedLastFrame && !FloatingLastFrame)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(TakeOff));
+                    VehicleRigidbody.WakeUp();
                 }
 
                 //synced variables because rigidbody values aren't accessable by non-owner players
                 CurrentVel = VehicleRigidbody.velocity;//CurrentVel is set by SAV_SyncScript for non owners
                 Speed = CurrentVel.magnitude;
-                bool VehicleMoving = false;
-                if (Speed > .1f)//don't bother doing all this for vehicles that arent moving and it therefore wont even effect
-                {
-                    VehicleMoving = true;//check this bool later for more optimizations
-                    WindAndAoA();
-                }
-
+                bool VehicleMoving;
                 if (Piloting)
                 {
-                    //gotta do these this if we're piloting but it didn't get done(specifically, hovering extremely slowly in a VTOL craft will cause control issues we don't)
-                    if (!VehicleMoving)
-                    { WindAndAoA(); VehicleMoving = true; }
+                    VehicleMoving = true;
+                    WindAndAoA();
                     DoRepeatingWorld();
 
                     if (!_DisablePhysicsAndInputs)
@@ -1151,6 +1146,17 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
+                    if (Speed > .01f)
+                    {
+                        VehicleMoving = true;//check this bool later for more optimizations
+                        WindAndAoA();
+                    }
+                    else if (!Asleep && GroundedLastFrame)
+                    {
+                        FallAsleep();
+                        VehicleMoving = false;
+                    }
+                    else { VehicleMoving = false; }
                     if (Taxiing)
                     {
                         StillWindMulti = Mathf.Min(Speed * .1f, 1);
@@ -1158,7 +1164,7 @@ namespace SaccFlightAndVehicles
                     else { StillWindMulti = 1; }
                     if (_EngineOn)
                     {
-                        //allow remote piloting using extensions?
+                        //this should allow remote piloting using extensions
                         if (_ThrottleOverridden)
                         { ThrottleInput = PlayerThrottle = ThrottleOverride; }
                         FuelEvents();
@@ -1334,7 +1340,7 @@ namespace SaccFlightAndVehicles
         }
         private void FixedUpdate()
         {
-            if (IsOwner)
+            if (IsOwner && !Asleep)
             {
                 float DeltaTime = Time.fixedDeltaTime;
                 //lerp velocity toward 0 to simulate air friction
@@ -1468,6 +1474,21 @@ namespace SaccFlightAndVehicles
                 VehicleObjectSync.Respawn();
             }
             EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
+        }
+        private void WakeUp()
+        {
+            Asleep = false;
+            EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
+        }
+        private void FallAsleep()
+        {
+            Asleep = true;
+            EntityControl.SendEventToExtensions("SFEXT_L_FallAsleep");
+            VehicleRigidbody.Sleep();
+            AllGs = 0;
+            GDamageToTake = 0;
+            VertGs = 0;
+            LastFrameVel = Vector3.zero;
         }
         public void SFEXT_L_CoMSet()
         {
@@ -1819,6 +1840,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_OnCollisionEnter()
         {
             if (!IsOwner) { return; }
+            if (Asleep) { WakeUp(); }
             LastCollisionTime = Time.time;
             if (Time.time - LastCollisionTime < MinCollisionSoundDelay)
             {
@@ -1969,6 +1991,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
+            if (Asleep) { WakeUp(); }
             GDamageToTake = 0f;
             VertGs = 0f;
             AllGs = 0f;
@@ -1998,7 +2021,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
-            //setting this as a workaround because it doesnt work reliably in Start()
+            if (Asleep) { WakeUp(); }
             if (!InEditor)
             {
                 InVR = localPlayer.IsUserInVR();

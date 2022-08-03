@@ -30,6 +30,7 @@ namespace SaccFlightAndVehicles
         private bool MaxLiftApplied;
         private bool InVR = false;
         private bool Selected;
+        private bool Asleep;
         private bool InEditor = true;
         private VRCPlayerApi localPlayer;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -89,48 +90,59 @@ namespace SaccFlightAndVehicles
             else
             { SetFlapsOn(); }
         }
+        public void SFEXT_L_WakeUp()
+        {
+            Asleep = false;
+        }
+        public void SFEXT_L_FallAsleep()
+        {
+            Asleep = true;
+        }
         private void Update()
         {
-            if (Selected)
+            if (!Asleep)
             {
-                float Trigger;
-                if (UseLeftTrigger)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if (Trigger > 0.75)
+                if (Selected)
                 {
-                    if (!TriggerLastFrame) { ToggleFlaps(); }
-                    TriggerLastFrame = true;
+                    float Trigger;
+                    if (UseLeftTrigger)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                    if (Trigger > 0.75)
+                    {
+                        if (!TriggerLastFrame) { ToggleFlaps(); }
+                        TriggerLastFrame = true;
+                    }
+                    else { TriggerLastFrame = false; }
                 }
-                else { TriggerLastFrame = false; }
-            }
-            if (Flaps)
-            {
-                if ((bool)SAVControl.GetProgramVariable("PitchDown"))//flaps on, but plane's angle of attack is negative so they have no helpful effect
+                if (Flaps)
                 {
-                    if (LiftApplied)
+                    if ((bool)SAVControl.GetProgramVariable("PitchDown"))//flaps on, but plane's angle of attack is negative so they have no helpful effect
                     {
-                        SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") - FlapsLiftMulti);
-                        LiftApplied = false;
+                        if (LiftApplied)
+                        {
+                            SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") - FlapsLiftMulti);
+                            LiftApplied = false;
+                        }
+                        if (MaxLiftApplied)
+                        {
+                            SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") - FlapsExtraMaxLift);
+                            MaxLiftApplied = false;
+                        }
                     }
-                    if (MaxLiftApplied)
+                    else//flaps on positive angle of attack, flaps are useful
                     {
-                        SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") - FlapsExtraMaxLift);
-                        MaxLiftApplied = false;
-                    }
-                }
-                else//flaps on positive angle of attack, flaps are useful
-                {
-                    if (!LiftApplied)
-                    {
-                        SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") + FlapsLiftMulti);
-                        LiftApplied = true;
-                    }
-                    if (!MaxLiftApplied)
-                    {
-                        SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") + FlapsExtraMaxLift);
-                        MaxLiftApplied = true;
+                        if (!LiftApplied)
+                        {
+                            SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") + FlapsLiftMulti);
+                            LiftApplied = true;
+                        }
+                        if (!MaxLiftApplied)
+                        {
+                            SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") + FlapsExtraMaxLift);
+                            MaxLiftApplied = true;
+                        }
                     }
                 }
             }

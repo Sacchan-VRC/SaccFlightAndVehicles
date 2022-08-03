@@ -45,6 +45,7 @@ namespace SaccFlightAndVehicles
         private float BrakeStrength;
         private int BRAKE_STRING = Animator.StringToHash("brake");
         private bool Braking;
+        private bool Asleep;
         private bool BrakingLastFrame;
         private float LastDrag = 0;
         private float AirbrakeLerper;
@@ -144,10 +145,12 @@ namespace SaccFlightAndVehicles
         {
             BrakeStrength = GroundBrakeStrength;
         }
+        public void SFEXT_L_WakeUp() { Asleep = false; }
+        public void SFEXT_L_FallAsleep() { Asleep = true; }
         private void Update()
         {
             float DeltaTime = Time.deltaTime;
-            if (IsOwner)
+            if (IsOwner && !Asleep)
             {
                 float Speed = (float)SAVControl.GetProgramVariable("Speed");
                 Vector3 CurrentVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
