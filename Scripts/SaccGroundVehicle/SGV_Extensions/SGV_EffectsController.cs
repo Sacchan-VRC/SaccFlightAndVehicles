@@ -43,6 +43,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Oneshot sound sound played each time vehicle recieves a resupply event")]
         public AudioSource ReSupply;
         public AudioSource GearChange;
+        public AudioSource GearUp;
+        public AudioSource GearDown;
         [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
         public Transform testcamera;
         private SaccEntity EntityControl;
@@ -352,6 +354,16 @@ namespace SaccFlightAndVehicles
         {
             if (GearChange) { GearChange.PlayOneShot(GearChange.clip); }
             VehicleAnimator.SetInteger("currentgear", (int)SGVControl.GetProgramVariable("CurrentGear"));
+        }
+        public void SFEXT_G_GearUp()
+        {
+            if (GearUp) { GearUp.PlayOneShot(GearUp.clip); }
+            VehicleAnimator.SetTrigger("gearup");
+        }
+        public void SFEXT_G_GearDown()
+        {
+            if (GearDown) { GearDown.PlayOneShot(GearDown.clip); }
+            VehicleAnimator.SetTrigger("geardown");
         }
         public void SFEXT_L_OnCollisionEnter() { WakeUp(); }
         public void SFEXT_G_SmallCrash()
