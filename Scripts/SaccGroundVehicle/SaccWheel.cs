@@ -102,10 +102,57 @@ namespace SaccFlightAndVehicles
         public bool IsOwner = false;
         public bool Debugslip = false;
         public bool CurrentlyDistant = true;
-        //public bool DebugMove;
-        //public bool PrintDebugValues;
-        //public Vector3 DebugMoveSpeed = Vector3.zero;
-        //public bool DebugFreezeWheel = true;
+
+        //DEBUG
+        /*         public bool SetVel;
+                public bool PrintDebugValues;
+                public Vector3 DebugMoveSpeed = Vector3.zero;
+                public bool DebugFreezeWheel = false;
+                public float DistResultPush;
+                public float DistResultAccel;
+                public float SpeedResultAccel;
+                private Vector3 pushstartpoint;
+                private Vector3 accelstartpoint;
+                public void DEBUGPushCar()
+                {
+                    pushstartpoint = CarRigid.position;
+                    CarRigid.velocity = CarRigid.transform.TransformDirection(DebugMoveSpeed);
+                    WheelRotationSpeedRPM = 0;
+                    WheelRotationSpeedRPS = 0;
+                    WheelRotationSpeedSurf = 0;
+                }
+                public void DEBUGAccelCar()
+                {
+                    CarRigid.velocity = Vector3.zero;
+                    CarRigid.angularVelocity = Vector3.zero;
+                    SendCustomEventDelayedSeconds(nameof(DEBUGAccelCar_2), Time.fixedDeltaTime * 2);
+                    SGVControl.SetProgramVariable("Revs", 0f);
+                    accelstartpoint = CarRigid.position;
+                    EngineRevs = 0;
+                    WheelRotationSpeedRPM = 0;
+                    WheelRotationSpeedRPS = 0;
+                    WheelRotationSpeedSurf = 0;
+                }
+                public void DEBUGAccelCar_2()
+                {
+                    CarRigid.velocity = Vector3.zero;
+                    CarRigid.angularVelocity = Vector3.zero;
+                    SendCustomEventDelayedSeconds(nameof(DEBUGMeasureAccel), 4);
+                    SGVControl.SetProgramVariable("ACCELTEST", true);
+                    SGVControl.SetProgramVariable("Revs", 0f);
+                    accelstartpoint = CarRigid.position;
+                    EngineRevs = 0;
+                    WheelRotationSpeedRPM = 0;
+                    WheelRotationSpeedRPS = 0;
+                    WheelRotationSpeedSurf = 0;
+                }
+                public void DEBUGMeasureAccel()
+                {
+                    SGVControl.SetProgramVariable("ACCELTEST", false);
+                    DistResultAccel = Vector3.Distance(accelstartpoint, CarRigid.position);
+                    SpeedResultAccel = CarRigid.velocity.magnitude;
+                } */
+        //ENDOFDEBUG
         void Start()
         {
             WheelRenderer = (Renderer)SGVControl.GetProgramVariable("MainObjectRenderer");
@@ -170,16 +217,6 @@ namespace SaccFlightAndVehicles
         private void FixedUpdate()
         {
             if (!IsOwner || Sleeping) { return; }
-            // if (DebugMove)
-            // {
-            //     CarRigid.velocity = DebugMoveSpeed;
-            //     if (DebugFreezeWheel)
-            //     {
-            //         WheelRotationSpeedRPM = 0;
-            //         WheelRotationSpeedRPS = 0;
-            //         WheelRotationSpeedSurf = 0;
-            //     }
-            // }
             RaycastHit SusOut;
             float compression = 0f;
             float ForwardSpeed = 0f;
@@ -187,6 +224,7 @@ namespace SaccFlightAndVehicles
             float ForceUsed = 0f;
             float ForwardSlip = 0f;
             Vector3 SusForce = Vector3.zero;
+
 
             if (IsDriveWheel && !GearNeutral)
             {
@@ -197,11 +235,22 @@ namespace SaccFlightAndVehicles
                 WheelRotationSpeedRPS = WheelRotationSpeedRPM / 60f;
                 WheelRotationSpeedSurf = WheelCircumference * WheelRotationSpeedRPS;
             }
+            float WheelRotationSpeedSurfLPrev = WheelRotationSpeedSurf;
             WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * Brake * BrakeStrength);
             WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * HandBrake * HandBrakeStrength);
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
             WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
+            //DEBUG
+            /*             DistResultPush = Vector3.Distance(pushstartpoint, CarRigid.position);
+                        if (SetVel) CarRigid.velocity = DebugMoveSpeed;
+                        if (DebugFreezeWheel)
+                        {
+                            WheelRotationSpeedRPM = 0;
+                            WheelRotationSpeedRPS = 0;
+                            WheelRotationSpeedSurf = 0;
+                        } */
+            //ENDOFDEBUG
             if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
             {
                 Grounded = true;
@@ -321,18 +370,20 @@ namespace SaccFlightAndVehicles
                 //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
                 CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
                 ForceUsed = (GripForce3.magnitude * ForwardSideRatio);
-                // if (PrintDebugValues)
-                // {
-                //     Debug.Log(string.Concat("ForwardSlip: ", ForwardSlip.ToString()));
-                //     Debug.Log(string.Concat("FORWARDSKIDMAG: ", ForwardSkid.magnitude.ToString()));
-                //     Debug.Log(string.Concat("SIDESKIDMAG: ", SideSkid.magnitude.ToString()));
-                //     Debug.Log(string.Concat("FULLSKIDMAG: ", FullSkidMag.ToString()));
-                //     Debug.Log(string.Concat("GripForce3.magnitude / Time.fixedDeltaTime: ", (GripForce3.magnitude / Time.fixedDeltaTime).ToString()));
-                //     Debug.Log(string.Concat("GripForce: ", (ForceUsed / Time.fixedDeltaTime).ToString()));
-                //     Debug.Log(string.Concat("SusForce.magnitude / Time.fixedDeltaTime: ", (SusForce.magnitude / Time.fixedDeltaTime).ToString()));//no delta problems
-                //     Debug.Log(string.Concat("(FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f): ", (FullSkidMag / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
-                //     Debug.Log(string.Concat("GRIPCRUVEEVAL : ", GripCurve.Evaluate((FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
-                // }
+                //DEBUG
+                /*                 if (PrintDebugValues)
+                                {
+                                    Debug.Log(string.Concat("ForwardSlip: ", ForwardSlip.ToString()));
+                                    Debug.Log(string.Concat("FORWARDSKIDMAG: ", ForwardSkid.magnitude.ToString()));
+                                    Debug.Log(string.Concat("SIDESKIDMAG: ", SideSkid.magnitude.ToString()));
+                                    Debug.Log(string.Concat("FULLSKIDMAG: ", FullSkidMag.ToString()));
+                                    Debug.Log(string.Concat("GripForce3.magnitude / Time.fixedDeltaTime: ", (GripForce3.magnitude / Time.fixedDeltaTime).ToString()));
+                                    Debug.Log(string.Concat("GripForce: ", (ForceUsed / Time.fixedDeltaTime).ToString()));
+                                    Debug.Log(string.Concat("SusForce.magnitude / Time.fixedDeltaTime: ", (SusForce.magnitude / Time.fixedDeltaTime).ToString()));//no delta problems
+                                    Debug.Log(string.Concat("(FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f): ", (FullSkidMag / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
+                                    Debug.Log(string.Concat("GRIPCRUVEEVAL : ", GripCurve.Evaluate((FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
+                                } */
+                //ENDOFDEBUG
             }
             else
             {
@@ -355,7 +406,6 @@ namespace SaccFlightAndVehicles
                     WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
                     WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
-                    SkidVectorFX += Vector3.forward * SlipGrip / WheelWeight;
                 }
                 else//vehicle is fully gripping
                 {
@@ -373,7 +423,6 @@ namespace SaccFlightAndVehicles
             {
                 SkidVectorFX += (Vector3.forward * Mathf.Abs(ForwardSlip));
             }
-            SkidLength = SkidVectorFX.magnitude;
             //wheels slow down due to ?friction
             WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, Time.fixedDeltaTime * WheelSlowDown);
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
@@ -387,6 +436,8 @@ namespace SaccFlightAndVehicles
                 //lerp engine towards wheel speed of handbrake is being used
                 SGVControl.Revs = Mathf.Lerp(SGVControl.Revs, (WheelRotationSpeedRPM / _GearRatio), HandBrake * (1f - Clutch) * 90f * Time.fixedDeltaTime);
             }
+            SkidVectorFX += Vector3.forward * (WheelRotationSpeedSurf - WheelRotationSpeedSurfLPrev);
+            SkidLength = SkidVectorFX.magnitude;
         }
         private void LateUpdate()
         {
