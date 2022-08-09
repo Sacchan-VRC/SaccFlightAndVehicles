@@ -51,7 +51,7 @@ namespace SaccFlightAndVehicles
         {
             FullGunAmmoInSeconds = GunAmmoInSeconds;
             reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
-            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
+            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(false); }
             FullGunAmmoInSeconds = GunAmmoInSeconds;
             FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
             GunDamageParticle_Parent.gameObject.SetActive(false);
@@ -82,6 +82,7 @@ namespace SaccFlightAndVehicles
             if (!InVR) { DFUNC_Selected(); }
             GunDamageParticle_Parent.gameObject.SetActive(true);
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Activate));
+            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(true); }
         }
         public void SFEXTP_O_UserExit()
         {
@@ -94,6 +95,7 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
             }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Deactivate));
+            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(false); }
         }
         public void SFEXTP_G_Explode()
         {
@@ -104,14 +106,12 @@ namespace SaccFlightAndVehicles
             Selected = false;
             GunDamageParticle_Parent.gameObject.SetActive(false);
             gameObject.SetActive(false);
-            UpdateAmmoVisuals();
         }
         public void SFEXTP_G_RespawnButton()
         {
             GunAmmoInSeconds = FullGunAmmoInSeconds;
             Minigun.localRotation = Quaternion.identity;
             GunRotation = Vector2.zero;
-            UpdateAmmoVisuals();
         }
         public void SFEXTP_G_ReSupply()
         {
@@ -128,7 +128,6 @@ namespace SaccFlightAndVehicles
                 if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
                 GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
             }
-            UpdateAmmoVisuals();
         }
         public void UpdateAmmoVisuals()
         {
@@ -228,13 +227,13 @@ namespace SaccFlightAndVehicles
                     RequestSerialization();
                 }
                 TimeSinceSerialization += DeltaTime;
+                UpdateAmmoVisuals();
             }
             else
             {
                 Quaternion newrot = (Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0)));
                 Minigun.rotation = Quaternion.Slerp(Minigun.rotation, newrot, 4 * DeltaTime);
             }
-            UpdateAmmoVisuals();
         }
         private void OnDisable()
         {

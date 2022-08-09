@@ -46,7 +46,7 @@ namespace SaccFlightAndVehicles
             FullRockets = NumRocket;
             reloadspeed = FullRockets / FullReloadTimeSec;
             FullRocketsDivider = 1f / (NumRocket > 0 ? NumRocket : 10000000);
-            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
+            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(false); }
             if (RocketHoldDelay < RocketDelay) { RocketHoldDelay = RocketDelay; }
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleTransform = EntityControl.transform;
@@ -84,6 +84,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXTP_O_UserEnter()
         {
+            if (AmmoBar) { AmmoBar.gameObject.SetActive(true); }
             if (!InVR)
             {
                 DFUNC_Selected();
@@ -91,6 +92,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXTP_O_UserExit()
         {
+            if (AmmoBar) { AmmoBar.gameObject.SetActive(false); }
             DFUNC_Deselected();
         }
         public void SFEXTP_G_Explode()
