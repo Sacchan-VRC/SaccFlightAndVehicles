@@ -22,6 +22,15 @@ namespace SaccFlightAndVehicles
         [Tooltip("Transform of which its X scale scales with ammo")]
         public Transform AmmoBar;
         public KeyCode MinigunFireKey = KeyCode.Space;
+
+        [Tooltip("Limit the angle the gun can turn to?")]
+        public bool LimitTurnAngle;
+        [Tooltip("Required to measure angle for angle limiting")]
+        public Transform ForwardVector;
+        public float AngleLimitLeft;
+        public float AngleLimitRight;
+        public float AngleLimitUp;
+        public float AngleLimitDown;
         [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
         private bool InVR;
         private VRCPlayerApi localPlayer;
@@ -171,6 +180,45 @@ namespace SaccFlightAndVehicles
                 else
                 {
                     Minigun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
+                }
+                if (LimitTurnAngle)
+                {
+                    float AngleHor = Minigun.localEulerAngles.y;
+                    if (AngleHor > 180) { AngleHor -= 360; }
+                    float AngleVert = Minigun.localEulerAngles.x;
+                    if (AngleVert > 180) { AngleVert -= 360; }
+
+                    if (AngleHor > 0)
+                    {
+                        if (AngleHor > AngleLimitRight)
+                        {
+                            Minigun.localRotation = Quaternion.Euler(new Vector3(AngleVert, AngleLimitRight, 0));
+                        }
+                    }
+                    else
+                    {
+                        if (AngleHor < -AngleLimitLeft)
+                        {
+                            Minigun.localRotation = Quaternion.Euler(new Vector3(AngleVert, -AngleLimitLeft, 0));
+                        }
+                    }
+                    AngleHor = Minigun.localEulerAngles.y;
+                    if (AngleHor > 180) { AngleHor -= 360; }
+
+                    if (AngleVert > 0)
+                    {
+                        if (AngleVert > AngleLimitDown)
+                        {
+                            Minigun.localRotation = Quaternion.Euler(new Vector3(AngleLimitDown, AngleHor, 0));
+                        }
+                    }
+                    else
+                    {
+                        if (AngleVert < -AngleLimitUp)
+                        {
+                            Minigun.localRotation = Quaternion.Euler(new Vector3(-AngleLimitUp, AngleHor, 0));
+                        }
+                    }
                 }
                 if (TimeSinceSerialization > .3f)
                 {
