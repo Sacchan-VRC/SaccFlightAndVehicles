@@ -23,6 +23,8 @@ namespace SaccFlightAndVehicles
         public Transform AmmoBar;
         public KeyCode MinigunFireKey = KeyCode.Space;
 
+        [Tooltip("Just use the direction that hand is pointing to aim?")]
+        public bool Aim_HandDirection;
         [Tooltip("Limit the angle the gun can turn to?")]
         public bool LimitTurnAngle;
         [Tooltip("Required to measure angle for angle limiting")]
@@ -31,7 +33,28 @@ namespace SaccFlightAndVehicles
         public float AngleLimitRight;
         public float AngleLimitUp;
         public float AngleLimitDown;
+        [Header("Single shot mode options:")]
+        [Tooltip("The weapon is a single shot weapon?")]
+        public bool UseProjectileMode;
+        public GameObject Projectile;
+        public int ProjectileAmmo = 30;
+        [Tooltip("Minimum delay between firing")]
+        public float FireDelay = 1f;
+        [Tooltip("Delay between firing when holding the trigger")]
+        public float FireHoldDelay = 1f;
+        public Transform[] FirePoints;
+        [Tooltip("Fired projectiles will be parented to this object, use if you happen to have some kind of moving origin system")]
+        public Transform WorldParent;
+        public AudioSource FireSound;
+        public bool SendAnimTrigger;
+        public string AnimTriggerName;
+        private int ProjectileAmmoFULL;
+        private int NumChildrenStart;
+        private float LastFireTime;
+        private bool TriggerLastFrame;
         [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
+        [System.NonSerialized] SaccEntity EntityControl;
+        [System.NonSerialized] bool IsOwner;
         private bool InVR;
         private VRCPlayerApi localPlayer;
         private bool UseLeftTrigger;
@@ -42,24 +65,47 @@ namespace SaccFlightAndVehicles
         private float FullGunAmmoInSeconds;
         private float TimeSinceSerialization;
         private bool firing;
-        private float FullGunAmmoDivider;
         private Vector3 AmmoBarScaleStart;
 
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXTP_L_EntityStart()
         {
-            FullGunAmmoInSeconds = GunAmmoInSeconds;
-            reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
+            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+            if (UseProjectileMode)
+            {
+                ProjectileAmmoFULL = ProjectileAmmo;
+                NumChildrenStart = transform.childCount;
+                reloadspeed = (float)ProjectileAmmoFULL / FullReloadTimeSec;
+            }
+            else
+            {
+                FullGunAmmoInSeconds = GunAmmoInSeconds;
+                reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
+                FullGunAmmoInSeconds = GunAmmoInSeconds;
+                GunDamageParticle_Parent.gameObject.SetActive(false);
+            }
             if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(false); }
-            FullGunAmmoInSeconds = GunAmmoInSeconds;
-            FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
-            GunDamageParticle_Parent.gameObject.SetActive(false);
+
             localPlayer = Networking.LocalPlayer;
             if (localPlayer != null)
             {
                 InVR = localPlayer.IsUserInVR();
             }
+            if (Projectile)
+            {
+                int NumToInstantiate = Mathf.Min(ProjectileAmmoFULL, 10);
+                for (int i = 0; i < NumToInstantiate; i++)
+                {
+                    InstantiateWeapon();
+                }
+            }
+        }
+        private GameObject InstantiateWeapon()
+        {
+            GameObject NewWeap = VRCInstantiate(Projectile);
+            NewWeap.transform.SetParent(transform);
+            return NewWeap;
         }
         public void Activate() { gameObject.SetActive(true); }
         public void Deactivate() { gameObject.SetActive(false); }
@@ -100,6 +146,7 @@ namespace SaccFlightAndVehicles
         public void SFEXTP_G_Explode()
         {
             GunAmmoInSeconds = FullGunAmmoInSeconds;
+            ProjectileAmmo = ProjectileAmmoFULL;
             Minigun.localRotation = Quaternion.identity;
             GunRotation = Vector2.zero;
             GunStopFiring();
@@ -115,42 +162,79 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXTP_G_ReSupply()
         {
-            if (gameObject.activeInHierarchy)
-            {
-                if (func_active)
-                {
-                    if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
-                    GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
-                }
-            }
-            else
+            if (UseProjectileMode)
             {
                 if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
                 GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
             }
+            else
+            {
+                if (ProjectileAmmo != ProjectileAmmoFULL) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+                ProjectileAmmo = (int)Mathf.Min(ProjectileAmmo + Mathf.Max(Mathf.Floor(reloadspeed), 1), ProjectileAmmoFULL);
+                if (AmmoBar) { AmmoBar.localScale = new Vector3((ProjectileAmmo / ProjectileAmmoFULL) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+            }
         }
         public void UpdateAmmoVisuals()
         {
-            if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+            if (UseProjectileMode)
+            {
+                if (AmmoBar) { AmmoBar.localScale = new Vector3(((float)ProjectileAmmo / (float)ProjectileAmmoFULL) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+            }
+            else
+            {
+                if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds / FullGunAmmoInSeconds) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+            }
         }
         private void LateUpdate()
         {
             float DeltaTime = Time.deltaTime;
-            if (Selected)
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+            if (UseProjectileMode)
             {
-                float Trigger;
-                if (UseLeftTrigger)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if ((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && GunAmmoInSeconds > 0)
+                if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
                 {
-                    if (!firing)
+                    if (!TriggerLastFrame)
                     {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStartFiring));
-                        firing = true;
+                        if (ProjectileAmmo > 0 && ((Time.time - LastFireTime) > FireDelay))
+                        {
+                            LastFireTime = Time.time;
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
+                        }
                     }
-                    GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
+                    else if (ProjectileAmmo > 0 && ((Time.time - LastFireTime) > FireHoldDelay))
+                    {//launch every FireHoldDelay
+                        LastFireTime = Time.time;
+                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
+                    }
+                    TriggerLastFrame = true;
+                }
+                else { TriggerLastFrame = false; }
+            }
+            else
+            {
+                if (Selected)
+                {
+                    if ((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && GunAmmoInSeconds > 0)
+                    {
+                        if (!firing)
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStartFiring));
+                            firing = true;
+                        }
+                        GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
+                    }
+                    else
+                    {
+                        if (firing)
+                        {
+                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
+                            firing = false;
+                        }
+                    }
                 }
                 else
                 {
@@ -161,20 +245,33 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
-            else
-            {
-                if (firing)
-                {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
-                    firing = false;
-                }
-            }
             if (func_active)
             {
                 if (InVR)
                 {
-                    Vector3 lookpoint = ((Minigun.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position) * 500) + Minigun.position;
-                    Minigun.LookAt(lookpoint, VehicleTransform.up);
+                    if (Aim_HandDirection)
+                    {
+                        if (UseLeftTrigger)
+                        { Minigun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
+                        else
+                        { Minigun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
+                        Vector3 mgrot = Minigun.localEulerAngles;
+                        mgrot.z = 0;
+                        Minigun.localRotation = Quaternion.Euler(mgrot);
+                    }
+                    else
+                    {
+                        Vector3 lookpoint;
+                        if (UseLeftTrigger)
+                        {
+                            lookpoint = ((Minigun.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position) * 500) + Minigun.position;
+                        }
+                        else
+                        {
+                            lookpoint = ((Minigun.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position) * 500) + Minigun.position;
+                        }
+                        Minigun.LookAt(lookpoint, VehicleTransform.up);
+                    }
                 }
                 else
                 {
@@ -234,6 +331,32 @@ namespace SaccFlightAndVehicles
                 Quaternion newrot = (Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0)));
                 Minigun.rotation = Quaternion.Slerp(Minigun.rotation, newrot, 4 * DeltaTime);
             }
+        }
+        public void FireGun()
+        {
+            IsOwner = localPlayer.IsOwner(gameObject);
+            int fp = FirePoints.Length;
+            if (ProjectileAmmo > 0) { ProjectileAmmo--; }
+            for (int x = 0; x < fp; x++)
+            {
+                GameObject proj;
+                if (transform.childCount - NumChildrenStart > 0)
+                { proj = transform.GetChild(NumChildrenStart).gameObject; }
+                else
+                { proj = InstantiateWeapon(); }
+                if (WorldParent) { proj.transform.SetParent(WorldParent); }
+                else { proj.transform.SetParent(null); }
+                proj.transform.SetPositionAndRotation(FirePoints[x].position, FirePoints[x].rotation);
+                proj.SetActive(true);
+                proj.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+            }
+            if (FireSound)
+            {
+                FireSound.pitch = Random.Range(.94f, 1.08f);
+                FireSound.PlayOneShot(FireSound.clip);
+            }
+            UpdateAmmoVisuals();
+            if (SendAnimTrigger) { GunAnimator.SetTrigger(AnimTriggerName); }
         }
         private void OnDisable()
         {

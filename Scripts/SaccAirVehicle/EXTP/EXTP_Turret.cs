@@ -54,8 +54,6 @@ namespace SaccFlightAndVehicles
         private float LastFireTime = 0f;
         private int FullAmmo;
         private float FullAmmoDivider;
-        private float StartHorTurnSpeed;
-        private float StartVertTurnSpeed;
         private float InputXKeyb;
         private float InputYKeyb;
         private float RotationSpeedX = 0f;
@@ -171,8 +169,11 @@ namespace SaccFlightAndVehicles
                 proj.SetActive(true);
                 proj.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
             }
-            FireSound.pitch = Random.Range(.94f, 1.08f);
-            FireSound.PlayOneShot(FireSound.clip);
+            if (FireSound)
+            {
+                FireSound.pitch = Random.Range(.94f, 1.08f);
+                FireSound.PlayOneShot(FireSound.clip);
+            }
             if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
             if (SendAnimTrigger) { TurretAnimator.SetTrigger(AnimTriggerName); }
         }
