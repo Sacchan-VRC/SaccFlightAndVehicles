@@ -64,15 +64,34 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableLeftDial_))] public int DisableLeftDial = 0;
         public int DisableLeftDial_
         {
-            set { _DisableLeftDial = value > 0; }
+            set
+            {
+                _DisableLeftDial = value > 0;
+                DisableLeftDial = value;
+            }
             get => DisableLeftDial;
         }
         [System.NonSerializedAttribute] public bool _DisableRightDial;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableRightDial_))] public int DisableRightDial = 0;
         public int DisableRightDial_
         {
-            set { _DisableRightDial = value > 0; }
+            set
+            {
+                _DisableRightDial = value > 0;
+                DisableRightDial = value;
+            }
             get => DisableRightDial;
+        }
+        [System.NonSerialized] public bool _DisallowOwnerShipTransfer;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisallowOwnerShipTransfer_))] public int DisallowOwnerShipTransfer = 0;
+        public int DisallowOwnerShipTransfer_
+        {
+            set
+            {
+                _DisallowOwnerShipTransfer = value > 0;
+                DisallowOwnerShipTransfer = value;
+            }
+            get => DisallowOwnerShipTransfer;
         }
         [System.NonSerializedAttribute] public bool[] LStickNULL;
         [System.NonSerializedAttribute] public bool[] RStickNULL;
@@ -94,6 +113,7 @@ namespace SaccFlightAndVehicles
             get => _dead;
         }
         [System.NonSerializedAttribute] public bool Using = false;
+        [System.NonSerializedAttribute] public bool Occupied = false;
         [System.NonSerializedAttribute] public bool Passenger = false;
         [System.NonSerializedAttribute] public bool InVehicle = false;
         [System.NonSerializedAttribute] public bool InVR = false;
@@ -105,7 +125,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int MySeat = -1;
         [System.NonSerializedAttribute] public int[] SeatedPlayers;
         [System.NonSerializedAttribute] public VRCStation[] VehicleStations;
-        [System.NonSerializedAttribute] public int[] InsidePlayers;
         [System.NonSerializedAttribute] public SaccEntity LastAttacker;
         [System.NonSerializedAttribute] public float PilotExitTime;
         [System.NonSerializedAttribute] public float PilotEnterTime;
@@ -128,6 +147,7 @@ namespace SaccFlightAndVehicles
                 IsOwner = true;
                 Using = true;
                 InVehicle = true;
+                Occupied = true;
             }
 
             if (CenterOfMass)
@@ -409,7 +429,7 @@ namespace SaccFlightAndVehicles
         }
         public override void InputJump(bool value, VRC.Udon.Common.UdonInputEventArgs args)
         {
-            if (InVehicle && InVR && InVehicle && args.boolValue) { ExitStation(); }
+            if (InVehicle && InVR && args.boolValue) { ExitStation(); }
         }
         private void OnEnable()
         {
@@ -430,6 +450,7 @@ namespace SaccFlightAndVehicles
             if (player.isLocal)
             {
                 IsOwner = true;
+                if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
                 SendEventToExtensions("SFEXT_O_TakeOwnership");
             }
             else
@@ -442,11 +463,16 @@ namespace SaccFlightAndVehicles
             }
             SendEventToExtensions("SFEXT_L_OwnershipTransfer");
         }
+        public override bool OnOwnershipRequest(VRCPlayerApi requester, VRCPlayerApi newOwner)
+        {
+            return !_DisallowOwnerShipTransfer;
+        }
         public void PilotEnterVehicleLocal()//called from PilotSeat
         {
             Using = true;
             Piloting = true;
             InVehicle = true;
+            Occupied = true;
             if (LStickNumFuncs == 1)
             {
                 Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected");
@@ -464,13 +490,14 @@ namespace SaccFlightAndVehicles
             if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
 
             Networking.SetOwner(localPlayer, gameObject);
-            TakeOwnerShipOfExtensions();
+            if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
             SendEventToExtensions("SFEXT_O_PilotEnter");
         }
         public void PilotEnterVehicleGlobal(VRCPlayerApi player)
         {
             if (player != null)
             {
+                Occupied = true;
                 UsersName = player.displayName;
                 UsersID = player.playerId;
                 PilotEnterTime = Time.time;
@@ -498,6 +525,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetUserNull()
         {
+            Occupied = false;
             UsersName = string.Empty;
             UsersID = -1;
         }
@@ -538,7 +566,7 @@ namespace SaccFlightAndVehicles
             Holding = true;
             Using = true;
             if (HoldingOnly) { HoldingOnly.SetActive(true); }
-            TakeOwnerShipOfExtensions();
+            if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
             SendEventToExtensions("SFEXT_O_OnPickup");
         }
         public override void OnDrop()
@@ -617,7 +645,7 @@ namespace SaccFlightAndVehicles
         }
         public void TakeOwnerShipOfExtensions()
         {
-            if (!InEditor)
+            if (!_DisallowOwnerShipTransfer && !InEditor)
             {
                 foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }

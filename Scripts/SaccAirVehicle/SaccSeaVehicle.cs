@@ -1324,7 +1324,6 @@ namespace SaccFlightAndVehicles
             if (!Occupied && !EntityControl.dead)
             {
                 Networking.SetOwner(localPlayer, EntityControl.gameObject);
-                EntityControl.TakeOwnerShipOfExtensions();
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
                 IsOwner = true;
                 //synced variables

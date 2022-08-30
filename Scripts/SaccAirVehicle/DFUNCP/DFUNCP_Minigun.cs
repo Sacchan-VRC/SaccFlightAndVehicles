@@ -11,7 +11,10 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour SAVControl;
         public Transform VehicleTransform;
+        [Tooltip("Transform that rotates the gun")]
         public Transform Minigun;
+        [Tooltip("OPTIONAL: Use a separate transform for the pitch rotation")]
+        public Transform MinigunPitch;
         [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
         public Transform GunDamageParticle_Parent;
         [SerializeField][UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
@@ -27,14 +30,12 @@ namespace SaccFlightAndVehicles
         public bool Aim_HandDirection;
         [Tooltip("Limit the angle the gun can turn to?")]
         public bool LimitTurnAngle;
-        [Tooltip("Required to measure angle for angle limiting")]
-        public Transform ForwardVector;
-        public float AngleLimitLeft;
-        public float AngleLimitRight;
-        public float AngleLimitUp;
-        public float AngleLimitDown;
-        [Header("Single shot mode options:")]
-        [Tooltip("The weapon is a single shot weapon?")]
+        public float AngleLimitLeft = 45f;
+        public float AngleLimitRight = 45f;
+        public float AngleLimitUp = 45f;
+        public float AngleLimitDown = 45f;
+        [Header("Projectile mode options:")]
+        [Tooltip("The weapon fires a projectile?")]
         public bool UseProjectileMode;
         public GameObject Projectile;
         public int ProjectileAmmo = 30;
@@ -66,6 +67,7 @@ namespace SaccFlightAndVehicles
         private float TimeSinceSerialization;
         private bool firing;
         private Vector3 AmmoBarScaleStart;
+        private Quaternion NonOwnerGunAngleSlerper;
 
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -83,7 +85,7 @@ namespace SaccFlightAndVehicles
                 FullGunAmmoInSeconds = GunAmmoInSeconds;
                 reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
                 FullGunAmmoInSeconds = GunAmmoInSeconds;
-                GunDamageParticle_Parent.gameObject.SetActive(false);
+                if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(false); }
             }
             if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(false); }
 
@@ -125,23 +127,26 @@ namespace SaccFlightAndVehicles
         public void SFEXTP_O_UserEnter()
         {
             func_active = true;
+            TriggerLastFrame = true;
+            LastFireTime = Time.time;
             if (!InVR) { DFUNC_Selected(); }
-            GunDamageParticle_Parent.gameObject.SetActive(true);
+            if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(true); }
+            AmmoBar.gameObject.SetActive(true);
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Activate));
-            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(true); }
+            UpdateAmmoVisuals();
         }
         public void SFEXTP_O_UserExit()
         {
             func_active = false;
             Selected = false;
-            GunDamageParticle_Parent.gameObject.SetActive(false);
+            if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(false); }
+            AmmoBar.gameObject.SetActive(false);
             if (firing)
             {
                 firing = false;
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
             }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Deactivate));
-            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(false); }
         }
         public void SFEXTP_G_Explode()
         {
@@ -151,7 +156,7 @@ namespace SaccFlightAndVehicles
             GunRotation = Vector2.zero;
             GunStopFiring();
             Selected = false;
-            GunDamageParticle_Parent.gameObject.SetActive(false);
+            if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(false); }
             gameObject.SetActive(false);
         }
         public void SFEXTP_G_RespawnButton()
@@ -171,7 +176,7 @@ namespace SaccFlightAndVehicles
             {
                 if (ProjectileAmmo != ProjectileAmmoFULL) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
                 ProjectileAmmo = (int)Mathf.Min(ProjectileAmmo + Mathf.Max(Mathf.Floor(reloadspeed), 1), ProjectileAmmoFULL);
-                if (AmmoBar) { AmmoBar.localScale = new Vector3((ProjectileAmmo / ProjectileAmmoFULL) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+                UpdateAmmoVisuals();
             }
         }
         public void UpdateAmmoVisuals()
@@ -188,51 +193,54 @@ namespace SaccFlightAndVehicles
         private void LateUpdate()
         {
             float DeltaTime = Time.deltaTime;
-            float Trigger;
-            if (UseLeftTrigger)
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-            else
-            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-            if (UseProjectileMode)
-            {
-                if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
-                {
-                    if (!TriggerLastFrame)
-                    {
-                        if (ProjectileAmmo > 0 && ((Time.time - LastFireTime) > FireDelay))
-                        {
-                            LastFireTime = Time.time;
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
-                        }
-                    }
-                    else if (ProjectileAmmo > 0 && ((Time.time - LastFireTime) > FireHoldDelay))
-                    {//launch every FireHoldDelay
-                        LastFireTime = Time.time;
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
-                    }
-                    TriggerLastFrame = true;
-                }
-                else { TriggerLastFrame = false; }
-            }
-            else
+            if (func_active)
             {
                 if (Selected)
                 {
-                    if ((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && GunAmmoInSeconds > 0)
+                    float Trigger;
+                    if (UseLeftTrigger)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                    if (UseProjectileMode)
                     {
-                        if (!firing)
+                        if (Trigger > 0.75 || (Input.GetKey(MinigunFireKey)))
                         {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStartFiring));
-                            firing = true;
+                            if (!TriggerLastFrame)
+                            {
+                                if (ProjectileAmmo > 0 && ((Time.time - LastFireTime) > FireDelay))
+                                {
+                                    LastFireTime = Time.time;
+                                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
+                                }
+                            }
+                            else if (ProjectileAmmo > 0 && ((Time.time - LastFireTime) > FireHoldDelay))
+                            {//launch every FireHoldDelay
+                                LastFireTime = Time.time;
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
+                            }
+                            TriggerLastFrame = true;
                         }
-                        GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
+                        else { TriggerLastFrame = false; }
                     }
                     else
                     {
-                        if (firing)
+                        if ((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && GunAmmoInSeconds > 0)
                         {
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
-                            firing = false;
+                            if (!firing)
+                            {
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStartFiring));
+                                firing = true;
+                            }
+                            GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
+                        }
+                        else
+                        {
+                            if (firing)
+                            {
+                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
+                                firing = false;
+                            }
                         }
                     }
                 }
@@ -244,9 +252,6 @@ namespace SaccFlightAndVehicles
                         firing = false;
                     }
                 }
-            }
-            if (func_active)
-            {
                 if (InVR)
                 {
                     if (Aim_HandDirection)
@@ -255,9 +260,6 @@ namespace SaccFlightAndVehicles
                         { Minigun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
                         else
                         { Minigun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
-                        Vector3 mgrot = Minigun.localEulerAngles;
-                        mgrot.z = 0;
-                        Minigun.localRotation = Quaternion.Euler(mgrot);
                     }
                     else
                     {
@@ -316,11 +318,34 @@ namespace SaccFlightAndVehicles
                         }
                     }
                 }
+
+                //set gun's roll to 0 and do pitch rotator if used
+                Vector3 mgrotH = Minigun.localEulerAngles;
+                if (MinigunPitch)
+                {
+                    mgrotH.z = 0;
+                    Vector3 mgrotP = mgrotH;
+                    mgrotH.x = 0;
+                    mgrotP.y = 0;
+                    MinigunPitch.localRotation = Quaternion.Euler(mgrotP);
+                }
+                else
+                { mgrotH.z = 0; }
+                Minigun.localRotation = Quaternion.Euler(mgrotH);
+
                 if (TimeSinceSerialization > .3f)
                 {
                     TimeSinceSerialization = 0;
-                    GunRotation.x = Minigun.rotation.eulerAngles.x;
-                    GunRotation.y = Minigun.rotation.eulerAngles.y;
+                    if (MinigunPitch)
+                    {
+                        GunRotation.x = MinigunPitch.rotation.eulerAngles.x;
+                        GunRotation.y = MinigunPitch.rotation.eulerAngles.y;
+                    }
+                    else
+                    {
+                        GunRotation.x = Minigun.rotation.eulerAngles.x;
+                        GunRotation.y = Minigun.rotation.eulerAngles.y;
+                    }
                     RequestSerialization();
                 }
                 TimeSinceSerialization += DeltaTime;
@@ -328,8 +353,26 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                Quaternion newrot = (Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0)));
-                Minigun.rotation = Quaternion.Slerp(Minigun.rotation, newrot, 4 * DeltaTime);
+                Quaternion mgrot = Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0));
+                NonOwnerGunAngleSlerper = Quaternion.Slerp(NonOwnerGunAngleSlerper, mgrot, 4 * DeltaTime);
+                Minigun.rotation = NonOwnerGunAngleSlerper;
+                Vector3 mgrotH = Minigun.localEulerAngles;
+                if (MinigunPitch)
+                {
+                    mgrotH.x = 0;
+                    mgrotH.z = 0;
+                    Minigun.localRotation = Quaternion.Euler(mgrotH);
+                    MinigunPitch.rotation = NonOwnerGunAngleSlerper;
+                    Vector3 mgrotP = MinigunPitch.localEulerAngles;
+                    mgrotP.y = 0;
+                    mgrotP.z = 0;
+                    MinigunPitch.localRotation = Quaternion.Euler(mgrotP);
+                }
+                else
+                {
+                    mgrotH.z = 0;
+                    Minigun.localRotation = Quaternion.Euler(mgrotH);
+                }
             }
         }
         public void FireGun()

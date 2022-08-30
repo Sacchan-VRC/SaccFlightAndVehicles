@@ -79,7 +79,7 @@ namespace SaccFlightAndVehicles
         private bool LockHack = true;
         private bool PitBull = false;
         private bool DoPitBull = false;
-        private Transform Target;
+        [System.NonSerializedAttribute] public Transform Target;
         private bool ColliderActive = false;
         [System.NonSerializedAttribute] public bool Exploding = false;
         private CapsuleCollider AAMCollider;

@@ -782,7 +782,6 @@ namespace SaccFlightAndVehicles
             {
                 Networking.SetOwner(localPlayer, EntityControl.gameObject);
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
-                EntityControl.TakeOwnerShipOfExtensions();
                 IsOwner = true;
                 Fuel = FullFuel;
                 Health = FullHealth;

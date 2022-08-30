@@ -77,7 +77,7 @@ namespace SaccFlightAndVehicles
             CenterOfMass = EntityControl.CenterOfMass;
             OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
             GunRecoil *= VehicleRigidbody.mass;
-            GunDamageParticle.gameObject.SetActive(false);
+            if (GunDamageParticle) GunDamageParticle.gameObject.SetActive(false);
 
             FindSelf();
 
@@ -110,7 +110,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             InVehicle = true;
-            GunDamageParticle.gameObject.SetActive(true);
+            if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(true); }
             gameObject.SetActive(true);
             RequestSerialization();
         }
@@ -130,7 +130,7 @@ namespace SaccFlightAndVehicles
             InVehicle = false;
             if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
             Selected = false;
-            GunDamageParticle.gameObject.SetActive(false);
+            if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(false); }
         }
         public void SFEXT_P_PassengerEnter()
         { InVehicle = true; }

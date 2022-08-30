@@ -95,7 +95,7 @@ namespace SaccFlightAndVehicles
         public float YawResponse = 20f;
         [Tooltip("If the vehicle is moving backwards, Yaw strength is multiplied by this. No effect if YawThrustVecMulti is above 0")]
         public float ReversingYawStrengthMulti = 2.4f;
-        [Tooltip("Yaw force multiplier, (gets stronger with airspeed)")]
+        [Tooltip("Roll force multiplier, (gets stronger with airspeed)")]
         public float RollStrength = 450f;
         [Tooltip("Roll rotation force (as multiple of RollStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
         [Range(0.0f, 1f)]
@@ -1446,6 +1446,7 @@ namespace SaccFlightAndVehicles
                 }
                 VehicleConstantForce.relativeForce = Vector3.zero;
                 VehicleConstantForce.relativeTorque = Vector3.zero;
+                VehicleRigidbody.WakeUp();
             }
         }
         public void NotDead()
@@ -1742,7 +1743,6 @@ namespace SaccFlightAndVehicles
             if (!Occupied && !EntityControl.dead)
             {
                 Networking.SetOwner(localPlayer, EntityControl.gameObject);
-                EntityControl.TakeOwnerShipOfExtensions();
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
                 IsOwner = true;
                 Atmosphere = 1;//vehiclemoving optimization requires this to be here

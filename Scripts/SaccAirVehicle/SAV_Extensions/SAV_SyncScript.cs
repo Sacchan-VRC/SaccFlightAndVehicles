@@ -78,6 +78,7 @@ namespace SaccFlightAndVehicles
         private bool IdleUpdateMode_Last;
         private bool Piloting;
         private bool Occupied;
+        private bool Grounded;
         private float CurrentUpdateInterval;
         private int EnterIdleModeNumber;
         private float PrevMaxExtrap;
@@ -176,7 +177,10 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_PilotExit()
         { Occupied = false; }
         public void SFEXT_G_TakeOff()
-        { if (IdleUpdateMode) { ExitIdleMode(); } }
+        {
+            if (IdleUpdateMode) { ExitIdleMode(); }
+            Grounded = false;
+        }
         public void SFEXT_L_OwnershipTransfer()
         { if (IdleUpdateMode) { ExitIdleMode(); } }
         public void SFEXT_O_PilotExit()
@@ -206,7 +210,7 @@ namespace SaccFlightAndVehicles
                     if (!Networking.IsClogged || Piloting)
                     {
                         //check if the vehicle has moved enough from it's last sent location and rotation to bother exiting idle mode
-                        bool Still = !Piloting && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
+                        bool Still = !Piloting && Grounded && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
 
                         if (Still)
                         {
@@ -437,6 +441,14 @@ namespace SaccFlightAndVehicles
             {
                 MaxPingExtrapolationInSeconds = PrevMaxExtrap;
             }
+        }
+        public void SFEXT_G_TouchDown()
+        {
+            Grounded = true;
+        }
+        public void SFEXT_G_TouchDownWater()
+        {
+            Grounded = true;
         }
     }
 }
