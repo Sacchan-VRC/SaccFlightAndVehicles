@@ -125,6 +125,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int MySeat = -1;
         [System.NonSerializedAttribute] public int[] SeatedPlayers;
         [System.NonSerializedAttribute] public VRCStation[] VehicleStations;
+        [System.NonSerializedAttribute] public SaccVehicleSeat[] VehicleSeats;
         [System.NonSerializedAttribute] public SaccEntity LastAttacker;
         [System.NonSerializedAttribute] public float PilotExitTime;
         [System.NonSerializedAttribute] public float PilotEnterTime;
@@ -164,6 +165,11 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i != SeatedPlayers.Length; i++)
             {
                 SeatedPlayers[i] = -1;
+            }
+            VehicleSeats = (SaccVehicleSeat[])GetComponentsInChildren<SaccVehicleSeat>();
+            for (int i = 0; i < VehicleSeats.Length; i++)
+            {
+                VehicleSeats[i].InitializeSeat();
             }
 
             TellDFUNCsLR();
@@ -506,8 +512,6 @@ namespace SaccFlightAndVehicles
         }
         public void PilotExitVehicle(VRCPlayerApi player)
         {
-            //do this one frame later to ensure any script running pilotexit, explode, etc has access to the values
-            SendCustomEventDelayedFrames(nameof(SetUserNull), 1);
             PilotExitTime = Time.time;
             LStickSelection = -1;
             RStickSelection = -1;
@@ -522,9 +526,6 @@ namespace SaccFlightAndVehicles
                 if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
                 { SendEventToExtensions("SFEXT_O_PilotExit"); }
             }
-        }
-        public void SetUserNull()
-        {
             Occupied = false;
             UsersName = string.Empty;
             UsersID = -1;

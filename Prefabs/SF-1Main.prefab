@@ -53521,6 +53521,7 @@ MonoBehaviour:
   DoAnimBool: 0
   AnimBoolName: GunSelected
   AnimBoolStayTrueOnExit: 0
+  AllowFiringGrounded: 1
   HUDControl: {fileID: -3233746014259053420}
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 4371473019558103429}
@@ -54213,6 +54214,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 2341975304134924734}
+  HeadXOffset: 0.25
 --- !u!114 &4371473019235475175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -59646,6 +59648,10 @@ MonoBehaviour:
   Lfunc7key: 122
   Lfunc8: {fileID: -3972693040188090698}
   Lfunc8key: 283
+  Lfunc9: {fileID: 0}
+  Lfunc9key: 0
+  Lfunc10: {fileID: 0}
+  Lfunc10key: 0
   Rfunc1: {fileID: 1794053405156706527}
   Rfunc1key: 49
   Rfunc2: {fileID: 5663865652243626336}
@@ -59662,6 +59668,10 @@ MonoBehaviour:
   Rfunc7key: 104
   Rfunc8: {fileID: 2621677993132170529}
   Rfunc8key: 53
+  Rfunc9: {fileID: 0}
+  Rfunc9key: 0
+  Rfunc10: {fileID: 0}
+  Rfunc10key: 0
 --- !u!114 &4371473019364021687
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65563,12 +65573,6 @@ MonoBehaviour:
   PlaneIdlePitchLerpValueOff: 0.09
   PlaneIdleVolLerpValueOff: 0.09
   PlaneIdleVolLerpValueOn: 0.72
-  SmallCrashPos: []
-  SmallCrashInsidePos: []
-  MediumCrashPos: []
-  MediumCrashInsidePos: []
-  BigCrashPos: []
-  BigCrashInsidePos: []
 --- !u!114 &4371473019549114405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81378,6 +81382,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 4371473018583758445}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 543805048618571905}
+  HeadXOffset: 0.25
 --- !u!114 &4371473019733388728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93004,7 +93009,10 @@ MonoBehaviour:
   ThrottleStrength: 20
   VerticalThrottle: 0
   ThrottleSensitivity: 6
+  ThrottleSpeedDesktop: 0.5
   MaxJoyAngles: {x: 45, y: 45, z: 45}
+  JoystickPushPullPitch: 0
+  JoystickPushPullDistance: 0.2
   GripSensitivity: 0.75
   AfterburnerThrustMulti: 1.5
   AccelerationResponse: 4.5

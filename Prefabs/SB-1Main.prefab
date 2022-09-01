@@ -29581,6 +29581,12 @@ MonoBehaviour:
   - {fileID: 2934804655434154002}
   MissileHit:
   - {fileID: 6731807014175998710}
+  SmallCrash: []
+  MediumCrash: []
+  BigCrash: []
+  SmallCrashInside: []
+  MediumCrashInside: []
+  BigCrashInside: []
   Rolling: {fileID: 0}
   RollingMaxVol: 1
   RollingVolCurve: 0.03
@@ -30148,6 +30154,7 @@ MonoBehaviour:
   DoAnimBool: 0
   AnimBoolName: GunSelected
   AnimBoolStayTrueOnExit: 0
+  AllowFiringGrounded: 1
   HUDControl: {fileID: -1311050107183977077}
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 8101121279009016025}
@@ -51475,6 +51482,10 @@ MonoBehaviour:
   Lfunc7key: 0
   Lfunc8: {fileID: 0}
   Lfunc8key: 283
+  Lfunc9: {fileID: 0}
+  Lfunc9key: 0
+  Lfunc10: {fileID: 0}
+  Lfunc10key: 0
   Rfunc1: {fileID: -6051132729492248690}
   Rfunc1key: 49
   Rfunc2: {fileID: -8238215579467137511}
@@ -51491,6 +51502,10 @@ MonoBehaviour:
   Rfunc7key: 0
   Rfunc8: {fileID: 0}
   Rfunc8key: 0
+  Rfunc9: {fileID: 0}
+  Rfunc9key: 0
+  Rfunc10: {fileID: 0}
+  Rfunc10key: 0
 --- !u!114 &2934804654579370602
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51650,6 +51665,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 2934804655512785824}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 374746152193602298}
+  HeadXOffset: 0.25
 --- !u!114 &2934804654584033638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99010,6 +99026,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 2809707790251052369}
+  HeadXOffset: 0.25
 --- !u!114 &2934804655606403472
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99306,6 +99323,8 @@ MonoBehaviour:
   - {fileID: -6051132729492248690}
   - {fileID: -8238215579467137511}
   - {fileID: -3303406810646691875}
+  LStickDisplayHighlighter: {fileID: 2934804654926962886}
+  RStickDisplayHighlighter: {fileID: 2934804655305527410}
   DialSensitivity: 0.7
   LeftDialDivideStraightUp: 0
   RightDialDivideStraightUp: 0
@@ -99315,13 +99334,11 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 2934804654959112473}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 2934804654583356880}
-  LStickDisplayHighlighter: {fileID: 2934804654926962886}
-  RStickDisplayHighlighter: {fileID: 2934804655305527410}
   DoVoiceVolumeChange: 1
   SwitchFunctionSound: {fileID: 2934804655618455735}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
-  DisableAfter10Seconds: []
+  AAMTargets: []
 --- !u!114 &2934804655656756585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100059,7 +100076,10 @@ MonoBehaviour:
   ThrottleStrength: 9
   VerticalThrottle: 0
   ThrottleSensitivity: 6
+  ThrottleSpeedDesktop: 0.5
   MaxJoyAngles: {x: 45, y: 45, z: 45}
+  JoystickPushPullPitch: 0
+  JoystickPushPullDistance: 0.2
   GripSensitivity: 0.75
   AfterburnerThrustMulti: 5
   AccelerationResponse: 2
@@ -100195,6 +100215,9 @@ MonoBehaviour:
   InvincibleAfterSpawn: 2.5
   BulletDamageTaken: 10
   PredictDamage: 1
+  SmallCrashSpeed: 1
+  MediumCrashSpeed: 8
+  BigCrashSpeed: 25
   MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080

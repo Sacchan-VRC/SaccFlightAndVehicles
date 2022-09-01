@@ -37,9 +37,10 @@ namespace SaccFlightAndVehicles
         private bool SeatInitialized = false;
         private bool InEditor = true;
         private VRCPlayerApi localPlayer;
-        private VRCPlayerApi SeatedPlayer;
+        [System.NonSerializedAttribute] public VRCPlayerApi SeatedPlayer;
         private bool DoVoiceVolumeChange = true;
         [System.NonSerializedAttribute] public VRCStation Station;
+        [System.NonSerializedAttribute] public bool Fake;//'Fake' exit from seat disables stuf flike seat adjuster, used for pilot swapping
         private Transform Seat;
         private Vector3 SeatPosTarget;
         private Quaternion SeatRotTarget;
@@ -87,7 +88,7 @@ namespace SaccFlightAndVehicles
                     { EntityControl.PassengerEnterVehicleLocal(); }
                     if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
 
-                    if (AdjustSeat && TargetEyePosition)
+                    if (!Fake && AdjustSeat && TargetEyePosition)
                     {
                         CalibratedY = false;
                         CalibratedZ = false;
@@ -106,7 +107,6 @@ namespace SaccFlightAndVehicles
                             }
                         }
                     }
-                    if (!player.IsUserInVR()) { ThreeSixtySeat(); }
                 }
                 else
                 {
@@ -117,8 +117,8 @@ namespace SaccFlightAndVehicles
                             SetVoiceInside(player);
                         }
                     }
-                    if (!player.IsUserInVR()) { ThreeSixtySeat(); }
                 }
+                if (!player.IsUserInVR() && !Fake) { ThreeSixtySeat(); }
                 if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
                 else
                 { EntityControl.PassengerEnterVehicleGlobal(); }
@@ -128,8 +128,11 @@ namespace SaccFlightAndVehicles
         {
             if (!SeatInitialized) { InitializeSeat(); }
             PlayerExitPlane(player);
-            Seat.localPosition = SeatPosTarget = SeatStartPos;
-            Seat.localRotation = SeatRotTarget = SeatStartRot;
+            if (!Fake)
+            {
+                Seat.localPosition = SeatPosTarget = SeatStartPos;
+                Seat.localRotation = SeatRotTarget = SeatStartRot;
+            }
         }
         public override void OnPlayerLeft(VRCPlayerApi player)
         {
@@ -188,7 +191,7 @@ namespace SaccFlightAndVehicles
             Player.SetVoiceDistanceFar(25);
             Player.SetVoiceGain(15);
         }
-        private void InitializeSeat()
+        public void InitializeSeat()
         {
             if (!EntityControl.Initialized) { return; }
             int x = 0;
