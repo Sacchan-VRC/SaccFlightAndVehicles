@@ -1,143 +1,407 @@
 fileFormatVersion: 2
 guid: c70148a519f38b644b6a1131cd7a0160
 ModelImporter:
-  serializedVersion: 23
-  fileIDToRecycleName:
-    100000: Empty.001
-    100002: //RootNode
-    100004: SaccHeli
-    100006: SaccHeli_blade
-    100008: SaccHeli_blade2
-    100010: Canopy
-    100012: Collective
-    100014: DoorL
-    100016: DoorR
-    100018: Joystick
-    100020: Pedals
-    100022: PitchEmpty
-    100024: RollEmpty
-    100026: YawEmpty
-    100028: JoystickPitchEmpty
-    100030: JoystickRollEmpty
-    100032: JoystickYawEmpty
-    100034: MiniGunL
-    100036: MiniGunR
-    100038: HeliBladeRotationEmpty
-    100040: PedalL
-    100042: PedalR
-    100044: SH-1
-    100046: SH-1.002
-    100048: Blade
-    100050: Blade2
-    100052: HeliBladeTiltEmpty
-    100054: MissileRack
-    100056: SideMiniGun
-    100058: SideMiniGunBarrel
-    100060: SideMiniGunEmpty
-    100062: SideMiniGunRotatorEmpty
-    400000: Empty.001
-    400002: //RootNode
-    400004: SaccHeli
-    400006: SaccHeli_blade
-    400008: SaccHeli_blade2
-    400010: Canopy
-    400012: Collective
-    400014: DoorL
-    400016: DoorR
-    400018: Joystick
-    400020: Pedals
-    400022: PitchEmpty
-    400024: RollEmpty
-    400026: YawEmpty
-    400028: JoystickPitchEmpty
-    400030: JoystickRollEmpty
-    400032: JoystickYawEmpty
-    400034: MiniGunL
-    400036: MiniGunR
-    400038: HeliBladeRotationEmpty
-    400040: PedalL
-    400042: PedalR
-    400044: SH-1
-    400046: SH-1.002
-    400048: Blade
-    400050: Blade2
-    400052: HeliBladeTiltEmpty
-    400054: MissileRack
-    400056: SideMiniGun
-    400058: SideMiniGunBarrel
-    400060: SideMiniGunEmpty
-    400062: SideMiniGunRotatorEmpty
-    2100000: metal
-    2100002: metal2
-    2100004: Glass
-    2100006: Tex2.001
-    2100008: metal2.001
-    2100010: Glass.001
-    2300000: SaccHeli
-    2300002: SaccHeli_blade
-    2300004: SaccHeli_blade2
-    2300006: //RootNode
-    2300008: Canopy
-    2300010: Collective
-    2300012: DoorL
-    2300014: DoorR
-    2300016: Joystick
-    2300018: Pedals
-    2300020: MiniGunL
-    2300022: MiniGunR
-    2300024: PedalL
-    2300026: PedalR
-    2300028: SH-1
-    2300030: SH-1.002
-    2300032: Blade
-    2300034: Blade2
-    2300036: MissileRack
-    2300038: SideMiniGun
-    2300040: SideMiniGunBarrel
-    3300000: SaccHeli
-    3300002: SaccHeli_blade
-    3300004: SaccHeli_blade2
-    3300006: //RootNode
-    3300008: Canopy
-    3300010: Collective
-    3300012: DoorL
-    3300014: DoorR
-    3300016: Joystick
-    3300018: Pedals
-    3300020: MiniGunL
-    3300022: MiniGunR
-    3300024: PedalL
-    3300026: PedalR
-    3300028: SH-1
-    3300030: SH-1.002
-    3300032: Blade
-    3300034: Blade2
-    3300036: MissileRack
-    3300038: SideMiniGun
-    3300040: SideMiniGunBarrel
-    4300000: SaccHeli
-    4300002: SaccHeli_blade
-    4300004: SaccHeli_blade2
-    4300006: Collective
-    4300008: Joystick
-    4300010: Pedals
-    4300012: DoorR
-    4300014: Canopy
-    4300016: DoorL
-    4300018: SH-1
-    4300020: MiniGunL
-    4300022: MiniGunR
-    4300024: PedalL
-    4300026: PedalR
-    4300028: SH-1.002
-    4300030: Blade2
-    4300032: Blade
-    4300034: MissileRack
-    4300036: SideMiniGun
-    4300038: SideMiniGunBarrel
+  serializedVersion: 19301
+  internalIDToNameTable:
+  - first:
+      1: 100000
+    second: Empty.001
+  - first:
+      1: 100002
+    second: //RootNode
+  - first:
+      1: 100004
+    second: SaccHeli
+  - first:
+      1: 100006
+    second: SaccHeli_blade
+  - first:
+      1: 100008
+    second: SaccHeli_blade2
+  - first:
+      1: 100010
+    second: Canopy
+  - first:
+      1: 100012
+    second: Collective
+  - first:
+      1: 100014
+    second: DoorL
+  - first:
+      1: 100016
+    second: DoorR
+  - first:
+      1: 100018
+    second: Joystick
+  - first:
+      1: 100020
+    second: Pedals
+  - first:
+      1: 100022
+    second: PitchEmpty
+  - first:
+      1: 100024
+    second: RollEmpty
+  - first:
+      1: 100026
+    second: YawEmpty
+  - first:
+      1: 100028
+    second: JoystickPitchEmpty
+  - first:
+      1: 100030
+    second: JoystickRollEmpty
+  - first:
+      1: 100032
+    second: JoystickYawEmpty
+  - first:
+      1: 100034
+    second: MiniGunL
+  - first:
+      1: 100036
+    second: MiniGunR
+  - first:
+      1: 100038
+    second: HeliBladeRotationEmpty
+  - first:
+      1: 100040
+    second: PedalL
+  - first:
+      1: 100042
+    second: PedalR
+  - first:
+      1: 100044
+    second: SH-1
+  - first:
+      1: 100046
+    second: SH-1.002
+  - first:
+      1: 100048
+    second: Blade
+  - first:
+      1: 100050
+    second: Blade2
+  - first:
+      1: 100052
+    second: HeliBladeTiltEmpty
+  - first:
+      1: 100054
+    second: MissileRack
+  - first:
+      1: 100056
+    second: SideMiniGun
+  - first:
+      1: 100058
+    second: SideMiniGunBarrel
+  - first:
+      1: 100060
+    second: SideMiniGunEmpty
+  - first:
+      1: 100062
+    second: SideMiniGunRotatorEmpty
+  - first:
+      4: 400000
+    second: Empty.001
+  - first:
+      4: 400002
+    second: //RootNode
+  - first:
+      4: 400004
+    second: SaccHeli
+  - first:
+      4: 400006
+    second: SaccHeli_blade
+  - first:
+      4: 400008
+    second: SaccHeli_blade2
+  - first:
+      4: 400010
+    second: Canopy
+  - first:
+      4: 400012
+    second: Collective
+  - first:
+      4: 400014
+    second: DoorL
+  - first:
+      4: 400016
+    second: DoorR
+  - first:
+      4: 400018
+    second: Joystick
+  - first:
+      4: 400020
+    second: Pedals
+  - first:
+      4: 400022
+    second: PitchEmpty
+  - first:
+      4: 400024
+    second: RollEmpty
+  - first:
+      4: 400026
+    second: YawEmpty
+  - first:
+      4: 400028
+    second: JoystickPitchEmpty
+  - first:
+      4: 400030
+    second: JoystickRollEmpty
+  - first:
+      4: 400032
+    second: JoystickYawEmpty
+  - first:
+      4: 400034
+    second: MiniGunL
+  - first:
+      4: 400036
+    second: MiniGunR
+  - first:
+      4: 400038
+    second: HeliBladeRotationEmpty
+  - first:
+      4: 400040
+    second: PedalL
+  - first:
+      4: 400042
+    second: PedalR
+  - first:
+      4: 400044
+    second: SH-1
+  - first:
+      4: 400046
+    second: SH-1.002
+  - first:
+      4: 400048
+    second: Blade
+  - first:
+      4: 400050
+    second: Blade2
+  - first:
+      4: 400052
+    second: HeliBladeTiltEmpty
+  - first:
+      4: 400054
+    second: MissileRack
+  - first:
+      4: 400056
+    second: SideMiniGun
+  - first:
+      4: 400058
+    second: SideMiniGunBarrel
+  - first:
+      4: 400060
+    second: SideMiniGunEmpty
+  - first:
+      4: 400062
+    second: SideMiniGunRotatorEmpty
+  - first:
+      21: 2100000
+    second: metal
+  - first:
+      21: 2100002
+    second: metal2
+  - first:
+      21: 2100004
+    second: Glass
+  - first:
+      21: 2100006
+    second: Tex2.001
+  - first:
+      21: 2100008
+    second: metal2.001
+  - first:
+      21: 2100010
+    second: Glass.001
+  - first:
+      23: 2300000
+    second: SaccHeli
+  - first:
+      23: 2300002
+    second: SaccHeli_blade
+  - first:
+      23: 2300004
+    second: SaccHeli_blade2
+  - first:
+      23: 2300006
+    second: //RootNode
+  - first:
+      23: 2300008
+    second: Canopy
+  - first:
+      23: 2300010
+    second: Collective
+  - first:
+      23: 2300012
+    second: DoorL
+  - first:
+      23: 2300014
+    second: DoorR
+  - first:
+      23: 2300016
+    second: Joystick
+  - first:
+      23: 2300018
+    second: Pedals
+  - first:
+      23: 2300020
+    second: MiniGunL
+  - first:
+      23: 2300022
+    second: MiniGunR
+  - first:
+      23: 2300024
+    second: PedalL
+  - first:
+      23: 2300026
+    second: PedalR
+  - first:
+      23: 2300028
+    second: SH-1
+  - first:
+      23: 2300030
+    second: SH-1.002
+  - first:
+      23: 2300032
+    second: Blade
+  - first:
+      23: 2300034
+    second: Blade2
+  - first:
+      23: 2300036
+    second: MissileRack
+  - first:
+      23: 2300038
+    second: SideMiniGun
+  - first:
+      23: 2300040
+    second: SideMiniGunBarrel
+  - first:
+      33: 3300000
+    second: SaccHeli
+  - first:
+      33: 3300002
+    second: SaccHeli_blade
+  - first:
+      33: 3300004
+    second: SaccHeli_blade2
+  - first:
+      33: 3300006
+    second: //RootNode
+  - first:
+      33: 3300008
+    second: Canopy
+  - first:
+      33: 3300010
+    second: Collective
+  - first:
+      33: 3300012
+    second: DoorL
+  - first:
+      33: 3300014
+    second: DoorR
+  - first:
+      33: 3300016
+    second: Joystick
+  - first:
+      33: 3300018
+    second: Pedals
+  - first:
+      33: 3300020
+    second: MiniGunL
+  - first:
+      33: 3300022
+    second: MiniGunR
+  - first:
+      33: 3300024
+    second: PedalL
+  - first:
+      33: 3300026
+    second: PedalR
+  - first:
+      33: 3300028
+    second: SH-1
+  - first:
+      33: 3300030
+    second: SH-1.002
+  - first:
+      33: 3300032
+    second: Blade
+  - first:
+      33: 3300034
+    second: Blade2
+  - first:
+      33: 3300036
+    second: MissileRack
+  - first:
+      33: 3300038
+    second: SideMiniGun
+  - first:
+      33: 3300040
+    second: SideMiniGunBarrel
+  - first:
+      43: 4300000
+    second: SaccHeli
+  - first:
+      43: 4300002
+    second: SaccHeli_blade
+  - first:
+      43: 4300004
+    second: SaccHeli_blade2
+  - first:
+      43: 4300006
+    second: Collective
+  - first:
+      43: 4300008
+    second: Joystick
+  - first:
+      43: 4300010
+    second: Pedals
+  - first:
+      43: 4300012
+    second: DoorR
+  - first:
+      43: 4300014
+    second: Canopy
+  - first:
+      43: 4300016
+    second: DoorL
+  - first:
+      43: 4300018
+    second: SH-1
+  - first:
+      43: 4300020
+    second: MiniGunL
+  - first:
+      43: 4300022
+    second: MiniGunR
+  - first:
+      43: 4300024
+    second: PedalL
+  - first:
+      43: 4300026
+    second: PedalR
+  - first:
+      43: 4300028
+    second: SH-1.002
+  - first:
+      43: 4300030
+    second: Blade2
+  - first:
+      43: 4300032
+    second: Blade
+  - first:
+      43: 4300034
+    second: MissileRack
+  - first:
+      43: 4300036
+    second: SideMiniGun
+  - first:
+      43: 4300038
+    second: SideMiniGunBarrel
   externalObjects: {}
   materials:
-    importMaterials: 1
+    materialImportMode: 1
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -155,7 +419,7 @@ ModelImporter:
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 1
+    animationCompression: 3
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
@@ -170,25 +434,28 @@ ModelImporter:
     meshCompression: 0
     addColliders: 0
     useSRGBMaterialColor: 1
+    sortHierarchyByName: 1
     importVisibility: 1
     importBlendShapes: 1
     importCameras: 1
     importLights: 1
+    fileIdsGeneration: 1
     swapUVChannels: 0
     generateSecondaryUV: 0
     useFileUnits: 1
-    optimizeMeshForGPU: 1
     keepQuads: 0
     weldVertices: 1
     preserveHierarchy: 0
+    skinWeightsMode: 0
+    maxBonesPerVertex: 4
+    minBoneWeight: 0.001
+    meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
     secondaryUVAreaDistortion: 15.000001
     secondaryUVHardAngle: 88
     secondaryUVPackMargin: 4
     useFileScale: 1
-    previousCalculatedGlobalScale: 1
-    hasPreviousCalculatedGlobalScale: 0
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0
@@ -197,10 +464,10 @@ ModelImporter:
     legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
     blendShapeNormalImportMode: 1
     normalSmoothingSource: 0
+  referencedClips: []
   importAnimation: 1
-  copyAvatar: 0
   humanDescription:
-    serializedVersion: 2
+    serializedVersion: 3
     human: []
     skeleton: []
     armTwist: 0.5
@@ -210,13 +477,16 @@ ModelImporter:
     armStretch: 0.05
     legStretch: 0.05
     feetSpacing: 0
+    globalScale: 1
     rootMotionBoneName: 
     hasTranslationDoF: 0
-    hasExtraRoot: 0
+    hasExtraRoot: 1
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 0
+  autoGenerateAvatarMappingIfUnspecified: 1
+  animationType: 2
   humanoidOversampling: 1
+  avatarSetup: 0
   additionalBone: 0
   userData: 
   assetBundleName: 
