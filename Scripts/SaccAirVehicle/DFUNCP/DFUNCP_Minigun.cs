@@ -34,6 +34,7 @@ namespace SaccFlightAndVehicles
         public float AngleLimitRight = 45f;
         public float AngleLimitUp = 45f;
         public float AngleLimitDown = 45f;
+        public bool AllowGroundedFiring = true;
         [Header("Projectile mode options:")]
         [Tooltip("The weapon fires a projectile?")]
         public bool UseProjectileMode;
@@ -68,6 +69,7 @@ namespace SaccFlightAndVehicles
         private bool firing;
         private Vector3 AmmoBarScaleStart;
         private Quaternion NonOwnerGunAngleSlerper;
+        private bool Grounded;
 
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -204,7 +206,7 @@ namespace SaccFlightAndVehicles
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                     if (UseProjectileMode)
                     {
-                        if (Trigger > 0.75 || (Input.GetKey(MinigunFireKey)))
+                        if ((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && (AllowGroundedFiring || !Grounded))
                         {
                             if (!TriggerLastFrame)
                             {
@@ -225,7 +227,7 @@ namespace SaccFlightAndVehicles
                     }
                     else
                     {
-                        if ((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && GunAmmoInSeconds > 0)
+                        if (((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && GunAmmoInSeconds > 0) && (AllowGroundedFiring || !Grounded))
                         {
                             if (!firing)
                             {
@@ -423,6 +425,18 @@ namespace SaccFlightAndVehicles
         public void GunStopFiring()
         {
             GunAnimator.SetBool(AnimatorFiringStringName, false);
+        }
+        public void SFEXTP_G_TouchDown()
+        {
+            Grounded = true;
+        }
+        public void SFEXTP_G_TouchDownWater()
+        {
+            Grounded = true;
+        }
+        public void SFEXTP_G_TakeOff()
+        {
+            Grounded = false;
         }
     }
 }
