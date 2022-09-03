@@ -1310,10 +1310,18 @@ namespace SaccFlightAndVehicles
                             yawaoarollforce = ((AngleOfAttackYaw > 0 ? -1 : 1) * YawAoaRollForce.Evaluate(Mathf.Abs(AngleOfAttackYaw)) * YawAoaRollForceMulti) * rotlift;
                         }
 
+                        //roll spaz fix, shold probably just remove the constantforce and move all this to fixedupdate eventually
+                        float rollfric = -localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw;
+                        float appliedforce = rollfric * Time.fixedDeltaTime / VehicleRigidbody.inertiaTensor.z;
+                        if (Mathf.Abs(appliedforce) * (Time.smoothDeltaTime / Time.fixedDeltaTime) > Mathf.Abs(localAngularVelocity.z))
+                        {
+                            rollfric *= (Time.fixedDeltaTime / Time.smoothDeltaTime);
+                        }
+
                         //roll + rotational frictions
                         Vector3 FinalInputRot = new Vector3((((-localAngularVelocity.x * PitchFriction * rotlift * AoALiftPitch * AoALiftYaw) - (localAngularVelocity.x * PitchConstantFriction)) + pitchaoapitchforce) * Atmosphere,// X Pitch
                             (((-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw) - (localAngularVelocity.y * YawConstantFriction)) * Atmosphere,// Y Yaw
-                                ((LerpedRoll + yawaoarollforce + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVRoll) - (localAngularVelocity.z * RollConstantFriction)) * Atmosphere);// Z Roll
+                                ((LerpedRoll + yawaoarollforce + rollfric + ADVRoll) - (localAngularVelocity.z * RollConstantFriction)) * Atmosphere);// Z Roll
 
                         //create values for use in fixedupdate (control input and straightening forces)
                         Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
