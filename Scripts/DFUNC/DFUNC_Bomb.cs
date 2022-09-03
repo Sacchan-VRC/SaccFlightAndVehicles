@@ -74,17 +74,19 @@ namespace SaccFlightAndVehicles
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
 
         //CCIP stuff from here on
-        [Header("KitKatsStuff from here on")]
+        [Header("KitKat's stuff from here on")]
+        [Tooltip("If the AGM cam will display where the bomb will hit even though CCIP and CCRP are off.")]
+        [SerializeField] bool PredictiveBombCam = true;
         [SerializeField] SaccAirVehicle LinkedAirVehicle;
         [SerializeField] SAV_BombController LinkedBombController;
         [SerializeField] Rigidbody AircraftRigidbody;
         [SerializeField] Rigidbody BombRigidbody;
+        [SerializeField] GameObject BombLaunchPoint;
+        [Tooltip("This is where you link an empty or something, it is nessecary for the prediction to work.")]
+        [SerializeField] GameObject PredictedImpact;
         [Header("CCIP")]
         [Tooltip("Disable anything related to CCIP?")]
         [SerializeField] bool DoCCIP = false;
-        [SerializeField] GameObject BombLaunchPoint;
-        [Tooltip("This is where you link an empty or something, it is nessecary for CCRP to work.")]
-        [SerializeField] GameObject PredictedImpact;
         [SerializeField] GameObject HudCCIP;
         [SerializeField] GameObject TopOfCCIPline;
         [SerializeField] Transform LinkedHudVelocityVector;
@@ -108,6 +110,7 @@ namespace SaccFlightAndVehicles
         Vector3 groundzero;
         Vector3[] DebugPosLine;
         Vector2 CurrentCCRPtarget;
+        Vector3 CCIPLookRot;
 
         public float distance_from_head = 1.333f;
 
@@ -129,25 +132,30 @@ namespace SaccFlightAndVehicles
 
         private void Start()
         {
-            if (!LinkedAirVehicle || !LinkedBombController || !AircraftRigidbody || !BombRigidbody || !BombLaunchPoint || !PredictedImpact || !HudCCIP || !TopOfCCIPline || !LinkedHudVelocityVector)
+            if (!LinkedAirVehicle || !LinkedBombController || !AircraftRigidbody || !BombRigidbody || !BombLaunchPoint || !PredictedImpact)
             {
-                if (DoCCIP) { Debug.LogError("CCIP not set up correctly, CCIP disabled."); }
-                DoCCIP = false;
+                if (PredictiveBombCam || DoCCIP || DoCCRP) { Debug.LogError("Vital dependencies not linked, CCIP and CCRP will be disabled and predictive bomb camera will be static."); }
                 DFUNC_Setup_ERR = true;
-                if (HudCCIP) { HudCCIP.SetActive(false); }
+            }
+            if(!HudCCIP || !TopOfCCIPline || !LinkedHudVelocityVector)
+            {
+                if (DoCCIP) { Debug.LogError("CCIP HUD elements are not set up correctly, CCIP disabled."); }
+                DoCCIP = false;
             }
             if (!HudCCRP || !LineRotator || !CrosshairRotator || !TimingRotator || !CCRP_Targets)
             {
-                if (DoCCRP) { Debug.LogError("CCRP not set up correctly, CCRP disabled."); }
+                if (DoCCRP) { Debug.LogError("CCRP is not set up correctly, CCRP disabled."); }
                 DoCCRP = false;
-                DFUNC_Setup_ERR = true;
-                if (HudCCRP) { HudCCRP.SetActive(false); }
             }
-            if(!DFUNC_Setup_ERR)
+            if(DFUNC_Setup_ERR)
             {
-                //if (DoCCRP) { DoCCIP = true; } //Eeeh not sure if I want to force ccip when ccrp is on. No point in having ccrp without ccip but also no point in not letting people do dumb shit.
-                if (PredictedImpact) PredictedImpact.SetActive(false);
+                DoCCIP = false;
+                DoCCRP = false;
             }
+            if (PredictedImpact) PredictedImpact.SetActive(false);
+            if (PredictiveBombCam && !PredictedImpact) { Debug.LogError("Predicted Impact empty is not linked."); }
+            if (HudCCIP) { HudCCIP.SetActive(DoCCIP); }
+            if (HudCCRP) { HudCCRP.SetActive(DoCCRP); }
         }
         //CCIP stuff ends here
 
@@ -178,11 +186,11 @@ namespace SaccFlightAndVehicles
             }
 
             //CCIP stuff
-            if (LinkedBombController && DoCCIP)
+            if (LinkedBombController)
             {
             float MaxTotalDropTime = LinkedBombController.MaxLifetime;
             iterationTime = MaxTotalDropTime / MaxiterationStep;
-            } else if (DoCCIP) { Debug.LogError("Bomb controller not linked."); }
+            } else if (DoCCIP || DoCCRP || PredictiveBombCam) { Debug.LogError("Bomb controller not linked."); }
             //CCIP stuff ends here
         }
         private GameObject InstantiateWeapon()
@@ -368,9 +376,9 @@ namespace SaccFlightAndVehicles
                         PredictedImpact.transform.position = hit.point; //This empty is nessecary for CCRP release prediction to work.
                     }
                 }
-                HudCCIP.SetActive(hitdetect); //Makes the hud element go away if the prediction didn't find a groundzero within the bomblifetime.
-                HudCCRP.SetActive(hitdetect);
-                CCRPmode = hitdetect;
+                if (HudCCIP) { HudCCIP.SetActive(hitdetect); } //Makes the hud element go away if the prediction didn't find a groundzero within the bomblifetime.
+                if (HudCCRP) { HudCCRP.SetActive(hitdetect); }
+                if (!hitdetect) { CCRPmode = false; }
             }
         }
         void GetCCRPtarget() //Iterates through all the empties in CCRP_Targets and gets the closest target to groundzero
@@ -398,12 +406,17 @@ namespace SaccFlightAndVehicles
         }
         void HUD()
         {
-            Vector3 CCIPLookRot = (groundzero - AircraftRigidbody.position);
-            AtGCam.transform.LookAt(groundzero);
-            AtGCam.fieldOfView = Mathf.Clamp(90f / (CCIPLookRot.magnitude * CCIPLookRot.magnitude), 2f, 60f);
-            HudCCIP.transform.rotation = Quaternion.LookRotation(CCIPLookRot);
-            TopOfCCIPline.transform.position = LinkedHudVelocityVector.position;
-
+            if (PredictiveBombCam)
+            {
+                CCIPLookRot = (groundzero - AircraftRigidbody.position);
+                AtGCam.transform.LookAt(groundzero);
+                AtGCam.fieldOfView = Mathf.Clamp(90f / (CCIPLookRot.magnitude * CCIPLookRot.magnitude), 2f, 60f);
+            }
+            if (DoCCIP)
+            {
+                HudCCIP.transform.rotation = Quaternion.LookRotation(CCIPLookRot);
+                TopOfCCIPline.transform.position = LinkedHudVelocityVector.position;
+            }
             if (DoCCRP)
             {
                 Vector2 AircraftCoordinate = new Vector2(AircraftRigidbody.position.x, AircraftRigidbody.position.z);
