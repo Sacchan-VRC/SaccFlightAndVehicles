@@ -589,7 +589,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.0176, y: 1.6332}
+  m_AnchoredPosition: {x: 0.0176, y: 1.6319}
   m_SizeDelta: {x: 20, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &6787706110392682769
@@ -6765,10 +6765,10 @@ MonoBehaviour:
   - {fileID: 1651320211284017606}
   - {fileID: 2653143541489113037}
   OnDefault: 0
-  PilotExitTurnOff: 0
-  PilotExitTurnOn: 0
-  PilotEnterTurnOff: 0
-  PilotEnterTurnOn: 0
+  UserExitTurnOff: 0
+  UserExitTurnOn: 0
+  UserEnterTurnOff: 0
+  UserEnterTurnOn: 0
   ToggleMinDelay: 0
   ToggleObjects: []
   ToggleEmission: []
@@ -7168,10 +7168,10 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 1651320212362696120}
   OnDefault: 0
-  PilotExitTurnOff: 1
-  PilotExitTurnOn: 0
-  PilotEnterTurnOff: 0
-  PilotEnterTurnOn: 0
+  UserExitTurnOff: 1
+  UserExitTurnOn: 0
+  UserEnterTurnOff: 0
+  UserEnterTurnOn: 0
   ToggleMinDelay: 0
   ToggleObjects:
   - {fileID: 1651320212675512075}
@@ -114265,8 +114265,8 @@ MonoBehaviour:
   Dial_Functions_L:
   - {fileID: 3500674108781184150}
   - {fileID: 2449688609888896633}
-  - {fileID: 4075196158679939147}
   - {fileID: 3907015542933838434}
+  - {fileID: 4075196158679939147}
   - {fileID: 6197969426043131869}
   Dial_Functions_R:
   - {fileID: 3145660371254424722}

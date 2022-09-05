@@ -10,7 +10,6 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SAV_WindChanger : UdonSharpBehaviour
     {
-        [Tooltip("List of SaccAirVehicles to be effected by this WindChnager")]
         public bool DefaultSynced = false;
         [HideInInspector] public UdonSharpBehaviour[] SaccAirVehicles;
         public GameObject WindMenu;

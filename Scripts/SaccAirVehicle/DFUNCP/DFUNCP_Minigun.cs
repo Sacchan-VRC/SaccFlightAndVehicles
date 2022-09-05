@@ -149,6 +149,7 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
             }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Deactivate));
+            NonOwnerGunAngleSlerper = Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0));
         }
         public void SFEXTP_G_Explode()
         {

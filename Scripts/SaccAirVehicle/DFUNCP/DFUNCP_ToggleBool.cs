@@ -17,13 +17,13 @@ namespace SaccFlightAndVehicles
         public GameObject[] Dial_Funcon;
         public bool OnDefault = false;
         [Tooltip("Set toggle to off when exiting?")]
-        public bool PilotExitTurnOff = true;
+        public bool UserExitTurnOff = true;
         [Tooltip("Set toggle to on when exiting?")]
-        public bool PilotExitTurnOn = false;
+        public bool UserExitTurnOn = false;
         [Tooltip("Set toggle to off when entering?")]
-        public bool PilotEnterTurnOff = false;
+        public bool UserEnterTurnOff = false;
         [Tooltip("Set toggle to on when entering?")]
-        public bool PilotEnterTurnOn = false;
+        public bool UserEnterTurnOn = false;
         [Tooltip("How long before toggle can be activated again")]
         public float ToggleMinDelay;
         [Tooltip("Objects to turn on/off with the toggle")]
@@ -95,16 +95,16 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(false);
         }
-        public void SFEXT_O_PilotEnter()
+        public void SFEXTP_O_UserEnter()
         {
             if (!IsSecondary)
             {
-                if (PilotEnterTurnOff)
+                if (UserEnterTurnOff)
                 {
                     if (AnimOn)
                     { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
                 }
-                if (PilotEnterTurnOn)
+                if (UserEnterTurnOn)
                 {
                     if (!AnimOn)
                     { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -115,12 +115,12 @@ namespace SaccFlightAndVehicles
         {
             if (!IsSecondary)
             {
-                if (PilotEnterTurnOff)
+                if (UserExitTurnOff)
                 {
                     if (AnimOn)
                     { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
                 }
-                if (PilotEnterTurnOn)
+                if (UserExitTurnOn)
                 {
                     if (!AnimOn)
                     { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -252,12 +252,12 @@ namespace SaccFlightAndVehicles
             {
                 if (player.isLocal)
                 {
-                    if (PilotExitTurnOff)
+                    if (UserExitTurnOff)
                     {
                         if (AnimOn)
                         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
                     }
-                    if (PilotExitTurnOn)
+                    if (UserExitTurnOn)
                     {
                         if (!AnimOn)
                         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }

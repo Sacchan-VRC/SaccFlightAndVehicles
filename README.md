@@ -2,7 +2,7 @@
 
 This is a prefab for VRChat containing the vehicles I've made. It is made in such a way that people can use it to create their own vehicles by altering the prefabs.
 
-As of version 1.5 it has become quite modular, allowing for much greator customization, and easy addition of custom code.
+As of version 1.5 it has become quite modular, allowing for much greater customization, and easy addition of custom code.
 
 # License
 
