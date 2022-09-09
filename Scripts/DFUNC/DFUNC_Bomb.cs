@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
@@ -72,6 +72,94 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool IsOwner;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
+
+        //CCIP stuff from here on
+        [Header("KitKat's stuff from here on")]
+        [Tooltip("If the AGM cam will display where the bomb will hit even though CCIP and CCRP are off.")]
+        [SerializeField] bool PredictiveBombCam = true;
+        [SerializeField] SaccAirVehicle LinkedAirVehicle;
+        [SerializeField] SAV_BombController LinkedBombController;
+        [SerializeField] Rigidbody AircraftRigidbody;
+        [SerializeField] Rigidbody BombRigidbody;
+        [SerializeField] GameObject BombLaunchPoint;
+        [Tooltip("This is where you link an empty or something, it is nessecary for the prediction to work.")]
+        [SerializeField] GameObject PredictedImpact;
+        [Header("CCIP")]
+        [Tooltip("Disable anything related to CCIP?")]
+        [SerializeField] bool DoCCIP = false;
+        [SerializeField] GameObject HudCCIP;
+        [SerializeField] GameObject TopOfCCIPline;
+        [SerializeField] Transform LinkedHudVelocityVector;
+        [Header("CCRP")]
+        [Tooltip("Disable anything related to CCRP?")]
+        [SerializeField] bool DoCCRP = false;
+        [SerializeField] GameObject HudCCRP;
+        [SerializeField] GameObject LineRotator;
+        [SerializeField] GameObject CrosshairRotator;
+        [SerializeField] GameObject TimingRotator;
+        [SerializeField] Transform CCRP_Targets;
+        [SerializeField] int MaxiterationStep = 100;
+        [SerializeField] int IterationsBeforeCollisionCheck = 1;
+        [Tooltip("The distance between where a bomb will land and where a possible target is located, if the ditance is below this value the HUD will tell you how to hit the target, and the script enters CCRP mode (more about that on line 123)")]
+        [SerializeField] float MinDistanceToTarget = 700;
+        [Tooltip("How fast the red distance diamond goes down the line. A higher number allows the pilot to be more accurate.")]
+        public float multiplier = 0.05f;
+        [Tooltip("How close the pilot needs needs to aim to the target before the script drops the bomb. In meters of course.")]
+        public float CCRP_Acc_Threshold = 5;
+
+        Vector3 groundzero;
+        Vector3[] DebugPosLine;
+        Vector2 CurrentCCRPtarget;
+        Vector3 CCIPLookRot;
+
+        public float distance_from_head = 1.333f;
+
+        float ClosestDistance;
+        float CCRPHeading = 0;
+        float DistanceRelease = 0;
+
+        float iterationTime;
+        float MaxTotalDropTime;
+
+        bool Selected;
+        bool hitdetect = false;
+        bool CCRPmode = false; //I added "CCRPmode" this mode makes it so when the trigger/spacebar is held the plane automatically drops the bomb whenever the bomb will hit close enough to the target.
+        bool CCRPfired;
+        bool CCRPheld;
+
+        float Gravity = Physics.gravity.magnitude * -1;
+
+        bool DFUNC_Setup_ERR = false;
+
+        private void Start()
+        {
+            if (!LinkedAirVehicle || !LinkedBombController || !AircraftRigidbody || !BombRigidbody || !BombLaunchPoint || !PredictedImpact)
+            {
+                if (PredictiveBombCam || DoCCIP || DoCCRP) { Debug.LogError("Vital dependencies not linked, CCIP and CCRP will be disabled and predictive bomb camera will be static."); }
+                DFUNC_Setup_ERR = true;
+            }
+            if(!HudCCIP || !TopOfCCIPline || !LinkedHudVelocityVector)
+            {
+                if (DoCCIP) { Debug.LogError("CCIP HUD elements are not set up correctly, CCIP disabled."); }
+                DoCCIP = false;
+            }
+            if (!HudCCRP || !LineRotator || !CrosshairRotator || !TimingRotator || !CCRP_Targets)
+            {
+                if (DoCCRP) { Debug.LogError("CCRP is not set up correctly, CCRP disabled."); }
+                DoCCRP = false;
+            }
+            if(DFUNC_Setup_ERR)
+            {
+                DoCCIP = false;
+                DoCCRP = false;
+            }
+            if (PredictedImpact) PredictedImpact.SetActive(false);
+            if (PredictiveBombCam && !PredictedImpact) { Debug.LogError("Predicted Impact empty is not linked."); }
+            if (!DoCCIP && HudCCIP) { HudCCIP.SetActive(false); }
+            if (!DoCCRP && HudCCRP) { HudCCRP.SetActive(false); }
+        }
+        //CCIP stuff ends here
+
         public void SFEXT_L_EntityStart()
         {
             FullBombs = NumBomb;
@@ -83,7 +171,6 @@ namespace SaccFlightAndVehicles
             CenterOfMass = EntityControl.CenterOfMass;
             VehicleTransform = EntityControl.transform;
             localPlayer = Networking.LocalPlayer;
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
 
             FindSelf();
 
@@ -98,6 +185,14 @@ namespace SaccFlightAndVehicles
                     InstantiateWeapon();
                 }
             }
+
+            //CCIP stuff
+            if (LinkedBombController)
+            {
+            float MaxTotalDropTime = LinkedBombController.MaxLifetime;
+            iterationTime = MaxTotalDropTime / MaxiterationStep;
+            } else if (DoCCIP || DoCCRP || PredictiveBombCam) { Debug.LogError("Bomb controller not linked."); }
+            //CCIP stuff ends here
         }
         private GameObject InstantiateWeapon()
         {
@@ -178,8 +273,6 @@ namespace SaccFlightAndVehicles
             BombPoint = 0;
             UpdateAmmoVisuals();
         }
-        public void SFEXT_O_TakeOwnership() { IsOwner = true; }
-        public void SFEXT_O_LoseOwnership() { IsOwner = false; }
         public void UpdateAmmoVisuals()
         {
             BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
@@ -197,42 +290,165 @@ namespace SaccFlightAndVehicles
             { gameObject.SetActive(false); }
             OthersEnabled = false;
         }
+        //CCIP stuff
         private void Update()
         {
+            if (HudCCIP && DoCCIP) { HudCCIP.SetActive(func_active); }
             if (func_active)
             {
-                float Trigger;
+                if (!DFUNC_Setup_ERR)
+                {
+                    SimulateTrajectory();
+                    GetCCRPtarget();
+                    if (HudCCRP) { HudCCRP.SetActive(CCRPmode); }
+                    HUD();
+                }
+
                 if (UseLeftTrigger)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                 if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
                 {
-                    if (!TriggerLastFrame)
+                    if (!CCRPmode)
                     {
-                        if (NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
+                        if (!TriggerLastFrame)
                         {
-                            BombFire++;
-                            RequestSerialization();
-                            if (IsOwner)
-                            { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+                            if (NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
+                            {
+                                BombFireFunc();
+                            }
+                        }
+                        else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !CCRPfired && !CCRPheld && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing"))) //!CCRPfired here so if you keep holding trigger after strafing a ccrp target it won't start dropping bombs afterwards unless you re-press the trigger.
+                        {//launch every BombHoldDelay
+                            BombFireFunc();
                         }
                     }
-                    else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
-                    {///launch every BombHoldDelay
-                        BombFire++;
-                        RequestSerialization();
-                        if (IsOwner)
-                        { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+                    else
+                    {
+                        CCRPheld = true;
+                        if (!CCRPfired)
+                        {
+                            //CCRP hold to fire when the bomb will land close enough to the target.
+                            Vector2 groundzeroCoordinate = new Vector2(groundzero.x, groundzero.z);
+                            if (Vector2.Distance(groundzeroCoordinate, CurrentCCRPtarget) < CCRP_Acc_Threshold && NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
+                            {
+                                BombFireFunc();
+                                CCRPfired = true;
+                            }
+                        }
                     }
                     TriggerLastFrame = true;
                 }
-                else { TriggerLastFrame = false; }
+                else { TriggerLastFrame = false; CCRPfired = false; CCRPheld = false; }
+            } else if (HudCCRP) { HudCCRP.SetActive(false); }
+        }
+        void BombFireFunc()
+        {
+            BombFire++;
+            RequestSerialization();
+            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+            { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+        }
+        //CCIP calculation happens here
+        public void SimulateTrajectory()
+        {
+            hitdetect = false;
+            Vector3 Velocity = AircraftRigidbody.velocity;
+            Vector3 Pos = BombLaunchPoint.transform.position; //The starting point of the trajectory calculation.
+            float drag = BombRigidbody.drag;
+
+            for (int i = 0; i < MaxiterationStep; i++) //Iterates through the trajectory.
+            {
+                Pos.y += Velocity.y * iterationTime + Gravity * iterationTime * iterationTime * 0.5f; //Accounts for gravity and predicts the next position at that timestep.
+                Pos.x += Velocity.x * iterationTime;
+                Pos.z += Velocity.z * iterationTime;
+                Velocity.y += Gravity * iterationTime; //Updates the velocity.
+                Velocity = Velocity * (1 - iterationTime * drag); //This works pretty well but is slightly off...
+                Vector3 PosOffset = Velocity * iterationTime; //This is the actual position the bomb will be at the current timestep.
+
+                if (i > IterationsBeforeCollisionCheck && !hitdetect) //Iterations before collisioncheck is to prevent the plane from marking itself as a hit. It then does a raycast that extends for 2m further than the next position.
+                {
+                    Ray ray = new Ray(origin: Pos, direction: PosOffset);
+                    RaycastHit hit;
+                    if (Physics.Raycast(ray, out hit, PosOffset.magnitude + 2f))
+                    {
+                        hitdetect = true;
+                        groundzero = hit.point;
+                        PredictedImpact.transform.position = hit.point; //This empty is nessecary for CCRP release prediction to work.
+                    }
+                }
+                if (HudCCIP && DoCCIP) { HudCCIP.SetActive(hitdetect); } //Makes the hud element go away if the prediction didn't find a groundzero within the bomblifetime.
+                if (HudCCRP && DoCCRP) { HudCCRP.SetActive(hitdetect); }
+                if (!hitdetect) { CCRPmode = false; }
             }
         }
+        void GetCCRPtarget() //Iterates through all the empties in CCRP_Targets and gets the closest target to groundzero
+        {
+            ClosestDistance = float.PositiveInfinity;
+            Transform ClosestTarget = null;
+            foreach (Transform Target in CCRP_Targets)
+            {
+                float distance = Vector3.Distance(groundzero, Target.position);
+                if (distance < ClosestDistance)
+                {
+                    ClosestDistance = distance;
+                    ClosestTarget = Target;
+                }
+            }
+            CurrentCCRPtarget = new Vector2(ClosestTarget.position.x, ClosestTarget.position.z);
+            if (ClosestDistance < MinDistanceToTarget)
+            {
+                if (DoCCRP && hitdetect) { CCRPmode = true; }
+            }
+            else
+            {
+                CCRPmode = false;
+            }
+        }
+        void HUD()
+        {
+            if (PredictiveBombCam)
+            {
+                CCIPLookRot = (groundzero - AircraftRigidbody.position);
+                AtGCam.transform.LookAt(groundzero);
+                AtGCam.fieldOfView = Mathf.Clamp(90f / (CCIPLookRot.magnitude * CCIPLookRot.magnitude), 2f, 60f);
+            }
+            if (DoCCIP)
+            {
+                HudCCIP.transform.rotation = Quaternion.LookRotation(CCIPLookRot);
+                TopOfCCIPline.transform.position = LinkedHudVelocityVector.position;
+            }
+            if (DoCCRP)
+            {
+                Vector2 AircraftCoordinate = new Vector2(AircraftRigidbody.position.x, AircraftRigidbody.position.z);
+                Vector2 HitCoordinate = new Vector2(groundzero.x, groundzero.z);
+                Vector2 CCRPLookRot = (CurrentCCRPtarget - AircraftCoordinate);
+                CCRPHeading = Mathf.Atan2(CCRPLookRot.y, CCRPLookRot.x) * -Mathf.Rad2Deg + 90f;
+                LineRotator.transform.rotation = Quaternion.Euler(new Vector3(0, CCRPHeading, 0));
+
+                float angle;
+                Vector3 Nosepos = AircraftRigidbody.transform.forward;
+                angle = Mathf.Clamp(Vector3.Angle(Nosepos, Vector3.up) - 90, -90, 90);
+
+                CrosshairRotator.transform.rotation = Quaternion.Euler(new Vector3(angle, CCRPHeading, 0));
+
+                PredictedImpact.transform.rotation = LineRotator.transform.rotation;
+                DistanceRelease = Mathf.Clamp(PredictedImpact.transform.InverseTransformPoint(new Vector3(CurrentCCRPtarget.x, 0, CurrentCCRPtarget.y)).z * -multiplier, -90, 90);
+                TimingRotator.transform.localRotation = Quaternion.Euler(new Vector3(DistanceRelease, 0, 0));
+                if (Mathf.Abs(DistanceRelease) < 60)
+                {
+                    TimingRotator.SetActive(true);
+                }
+                else { TimingRotator.SetActive(false); }
+            }
+        }
+        //CCIP stuff ends here
+
         public void LaunchBomb()
         {
             LastBombDropTime = Time.time;
+            IsOwner = localPlayer.IsOwner(gameObject);
             if (NumBomb > 0) { NumBomb--; }
             BombAnimator.SetTrigger(AnimFiredTriggerName);
             if (Bomb)
