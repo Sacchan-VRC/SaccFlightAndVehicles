@@ -125,6 +125,7 @@ namespace SaccFlightAndVehicles
         bool hitdetect = false;
         bool CCRPmode = false; //I added "CCRPmode" this mode makes it so when the trigger/spacebar is held the plane automatically drops the bomb whenever the bomb will hit close enough to the target.
         bool CCRPfired;
+        bool CCRPheld;
 
         float Gravity = Physics.gravity.magnitude * -1;
 
@@ -318,24 +319,28 @@ namespace SaccFlightAndVehicles
                                 BombFireFunc();
                             }
                         }
-                        else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !CCRPfired && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing"))) //!CCRPfired here so if you keep holding trigger after strafing a ccrp target it won't start dropping bombs afterwards unless you re-press the trigger.
+                        else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && !CCRPfired && !CCRPheld && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing"))) //!CCRPfired here so if you keep holding trigger after strafing a ccrp target it won't start dropping bombs afterwards unless you re-press the trigger.
                         {//launch every BombHoldDelay
                             BombFireFunc();
                         }
                     }
-                    else if (!CCRPfired)
+                    else
                     {
-                        //CCRP hold to fire when the bomb will land close enough to the target.
-                        Vector2 groundzeroCoordinate = new Vector2(groundzero.x, groundzero.z);
-                        if (Vector2.Distance(groundzeroCoordinate, CurrentCCRPtarget) < CCRP_Acc_Threshold && NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
+                        CCRPheld = true;
+                        if (!CCRPfired)
                         {
-                            BombFireFunc();
-                            CCRPfired = true;
+                            //CCRP hold to fire when the bomb will land close enough to the target.
+                            Vector2 groundzeroCoordinate = new Vector2(groundzero.x, groundzero.z);
+                            if (Vector2.Distance(groundzeroCoordinate, CurrentCCRPtarget) < CCRP_Acc_Threshold && NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
+                            {
+                                BombFireFunc();
+                                CCRPfired = true;
+                            }
                         }
                     }
                     TriggerLastFrame = true;
                 }
-                else { TriggerLastFrame = false; CCRPfired = false; }
+                else { TriggerLastFrame = false; CCRPfired = false; CCRPheld = false; }
             } else if (HudCCRP) { HudCCRP.SetActive(false); }
         }
         void BombFireFunc()
