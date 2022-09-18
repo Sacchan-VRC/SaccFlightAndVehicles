@@ -265,6 +265,7 @@ namespace SaccFlightAndVehicles
                 pname = other.transform.GetChild(0).name;
                 index = pname.LastIndexOf(':');
             }
+            int dmg = 1;
             if (index > -1)
             {
                 pname = pname.Substring(index);
@@ -275,10 +276,8 @@ namespace SaccFlightAndVehicles
                         if (pname[2] >= '0' && pname[2] <= '9')
                         {
                             //damage reduction using case:
-                            int dmg = pname[2] - 48;
+                            dmg = pname[2] - 48;
                             LastHitBulletDamageMulti = 1 / (float)(dmg);
-                            SendEventToExtensions("SFEXT_L_BulletHit");
-                            SendDamageEvent(dmg, false);
                         }
                     }
                     else if (pname[1] >= '0' && pname[1] <= '9')
@@ -286,22 +285,13 @@ namespace SaccFlightAndVehicles
                         if (pname[2] >= '0' && pname[2] <= '9')
                         {
                             //damage reduction using case:
-                            int dmg = 10 * (pname[1] - 48);
+                            dmg = 10 * (pname[1] - 48);
                             dmg += pname[2] - 48;
                             LastHitBulletDamageMulti = dmg == 1 ? 1 : Mathf.Pow(2, dmg);
-                            SendEventToExtensions("SFEXT_L_BulletHit");
-                            SendDamageEvent(dmg, true);
                         }
                     }
                 }
             }
-            else
-            {
-                LastHitBulletDamageMulti = 1;
-                SendEventToExtensions("SFEXT_L_BulletHit");
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
-            }
-
             //Try to find the saccentity that shot at us
             GameObject EnemyObjs = other;
             SaccEntity EnemyEntityControl = null;
@@ -325,6 +315,14 @@ namespace SaccFlightAndVehicles
                 if (EnemyUdonBehaviour)
                 { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
             }
+            SendEventToExtensions("SFEXT_L_BulletHit");
+            SendDamageEvent(dmg, true);
+            if (LastAttacker) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
+        }
+        private void SendDefaultDamage()
+        {
+            LastHitBulletDamageMulti = 1;
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
         }
         private void Update()
         {

@@ -69,9 +69,10 @@ namespace SaccFlightAndVehicles
         [Tooltip("Click Find Campositions in Scene to test if your cameraposition is added, this function is run on build.\nName an object in the scene :campos<name> in order for it to get added to this list\n add FOV:60 to the end of the name to set FOV\nExample name: :camposVehicleCamFOV:20")]
         public Transform[] CamPositions;
         public Text ChannelNumberText;
+        public bool ShowChannelNumber = true;
         private float StartFov;
-        [System.NonSerializedAttribute] public GameObject[] CamTargets = new GameObject[80];
-        [UdonSynced, FieldChangeCallback(nameof(CurrentTarget))] private int _CurrentTarget;
+        [System.NonSerializedAttribute] public GameObject[] CamTargets = new GameObject[0];
+        [UdonSynced, FieldChangeCallback(nameof(CurrentTarget)), System.NonSerializedAttribute] public int _CurrentTarget;
         public int CurrentTarget
         {
             set
@@ -87,11 +88,18 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public bool Disabled = true;
         [System.NonSerializedAttribute] public bool InEditor = true;
-        private Transform CameraTransform;
-        private SaccEntity TargetEntity;
-        private Transform TargetCoM;
-        void Start()
+        [System.NonSerializedAttribute] public Transform CameraTransform;
+        [System.NonSerializedAttribute] public SaccEntity TargetEntity;
+        [System.NonSerializedAttribute] public Transform TargetCoM;
+        private bool Initialized = false;
+        private void Start()
         {
+            Init();
+        }
+        public void Init()
+        {
+            if (Initialized) { return; }
+            Initialized = true;
             CameraTransform = Cam.transform;
             StartFov = Cam.fieldOfView;
             localPlayer = Networking.LocalPlayer;
@@ -99,13 +107,13 @@ namespace SaccFlightAndVehicles
             //get array of AAM Targets
 
             //populate AAMTargets list
-            int n = 0;
-            foreach (Transform camtarget in CamPositions)
+            CamTargets = new GameObject[CamPositions.Length];
+            for (int i = 0; i < CamPositions.Length; i++)
             {
                 SaccEntity TargetEntityStart = null;
-                if (camtarget)
+                if (CamPositions[i])
                 {
-                    GameObject TargObjs = camtarget.gameObject;
+                    GameObject TargObjs = CamPositions[i].gameObject;
                     while (!TargetEntityStart && TargObjs.transform.parent)
                     {
                         TargObjs = TargObjs.transform.parent.gameObject;
@@ -115,15 +123,13 @@ namespace SaccFlightAndVehicles
 
                 if (TargetEntityStart)
                 {
-                    CamTargets[n] = TargetEntityStart.gameObject;
+                    CamTargets[i] = TargetEntityStart.gameObject;
                 }
                 else
                 {
-                    CamTargets[n] = null;
+                    CamTargets[i] = null;
                 }
-                n++;
             }
-            n = 0;
 
             Disabled = false;
             TurnOff();
@@ -149,11 +155,12 @@ namespace SaccFlightAndVehicles
         {
             if (TargetEntity)
             {
-                ChannelNumberText.text = string.Concat((CurrentTarget + 1).ToString(), "\n", TargetEntity.UsersName);
+                ChannelNumberText.text = (ShowChannelNumber ? (CurrentTarget + 1).ToString() + "\n" : "") + TargetEntity.UsersName;
             }
             else
             {
-                ChannelNumberText.text = string.Concat((CurrentTarget + 1).ToString());
+                if (ShowChannelNumber)
+                { ChannelNumberText.text = string.Concat((CurrentTarget + 1).ToString()); }
             }
         }
         public void TurnOff()

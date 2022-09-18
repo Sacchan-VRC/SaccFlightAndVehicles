@@ -24,6 +24,8 @@ namespace SaccFlightAndVehicles
         public AudioSource EnterWaterOutside;
         [Tooltip("Looping Sound that plays while vehicle is underwater and player is inside")]
         public AudioSource UnderWater;
+        [Tooltip("When you do damage to an enemy, play this sound")]
+        public AudioSource DamageFeedBack;
         [Tooltip("Sounds that can be played when vehicle explodes")]
         public AudioSource[] Explosion;
         [Tooltip("Sounds that can be played when vehicle gets hit by something")]
@@ -519,6 +521,10 @@ namespace SaccFlightAndVehicles
             { SteerWheels[i].SetProgramVariable("CurrentlyDistant", true); }
             for (int i = 0; i < OtherWheels.Length; i++)
             { OtherWheels[i].SetProgramVariable("CurrentlyDistant", true); }
+        }
+        public void SFEXT_L_DamageFeedback()
+        {
+            if (DamageFeedBack) { DamageFeedBack.PlayOneShot(DamageFeedBack.clip); }
         }
     }
 }

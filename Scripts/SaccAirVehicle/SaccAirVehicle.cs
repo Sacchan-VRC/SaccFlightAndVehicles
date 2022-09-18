@@ -1757,6 +1757,7 @@ namespace SaccFlightAndVehicles
                                //synced variables
                 Health = FullHealth;
                 Fuel = FullFuel;
+                EngineOutput = 0;
                 VTOLAngle = VTOLDefaultValue;
                 VTOLAngleInput = VTOLDefaultValue;
                 VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
@@ -1801,6 +1802,7 @@ namespace SaccFlightAndVehicles
                     PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
                     if (PredictedHealth <= 0)
                     {
+                        LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
@@ -1809,10 +1811,10 @@ namespace SaccFlightAndVehicles
                     PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
                     if (PredictedHealth <= 0)
                     {
+                        LastHitTime = Time.time;
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
-                LastHitTime = Time.time;
             }
         }
         public void SFEXT_G_BulletHit()

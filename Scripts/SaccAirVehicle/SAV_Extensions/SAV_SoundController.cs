@@ -79,6 +79,8 @@ namespace SaccFlightAndVehicles
         public AudioSource EnterWaterOutside;
         [Tooltip("Looping Sound that plays while vehicle is underwater and player is inside")]
         public AudioSource UnderWater;
+        [Tooltip("When you do damage to an enemy, play this sound")]
+        public AudioSource DamageFeedBack;
         [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
         public AudioSource[] DopplerSounds;
         [Tooltip("Amount the outside thrust volume is multiplied by when you're inside the vehicle")]
@@ -1083,6 +1085,9 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void SFEXT_L_DamageFeedback()
+        {
+            if (DamageFeedBack) { DamageFeedBack.PlayOneShot(DamageFeedBack.clip); }
+        }
     }
-
 }

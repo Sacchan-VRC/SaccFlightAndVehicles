@@ -366,10 +366,12 @@ namespace SaccFlightAndVehicles
             {
                 if (IsOwner)
                 {
-                    DirectHit = true;
                     SaccEntity TargetEntity = other.gameObject.GetComponent<SaccEntity>();
                     if (TargetEntity)
                     {
+                        DirectHit = true;
+                        TargetEntity.LastAttacker = EntityControl;
+                        TargetSAVControl.SetProgramVariable("LastHitTime", Time.time);
                         TargetEntity.SendEventToExtensions("SFEXT_L_MissileHit100");
                         //Debug.Log("DIRECTHIT");
                     }
@@ -438,6 +440,7 @@ namespace SaccFlightAndVehicles
                         }
                     }
                 }
+                EntityControl.SendEventToExtensions("SFEXT_L_DamageFeedback");
             }
             MissileAnimator.SetTrigger("explode");
             MissileAnimator.SetBool("hitwater", hitwater);
