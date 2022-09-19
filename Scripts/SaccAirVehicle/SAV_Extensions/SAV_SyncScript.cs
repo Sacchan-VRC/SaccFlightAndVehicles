@@ -82,6 +82,8 @@ namespace SaccFlightAndVehicles
         private float CurrentUpdateInterval;
         private int EnterIdleModeNumber;
         private float PrevMaxExtrap;
+        private double lastframetime;
+        private Vector3 poslasframe;
         System.Diagnostics.Stopwatch StartStopWatch = new System.Diagnostics.Stopwatch();//the most accurate timer AFAIK
         public void SFEXT_L_EntityStart()
         {
@@ -148,6 +150,7 @@ namespace SaccFlightAndVehicles
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             VehicleRigid.drag = 0;
             VehicleRigid.angularDrag = 0;
+            lastframetime = StartStopWatch.Elapsed.TotalSeconds;
         }
         public void SFEXT_O_LoseOwnership()
         {
@@ -205,7 +208,24 @@ namespace SaccFlightAndVehicles
         {
             if (IsOwner)//send data
             {
-                if (StartStopWatch.Elapsed.TotalSeconds > nextUpdateTime - (Time.deltaTime * .5f))
+                double time = StartStopWatch.Elapsed.TotalSeconds;
+                if (Time.deltaTime > .05f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
+                {
+                    double acctime = StartStopWatch.Elapsed.TotalSeconds;
+                    double accuratedelta = acctime - lastframetime;
+                    Vector3 RigidMovedAmount = VehicleRigid.velocity * Time.deltaTime;
+                    float DistanceTravelled = RigidMovedAmount.magnitude;
+
+                    if (DistanceTravelled < (VehicleRigid.velocity * (float)accuratedelta).magnitude)
+                    {
+                        //smooth, but the extrapolation gets added each time (i think) causing vehicle to be faster (1%~)
+                        //it's more correct to use RB position, but then you're removing the RB extrapolation and things get jerky.
+                        //is there a best of both worlds solution?
+                        VehicleRigid.transform.position += (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
+                    }
+                }
+                else { lastframetime = time; }
+                if (time > nextUpdateTime - (Time.deltaTime * .5f))
                 {
                     if (!Networking.IsClogged || Piloting)
                     {
@@ -252,11 +272,11 @@ namespace SaccFlightAndVehicles
                         //update time is a double so that it can interact with (int)Networking.GetServerTimeInMilliseconds() without innacuracy
                         //update time is the Networking.GetServerTimeInMilliseconds() taken from SFEXT_L_EntityStart() + real time as float since that to make
                         //the sub-millisecond error constant to eliminate jitter
-                        O_UpdateTime = (dblStartupTimeMS) + (StartStopWatch.Elapsed.TotalSeconds);//send servertime of update
+                        O_UpdateTime = (dblStartupTimeMS) + (time);//send servertime of update
                         RequestSerialization();
-                        UpdateTime = StartStopWatch.Elapsed.TotalSeconds;
+                        UpdateTime = time;
                     }
-                    nextUpdateTime = (StartStopWatch.Elapsed.TotalSeconds + (double)(IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
+                    nextUpdateTime = (time + (double)(IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
                 }
             }
             else//extrapolate and interpolate based on recieved data
@@ -283,7 +303,7 @@ namespace SaccFlightAndVehicles
                             StartStopWatch.Elapsed.TotalSeconds)) - L_LastUpdateTime);
                     //extrapolated position based on data from previous update using time passed since previous update
                     Vector3 OldPredictedPosition = L_LastPingAdjustedPosition
-                        + (LastExtrapolationDirection * TimeSincePreviousUpdate);
+                        + (LastExtrapolationDirection * TimeSinceUpdate);
                     //extrapolated rotation based on data from previous update using time passed since previous update
                     Quaternion OldPredictedRotation =
                         (Quaternion.SlerpUnclamped(Quaternion.identity, LastCurAngMom, LastPing + TimeSincePreviousUpdate)
@@ -333,6 +353,7 @@ namespace SaccFlightAndVehicles
             if (O_UpdateTime != O_LastUpdateTime && !IsOwner)//only do anything if OnDeserialization was for this script
             {
                 LastAcceleration = Acceleration;
+                L_LastPingAdjustedPosition = CalcJustPos();
                 LastPing = Ping;
                 L_LastUpdateTime = L_UpdateTime;
                 LastCurAngMom = CurAngMom;
@@ -373,7 +394,6 @@ namespace SaccFlightAndVehicles
                 //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
                 SAVControl.SetProgramVariable("CurrentVel", CurrentVelocity);
 
-                L_LastPingAdjustedPosition = L_PingAdjustedPosition;
                 L_PingAdjustedPosition = O_Position + ((CurrentVelocity + Acceleration) * Ping);
 
                 LastExtrapolationDirection = ExtrapolationDirection;
@@ -401,6 +421,36 @@ namespace SaccFlightAndVehicles
                     O_LastRotation2 = O_LastRotation = O_Rotation_Q;
                     O_LastPosition = O_Position;
                 }
+            }
+        }
+        private Vector3 CalcJustPos()
+        {
+            float TimeSinceUpdate = (float)((dblStartupTimeMS + (
+                    StartStopWatch.Elapsed.TotalSeconds)) - L_UpdateTime);
+
+            Vector3 PredictedPosition = L_PingAdjustedPosition
+                 + (ExtrapolationDirection * TimeSinceUpdate);
+
+            Quaternion PredictedRotation =
+                (Quaternion.SlerpUnclamped(Quaternion.identity, CurAngMom, Ping + TimeSinceUpdate)
+                * O_Rotation_Q);
+
+            if (TimeSinceUpdate < CurrentUpdateInterval)
+            {
+
+                float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + (
+                        StartStopWatch.Elapsed.TotalSeconds)) - L_LastUpdateTime);
+
+                Vector3 OldPredictedPosition = L_LastPingAdjustedPosition
+                    + (LastExtrapolationDirection * TimeSinceUpdate);
+
+                //Set position to a lerp(interpolation) of last 2 extrapolations  
+                //never set position using rigidbody.position because it's 1 frame lagged due to waiting for a physics update before setting
+                return Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider);
+            }
+            else
+            {
+                return PredictedPosition;
             }
         }
         public void SFEXT_O_Explode()//all the things players see happen when the vehicle explodes
