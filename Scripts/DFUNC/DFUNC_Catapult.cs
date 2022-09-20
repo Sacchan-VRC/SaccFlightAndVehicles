@@ -220,9 +220,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (!TriggerLastFrame)
                         {
-                            Launching = true;
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PreLaunchCatapult));
-                            EntityControl.SendEventToExtensions("SFEXT_O_LaunchFromCatapult");
+                            CatapultLaunchNow();
                         }
                         TriggerLastFrame = true;
                     }
@@ -290,10 +288,15 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (OnCatapult && !Launching)
+            CatapultLaunchNow();
+        }
+        public void CatapultLaunchNow()
+        {
+            if (IsOwner && OnCatapult && !Launching)
             {
                 Launching = true;
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PreLaunchCatapult));
+                EntityControl.SendEventToExtensions("SFEXT_O_LaunchFromCatapult");
             }
         }
         public void PreLaunchCatapult()
