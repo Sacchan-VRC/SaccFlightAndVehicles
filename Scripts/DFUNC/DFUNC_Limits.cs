@@ -14,10 +14,14 @@ namespace SaccFlightAndVehicles
         public bool DefaultLimitsOn = true;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
-        [Tooltip("Try to stop pilot pulling this many Gs")]
+        [Tooltip("Below this number of Gs, G Limiter has zero effect")]
+        public float GLimiter_Begin = 0f;
+        [Tooltip("Linearly decrease control limit up to this many Gs")]
         public float GLimiter = 12f;
         [Tooltip("Try to stop pilot pulling this much AoA")]
         public float AoALimiter = 15f;
+        public bool DisableGLimiter = false;
+        public bool DisableAoALimiter = false;
         private SaccEntity EntityControl;
         private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
@@ -25,6 +29,7 @@ namespace SaccFlightAndVehicles
         private bool Piloting;
         private bool Grounded = true;
         private bool Selected;
+        private float GLimiterRange;
         [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -35,6 +40,7 @@ namespace SaccFlightAndVehicles
             { InVR = localPlayer.IsUserInVR(); }
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             if (!DefaultLimitsOn) { SetLimitsOff(); }
+            GLimiterRange = GLimiter - GLimiter_Begin;
         }
         public void DFUNC_Selected()
         {
@@ -129,8 +135,10 @@ namespace SaccFlightAndVehicles
             }
             if (FlightLimitsEnabled && Piloting && !Grounded)
             {
-                float GLimitStrength = Mathf.Clamp(1 - (Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs")) / GLimiter), 0, 1);
-                float AoALimitStrength = Mathf.Clamp(1 - (Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack")) / AoALimiter), 0, 1);
+                float GLimitStrength = 1f;
+                float AoALimitStrength = 1f;
+                if (!DisableGLimiter) { GLimitStrength = Mathf.Clamp(1 - ((-GLimiter_Begin + Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs"))) / GLimiterRange), 0, 1); }
+                if (!DisableAoALimiter) { AoALimitStrength = Mathf.Clamp(1 - (Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack")) / AoALimiter), 0, 1); }
                 SAVControl.SetProgramVariable("Limits", Mathf.Min(GLimitStrength, AoALimitStrength));
             }
         }

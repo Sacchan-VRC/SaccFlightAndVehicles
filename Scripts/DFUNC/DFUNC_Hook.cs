@@ -115,9 +115,9 @@ namespace SaccFlightAndVehicles
                 else { TriggerLastFrame = false; }
             }
             //check for catching a cable with hook
-            if (HookDown)
+            if (HookDown && !Hooked)
             {
-                if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookCableLayer) && !Hooked)
+                if (Physics.Raycast(HookDetector.position, Vector3.down, 2f, HookCableLayer))
                 {
                     HookedLoc = VehicleTransform.position;
                     Hooked = true;
