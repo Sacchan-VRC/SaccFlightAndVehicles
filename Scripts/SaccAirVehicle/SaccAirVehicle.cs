@@ -51,7 +51,7 @@ namespace SaccFlightAndVehicles
         public bool VerticalThrottle = false;
         [Tooltip("Multiply how much the VR throttle moves relative to hand movement")]
         public float ThrottleSensitivity = 6f;
-        [Tooltip("How long it takes to raech max throttle while holding the key on desktop")]
+        [Tooltip("How quickly to reach max throttle while holding the key on desktop")]
         public float ThrottleSpeedDesktop = .5f;
         [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
         public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
@@ -1105,7 +1105,8 @@ namespace SaccFlightAndVehicles
                                 }
                             }
 
-                            RotationInputs.x = Mathf.Clamp(VRJoystickPos.x + Wi + Si + downi + upi, -1, 1) * Limits;
+                            RotationInputs.x = Mathf.Clamp(VRJoystickPos.x + Wi + Si + downi + upi, -1, 1);
+                            if ((RotationInputs.x < 0 && VertGs > 0) || (RotationInputs.x > 0 && VertGs < 0)) { RotationInputs.x *= Limits; }
                             RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.y, -1, 1) * Limits;
                             //roll isn't subject to flight limits
                             RotationInputs.z = Mathf.Clamp(((VRJoystickPos.z + Ai + Di + lefti + righti) * -1), -1, 1);
@@ -1792,18 +1793,18 @@ namespace SaccFlightAndVehicles
                 if (Time.time - LastHitTime > 2)
                 {
                     PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
+                    LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
                     if (PredictedHealth <= 0)
                     {
-                        LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
                 else
                 {
                     PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
+                    LastHitTime = Time.time;
                     if (PredictedHealth <= 0)
                     {
-                        LastHitTime = Time.time;
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
@@ -1813,7 +1814,6 @@ namespace SaccFlightAndVehicles
         {
             if (!EntityControl.dead)
             {
-                LastHitTime = Time.time;
                 if (IsOwner)
                 {
                     Health -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;

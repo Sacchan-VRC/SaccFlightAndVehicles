@@ -11,6 +11,8 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     public SaccEntity EntityControl;
     private SaccVehicleSeat[] VehicleSeats;
     public SaccVehicleSeat ThisSVSeat;
+    public Transform[] MoveTransforms;
+    public Transform[] MoveTransforms_CoPosition;
     private SaccVehicleSeat PilotSVSeat;
     private bool TriggerLastFrame;
     private bool UseLeftTrigger;
@@ -21,6 +23,8 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     private VRCPlayerApi SeatAPI;
     private VRCPlayerApi PilotSeatAPI;
     private SaccAirVehicle SAVControl;
+    private Vector3[] MoveTransformsPos_Orig;
+    private Quaternion[] MoveTransformsRot_Orig;
     public void DFUNC_LeftDial() { UseLeftTrigger = true; }
     public void DFUNC_RightDial() { UseLeftTrigger = false; }
     public void SFEXTP_L_EntityStart()
@@ -30,6 +34,17 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
         PilotThisSeatOnly = PilotSVSeat.ThisSeatOnly;
         ThisThisSeatOnly = ThisSVSeat.ThisSeatOnly;
         SAVControl = (SaccAirVehicle)EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
+        int mtlen = MoveTransforms.Length;
+        MoveTransformsPos_Orig = new Vector3[mtlen];
+        MoveTransformsRot_Orig = new Quaternion[mtlen];
+        for (int i = 0; i < mtlen; i++)
+        {
+            if (MoveTransforms[i])
+            {
+                MoveTransformsPos_Orig[i] = MoveTransforms[i].localPosition;
+                MoveTransformsRot_Orig[i] = MoveTransforms[i].localRotation;
+            }
+        }
     }
     public void TakeControl()
     {
@@ -75,6 +90,14 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
             SAVControl.EngineOnOnEnter = autoEngineEnter;
             SAVControl.EngineOffOnExit = autoEngineExit;
         }
+        for (int i = 0; i < MoveTransforms.Length; i++)
+        {
+            if (MoveTransforms[i])
+            {
+                MoveTransforms[i].position = MoveTransforms_CoPosition[i].position;
+                MoveTransforms[i].rotation = MoveTransforms_CoPosition[i].rotation;
+            }
+        }
         Swapped = true;
     }
     public void UnSwap_Event()
@@ -110,6 +133,14 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
         {
             SAVControl.EngineOnOnEnter = autoEngineEnter;
             SAVControl.EngineOffOnExit = autoEngineExit;
+        }
+        for (int i = 0; i < MoveTransforms.Length; i++)
+        {
+            if (MoveTransforms[i])
+            {
+                MoveTransforms[i].localPosition = MoveTransformsPos_Orig[i];
+                MoveTransforms[i].localRotation = MoveTransformsRot_Orig[i];
+            }
         }
         Swapped = false;
     }
