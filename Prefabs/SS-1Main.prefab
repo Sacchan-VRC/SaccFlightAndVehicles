@@ -924,6 +924,7 @@ MonoBehaviour:
   AngleLimitRight: 45
   AngleLimitUp: 45
   AngleLimitDown: 45
+  AllowGroundedFiring: 1
   UseProjectileMode: 0
   Projectile: {fileID: 0}
   ProjectileAmmo: 30
@@ -1026,7 +1027,10 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 1460606752}
   OnDefault: 0
-  PilotExitTurnOff: 1
+  UserExitTurnOff: 1
+  UserExitTurnOn: 0
+  UserEnterTurnOff: 0
+  UserEnterTurnOn: 0
   ToggleMinDelay: 0
   ToggleObjects: []
   ToggleEmission: []
@@ -37556,7 +37560,7 @@ ParticleSystem:
   playOnAwake: 1
   useUnscaledTime: 0
   autoRandomSeed: 1
-  useRigidbodyForVelocity: 1
+  useRigidbodyForVelocity: 0
   startDelay:
     serializedVersion: 2
     minMaxState: 0
@@ -37789,7 +37793,7 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 0.08
+      scalar: 0.4
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -38105,7 +38109,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
-    maxNumParticles: 800
+    maxNumParticles: 405
     size3D: 0
     rotation3D: 0
     gravityModifier:
@@ -38163,9 +38167,9 @@ ParticleSystem:
         m_RotationOrder: 4
   ShapeModule:
     serializedVersion: 6
-    enabled: 0
+    enabled: 1
     type: 4
-    angle: 0.25
+    angle: 0.5
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -38370,7 +38374,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 100
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -41516,7 +41520,7 @@ ParticleSystem:
     widthOverTrail:
       serializedVersion: 2
       minMaxState: 1
-      scalar: 2
+      scalar: 0.5
       minScalar: 1
       maxCurve:
         serializedVersion: 2
@@ -47519,7 +47523,7 @@ ParticleSystem:
   playOnAwake: 1
   useUnscaledTime: 0
   autoRandomSeed: 1
-  useRigidbodyForVelocity: 1
+  useRigidbodyForVelocity: 0
   startDelay:
     serializedVersion: 2
     minMaxState: 0
@@ -48068,7 +48072,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
-    maxNumParticles: 800
+    maxNumParticles: 405
     size3D: 0
     rotation3D: 0
     gravityModifier:
@@ -48126,9 +48130,9 @@ ParticleSystem:
         m_RotationOrder: 4
   ShapeModule:
     serializedVersion: 6
-    enabled: 0
+    enabled: 1
     type: 4
-    angle: 25
+    angle: 0.5
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -48214,7 +48218,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 1
+      value: 0.0001
       mode: 0
       spread: 0
       speed:
@@ -48333,7 +48337,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 15
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -82829,6 +82833,7 @@ MonoBehaviour:
   EnterWater: {fileID: 2849390445388419823}
   EnterWaterOutside: {fileID: 0}
   UnderWater: {fileID: 2849390443838908166}
+  DamageFeedBack: {fileID: 0}
   DopplerSounds: []
   InVehicleThrustVolumeFactor: 0.09
   AllDoorsClosed: 0
@@ -86098,7 +86103,7 @@ MonoBehaviour:
   GroundDetectorLayers:
     serializedVersion: 2
     m_Bits: 2049
-  Health: 100
+  Health: 403
   RepeatingWorld: 1
   RepeatingWorldDistance: 20000
   SwitchHandsJoyThrottle: 0

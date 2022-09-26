@@ -20598,8 +20598,11 @@ MonoBehaviour:
   HudLimit: {fileID: 5465751469429868294}
   DefaultLimitsOn: 1
   Dial_Funcon: {fileID: 4740379952925402349}
+  GLimiter_Begin: 0
   GLimiter: 12
   AoALimiter: 15
+  DisableGLimiter: 0
+  DisableAoALimiter: 0
 --- !u!114 &914079681347326636
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26894,7 +26897,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
-    maxNumParticles: 800
+    maxNumParticles: 405
     size3D: 0
     rotation3D: 0
     gravityModifier:
@@ -26952,9 +26955,9 @@ ParticleSystem:
         m_RotationOrder: 4
   ShapeModule:
     serializedVersion: 6
-    enabled: 0
+    enabled: 1
     type: 4
-    angle: 0.25
+    angle: 0.5
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -27159,7 +27162,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 100
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -32408,7 +32411,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
-    maxNumParticles: 800
+    maxNumParticles: 405
     size3D: 0
     rotation3D: 0
     gravityModifier:
@@ -32466,9 +32469,9 @@ ParticleSystem:
         m_RotationOrder: 4
   ShapeModule:
     serializedVersion: 6
-    enabled: 0
+    enabled: 1
     type: 4
-    angle: 25
+    angle: 0.5
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -32554,7 +32557,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 1
+      value: 0.0001
       mode: 0
       spread: 0
       speed:
@@ -32673,7 +32676,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 15
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -60105,7 +60108,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
-    maxNumParticles: 800
+    maxNumParticles: 405
     size3D: 0
     rotation3D: 0
     gravityModifier:
@@ -60163,9 +60166,9 @@ ParticleSystem:
         m_RotationOrder: 4
   ShapeModule:
     serializedVersion: 6
-    enabled: 0
+    enabled: 1
     type: 4
-    angle: 0.25
+    angle: 0.5
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -60370,7 +60373,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 100
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -65737,7 +65740,7 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     randomizeRotationDirection: 0
-    maxNumParticles: 800
+    maxNumParticles: 405
     size3D: 0
     rotation3D: 0
     gravityModifier:
@@ -65795,9 +65798,9 @@ ParticleSystem:
         m_RotationOrder: 4
   ShapeModule:
     serializedVersion: 6
-    enabled: 0
+    enabled: 1
     type: 4
-    angle: 25
+    angle: 0.5
     length: 5
     boxThickness: {x: 0, y: 0, z: 0}
     radiusThickness: 1
@@ -65883,7 +65886,7 @@ ParticleSystem:
     sphericalDirectionAmount: 0
     randomPositionAmount: 0
     radius:
-      value: 1
+      value: 0.0001
       mode: 0
       spread: 0
       speed:
@@ -66002,7 +66005,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 15
+      scalar: 50
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -95885,6 +95888,7 @@ MonoBehaviour:
   EnterWater: {fileID: 7414449358710994856}
   EnterWaterOutside: {fileID: 5465751470705844540}
   UnderWater: {fileID: 7414449359777769954}
+  DamageFeedBack: {fileID: 0}
   DopplerSounds: []
   InVehicleThrustVolumeFactor: 0.09
   AllDoorsClosed: 1
@@ -96116,7 +96120,7 @@ MonoBehaviour:
   GroundDetectorLayers:
     serializedVersion: 2
     m_Bits: 2049
-  Health: 253
+  Health: 503
   RepeatingWorld: 1
   RepeatingWorldDistance: 20000
   SwitchHandsJoyThrottle: 0
@@ -102136,6 +102140,9 @@ MonoBehaviour:
   AnimBoolName: movecabin
   OnDefault: 0
   PilotExitTurnOff: 0
+  PilotExitTurnOn: 0
+  PilotEnterTurnOff: 0
+  PilotEnterTurnOn: 0
   ToggleMinDelay: 6
   ToggleObjects: []
   ToggleEmission: []

@@ -13,6 +13,7 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     public SaccVehicleSeat ThisSVSeat;
     public Transform[] MoveTransforms;
     public Transform[] MoveTransforms_CoPosition;
+    public KeyCode TakeControlKey = KeyCode.Space;
     private SaccVehicleSeat PilotSVSeat;
     private bool TriggerLastFrame;
     private bool UseLeftTrigger;
@@ -171,10 +172,6 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     {
         IsUser = false;
     }
-    public void KeyboardInput()
-    {
-        TakeControl();
-    }
     public void DFUNC_Selected()
     {
         TriggerLastFrame = true;
@@ -191,7 +188,7 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
         else
         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-        if (Trigger > 0.75)
+        if (Trigger > 0.75 || Input.GetKey(TakeControlKey))
         {
             if (!TriggerLastFrame)
             {
