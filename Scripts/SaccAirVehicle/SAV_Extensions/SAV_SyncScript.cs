@@ -153,6 +153,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_TakeOwnership()
         {
+            lastframetime = StartStopWatch.Elapsed.TotalSeconds;
             IsOwner = true;
             VehicleRigid.isKinematic = false;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
@@ -217,13 +218,12 @@ namespace SaccFlightAndVehicles
             if (IsOwner)//send data
             {
                 double time = StartStopWatch.Elapsed.TotalSeconds;
-                if (Time.deltaTime > .083f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
+                if (Time.deltaTime > .06666f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
                 {
                     double acctime = StartStopWatch.Elapsed.TotalSeconds;
                     double accuratedelta = acctime - lastframetime;
                     Vector3 RigidMovedAmount = VehicleRigid.velocity * Time.deltaTime;
                     float DistanceTravelled = RigidMovedAmount.magnitude;
-                    lastframetime = time;
 
                     if (DistanceTravelled < (VehicleRigid.velocity * (float)accuratedelta).magnitude)
                     {
