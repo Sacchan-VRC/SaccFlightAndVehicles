@@ -218,7 +218,7 @@ namespace SaccFlightAndVehicles
             if (IsOwner)//send data
             {
                 double time = StartStopWatch.Elapsed.TotalSeconds;
-                if (Time.deltaTime > .06666f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
+                if (Time.deltaTime > .083f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
                 {
                     double acctime = StartStopWatch.Elapsed.TotalSeconds;
                     double accuratedelta = acctime - lastframetime;
@@ -230,9 +230,10 @@ namespace SaccFlightAndVehicles
                         //smooth, but the extrapolation gets added each time (i think) causing vehicle to be faster (10%~)
                         //VehicleTransform.position += (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
                         //it's more correct to use RB position, but then you're removing the RB extrapolation and things get jerky.
-                        //I'm using rigidbody position because although it looks more jerky when flying side-by-side, it's more accurate speed-wise
+                        //When setting rigidbody position, although it looks more jerky when flying side-by-side, it's more accurate speed-wise
                         //and hopefully doesn't cause rapid speed-up-slow-down if you keep on transitioning in and out of the parent if statement.
-                        VehicleRigid.position += (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
+                        //Setting transform position to rigidbody position+, so that position is correct if data is sent this frame (the result should be the jerky, speed-accurate one)
+                        VehicleTransform.position = VehicleRigid.position + (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
                         //is there a best of both worlds solution?
                     }
                 }
