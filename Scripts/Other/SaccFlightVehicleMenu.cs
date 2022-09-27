@@ -55,6 +55,7 @@ namespace SaccFlightAndVehicles
             if (DialSensSlider) { DialSensDefault = DialSensSlider.value; SetDialSensitivity(); }
             if (GripSensitivitySlider) { GripSensitivityDefault = GripSensitivitySlider.value; SetGripSensitivity(); }
             if (JoystickSensitivitySlider) { JoyStickSensitivityDefault = JoystickSensitivitySlider.value; SetJoystickSensitivity(); }
+            if (KeyboardThrottleSensitivitySlider) { KeyboardThrottleSensitivityDefault = KeyboardThrottleSensitivitySlider.value; SetKeyboardThrottleSensitivity(); }
             if (SteeringSensSlider) { SteeringSensDefault = SteeringSensSlider.value; SetSteeringSensitivity(); }
             if (ThrottleSensitivitySlider) { ThrottleSensitivityDefault = ThrottleSensitivitySlider.value; SetThrottleSensitivity(); }
             if (SaccFlightStrengthSlider) { SaccFlightStrengthDefault = SaccFlightStrengthSlider.value; SetSaccFlightStrength(); }
@@ -157,7 +158,7 @@ namespace SaccFlightAndVehicles
                 { SGV.SetProgramVariable("SwitchHandsJoyThrottle", !(bool)SGV.GetProgramVariable("SwitchHandsJoyThrottle")); }
             } */
         }
-        public float DialSensDefault;
+        [System.NonSerialized] public float DialSensDefault;
         public Slider DialSensSlider;
         public Text DialSensSliderNumber;
         public void SetDialSensitivity()
@@ -204,7 +205,7 @@ namespace SaccFlightAndVehicles
                 { SAV.SetProgramVariable("MaxJoyAngles", sens); }
             }
         }
-        public float SteeringSensDefault;
+        [System.NonSerialized] public float SteeringSensDefault;
         public Slider SteeringSensSlider;
         public Text SteeringSenseSliderNumber;
         public void SetSteeringSensitivity()
@@ -217,7 +218,7 @@ namespace SaccFlightAndVehicles
                 { SaccGroundVehicles[i].SetProgramVariable("SteeringWheelDegrees", DefaultSteeringDegrees[i] / SteeringSens); }
             }
         }
-        public float ThrottleSensitivityDefault;
+        [System.NonSerialized] public float ThrottleSensitivityDefault;
         public Slider ThrottleSensitivitySlider;
         public Text ThrottleSensitivitySliderNumber;
         public void SetThrottleSensitivity()
@@ -235,7 +236,25 @@ namespace SaccFlightAndVehicles
                 { SSV.SetProgramVariable("ThrottleSensitivity", sensvalue); }
             }
         }
-        public float SaccFlightStrengthDefault;
+        [System.NonSerialized] public float KeyboardThrottleSensitivityDefault;
+        public Slider KeyboardThrottleSensitivitySlider;
+        public Text KeyboardThrottleSensitivitySliderNumber;
+        public void SetKeyboardThrottleSensitivity()
+        {
+            float sensvalue = KeyboardThrottleSensitivitySlider.value;
+            KeyboardThrottleSensitivitySliderNumber.text = sensvalue.ToString("F2");
+            foreach (UdonSharpBehaviour SAV in SaccAirVehicles)
+            {
+                if (SAV)
+                { SAV.SetProgramVariable("KeyboardThrottleSens", sensvalue); }
+            }
+            foreach (UdonSharpBehaviour SSV in SaccSeaVehicles)
+            {
+                if (SSV)
+                { SSV.SetProgramVariable("KeyboardThrottleSens", sensvalue); }
+            }
+        }
+        [System.NonSerialized] public float SaccFlightStrengthDefault;
         public Slider SaccFlightStrengthSlider;
         public Text SaccFlightStrengthSliderNumber;
         public UdonSharpBehaviour SaccFlight;
@@ -255,6 +274,7 @@ namespace SaccFlightAndVehicles
             if (DialSensSlider) { DialSensSlider.value = DialSensDefault; }
             if (ThrottleSensitivitySlider) { ThrottleSensitivitySlider.value = ThrottleSensitivityDefault; }
             if (JoystickSensitivitySlider) { JoystickSensitivitySlider.value = JoyStickSensitivityDefault; }
+            if (KeyboardThrottleSensitivitySlider) { KeyboardThrottleSensitivitySlider.value = KeyboardThrottleSensitivityDefault; }
             if (SteeringSensSlider) { SteeringSensSlider.value = SteeringSensDefault; }
             if (SwitchHandsToggle) { if (SwitchHandsToggle.isOn != SwitchHandsDefault) { SwitchHandsToggle.isOn = SwitchHandsDefault; } }
             if (AutomaticGearsToggle) { AutomaticGearsToggle.isOn = AutomaticGearsDefault; }
