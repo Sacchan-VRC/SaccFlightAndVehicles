@@ -33,6 +33,14 @@ namespace SaccFlightAndVehicles
         public float MaxPingExtrapolationInSeconds = 999f;
         [Tooltip("Set maximum extrapolation to 0 for passengers to reduce uncomfortable movement, passengers will not see formation flying properly.")]
         public bool PassengerComfortMode;
+        [Tooltip("How much vehicle accelerates extra towards its 'raw' position when not owner in order to correct positional errors")]
+        public float CorrectionTime = 20f;
+        [Tooltip("How quickly non-owned vehicle's velocity vector lerps towards its new value")]
+        public float SpeedLerpTime = 4f;
+        [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE IN TEST MODE")]
+        public Transform TestTransform;
+        [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE IN TEST MODE")]
+        public Transform TestTransform_Raw;
         private Transform VehicleTransform;
         private double nextUpdateTime = double.MaxValue;
         private int StartupTimeMS = 0;
@@ -84,21 +92,29 @@ namespace SaccFlightAndVehicles
         private float PrevMaxExtrap;
         private double lastframetime;
         private Vector3 poslasframe;
-        System.Diagnostics.Stopwatch StartStopWatch = new System.Diagnostics.Stopwatch();//the most accurate timer AFAIK
+        private Vector3 Extrapolation_Raw;
+        private float StartupRealTime;
+        private Vector3 ExtrapDirection_Smooth;
+        private bool TestMode;
+        // private float ErrorLastFrame;
+        // private float ErrorI;
+        // public float ErrorIStrength = .1f;
         private void Start()
         {
             if (!VehicleRigid)
             {
                 VehicleRigid = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Rigidbody>();
-                VehicleTransform = VehicleRigid.transform;
             }
+            if (!TestTransform)
+            { TestTransform = VehicleRigid.transform; }
+            else { TestMode = true; }
         }
         public void SFEXT_L_EntityStart()
         {
             Initialized = true;
             VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
             VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
-            L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position = VehicleTransform.position;
+            Extrapolation_Raw = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position = VehicleTransform.position;
             O_LastRotation2 = O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             bool InEditor = localPlayer == null;
@@ -128,7 +144,8 @@ namespace SaccFlightAndVehicles
             dblStartupTimeMS = (double)StartupTimeMS * .001f;
             System.DateTime offsetDateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
             StartupTime = (System.DateTime.UtcNow - offsetDateTime).TotalSeconds;
-            StartStopWatch.Start();
+            StartupRealTime = Time.realtimeSinceStartup;
+            // StartStopWatch.Start();
 
             CurrentUpdateInterval = updateInterval;
             EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
@@ -149,22 +166,22 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.isKinematic = true;
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
             }
-            nextUpdateTime = StartStopWatch.Elapsed.TotalSeconds + (double)Random.Range(0f, updateInterval);
+            nextUpdateTime = (Time.realtimeSinceStartup - StartupRealTime) + (double)Random.Range(0f, updateInterval);
         }
         public void SFEXT_O_TakeOwnership()
         {
-            lastframetime = StartStopWatch.Elapsed.TotalSeconds;
+            lastframetime = (Time.realtimeSinceStartup - StartupRealTime);
             IsOwner = true;
             VehicleRigid.isKinematic = false;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
             VehicleRigid.drag = 0;
             VehicleRigid.angularDrag = 0;
-            lastframetime = StartStopWatch.Elapsed.TotalSeconds;
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
-            L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
+            Extrapolation_Raw = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
+            ExtrapDirection_Smooth = CurrentVelocityLast; ;
             RotationLerper = O_LastRotation2 = O_LastRotation = O_Rotation_Q;
             LastCurAngMom = CurAngMom = Quaternion.identity;
             LastExtrapolationDirection = VehicleRigid.velocity;
@@ -208,8 +225,9 @@ namespace SaccFlightAndVehicles
             //make it teleport instead of interpolating
             ExtrapolationDirection = Vector3.zero;
             LastExtrapolationDirection = Vector3.zero;
-            VehicleTransform.position = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_LastPosition = O_Position;
+            Extrapolation_Raw = VehicleTransform.position = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_LastPosition = O_Position;
             RotationLerper = VehicleTransform.rotation = O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+            ExtrapDirection_Smooth = Vector3.zero;
             CurrentVelocityLast = Vector3.zero;
             LastAcceleration = Acceleration = Vector3.zero;
         }
@@ -217,10 +235,10 @@ namespace SaccFlightAndVehicles
         {
             if (IsOwner)//send data
             {
-                double time = StartStopWatch.Elapsed.TotalSeconds;
+                double time = (Time.realtimeSinceStartup - StartupRealTime);
                 if (Time.deltaTime > .083f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
                 {
-                    double acctime = StartStopWatch.Elapsed.TotalSeconds;
+                    double acctime = (Time.realtimeSinceStartup - StartupRealTime);
                     double accuratedelta = acctime - lastframetime;
                     Vector3 RigidMovedAmount = VehicleRigid.velocity * Time.deltaTime;
                     float DistanceTravelled = RigidMovedAmount.magnitude;
@@ -291,54 +309,66 @@ namespace SaccFlightAndVehicles
                     }
                     nextUpdateTime = (time + (double)(IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
                 }
+                if (TestMode)
+                {
+                    DeserializationStuff();
+                    ExtrapolationAndSmoothing();
+                }
             }
             else//extrapolate and interpolate based on recieved data
             {
-                //Extrapolate position forward by amount that'd make it match the current position on the other client (assuming straight movement)
-                //Do this for the last two updates recieved, and interpolate between them over the length of the Update Interval
-                //The interpolation should reach 100% the current extrapolaton hopefully at the exact moment the next update is recieved, otherwise continue extrapolating the last update until an update comes
+                ExtrapolationAndSmoothing();
+            }
+        }
+        private void ExtrapolationAndSmoothing()
+        {
+            //Extrapolate position forward by amount that'd make it match the current position on the other client (assuming straight movement)
+            //Do this for the last two updates recieved, and interpolate between them over the length of the Update Interval
+            //The interpolation should reach 100% the current extrapolaton hopefully at the exact moment the next update is recieved, otherwise continue extrapolating the last update until an update comes
 
-                //time since recieving last update
-                float TimeSinceUpdate = (float)((dblStartupTimeMS + (
-                        StartStopWatch.Elapsed.TotalSeconds)) - L_UpdateTime);
-                //extrapolated position based on time passed since update
-                Vector3 PredictedPosition = L_PingAdjustedPosition
-                     + (ExtrapolationDirection * TimeSinceUpdate);
-                //extrapolated rotation based on time passed since update
-                Quaternion PredictedRotation =
-                    (Quaternion.SlerpUnclamped(Quaternion.identity, CurAngMom, Ping + TimeSinceUpdate)
-                    * O_Rotation_Q);
-                //If interpolation hasn't finished, calculate extrapolation of last update
-                if (TimeSinceUpdate < CurrentUpdateInterval)
-                {
-                    //time since recieving previous update
-                    float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + (
-                            StartStopWatch.Elapsed.TotalSeconds)) - L_LastUpdateTime);
-                    //extrapolated position based on data from previous update using time passed since previous update
-                    Vector3 OldPredictedPosition = L_LastPingAdjustedPosition
-                        + (LastExtrapolationDirection * TimeSinceUpdate);
-                    //extrapolated rotation based on data from previous update using time passed since previous update
-                    Quaternion OldPredictedRotation =
-                        (Quaternion.SlerpUnclamped(Quaternion.identity, LastCurAngMom, LastPing + TimeSincePreviousUpdate)
-                        * O_LastRotation2);
-                    //Rotation is slerped to smooth it out, because it's not as important as position, and because sudden rotations create large over-predictions anyway
-                    //Slerp towards a slerp(interpolation) of last 2 extrapolations
-                    RotationLerper = Quaternion.Slerp(RotationLerper,
-                     Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),
-                      IdleUpdateMode ? Time.smoothDeltaTime : Time.smoothDeltaTime * RotationSyncAgressiveness);
+            //time since recieving last update
+            float TimeSinceUpdate = (float)((dblStartupTimeMS + (
+                    (Time.realtimeSinceStartup - StartupRealTime))) - L_UpdateTime);
+            //extrapolated position based on time passed since update
+            float Error = Vector3.Distance(TestTransform.position, Extrapolation_Raw);
+            Vector3 PredictedPosition = Extrapolation_Raw;
+            Vector3 Correction = ((PredictedPosition - TestTransform.position) * CorrectionTime);
+            Vector3 VelEstimate = O_CurVel + (Acceleration * (TimeSinceUpdate / updateInterval));
+            // ErrorI += Correction.magnitude * ErrorIStrength;
+            // if (Error < ErrorLastFrame)
+            // {
+            //     ErrorI *= Error / ErrorLastFrame;
+            // }
+            // ErrorLastFrame = Error;
+            ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction, (/* ErrorI + */ SpeedLerpTime) * Time.deltaTime);
 
-                    //Set position to a lerp(interpolation) of last 2 extrapolations  
-                    //never set position using rigidbody.position because it's 1 frame lagged due to waiting for a physics update before setting
-                    VehicleTransform.SetPositionAndRotation(
-                        Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider),
-                           RotationLerper);
-                }
-                else
-                {
-                    //interpolation is over, just move position and rotation towards last extrapolation
-                    RotationLerper = Quaternion.Slerp(RotationLerper, PredictedRotation, Time.smoothDeltaTime * SmoothingTimeDivider);
-                    VehicleTransform.SetPositionAndRotation(PredictedPosition, RotationLerper);
-                }
+            //rotation shit
+            Quaternion PredictedRotation =
+                 (Quaternion.SlerpUnclamped(Quaternion.identity, CurAngMom, Ping + TimeSinceUpdate)
+                 * O_Rotation_Q);
+            {
+                //time since recieving previous update
+                float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + (
+                        (Time.realtimeSinceStartup - StartupRealTime))) - L_LastUpdateTime);
+                //extrapolated rotation based on data from previous update using time passed since previous update
+                Quaternion OldPredictedRotation =
+                    (Quaternion.SlerpUnclamped(Quaternion.identity, LastCurAngMom, LastPing + TimeSincePreviousUpdate)
+                    * O_LastRotation2);
+                //Rotation is slerped to smooth it out, because it's not as important as position, and because sudden rotations create large over-predictions anyway
+                //Slerp towards a slerp(interpolation) of last 2 extrapolations
+                RotationLerper = Quaternion.Slerp(RotationLerper,
+                 Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),
+                  IdleUpdateMode ? Time.smoothDeltaTime : Time.smoothDeltaTime * RotationSyncAgressiveness);
+            }
+            RotationLerper = Quaternion.Slerp(RotationLerper, PredictedRotation, Time.smoothDeltaTime * SmoothingTimeDivider);
+
+            Extrapolation_Raw += ExtrapolationDirection * Time.deltaTime;
+            TestTransform.position += ExtrapDirection_Smooth * Time.deltaTime;
+            TestTransform.rotation = RotationLerper;
+            if (TestTransform_Raw)
+            {
+                TestTransform_Raw.position = Extrapolation_Raw;
+                TestTransform_Raw.rotation = RotationLerper;
             }
         }
         public void EnterIdleMode()
@@ -363,10 +393,17 @@ namespace SaccFlightAndVehicles
         }
         public override void OnDeserialization()
         {
-            if (O_UpdateTime != O_LastUpdateTime && !IsOwner)//only do anything if OnDeserialization was for this script
+            if (!IsOwner)//only do anything if OnDeserialization was for this script
+            {
+                DeserializationStuff();
+            }
+        }
+        private void DeserializationStuff()
+        {
+            if (O_UpdateTime != O_LastUpdateTime)//only do anything if OnDeserialization was for this script
             {
                 LastAcceleration = Acceleration;
-                L_LastPingAdjustedPosition = CalcJustPos();
+                // L_LastPingAdjustedPosition = CalcJustPos();
                 LastPing = Ping;
                 L_LastUpdateTime = L_UpdateTime;
                 LastCurAngMom = CurAngMom;
@@ -375,7 +412,7 @@ namespace SaccFlightAndVehicles
                 float speednormalizer = 1 / updatedelta;
 
                 //local time update was recieved
-                L_UpdateTime = (dblStartupTimeMS) + (StartStopWatch.Elapsed.TotalSeconds);
+                L_UpdateTime = (dblStartupTimeMS) + ((Time.realtimeSinceStartup - StartupRealTime));
                 //Ping is time between server time update was sent, and the local time the update was recieved
                 Ping = Mathf.Min((float)(L_UpdateTime - O_UpdateTime), MaxPingExtrapolationInSeconds);
                 //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
@@ -400,17 +437,19 @@ namespace SaccFlightAndVehicles
                 O_Rotation_Q = Quaternion.Euler(new Vector3(O_RotationX, O_RotationY, O_RotationZ) * .0054931640625f);
                 //rotate Acceleration by the difference in rotation of vehicle between last and this update to make it match the angle for the next update better
                 Quaternion PlaneRotDif = O_Rotation_Q * Quaternion.Inverse(O_LastRotation);
-                Acceleration = PlaneRotDif * Acceleration;
+                Acceleration = PlaneRotDif * Acceleration * .5f;//not sure why it's 0.5, but it seems correct from testing
 
                 //current angular momentum as a quaternion
                 CurAngMom = Quaternion.SlerpUnclamped(Quaternion.identity, PlaneRotDif, speednormalizer);
                 //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
                 SAVControl.SetProgramVariable("CurrentVel", CurrentVelocity);
 
-                L_PingAdjustedPosition = O_Position + ((CurrentVelocity + Acceleration) * Ping);
+                L_PingAdjustedPosition = O_Position + ((CurrentVelocity + (Acceleration)) * Ping);
 
                 LastExtrapolationDirection = ExtrapolationDirection;
-                ExtrapolationDirection = CurrentVelocity + Acceleration;
+                ExtrapolationDirection = CurrentVelocity + (Acceleration);
+
+                Extrapolation_Raw = L_PingAdjustedPosition - (ExtrapolationDirection * Time.deltaTime);//undo 1 frame worth of movement because its done again in update()
                 if (IdleUpdateMode) { ExtrapolationDirection *= IdleModeVelMultiplier; }
                 O_LastRotation2 = O_LastRotation;//O_LastRotation2 is needed for use in Update() as O_LastRotation is the same as O_Rotation_Q there
 
@@ -433,38 +472,18 @@ namespace SaccFlightAndVehicles
                     LastPing = Ping;
                     O_LastRotation2 = O_LastRotation = O_Rotation_Q;
                     O_LastPosition = O_Position;
+                    TestTransform.position = Extrapolation_Raw;
                 }
             }
         }
         private Vector3 CalcJustPos()
         {
             float TimeSinceUpdate = (float)((dblStartupTimeMS + (
-                    StartStopWatch.Elapsed.TotalSeconds)) - L_UpdateTime);
+                    (Time.realtimeSinceStartup - StartupRealTime))) - L_UpdateTime);
 
             Vector3 PredictedPosition = L_PingAdjustedPosition
                  + (ExtrapolationDirection * TimeSinceUpdate);
-
-            Quaternion PredictedRotation =
-                (Quaternion.SlerpUnclamped(Quaternion.identity, CurAngMom, Ping + TimeSinceUpdate)
-                * O_Rotation_Q);
-
-            if (TimeSinceUpdate < CurrentUpdateInterval)
-            {
-
-                float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + (
-                        StartStopWatch.Elapsed.TotalSeconds)) - L_LastUpdateTime);
-
-                Vector3 OldPredictedPosition = L_LastPingAdjustedPosition
-                    + (LastExtrapolationDirection * TimeSinceUpdate);
-
-                //Set position to a lerp(interpolation) of last 2 extrapolations  
-                //never set position using rigidbody.position because it's 1 frame lagged due to waiting for a physics update before setting
-                return Vector3.Lerp(OldPredictedPosition, PredictedPosition, (float)TimeSinceUpdate * SmoothingTimeDivider);
-            }
-            else
-            {
-                return PredictedPosition;
-            }
+            return PredictedPosition;
         }
         public void SFEXT_O_Explode()//all the things players see happen when the vehicle explodes
         {
