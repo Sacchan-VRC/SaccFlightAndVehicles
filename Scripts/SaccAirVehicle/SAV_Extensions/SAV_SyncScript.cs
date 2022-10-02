@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -21,7 +21,7 @@ namespace SaccFlightAndVehicles
         public bool FreezePositionOnDeath = true;
         [Tooltip("How quickly to lerp rotation to new extrapolated target rotation, it might help to reduce this in high-lag situations with planes that can roll quickly")]
         public float RotationSyncAgressiveness = 10f;
-        [Tooltip("Multiply velocity vectors recieved while in idle mode, useful for stopping sea vehicles from extrapolating above and below the water")]
+        [Tooltip("Multiply velocity vectors received while in idle mode, useful for stopping sea vehicles from extrapolating above and below the water")]
         public float IdleModeVelMultiplier = .4f;
         [Tooltip("If vehicle moves less than this distance since it's last update, it'll be considered to be idle, may need to be increased for vehicles that want to be idle on water. If the vehicle floats away sometimes, this value is probably too big")]
         public float IdleMovementRange = .35f;
@@ -34,23 +34,32 @@ namespace SaccFlightAndVehicles
         [Tooltip("Set maximum extrapolation to 0 for passengers to reduce uncomfortable movement, passengers will not see formation flying properly.")]
         public bool PassengerComfortMode;
         [Tooltip("How much vehicle accelerates extra towards its 'raw' position when not owner in order to correct positional errors")]
-        public float CorrectionTime = 20f;
+        public float CorrectionTime = 8f;
         [Tooltip("How quickly non-owned vehicle's velocity vector lerps towards its new value")]
         public float SpeedLerpTime = 4f;
+        [Tooltip("Strength of force to stop correction overshooting target")]
+        public float CorrectionDerivStrength = 150f;
+        [Tooltip("How much vehicle accelerates extra towards its 'raw' rotation when not owner in order to correct rotational errors")]
+        public float CorrectionTime_Rotation = 1f;
+        [Tooltip("How quickly non-owned vehicle's rotation slerps towards its new value")]
+        public float RotationSpeedLerpTime = 10f;
+        [Tooltip("Teleports owned vehicles forward by real time * velocity if frame takes too long to render and simulation slows down. Prevents other players from seeing you warp.")]
+        public bool AntiWarp = true;
+        [Header("DEBUG:")]
         [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE IN TEST MODE")]
         public Transform TestTransform;
-        [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE IN TEST MODE")]
+        [Tooltip("UNCOMMENT THE CODE TO USE THIS. LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE IN TEST MODE, If TestTransform is empty and this is filled you can see the raw position in multiplayer")]
         public Transform TestTransform_Raw;
         private Transform VehicleTransform;
-        private double nextUpdateTime = double.MaxValue;
+        private float nextUpdateTime = float.MaxValue;
         private int StartupTimeMS = 0;
         private double dblStartupTimeMS = 0;
-        private double StartupTime;
-        [UdonSynced(UdonSyncMode.None)] private double O_UpdateTime;
-        [UdonSynced(UdonSyncMode.None)] private Vector3 O_Position;
-        [UdonSynced(UdonSyncMode.None)] private short O_RotationX;
-        [UdonSynced(UdonSyncMode.None)] private short O_RotationY;
-        [UdonSynced(UdonSyncMode.None)] private short O_RotationZ;
+        [UdonSynced] private float O_UpdateTime;
+        [UdonSynced] private Vector3 O_Position;
+        [UdonSynced] private short O_RotationW;
+        [UdonSynced] private short O_RotationX;
+        [UdonSynced] private short O_RotationY;
+        [UdonSynced] private short O_RotationZ;
         //sending velocity improves quality but will cause laggy movment if someone has very low fps.
         [UdonSynced(UdonSyncMode.None)] private Vector3 O_CurVel = Vector3.zero;
         private Vector3 O_CurVelLast = Vector3.zero;
@@ -58,27 +67,29 @@ namespace SaccFlightAndVehicles
         private Quaternion O_Rotation_Q = Quaternion.identity;
         private Vector3 CurrentVelocityLast = Vector3.zero;
         private Quaternion CurAngMom = Quaternion.identity;
+        private Quaternion CurAngMomAcceleration = Quaternion.identity;
         private Quaternion LastCurAngMom = Quaternion.identity;
         private Quaternion O_LastRotation = Quaternion.identity;
-        private Quaternion O_LastRotation2 = Quaternion.identity;
+        // private Quaternion O_LastRotation2 = Quaternion.identity;
         private Quaternion RotationLerper = Quaternion.identity;
         private float Ping;
-        private float LastPing;
-        private double L_UpdateTime;
-        private double L_LastUpdateTime;
-        private double O_LastUpdateTime;
+        // private float LastPing;
+        private float L_UpdateTime;
+        private float L_LastUpdateTime;
+        private float O_LastUpdateTime;
         //make everyone think they're the owner for the first frame so that don't set the position to 0,0,0 before SFEXT_L_EntityStart runs
         private bool IsOwner = true;
         private Vector3 ExtrapolationDirection;
-        private Vector3 LastExtrapolationDirection = Vector3.zero;
+        private Quaternion RotationExtrapolationDirection;
         private Vector3 L_PingAdjustedPosition = Vector3.zero;
+        private Quaternion L_PingAdjustedRotation = Quaternion.identity;
         private Vector3 L_LastPingAdjustedPosition;
         private Vector3 lerpedCurVel;
         private Vector3 Acceleration = Vector3.zero;
         private Vector3 LastAcceleration;
         private Vector3 O_LastPosition;
         private float SmoothingTimeDivider;
-        private double UpdateTime;
+        private float UpdateTime;
         private int UpdatesSentWhileStill;
         private Rigidbody VehicleRigid;
         private bool Initialized = false;
@@ -93,12 +104,13 @@ namespace SaccFlightAndVehicles
         private double lastframetime;
         private Vector3 poslasframe;
         private Vector3 Extrapolation_Raw;
+        private Quaternion RotExtrapolation_Raw;
         private float StartupRealTime;
         private Vector3 ExtrapDirection_Smooth;
+        public Quaternion RotExtrapDirection_Smooth;
+        // private Quaternion RotExtrapDirection_Smooth_Correction;
         private bool TestMode;
-        // private float ErrorLastFrame;
-        // private float ErrorI;
-        // public float ErrorIStrength = .1f;
+        private float ErrorLastFrame;
         private void Start()
         {
             if (!VehicleRigid)
@@ -108,6 +120,7 @@ namespace SaccFlightAndVehicles
             if (!TestTransform)
             { TestTransform = VehicleRigid.transform; }
             else { TestMode = true; }
+            RotExtrapolation_Raw = Quaternion.identity;
         }
         public void SFEXT_L_EntityStart()
         {
@@ -115,7 +128,8 @@ namespace SaccFlightAndVehicles
             VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
             VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             Extrapolation_Raw = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position = VehicleTransform.position;
-            O_LastRotation2 = O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
+            /* O_LastRotation2 = */
+            O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             bool InEditor = localPlayer == null;
             if (!InEditor)
@@ -143,7 +157,7 @@ namespace SaccFlightAndVehicles
             StartupTimeMS = Networking.GetServerTimeInMilliseconds();
             dblStartupTimeMS = (double)StartupTimeMS * .001f;
             System.DateTime offsetDateTime = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
-            StartupTime = (System.DateTime.UtcNow - offsetDateTime).TotalSeconds;
+            // StartupTime = (System.DateTime.UtcNow - offsetDateTime).TotalSeconds;
             StartupRealTime = Time.realtimeSinceStartup;
             // StartStopWatch.Start();
 
@@ -166,7 +180,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.isKinematic = true;
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
             }
-            nextUpdateTime = (Time.realtimeSinceStartup - StartupRealTime) + (double)Random.Range(0f, updateInterval);
+            nextUpdateTime = (Time.realtimeSinceStartup - StartupRealTime) + Random.Range(0f, updateInterval);
         }
         public void SFEXT_O_TakeOwnership()
         {
@@ -182,9 +196,8 @@ namespace SaccFlightAndVehicles
             IsOwner = false;
             Extrapolation_Raw = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
             ExtrapDirection_Smooth = CurrentVelocityLast; ;
-            RotationLerper = O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+            RotationLerper = /* O_LastRotation2 = */ O_LastRotation = O_Rotation_Q;
             LastCurAngMom = CurAngMom = Quaternion.identity;
-            LastExtrapolationDirection = VehicleRigid.velocity;
             VehicleRigid.isKinematic = true;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
             VehicleRigid.drag = 9999;
@@ -224,9 +237,8 @@ namespace SaccFlightAndVehicles
             UpdatesSentWhileStill = 0;
             //make it teleport instead of interpolating
             ExtrapolationDirection = Vector3.zero;
-            LastExtrapolationDirection = Vector3.zero;
             Extrapolation_Raw = VehicleTransform.position = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_LastPosition = O_Position;
-            RotationLerper = VehicleTransform.rotation = O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+            RotationLerper = VehicleTransform.rotation = /* O_LastRotation2 = */ O_LastRotation = O_Rotation_Q;
             ExtrapDirection_Smooth = Vector3.zero;
             CurrentVelocityLast = Vector3.zero;
             LastAcceleration = Acceleration = Vector3.zero;
@@ -235,8 +247,8 @@ namespace SaccFlightAndVehicles
         {
             if (IsOwner)//send data
             {
-                double time = (Time.realtimeSinceStartup - StartupRealTime);
-                if (Time.deltaTime > .083f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
+                float time = (Time.realtimeSinceStartup - StartupRealTime);
+                if (AntiWarp && Time.deltaTime > .083f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
                 {
                     double acctime = (Time.realtimeSinceStartup - StartupRealTime);
                     double accuratedelta = acctime - lastframetime;
@@ -289,25 +301,19 @@ namespace SaccFlightAndVehicles
                         O_Position = VehicleTransform.position;
                         O_Rotation_Q = VehicleTransform.rotation;
                         //convert each euler angle to shorts to save bandwidth
-                        Vector3 rot = O_Rotation_Q.eulerAngles;
-                        rot = new Vector3(rot.x > 180 ? rot.x - 360 : rot.x,
-                         rot.y > 180 ? rot.y - 360 : rot.y,
-                          rot.z > 180 ? rot.z - 360 : rot.z)
-                          * 182.0444444444444f;//convert 0-360 to 0-65536
-                                               //this shouldn't need clamping but for some reason it does
-                        O_RotationX = (short)Mathf.Clamp(rot.x, short.MinValue, short.MaxValue);
-                        O_RotationY = (short)Mathf.Clamp(rot.y, short.MinValue, short.MaxValue);
-                        O_RotationZ = (short)Mathf.Clamp(rot.z, short.MinValue, short.MaxValue);
+                        float smv = short.MaxValue;
+                        O_RotationX = (short)(O_Rotation_Q.x * smv);
+                        O_RotationY = (short)(O_Rotation_Q.y * smv);
+                        O_RotationZ = (short)(O_Rotation_Q.z * smv);
+                        O_RotationW = (short)(O_Rotation_Q.w * smv);
 
                         O_CurVel = VehicleRigid.velocity;
-                        //update time is a double so that it can interact with (int)Networking.GetServerTimeInMilliseconds() without innacuracy
-                        //update time is the Networking.GetServerTimeInMilliseconds() taken from SFEXT_L_EntityStart() + real time as float since that to make
-                        //the sub-millisecond error constant to eliminate jitter
-                        O_UpdateTime = (dblStartupTimeMS) + (time);//send servertime of update
+
+                        O_UpdateTime = (float)(dblStartupTimeMS) + (time);//send servertime of update
                         RequestSerialization();
                         UpdateTime = time;
                     }
-                    nextUpdateTime = (time + (double)(IdleUpdateMode ? IdleModeUpdateInterval : updateInterval));
+                    nextUpdateTime = time + (IdleUpdateMode ? IdleModeUpdateInterval : updateInterval);
                 }
                 if (TestMode)
                 {
@@ -315,61 +321,51 @@ namespace SaccFlightAndVehicles
                     ExtrapolationAndSmoothing();
                 }
             }
-            else//extrapolate and interpolate based on recieved data
+            else//extrapolate and interpolate based on received data
             {
                 ExtrapolationAndSmoothing();
             }
         }
         private void ExtrapolationAndSmoothing()
         {
-            //Extrapolate position forward by amount that'd make it match the current position on the other client (assuming straight movement)
-            //Do this for the last two updates recieved, and interpolate between them over the length of the Update Interval
-            //The interpolation should reach 100% the current extrapolaton hopefully at the exact moment the next update is recieved, otherwise continue extrapolating the last update until an update comes
-
-            //time since recieving last update
-            float TimeSinceUpdate = (float)((dblStartupTimeMS + (
-                    (Time.realtimeSinceStartup - StartupRealTime))) - L_UpdateTime);
+            float deltatime = Time.deltaTime;
+            float TimeSinceUpdate = ((float)((dblStartupTimeMS + ((Time.realtimeSinceStartup - StartupRealTime))) - L_UpdateTime))
+                    / updateInterval;
             //extrapolated position based on time passed since update
+            Vector3 Correction = ((Extrapolation_Raw - TestTransform.position) * CorrectionTime);
+            Vector3 VelEstimate = O_CurVel + (Acceleration * TimeSinceUpdate);
+
+            //like a PID derivative. Makes movement a bit jerky because the 'raw' target is jerky.
             float Error = Vector3.Distance(TestTransform.position, Extrapolation_Raw);
-            Vector3 PredictedPosition = Extrapolation_Raw;
-            Vector3 Correction = ((PredictedPosition - TestTransform.position) * CorrectionTime);
-            Vector3 VelEstimate = O_CurVel + (Acceleration * (TimeSinceUpdate / updateInterval));
-            // ErrorI += Correction.magnitude * ErrorIStrength;
-            // if (Error < ErrorLastFrame)
+            Vector3 Deriv = Vector3.zero;
+            if (ErrorLastFrame > Error)
+            {
+                Deriv = -Correction.normalized * (ErrorLastFrame - Error) * CorrectionDerivStrength;
+            }
+            ErrorLastFrame = Error;
+            ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
+
+            //rotate using method to movement (no deriv, correction is done with a simple slerp later)
+            Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngMomAcceleration, TimeSinceUpdate);
+            Quaternion AngMomEstimate = FrameRotAccel * CurAngMom;
+            RotExtrapDirection_Smooth = RealSlerp(RotExtrapDirection_Smooth, AngMomEstimate, RotationSpeedLerpTime * deltatime);
+
+            //apply positional update
+            Extrapolation_Raw += ExtrapolationDirection * deltatime;
+            Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime);
+            RotExtrapolation_Raw = FrameRotExtrap * RotExtrapolation_Raw;
+            TestTransform.position += ExtrapDirection_Smooth * deltatime;
+            //apply rotational update
+            Quaternion FrameRotExtrap_Smooth = RealSlerp(Quaternion.identity, RotExtrapDirection_Smooth, deltatime);
+            TestTransform.rotation = FrameRotExtrap_Smooth * TestTransform.rotation;
+            //correct rotational desync
+            TestTransform.rotation = RealSlerp(TestTransform.rotation, RotExtrapolation_Raw, CorrectionTime_Rotation * deltatime);
+            //UNCOMMENT HERE TO SHOW 'RAW' position
+            // if (TestTransform_Raw)
             // {
-            //     ErrorI *= Error / ErrorLastFrame;
+            //     TestTransform_Raw.position = Extrapolation_Raw;
+            //     TestTransform_Raw.rotation = RotExtrapolation_Raw;
             // }
-            // ErrorLastFrame = Error;
-            ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction, (/* ErrorI + */ SpeedLerpTime) * Time.deltaTime);
-
-            //rotation shit
-            Quaternion PredictedRotation =
-                 (Quaternion.SlerpUnclamped(Quaternion.identity, CurAngMom, Ping + TimeSinceUpdate)
-                 * O_Rotation_Q);
-            {
-                //time since recieving previous update
-                float TimeSincePreviousUpdate = (float)((dblStartupTimeMS + (
-                        (Time.realtimeSinceStartup - StartupRealTime))) - L_LastUpdateTime);
-                //extrapolated rotation based on data from previous update using time passed since previous update
-                Quaternion OldPredictedRotation =
-                    (Quaternion.SlerpUnclamped(Quaternion.identity, LastCurAngMom, LastPing + TimeSincePreviousUpdate)
-                    * O_LastRotation2);
-                //Rotation is slerped to smooth it out, because it's not as important as position, and because sudden rotations create large over-predictions anyway
-                //Slerp towards a slerp(interpolation) of last 2 extrapolations
-                RotationLerper = Quaternion.Slerp(RotationLerper,
-                 Quaternion.Slerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider),
-                  IdleUpdateMode ? Time.smoothDeltaTime : Time.smoothDeltaTime * RotationSyncAgressiveness);
-            }
-            RotationLerper = Quaternion.Slerp(RotationLerper, PredictedRotation, Time.smoothDeltaTime * SmoothingTimeDivider);
-
-            Extrapolation_Raw += ExtrapolationDirection * Time.deltaTime;
-            TestTransform.position += ExtrapDirection_Smooth * Time.deltaTime;
-            TestTransform.rotation = RotationLerper;
-            if (TestTransform_Raw)
-            {
-                TestTransform_Raw.position = Extrapolation_Raw;
-                TestTransform_Raw.rotation = RotationLerper;
-            }
         }
         public void EnterIdleMode()
         {
@@ -377,7 +373,6 @@ namespace SaccFlightAndVehicles
             IdleUpdateMode = true;
             CurrentUpdateInterval = IdleModeUpdateInterval;
             SmoothingTimeDivider = 1f / CurrentUpdateInterval;
-            LastExtrapolationDirection *= IdleModeVelMultiplier;
         }
         public void ExitIdleMode()
         {
@@ -403,17 +398,16 @@ namespace SaccFlightAndVehicles
             if (O_UpdateTime != O_LastUpdateTime)//only do anything if OnDeserialization was for this script
             {
                 LastAcceleration = Acceleration;
-                // L_LastPingAdjustedPosition = CalcJustPos();
-                LastPing = Ping;
+                // LastPing = Ping;
                 L_LastUpdateTime = L_UpdateTime;
                 LastCurAngMom = CurAngMom;
                 //time between this update and last
                 float updatedelta = (float)(O_UpdateTime - O_LastUpdateTime);
                 float speednormalizer = 1 / updatedelta;
 
-                //local time update was recieved
-                L_UpdateTime = (dblStartupTimeMS) + ((Time.realtimeSinceStartup - StartupRealTime));
-                //Ping is time between server time update was sent, and the local time the update was recieved
+                //local time update was received
+                L_UpdateTime = (float)(dblStartupTimeMS) + ((Time.realtimeSinceStartup - StartupRealTime));
+                //Ping is time between server time update was sent, and the local time the update was received
                 Ping = Mathf.Min((float)(L_UpdateTime - O_UpdateTime), MaxPingExtrapolationInSeconds);
                 //Curvel is 0 when launching from a catapult because it doesn't use rigidbody physics, so do it based on position
                 Vector3 CurrentVelocity;
@@ -433,25 +427,31 @@ namespace SaccFlightAndVehicles
                 if (IdleUpdateMode || Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero)
                 { Acceleration = Vector3.zero; }
 
-                //convert short back to angle (0-65536 to 0-360)
-                O_Rotation_Q = Quaternion.Euler(new Vector3(O_RotationX, O_RotationY, O_RotationZ) * .0054931640625f);
+                float smv = short.MaxValue;
+                O_Rotation_Q = (new Quaternion(O_RotationX / smv, O_RotationY / smv, O_RotationZ / smv, O_RotationW / smv));
+
                 //rotate Acceleration by the difference in rotation of vehicle between last and this update to make it match the angle for the next update better
                 Quaternion PlaneRotDif = O_Rotation_Q * Quaternion.Inverse(O_LastRotation);
                 Acceleration = PlaneRotDif * Acceleration * .5f;//not sure why it's 0.5, but it seems correct from testing
 
                 //current angular momentum as a quaternion
-                CurAngMom = Quaternion.SlerpUnclamped(Quaternion.identity, PlaneRotDif, speednormalizer);
+                CurAngMom = RealSlerp(Quaternion.identity, PlaneRotDif, speednormalizer);
+                CurAngMomAcceleration = CurAngMom * Quaternion.Inverse(LastCurAngMom);
+
+                RotationExtrapolationDirection = CurAngMomAcceleration * CurAngMom;
+                Quaternion PingRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, Ping);
+                L_PingAdjustedRotation = PingRotExtrap * O_Rotation_Q;
+                Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, -Time.deltaTime);
+                RotExtrapolation_Raw = FrameRotExtrap * L_PingAdjustedRotation;//undo 1 frame worth of movement because its done again in update()
+
                 //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
                 SAVControl.SetProgramVariable("CurrentVel", CurrentVelocity);
-
                 L_PingAdjustedPosition = O_Position + ((CurrentVelocity + (Acceleration)) * Ping);
-
-                LastExtrapolationDirection = ExtrapolationDirection;
                 ExtrapolationDirection = CurrentVelocity + (Acceleration);
 
                 Extrapolation_Raw = L_PingAdjustedPosition - (ExtrapolationDirection * Time.deltaTime);//undo 1 frame worth of movement because its done again in update()
                 if (IdleUpdateMode) { ExtrapolationDirection *= IdleModeVelMultiplier; }
-                O_LastRotation2 = O_LastRotation;//O_LastRotation2 is needed for use in Update() as O_LastRotation is the same as O_Rotation_Q there
+                // O_LastRotation2 = O_LastRotation;//O_LastRotation2 is needed for use in Update() as O_LastRotation is the same as O_Rotation_Q there
 
                 O_LastUpdateTime = O_UpdateTime;
                 O_LastRotation = O_Rotation_Q;
@@ -467,10 +467,9 @@ namespace SaccFlightAndVehicles
                 {
                     L_LastUpdateTime = L_UpdateTime;
                     L_LastPingAdjustedPosition = L_PingAdjustedPosition;
-                    LastExtrapolationDirection = ExtrapolationDirection;
                     LastCurAngMom = CurAngMom;
-                    LastPing = Ping;
-                    O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+                    // LastPing = Ping;
+                    // O_LastRotation2 = O_LastRotation = O_Rotation_Q;
                     O_LastPosition = O_Position;
                     TestTransform.position = Extrapolation_Raw;
                 }
@@ -531,6 +530,17 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_TouchDownWater()
         {
             Grounded = true;
+        }
+        //unity slerp always uses shortest route to orientation rather than slerping to the actual quat. This undoes that
+        public Quaternion RealSlerp(Quaternion p, Quaternion q, float t)
+        {
+            if (Quaternion.Dot(p, q) < 0)
+            {
+                float angle = Quaternion.Angle(p, q);//quaternion.angle also checks shortest route
+                float newvalue = (360f - angle) / angle;
+                return Quaternion.SlerpUnclamped(p, q, -t * newvalue);
+            }
+            else return Quaternion.SlerpUnclamped(p, q, t);
         }
     }
 }
