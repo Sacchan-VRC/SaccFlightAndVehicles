@@ -49,7 +49,6 @@ namespace SaccFlightAndVehicles
             if (AutomaticGearsToggle) { AutomaticGearsDefault = AutomaticGearsToggle.isOn; ToggleAutomaticGears(); }
             if (InvertVRGearChangeToggle) { InvertVRGearChangeDefault = InvertVRGearChangeToggle.isOn; ToggleInvertVRGearChange(); }
             if (LeftGripClutchToggle) { LeftGripClutchDefault = LeftGripClutchToggle.isOn; ToggleLeftGripClutch(); }
-            if (PassengerComfortModeToggle) { PassengerComfortModeDefault = PassengerComfortModeToggle.isOn; TogglePassengerComfortMode(); }
             if (SwitchHandsToggle) { SwitchHandsDefault = SwitchHandsToggle.isOn; }//don't run this one because it can be on or off by default and running it would toggle it
             //sliders
             if (DialSensSlider) { DialSensDefault = DialSensSlider.value; SetDialSensitivity(); }
@@ -125,17 +124,6 @@ namespace SaccFlightAndVehicles
             {
                 if (SGV)
                 { SGV.SetProgramVariable("SteeringHand_Left", !LeftGripClutch); }
-            }
-        }
-        public Toggle PassengerComfortModeToggle;
-        private bool PassengerComfortModeDefault;
-        public void TogglePassengerComfortMode()
-        {
-            bool PassengerComfortMode = PassengerComfortModeToggle.isOn;
-            foreach (UdonSharpBehaviour SS in SAVSyncScripts)
-            {
-                if (SS)
-                { SS.SetProgramVariable("PassengerComfortMode", PassengerComfortMode); }
             }
         }
         public Toggle SwitchHandsToggle;
@@ -281,7 +269,6 @@ namespace SaccFlightAndVehicles
             if (InvertVRGearChangeToggle) { InvertVRGearChangeToggle.isOn = InvertVRGearChangeDefault; }
             if (LeftGripClutchToggle) { LeftGripClutchToggle.isOn = LeftGripClutchDefault; }
             if (AutoEngineToggle) { AutoEngineToggle.isOn = AutoEngineDefault; }
-            if (PassengerComfortModeToggle) { PassengerComfortModeToggle.isOn = PassengerComfortModeDefault; }
             if (SaccFlight) { SaccFlightStrengthSlider.value = SaccFlightStrengthDefault; }
         }
         [Header("Debug")]

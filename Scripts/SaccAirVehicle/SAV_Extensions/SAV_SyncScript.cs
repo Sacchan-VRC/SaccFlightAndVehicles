@@ -19,18 +19,12 @@ namespace SaccFlightAndVehicles
         public float IdleModeUpdateInterval = 3f;
         [Tooltip("Freeze the vehicle's position when it's dead? Turn off for boats that sink etc")]
         public bool FreezePositionOnDeath = true;
-        [Tooltip("How quickly to lerp rotation to new extrapolated target rotation, it might help to reduce this in high-lag situations with planes that can roll quickly")]
-        public float RotationSyncAgressiveness = 10f;
         [Tooltip("If vehicle moves less than this distance since it's last update, it'll be considered to be idle, may need to be increased for vehicles that want to be idle on water. If the vehicle floats away sometimes, this value is probably too big")]
         public float IdleMovementRange = .35f;
         [Tooltip("If vehicle rotates less than this many degrees since it's last update, it'll be considered to be idle")]
         public float IdleRotationRange = 5f;
         [Tooltip("Angle Difference between movement direction and rigidbody velocity that will cause the vehicle to teleport instead of interpolate")]
         public float TeleportAngleDifference = 20;
-        [Tooltip("Maximum amount of extrapolation for high ping players, will brake formation flying for high ping players if set lower than their ping = 0.1 = 100ms, useful for dogfight worlds")]
-        public float MaxPingExtrapolationInSeconds = 999f;
-        [Tooltip("Set maximum extrapolation to 0 for passengers to reduce uncomfortable movement, passengers will not see formation flying properly.")]
-        public bool PassengerComfortMode;
         [Tooltip("How much vehicle accelerates extra towards its 'raw' position when not owner in order to correct positional errors")]
         public float CorrectionTime = 8f;
         [Tooltip("How quickly non-owned vehicle's velocity vector lerps towards its new value")]
@@ -91,7 +85,6 @@ namespace SaccFlightAndVehicles
         private bool Occupied;
         private bool Grounded;
         private int EnterIdleModeNumber;
-        private float PrevMaxExtrap;
         private double lastframetime;
         private Vector3 poslasframe;
         private Vector3 Extrapolation_Raw;
@@ -419,7 +412,7 @@ namespace SaccFlightAndVehicles
             //local time update was received
             L_UpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime);
             //Ping is time between server time update was sent, and the local time the update was received
-            Ping = Mathf.Min((float)(L_UpdateTime - O_UpdateTime), MaxPingExtrapolationInSeconds);
+            Ping = (float)(L_UpdateTime - O_UpdateTime);
 #if UNITY_EDITOR
             DBGPING = Ping;
 #endif
@@ -435,10 +428,7 @@ namespace SaccFlightAndVehicles
             else
             { L_CurVel = O_CurVel; }
             O_CurVelLast = O_CurVel;
-            //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             Acceleration = (L_CurVel - L_CurVelLast);//acceleration is difference in velocity
-            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero)
-            { Acceleration = Vector3.zero; }
 
             float smv = short.MaxValue;
             O_Rotation_Q = (new Quaternion(O_RotationX / smv, O_RotationY / smv, O_RotationZ / smv, O_RotationW / smv));
@@ -451,6 +441,11 @@ namespace SaccFlightAndVehicles
             //current angular momentum as a quaternion
             CurAngMom = RealSlerp(Quaternion.identity, PlaneRotDif, speednormalizer);
             CurAngMomAcceleration = CurAngMom * Quaternion.Inverse(LastCurAngMom);
+
+            //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
+            //+ if idlemode, disable acceleration because it brakes
+            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero || O_CurVel.magnitude < IdleMovementRange)
+            { Acceleration = Vector3.zero; CurAngMomAcceleration = Quaternion.identity;}
 
             RotationExtrapolationDirection = CurAngMomAcceleration * CurAngMom;
             Quaternion PingRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, Ping);
@@ -509,21 +504,6 @@ namespace SaccFlightAndVehicles
             {
                 VehicleRigid.drag = 9999;
                 VehicleRigid.angularDrag = 9999;
-            }
-        }
-        public void SFEXT_P_PassengerEnter()
-        {
-            if (PassengerComfortMode)
-            {
-                PrevMaxExtrap = MaxPingExtrapolationInSeconds;
-                MaxPingExtrapolationInSeconds = 0;
-            }
-        }
-        public void SFEXT_P_PassengerExit()
-        {
-            if (PassengerComfortMode)
-            {
-                MaxPingExtrapolationInSeconds = PrevMaxExtrap;
             }
         }
         public void SFEXT_G_TouchDown()
