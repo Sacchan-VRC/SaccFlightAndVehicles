@@ -62788,6 +62788,7 @@ MonoBehaviour:
   EnterWater: {fileID: 8570690015368958712}
   EnterWaterOutside: {fileID: 4098285560150720176}
   UnderWater: {fileID: 6616472201323855423}
+  DamageFeedBack: {fileID: 0}
   Explosion:
   - {fileID: 7545207850356807991}
   BulletHit:
@@ -62806,6 +62807,8 @@ MonoBehaviour:
   - {fileID: 3094579988564083524}
   ReSupply: {fileID: 6088146973860002334}
   GearChange: {fileID: 0}
+  GearUp: {fileID: 0}
+  GearDown: {fileID: 0}
   testcamera: {fileID: 0}
 --- !u!114 &1890296060720629965
 MonoBehaviour:
@@ -63573,6 +63576,15 @@ MonoBehaviour:
   TeleportAngleDifference: 180
   MaxPingExtrapolationInSeconds: 999
   PassengerComfortMode: 0
+  CorrectionTime: 8
+  SpeedLerpTime: 4
+  CorrectionDerivStrength: 150
+  CorrectionTime_Rotation: 2
+  RotationSpeedLerpTime: 10
+  AntiWarp: 1
+  TestTransform: {fileID: 0}
+  TestTransform_Raw: {fileID: 0}
+  RotExtrapDirection_Smooth: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &3243243056881722325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69983,6 +69995,9 @@ MonoBehaviour:
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
+  PilotExitTurnOn: 0
+  PilotEnterTurnOff: 0
+  PilotEnterTurnOn: 0
   ToggleMinDelay: 0
   ToggleObjects:
   - {fileID: 5017952649996745700}

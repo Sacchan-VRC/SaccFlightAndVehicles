@@ -201,6 +201,10 @@ MonoBehaviour:
   TeleportAngleDifference: 20
   MaxPingExtrapolationInSeconds: 999
   PassengerComfortMode: 0
+  CorrectionTime: 8
+  SpeedLerpTime: 4
+  TestTransform: {fileID: 0}
+  TestTransform_Raw: {fileID: 0}
 --- !u!114 &1344609028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20598,9 +20602,10 @@ MonoBehaviour:
   HudLimit: {fileID: 5465751469429868294}
   DefaultLimitsOn: 1
   Dial_Funcon: {fileID: 4740379952925402349}
-  GLimiter_Begin: 0
-  GLimiter: 12
-  AoALimiter: 15
+  GLimiter_Begin: 20
+  GLimiter: 25
+  AoALimiter_Begin: 10
+  AoALimiter: 14
   DisableGLimiter: 0
   DisableAoALimiter: 0
 --- !u!114 &914079681347326636
@@ -96131,7 +96136,7 @@ MonoBehaviour:
   ThrottleStrength: 12
   VerticalThrottle: 0
   ThrottleSensitivity: 6
-  ThrottleSpeedDesktop: 0.5
+  KeyboardThrottleSens: 0.5
   MaxJoyAngles: {x: 45, y: 45, z: 45}
   JoystickPushPullPitch: 0
   JoystickPushPullDistance: 0.2
@@ -96306,7 +96311,7 @@ MonoBehaviour:
   MaxLift: 8
   VelLift: 4.5
   VelLiftMax: 10
-  MaxGs: 40
+  MaxGs: 25
   GDamage: 110
   GroundEffectMaxDistance: 9
   GroundEffectStrength: 6

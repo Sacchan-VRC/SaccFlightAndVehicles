@@ -65,6 +65,10 @@ MonoBehaviour:
   TeleportAngleDifference: 20
   MaxPingExtrapolationInSeconds: 999
   PassengerComfortMode: 0
+  CorrectionTime: 8
+  SpeedLerpTime: 4
+  TestTransform: {fileID: 0}
+  TestTransform_Raw: {fileID: 0}
 --- !u!114 &630903748
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42653,7 +42657,7 @@ MonoBehaviour:
   ThrottleStrength: 13
   VerticalThrottle: 1
   ThrottleSensitivity: 6
-  ThrottleSpeedDesktop: 0.5
+  KeyboardThrottleSens: 0.5
   MaxJoyAngles: {x: 45, y: 45, z: 45}
   JoystickPushPullPitch: 0
   JoystickPushPullDistance: 0.2
@@ -139694,6 +139698,7 @@ MonoBehaviour:
   ThisSVSeat: {fileID: 3335687585135616608}
   MoveTransforms: []
   MoveTransforms_CoPosition: []
+  TakeControlKey: 32
 --- !u!114 &5977842168220115740
 MonoBehaviour:
   m_ObjectHideFlags: 0

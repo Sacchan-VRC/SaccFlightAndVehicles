@@ -27739,6 +27739,10 @@ MonoBehaviour:
   TeleportAngleDifference: 20
   MaxPingExtrapolationInSeconds: 999
   PassengerComfortMode: 0
+  CorrectionTime: 10
+  SpeedLerpTime: 4
+  TestTransform: {fileID: 0}
+  TestTransform_Raw: {fileID: 0}
 --- !u!114 &2849390445293511764
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86112,7 +86116,7 @@ MonoBehaviour:
   ThrottleAfterburnerPoint: 0.8
   ThrottleStrength: 4
   ThrottleSensitivity: 6
-  ThrottleSpeedDesktop: 0.5
+  KeyboardThrottleSens: 0.5
   SteeringWheelDegrees: 360
   GripSensitivity: 0.75
   KeyboardSteeringSpeed: 1.5

@@ -1912,6 +1912,15 @@ MonoBehaviour:
   TeleportAngleDifference: 180
   MaxPingExtrapolationInSeconds: 999
   PassengerComfortMode: 0
+  CorrectionTime: 8
+  SpeedLerpTime: 4
+  CorrectionDerivStrength: 150
+  CorrectionTime_Rotation: 2
+  RotationSpeedLerpTime: 10
+  AntiWarp: 1
+  TestTransform: {fileID: 0}
+  TestTransform_Raw: {fileID: 0}
+  RotExtrapDirection_Smooth: {x: 0, y: 0, z: 0, w: 0}
 --- !u!114 &1217889975477297945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2295,9 +2304,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1217889975697026387}
   EntityControl: {fileID: 1217889975573313657}
   VehicleMesh: {fileID: 4780432453592769640}
+  MainObjectRenderer: {fileID: 1964195338337086324}
   OnlyChangeColliders: 0
   OnboardVehicleLayer: 31
-  MainObjectRenderer: {fileID: 1964195338337086324}
   Health: 73
   VehicleAnimator: {fileID: 1217889975573313658}
   DriveWheels:
@@ -7694,6 +7703,7 @@ MonoBehaviour:
   EnterWater: {fileID: 5410429754790072884}
   EnterWaterOutside: {fileID: 361564616177745532}
   UnderWater: {fileID: 7365336421728337651}
+  DamageFeedBack: {fileID: 0}
   Explosion:
   - {fileID: 6147825305097279995}
   BulletHit:
@@ -7712,6 +7722,8 @@ MonoBehaviour:
   - {fileID: 1832896420802041804}
   ReSupply: {fileID: 7609378508811401938}
   GearChange: {fileID: 0}
+  GearUp: {fileID: 0}
+  GearDown: {fileID: 0}
   testcamera: {fileID: 0}
 --- !u!114 &2873066051735144449
 MonoBehaviour:
@@ -77183,6 +77195,9 @@ MonoBehaviour:
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
+  PilotExitTurnOn: 0
+  PilotEnterTurnOff: 0
+  PilotEnterTurnOn: 0
   ToggleMinDelay: 0
   ToggleObjects:
   - {fileID: 8667134892983958312}

@@ -47496,9 +47496,10 @@ MonoBehaviour:
   HudLimit: {fileID: 4371473019644549653}
   DefaultLimitsOn: 1
   Dial_Funcon: {fileID: 5918980766768351896}
-  GLimiter_Begin: 0
-  GLimiter: 12
-  AoALimiter: 15
+  GLimiter_Begin: 35
+  GLimiter: 40
+  AoALimiter_Begin: 10
+  AoALimiter: 14
   DisableGLimiter: 0
   DisableAoALimiter: 0
 --- !u!114 &4371473018833571869
@@ -47591,7 +47592,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 546733dd04cce67489fbfb08f9105d9b, type: 2}
-  m_CullingMode: 1
+  m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
@@ -59136,7 +59137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &4371473019321031448
 Transform:
   m_ObjectHideFlags: 0
@@ -92974,7 +92975,7 @@ MonoBehaviour:
   ThrottleStrength: 20
   VerticalThrottle: 0
   ThrottleSensitivity: 6
-  ThrottleSpeedDesktop: 0.5
+  KeyboardThrottleSens: 0.5
   MaxJoyAngles: {x: 45, y: 45, z: 45}
   JoystickPushPullPitch: 0
   JoystickPushPullDistance: 0.2
@@ -104549,13 +104550,19 @@ MonoBehaviour:
   updateInterval: 0.2
   IdleModeUpdateInterval: 3
   FreezePositionOnDeath: 1
-  RotationSyncAgressiveness: 10
-  IdleModeVelMultiplier: 0.4
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
-  MaxPingExtrapolationInSeconds: 999
-  PassengerComfortMode: 0
+  CorrectionTime: 8
+  SpeedLerpTime: 4
+  CorrectionDerivStrength: 150
+  CorrectionTime_Rotation: 1
+  RotationSpeedLerpTime: 10
+  AntiWarp: 1
+  TestTransform: {fileID: 0}
+  TestTransform_Raw: {fileID: 0}
+  LagSimDelay: 0
+  DBGPING: 0
 --- !u!114 &8771412242316313159
 MonoBehaviour:
   m_ObjectHideFlags: 0
