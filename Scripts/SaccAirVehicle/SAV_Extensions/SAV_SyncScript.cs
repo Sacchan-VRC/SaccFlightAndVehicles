@@ -86,6 +86,7 @@ namespace SaccFlightAndVehicles
         private bool Grounded;
         private int EnterIdleModeNumber;
         private double lastframetime;
+        private double lastframetime_extrap;
         private Vector3 poslasframe;
         private Vector3 Extrapolation_Raw;
         private Quaternion RotExtrapolation_Raw = Quaternion.identity;
@@ -179,6 +180,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_LoseOwnership()
         {
+            L_UpdateTime = lastframetime_extrap = StartupServerTime + (double)(Time.time - StartupLocalTime);
             IsOwner = false;
             Extrapolation_Raw = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
             ExtrapDirection_Smooth = L_CurVelLast; ;
@@ -210,8 +212,8 @@ namespace SaccFlightAndVehicles
         { Piloting = false; }
         public void SFEXT_O_RespawnButton()
         {
-            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
             ResetSyncTimes();
+            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
         }
         public void SFEXT_G_RespawnButton()
         {
@@ -230,25 +232,29 @@ namespace SaccFlightAndVehicles
             if (IsOwner)//send data
             {
                 double time = (StartupServerTime + (double)(Time.time - StartupLocalTime));
-                if (AntiWarp && Time.deltaTime > .099f)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
+                if (Time.deltaTime > .099f)
                 {
-                    double acctime = Networking.GetServerTimeInSeconds();
-                    double accuratedelta = acctime - lastframetime;
-                    Vector3 RigidMovedAmount = VehicleRigid.velocity * Time.deltaTime;
-                    float DistanceTravelled = RigidMovedAmount.magnitude;
-
-                    if (DistanceTravelled < (VehicleRigid.velocity * (float)accuratedelta).magnitude)
-                    {
-                        //smooth, but the extrapolation gets added each time (i think) causing vehicle to be faster (10%~)
-                        //VehicleTransform.position += (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
-                        //it's more correct to use RB position, but then you're removing the RB extrapolation and things get jerky.
-                        //When setting rigidbody position, although it looks more jerky when flying side-by-side, it's more accurate speed-wise
-                        //and hopefully doesn't cause rapid speed-up-slow-down if you keep on transitioning in and out of the parent if statement.
-                        //Setting transform position to rigidbody position+, so that position is correct if data is sent this frame (the result should be the jerky, speed-accurate one)
-                        VehicleTransform.position = VehicleRigid.position + (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
-                        //is there a best of both worlds solution?
-                    }
                     ResetSyncTimes();
+                    time = Networking.GetServerTimeInSeconds();//because we just ResetSyncTimes()'d
+                    if (AntiWarp)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
+                    {
+                        double acctime = time;
+                        double accuratedelta = acctime - lastframetime;
+                        Vector3 RigidMovedAmount = VehicleRigid.velocity * Time.deltaTime;
+                        float DistanceTravelled = RigidMovedAmount.magnitude;
+
+                        if (DistanceTravelled < (VehicleRigid.velocity * (float)accuratedelta).magnitude)
+                        {
+                            //smooth, but the extrapolation gets added each time (i think) causing vehicle to be faster (10%~)
+                            //VehicleTransform.position += (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
+                            //it's more correct to use RB position, but then you're removing the RB extrapolation and things get jerky.
+                            //When setting rigidbody position, although it looks more jerky when flying side-by-side, it's more accurate speed-wise
+                            //and hopefully doesn't cause rapid speed-up-slow-down if you keep on transitioning in and out of the parent if statement.
+                            //Setting transform position to rigidbody position+, so that position is correct if data is sent this frame (the result should be the jerky, speed-accurate one)
+                            VehicleTransform.position = VehicleRigid.position + (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
+                            //is there a best of both worlds solution?
+                        }
+                    }
                 }
                 lastframetime = time;
                 if (time > nextUpdateTime - (Time.deltaTime * .5f))
@@ -306,9 +312,19 @@ namespace SaccFlightAndVehicles
                 DeserializationStuff();
             }
             float deltatime = Time.deltaTime;
+            double time;
             if (Time.deltaTime > .099f)
-            { ResetSyncTimes(); }
-            float TimeSinceUpdate = (float)(StartupServerTime + (double)(Time.time - StartupLocalTime) - L_UpdateTime)
+            {
+                time = Networking.GetServerTimeInSeconds();
+                deltatime = (float)(time - lastframetime_extrap);
+                Vector3 RigidMovedAmount = VehicleRigid.velocity * Time.deltaTime;
+                float DistanceTravelled = RigidMovedAmount.magnitude;
+                ResetSyncTimes();
+            }
+            else
+            { time = StartupServerTime + (double)(Time.time - StartupLocalTime); }
+            lastframetime_extrap = Networking.GetServerTimeInSeconds();
+            float TimeSinceUpdate = (float)(time - L_UpdateTime)
                     / updateInterval;
             //extrapolated position based on time passed since update
             Vector3 Correction = ((Extrapolation_Raw - TestTransform.position) * CorrectionTime);
@@ -445,7 +461,7 @@ namespace SaccFlightAndVehicles
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             //+ if idlemode, disable acceleration because it brakes
             if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero || O_CurVel.magnitude < IdleMovementRange)
-            { Acceleration = Vector3.zero; CurAngMomAcceleration = Quaternion.identity;}
+            { Acceleration = Vector3.zero; CurAngMomAcceleration = Quaternion.identity; }
 
             RotationExtrapolationDirection = CurAngMomAcceleration * CurAngMom;
             Quaternion PingRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, Ping);
@@ -462,7 +478,7 @@ namespace SaccFlightAndVehicles
 
             //if we're going one way but moved the other, we must have teleported.
             //set values to the same thing for Current and Last to make teleportation instead of interpolation
-            if (Vector3.Angle(O_Position - O_LastPosition, O_CurVel) > TeleportAngleDifference)
+            if (Vector3.Angle(O_Position - O_LastPosition, O_CurVel) > TeleportAngleDifference && L_CurVel.magnitude > 30f)
             {
                 L_LastUpdateTime = L_UpdateTime;
                 L_LastPingAdjustedPosition = L_PingAdjustedPosition;
