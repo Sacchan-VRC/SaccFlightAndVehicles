@@ -64,7 +64,7 @@ namespace SaccFlightAndVehicles
         private float Ping;
         // private float LastPing;
         private double L_UpdateTime;
-        private double L_LastUpdateTime;
+        // private double L_LastUpdateTime;
         private double O_LastUpdateTime;
         //make everyone think they're the owner for the first frame so that don't set the position to 0,0,0 before SFEXT_L_EntityStart runs
         private bool IsOwner = true;
@@ -72,7 +72,7 @@ namespace SaccFlightAndVehicles
         private Quaternion RotationExtrapolationDirection;
         private Vector3 L_PingAdjustedPosition = Vector3.zero;
         private Quaternion L_PingAdjustedRotation = Quaternion.identity;
-        private Vector3 L_LastPingAdjustedPosition;
+        // private Vector3 L_LastPingAdjustedPosition;
         private Vector3 lerpedCurVel;
         private Vector3 Acceleration = Vector3.zero;
         private Vector3 LastAcceleration;
@@ -118,7 +118,7 @@ namespace SaccFlightAndVehicles
             Initialized = true;
             VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
             VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
-            Extrapolation_Raw = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position = VehicleTransform.position;
+            Extrapolation_Raw /* = L_LastPingAdjustedPosition */ = L_PingAdjustedPosition = O_Position = VehicleTransform.position;
             /* O_LastRotation2 = */
             O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
@@ -144,8 +144,9 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.drag = 9999;
                 VehicleRigid.angularDrag = 9999;
             }
-            StartupServerTime = Networking.GetServerTimeInSeconds();
-            StartupLocalTime = Time.time;
+            ResetSyncTimes();
+            O_LastUpdateTime = L_UpdateTime = lastframetime = lastframetime_extrap = Networking.GetServerTimeInMilliseconds();
+            O_LastUpdateTime -= updateInterval;
             EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
             //script is disabled for 5 seconds to make sure nothing moves before everything is initialized    
             SendCustomEventDelayedSeconds(nameof(ActivateScript), 5);
@@ -180,11 +181,12 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_LoseOwnership()
         {
-            L_UpdateTime = lastframetime_extrap = StartupServerTime + (double)(Time.time - StartupLocalTime);
+            O_LastUpdateTime = L_UpdateTime = lastframetime_extrap = StartupServerTime + (double)(Time.time - StartupLocalTime);
+            O_LastUpdateTime -= updateInterval;
             IsOwner = false;
-            Extrapolation_Raw = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_Position;
-            ExtrapDirection_Smooth = L_CurVelLast; ;
-            RotationLerper = /* O_LastRotation2 = */ O_LastRotation = O_Rotation_Q;
+            Extrapolation_Raw /* = L_LastPingAdjustedPosition */ = L_PingAdjustedPosition = O_Position;
+            ExtrapDirection_Smooth = O_CurVel;
+            RotExtrapolation_Raw = RotationLerper = /* O_LastRotation2 = */ O_LastRotation = O_Rotation_Q;
             LastCurAngMom = CurAngMom = Quaternion.identity;
             VehicleRigid.isKinematic = true;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
@@ -221,9 +223,10 @@ namespace SaccFlightAndVehicles
             UpdatesSentWhileStill = 0;
             //make it teleport instead of interpolating
             ExtrapolationDirection = Vector3.zero;
-            Extrapolation_Raw = VehicleTransform.position = L_LastPingAdjustedPosition = L_PingAdjustedPosition = O_LastPosition = O_Position;
+            Extrapolation_Raw = VehicleTransform.position /* = L_LastPingAdjustedPosition */ = L_PingAdjustedPosition = O_LastPosition = O_Position;
             RotationLerper = VehicleTransform.rotation = /* O_LastRotation2 = */ O_LastRotation = O_Rotation_Q;
             ExtrapDirection_Smooth = Vector3.zero;
+            RotExtrapDirection_Smooth = Quaternion.identity;
             L_CurVelLast = Vector3.zero;
             LastAcceleration = Acceleration = Vector3.zero;
         }
@@ -327,7 +330,7 @@ namespace SaccFlightAndVehicles
             float TimeSinceUpdate = (float)(time - L_UpdateTime)
                     / updateInterval;
             //extrapolated position based on time passed since update
-            Vector3 Correction = ((Extrapolation_Raw - TestTransform.position) * CorrectionTime);
+            Vector3 Correction = (Extrapolation_Raw - TestTransform.position) * CorrectionTime;
             Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
 
             //like a PID derivative. Makes movement a bit jerky because the 'raw' target is jerky.
@@ -419,7 +422,7 @@ namespace SaccFlightAndVehicles
         {
             LastAcceleration = Acceleration;
             // LastPing = Ping;
-            L_LastUpdateTime = L_UpdateTime;
+            // L_LastUpdateTime = L_UpdateTime;
             LastCurAngMom = CurAngMom;
             //time between this update and last
             float updatedelta = (float)(O_UpdateTime - O_LastUpdateTime);
@@ -480,11 +483,11 @@ namespace SaccFlightAndVehicles
             //set values to the same thing for Current and Last to make teleportation instead of interpolation
             if (Vector3.Angle(O_Position - O_LastPosition, O_CurVel) > TeleportAngleDifference && L_CurVel.magnitude > 30f)
             {
-                L_LastUpdateTime = L_UpdateTime;
-                L_LastPingAdjustedPosition = L_PingAdjustedPosition;
-                LastCurAngMom = CurAngMom;
+                // L_LastUpdateTime = L_UpdateTime;
+                // L_LastPingAdjustedPosition = L_PingAdjustedPosition;
                 // LastPing = Ping;
                 // O_LastRotation2 = O_LastRotation = O_Rotation_Q;
+                LastCurAngMom = CurAngMom;
                 TestTransform.position = Extrapolation_Raw;
             }
             // O_LastRotation2 = O_LastRotation;//O_LastRotation2 is needed for use in Update() as O_LastRotation is the same as O_Rotation_Q there
