@@ -316,34 +316,35 @@ namespace SaccFlightAndVehicles
             }
             float deltatime = Time.deltaTime;
             double time;
+            Vector3 Deriv = Vector3.zero;
+            Vector3 Correction = (Extrapolation_Raw - TestTransform.position) * CorrectionTime;
+            float Error = Vector3.Distance(TestTransform.position, Extrapolation_Raw);
             if (Time.deltaTime > .099f)
             {
                 time = Networking.GetServerTimeInSeconds();
                 deltatime = (float)(time - lastframetime_extrap);
-                Vector3 RigidMovedAmount = VehicleRigid.velocity * Time.deltaTime;
-                float DistanceTravelled = RigidMovedAmount.magnitude;
                 ResetSyncTimes();
             }
             else
-            { time = StartupServerTime + (double)(Time.time - StartupLocalTime); }
+            {
+                time = StartupServerTime + (double)(Time.time - StartupLocalTime);
+                //deriv is only done if the real time matches the simulation time (FPS > 10)
+                //because otherwise it causes a feedback loop and sends the vehicle to infinity.
+                //like a PID derivative. Makes movement a bit jerky because the 'raw' target is jerky.
+                if (Error < ErrorLastFrame)
+                {
+                    Deriv = -Correction.normalized * (ErrorLastFrame - Error) * CorrectionDerivStrength;
+                }
+            }
+            ErrorLastFrame = Error;
             lastframetime_extrap = Networking.GetServerTimeInSeconds();
             float TimeSinceUpdate = (float)(time - L_UpdateTime)
                     / updateInterval;
             //extrapolated position based on time passed since update
-            Vector3 Correction = (Extrapolation_Raw - TestTransform.position) * CorrectionTime;
             Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
-
-            //like a PID derivative. Makes movement a bit jerky because the 'raw' target is jerky.
-            float Error = Vector3.Distance(TestTransform.position, Extrapolation_Raw);
-            Vector3 Deriv = Vector3.zero;
-            if (Error < ErrorLastFrame)
-            {
-                Deriv = -Correction.normalized * (ErrorLastFrame - Error) * CorrectionDerivStrength;
-            }
-            ErrorLastFrame = Error;
             ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
 
-            //rotate using method to movement (no deriv, correction is done with a simple slerp later)
+            //rotate using similar method to movement (no deriv, correction is done with a simple slerp after)
             Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngMomAcceleration, TimeSinceUpdate);
             Quaternion AngMomEstimate = FrameRotAccel * CurAngMom;
             RotExtrapDirection_Smooth = RealSlerp(RotExtrapDirection_Smooth, AngMomEstimate, RotationSpeedLerpTime * deltatime);
