@@ -147,6 +147,12 @@ namespace SaccFlightAndVehicles
                     if (HookedDelta < 5)
                     { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayCableSnap)); }
                 }
+            }
+        }
+        private void FixedUpdate()
+        {
+            if (Hooked && (bool)SAVControl.GetProgramVariable("Taxiing"))
+            {
                 float DeltaTime = Time.deltaTime;
                 if ((float)SAVControl.GetProgramVariable("Speed") > HookedBrakeStrength * DeltaTime)
                 {
@@ -156,7 +162,6 @@ namespace SaccFlightAndVehicles
                 {
                     VehicleRigidbody.velocity = Vector3.zero;
                 }
-                //Debug.Log("hooked");
             }
         }
         public void ToggleHook()
