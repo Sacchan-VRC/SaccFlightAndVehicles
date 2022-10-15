@@ -916,6 +916,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_L_WakeUp()
         {
+            VehicleRigidbody.WakeUp();
             VehicleRigidbody.useGravity = true;
             Sleeping = false;
         }
