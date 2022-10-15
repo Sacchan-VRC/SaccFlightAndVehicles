@@ -88,14 +88,15 @@ namespace SaccFlightAndVehicles
                 VehicleAnimator.SetFloat(THROTTLE_STRING, EngineOutput);//non-owners use value that is similar, but smoothed and would feel bad if the pilot used it himself
                 VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, EngineOutput);
             }
-            if (Occupied)
+            float spd = (float)SSVControl.GetProgramVariable("Speed");
+            if (Occupied || spd > 2)
             {
                 DoEffects = 0f;
                 VehicleAnimator.SetFloat(FUEL_STRING, (float)SSVControl.GetProgramVariable("Fuel") * FullFuelDivider);
             }
             else { DoEffects += DeltaTime; }
             VehicleAnimator.SetFloat(HEALTH_STRING, (float)SSVControl.GetProgramVariable("Health") * FullHealthDivider);
-            VehicleAnimator.SetFloat(MACH10_STRING, (float)SSVControl.GetProgramVariable("Speed") * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
+            VehicleAnimator.SetFloat(MACH10_STRING, spd * 0.000291545189504373f);//should be airspeed but nonlocal players don't have it
 
             float watersurface = (float)FloatScript.GetProgramVariable("SurfaceHeight") + .02f;
 
