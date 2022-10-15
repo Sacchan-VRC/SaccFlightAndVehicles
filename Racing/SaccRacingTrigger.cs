@@ -78,7 +78,7 @@ namespace SaccFlightAndVehicles
         {
             if (RaceOn)
             {
-                RaceTime = Time.time - RaceStartTime;
+                RaceTime = Time.realtimeSinceStartup - RaceStartTime;
                 TimeText_Cockpit.text = RaceTime.ToString();
             }
         }
@@ -134,7 +134,7 @@ namespace SaccFlightAndVehicles
                     }
 
                     //Debug.Log("Finish Race!");
-                    RaceTime = LastTime = (Time.time - RaceStartTime - subframetime);
+                    RaceTime = LastTime = (Time.realtimeSinceStartup - RaceStartTime - subframetime);
                     RaceOn = false;
                     NextCheckpoint = FirstCheckPoint;
 
@@ -207,7 +207,7 @@ namespace SaccFlightAndVehicles
                     }
 
                     //Debug.Log("Start Race!");
-                    RaceStartTime = Time.time - subframetime;
+                    RaceStartTime = Time.realtimeSinceStartup - subframetime;
                     RaceOn = true;
                     NextCheckpoint += TrackDirection;
                     ProgressCheckPointAnims();
