@@ -219,6 +219,7 @@ namespace SaccFlightAndVehicles
         private bool Piloting;
         private bool Passenger;
         private bool InVehicle;
+        private bool InVehicle_Sounds;
         private int DoorsOpen = 0;
         private bool InWater;
         private bool Taxiing;
@@ -226,6 +227,7 @@ namespace SaccFlightAndVehicles
         private bool Occupied;
         private bool EngineStarted;
         private bool DoRollingSwap;
+        private bool SoundsOutside = true;
         public void SFEXT_L_EntityStart()
         {
             IsOwner = EntityControl.IsOwner;
@@ -372,7 +374,7 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.smoothDeltaTime;
             if (DoSound > 35f)
             {
-                if (!soundsoff && (!InVehicle || !AllDoorsClosed))//disable all the sounds that always play, re-enabled in pilotseat
+                if (!soundsoff && (!InVehicle_Sounds || !AllDoorsClosed))//disable all the sounds that always play, re-enabled in pilotseat
                 {
                     if (PlaneDistant) { PlaneDistant.Stop(); }
                     if (PlaneWind) { PlaneWind.Stop(); }
@@ -429,7 +431,7 @@ namespace SaccFlightAndVehicles
                     doppletemp = .0001f; // prevent divide by 0
 
                     //Only Supersonic if the vehicle is actually moving faster than sound, and you're not inside it (prevents sonic booms from occuring if you move past a stationary vehicle)
-                    if (((Vector3)SAVControl.GetProgramVariable("CurrentVel")).magnitude > 343 && !InVehicle)
+                    if (((Vector3)SAVControl.GetProgramVariable("CurrentVel")).magnitude > 343 && !InVehicle_Sounds)
                     {
                         if (!silent)
                         {
@@ -461,7 +463,7 @@ namespace SaccFlightAndVehicles
             }
 
             //Piloting = true in editor play mode w/o cyanemu
-            if (InVehicle && AllDoorsClosed)
+            if (InVehicle_Sounds && AllDoorsClosed)
             {
                 if (!RollingOnWater && _rolling)
                 {
@@ -578,7 +580,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_EnterWater()
         {
             InWater = true;
-            if (InVehicle)
+            if (InVehicle_Sounds)
             {
                 if (EnterWater) { EnterWater.Play(); }
                 if (UnderWater) { UnderWater.Play(); }
@@ -680,32 +682,39 @@ namespace SaccFlightAndVehicles
         {
             Piloting = true;
             InVehicle = true;
-            if (AllDoorsClosed) { SetSoundsInside(); }
+            if (EntityControl.MySeat != -1)
+            {
+                InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
+            }
+            if (AllDoorsClosed && InVehicle_Sounds)
+            { SetSoundsInside(); }
             if (InWater) { if (UnderWater) { UnderWater.Play(); } }
         }
         public void SFEXT_O_PilotExit()
         {
             Piloting = false;
-            InVehicle = false;
+            InVehicle = InVehicle_Sounds = false;
             if (UnderWater) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
-            if (AllDoorsClosed)
-            { SetSoundsOutside(); }
+            SetSoundsOutside();
         }
         public void SFEXT_P_PassengerEnter()
         {
             DoSound = 0;
             Passenger = true;
-            InVehicle = true;
-            if (AllDoorsClosed) { SetSoundsInside(); }
+            if (EntityControl.MySeat != -1)
+            {
+                InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
+            }
+            if (AllDoorsClosed && InVehicle_Sounds)
+            { SetSoundsInside(); }
             if (InWater) { if (UnderWater) { UnderWater.Play(); } }
         }
         public void SFEXT_P_PassengerExit()
         {
             Passenger = false;
-            InVehicle = false;
+            InVehicle = InVehicle_Sounds = false;
             if (UnderWater) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
-            if (AllDoorsClosed)
-            { SetSoundsOutside(); }
+            SetSoundsOutside();
         }
         public void SFEXT_G_EngineStartup()
         {
@@ -713,7 +722,7 @@ namespace SaccFlightAndVehicles
             { EngineLerpSpeedMultiplier = EngineStartingLerpSpeedMulti; }
             EngineStarted = true;
             EngineSoundsOn();
-            if (AllDoorsClosed)
+            if (AllDoorsClosed && InVehicle_Sounds)
             { if (EngineStartupInside) { EngineStartupInside.Play(); } }
             else
             { if (EngineStartup) { EngineStartup.Play(); } }
@@ -723,7 +732,7 @@ namespace SaccFlightAndVehicles
             if (DoEngineLerpSpeedMultiplierChanges)
             { EngineLerpSpeedMultiplier = EngineOffLerpSpeedMulti; }
             EngineStarted = false;
-            if (AllDoorsClosed)
+            if (AllDoorsClosed && InVehicle_Sounds)
             { if (EngineStartupCancelInside) { EngineStartupCancelInside.Play(); } }
             else
             { if (EngineStartupCancel) { EngineStartupCancel.Play(); } }
@@ -771,7 +780,7 @@ namespace SaccFlightAndVehicles
         {
             EngineStarted = false;
             EngineOn = false;
-            if (AllDoorsClosed)
+            if (AllDoorsClosed && InVehicle_Sounds)
             { if (EngineTurnOffInside) { EngineTurnOffInside.Play(); } }
             else
             { if (EngineTurnOff) { EngineTurnOff.Play(); } }
@@ -981,7 +990,7 @@ namespace SaccFlightAndVehicles
             if (DoorsOpen == 0)
             {
                 AllDoorsClosed = true;
-                if (InVehicle)
+                if (InVehicle_Sounds)
                 { SetSoundsInside(); }
                 if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_DoorsClosed"); }
             }
@@ -993,7 +1002,7 @@ namespace SaccFlightAndVehicles
             DoorsOpen += 1;
             if (DoorsOpen != 0)
             {
-                if (InVehicle && AllDoorsClosed)//only run exitplane if doors were closed before
+                if (InVehicle_Sounds && AllDoorsClosed)//only run exitplane if doors were closed before
                 { SetSoundsOutside(); }
                 if (IsOwner && AllDoorsClosed)//if AllDoorsClosed == true then all doors were closed last frame, so send 'opened' event
                 { EntityControl.SendEventToExtensions("SFEXT_O_DoorsOpened"); }
@@ -1003,6 +1012,8 @@ namespace SaccFlightAndVehicles
         }
         private void SetSoundsInside()
         {
+            if (!SoundsOutside) { return; }
+            SoundsOutside = false;
             //change stuff when you get in/canopy closes
             if (ABOnOutside) { ABOnOutside.Stop(); }
             if (EngineStartup) { EngineStartup.Stop(); }
@@ -1040,6 +1051,8 @@ namespace SaccFlightAndVehicles
         }
         private void SetSoundsOutside()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
         {
+            if (SoundsOutside) { return; }
+            SoundsOutside = true;
             if (RadarLocked) { RadarLocked.Stop(); }
             if (!RollingOnWater && _rolling) { _rolling.Stop(); }
             if (PlaneInside) { PlaneInside.Stop(); }

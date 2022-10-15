@@ -16,6 +16,8 @@ namespace SaccFlightAndVehicles
         public GameObject ThisSeatOnly;
         public bool AdjustSeat = true;
         public Transform TargetEyePosition;
+        [Tooltip("Let other scripts know that this seat is on the outside of the vehicle (stop sound changing when closing canopy)")]
+        public bool SeatOutSideVehicle;
         [Tooltip("How far to move the head to the side when looking backwards in desktop")]
         [SerializeField] float HeadXOffset = 0.25f;
         [UdonSynced, FieldChangeCallback(nameof(AdjustedPos))] private Vector2 _adjustedPos;
@@ -32,7 +34,7 @@ namespace SaccFlightAndVehicles
         private bool CalibratedY = false;
         private bool CalibratedZ = false;
         private bool InSeat = false;
-        private bool SeatOccupied = false;
+        [System.NonSerializedAttribute] public bool SeatOccupied = false;
         [System.NonSerializedAttribute] public int ThisStationID;
         private bool SeatInitialized = false;
         private bool InEditor = true;
