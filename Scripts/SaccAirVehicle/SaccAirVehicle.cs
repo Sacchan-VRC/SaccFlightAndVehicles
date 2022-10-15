@@ -347,6 +347,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float VTOLAngleForward90;//dot converted to angle, 0=0 90=1 max 1, for adjusting values that change with engine angle
         [System.NonSerializedAttribute] public float VTOLAngleForwardDot;
         [System.NonSerializedAttribute] public bool VTOLAngleForward = true;
+        [System.NonSerializedAttribute] public Vector3 Gs3;
         private VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
         private GameObject VehicleGameObj;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
@@ -1354,11 +1355,13 @@ namespace SaccFlightAndVehicles
                 //calc Gs
                 float gravity = 9.81f * DeltaTime;
                 LastFrameVel.y -= gravity; //add gravity
-                AllGs = Vector3.Distance(LastFrameVel, VehicleVel) / gravity;
+
+                Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);
+                VertGs = Gs3.y / gravity;
+
+                AllGs = Vector3.Magnitude(Gs3) / gravity;
                 GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
 
-                Vector3 Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);
-                VertGs = Gs3.y / gravity;
                 LastFrameVel = VehicleVel;
             }
         }
