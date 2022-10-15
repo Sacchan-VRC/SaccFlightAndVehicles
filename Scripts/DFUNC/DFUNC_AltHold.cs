@@ -33,6 +33,7 @@ namespace SaccFlightAndVehicles
         private bool InVR;
         private bool Selected;
         private bool JoyStickOveridden;
+        private bool StickHeld;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
@@ -65,6 +66,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             Selected = false;
+            StickHeld = false;
         }
         public void SFEXT_L_PassengerEnter()
         {
@@ -102,6 +104,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_JoystickGrabbed()
         {
             AltHoldPitchIntegrator = 0;
+            StickHeld = true;
             if (JoyStickOveridden)
             {
                 SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") - 1);
@@ -111,6 +114,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_JoystickDropped()
         {
             AltHoldPitchIntegrator = 0;
+            StickHeld = false;
             if (!JoyStickOveridden && AltHold)
             {
                 SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") + 1);
@@ -121,7 +125,7 @@ namespace SaccFlightAndVehicles
         {
             if (AltHold) { return; }
             AltHold = true;
-            if (!JoyStickOveridden)
+            if (!JoyStickOveridden && !StickHeld)
             {
                 SAVControl.SetProgramVariable("JoystickOverridden", (int)SAVControl.GetProgramVariable("JoystickOverridden") + 1);
                 JoyStickOveridden = true;
