@@ -540,6 +540,7 @@ namespace SaccFlightAndVehicles
             if (Quaternion.Dot(p, q) < 0)
             {
                 float angle = Quaternion.Angle(p, q);//quaternion.angle also checks shortest route
+                if (angle == 0f) { return p; }
                 float newvalue = (360f - angle) / angle;
                 return Quaternion.SlerpUnclamped(p, q, -t * newvalue);
             }
