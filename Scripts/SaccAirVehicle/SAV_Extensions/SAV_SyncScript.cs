@@ -163,7 +163,7 @@ namespace SaccFlightAndVehicles
             else
             {
                 VehicleRigid.isKinematic = true;
-                VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
+                VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime + Random.Range(0f, updateInterval));
         }
@@ -189,7 +189,7 @@ namespace SaccFlightAndVehicles
             RotExtrapolation_Raw = RotationLerper = /* O_LastRotation2 = */ O_LastRotation = O_Rotation_Q;
             LastCurAngMom = CurAngMom = Quaternion.identity;
             VehicleRigid.isKinematic = true;
-            VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Continuous;
+            VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             VehicleRigid.drag = 9999;
             VehicleRigid.angularDrag = 9999;
             UpdatesSentWhileStill = 0;
