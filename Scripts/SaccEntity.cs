@@ -467,10 +467,6 @@ namespace SaccFlightAndVehicles
             }
             SendEventToExtensions("SFEXT_L_OwnershipTransfer");
         }
-        public override bool OnOwnershipRequest(VRCPlayerApi requester, VRCPlayerApi newOwner)
-        {
-            return !_DisallowOwnerShipTransfer;
-        }
         public void PilotEnterVehicleLocal()//called from PilotSeat
         {
             Using = true;
