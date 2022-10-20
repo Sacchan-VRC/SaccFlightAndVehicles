@@ -194,17 +194,19 @@ MonoBehaviour:
   updateInterval: 0.3
   IdleModeUpdateInterval: 3
   FreezePositionOnDeath: 1
-  RotationSyncAgressiveness: 10
-  IdleModeVelMultiplier: 0.2
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
-  MaxPingExtrapolationInSeconds: 999
-  PassengerComfortMode: 0
   CorrectionTime: 8
   SpeedLerpTime: 4
+  CorrectionDerivStrength: 150
+  CorrectionTime_Rotation: 1
+  RotationSpeedLerpTime: 10
+  AntiWarp: 1
   TestTransform: {fileID: 0}
   TestTransform_Raw: {fileID: 0}
+  LagSimDelay: 0
+  DBGPING: 0
 --- !u!114 &1344609028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26101,6 +26103,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6168439344690285502}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &914079681445392395
 MonoBehaviour:
@@ -58827,6 +58830,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6168439344353923914}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &914079682345404375
 MonoBehaviour:
@@ -80114,6 +80118,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 914079681340633185}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 719214354298189907}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &914079682730908513
 MonoBehaviour:
@@ -85264,6 +85269,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6168439344697829225}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &914079682918043358
 MonoBehaviour:
@@ -85390,6 +85396,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6168439343282272442}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &914079682919084881
 MonoBehaviour:
@@ -95536,8 +95543,8 @@ MonoBehaviour:
   Compressing: 25
   MaxCompressingForce: 25
   FloatRadius: 0.6
-  WaterSidewaysDrag: 1
-  WaterForwardDrag: 0.05
+  WaterSidewaysDrag: 0.25
+  WaterForwardDrag: 0.0125
   WaterRotDrag: 5
   WaterVelDrag: 0
   WaveHeight: 0.6
@@ -95549,6 +95556,7 @@ MonoBehaviour:
   HoverBike: 0
   HoverBikeTurningStrength: 1
   BackThrustStrength: 5
+  DrawDebugGizmos: 0
 --- !u!114 &914079683148244597
 MonoBehaviour:
   m_ObjectHideFlags: 0

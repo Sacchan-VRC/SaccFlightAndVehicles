@@ -330,17 +330,19 @@ MonoBehaviour:
   updateInterval: 0.2
   IdleModeUpdateInterval: 3
   FreezePositionOnDeath: 1
-  RotationSyncAgressiveness: 10
-  IdleModeVelMultiplier: 0.4
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
-  MaxPingExtrapolationInSeconds: 999
-  PassengerComfortMode: 0
   CorrectionTime: 8
   SpeedLerpTime: 4
+  CorrectionDerivStrength: 150
+  CorrectionTime_Rotation: 1
+  RotationSpeedLerpTime: 10
+  AntiWarp: 1
   TestTransform: {fileID: 0}
   TestTransform_Raw: {fileID: 0}
+  LagSimDelay: 0
+  DBGPING: 0
 --- !u!114 &1538257256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31117,7 +31119,7 @@ MonoBehaviour:
   Compressing: 25
   MaxCompressingForce: 25
   FloatRadius: 2
-  WaterSidewaysDrag: 0.1
+  WaterSidewaysDrag: 0.025
   WaterForwardDrag: 0
   WaterRotDrag: 0
   WaterVelDrag: 0
@@ -31130,6 +31132,7 @@ MonoBehaviour:
   HoverBike: 1
   HoverBikeTurningStrength: 0.2
   BackThrustStrength: 15
+  DrawDebugGizmos: 0
 --- !u!114 &2934804654181102685
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51670,6 +51673,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 2934804655512785824}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 374746152193602298}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &2934804654584033638
 MonoBehaviour:
@@ -99031,6 +99035,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 2809707790251052369}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &2934804655606403472
 MonoBehaviour:
