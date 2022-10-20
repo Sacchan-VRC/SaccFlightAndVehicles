@@ -9,6 +9,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SAV_FloatScript : UdonSharpBehaviour
     {
+        [Header("Some values need you to run the SFEXT_L_EntityStart event to reinitialize after changing them during play mode")]
         public Rigidbody VehicleRigidbody;
         public UdonSharpBehaviour SAVControl;
         [Tooltip("Transforms at which floating forces are calculate, recomd using 4 in a rectangle centered around the center of mass")]
@@ -200,7 +201,7 @@ namespace SaccFlightAndVehicles
             if (!HitLandLast[i])
             {
                 float time = Time.time;
-                Waves.y = ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f);
+                Waves.y = ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - (WaveHeight * .5f));
             }
 
             RaycastHit hit;
@@ -250,7 +251,7 @@ namespace SaccFlightAndVehicles
             {
                 float time = Time.time;
                 //waves = (noise(+-0.5) * waveheight)
-                Waves.y = ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - .5f);
+                Waves.y = ((Mathf.PerlinNoise(((TopOfFloat.x + (time * WaveSpeed)) * WaveScale), ((TopOfFloat.z + (time * WaveSpeed)) * WaveScale)) * WaveHeight) - (WaveHeight * .5f));
             }
             ///if above water, trace down to find water
             //if touching/in water trace down from diameter above last water height at current xz to find water
@@ -258,8 +259,8 @@ namespace SaccFlightAndVehicles
             FloatTouchWaterPoint[currentfloatpoint] = FloatLastRayHitHeight[currentfloatpoint] + FloatDiameter + Waves.y;
             if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat.y && (DoOnLand || !HitLandLast[currentfloatpoint]))
             {
-                FloatDepth[currentfloatpoint] = (FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y);
-                float CompressionDifference = ((FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]));
+                FloatDepth[currentfloatpoint] = (FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y) / FloatDiameter;
+                float CompressionDifference = (FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]) / FloatDiameter;
                 if (CompressionDifference > 0)
                 { CompressionDifference = Mathf.Min(CompressionDifference * Compressing, MaxCompressingForce); }
                 else
@@ -269,7 +270,7 @@ namespace SaccFlightAndVehicles
                 FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
                 FloatPointForce[currentfloatpoint] = Vector3.up * Time.deltaTime * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce * Time.deltaTime) * _floatForce) + (CompressionDifference / Time.deltaTime / 90)));
                 //float is potentially below the top of the trigger, so fire a raycast from above the last known trigger height to check if it's still there
-                //the '+10': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
+                //the '+RayCastHeight': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
                 Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + RayCastHeight, TopOfFloat.z);
                 if (Physics.Raycast(checksurface, -Vector3.up, out hit, 20, FloatLayers, QueryTriggerInteraction.Collide))
                 {
@@ -312,12 +313,7 @@ namespace SaccFlightAndVehicles
             float DepthMaxd = Mathf.Min(depth, _maxDepthForce * Time.deltaTime);
             if (depth > 0)
             {//apply last calculated floating force for each floatpoint to respective floatpoint
-                for (int i = 0; i != FloatPoints.Length; i++)
-                {
-                    VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.VelocityChange);
-                }
-                VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * DepthMaxd * WaterRotDrag, ForceMode.Acceleration);
-                VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * DepthMaxd * WaterVelDrag, ForceMode.Acceleration);
+
                 if (SAVControl && !HoverBike) { SAVControl.SetProgramVariable("Floating", true); }
 
 
@@ -326,6 +322,7 @@ namespace SaccFlightAndVehicles
 
                 float sidespeed = Vector3.Dot(Vel, right);
                 float forwardspeed = Vector3.Dot(Vel, forward);
+                Vector3 DirectionalDrag = Vector3.zero;
                 if (HoverBike)
                 {
                     Vector3 hoverup = Vector3.Cross(Vel, forward);
@@ -343,10 +340,17 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    VehicleRigidbody.AddForceAtPosition(right * -sidespeed * WaterSidewaysDrag * DepthMaxd, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
+                    DirectionalDrag += right * -sidespeed * WaterSidewaysDrag;
                 }
-                VehicleRigidbody.AddForceAtPosition(forward * -forwardspeed * WaterForwardDrag * DepthMaxd, FloatPoints[currentfloatpoint].position, ForceMode.Acceleration);
-
+                DirectionalDrag += forward * -forwardspeed * WaterForwardDrag;
+                DirectionalDrag *= DepthMaxd * Time.deltaTime;
+                FloatPointForce[currentfloatpoint] += DirectionalDrag;
+                for (int i = 0; i != FloatPoints.Length; i++)
+                {
+                    VehicleRigidbody.AddForceAtPosition(FloatPointForce[i], FloatPoints[i].position, ForceMode.VelocityChange);
+                }
+                VehicleRigidbody.AddTorque(-VehicleRigidbody.angularVelocity * DepthMaxd * WaterRotDrag, ForceMode.Acceleration);
+                VehicleRigidbody.AddForce(-VehicleRigidbody.velocity * DepthMaxd * WaterVelDrag, ForceMode.Acceleration);
             }
             else
             { if (SAVControl && !HoverBike) { SAVControl.SetProgramVariable("Floating", false); } }
@@ -354,5 +358,21 @@ namespace SaccFlightAndVehicles
             currentfloatpoint++;
             if (currentfloatpoint == FPLength) { currentfloatpoint = 0; }
         }
+#if UNITY_EDITOR
+        [Header("Editor Only, use in play mode")]
+        public bool DrawDebugGizmos;
+        private void OnDrawGizmosSelected()
+        {
+            if (DrawDebugGizmos)
+            {
+                for (int i = 0; i < FloatPoints.Length; i++)
+                {
+                    Gizmos.DrawWireSphere(FloatPoints[i].position, FloatRadius);
+                    Gizmos.DrawWireCube(new Vector3(FloatPoints[i].position.x, FloatTouchWaterPoint[i] - FloatDiameter, FloatPoints[i].position.z), new Vector3(1.5f, .001f, 1.5f));
+                    Gizmos.DrawWireCube(new Vector3(FloatPoints[i].position.x, FloatLastRayHitHeight[i], FloatPoints[i].position.z), new Vector3(2, .001f, 2));
+                }
+            }
+        }
+#endif
     }
 }
