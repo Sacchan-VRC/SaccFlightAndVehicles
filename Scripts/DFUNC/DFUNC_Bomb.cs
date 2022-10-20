@@ -135,26 +135,26 @@ namespace SaccFlightAndVehicles
         {
             if (!LinkedAirVehicle || !LinkedBombController || !AircraftRigidbody || !BombRigidbody || !BombLaunchPoint || !PredictedImpact)
             {
-                if (PredictiveBombCam || DoCCIP || DoCCRP) { Debug.LogError("Vital dependencies not linked, CCIP and CCRP will be disabled and predictive bomb camera will be static."); }
+                if (PredictiveBombCam || DoCCIP || DoCCRP) { Debug.LogWarning("Vital dependencies not linked, CCIP and CCRP will be disabled and predictive bomb camera will be static."); }
                 DFUNC_Setup_ERR = true;
             }
-            if(!HudCCIP || !TopOfCCIPline || !LinkedHudVelocityVector)
+            if (!HudCCIP || !TopOfCCIPline || !LinkedHudVelocityVector)
             {
-                if (DoCCIP) { Debug.LogError("CCIP HUD elements are not set up correctly, CCIP disabled."); }
+                if (DoCCIP) { Debug.LogWarning("CCIP HUD elements are not set up correctly, CCIP disabled."); }
                 DoCCIP = false;
             }
             if (!HudCCRP || !LineRotator || !CrosshairRotator || !TimingRotator || !CCRP_Targets)
             {
-                if (DoCCRP) { Debug.LogError("CCRP is not set up correctly, CCRP disabled."); }
+                if (DoCCRP) { Debug.LogWarning("CCRP is not set up correctly, CCRP disabled."); }
                 DoCCRP = false;
             }
-            if(DFUNC_Setup_ERR)
+            if (DFUNC_Setup_ERR)
             {
                 DoCCIP = false;
                 DoCCRP = false;
             }
             if (PredictedImpact) PredictedImpact.SetActive(false);
-            if (PredictiveBombCam && !PredictedImpact) { Debug.LogError("Predicted Impact empty is not linked."); }
+            if (PredictiveBombCam && !PredictedImpact) { Debug.LogWarning("Predicted Impact empty is not linked."); }
             if (!DoCCIP && HudCCIP) { HudCCIP.SetActive(false); }
             if (!DoCCRP && HudCCRP) { HudCCRP.SetActive(false); }
         }
@@ -189,9 +189,10 @@ namespace SaccFlightAndVehicles
             //CCIP stuff
             if (LinkedBombController)
             {
-            float MaxTotalDropTime = LinkedBombController.MaxLifetime;
-            iterationTime = MaxTotalDropTime / MaxiterationStep;
-            } else if (DoCCIP || DoCCRP || PredictiveBombCam) { Debug.LogError("Bomb controller not linked."); }
+                float MaxTotalDropTime = LinkedBombController.MaxLifetime;
+                iterationTime = MaxTotalDropTime / MaxiterationStep;
+            }
+            else if (DoCCIP || DoCCRP || PredictiveBombCam) { Debug.LogWarning("Bomb controller not linked."); }
             //CCIP stuff ends here
         }
         private GameObject InstantiateWeapon()
@@ -341,7 +342,8 @@ namespace SaccFlightAndVehicles
                     TriggerLastFrame = true;
                 }
                 else { TriggerLastFrame = false; CCRPfired = false; CCRPheld = false; }
-            } else if (HudCCRP) { HudCCRP.SetActive(false); }
+            }
+            else if (HudCCRP) { HudCCRP.SetActive(false); }
         }
         void BombFireFunc()
         {
