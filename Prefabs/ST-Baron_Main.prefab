@@ -5379,12 +5379,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children:
-  - {fileID: 868763756026982624}
-  - {fileID: 347087326736213484}
-  - {fileID: 4983528460869368017}
-  - {fileID: 442097769743349046}
-  - {fileID: 2409347689529702021}
+  m_Children: []
   m_Father: {fileID: 6100835885085105368}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -5610,6 +5605,7 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
   EngineInfluence: 225
+  NoEffects: 1
   IsDriveWheel: 0
   SurfaceType: 0
   SurfaceTypeLast: 0
@@ -20583,7 +20579,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 9005358114075198982}
+  m_Father: {fileID: 7166121999691054999}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7437112881397686517
@@ -35498,6 +35494,7 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
   EngineInfluence: 225
+  NoEffects: 1
   IsDriveWheel: 0
   SurfaceType: 0
   SurfaceTypeLast: 0
@@ -35741,6 +35738,7 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
   EngineInfluence: 225
+  NoEffects: 1
   IsDriveWheel: 0
   SurfaceType: 0
   SurfaceTypeLast: 0
@@ -45644,7 +45642,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 9005358114075198982}
+  m_Father: {fileID: 7166121999691054999}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8057577474638648626
@@ -52156,6 +52154,7 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
   EngineInfluence: 225
+  NoEffects: 1
   IsDriveWheel: 0
   SurfaceType: 0
   SurfaceTypeLast: 0
@@ -57834,6 +57833,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6733660352721803929}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &6141758680061051261
 MonoBehaviour:
@@ -57988,6 +57988,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 6169200270901643276}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6141758679963414950}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &6141758680273700199
 MonoBehaviour:
@@ -58073,13 +58074,9 @@ MonoBehaviour:
   updateInterval: 0.2
   IdleModeUpdateInterval: 3
   FreezePositionOnDeath: 1
-  RotationSyncAgressiveness: 10
-  IdleModeVelMultiplier: 0.4
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 180
-  MaxPingExtrapolationInSeconds: 999
-  PassengerComfortMode: 0
   CorrectionTime: 8
   SpeedLerpTime: 4
   CorrectionDerivStrength: 150
@@ -58088,7 +58085,8 @@ MonoBehaviour:
   AntiWarp: 1
   TestTransform: {fileID: 0}
   TestTransform_Raw: {fileID: 0}
-  RotExtrapDirection_Smooth: {x: 0, y: 0, z: 0, w: 0}
+  LagSimDelay: 0
+  DBGPING: 0
 --- !u!114 &6141758680275868697
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58539,6 +58537,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6733660353092015039}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &6141758680559467796
 MonoBehaviour:
@@ -58695,6 +58694,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 6733660353753921584}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &6141758681580453100
 MonoBehaviour:
@@ -63613,7 +63613,12 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 868763756026982624}
+  - {fileID: 347087326736213484}
+  - {fileID: 4983528460869368017}
+  - {fileID: 442097769743349046}
+  - {fileID: 2409347689529702021}
   m_Father: {fileID: 6100835885085105368}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -74457,11 +74462,11 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7792437212829638097}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 9005358114075198982}
+  m_Father: {fileID: 7166121999691054999}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-3050058227375397788
@@ -75143,7 +75148,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 9005358114075198982}
+  m_Father: {fileID: 7166121999691054999}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4875450462785518875
@@ -75239,7 +75244,7 @@ Transform:
   m_LocalPosition: {x: -228.51001, y: 103.82969, z: 151.31999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 9005358114075198982}
+  m_Father: {fileID: 7166121999691054999}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &4167034694919297932

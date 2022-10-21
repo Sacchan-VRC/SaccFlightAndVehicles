@@ -99348,7 +99348,9 @@ MonoBehaviour:
   SwitchFunctionSound: {fileID: 2934804655618455735}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
-  AAMTargets: []
+  AAMTargets:
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &2934804655656756585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100075,7 +100077,7 @@ MonoBehaviour:
   GroundDetectorLayers:
     serializedVersion: 2
     m_Bits: 2049
-  Health: 53
+  Health: 86
   RepeatingWorld: 1
   RepeatingWorldDistance: 20000
   SwitchHandsJoyThrottle: 0
@@ -100427,7 +100429,7 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 0
+  _syncMethod: 2
   serializedProgramAsset: {fileID: 11400000, guid: f3160cae23daa6a40bf523f079e50271,
     type: 2}
   programSource: {fileID: 11400000, guid: 8dc9ac2701bce104985cf5c9109f47ae, type: 2}
