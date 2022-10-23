@@ -25,13 +25,11 @@ namespace SaccFlightAndVehicles
         public float IdleRotationRange = 5f;
         [Tooltip("Angle Difference between movement direction and rigidbody velocity that will cause the vehicle to teleport instead of interpolate")]
         public float TeleportAngleDifference = 20;
-        [Tooltip("How much vehicle accelerates extra towards its 'raw' position when not owner in order to correct positional errors")]
-        public float CorrectionTime = 8f;
         [Tooltip("How quickly non-owned vehicle's velocity vector lerps towards its new value")]
         public float SpeedLerpTime = 4f;
-        [Tooltip("Strength of force to stop correction overshooting target")]
-        public float CorrectionDerivStrength = 150f;
-        [Tooltip("How much vehicle accelerates extra towards its 'raw' rotation when not owner in order to correct rotational errors")]
+        [Tooltip("How fast the positional correction lerp happens")]
+        public float CorrectionTime_Position = 5f;
+        [Tooltip("How fast the rotational correction lerp happens")]
         public float CorrectionTime_Rotation = 1f;
         [Tooltip("How quickly non-owned vehicle's rotation slerps towards its new value")]
         public float RotationSpeedLerpTime = 10f;
@@ -316,8 +314,6 @@ namespace SaccFlightAndVehicles
             }
             float deltatime = Time.deltaTime;
             double time;
-            Vector3 Deriv = Vector3.zero;
-            Vector3 Correction = (Extrapolation_Raw - TestTransform.position) * CorrectionTime;
             float Error = Vector3.Distance(TestTransform.position, Extrapolation_Raw);
             if (Time.deltaTime > .099f)
             {
@@ -328,21 +324,13 @@ namespace SaccFlightAndVehicles
             else
             {
                 time = StartupServerTime + (double)(Time.time - StartupLocalTime);
-                //deriv is only done if the real time matches the simulation time (FPS > 10)
-                //because otherwise it causes a feedback loop and sends the vehicle to infinity.
-                //like a PID derivative. Makes movement a bit jerky because the 'raw' target is jerky.
-                if (Error < ErrorLastFrame)
-                {
-                    Deriv = -Correction.normalized * (ErrorLastFrame - Error) * CorrectionDerivStrength;
-                }
             }
             ErrorLastFrame = Error;
             lastframetime_extrap = Networking.GetServerTimeInSeconds();
-            float TimeSinceUpdate = (float)(time - L_UpdateTime)
-                    / updateInterval;
+            float TimeSinceUpdate = (float)(time - L_UpdateTime) / updateInterval;
             //extrapolated position based on time passed since update
             Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
-            ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
+            ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate, SpeedLerpTime * deltatime);
 
             //rotate using similar method to movement (no deriv, correction is done with a simple slerp after)
             Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngMomAcceleration, TimeSinceUpdate);
@@ -352,6 +340,7 @@ namespace SaccFlightAndVehicles
             //apply positional update
             Extrapolation_Raw += ExtrapolationDirection * deltatime;
             TestTransform.position += ExtrapDirection_Smooth * deltatime;
+            TestTransform.position = Vector3.Lerp(TestTransform.position, Extrapolation_Raw, CorrectionTime_Position * deltatime);
             //apply rotational update
             Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime);
             RotExtrapolation_Raw = FrameRotExtrap * RotExtrapolation_Raw;
