@@ -293,7 +293,7 @@ namespace SaccFlightAndVehicles
                 //Debug.Log(string.Concat(currentfloatpoint.ToString(), ": Air: floatpointforce: ", FloatPointForce[currentfloatpoint].ToString()));
                 //float could be below the top of the trigger if the waves are big enough, check for water trigger with current position + waveheight
                 Vector3 checksurface = new Vector3(TopOfFloat.x, TopOfFloat.y + WaveHeight, TopOfFloat.z);
-                if (Physics.Raycast(TopOfFloat, -Vector3.up, out hit, 35, FloatLayers, QueryTriggerInteraction.Collide))
+                if (Physics.Raycast(checksurface, -Vector3.up, out hit, 35, FloatLayers, QueryTriggerInteraction.Collide))
                 {
                     FloatTouchWaterPoint[currentfloatpoint] = hit.point.y + FloatDiameter + Waves.y; ;
                     HitLandLast[currentfloatpoint] = !hit.collider.isTrigger;
