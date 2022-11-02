@@ -750,7 +750,7 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.deltaTime;
             if (IsOwner)//works in editor or ingame
             {
-                if (!EntityControl.dead)
+                if (!EntityControl._dead)
                 {
                     //G/crash Damage
                     if (GDamageToTake > 0)
@@ -1367,7 +1367,7 @@ namespace SaccFlightAndVehicles
         }
         public void Explode()//all the things players see happen when the vehicle explodes
         {
-            if (EntityControl.dead) { return; }//can happen with prediction enabled if two people kill something at the same time
+            if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
             EntityControl.dead = true;
             EngineOn = false;
             PlayerThrottle = 0;
@@ -1744,7 +1744,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_RespawnButton()//called when using respawn button
         {
-            if (!Occupied && !EntityControl.dead)
+            if (!Occupied && !EntityControl._dead)
             {
                 Networking.SetOwner(localPlayer, EntityControl.gameObject);
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
@@ -1815,7 +1815,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
-            if (!EntityControl.dead)
+            if (!EntityControl._dead)
             {
                 if (IsOwner)
                 {
@@ -1831,7 +1831,7 @@ namespace SaccFlightAndVehicles
         }
         public void CheckLaggyKilled()
         {
-            if (!EntityControl.dead)
+            if (!EntityControl._dead)
             {
                 //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
                 if (Health == 0.0911f)
@@ -1882,7 +1882,7 @@ namespace SaccFlightAndVehicles
         //Add .001 to each value of damage taken to prevent float comparison bullshit
         public void SFEXT_L_MissileHit25()
         {
-            if (PredictDamage && !EntityControl.dead)
+            if (PredictDamage && !EntityControl._dead)
             { MissileDamagePrediction(.251f); }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit25));
         }
@@ -1898,7 +1898,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_L_MissileHit50()
         {
-            if (PredictDamage && !EntityControl.dead)
+            if (PredictDamage && !EntityControl._dead)
             { MissileDamagePrediction(.501f); }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit50));
         }
@@ -1914,7 +1914,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_L_MissileHit75()
         {
-            if (PredictDamage && !EntityControl.dead)
+            if (PredictDamage && !EntityControl._dead)
             { MissileDamagePrediction(.751f); }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit75));
         }
@@ -1930,7 +1930,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_L_MissileHit100()
         {
-            if (PredictDamage && !EntityControl.dead)
+            if (PredictDamage && !EntityControl._dead)
             { MissileDamagePrediction(1.001f); }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMissileHit100));
         }
@@ -1947,7 +1947,7 @@ namespace SaccFlightAndVehicles
         public void TakeMissileDamage(float damage)
         {
             Health -= ((FullHealth * damage) * MissileDamageTakenMultiplier);
-            if (PredictDamage && !EntityControl.dead && Health <= 0)
+            if (PredictDamage && !EntityControl._dead && Health <= 0)
             { Health = 0.1f; }//the attacker calls the explode function in this case
             Vector3 explosionforce = new Vector3(Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce), Random.Range(-MissilePushForce, MissilePushForce)) * damage;
             VehicleRigidbody.AddTorque(explosionforce, ForceMode.VelocityChange);
@@ -2040,7 +2040,7 @@ namespace SaccFlightAndVehicles
             { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0; }
 
             Piloting = true;
-            if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
+            if (EntityControl._dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
             //hopefully prevents explosions when you enter the vehicle
             GDamageToTake = 0f;

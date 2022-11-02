@@ -385,7 +385,7 @@ namespace SaccFlightAndVehicles
                         NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
                     }
                     //if target SAVontroller is null then it's a dummy target (or hierarchy isn't set up properly)
-                    if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
+                    if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl._dead)))
                     {
                         RaycastHit hitnext;
                         //raycast to check if it's behind something
@@ -409,7 +409,7 @@ namespace SaccFlightAndVehicles
                                             && (!HighAspectPreventLock || !NextTargetSAVControl || Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot)
                                             || (AAMCurrentTargetSAVControl &&//null check
                                                                         (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
-                                                                        (MissileType == 0 && !AAMCurrentTargetSAVControl.EngineOn)))//switch target if heatseeker and current target's engine is off
+                                                                        (MissileType == 0 && !AAMCurrentTargetSAVControl._EngineOn)))//switch target if heatseeker and current target's engine is off
                                                 || !AAMTargets[AAMTarget].activeInHierarchy//switch target if current target is destroyed
                                                 )
                         {
@@ -454,8 +454,8 @@ namespace SaccFlightAndVehicles
                         && AAMCurrentTargetDistance < AAMMaxTargetDistance
                             && AAMTargets[AAMTarget].activeInHierarchy
                                 && (!AAMCurrentTargetSAVControl ||
-                                    (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead &&
-                                        (MissileType != 0 || AAMCurrentTargetSAVControl.EngineOn)))//heatseekers cant lock if engine off
+                                    (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl._dead &&
+                                        (MissileType != 0 || AAMCurrentTargetSAVControl._EngineOn)))//heatseekers cant lock if engine off
                                     &&
                                         (!HighAspectPreventLock || !AAMCurrentTargetSAVControl || Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot)
                                         )

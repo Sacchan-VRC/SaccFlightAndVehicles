@@ -131,7 +131,7 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                if (!EntityControl.dead && Occupied)
+                if (!EntityControl._dead && Occupied)
                 {
                     _firing = value;
                     AAGunAnimator.SetBool("firing", value);
@@ -150,7 +150,7 @@ namespace SaccFlightAndVehicles
             set
             {
                 _AAMFire = value;
-                if (!EntityControl.dead && Occupied)
+                if (!EntityControl._dead && Occupied)
                 { LaunchAAM(); }
             }
             get => _AAMFire;
@@ -416,7 +416,7 @@ namespace SaccFlightAndVehicles
         }
         public void Explode()//all the things players see happen when the vehicle explodes
         {
-            if (EntityControl.dead) { return; }
+            if (EntityControl._dead) { return; }
             if (Manning && !InEditor)
             {
                 if (AAGunSeat) { AAGunSeat.ExitStation(localPlayer); }
@@ -485,7 +485,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_BulletHit()
         {
             HPRepairTimer = HPRepairDelay - HPRepairHitTimer;
-            if (!EntityControl.dead)
+            if (!EntityControl._dead)
             {
                 if (IsOwner)
                 {
@@ -538,7 +538,7 @@ namespace SaccFlightAndVehicles
                     NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
                 }
                 //if target SaccAirVehicle is null then it's a dummy target (or hierarchy isn't set up properly)
-                if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
+                if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl._dead)))
                 {
                     RaycastHit hitnext;
                     //raycast to check if it's behind something
@@ -595,7 +595,7 @@ namespace SaccFlightAndVehicles
             else
             { AAMTargetObscuredDelay = 0; }
             if (AAMTargets[AAMTarget].activeInHierarchy
-                    && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
+                    && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl._dead)))
             {
                 if ((AAMTargetObscuredDelay < .25f)
                             && AAMCurrentTargetDistance < AAMMaxTargetDistance)

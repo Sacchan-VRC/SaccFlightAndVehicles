@@ -273,7 +273,7 @@ namespace SaccFlightAndVehicles
                         NextTargetSAVControl = TargetCheckerParent.GetComponent<SaccAirVehicle>();
                     }
                     //if target EngineController is null then it's a dummy target (or hierarchy isn't set up properly)
-                    if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl.dead)))
+                    if ((!NextTargetSAVControl || (!NextTargetSAVControl.Taxiing && !NextTargetSAVControl.EntityControl._dead)))
                     {
                         RaycastHit hitnext;
                         //raycast to check if it's behind something
@@ -339,7 +339,7 @@ namespace SaccFlightAndVehicles
                     && (AAMTargetObscuredDelay < .25f)
                         && AAMCurrentTargetDistance < MaxTargetDistance
                             && AAMTargets[AAMTarget].activeInHierarchy
-                                && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl.dead)))
+                                && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl._dead)))
                 {
                     if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < MaxTargetDistance)
                     {

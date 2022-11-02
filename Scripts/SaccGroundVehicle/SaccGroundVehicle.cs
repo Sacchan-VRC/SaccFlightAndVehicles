@@ -309,7 +309,7 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.deltaTime;
             if (IsOwner)
             {
-                if (!EntityControl.dead)
+                if (!EntityControl._dead)
                 {
                     //G/crash Damage
                     if (GDamageToTake > 0)
@@ -709,7 +709,7 @@ namespace SaccFlightAndVehicles
         }
         public void Explode()
         {
-            if (EntityControl.dead) { return; }//can happen with prediction enabled if two people kill something at the same time
+            if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
             EntityControl.dead = true;
             Health = FullHealth;
             HasFuel_ = true;
@@ -778,7 +778,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool UsingManualSync = true;
         public void SFEXT_O_RespawnButton()//called when using respawn button
         {
-            if (!Occupied && !EntityControl.dead)
+            if (!Occupied && !EntityControl._dead)
             {
                 Networking.SetOwner(localPlayer, EntityControl.gameObject);
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
@@ -950,7 +950,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
-            if (!EntityControl.dead)
+            if (!EntityControl._dead)
             {
                 LastHitTime = Time.time;
                 if (IsOwner)
@@ -967,7 +967,7 @@ namespace SaccFlightAndVehicles
         }
         public void CheckLaggyKilled()
         {
-            if (!EntityControl.dead)
+            if (!EntityControl._dead)
             {
                 //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
                 if (Health == 0.0911f)

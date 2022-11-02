@@ -470,7 +470,7 @@ namespace SaccFlightAndVehicles
                     if (Taxiing)
                     { _rolling.volume = Mathf.Lerp(_rolling.volume, Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve, RollingMaxVol), 3f * DeltaTime); }
                     else
-                    { _rolling.volume = Mathf.Lerp(_rolling.volume, Mathf.Min(0), 5f * DeltaTime); }
+                    { _rolling.volume = Mathf.Lerp(_rolling.volume, 0f, 5f * DeltaTime); }
                 }
                 if ((Piloting || Passenger) && EngineStarted)
                 {
@@ -545,7 +545,7 @@ namespace SaccFlightAndVehicles
             //lerp should help smooth out laggers and the dopple only being calculated every 5 frames
             if (playsonicboom && !silent && !SonicBoomNull)
             {
-                if (SonicBoomPreventer > 5 && !EntityControl.dead)
+                if (SonicBoomPreventer > 5 && !EntityControl._dead)
                 {
                     int rand = Random.Range(0, SonicBoom.Length);
                     SonicBoom[rand].pitch = Random.Range(.94f, 1.2f);
@@ -1061,7 +1061,7 @@ namespace SaccFlightAndVehicles
             if (EngineStartupCancelInside) { EngineStartupCancelInside.Stop(); }
             if (EngineTurnOffInside) { EngineTurnOffInside.Stop(); }
 
-            if (!EntityControl.dead && !soundsoff)
+            if (!EntityControl._dead && !soundsoff)
             {
                 foreach (AudioSource idle in PlaneIdle) { idle.Play(); }
                 foreach (AudioSource thrust in Thrust) { thrust.Play(); }

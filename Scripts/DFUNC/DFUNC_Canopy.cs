@@ -142,7 +142,7 @@ namespace SaccFlightAndVehicles
                 }
             }
 
-            if (!CanopyBroken && CanopyOpen && !EntityControl.dead)
+            if (!CanopyBroken && CanopyOpen && !EntityControl._dead)
             {
                 if (CanopyCanBreakOff && (float)SAVControl.GetProgramVariable("AirSpeed") > CanopyBreakSpeed)
                 {

@@ -138,7 +138,7 @@ namespace SaccFlightAndVehicles
         }
         private void OnTriggerEnter(Collider other)
         {
-            if (Piloting && !EntityControl.dead)
+            if (Piloting && !EntityControl._dead)
             {
                 if (!OnCatapult)
                 {
@@ -226,7 +226,7 @@ namespace SaccFlightAndVehicles
                     }
                     else { TriggerLastFrame = false; }
                 }
-                if (EntityControl.dead)
+                if (EntityControl._dead)
                 {
                     CatapultDeadTimer -= 1;
                     if (CatapultDeadTimer == 0) { EntityControl.dead = false; }

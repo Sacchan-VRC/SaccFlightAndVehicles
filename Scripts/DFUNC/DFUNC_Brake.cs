@@ -52,6 +52,7 @@ namespace SaccFlightAndVehicles
         private float NonLocalActiveDelay;//this var is for adding a min delay for disabling for non-local users to account for lag
         private bool Selected;
         private bool IsOwner;
+        private bool InVehicle;
         private float NextUpdateTime;
         private float RotMultiMaxSpeedDivider;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -81,6 +82,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
+            InVehicle = true;
             if (!NoPilotAlwaysGroundBrake)
             {
                 if ((bool)SAVControl.GetProgramVariable("Floating"))
@@ -95,11 +97,24 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotExit()
         {
+            InVehicle = false;
             BrakeInput = 0;
             RequestSerialization();
             Selected = false;
             if (!NoPilotAlwaysGroundBrake)
             { BrakeStrength = 0; }
+            Airbrake_snd.pitch = 0f;
+            Airbrake_snd.volume = 0f;
+        }
+        public void SFEXT_P_PassengerEnter()
+        {
+            InVehicle = true;
+        }
+        public void SFEXT_P_PassengerExit()
+        {
+            InVehicle = false;
+            Airbrake_snd.pitch = 0f;
+            Airbrake_snd.volume = 0f;
         }
         public void SFEXT_G_Explode()
         {
@@ -290,7 +305,7 @@ namespace SaccFlightAndVehicles
             }
             AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, BrakeInput, 2f * DeltaTime);
             BrakeAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper);
-            if (Airbrake_snd)
+            if (InVehicle && Airbrake_snd)
             {
                 Airbrake_snd.pitch = AirbrakeLerper * .2f + .9f;
                 Airbrake_snd.volume = AirbrakeLerper * Mathf.Min((float)SAVControl.GetProgramVariable("Speed") * RotMultiMaxSpeedDivider, 1);

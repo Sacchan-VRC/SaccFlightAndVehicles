@@ -502,7 +502,7 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.deltaTime;
             if (IsOwner)//works in editor or ingame
             {
-                if (!EntityControl.dead)
+                if (!EntityControl._dead)
                 {
                     //G/crash Damage
                     if (GDamageToTake > 0)
@@ -987,7 +987,7 @@ namespace SaccFlightAndVehicles
         }
         public void Explode()//all the things players see happen when the vehicle explodes
         {
-            if (EntityControl.dead) { return; }
+            if (EntityControl._dead) { return; }
             EntityControl.dead = true;
             EngineOn = false;
             PlayerThrottle = 0;
@@ -1321,7 +1321,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_RespawnButton()//called when using respawn button
         {
-            if (!Occupied && !EntityControl.dead)
+            if (!Occupied && !EntityControl._dead)
             {
                 Networking.SetOwner(localPlayer, EntityControl.gameObject);
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
@@ -1388,7 +1388,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
-            if (!EntityControl.dead)
+            if (!EntityControl._dead)
             {
                 LastHitTime = Time.time;
                 if (IsOwner)
@@ -1405,7 +1405,7 @@ namespace SaccFlightAndVehicles
         }
         public void CheckLaggyKilled()
         {
-            if (!EntityControl.dead)
+            if (!EntityControl._dead)
             {
                 //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
                 if (Health == 0.0911f)
@@ -1511,7 +1511,7 @@ namespace SaccFlightAndVehicles
             { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0; }
 
             Piloting = true;
-            if (EntityControl.dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
+            if (EntityControl._dead) { Health = FullHealth; }//dead is true for the first 5 seconds after spawn, this might help with spontaneous explosions
 
             //hopefully prevents explosions when you enter the vehicle
             VehicleRigidbody.velocity = CurrentVel;
