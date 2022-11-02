@@ -68,7 +68,7 @@ namespace SaccFlightAndVehicles
         private float TriggerTapTime;
         [System.NonSerializedAttribute] public int FullAGMs;
         public Transform AGMLaunchPoint;
-        public LayerMask AGMTargetsLayer = 67108864;
+        public LayerMask AGMTargetsLayer =  1 << 26;
         private float FullAGMsDivider;
         private int NumChildrenStart;
         [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(AGMTarget))] public Vector3 _AGMTarget;

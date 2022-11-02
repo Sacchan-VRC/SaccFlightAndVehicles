@@ -38,6 +38,7 @@ namespace SaccFlightAndVehicles
         public Transform WorldParent;
         public Camera AtGCam;
         public GameObject AtGScreen;
+        public float distance_from_head = 1.333f;
         [UdonSynced, FieldChangeCallback(nameof(BombFire))] private ushort _BombFire;
         public ushort BombFire
         {
@@ -77,10 +78,9 @@ namespace SaccFlightAndVehicles
         [Header("KitKat's stuff from here on")]
         [Tooltip("If the AGM cam will display where the bomb will hit even though CCIP and CCRP are off.")]
         [SerializeField] bool PredictiveBombCam = true;
-        [SerializeField] SaccAirVehicle LinkedAirVehicle;
         [SerializeField] SAV_BombController LinkedBombController;
-        [SerializeField] Rigidbody AircraftRigidbody;
-        [SerializeField] Rigidbody BombRigidbody;
+        Rigidbody AircraftRigidbody;
+        Rigidbody BombRigidbody;
         [SerializeField] GameObject BombLaunchPoint;
         [Tooltip("This is where you link an empty or something, it is nessecary for the prediction to work.")]
         [SerializeField] GameObject PredictedImpact;
@@ -97,7 +97,7 @@ namespace SaccFlightAndVehicles
         [SerializeField] GameObject LineRotator;
         [SerializeField] GameObject CrosshairRotator;
         [SerializeField] GameObject TimingRotator;
-        [SerializeField] Transform CCRP_Targets;
+        public Transform[] CCRP_Targets;
         [SerializeField] int MaxiterationStep = 100;
         [SerializeField] int IterationsBeforeCollisionCheck = 1;
         [Tooltip("The distance between where a bomb will land and where a possible target is located, if the ditance is below this value the HUD will tell you how to hit the target, and the script enters CCRP mode (more about that on line 123)")]
@@ -106,13 +106,12 @@ namespace SaccFlightAndVehicles
         public float multiplier = 0.05f;
         [Tooltip("How close the pilot needs needs to aim to the target before the script drops the bomb. In meters of course.")]
         public float CCRP_Acc_Threshold = 5;
-
+        public LayerMask AGMTargetsLayer = 1 << 26;
         Vector3 groundzero;
         Vector3[] DebugPosLine;
         Vector2 CurrentCCRPtarget;
         Vector3 CCIPLookRot;
 
-        public float distance_from_head = 1.333f;
 
         float ClosestDistance;
         float CCRPHeading = 0;
@@ -133,7 +132,9 @@ namespace SaccFlightAndVehicles
 
         private void Start()
         {
-            if (!LinkedAirVehicle || !LinkedBombController || !AircraftRigidbody || !BombRigidbody || !BombLaunchPoint || !PredictedImpact)
+            AircraftRigidbody = EntityControl.GetComponent<Rigidbody>();
+            BombRigidbody = LinkedBombController.GetComponent<Rigidbody>();
+            if (!SAVControl || !LinkedBombController || !AircraftRigidbody || !BombRigidbody || !BombLaunchPoint || !PredictedImpact)
             {
                 if (PredictiveBombCam || DoCCIP || DoCCRP) { Debug.LogWarning("Vital dependencies not linked, CCIP and CCRP will be disabled and predictive bomb camera will be static."); }
                 DFUNC_Setup_ERR = true;
@@ -143,7 +144,7 @@ namespace SaccFlightAndVehicles
                 if (DoCCIP) { Debug.LogWarning("CCIP HUD elements are not set up correctly, CCIP disabled."); }
                 DoCCIP = false;
             }
-            if (!HudCCRP || !LineRotator || !CrosshairRotator || !TimingRotator || !CCRP_Targets)
+            if (!HudCCRP || !LineRotator || !CrosshairRotator || !TimingRotator || CCRP_Targets.Length == 0)
             {
                 if (DoCCRP) { Debug.LogWarning("CCRP is not set up correctly, CCRP disabled."); }
                 DoCCRP = false;
@@ -193,6 +194,8 @@ namespace SaccFlightAndVehicles
                 iterationTime = MaxTotalDropTime / MaxiterationStep;
             }
             else if (DoCCIP || DoCCRP || PredictiveBombCam) { Debug.LogWarning("Bomb controller not linked."); }
+            if (HudCCIP) { HudCCIP.SetActive(false); }
+            if (HudCCRP) { HudCCRP.SetActive(false); }
             //CCIP stuff ends here
         }
         private GameObject InstantiateWeapon()
@@ -219,6 +222,8 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             if (AtGScreen) { AtGScreen.SetActive(false); }
             if (AtGCam) { AtGCam.gameObject.SetActive(false); }
+            if (HudCCIP) { HudCCIP.SetActive(false); }
+            if (HudCCRP) { HudCCRP.SetActive(false); }
         }
         public void SFEXT_P_PassengerEnter()
         {
@@ -249,6 +254,8 @@ namespace SaccFlightAndVehicles
             if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
             if (AtGScreen) { AtGScreen.SetActive(false); }
             if (AtGCam) { AtGCam.gameObject.SetActive(false); }
+            if (HudCCIP) { HudCCIP.SetActive(false); }
+            if (HudCCRP) { HudCCRP.SetActive(false); }
         }
         public void SFEXT_G_Explode()
         {
@@ -294,14 +301,16 @@ namespace SaccFlightAndVehicles
         //CCIP stuff
         private void Update()
         {
-            if (HudCCIP && DoCCIP) { HudCCIP.SetActive(func_active); }
             if (func_active)
             {
                 if (!DFUNC_Setup_ERR)
                 {
                     SimulateTrajectory();
-                    GetCCRPtarget();
-                    if (HudCCRP) { HudCCRP.SetActive(CCRPmode); }
+                    if (HudCCRP)
+                    {
+                        GetCCRPtarget();
+                        HudCCRP.SetActive(CCRPmode);
+                    }
                     HUD();
                 }
 
@@ -343,7 +352,6 @@ namespace SaccFlightAndVehicles
                 }
                 else { TriggerLastFrame = false; CCRPfired = false; CCRPheld = false; }
             }
-            else if (HudCCRP) { HudCCRP.SetActive(false); }
         }
         void BombFireFunc()
         {
