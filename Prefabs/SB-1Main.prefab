@@ -333,9 +333,8 @@ MonoBehaviour:
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 20
-  CorrectionTime: 8
   SpeedLerpTime: 4
-  CorrectionDerivStrength: 150
+  CorrectionTime_Position: 5
   CorrectionTime_Rotation: 1
   RotationSpeedLerpTime: 10
   AntiWarp: 1
@@ -31112,11 +31111,11 @@ MonoBehaviour:
   FloatLayers:
     serializedVersion: 2
     m_Bits: 2065
-  FloatForce: 5
+  FloatForce: 10
   DeadFloatForce: 5
   MaxDepthForce: 25
   DeadMaxDepthForce: 0.4
-  Compressing: 25
+  Compressing: 50
   MaxCompressingForce: 25
   FloatRadius: 2
   WaterSidewaysDrag: 0.025
