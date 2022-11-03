@@ -1,4 +1,3 @@
-
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +6,7 @@ using VRC.Udon;
 
 namespace SaccFlightAndVehicles
 {
+    [DefaultExecutionOrder(10)]
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class DFUNC_Bomb : UdonSharpBehaviour
     {
@@ -78,6 +78,7 @@ namespace SaccFlightAndVehicles
         [Header("KitKat's stuff from here on")]
         [Tooltip("If the AGM cam will display where the bomb will hit even though CCIP and CCRP are off.")]
         [SerializeField] bool PredictiveBombCam = true;
+        public float BombCamZoom = 90f;
         [SerializeField] SAV_BombController LinkedBombController;
         Rigidbody AircraftRigidbody;
         Rigidbody BombRigidbody;
@@ -110,8 +111,10 @@ namespace SaccFlightAndVehicles
         Vector3 groundzero;
         Vector3[] DebugPosLine;
         Vector2 CurrentCCRPtarget;
-        Vector3 CCIPLookRot;
-
+        Vector3 CCIPLookPos;
+        
+        //[Header("This makes it look better")]
+        float CCIPverticaloffset = 0f;
 
         float ClosestDistance;
         float CCRPHeading = 0;
@@ -346,9 +349,12 @@ namespace SaccFlightAndVehicles
                         GetCCRPtarget();
                         HudCCRP.SetActive(CCRPmode);
                     }
-                    HUD();
                 }
             }
+        }
+        private void LateUpdate()
+        {
+            HUD();
         }
 #if UNITY_EDITOR
         [Header("Debug")]
@@ -425,14 +431,18 @@ namespace SaccFlightAndVehicles
         {
             if (PredictiveBombCam)
             {
-                CCIPLookRot = (groundzero - AircraftRigidbody.position);
+                CCIPLookPos = (groundzero - AircraftRigidbody.position);
                 AtGCam.transform.LookAt(groundzero);
-                AtGCam.fieldOfView = Mathf.Clamp(90f / (CCIPLookRot.magnitude * CCIPLookRot.magnitude), 2f, 60f);
+                AtGCam.fieldOfView = Mathf.Clamp(BombCamZoom / (CCIPLookPos.magnitude * CCIPLookPos.magnitude), 2f, 60f);
             }
             if (DoCCIP)
             {
-                HudCCIP.transform.rotation = Quaternion.LookRotation(CCIPLookRot);
-                TopOfCCIPline.transform.position = LinkedHudVelocityVector.position;
+                Quaternion Qx = Quaternion.LookRotation(CCIPLookPos);
+                float x = Qx.eulerAngles.x;
+                Quaternion Qy = Quaternion.LookRotation(AircraftRigidbody.position - LinkedHudVelocityVector.position);
+                float y = Qy.eulerAngles.y;
+                HudCCIP.transform.rotation = Quaternion.Euler(x, y -180, 0);
+                TopOfCCIPline.transform.position = new Vector3(LinkedHudVelocityVector.position.x, LinkedHudVelocityVector.position.y - CCIPverticaloffset, LinkedHudVelocityVector.position.z);
             }
             if (DoCCRP)
             {
