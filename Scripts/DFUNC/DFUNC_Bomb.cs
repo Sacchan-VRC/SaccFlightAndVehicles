@@ -83,7 +83,7 @@ namespace SaccFlightAndVehicles
         Rigidbody BombRigidbody;
         [SerializeField] GameObject BombLaunchPoint;
         [Tooltip("This is where you link an empty or something, it is nessecary for the prediction to work.")]
-        [SerializeField] GameObject PredictedImpact;
+        [SerializeField] Transform PredictedImpact;
         [Header("CCIP")]
         [Tooltip("Disable anything related to CCIP?")]
         [SerializeField] bool DoCCIP = false;
@@ -129,36 +129,6 @@ namespace SaccFlightAndVehicles
         float Gravity = Physics.gravity.magnitude * -1;
 
         bool DFUNC_Setup_ERR = false;
-
-        private void Start()
-        {
-            AircraftRigidbody = EntityControl.GetComponent<Rigidbody>();
-            BombRigidbody = LinkedBombController.GetComponent<Rigidbody>();
-            if (!SAVControl || !LinkedBombController || !AircraftRigidbody || !BombRigidbody || !BombLaunchPoint || !PredictedImpact)
-            {
-                if (PredictiveBombCam || DoCCIP || DoCCRP) { Debug.LogWarning("Vital dependencies not linked, CCIP and CCRP will be disabled and predictive bomb camera will be static."); }
-                DFUNC_Setup_ERR = true;
-            }
-            if (!HudCCIP || !TopOfCCIPline || !LinkedHudVelocityVector)
-            {
-                if (DoCCIP) { Debug.LogWarning("CCIP HUD elements are not set up correctly, CCIP disabled."); }
-                DoCCIP = false;
-            }
-            if (!HudCCRP || !LineRotator || !CrosshairRotator || !TimingRotator || CCRP_Targets.Length == 0)
-            {
-                if (DoCCRP) { Debug.LogWarning("CCRP is not set up correctly, CCRP disabled."); }
-                DoCCRP = false;
-            }
-            if (DFUNC_Setup_ERR)
-            {
-                DoCCIP = false;
-                DoCCRP = false;
-            }
-            if (PredictedImpact) PredictedImpact.SetActive(false);
-            if (PredictiveBombCam && !PredictedImpact) { Debug.LogWarning("Predicted Impact empty is not linked."); }
-            if (!DoCCIP && HudCCIP) { HudCCIP.SetActive(false); }
-            if (!DoCCRP && HudCCRP) { HudCCRP.SetActive(false); }
-        }
         //CCIP stuff ends here
 
         public void SFEXT_L_EntityStart()
@@ -188,6 +158,34 @@ namespace SaccFlightAndVehicles
             }
 
             //CCIP stuff
+            AircraftRigidbody = EntityControl.GetComponent<Rigidbody>();
+            if (LinkedBombController) { BombRigidbody = LinkedBombController.GetComponent<Rigidbody>(); }
+            if (!SAVControl || !LinkedBombController || !AircraftRigidbody || !BombRigidbody || !BombLaunchPoint || !PredictedImpact)
+            {
+                if (PredictiveBombCam || DoCCIP || DoCCRP) { Debug.LogWarning("Vital dependencies not linked, CCIP and CCRP will be disabled and predictive bomb camera will be static."); }
+                DFUNC_Setup_ERR = true;
+            }
+            if (!HudCCIP || !TopOfCCIPline || !LinkedHudVelocityVector)
+            {
+                if (DoCCIP) { Debug.LogWarning("CCIP HUD elements are not set up correctly, CCIP disabled."); }
+                DoCCIP = false;
+            }
+            if (!HudCCRP || !LineRotator || !CrosshairRotator || !TimingRotator || CCRP_Targets.Length == 0)
+            {
+                if (DoCCRP) { Debug.LogWarning("CCRP is not set up correctly, CCRP disabled."); }
+                DoCCRP = false;
+            }
+            if (DFUNC_Setup_ERR)
+            {
+                DoCCIP = false;
+                DoCCRP = false;
+            }
+            if (PredictedImpact) PredictedImpact.gameObject.SetActive(false);
+            if (PredictiveBombCam && !PredictedImpact) { Debug.LogWarning("Predicted Impact empty is not linked."); }
+            if (!DoCCIP && HudCCIP) { HudCCIP.SetActive(false); }
+            if (!DoCCRP && HudCCRP) { HudCCRP.SetActive(false); }
+
+
             if (LinkedBombController)
             {
                 float MaxTotalDropTime = LinkedBombController.MaxLifetime;
@@ -303,17 +301,6 @@ namespace SaccFlightAndVehicles
         {
             if (func_active)
             {
-                if (!DFUNC_Setup_ERR)
-                {
-                    SimulateTrajectory();
-                    if (HudCCRP)
-                    {
-                        GetCCRPtarget();
-                        HudCCRP.SetActive(CCRPmode);
-                    }
-                    HUD();
-                }
-
                 if (UseLeftTrigger)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
@@ -351,14 +338,32 @@ namespace SaccFlightAndVehicles
                     TriggerLastFrame = true;
                 }
                 else { TriggerLastFrame = false; CCRPfired = false; CCRPheld = false; }
+                if (!DFUNC_Setup_ERR)
+                {
+                    SimulateTrajectory();
+                    if (HudCCRP)
+                    {
+                        GetCCRPtarget();
+                        HudCCRP.SetActive(CCRPmode);
+                    }
+                    HUD();
+                }
             }
         }
+#if UNITY_EDITOR
+        [Header("Debug")]
+        [Tooltip("Position is set to prediction point when bomb is dropped")]
+        public Transform DropPoint;
+#endif
         void BombFireFunc()
         {
             BombFire++;
             RequestSerialization();
             if ((bool)SAVControl.GetProgramVariable("IsOwner"))
             { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+#if UNITY_EDITOR
+            if (DropPoint) { DropPoint.position = PredictedImpact.position; }
+#endif
         }
         //CCIP calculation happens here
         public void SimulateTrajectory()
@@ -385,7 +390,7 @@ namespace SaccFlightAndVehicles
                     {
                         hitdetect = true;
                         groundzero = hit.point;
-                        PredictedImpact.transform.position = hit.point; //This empty is nessecary for CCRP release prediction to work.
+                        PredictedImpact.position = hit.point; //This empty is nessecary for CCRP release prediction to work.
                     }
                 }
                 if (HudCCIP && DoCCIP) { HudCCIP.SetActive(hitdetect); } //Makes the hud element go away if the prediction didn't find a groundzero within the bomblifetime.
@@ -443,8 +448,8 @@ namespace SaccFlightAndVehicles
 
                 CrosshairRotator.transform.rotation = Quaternion.Euler(new Vector3(angle, CCRPHeading, 0));
 
-                PredictedImpact.transform.rotation = LineRotator.transform.rotation;
-                DistanceRelease = Mathf.Clamp(PredictedImpact.transform.InverseTransformPoint(new Vector3(CurrentCCRPtarget.x, 0, CurrentCCRPtarget.y)).z * -multiplier, -90, 90);
+                PredictedImpact.rotation = LineRotator.transform.rotation;
+                DistanceRelease = Mathf.Clamp(PredictedImpact.InverseTransformPoint(new Vector3(CurrentCCRPtarget.x, 0, CurrentCCRPtarget.y)).z * -multiplier, -90, 90);
                 TimingRotator.transform.localRotation = Quaternion.Euler(new Vector3(DistanceRelease, 0, 0));
                 if (Mathf.Abs(DistanceRelease) < 60)
                 {
