@@ -330,13 +330,13 @@ namespace SaccFlightAndVehicles
             EngineOn = false;
         }
         [System.NonSerializedAttribute] public float AllGs;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
         [System.NonSerializedAttribute] public float AngleOfAttackPitch;
         [System.NonSerializedAttribute] public float AngleOfAttackYaw;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
-        [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
+        [UdonSynced] [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
         [System.NonSerialized] public int NumPassengers;
         [System.NonSerializedAttribute] public float VTOLAngle;
 
@@ -369,7 +369,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float FullHealth;
         [System.NonSerializedAttribute] public bool Taxiing = false;
         [System.NonSerializedAttribute] public bool Floating = false;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
         [System.NonSerializedAttribute] public bool Piloting = false;
         [System.NonSerializedAttribute] public bool Passenger = false;
         [System.NonSerializedAttribute] public bool InEditor = true;
