@@ -104,6 +104,7 @@ namespace SaccFlightAndVehicles
                     VelocityIndicator.position = transform.position + Vel_Lerper;
                 }
                 VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
+                VelocityIndicator.rotation = Quaternion.LookRotation(VelocityIndicator.position - gameObject.transform.position, gameObject.transform.up);//This makes it face the pilot.
             }
             /////////////////
 
