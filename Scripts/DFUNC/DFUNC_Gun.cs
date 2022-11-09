@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -394,6 +394,7 @@ namespace SaccFlightAndVehicles
                     TargetIndicator.gameObject.SetActive(true);
                     TargetIndicator.position = HUDControl.transform.position + AAMCurrentTargetDirection;
                     TargetIndicator.localPosition = TargetIndicator.localPosition.normalized * distance_from_head;
+                    TargetIndicator.rotation = Quaternion.LookRotation(TargetIndicator.position - gameObject.transform.position, gameObject.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
                 }
 
                 if (GUNLeadIndicator)
@@ -419,7 +420,7 @@ namespace SaccFlightAndVehicles
                     Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
                     Vector3 PredictedPos = TargetDir
                         + (((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
-                            //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
+                                                                          //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
                             + (TargetAccel * .125f * BulletHitTime))//Acceleration
                                     * BulletHitTime);
 
@@ -442,6 +443,8 @@ namespace SaccFlightAndVehicles
                     GUNLeadIndicator.position = TargetPos + PredictedPos;
                     //move lead indicator to match the distance of the rest of the hud
                     GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
+
+                    GUNLeadIndicator.rotation = Quaternion.LookRotation(GUNLeadIndicator.position - gameObject.transform.position, gameObject.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
 
                     RelativeTargetVelLastFrame = RelativeTargetVel;
                 }
