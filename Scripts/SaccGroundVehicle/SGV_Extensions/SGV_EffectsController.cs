@@ -352,17 +352,17 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void SFEXT_G_ChangeGear()
+        public void SFEXT_G_CarChangeGear()
         {
             if (GearChange) { GearChange.PlayOneShot(GearChange.clip); }
             VehicleAnimator.SetInteger("currentgear", (int)SGVControl.GetProgramVariable("CurrentGear"));
         }
-        public void SFEXT_G_GearUp()
+        public void SFEXT_G_CarGearUp()
         {
             if (GearUp) { GearUp.PlayOneShot(GearUp.clip); }
             VehicleAnimator.SetTrigger("gearup");
         }
-        public void SFEXT_G_GearDown()
+        public void SFEXT_G_CarGearDown()
         {
             if (GearDown) { GearDown.PlayOneShot(GearDown.clip); }
             VehicleAnimator.SetTrigger("geardown");

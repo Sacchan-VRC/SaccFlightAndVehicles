@@ -62,10 +62,10 @@ namespace SaccFlightAndVehicles
                 else
                 { InMinGear = false; }
                 if (value > _CurrentGear)
-                { EntityControl.SendEventToExtensions("SFEXT_G_GearUp"); }
+                { EntityControl.SendEventToExtensions("SFEXT_G_CarGearUp"); }
                 else
-                { EntityControl.SendEventToExtensions("SFEXT_G_GearDown"); }
-                EntityControl.SendEventToExtensions("SFEXT_G_ChangeGear");
+                { EntityControl.SendEventToExtensions("SFEXT_G_CarGearDown"); }
+                EntityControl.SendEventToExtensions("SFEXT_G_CarChangeGear");
                 _CurrentGear = value;
             }
             get => _CurrentGear;
