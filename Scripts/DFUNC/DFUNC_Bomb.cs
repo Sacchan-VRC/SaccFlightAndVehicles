@@ -1,4 +1,3 @@
-
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
@@ -7,6 +6,7 @@ using VRC.Udon;
 
 namespace SaccFlightAndVehicles
 {
+    [DefaultExecutionOrder(10)]
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class DFUNC_Bomb : UdonSharpBehaviour
     {
@@ -78,6 +78,7 @@ namespace SaccFlightAndVehicles
         [Header("KitKat's stuff from here on")]
         [Tooltip("If the AGM cam will display where the bomb will hit even though CCIP and CCRP are off.")]
         [SerializeField] bool PredictiveBombCam = true;
+        public float BombCamZoom = 90f;
         [SerializeField] SAV_BombController LinkedBombController;
         Rigidbody AircraftRigidbody;
         Rigidbody BombRigidbody;
@@ -101,17 +102,21 @@ namespace SaccFlightAndVehicles
         [SerializeField] int MaxiterationStep = 100;
         [SerializeField] int IterationsBeforeCollisionCheck = 1;
         [Tooltip("The distance between where a bomb will land and where a possible target is located, if the ditance is below this value the HUD will tell you how to hit the target, and the script enters CCRP mode (more about that on line 123)")]
-        [SerializeField] float MinDistanceToTarget = 700;
+        [SerializeField] float MinDistanceToTarget = 1000;
         [Tooltip("How fast the red distance diamond goes down the line. A higher number allows the pilot to be more accurate.")]
-        public float multiplier = 0.05f;
+        public float multiplier = 0.005f;
+        public float VerticalBounds = 9f;
         [Tooltip("How close the pilot needs needs to aim to the target before the script drops the bomb. In meters of course.")]
         public float CCRP_Acc_Threshold = 5;
         public LayerMask AGMTargetsLayer = 1 << 26;
         Vector3 groundzero;
         Vector3[] DebugPosLine;
         Vector2 CurrentCCRPtarget;
-        Vector3 CCIPLookRot;
-
+        Vector3 CCIPLookPos;
+        
+        //[Header("This makes it look better")]
+        float CCIPverticaloffset = 8.5f;
+        float CCRPReleaseClamp = 90;
 
         float ClosestDistance;
         float CCRPHeading = 0;
@@ -125,6 +130,8 @@ namespace SaccFlightAndVehicles
         bool CCRPmode = false; //I added "CCRPmode" this mode makes it so when the trigger/spacebar is held the plane automatically drops the bomb whenever the bomb will hit close enough to the target.
         bool CCRPfired;
         bool CCRPheld;
+
+        float CCRPTimer = 0;
 
         float Gravity = Physics.gravity.magnitude * -1;
 
@@ -323,6 +330,7 @@ namespace SaccFlightAndVehicles
                     }
                     else
                     {
+                        CCRPTimer += Time.deltaTime;
                         CCRPheld = true;
                         if (!CCRPfired)
                         {
@@ -337,7 +345,18 @@ namespace SaccFlightAndVehicles
                     }
                     TriggerLastFrame = true;
                 }
-                else { TriggerLastFrame = false; CCRPfired = false; CCRPheld = false; }
+                else
+                {
+                    TriggerLastFrame = false;
+                    CCRPfired = false;
+                    if(CCRPheld && CCRPTimer < 0.75 && CCRPmode && NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
+                    {
+                        BombFireFunc();
+                    }
+                    CCRPheld = false;
+                    CCRPTimer = 0;
+                }
+
                 if (!DFUNC_Setup_ERR)
                 {
                     SimulateTrajectory();
@@ -346,9 +365,12 @@ namespace SaccFlightAndVehicles
                         GetCCRPtarget();
                         HudCCRP.SetActive(CCRPmode);
                     }
-                    HUD();
                 }
             }
+        }
+        private void LateUpdate()
+        {
+            HUD();
         }
 #if UNITY_EDITOR
         [Header("Debug")]
@@ -425,14 +447,18 @@ namespace SaccFlightAndVehicles
         {
             if (PredictiveBombCam)
             {
-                CCIPLookRot = (groundzero - AircraftRigidbody.position);
+                CCIPLookPos = (groundzero - AircraftRigidbody.position);
                 AtGCam.transform.LookAt(groundzero);
-                AtGCam.fieldOfView = Mathf.Clamp(90f / (CCIPLookRot.magnitude * CCIPLookRot.magnitude), 2f, 60f);
+                AtGCam.fieldOfView = Mathf.Clamp(BombCamZoom / (CCIPLookPos.magnitude * CCIPLookPos.magnitude), 2f, 60f);
             }
             if (DoCCIP)
             {
-                HudCCIP.transform.rotation = Quaternion.LookRotation(CCIPLookRot);
-                TopOfCCIPline.transform.position = LinkedHudVelocityVector.position;
+                Quaternion Qx = Quaternion.LookRotation(CCIPLookPos);
+                float x = Qx.eulerAngles.x;
+                Quaternion Qy = Quaternion.LookRotation(AircraftRigidbody.position - LinkedHudVelocityVector.position);
+                float y = Qy.eulerAngles.y;
+                HudCCIP.transform.rotation = Quaternion.Euler(x, y -180, 0);
+                TopOfCCIPline.transform.position = new Vector3(LinkedHudVelocityVector.position.x, LinkedHudVelocityVector.position.y - CCIPverticaloffset, LinkedHudVelocityVector.position.z);
             }
             if (DoCCRP)
             {
@@ -449,13 +475,9 @@ namespace SaccFlightAndVehicles
                 CrosshairRotator.transform.rotation = Quaternion.Euler(new Vector3(angle, CCRPHeading, 0));
 
                 PredictedImpact.rotation = LineRotator.transform.rotation;
-                DistanceRelease = Mathf.Clamp(PredictedImpact.InverseTransformPoint(new Vector3(CurrentCCRPtarget.x, 0, CurrentCCRPtarget.y)).z * -multiplier, -90, 90);
-                TimingRotator.transform.localRotation = Quaternion.Euler(new Vector3(DistanceRelease, 0, 0));
-                if (Mathf.Abs(DistanceRelease) < 60)
-                {
-                    TimingRotator.SetActive(true);
-                }
-                else { TimingRotator.SetActive(false); }
+                DistanceRelease = PredictedImpact.InverseTransformPoint(new Vector3(CurrentCCRPtarget.x, 0, CurrentCCRPtarget.y)).z * multiplier;
+                float DampenedReleaseQue = Mathf.Clamp((float)System.Math.Tanh(DistanceRelease), -CCRPReleaseClamp, CCRPReleaseClamp);
+                TimingRotator.transform.localRotation = Quaternion.Euler(new Vector3(DampenedReleaseQue * -VerticalBounds, 0, 0));
             }
         }
         //CCIP stuff ends here
