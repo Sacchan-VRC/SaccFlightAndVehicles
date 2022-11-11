@@ -52,7 +52,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("How much the wheel slowing down/speeding up changes the engine speed")]
         public float EngineInfluence = 225f;
         [Tooltip("Skip sound and skid effects completely")]
-        public bool NoEffects = true;
+        public bool DisableEffects = false;
         [Header("Debug")]
         public bool IsDriveWheel = false;
         private AudioSource SkidSound;
@@ -460,7 +460,7 @@ namespace SaccFlightAndVehicles
                         Suspension_VisualOnly();
                     }
                 }
-                if (NoEffects) { return; }
+                if (DisableEffects) { return; }
                 if (Grounded && !CurrentlyDistant)
                 {
                     float skidvol = Mathf.Min((SkidLength - SkidSound_Min) * SkidSound_VolumeIncrease, 1);
