@@ -1334,6 +1334,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 1778918461833538751}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &1217889974125167124
 MonoBehaviour:
@@ -1458,6 +1459,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 1778918460298135344}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &1217889974575203308
 MonoBehaviour:
@@ -1820,6 +1822,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 1171039762782402316}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 1217889975122693798}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &1217889975416420967
 MonoBehaviour:
@@ -1864,7 +1867,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1217889975477297946
 Transform:
   m_ObjectHideFlags: 0
@@ -1905,22 +1908,19 @@ MonoBehaviour:
   updateInterval: 0.2
   IdleModeUpdateInterval: 3
   FreezePositionOnDeath: 1
-  RotationSyncAgressiveness: 10
-  IdleModeVelMultiplier: 0.4
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 180
-  MaxPingExtrapolationInSeconds: 999
-  PassengerComfortMode: 0
   CorrectionTime: 8
   SpeedLerpTime: 4
-  CorrectionDerivStrength: 150
+  CorrectionDStrength: 1.666666
   CorrectionTime_Rotation: 2
   RotationSpeedLerpTime: 10
   AntiWarp: 1
   TestTransform: {fileID: 0}
   TestTransform_Raw: {fileID: 0}
-  RotExtrapDirection_Smooth: {x: 0, y: 0, z: 0, w: 0}
+  LagSimDelay: 0
+  DBGPING: 0
 --- !u!114 &1217889975477297945
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2526,6 +2526,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 1778918460924618137}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &1217889975763254909
 MonoBehaviour:
@@ -20091,6 +20092,7 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
   EngineInfluence: 225
+  DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: -1
   SurfaceTypeLast: 0
@@ -44501,6 +44503,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 5034242081659681147}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &5034242081967368629
 MonoBehaviour:
@@ -50216,6 +50219,7 @@ MonoBehaviour:
   ThisSeatOnly: {fileID: 0}
   AdjustSeat: 1
   TargetEyePosition: {fileID: 5034242082607500282}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
 --- !u!114 &5034242082806762028
 MonoBehaviour:
@@ -60120,6 +60124,7 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
   EngineInfluence: 225
+  DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: -1
   SurfaceTypeLast: 0
@@ -60578,6 +60583,7 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
   EngineInfluence: 225
+  DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: -1
   SurfaceTypeLast: 0
@@ -61115,6 +61121,7 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
   EngineInfluence: 225
+  DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: -1
   SurfaceTypeLast: 0

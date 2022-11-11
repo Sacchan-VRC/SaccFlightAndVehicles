@@ -17,7 +17,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &630903747
 Transform:
   m_ObjectHideFlags: 0
@@ -86550,10 +86550,7 @@ MonoBehaviour:
   AtGScreen: {fileID: 0}
   distance_from_head: 1.333
   PredictiveBombCam: 1
-  LinkedAirVehicle: {fileID: 0}
   LinkedBombController: {fileID: 0}
-  AircraftRigidbody: {fileID: 0}
-  BombRigidbody: {fileID: 0}
   BombLaunchPoint: {fileID: 0}
   PredictedImpact: {fileID: 0}
   DoCCIP: 0
@@ -86575,6 +86572,7 @@ MonoBehaviour:
   AGMTargetsLayer:
     serializedVersion: 2
     m_Bits: 67108864
+  DropPoint: {fileID: 0}
 --- !u!114 &8333115238754075734
 MonoBehaviour:
   m_ObjectHideFlags: 0
