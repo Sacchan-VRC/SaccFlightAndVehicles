@@ -260,7 +260,7 @@ namespace SaccFlightAndVehicles
             if (FloatTouchWaterPoint[currentfloatpoint] > TopOfFloat.y && (DoOnLand || !HitLandLast[currentfloatpoint]))
             {
                 FloatDepth[currentfloatpoint] = (FloatTouchWaterPoint[currentfloatpoint] - TopOfFloat.y) / FloatDiameter;
-                float CompressionDifference = (FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]) / FloatDiameter;
+                float CompressionDifference = (FloatDepth[currentfloatpoint] - FloatDepthLastFrame[currentfloatpoint]);
                 if (CompressionDifference > 0)
                 { CompressionDifference = Mathf.Min(CompressionDifference * Compressing, MaxCompressingForce); }
                 else
