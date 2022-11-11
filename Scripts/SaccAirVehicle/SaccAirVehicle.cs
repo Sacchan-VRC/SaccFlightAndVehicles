@@ -1033,7 +1033,7 @@ namespace SaccFlightAndVehicles
                             Taxiinglerper = 0;
                         }
                         //keyboard control for afterburner
-                        if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner && (VTOLAngle == 0 || VTOLAllowAfterburner))
+                        if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner && (VTOLAngleDegrees < EnterVTOLEvent_Angle || VTOLAllowAfterburner))
                         {
                             if (AfterburnerOn)
                             { PlayerThrottle = ThrottleAfterburnerPoint; }
@@ -1122,16 +1122,18 @@ namespace SaccFlightAndVehicles
 
                         if (VTOLenabled)
                         {
-                            if (VTOLOnly || !(VTOLAngle == VTOLAngleInput && VTOLAngleInput == 0))//only SetVTOLValues if it'll do anything
-                            {
-                                SetVTOLRotValues();
-                            }
+                            SetVTOLRotValues();
                             if (VTOLAngleDegrees > EnterVTOLEvent_Angle && VTOLAngleDegrees < 360 - EnterVTOLEvent_Angle)
                             {
                                 if (!InVTOL)
                                 {
                                     EntityControl.SendEventToExtensions("SFEXT_O_EnterVTOL");
                                     InVTOL = true;
+                                    if (!VTOLAllowAfterburner)
+                                    {
+                                        if (AfterburnerOn)
+                                        { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                    }
                                 }
                             }
                             else
@@ -2215,7 +2217,7 @@ namespace SaccFlightAndVehicles
             else if (VTOLAngle > 1) { VTOLAngle--; }
             VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
             float SpeedForVTOL = (Mathf.Min(Speed / VTOLLoseControlSpeed, 1));
-            if (VTOLOnly || (VTOLAngle > 0 && SpeedForVTOL != 1))
+            if (VTOLOnly || (VTOLAngle > 0))
             {
                 if (VTOLOnly)
                 {
@@ -2256,12 +2258,6 @@ namespace SaccFlightAndVehicles
                         ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
                         ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
                     }
-                }
-
-                if (!VTOLAllowAfterburner)
-                {
-                    if (AfterburnerOn)
-                    { PlayerThrottle = ThrottleAfterburnerPoint; }
                 }
             }
             else
