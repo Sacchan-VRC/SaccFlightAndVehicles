@@ -77,7 +77,7 @@ namespace SaccFlightAndVehicles
         //CCIP stuff from here on
         [Header("KitKat's stuff from here on")]
         [Tooltip("If the AGM cam will display where the bomb will hit even though CCIP and CCRP are off.")]
-        [SerializeField] bool PredictiveBombCam = true;
+        [SerializeField] bool PredictiveBombCam = false;
         public float BombCamZoom = 90f;
         [SerializeField] SAV_BombController LinkedBombController;
         Rigidbody AircraftRigidbody;
@@ -113,7 +113,7 @@ namespace SaccFlightAndVehicles
         Vector3[] DebugPosLine;
         Vector2 CurrentCCRPtarget;
         Vector3 CCIPLookPos;
-        
+
         //[Header("This makes it look better")]
         float CCIPverticaloffset = 8.5f;
         float CCRPReleaseClamp = 90;
@@ -188,19 +188,22 @@ namespace SaccFlightAndVehicles
                 DoCCRP = false;
             }
             if (PredictedImpact) PredictedImpact.gameObject.SetActive(false);
-            if (PredictiveBombCam && !PredictedImpact) { Debug.LogWarning("Predicted Impact empty is not linked."); }
             if (!DoCCIP && HudCCIP) { HudCCIP.SetActive(false); }
             if (!DoCCRP && HudCCRP) { HudCCRP.SetActive(false); }
-
-
             if (LinkedBombController)
             {
                 float MaxTotalDropTime = LinkedBombController.MaxLifetime;
                 iterationTime = MaxTotalDropTime / MaxiterationStep;
             }
-            else if (DoCCIP || DoCCRP || PredictiveBombCam) { Debug.LogWarning("Bomb controller not linked."); }
+            else if (DoCCIP || DoCCRP || PredictiveBombCam) { Debug.LogWarning("Bomb controller not linked."); } else { DFUNC_Setup_ERR = true; } //This saves some performance as it disables the calculation if everything that relies on the calculation is disabled.
             if (HudCCIP) { HudCCIP.SetActive(false); }
             if (HudCCRP) { HudCCRP.SetActive(false); }
+            if (PredictiveBombCam)
+            {
+                if (!PredictedImpact) { Debug.LogWarning("Predicted Impact empty is not linked."); }
+                if (!AtGCam) { Debug.LogWarning("AtGCam not linked."); }
+                PredictiveBombCam = false;
+            }
             //CCIP stuff ends here
         }
         private GameObject InstantiateWeapon()
@@ -349,7 +352,7 @@ namespace SaccFlightAndVehicles
                 {
                     TriggerLastFrame = false;
                     CCRPfired = false;
-                    if(CCRPheld && CCRPTimer < 0.75 && CCRPmode && NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
+                    if (CCRPheld && CCRPTimer < 0.75 && CCRPmode && NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
                     {
                         BombFireFunc();
                     }
@@ -445,20 +448,20 @@ namespace SaccFlightAndVehicles
         }
         void HUD()
         {
-            if (PredictiveBombCam)
-            {
-                CCIPLookPos = (groundzero - AircraftRigidbody.position);
-                AtGCam.transform.LookAt(groundzero);
-                AtGCam.fieldOfView = Mathf.Clamp(BombCamZoom / (CCIPLookPos.magnitude * CCIPLookPos.magnitude), 2f, 60f);
-            }
             if (DoCCIP)
             {
+                CCIPLookPos = (groundzero - AircraftRigidbody.position);
                 Quaternion Qx = Quaternion.LookRotation(CCIPLookPos);
                 float x = Qx.eulerAngles.x;
                 Quaternion Qy = Quaternion.LookRotation(AircraftRigidbody.position - LinkedHudVelocityVector.position);
                 float y = Qy.eulerAngles.y;
-                HudCCIP.transform.rotation = Quaternion.Euler(x, y -180, 0);
+                HudCCIP.transform.rotation = Quaternion.Euler(x, y - 180, 0);
                 TopOfCCIPline.transform.position = new Vector3(LinkedHudVelocityVector.position.x, LinkedHudVelocityVector.position.y - CCIPverticaloffset, LinkedHudVelocityVector.position.z);
+            }
+            if (PredictiveBombCam)
+            {
+                AtGCam.transform.LookAt(groundzero);
+                AtGCam.fieldOfView = Mathf.Clamp(BombCamZoom / (CCIPLookPos.magnitude * CCIPLookPos.magnitude), 2f, 60f);
             }
             if (DoCCRP)
             {
