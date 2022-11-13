@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
@@ -136,7 +136,6 @@ namespace SaccFlightAndVehicles
             { LockTimeABDivide = 0.0001f; }
             if (LockTimeMinDivide <= 0)
             { LockTimeMinDivide = 0.0001f; }
-
 
             //HUD
             if (HUDControl)
@@ -354,6 +353,16 @@ namespace SaccFlightAndVehicles
         private Vector3 AAMCurrentTargetDirection;
         private float AAMTargetedTimer = 2;
         private float AAMTargetObscuredDelay;
+        //HMCS
+        [Tooltip("Linking an HMCSController will allow players to look at the target they would like to lock.")]
+        public Transform LinkedHMCSController;
+        [Tooltip("This is how far back you can look before it reaches the edge of the missile FOV and caps. Just like in DCS.")]
+        public float MaxHMCSLookAngle = 90;
+        public GameObject HMCSMissileLockReticle;
+        //public GameObject HMCSCrosshair;
+        [HideInInspector] public Vector3 ClampedLookAngle;
+        public float HMCSSmoothing = 0.15f;
+        private Vector3 Smoothlook = Vector3.zero;
         //public Transform TARGETDEBUG;
         /* everywhere that GetComponent<SaccAirVehicle>() is used should be changed to UdonSharpBehaviour for modularity's sake,
         but it seems that it's impossible until further udon/sharp updates, because it currently doesn't support checking if a variable exists before trying to get it */
@@ -361,19 +370,33 @@ namespace SaccFlightAndVehicles
         {
             if (func_active)
             {
+                if (HMCSMissileLockReticle) { HMCSMissileLockReticle.SetActive(true); } //HMCS AAM targeting circle
+                //if (HMCSCrosshair) { HMCSCrosshair.SetActive(false); } //Turns off the normal HMCS crosshair, this script does not turn it on again though so if there is nothing else turning it on it will remain off lol.
                 //TARGETDEBUG.position = AAMTargets[AAMTarget].transform.position;
                 float DeltaTime = Time.fixedDeltaTime;
                 var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                 Vector3 HudControlPosition = HUDControl ? HUDControl.transform.position : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
-                float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
-
+                //HMCS clamping pain in the ass
+                if (LinkedHMCSController) { ClampedLookAngle = LinkedHMCSController.forward; }
+                if (LinkedHMCSController)
+                {
+                    Quaternion rotatebackby;
+                    float angle = Vector3.Angle(LinkedHMCSController.forward, VehicleTransform.forward);
+                    if (angle > MaxHMCSLookAngle)
+                    {
+                        rotatebackby = Quaternion.AngleAxis(angle - MaxHMCSLookAngle, Vector3.Cross(LinkedHMCSController.forward, VehicleTransform.forward));
+                        ClampedLookAngle = rotatebackby * LinkedHMCSController.forward;
+                    }
+                }
+                Smoothlook = Vector3.Slerp(Smoothlook, ClampedLookAngle, HMCSSmoothing);
+                float AAMCurrentTargetAngle = Vector3.Angle(LinkedHMCSController ? Smoothlook: VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
                 //check 1 target per frame to see if it's infront of us and worthy of being our current target
                 var TargetChecker = AAMTargets[AAMTargetChecker];
                 var TargetCheckerTransform = TargetChecker.transform;
                 var TargetCheckerParent = TargetCheckerTransform.parent;
 
                 Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
-                float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
+                float NextTargetAngle = Vector3.Angle(LinkedHMCSController ? Smoothlook : VehicleTransform.forward, AAMNextTargetDirection);
                 float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
 
                 if (TargetChecker.activeInHierarchy)
@@ -457,7 +480,7 @@ namespace SaccFlightAndVehicles
                                     (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl._dead &&
                                         (MissileType != 0 || AAMCurrentTargetSAVControl._EngineOn)))//heatseekers cant lock if engine off
                                     &&
-                                        (!HighAspectPreventLock || !AAMCurrentTargetSAVControl || Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot)
+                                        (!HighAspectPreventLock || !AAMCurrentTargetSAVControl || Vector3.Dot(LinkedHMCSController ? LinkedHMCSController.forward : AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot)
                                         )
                 {
                     if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
@@ -503,9 +526,29 @@ namespace SaccFlightAndVehicles
                                 Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
                                 Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < AAMLockAngle));
                                 Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance)); */
-            }
+            } else if (HMCSMissileLockReticle) { HMCSMissileLockReticle.SetActive(false); }
         }
-
+        private Vector3 ReticleSmoothDirection = Vector3.zero;
+        private void LateUpdate()
+        {
+            //HMCS circle reticle
+            if (HMCSMissileLockReticle)
+            {
+                float t = 0;
+                if (AAMLocked)
+                {
+                    t = 0;
+                }
+                else
+                {
+                    if (AAMCurrentTargetDirection.magnitude < AAMMaxTargetDistance && (NumAAM > 0 || AllowNoAmmoLock)) { t = Mathf.Clamp(Vector3.Angle(AAMCurrentTargetDirection, Smoothlook), 0, AAMLockAngle) / AAMLockAngle; } else { t = 1; }
+                }
+                ReticleSmoothDirection = Vector3.Slerp(ReticleSmoothDirection, Vector3.Lerp(AAMCurrentTargetDirection.normalized, ClampedLookAngle.normalized, t), HMCSSmoothing);
+                HMCSMissileLockReticle.transform.position = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position + ReticleSmoothDirection;
+                HMCSMissileLockReticle.transform.localPosition = HMCSMissileLockReticle.transform.localPosition.normalized * distance_from_head;
+            }
+            /////////////////////
+        }
 
         //hud stuff
         public Text HUDText_AAM_ammo;
@@ -524,11 +567,11 @@ namespace SaccFlightAndVehicles
                     AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
                     if (AAMLocked)
                     {
-                        AAMTargetIndicator.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));//back of mesh is locked version
+                        AAMTargetIndicator.rotation = Quaternion.LookRotation(gameObject.transform.position - AAMTargetIndicator.position, LinkedHMCSController ? LinkedHMCSController.up : gameObject.transform.up); //back of mesh is locked version so direction is reversed
                     }
                     else
                     {
-                        AAMTargetIndicator.localRotation = Quaternion.identity;
+                        AAMTargetIndicator.rotation = Quaternion.LookRotation(AAMTargetIndicator.position - gameObject.transform.position, LinkedHMCSController ? LinkedHMCSController.up : gameObject.transform.up);
                     }
                 }
                 else AAMTargetIndicator.localScale = Vector3.zero;
