@@ -103,8 +103,11 @@ namespace SaccFlightAndVehicles
             Selected = false;
             if (!NoPilotAlwaysGroundBrake)
             { BrakeStrength = 0; }
-            Airbrake_snd.pitch = 0f;
-            Airbrake_snd.volume = 0f;
+            if (Airbrake_snd)
+            {
+                Airbrake_snd.pitch = 0f;
+                Airbrake_snd.volume = 0f;
+            }
         }
         public void SFEXT_P_PassengerEnter()
         {
@@ -113,8 +116,11 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerExit()
         {
             InVehicle = false;
-            Airbrake_snd.pitch = 0f;
-            Airbrake_snd.volume = 0f;
+            if (Airbrake_snd)
+            {
+                Airbrake_snd.pitch = 0f;
+                Airbrake_snd.volume = 0f;
+            }
         }
         public void SFEXT_G_Explode()
         {
