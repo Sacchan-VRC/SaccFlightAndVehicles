@@ -61,6 +61,8 @@ namespace SaccFlightAndVehicles
         public AudioSource AAMTargetLock;
         [Tooltip("Fired AAMs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
+        [Tooltip("If not empty, targeting will be done relative to this transform's forward")]
+        public Transform TargetingTransform;
         private float HighAspectPreventLockAngleDot;
         [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private ushort _AAMFire;
         public ushort AAMFire
@@ -159,6 +161,8 @@ namespace SaccFlightAndVehicles
                     InstantiateWeapon();
                 }
             }
+            if (!TargetingTransform)
+            { TargetingTransform = VehicleTransform; }
         }
         private GameObject InstantiateWeapon()
         {
@@ -365,7 +369,7 @@ namespace SaccFlightAndVehicles
                 float DeltaTime = Time.fixedDeltaTime;
                 var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
                 Vector3 HudControlPosition = HUDControl ? HUDControl.transform.position : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
-                float AAMCurrentTargetAngle = Vector3.Angle(VehicleTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
+                float AAMCurrentTargetAngle = Vector3.Angle(TargetingTransform.forward, (AAMCurrentTargetPosition - HudControlPosition));
 
                 //check 1 target per frame to see if it's infront of us and worthy of being our current target
                 var TargetChecker = AAMTargets[AAMTargetChecker];
@@ -373,7 +377,7 @@ namespace SaccFlightAndVehicles
                 var TargetCheckerParent = TargetCheckerTransform.parent;
 
                 Vector3 AAMNextTargetDirection = (TargetCheckerTransform.position - HudControlPosition);
-                float NextTargetAngle = Vector3.Angle(VehicleTransform.forward, AAMNextTargetDirection);
+                float NextTargetAngle = Vector3.Angle(TargetingTransform.forward, AAMNextTargetDirection);
                 float NextTargetDistance = Vector3.Distance(CenterOfMass.position, TargetCheckerTransform.position);
 
                 if (TargetChecker.activeInHierarchy)
@@ -524,11 +528,11 @@ namespace SaccFlightAndVehicles
                     AAMTargetIndicator.localPosition = AAMTargetIndicator.localPosition.normalized * distance_from_head;
                     if (AAMLocked)
                     {
-                        AAMTargetIndicator.localRotation = Quaternion.Euler(new Vector3(0, 180, 0));//back of mesh is locked version
+                        AAMTargetIndicator.rotation = Quaternion.LookRotation(-(AAMTargetIndicator.position - HUDControl.transform.position), VehicleTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
                     }
                     else
                     {
-                        AAMTargetIndicator.localRotation = Quaternion.identity;
+                        AAMTargetIndicator.rotation = Quaternion.LookRotation(AAMTargetIndicator.position - HUDControl.transform.position, VehicleTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
                     }
                 }
                 else AAMTargetIndicator.localScale = Vector3.zero;
