@@ -701,6 +701,7 @@ namespace SaccFlightAndVehicles
         {
             DoSound = 0;
             Passenger = true;
+            InVehicle = true;
             if (EntityControl.MySeat != -1)
             {
                 InVehicle_Sounds = !EntityControl.VehicleSeats[EntityControl.MySeat].SeatOutSideVehicle;
@@ -762,7 +763,7 @@ namespace SaccFlightAndVehicles
                 if (!thrust.isPlaying)
                 { thrust.Play(); }
             }
-            if (!InVehicle || !AllDoorsClosed)
+            if (!InVehicle_Sounds || !AllDoorsClosed)
             {
                 if (!PlaneIdleNull && !PlaneIdle[0].isPlaying)
                 {
@@ -807,7 +808,7 @@ namespace SaccFlightAndVehicles
             {
                 _rollingVolCurve = RollingVolCurve;
                 _rollingMaxVol = RollingMaxVol;
-                if (InVehicle && AllDoorsClosed)
+                if (InVehicle_Sounds && AllDoorsClosed)
                 {
                     _rolling.Play();
                     _rolling.volume = (float)SAVControl.GetProgramVariable("Speed") * RollingVolCurve;
@@ -864,7 +865,7 @@ namespace SaccFlightAndVehicles
         { if (InVehicle && !MissileHitNULL) { PlayMissileHit(); } }
         public void SFEXT_G_SmallCrash()
         {
-            if (InVehicle)
+            if (InVehicle_Sounds)
             {
                 if (SmallCrashInsideNULL) { return; }
                 int rand = Random.Range(0, SmallCrashInside.Length);
@@ -889,7 +890,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_MediumCrash()
         {
-            if (InVehicle)
+            if (InVehicle_Sounds)
             {
                 if (MediumCrashInsideNULL) { return; }
                 int rand = Random.Range(0, MediumCrashInside.Length);
@@ -914,7 +915,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BigCrash()
         {
-            if (InVehicle)
+            if (InVehicle_Sounds)
             {
                 if (BigCrashInsideNULL) { return; }
                 int rand = Random.Range(0, BigCrashInside.Length);
@@ -1086,7 +1087,7 @@ namespace SaccFlightAndVehicles
         {
             if (EngineOn)
             {
-                if (InVehicle && AllDoorsClosed)
+                if (InVehicle_Sounds && AllDoorsClosed)
                 {
                     if (ABOnInside)
                         ABOnInside.Play();
