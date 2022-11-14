@@ -104,7 +104,6 @@ namespace SaccFlightAndVehicles
             SetUpPlanesMenu();
             DisableInVehicleOnlys();
             SetEntityTargets();
-            SetBombAGMTargets();
             SaccFlightMenu.SetUpReferenceCameraForFlight();
         }
         public static void DisableInVehicleOnlys()
@@ -150,25 +149,6 @@ namespace SaccFlightAndVehicles
                 }
                 PrefabUtility.RecordPrefabInstancePropertyModifications(se);
                 EditorUtility.SetDirty(se);
-            }
-        }
-        public static void SetBombAGMTargets()
-        {
-            var DFBs = GetAllDFUNCBombs().ToArray();
-            foreach (var dfb in DFBs)
-            {
-                var Targets = GetAllAAMTargets(dfb.AGMTargetsLayer);
-                if (Targets.Count > 0)
-                {
-                    Transform[] targs_trans = new Transform[Targets.Count];
-                    for (int i = 0; i < Targets.Count; i++)
-                    {
-                        targs_trans[i] = Targets[i].transform;
-                    }
-                    dfb.CCRP_Targets = targs_trans;
-                }
-                PrefabUtility.RecordPrefabInstancePropertyModifications(dfb);
-                EditorUtility.SetDirty(dfb);
             }
         }
         public static void SetUpPlanesMenu()
@@ -355,16 +335,6 @@ namespace SaccFlightAndVehicles
             foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
             {
                 var objs = g.GetComponentsInChildren<SaccEntity>(true);
-                ls.AddRange(objs);
-            }
-            return ls;
-        }
-        static List<DFUNC_Bomb> GetAllDFUNCBombs()
-        {
-            var ls = new List<DFUNC_Bomb>();
-            foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
-            {
-                var objs = g.GetComponentsInChildren<DFUNC_Bomb>(true);
                 ls.AddRange(objs);
             }
             return ls;
