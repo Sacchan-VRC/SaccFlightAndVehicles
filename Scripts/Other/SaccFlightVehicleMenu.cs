@@ -50,6 +50,7 @@ namespace SaccFlightAndVehicles
             if (InvertVRGearChangeToggle) { InvertVRGearChangeDefault = InvertVRGearChangeToggle.isOn; ToggleInvertVRGearChange(); }
             if (LeftGripClutchToggle) { LeftGripClutchDefault = LeftGripClutchToggle.isOn; ToggleLeftGripClutch(); }
             if (SwitchHandsToggle) { SwitchHandsDefault = SwitchHandsToggle.isOn; }//don't run this one because it can be on or off by default and running it would toggle it
+            if (DoubleTapToExit) { DoubleTapToExitDefault = SwitchHandsToggle.isOn; }//don't run this one because it can be on or off by default and running it would toggle it
             //sliders
             if (DialSensSlider) { DialSensDefault = DialSensSlider.value; SetDialSensitivity(); }
             if (GripSensitivitySlider) { GripSensitivityDefault = GripSensitivitySlider.value; SetGripSensitivity(); }
@@ -242,6 +243,19 @@ namespace SaccFlightAndVehicles
                 { SSV.SetProgramVariable("KeyboardThrottleSens", sensvalue); }
             }
         }
+        public Toggle DoubleTapToExit;
+        private bool DoubleTapToExitDefault;
+        public void ToggleDoubleTapToExit()
+        {
+            bool DoubleTap = DoubleTapToExit.isOn;
+            foreach (UdonSharpBehaviour SE in Vehicles)
+            {
+                if (SE)
+                {
+                    SE.SetProgramVariable("DoubleTapToExit", DoubleTap);
+                }
+            }
+        }
         [System.NonSerialized] public float SaccFlightStrengthDefault;
         public Slider SaccFlightStrengthSlider;
         public Text SaccFlightStrengthSliderNumber;
@@ -269,6 +283,7 @@ namespace SaccFlightAndVehicles
             if (InvertVRGearChangeToggle) { InvertVRGearChangeToggle.isOn = InvertVRGearChangeDefault; }
             if (LeftGripClutchToggle) { LeftGripClutchToggle.isOn = LeftGripClutchDefault; }
             if (AutoEngineToggle) { AutoEngineToggle.isOn = AutoEngineDefault; }
+            if (DoubleTapToExit) { DoubleTapToExit.isOn = DoubleTapToExitDefault; }
             if (SaccFlight) { SaccFlightStrengthSlider.value = SaccFlightStrengthDefault; }
         }
         [Header("Debug")]

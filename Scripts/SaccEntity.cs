@@ -36,6 +36,8 @@ namespace SaccFlightAndVehicles
         public Transform CenterOfMass;
         [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
         public bool DoVoiceVolumeChange = true;
+        [Tooltip("Double tap the exit vehicle button to exit the vehicle?")]
+        public bool DoubleTapToExit = false;
         [Header("Selection Sound")]
 
         [Tooltip("Oneshot sound played each time function selection changes")]
@@ -428,12 +430,32 @@ namespace SaccFlightAndVehicles
             if (InVehicle)
             {
                 if (Input.GetKeyDown(KeyCode.Return))
-                { if (!InEditor) ExitStation(); }
+                {
+                    if (!InEditor)
+                    {
+                        ExitVehicleCheck();
+                    }
+                }
             }
         }
+        private float LastJumpInput = 0f;
         public override void InputJump(bool value, VRC.Udon.Common.UdonInputEventArgs args)
         {
-            if (InVehicle && InVR && args.boolValue) { ExitStation(); }
+            if (InVehicle && InVR && args.boolValue)
+            {
+                ExitVehicleCheck();
+            }
+        }
+        public void ExitVehicleCheck()
+        {
+            if (!DoubleTapToExit)
+            { ExitStation(); }
+            else
+            {
+                if (Time.time - LastJumpInput < .3f)
+                { ExitStation(); }
+                LastJumpInput = Time.time;
+            }
         }
         private void OnEnable()
         {
