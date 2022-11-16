@@ -5,55 +5,6 @@ using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
 
-#if UNITY_EDITOR
-using UnityEditor;
-using UdonSharpEditor;
-using UnityEngine.SceneManagement;
-using System.Collections.Generic;
-
-namespace SaccFlightAndVehicles
-{
-    [CustomEditor(typeof(SaccViewScreenController))]
-    public class SaccViewScreenControllerEditor : Editor
-    {
-        const string TransformPrefix = ":campos";
-        public override void OnInspectorGUI()
-        {
-            SaccViewScreenController _target = target as SaccViewScreenController;
-            // We make sure that Udon Behaviour header is drawn
-            if (UdonSharpGUI.DrawDefaultUdonSharpBehaviourHeader(target)) return;
-            DrawDefaultInspector();
-            if (GUILayout.Button("Find Campositions In Scene"))
-            {
-                Undo.RecordObject(target, "Array objects changed");
-                var AllCamsArray = GetAllSceneCameraPositions().ToArray();
-                PutCamPositionsInArray(_target, AllCamsArray);
-                PrefabUtility.RecordPrefabInstancePropertyModifications(target);
-                EditorUtility.SetDirty(_target);//needed
-            }
-        }
-        public void PutCamPositionsInArray(SaccViewScreenController input, Transform[] pos)
-        {
-            input.CamPositions = pos;
-        }
-        List<Transform> GetAllSceneCameraPositions(Transform tr = null, List<Transform> ls = null)
-        {
-            if (tr == null)
-            {
-                ls = ls ?? new List<Transform>();
-                foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects()) GetAllSceneCameraPositions(g.transform, ls);
-            }
-            else
-            {
-                if (tr.name.StartsWith(TransformPrefix, System.StringComparison.InvariantCultureIgnoreCase)) ls.Add(tr);
-                foreach (Transform t in tr) GetAllSceneCameraPositions(t, ls);
-            }
-            return ls;
-        }
-    }
-}
-#endif
-
 namespace SaccFlightAndVehicles
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]

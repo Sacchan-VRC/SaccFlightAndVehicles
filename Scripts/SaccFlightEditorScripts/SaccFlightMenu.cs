@@ -97,14 +97,31 @@ namespace SaccFlightAndVehicles
         [MenuItem("SaccFlight/Debug_OnBuild_SetReferences", false, 1000)]
         public static void SaccFlightSetup()
         {
-            SetUpCameras();
+            SetUpCameras();//sets up saccviewscreencontroller
             SetUpRaceButtons();
-            SetUpRaceKillTrackers();
+            SetUpKillTrackers();
             SetUpWindChangers();
-            SetUpPlanesMenu();
+            SetUpVehicleMenu();
             DisableInVehicleOnlys();
-            SetEntityTargets();
+            SetEntityTargets();//sets list of targets in each vehicle's saccentity
+            SetPlaneList_VehicleEnterer();//^ for VehicleEnterer
             SaccFlightMenu.SetUpReferenceCameraForFlight();
+        }
+        public static void SetPlaneList_VehicleEnterer()
+        {
+            var SEs = GetAllSaccEntitys().ToArray();
+            var VEs = GetAllVehicleEnterers().ToArray();
+            var SETransforms = new Transform[SEs.Length];
+            for (int i = 0; i < SEs.Length; i++)
+            {
+                SETransforms[i] = SEs[i].transform;
+            }
+            for (int i = 0; i < VEs.Length; i++)
+            {
+                VEs[i].AllPlanes = SETransforms;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(VEs[i]);
+                EditorUtility.SetDirty(VEs[i]);
+            }
         }
         public static void DisableInVehicleOnlys()
         {
@@ -151,7 +168,7 @@ namespace SaccFlightAndVehicles
                 EditorUtility.SetDirty(se);
             }
         }
-        public static void SetUpPlanesMenu()
+        public static void SetUpVehicleMenu()
         {
             var SEs = GetAllSaccEntitys().ToArray();
             var menus = GetAllSaccFlightVehicleMenus();
@@ -178,10 +195,10 @@ namespace SaccFlightAndVehicles
                 EditorUtility.SetDirty(WC);
             }
         }
-        public static void SetUpRaceKillTrackers()
+        public static void SetUpKillTrackers()
         {
             var killTrackers = GetAllSAV_KillTrackers();
-            var killBoards = GetAllSaccScoreboard_Killss().ToArray();
+            var killBoards = GetAllSaccScoreboard_Kills().ToArray();
             if (killBoards.Length > 0)
             {
                 foreach (SAV_KillTracker KT in killTrackers)
@@ -234,6 +251,16 @@ namespace SaccFlightAndVehicles
         public static void PutCamPositionsInArray(SaccViewScreenController viewscreen, Transform[] CamTransform)
         {
             viewscreen.CamPositions = CamTransform;
+        }
+        static List<VehicleEnterer> GetAllVehicleEnterers()
+        {
+            var ls = new List<VehicleEnterer>();
+            foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                var objs = g.GetComponentsInChildren<VehicleEnterer>(true);
+                ls.AddRange(objs);
+            }
+            return ls;
         }
         static List<Transform> GetAllSceneCameraPoints(Transform tr = null, List<Transform> ls = null)
         {
@@ -299,7 +326,7 @@ namespace SaccFlightAndVehicles
             }
             return ls;
         }
-        static List<SaccScoreboard_Kills> GetAllSaccScoreboard_Killss()
+        static List<SaccScoreboard_Kills> GetAllSaccScoreboard_Kills()
         {
             var ls = new List<SaccScoreboard_Kills>();
             foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
@@ -447,6 +474,43 @@ namespace SaccFlightAndVehicles
             {
                 var objs = g.GetComponentsInChildren<Collider>(true);
                 ls.AddRange(objs);
+            }
+            return ls;
+        }
+    }
+    [CustomEditor(typeof(SaccViewScreenController))]
+    public class SaccViewScreenControllerEditor : Editor
+    {
+        const string TransformPrefix = ":campos";
+        public override void OnInspectorGUI()
+        {
+            SaccViewScreenController _target = target as SaccViewScreenController;
+            if (UdonSharpGUI.DrawDefaultUdonSharpBehaviourHeader(target)) return;
+            DrawDefaultInspector();
+            if (GUILayout.Button("Find Campositions In Scene"))
+            {
+                Undo.RecordObject(target, "Array objects changed");
+                var AllCamsArray = GetAllSceneCameraPositions().ToArray();
+                PutCamPositionsInArray(_target, AllCamsArray);
+                PrefabUtility.RecordPrefabInstancePropertyModifications(target);
+                EditorUtility.SetDirty(_target);//needed
+            }
+        }
+        public void PutCamPositionsInArray(SaccViewScreenController input, Transform[] pos)
+        {
+            input.CamPositions = pos;
+        }
+        List<Transform> GetAllSceneCameraPositions(Transform tr = null, List<Transform> ls = null)
+        {
+            if (tr == null)
+            {
+                ls = ls ?? new List<Transform>();
+                foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects()) GetAllSceneCameraPositions(g.transform, ls);
+            }
+            else
+            {
+                if (tr.name.StartsWith(TransformPrefix, System.StringComparison.InvariantCultureIgnoreCase)) ls.Add(tr);
+                foreach (Transform t in tr) GetAllSceneCameraPositions(t, ls);
             }
             return ls;
         }
