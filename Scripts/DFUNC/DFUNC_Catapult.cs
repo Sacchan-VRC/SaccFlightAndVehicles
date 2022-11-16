@@ -155,8 +155,14 @@ namespace SaccFlightAndVehicles
                                     CatapultPosLastFrame = CatapultTransform.position;
                                     //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
                                     //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
-                                    VehicleTransform.rotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
-
+                                    Quaternion newrotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
+                                    //flip the plane 360 degrees if the quaternion is the wrong way round, so that syncscript doesnt make other players see you do a 360
+                                    bool InvertQuat = Quaternion.Dot(VehicleTransform.rotation, newrotation) < 0;
+                                    VehicleTransform.rotation = newrotation;
+                                    if (InvertQuat)
+                                    {
+                                        VehicleTransform.Rotate(new Vector3(0, 360, 0));
+                                    }
                                     //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
                                     float PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
                                     VehicleTransform.position = CatapultTransform.position;
