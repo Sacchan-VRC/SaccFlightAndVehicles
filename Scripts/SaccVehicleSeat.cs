@@ -14,14 +14,16 @@ namespace SaccFlightAndVehicles
         public bool IsPilotSeat = false;
         [Tooltip("Object that is enabled only when sitting in this seat")]
         public GameObject ThisSeatOnly;
-        public bool AdjustSeat = true;
+        public bool AdjustSeatPosition = true;
+        public bool AdjustSeatRotation = true;
         public Transform TargetEyePosition;
         [Tooltip("Let other scripts know that this seat is on the outside of the vehicle (stop sound changing when closing canopy)")]
         public bool SeatOutSideVehicle;
-        [Tooltip("How far to move the head to the side when looking backwards in desktop")]
+        [Tooltip("How far to move the seat to the side when looking backwards in desktop")]
         [SerializeField] float HeadXOffset = 0.25f;
-        [UdonSynced, FieldChangeCallback(nameof(AdjustedPos))] private Vector2 _adjustedPos;
-        public Vector2 AdjustedPos
+        private Vector3 SeatAdjustedPos;
+        [UdonSynced, FieldChangeCallback(nameof(AdjustedPos))] private Vector3 _adjustedPos;// xy = seat up and forward, z = yaw
+        public Vector3 AdjustedPos
         {
             set
             {
@@ -33,6 +35,7 @@ namespace SaccFlightAndVehicles
         private float AdjustTime;
         private bool CalibratedY = false;
         private bool CalibratedZ = false;
+        private bool CalibratedYaw = false;
         private bool InSeat = false;
         [System.NonSerializedAttribute] public bool SeatOccupied = false;
         [System.NonSerializedAttribute] public int ThisStationID;
@@ -56,7 +59,7 @@ namespace SaccFlightAndVehicles
             Station = (VRC.SDK3.Components.VRCStation)GetComponent(typeof(VRC.SDK3.Components.VRCStation));
             Seat = Station.stationEnterPlayerLocation;
             SeatStartRot = Seat.localRotation;
-            SeatStartPos = Seat.localPosition;
+            SeatAdjustedPos = SeatStartPos = Seat.localPosition;
             if (InEditor && ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
             DT180SeatCalcCounter = Random.Range(0, 10);
         }
@@ -90,10 +93,12 @@ namespace SaccFlightAndVehicles
                     { EntityControl.PassengerEnterVehicleLocal(); }
                     if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
 
-                    if (!Fake && AdjustSeat && TargetEyePosition)
+                    if (!Fake && AdjustSeatPosition && TargetEyePosition)
                     {
                         CalibratedY = false;
                         CalibratedZ = false;
+                        //don't do rotation calibration if in desktop mode
+                        if (AdjustSeatRotation && player.IsUserInVR()) { CalibratedYaw = false; } else { CalibratedYaw = true; }
                         AdjustTime = 0;
                         SeatAdjustment();
                         SeatAdjustmentSerialization();
@@ -132,7 +137,7 @@ namespace SaccFlightAndVehicles
             PlayerExitPlane(player);
             if (!Fake)
             {
-                Seat.localPosition = SeatPosTarget = SeatStartPos;
+                Seat.localPosition = SeatAdjustedPos = SeatPosTarget = SeatStartPos;
                 Seat.localRotation = SeatRotTarget = SeatStartRot;
             }
         }
@@ -209,7 +214,6 @@ namespace SaccFlightAndVehicles
             }
             SeatInitialized = true;
         }
-
         //seat adjuster stuff
         public void SeatAdjustmentSerialization()
         {
@@ -218,7 +222,7 @@ namespace SaccFlightAndVehicles
                 if (!InEditor)
                 {
                     RequestSerialization();
-                    if (EntityControl.InVehicle && (!CalibratedY || !CalibratedZ))
+                    if (EntityControl.InVehicle && (!CalibratedY || !CalibratedZ || !CalibratedYaw))
                     {
                         SendCustomEventDelayedSeconds(nameof(SeatAdjustmentSerialization), .3f, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
                     }
@@ -237,7 +241,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (Mathf.Abs(TargetRelative.y) > 0.01f)
                         {
-                            Seat.position -= TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y);
+                            SeatAdjustedPos -= transform.InverseTransformDirection(TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y));
                         }
                         else
                         {
@@ -251,7 +255,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (Mathf.Abs(TargetRelative.z) > 0.01f)
                         {
-                            Seat.position -= TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z);
+                            SeatAdjustedPos -= transform.InverseTransformDirection(TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z));
                         }
                         else
                         {
@@ -261,17 +265,29 @@ namespace SaccFlightAndVehicles
                             }
                         }
                     }
-                    //remove floating point errors on x
-                    Vector3 seatpos = Seat.localPosition;
-                    seatpos.x = SeatStartPos.x;
-                    Seat.localPosition = seatpos;
-                    //set synced variable
-                    Vector3 newpos = Seat.localPosition;
-                    _adjustedPos.x = newpos.y;
-                    _adjustedPos.y = newpos.z;
+                    Vector3 HeadForward = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward;
+                    float angle = Vector3.SignedAngle(transform.forward, Vector3.ProjectOnPlane(HeadForward, transform.up), transform.up);
+                    Vector3 seatrot = Seat.localEulerAngles;
+                    if (!CalibratedYaw)
+                    {
+                        if (Mathf.Abs(angle) > 1f)
+                        {
+                            if (seatrot.y > 180) { seatrot.y -= 360; }
+                            _adjustedPos.z = seatrot.y - (angle * .5f);
+                        }
+                        else
+                        {
+                            if (AdjustTime > 1f)
+                            {
+                                CalibratedYaw = true;
+                            }
+                        }
+                    }
+                    _adjustedPos = new Vector3(SeatAdjustedPos.y, SeatAdjustedPos.z, _adjustedPos.z); ;
+                    AdjustedPos = _adjustedPos;
                     AdjustTime += 0.3f;
                     RequestSerialization();
-                    if (EntityControl.InVehicle && (!CalibratedY || !CalibratedZ))
+                    if (EntityControl.InVehicle && (!CalibratedY || !CalibratedZ || !CalibratedYaw))
                     {
                         SendCustomEventDelayedSeconds(nameof(SeatAdjustment), .3f, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
                     }
@@ -296,6 +312,12 @@ namespace SaccFlightAndVehicles
             {
                 Vector3 newpos = (new Vector3(SeatStartPos.x, _adjustedPos.x, _adjustedPos.y));
                 Seat.localPosition = newpos;
+                if (SeatedPlayer != null && SeatedPlayer.IsUserInVR())
+                {
+                    Vector3 seatrot = Seat.localEulerAngles;
+                    Quaternion newrot = Quaternion.Euler(new Vector3(seatrot.x, _adjustedPos.z, seatrot.z));
+                    Seat.localRotation = newrot;
+                }
             }
         }
         //Thanks to iffn, absolute legend https://github.com/iffn/iffns360ChairForVRChat
