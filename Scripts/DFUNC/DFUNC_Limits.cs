@@ -14,11 +14,15 @@ namespace SaccFlightAndVehicles
         public bool DefaultLimitsOn = true;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
-        [Tooltip("Below this number of Gs, G Limiter has zero effect")]
-        public float GLimiter_Begin = 35f;
-        [Tooltip("Linearly decrease control limit up to this many Gs")]
-        public float GLimiter = 40f;
-        [Tooltip("Below this number of AoA, AoA Limiter has zero effect")]
+        [Tooltip("Below this number of positive Gs, G Limiter has zero effect")]
+        public float GLimiter_Begin_Pos = 35f;
+        [Tooltip("Linearly decrease control limit up to this many positive Gs")]
+        public float GLimiter_Pos = 40f;
+        [Tooltip("Below this number of negative Gs, G Limiter has zero effect")]
+        public float GLimiter_Begin_Neg = -1f;
+        [Tooltip("Linearly decrease control limit up to this many negative Gs. IF SET <0, VALUES WILL BE SET TO MATCH POSITIVE VALUES")]
+        public float GLimiter_Neg = -1f;
+        [Tooltip("Below this number of AoA, AoA Limiter has zero effect. IF SET <0, VALUES WILL BE SET TO MATCH POSITIVE VALUES")]
         public float AoALimiter_Begin = 10f;
         [Tooltip("Try to stop pilot pulling this much AoA")]
         public float AoALimiter = 14f;
@@ -31,7 +35,8 @@ namespace SaccFlightAndVehicles
         private bool Piloting;
         private bool Grounded = true;
         private bool Selected;
-        private float GLimiterRange;
+        private float GLimiterRange_Pos;
+        private float GLimiterRange_Neg;
         private float AoALimiterRange;
         [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
@@ -43,7 +48,13 @@ namespace SaccFlightAndVehicles
             { InVR = localPlayer.IsUserInVR(); }
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             if (!DefaultLimitsOn) { SetLimitsOff(); }
-            GLimiterRange = GLimiter - GLimiter_Begin;
+            GLimiterRange_Pos = GLimiter_Pos - GLimiter_Begin_Pos;
+            if (GLimiter_Neg < 0 || GLimiter_Begin_Neg < 0)
+            {
+                GLimiter_Neg = GLimiter_Pos;
+                GLimiter_Begin_Neg = GLimiter_Begin_Pos;
+            }
+            GLimiterRange_Neg = GLimiter_Neg - GLimiter_Begin_Neg;
             AoALimiterRange = AoALimiter - AoALimiter_Begin;
         }
         public void DFUNC_Selected()
@@ -141,7 +152,14 @@ namespace SaccFlightAndVehicles
             {
                 float GLimitStrength = 1f;
                 float AoALimitStrength = 1f;
-                if (!DisableGLimiter) { GLimitStrength = Mathf.Clamp(1 - ((-GLimiter_Begin + Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs"))) / GLimiterRange), 0, 1); }
+                if (!DisableGLimiter)
+                {
+                    float vertGs = (float)SAVControl.GetProgramVariable("VertGs");
+                    if (vertGs > 0)
+                    { GLimitStrength = Mathf.Clamp(1 - ((-GLimiter_Begin_Pos + Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs"))) / GLimiterRange_Pos), 0, 1); }
+                    else
+                    { GLimitStrength = Mathf.Clamp(1 - ((-GLimiter_Begin_Neg + Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs"))) / GLimiterRange_Neg), 0, 1); }
+                }
                 if (!DisableAoALimiter) { AoALimitStrength = Mathf.Clamp(1 - ((-AoALimiter_Begin + Mathf.Abs((float)SAVControl.GetProgramVariable("AngleOfAttack"))) / AoALimiterRange), 0, 1); }
                 SAVControl.SetProgramVariable("Limits", Mathf.Min(GLimitStrength, AoALimitStrength));
             }
