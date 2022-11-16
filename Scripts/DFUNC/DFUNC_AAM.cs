@@ -44,6 +44,8 @@ namespace SaccFlightAndVehicles
         public string AnimFloatName = "AAMs";
         [Tooltip("Animator trigger that is set when a missile is launched")]
         public string AnimFiredTriggerName = "aamlaunched";
+        [Tooltip("Set animator bool with this name to true if missile has a lock")]
+        public string AnimLockedOnBoolName = string.Empty;
         [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
         public bool AnimBoolStayTrueOnExit;
         [Tooltip("Make it only possible to lock if the angle you are looking at the back of the enemy plane is less than HighAspectPreventLock (for heatseekers)")]
@@ -102,7 +104,20 @@ namespace SaccFlightAndVehicles
         private int NumAAMTargets;
         private float AAMLockTimer = 0;
         private bool AAMHasTarget = false;
-        [System.NonSerializedAttribute] public bool AAMLocked = false;
+        [System.NonSerializedAttribute] public bool _AAMLocked = false;
+        public bool AAMLocked
+        {
+            set
+            {
+                _AAMLocked = value;
+                if (DoLockedBool && AAMAnimator)
+                {
+                    AAMAnimator.SetBool(AnimLockedOnBoolName, value);
+                }
+            }
+            get => _AAMLocked;
+        }
+        private bool DoLockedBool = false;
         private bool TriggerLastFrame;
         private float AAMLastFiredTime = -999;
         private float FullAAMsDivider;
@@ -163,6 +178,7 @@ namespace SaccFlightAndVehicles
             }
             if (!TargetingTransform)
             { TargetingTransform = VehicleTransform; }
+            if (AnimLockedOnBoolName != string.Empty) { DoLockedBool = true; }
         }
         private GameObject InstantiateWeapon()
         {
