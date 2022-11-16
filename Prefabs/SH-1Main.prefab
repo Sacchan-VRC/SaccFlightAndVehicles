@@ -68936,10 +68936,12 @@ MonoBehaviour:
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2653143539570689386}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115238084813638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69307,6 +69309,7 @@ MonoBehaviour:
   AnimBoolName: AAMSelected
   AnimFloatName: AAMs
   AnimFiredTriggerName: aamlaunched
+  AnimLockedOnBoolName: 
   AnimBoolStayTrueOnExit: 0
   HighAspectPreventLock: 0
   HighAspectAngle: 85
@@ -69316,6 +69319,7 @@ MonoBehaviour:
   AAMTargeting: {fileID: 8333115239476357053}
   AAMTargetLock: {fileID: 8333115238359307028}
   WorldParent: {fileID: 0}
+  TargetingTransform: {fileID: 0}
   HUDControl: {fileID: -7071171659312887935}
   AAMMaxTargetDistance: 6000
   HUDText_AAM_ammo: {fileID: 8333115238396513880}
@@ -70111,10 +70115,12 @@ MonoBehaviour:
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 8333115238474179255}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 388422482105506395}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115238229734847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86548,31 +86554,6 @@ MonoBehaviour:
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   AtGScreen: {fileID: 0}
-  distance_from_head: 1.333
-  PredictiveBombCam: 1
-  LinkedBombController: {fileID: 0}
-  BombLaunchPoint: {fileID: 0}
-  PredictedImpact: {fileID: 0}
-  DoCCIP: 0
-  HudCCIP: {fileID: 0}
-  TopOfCCIPline: {fileID: 0}
-  LinkedHudVelocityVector: {fileID: 0}
-  DoCCRP: 0
-  HudCCRP: {fileID: 0}
-  LineRotator: {fileID: 0}
-  CrosshairRotator: {fileID: 0}
-  TimingRotator: {fileID: 0}
-  CCRP_Targets:
-  - {fileID: 0}
-  MaxiterationStep: 100
-  IterationsBeforeCollisionCheck: 1
-  MinDistanceToTarget: 700
-  multiplier: 0.05
-  CCRP_Acc_Threshold: 5
-  AGMTargetsLayer:
-    serializedVersion: 2
-    m_Bits: 67108864
-  DropPoint: {fileID: 0}
 --- !u!114 &8333115238754075734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87007,10 +86988,12 @@ MonoBehaviour:
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2653143539710161896}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115238828317008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87346,10 +87329,12 @@ MonoBehaviour:
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 5176589018563589172}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2653143540183886235}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115238922619061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114035,6 +114020,7 @@ MonoBehaviour:
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 8333115239186322126}
   DoVoiceVolumeChange: 1
+  DoubleTapToExit: 0
   SwitchFunctionSound: {fileID: 8333115238311187226}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -124591,10 +124577,12 @@ MonoBehaviour:
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 8333115238768783589}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2653143541454527584}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 1651320211060793692}
 --- !u!114 &8333115240067380491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124852,10 +124840,12 @@ MonoBehaviour:
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2653143541203552689}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115240080910066
 MonoBehaviour:
   m_ObjectHideFlags: 0

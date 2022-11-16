@@ -21,6 +21,8 @@ namespace SaccFlightAndVehicles
         public bool SeatOutSideVehicle;
         [Tooltip("How far to move the seat to the side when looking backwards in desktop")]
         [SerializeField] float HeadXOffset = 0.25f;
+        [Tooltip("Calbrate rotation towards this transform's forward vector, leave empty to use this station's transform")]
+        public Transform RotationCalibrationTarget;
         private Vector3 SeatAdjustedPos;
         [UdonSynced, FieldChangeCallback(nameof(AdjustedPos))] private Vector3 _adjustedPos;// xy = seat up and forward, z = yaw
         public Vector3 AdjustedPos
@@ -70,6 +72,7 @@ namespace SaccFlightAndVehicles
                 Seat.rotation = Quaternion.Euler(0, Seat.eulerAngles.y, 0);//fixes offset seated position when getting in a rolled/pitched vehicle in VR
                 localPlayer.UseAttachedStation();
                 Seat.localRotation = SeatStartRot;
+                _adjustedPos.z = Seat.localEulerAngles.y;
             }
         }
         public override void OnStationEntered(VRCPlayerApi player)
@@ -139,6 +142,7 @@ namespace SaccFlightAndVehicles
             {
                 Seat.localPosition = SeatAdjustedPos = SeatPosTarget = SeatStartPos;
                 Seat.localRotation = SeatRotTarget = SeatStartRot;
+                _adjustedPos.z = Seat.localEulerAngles.y;
             }
         }
         public override void OnPlayerLeft(VRCPlayerApi player)
@@ -201,6 +205,7 @@ namespace SaccFlightAndVehicles
         public void InitializeSeat()
         {
             if (!EntityControl.Initialized) { return; }
+            if (!RotationCalibrationTarget) { RotationCalibrationTarget = transform; }
             int x = 0;
             foreach (VRCStation station in EntityControl.VehicleStations)
             {
@@ -266,7 +271,7 @@ namespace SaccFlightAndVehicles
                         }
                     }
                     Vector3 HeadForward = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward;
-                    float angle = Vector3.SignedAngle(transform.forward, Vector3.ProjectOnPlane(HeadForward, transform.up), transform.up);
+                    float angle = Vector3.SignedAngle(RotationCalibrationTarget.forward, Vector3.ProjectOnPlane(HeadForward, transform.up), transform.up);
                     Vector3 seatrot = Seat.localEulerAngles;
                     if (!CalibratedYaw)
                     {
