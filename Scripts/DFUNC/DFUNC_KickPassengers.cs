@@ -9,7 +9,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_KickPassengers : UdonSharpBehaviour
     {
-        public SaccFlightAndVehicles.SaccEntity EntityControl;
+        public SaccEntity EntityControl;
         private bool UseLeftTrigger;
         private bool TriggerLastFrame;
         private bool Passenger;
