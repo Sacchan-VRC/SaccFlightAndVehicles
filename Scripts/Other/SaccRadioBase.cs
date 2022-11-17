@@ -8,6 +8,7 @@ using TMPro;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SaccRadioBase : UdonSharpBehaviour
 {
+    [Tooltip("Filled automatically on build.")]
     public Transform[] AllPlanes;
     private SaccFlightAndVehicles.SaccEntity[] _AllPlanes_ENT;
     private SAV_Radio[] _AllPlanes_RD;
