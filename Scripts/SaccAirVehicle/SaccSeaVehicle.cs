@@ -21,7 +21,7 @@ namespace SaccFlightAndVehicles
         public Transform ThrustPoint;
         [Tooltip("Position yawing forces are applied at")]
         public Transform YawMoment;
-        [Tooltip("Position traced down from to detect whether the vehicle is currently on the ground. Trace distance is 44cm. Place between the back wheels around 20cm above the height where the wheels touch the ground")]
+        [Tooltip("Position traced down from to detect whether the vehicle is currently on the ground.")]
         public Transform GroundDetector;
         [Tooltip("Distance traced down from the ground detector's position to see if the ground is there, in order to determine if the vehicle is grounded")]
         public float GroundDetectorRayDistance = .44f;
@@ -87,8 +87,6 @@ namespace SaccFlightAndVehicles
         public bool DisallowTaxiRotationWhileStill = false;
         [Tooltip("When the above is ticked, This is the speed at which the vehicle will reach its full turning speed. Meters/second.")]
         public float TaxiFullTurningSpeed = 20f;
-        [Tooltip("Push the vehicle up based on speed. Sit higher on the water when moving faster")]
-        public float VelLift = 1f;
         [Tooltip("Maximum Vel Lift, to stop the nose being pushed up. Technically should probably be 9.81 to counter gravity exactly")]
         public float VelLiftMax = 10f;
         [Tooltip("Vehicle will take damage if experiences more Gs that this (Internally Gs are calculated in all directions, the HUD shows only vertical Gs so it will differ slightly")]
@@ -236,13 +234,11 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool DoAAMTargeting;
         [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
         [System.NonSerializedAttribute] public bool UsingManualSync;
+        [System.NonSerializedAttribute] public bool Grounded = false;
         private bool RepeatingWorldCheckAxis;
         bool FloatingLastFrame = false;
         bool GroundedLastFrame = false;
-        private float VelLiftStart;
         private int VehicleLayer;
-        private float VelLiftMaxStart;
-        private bool HasAirBrake;//set to false if air brake strength is 0
         private float HandDistanceZLastFrame;
         private float EngineAngle;
         private float PitchThrustVecMultiStart;
@@ -472,9 +468,6 @@ namespace SaccFlightAndVehicles
 
             FullHealth = Health;
             FullFuel = Fuel;
-
-            VelLiftMaxStart = VelLiftMax;
-            VelLiftStart = VelLift;
 
             CenterOfMass = EntityControl.CenterOfMass;
             SetCoMMeshOffset();
@@ -934,10 +927,6 @@ namespace SaccFlightAndVehicles
                         //Lerp the inputs for 'rotation response'
                         LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
                     }
-                    else
-                    {
-                        VelLift = yaw = 0;
-                    }
                     if (Taxiing)//on ground or water (boats will never be on ground because you disable grounddetector)
                     {
                         Yawing = (VehicleTransform.right * LerpedYaw);
@@ -1007,7 +996,6 @@ namespace SaccFlightAndVehicles
                 Health = FullHealth;//turns off low health smoke
                 Fuel = FullFuel;
                 AngleOfAttack = 0;
-                VelLift = VelLiftStart;
                 SendCustomEventDelayedSeconds(nameof(MoveToSpawn), RespawnDelay - 3);
                 EntityControl.SendEventToExtensions("SFEXT_O_Explode");
             }

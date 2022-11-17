@@ -8,7 +8,8 @@ using TMPro;
 [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
 public class SaccRadioBase : UdonSharpBehaviour
 {
-    [Tooltip("Filled automatically on build.")]
+    [Header("Vehicles must have SAV_Radio extension for this to work")]
+    [Header("All Planes is filled automatically on build.")]
     public Transform[] AllPlanes;
     private SaccFlightAndVehicles.SaccEntity[] _AllPlanes_ENT;
     private SAV_Radio[] _AllPlanes_RD;

@@ -11,7 +11,6 @@ public class SAV_Radio : UdonSharpBehaviour
     public SaccEntity EntityControl;
     public UdonSharpBehaviour RadioBase;
     [UdonSynced] public bool RadioOn = true;
-    [UdonSynced] public int RadioChannel = 0;
     private bool Initialized;
     private VRCPlayerApi localPlayer;
     public void SFEXT_P_PassengerEnter()
