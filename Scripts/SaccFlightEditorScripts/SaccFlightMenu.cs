@@ -104,13 +104,30 @@ namespace SaccFlightAndVehicles
             SetUpVehicleMenu();
             DisableInVehicleOnlys();
             SetEntityTargets();//sets list of targets in each vehicle's saccentity
-            SetPlaneList_VehicleEnterer();//^ for VehicleEnterer
+            SetPlaneList_SaccVehicleEnterer();//^ for SaccVehicleEnterer
+            SetPlaneList_RadioBase();
             SaccFlightMenu.SetUpReferenceCameraForFlight();
         }
-        public static void SetPlaneList_VehicleEnterer()
+        public static void SetPlaneList_RadioBase()
         {
             var SEs = GetAllSaccEntitys().ToArray();
-            var VEs = GetAllVehicleEnterers().ToArray();
+            var RBs = GetAllSaccRadioBases().ToArray();
+            var SETransforms = new Transform[SEs.Length];
+            for (int i = 0; i < SEs.Length; i++)
+            {
+                SETransforms[i] = SEs[i].transform;
+            }
+            for (int i = 0; i < RBs.Length; i++)
+            {
+                RBs[i].AllPlanes = SETransforms;
+                PrefabUtility.RecordPrefabInstancePropertyModifications(RBs[i]);
+                EditorUtility.SetDirty(RBs[i]);
+            }
+        }
+        public static void SetPlaneList_SaccVehicleEnterer()
+        {
+            var SEs = GetAllSaccEntitys().ToArray();
+            var VEs = GetAllSaccVehicleEnterers().ToArray();
             var SETransforms = new Transform[SEs.Length];
             for (int i = 0; i < SEs.Length; i++)
             {
@@ -252,12 +269,22 @@ namespace SaccFlightAndVehicles
         {
             viewscreen.CamPositions = CamTransform;
         }
-        static List<VehicleEnterer> GetAllVehicleEnterers()
+        static List<SaccVehicleEnterer> GetAllSaccVehicleEnterers()
         {
-            var ls = new List<VehicleEnterer>();
+            var ls = new List<SaccVehicleEnterer>();
             foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
             {
-                var objs = g.GetComponentsInChildren<VehicleEnterer>(true);
+                var objs = g.GetComponentsInChildren<SaccVehicleEnterer>(true);
+                ls.AddRange(objs);
+            }
+            return ls;
+        }
+        static List<SaccRadioBase> GetAllSaccRadioBases()
+        {
+            var ls = new List<SaccRadioBase>();
+            foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                var objs = g.GetComponentsInChildren<SaccRadioBase>(true);
                 ls.AddRange(objs);
             }
             return ls;
