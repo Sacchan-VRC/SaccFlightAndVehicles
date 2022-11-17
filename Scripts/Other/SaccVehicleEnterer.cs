@@ -8,7 +8,7 @@ using TMPro;
 namespace SaccFlightAndVehicles
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
-    public class VehicleEnterer : UdonSharpBehaviour
+    public class SaccVehicleEnterer : UdonSharpBehaviour
     {
         public Transform[] AllPlanes;
         private VRCPlayerApi localPlayer;
