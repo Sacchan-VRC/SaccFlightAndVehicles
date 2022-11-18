@@ -5417,7 +5417,7 @@ WheelCollider:
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
   m_Mass: 0.1
-  m_WheelDampingRate: 1000
+  m_WheelDampingRate: 20
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1
@@ -47501,8 +47501,10 @@ MonoBehaviour:
   HudLimit: {fileID: 4371473019644549653}
   DefaultLimitsOn: 1
   Dial_Funcon: {fileID: 5918980766768351896}
-  GLimiter_Begin: 35
-  GLimiter: 40
+  GLimiter_Begin_Pos: 35
+  GLimiter_Pos: 40
+  GLimiter_Begin_Neg: -1
+  GLimiter_Neg: -1
   AoALimiter_Begin: 10
   AoALimiter: 14
   DisableGLimiter: 0
@@ -47688,6 +47690,7 @@ MonoBehaviour:
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 4371473018504201464}
   DoVoiceVolumeChange: 1
+  DoubleTapToExit: 0
   SwitchFunctionSound: {fileID: 4371473019709341094}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -54055,10 +54058,12 @@ MonoBehaviour:
   EntityControl: {fileID: -2692614534935363141}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2341975304134924734}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &4371473019235475175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81169,10 +81174,12 @@ MonoBehaviour:
   EntityControl: {fileID: -2692614534935363141}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 4371473018583758445}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 543805048618571905}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &4371473019733388728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86879,6 +86886,7 @@ MonoBehaviour:
   AnimBoolName: AAMSelected
   AnimFloatName: AAMs
   AnimFiredTriggerName: aamlaunched
+  AnimLockedOnBoolName: 
   AnimBoolStayTrueOnExit: 0
   HighAspectPreventLock: 0
   HighAspectAngle: 85
@@ -92559,7 +92567,7 @@ WheelCollider:
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
   m_Mass: 0.1
-  m_WheelDampingRate: 1000
+  m_WheelDampingRate: 20
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1
@@ -93880,7 +93888,7 @@ WheelCollider:
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
   m_Mass: 0.1
-  m_WheelDampingRate: 1000
+  m_WheelDampingRate: 20
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1
