@@ -418,10 +418,12 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_Explode()
         {
+            Debug.Log("SFEXT_G_Explode");
             ResetHook();
         }
         public void SFEXT_O_PilotExit()
         {
+            Debug.Log("SFEXT_O_PilotExit");
             Selected = false;
             if (!InVr && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); } }
         }
@@ -450,6 +452,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotExit()
         {
+            Debug.Log("SFEXT_G_PilotExit");
             Occupied = false;
             if (_HookLaunched)
             { HookLaunched = false; }

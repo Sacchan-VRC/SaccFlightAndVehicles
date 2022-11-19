@@ -149,14 +149,10 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     {
         if (Swapped)
         {
-            PilotSVSeat.ThisSeatOnly = PilotThisSeatOnly;
-            ThisSVSeat.ThisSeatOnly = ThisThisSeatOnly;
-            PilotSVSeat.IsPilotSeat = true;
-            ThisSVSeat.IsPilotSeat = false;
-            Swapped = false;
+            UnSwap_Event();
         }
     }
-    public void SFEXTP_G_Explode()
+    public void SFEXTP_G_ReAppear()
     {
         ResetSwap();
     }
