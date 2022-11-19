@@ -26,7 +26,6 @@ namespace SaccFlightAndVehicles
         public float MaxDepthForce = 25;
         [Tooltip("Set a lower max depth force value to make the vehicle sink when dead")]
         public float DeadMaxDepthForce = .4f;
-        private float _maxDepthForce;
         [Tooltip("Value that the floating forces are multiplied by while vehicle is moving down in water. Higher = more stable floating")]
         public float Compressing = 25;
         [Tooltip("Prevent extra force from compression becoming too high if the object is teleported deep underwater")]
@@ -84,7 +83,6 @@ namespace SaccFlightAndVehicles
         {
             FPLength = FloatPoints.Length;
             FloatDiameter = FloatRadius * 2;
-            _maxDepthForce = MaxDepthForce * 90;
             _floatForce = FloatForce;
 
             localPlayer = Networking.LocalPlayer;
@@ -128,12 +126,10 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_Explode()
         {
-            _maxDepthForce = DeadMaxDepthForce * 90;
             _floatForce = DeadFloatForce;
         }
         public void SFEXT_G_ReAppear()
         {
-            _maxDepthForce = MaxDepthForce * 90;
             _floatForce = FloatForce;
         }
         public void SFEXT_G_EngineOff()
@@ -211,7 +207,7 @@ namespace SaccFlightAndVehicles
                 FloatDepth[i] = FloatTouchWaterPoint[i] - TopOfFloat.y;
 
                 FloatDepthLastFrame[i] = FloatDepth[i];
-                FloatPointForce[currentfloatpoint] = Vector3.up * Time.deltaTime * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce * Time.deltaTime) * _floatForce)));
+                FloatPointForce[currentfloatpoint] = Vector3.up * Time.deltaTime * (((Mathf.Min(FloatDepth[currentfloatpoint], MaxDepthForce) * _floatForce)));
                 Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[i] + RayCastHeight, TopOfFloat.z);
                 if (Physics.Raycast(checksurface, -Vector3.up, out hit, 20, FloatLayers, QueryTriggerInteraction.Collide))
                 {
@@ -268,7 +264,7 @@ namespace SaccFlightAndVehicles
                     CompressionDifference = 0;
                 }
                 FloatDepthLastFrame[currentfloatpoint] = FloatDepth[currentfloatpoint];
-                FloatPointForce[currentfloatpoint] = Vector3.up * Time.deltaTime * (((Mathf.Min(FloatDepth[currentfloatpoint], _maxDepthForce * Time.deltaTime) * _floatForce) + (CompressionDifference / Time.deltaTime / 90)));
+                FloatPointForce[currentfloatpoint] = Vector3.up * Time.deltaTime * (((Mathf.Min(FloatDepth[currentfloatpoint], MaxDepthForce) * _floatForce) + (CompressionDifference / Time.deltaTime / 90)));
                 //float is potentially below the top of the trigger, so fire a raycast from above the last known trigger height to check if it's still there
                 //the '+RayCastHeight': larger number means less chance of error if moving faster on a sloped water trigger, but could cause issues with bridges etc
                 Vector3 checksurface = new Vector3(TopOfFloat.x, FloatLastRayHitHeight[currentfloatpoint] + RayCastHeight, TopOfFloat.z);
@@ -310,7 +306,7 @@ namespace SaccFlightAndVehicles
             {
                 depth += FloatDepth[i];
             }
-            float DepthMaxd = Mathf.Min(depth, _maxDepthForce * Time.deltaTime);
+            float DepthMaxd = Mathf.Min(depth, MaxDepthForce);
             if (depth > 0)
             {//apply last calculated floating force for each floatpoint to respective floatpoint
 
