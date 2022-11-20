@@ -56,6 +56,13 @@ namespace SaccFlightAndVehicles
 
                 Vector3 NewUpVec = ((Vector3.up * _thruststrength) * UpThrust * DeltaTime);
 
+#if UNITY_EDITOR
+                //SetVelocity overrides all other forces in clientsim so we need to add gravity ourselves
+                if (ForwardThrust + UpThrust == 0) { return; }
+                else
+                { NewForwardVec += -Vector3.up * 9.81f * Time.deltaTime; }
+#endif
+
                 localPlayer.SetVelocity(PlayerVel + NewForwardVec + NewUpVec);
             }
         }
