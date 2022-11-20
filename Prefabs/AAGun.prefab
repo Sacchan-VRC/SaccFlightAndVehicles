@@ -257,9 +257,12 @@ MonoBehaviour:
   EntityControl: {fileID: -6981790852263073105}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 784884802}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2041867257}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  ControlsRoot: {fileID: 6124371904254225453}
 --- !u!114 &204394095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -36009,6 +36012,7 @@ MonoBehaviour:
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 1947454891}
   DoVoiceVolumeChange: 1
+  DoubleTapToExit: 0
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
