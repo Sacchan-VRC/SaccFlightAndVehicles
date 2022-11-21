@@ -44,6 +44,8 @@ namespace SaccFlightAndVehicles
         public AudioSource SwitchFunctionSound;
         public bool PlaySelectSoundLeft = true;
         public bool PlaySelectSoundRight = true;
+        [Tooltip("You can add seats that are NOT a child of this object, if you want to control the vehicle from outside")]
+        public VRCStation[] ExternalSeats;
         [Header("For debugging, auto filled on build")]
         public GameObject[] AAMTargets;
         [System.NonSerializedAttribute] public bool InEditor = true;
@@ -163,15 +165,24 @@ namespace SaccFlightAndVehicles
                 Debug.Log(string.Concat(gameObject.name, ": ", "No Center Of Mass Set"));
             }
             VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation), true);
+            //add EXTRASEATS to VehicleStations list
+            if (ExternalSeats.Length > 0)
+            {
+                var temp = VehicleStations;
+                VehicleStations = new VRCStation[temp.Length + ExternalSeats.Length];
+                for (int i = 0; i < temp.Length; i++)
+                { VehicleStations[i] = temp[i]; }
+                for (int i = temp.Length; i < temp.Length + ExternalSeats.Length; i++)
+                { VehicleStations[i] = ExternalSeats[i - temp.Length]; }
+            }
+            VehicleSeats = new SaccVehicleSeat[VehicleStations.Length];
             SeatedPlayers = new int[VehicleStations.Length];
             for (int i = 0; i != SeatedPlayers.Length; i++)
-            {
-                SeatedPlayers[i] = -1;
-            }
-            VehicleSeats = (SaccVehicleSeat[])GetComponentsInChildren<SaccVehicleSeat>();
+            { SeatedPlayers[i] = -1; }
             for (int i = 0; i < VehicleSeats.Length; i++)
             {
-                VehicleSeats[i].InitializeSeat();
+                VehicleSeats[i] = (SaccVehicleSeat)VehicleStations[i].GetComponent<SaccVehicleSeat>();
+                if (VehicleSeats[i]) { VehicleSeats[i].InitializeSeat(); }
             }
 
             TellDFUNCsLR();
