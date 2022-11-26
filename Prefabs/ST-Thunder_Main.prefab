@@ -6348,7 +6348,7 @@ MonoBehaviour:
   Lfunc1key: 102
   Lfunc2: {fileID: 2894335725299023239}
   Lfunc2key: 116
-  Lfunc3: {fileID: 8200442387683442408}
+  Lfunc3: {fileID: 0}
   Lfunc3key: 50
   Lfunc4: {fileID: 0}
   Lfunc4key: 0
@@ -22947,9 +22947,12 @@ MonoBehaviour:
   EntityControl: {fileID: 2935594654239514266}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2393009876853872156}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &11707293986087042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22986,7 +22989,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2935594652858234754}
   m_Layer: 0
-  m_Name: Thunder_Main
+  m_Name: ST-Thunder_Main
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23103,9 +23106,12 @@ MonoBehaviour:
   EntityControl: {fileID: 2935594654239514266}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2374662920228413907}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &2935594653223068943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23469,9 +23475,12 @@ MonoBehaviour:
   EntityControl: {fileID: 2935594654239514266}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2374662921348105082}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &2935594653914077342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23556,13 +23565,19 @@ MonoBehaviour:
   updateInterval: 0.2
   IdleModeUpdateInterval: 3
   FreezePositionOnDeath: 1
-  RotationSyncAgressiveness: 10
-  IdleModeVelMultiplier: 0.4
   IdleMovementRange: 0.35
   IdleRotationRange: 5
   TeleportAngleDifference: 180
-  MaxPingExtrapolationInSeconds: 999
-  PassengerComfortMode: 0
+  CorrectionTime: 8
+  SpeedLerpTime: 4
+  CorrectionDStrength: 1.666666
+  CorrectionTime_Rotation: 1
+  RotationSpeedLerpTime: 10
+  AntiWarp: 1
+  TestTransform: {fileID: 0}
+  TestTransform_Raw: {fileID: 0}
+  LagSimDelay: 0
+  DBGPING: 0
 --- !u!114 &2935594654065772026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23684,9 +23699,12 @@ MonoBehaviour:
   EntityControl: {fileID: 2935594654239514266}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 2890147434895610351}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2935594654823327813}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &2935594654126660740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -23811,7 +23829,7 @@ MonoBehaviour:
   - {fileID: 2415333971997971365}
   - {fileID: 2760801949162191546}
   Dial_Functions_L:
-  - {fileID: 8200442387683442408}
+  - {fileID: 0}
   - {fileID: 1320961205973880017}
   - {fileID: 2894335725299023239}
   - {fileID: 4480993046480790776}
@@ -23830,9 +23848,11 @@ MonoBehaviour:
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 2935594653319740705}
   DoVoiceVolumeChange: 1
+  DoubleTapToExit: 0
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
+  ExternalSeats: []
   AAMTargets: []
 --- !u!95 &2935594654239514265
 Animator:
@@ -24382,7 +24402,10 @@ MonoBehaviour:
   AnimBoolName: 0
   Dial_Funcon: []
   OnDefault: 0
-  PilotExitTurnOff: 1
+  UserExitTurnOff: 1
+  UserExitTurnOn: 0
+  UserEnterTurnOff: 0
+  UserEnterTurnOn: 0
   ToggleMinDelay: 0
   ToggleObjects:
   - {fileID: 6717010318449346862}
@@ -24514,9 +24537,12 @@ MonoBehaviour:
   EntityControl: {fileID: 2935594654239514266}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 1821296935755917208}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 8898729298587184617}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &5870588325563423881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29432,6 +29458,7 @@ MonoBehaviour:
   EnterWater: {fileID: 1782727465671528934}
   EnterWaterOutside: {fileID: 4196158034111323874}
   UnderWater: {fileID: 6873246412272345364}
+  DamageFeedBack: {fileID: 0}
   Explosion:
   - {fileID: 3961007710323092619}
   BulletHit:
@@ -41451,6 +41478,9 @@ MonoBehaviour:
   AnimBoolName: AnimBool
   OnDefault: 0
   PilotExitTurnOff: 1
+  PilotExitTurnOn: 0
+  PilotEnterTurnOff: 0
+  PilotEnterTurnOn: 0
   ToggleMinDelay: 0
   ToggleObjects:
   - {fileID: 4619667313057504715}
@@ -51477,8 +51507,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2242555505940159751}
-  - component: {fileID: 8200442387683442408}
   - component: {fileID: 4095681417414994548}
+  - component: {fileID: 3627544486871626380}
+  - component: {fileID: 8031549474760517068}
   m_Layer: 17
   m_Name: DFUNC_Grapple
   m_TagString: Untagged
@@ -51500,7 +51531,7 @@ Transform:
   m_Father: {fileID: 2230855009767122548}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8200442387683442408
+--- !u!114 &4095681417414994548
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -51509,7 +51540,33 @@ MonoBehaviour:
   m_GameObject: {fileID: 6253520291535217931}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 47ab6777c5737c44ab03bcd1c9fe8031, type: 3}
+  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactTextPlacement: {fileID: 0}
+  interactText: Use
+  interactTextGO: {fileID: 0}
+  proximity: 2
+  SynchronizePosition: 0
+  AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
+  _syncMethod: 3
+  serializedProgramAsset: {fileID: 11400000, guid: dc57ceb52886f6f42a9575838d09c233,
+    type: 2}
+  programSource: {fileID: 11400000, guid: 9f86d61d303ed474b8e8a3da0058df86, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
+  publicVariablesUnityEngineObjects: []
+  publicVariablesSerializationDataFormat: 0
+--- !u!114 &3627544486871626380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6253520291535217931}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1bf677486d7a92498a8a9ab4a3aa482, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
@@ -51521,7 +51578,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 4095681417414994548}
+  _udonSharpBackingUdonBehaviour: {fileID: 8031549474760517068}
   Hook: {fileID: 4170263620629656132}
   HookRopePoint: {fileID: 2484288252066074707}
   Dial_Funcon: {fileID: 82623983597034053}
@@ -51531,13 +51588,18 @@ MonoBehaviour:
   HookLaunchPoint: {fileID: 2100788738970344315}
   TwoWayForces: 1
   TwoWayForces_LocalForceMode: 1
+  UseForceApplyPoint: 1
   ForceApplyPoint: {fileID: 0}
+  PullReductionStrength: 5
+  HoldTargetUpright: 0
+  KeyboardSelectMode: 0
   Rope_Line: {fileID: 6828200848145843683}
   RopeBasePoint: {fileID: 5212570712295060674}
   HookLayers:
     serializedVersion: 2
     m_Bits: 2147624961
   HookStrength: 15
+  MaxExtraStrByDist: 10
   HookRange: 250
   SphereCastAccuracy: 0.5
   PullStrOverDist:
@@ -51577,7 +51639,7 @@ MonoBehaviour:
   HookAttach: {fileID: 4832687111187147371}
   HookReelIn: {fileID: 7921035728162589474}
   EnableOnSelect: []
---- !u!114 &4095681417414994548
+--- !u!114 &8031549474760517068
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -57476,6 +57538,7 @@ MonoBehaviour:
   AngleLimitRight: 0
   AngleLimitUp: 0
   AngleLimitDown: 0
+  AllowGroundedFiring: 1
   UseProjectileMode: 0
   Projectile: {fileID: 0}
   ProjectileAmmo: 30
@@ -57607,9 +57670,12 @@ MonoBehaviour:
   EntityControl: {fileID: 2935594654239514266}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 8179344056730957155}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &253449787524344531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -72406,7 +72472,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  WheelSlowDown: 0
   WheelWeight: 0.1
   BrakeStrength: 250
   HandBrakeStrength: 7
@@ -72424,6 +72489,17 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 1
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
   SurfaceType_SkidSounds:
   - {fileID: 4519999195988262253}
   - {fileID: 1414854987153400782}
@@ -72448,9 +72524,9 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
   EngineInfluence: 225
+  DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: 0
-  SurfaceTypeLast: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
@@ -77799,7 +77875,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  WheelSlowDown: 0
   WheelWeight: 0.1
   BrakeStrength: 250
   HandBrakeStrength: 7
@@ -77817,6 +77892,17 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 1
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
   SurfaceType_SkidSounds:
   - {fileID: 8577310328074816929}
   - {fileID: 7576634545262651334}
@@ -77841,9 +77927,9 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
   EngineInfluence: 225
+  DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: 0
-  SurfaceTypeLast: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
@@ -82858,7 +82944,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  WheelSlowDown: 0
   WheelWeight: 0.1
   BrakeStrength: 250
   HandBrakeStrength: 7
@@ -82876,6 +82961,17 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 1
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
   SurfaceType_SkidSounds:
   - {fileID: 3211433585993977806}
   - {fileID: 4500850556240078875}
@@ -82900,9 +82996,9 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
   EngineInfluence: 225
+  DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: 0
-  SurfaceTypeLast: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
@@ -97541,9 +97637,12 @@ MonoBehaviour:
   EntityControl: {fileID: 2935594654239514266}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2676985898177457631}
+  SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &9026632105835266004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97672,7 +97771,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  WheelSlowDown: 0
   WheelWeight: 0.1
   BrakeStrength: 250
   HandBrakeStrength: 7
@@ -97690,6 +97788,17 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 1
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
   SurfaceType_SkidSounds:
   - {fileID: 8111761856487673613}
   - {fileID: 552847989740754701}
@@ -97714,9 +97823,9 @@ MonoBehaviour:
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
   EngineInfluence: 225
+  DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: 0
-  SurfaceTypeLast: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
@@ -98194,15 +98303,9 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &6742347727811927341 stripped
+--- !u!4 &6244952549718896985 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -6911025712357619089, guid: d45fbcae04af9f946924d27e17896c83,
-    type: 3}
-  m_PrefabInstance: {fileID: 9045122725599844162}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &8242581651128111581 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1145378189432178335, guid: d45fbcae04af9f946924d27e17896c83,
+  m_CorrespondingSourceObject: {fileID: -6112444127010675173, guid: d45fbcae04af9f946924d27e17896c83,
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}
@@ -98212,33 +98315,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &6804424785436110686 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -6635887507701925860, guid: d45fbcae04af9f946924d27e17896c83,
-    type: 3}
-  m_PrefabInstance: {fileID: 9045122725599844162}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &1360454494236487788 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -1195717702560405714, guid: d45fbcae04af9f946924d27e17896c83,
+--- !u!1 &8491834310977504363 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8619971727969430743, guid: d45fbcae04af9f946924d27e17896c83,
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &8925908164272044935 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8765824441180443451, guid: d45fbcae04af9f946924d27e17896c83,
-    type: 3}
-  m_PrefabInstance: {fileID: 9045122725599844162}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &6244952549718896985 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -6112444127010675173, guid: d45fbcae04af9f946924d27e17896c83,
-    type: 3}
-  m_PrefabInstance: {fileID: 9045122725599844162}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &8491834310977504363 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -8619971727969430743, guid: d45fbcae04af9f946924d27e17896c83,
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}
@@ -98260,21 +98345,9 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &8794406712276447401 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d45fbcae04af9f946924d27e17896c83,
-    type: 3}
-  m_PrefabInstance: {fileID: 9045122725599844162}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &327754009790401809 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -501357806629856685, guid: d45fbcae04af9f946924d27e17896c83,
-    type: 3}
-  m_PrefabInstance: {fileID: 9045122725599844162}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &8526519379945658905 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 852010467245428059, guid: d45fbcae04af9f946924d27e17896c83,
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}
@@ -98284,9 +98357,45 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &8794406712276447401 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: d45fbcae04af9f946924d27e17896c83,
+    type: 3}
+  m_PrefabInstance: {fileID: 9045122725599844162}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6804424785436110686 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6635887507701925860, guid: d45fbcae04af9f946924d27e17896c83,
+    type: 3}
+  m_PrefabInstance: {fileID: 9045122725599844162}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &8971839939380473895 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -9149946848031643803, guid: d45fbcae04af9f946924d27e17896c83,
+    type: 3}
+  m_PrefabInstance: {fileID: 9045122725599844162}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8242581651128111581 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1145378189432178335, guid: d45fbcae04af9f946924d27e17896c83,
+    type: 3}
+  m_PrefabInstance: {fileID: 9045122725599844162}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8526519379945658905 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 852010467245428059, guid: d45fbcae04af9f946924d27e17896c83,
+    type: 3}
+  m_PrefabInstance: {fileID: 9045122725599844162}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1360454494236487788 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -1195717702560405714, guid: d45fbcae04af9f946924d27e17896c83,
+    type: 3}
+  m_PrefabInstance: {fileID: 9045122725599844162}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6742347727811927341 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6911025712357619089, guid: d45fbcae04af9f946924d27e17896c83,
     type: 3}
   m_PrefabInstance: {fileID: 9045122725599844162}
   m_PrefabAsset: {fileID: 0}

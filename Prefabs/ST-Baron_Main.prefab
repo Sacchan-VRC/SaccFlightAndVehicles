@@ -5563,7 +5563,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  WheelSlowDown: 0
   WheelWeight: 0.1
   BrakeStrength: 500
   HandBrakeStrength: 7
@@ -5581,6 +5580,17 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 0.6
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
   SurfaceType_SkidSounds:
   - {fileID: 8894572861119677086}
   - {fileID: 557774370111641267}
@@ -5608,7 +5618,6 @@ MonoBehaviour:
   DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: 0
-  SurfaceTypeLast: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
@@ -35452,7 +35461,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  WheelSlowDown: 0
   WheelWeight: 0.1
   BrakeStrength: 500
   HandBrakeStrength: 7
@@ -35470,6 +35478,17 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 0.6
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
   SurfaceType_SkidSounds:
   - {fileID: 1262685652512150063}
   - {fileID: 5233924591700483975}
@@ -35497,7 +35516,6 @@ MonoBehaviour:
   DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: 0
-  SurfaceTypeLast: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
@@ -35696,7 +35714,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  WheelSlowDown: 0
   WheelWeight: 0.1
   BrakeStrength: 500
   HandBrakeStrength: 7
@@ -35714,6 +35731,17 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 0.6
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
   SurfaceType_SkidSounds:
   - {fileID: 4031639203262013529}
   - {fileID: 7652792915499050624}
@@ -35741,7 +35769,6 @@ MonoBehaviour:
   DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: 0
-  SurfaceTypeLast: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
@@ -52112,7 +52139,6 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  WheelSlowDown: 0
   WheelWeight: 0.1
   BrakeStrength: 500
   HandBrakeStrength: 7
@@ -52130,6 +52156,17 @@ MonoBehaviour:
   - 1
   - 1
   - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 0.6
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
   SurfaceType_SkidSounds:
   - {fileID: 8202946498933891094}
   - {fileID: 6987903778535580342}
@@ -52157,7 +52194,6 @@ MonoBehaviour:
   DisableEffects: 0
   IsDriveWheel: 0
   SurfaceType: 0
-  SurfaceTypeLast: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
@@ -57831,10 +57867,12 @@ MonoBehaviour:
   EntityControl: {fileID: 6141758680382097273}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 6733660352721803929}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &6141758680061051261
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57986,10 +58024,12 @@ MonoBehaviour:
   EntityControl: {fileID: 6141758680382097273}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 6169200270901643276}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 6141758679963414950}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &6141758680273700199
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58225,9 +58265,11 @@ MonoBehaviour:
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 6141758680536392898}
   DoVoiceVolumeChange: 1
+  DoubleTapToExit: 0
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
+  ExternalSeats: []
   AAMTargets: []
 --- !u!95 &6141758680382097274
 Animator:
@@ -58535,10 +58577,12 @@ MonoBehaviour:
   EntityControl: {fileID: 6141758680382097273}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 6733660353092015039}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &6141758680559467796
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58692,10 +58736,12 @@ MonoBehaviour:
   EntityControl: {fileID: 6141758680382097273}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 6733660353753921584}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &6141758681580453100
 MonoBehaviour:
   m_ObjectHideFlags: 0

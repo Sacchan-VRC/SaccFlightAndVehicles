@@ -27,13 +27,14 @@ namespace SaccFlightAndVehicles
         public float ExtraRayCastDistance = .5f;
         public float Grip = 7f;
         public AnimationCurve GripCurve = AnimationCurve.Linear(0, 1, 1, 1);
-        public float WheelSlowDown = 0.1f;
+        private float WheelSlowDown = 0f;
         [Tooltip("Torque, kindof. How quickly the wheel matches the speed of the ground when in contact with it")]
         public float WheelWeight = 0.1f;
         public float BrakeStrength = 500f;
         public float HandBrakeStrength = 7f;
         public LayerMask WheelLayers;
-        public float[] SurfaceType_Grips = { 1, 0.7f, 0.2f, 1, 1, 1, 1, 1, 1, 1 };
+        public float[] SurfaceType_Grips = { 1f, 0.7f, 0.2f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
+        public float[] SurfaceType_Slowdown = { 0.1f, 4f, 0.05f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f };
         public AudioSource[] SurfaceType_SkidSounds;
         public ParticleSystem[] SurfaceType_SkidParticles;
         public ParticleSystem.EmissionModule[] SurfaceType_SkidParticlesEM;
@@ -61,7 +62,6 @@ namespace SaccFlightAndVehicles
         private Vector3 SkidVectorFX;
         [UdonSynced(UdonSyncMode.Linear)] private float SkidLength;
         public int SurfaceType = -1;
-        public int SurfaceTypeLast = 0;
         public float Clutch = 1f;
         public float WheelRotation;
         public float WheelRotationSpeedRPS;
@@ -220,6 +220,7 @@ namespace SaccFlightAndVehicles
         }
         private void ChangeSurface()
         {
+            WheelSlowDown = SurfaceType_Slowdown[SurfaceType];
             StopSkidSound();
             if (SurfaceType < SurfaceType_SkidSounds.Length)
             {
@@ -312,7 +313,6 @@ namespace SaccFlightAndVehicles
                 {
                     if (SurfaceType != SurfLastChar - '0')
                     {
-                        SurfaceTypeLast = SurfaceType;
                         SurfaceType = SurfLastChar - '0';
                         ChangeSurface();
                     }
@@ -321,7 +321,6 @@ namespace SaccFlightAndVehicles
                 {
                     if (SurfaceType != 0)
                     {
-                        SurfaceTypeLast = SurfaceType;
                         SurfaceType = 0;
                         ChangeSurface();
                     }
@@ -633,7 +632,6 @@ namespace SaccFlightAndVehicles
                     {
                         if (SurfaceType != SurfLastChar - '0')
                         {
-                            SurfaceTypeLast = SurfaceType;
                             SurfaceType = SurfLastChar - '0';
                             ChangeSurface();
                         }
@@ -642,7 +640,6 @@ namespace SaccFlightAndVehicles
                     {
                         if (SurfaceType != 0)
                         {
-                            SurfaceTypeLast = SurfaceType;
                             SurfaceType = 0;
                             ChangeSurface();
                         }
