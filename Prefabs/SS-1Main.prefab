@@ -571,10 +571,12 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 1209846102}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 515467600}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &706443860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -696,10 +698,12 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 865498790}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2246501683413073306}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &747948962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21803,10 +21807,12 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 3411756929047500885}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &3818207961936412323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27414,7 +27420,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 7760071150265229394}
-  m_RootOrder: 3
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2820685825233589617
 GameObject:
@@ -62327,9 +62333,8 @@ MonoBehaviour:
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
   _syncMethod: 1
-  serializedProgramAsset: {fileID: 11400000, guid: faa246373e453f54389ebac302a25bcd,
-    type: 2}
-  programSource: {fileID: 11400000, guid: 84779ee523a77e241bccacb809c53da6, type: 2}
+  serializedProgramAsset: {fileID: 0}
+  programSource: {fileID: 0}
   serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgIAAAAAAAAAAi8CAAAAAUsAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgACAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAErAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIASABhAHMARABvAG4AZQBTAGMAZQBuAGUAVQBwAGcAcgBhAGQAZQBfAF8AXwAnAQQAAAB0AHkAcABlAAEYAAAAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAKwEFAAAAVgBhAGwAdQBlAAEHBQIvAwAAAAFJAAAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQBgADEAWwBbAFMAeQBzAHQAZQBtAC4ASQBuAHQAMwAyACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgADAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAEfAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIAVgBlAHIAcwBpAG8AbgBfAF8AXwAnAQQAAAB0AHkAcABlAAEWAAAAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgAXAQUAAABWAGEAbAB1AGUAAgAAAAcFBwUHBQ==
   publicVariablesUnityEngineObjects: []
   publicVariablesSerializationDataFormat: 0
@@ -67929,10 +67934,12 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 627682400261023669}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &7105509204448147700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82917,50 +82924,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!1 &7105509204727997883
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7105509204727997884}
-  - component: {fileID: 7105509204727997885}
-  m_Layer: 25
-  m_Name: AAMTarget
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7105509204727997884
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7105509204727997883}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.08, z: -0.19}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 7760071150265229394}
-  m_RootOrder: 2
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &7105509204727997885
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7105509204727997883}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &7105509204753699421
 GameObject:
   m_ObjectHideFlags: 0
@@ -83192,10 +83155,12 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 7105509205904838782}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 1554130111}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &7105509204755205035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85560,9 +85525,11 @@ MonoBehaviour:
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 7105509205716476651}
   DoVoiceVolumeChange: 1
+  DoubleTapToExit: 0
   SwitchFunctionSound: {fileID: 7105509204779129781}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
+  ExternalSeats: []
   AAMTargets: []
 --- !u!114 &7105509205546161465
 MonoBehaviour:
@@ -85967,7 +85934,6 @@ Transform:
   m_Children:
   - {fileID: 7105509205716476651}
   - {fileID: 7105509205677052389}
-  - {fileID: 7105509204727997884}
   - {fileID: 2622471709928165166}
   m_Father: {fileID: 7105509206185251113}
   m_RootOrder: 2
@@ -86036,7 +86002,6 @@ MonoBehaviour:
   TaxiRotationResponse: 2.5
   DisallowTaxiRotationWhileStill: 0
   TaxiFullTurningSpeed: 20
-  VelLift: 1
   VelLiftMax: 10
   MaxGs: 10
   GDamage: 10
@@ -86246,10 +86211,12 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2415259330074371874}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &793195262885574237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86371,10 +86338,12 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
-  AdjustSeat: 1
+  AdjustSeatPosition: 1
+  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 4057865969602712601}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &6685914054707775335
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86650,15 +86619,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1c1e77e98c2e280468c70fe283fca73c, type: 3}
---- !u!4 &6461440781556724414 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 6461440783219916575, guid: 1c1e77e98c2e280468c70fe283fca73c,
-    type: 3}
-  m_PrefabInstance: {fileID: 1692552609}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &6461440781556724388 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6461440783219916549, guid: 1c1e77e98c2e280468c70fe283fca73c,
+    type: 3}
+  m_PrefabInstance: {fileID: 1692552609}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6461440781556724414 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6461440783219916575, guid: 1c1e77e98c2e280468c70fe283fca73c,
     type: 3}
   m_PrefabInstance: {fileID: 1692552609}
   m_PrefabAsset: {fileID: 0}
@@ -87319,6 +87288,18 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: cc77351680710ce4ba42688a4f7fee5e, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 341178132686ee84386bf7dc115459cb, type: 3}
+--- !u!4 &5368211242935392779 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1722550530112369231, guid: 341178132686ee84386bf7dc115459cb,
+    type: 3}
+  m_PrefabInstance: {fileID: 6744154986112755780}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7455050868411296326 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -4977141150030675454, guid: 341178132686ee84386bf7dc115459cb,
+    type: 3}
+  m_PrefabInstance: {fileID: 6744154986112755780}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7293944282278909810 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4080620340283703094, guid: 341178132686ee84386bf7dc115459cb,
@@ -87334,18 +87315,6 @@ Transform:
 --- !u!1 &5861827353522672917 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 341178132686ee84386bf7dc115459cb,
-    type: 3}
-  m_PrefabInstance: {fileID: 6744154986112755780}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &7455050868411296326 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -4977141150030675454, guid: 341178132686ee84386bf7dc115459cb,
-    type: 3}
-  m_PrefabInstance: {fileID: 6744154986112755780}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &5368211242935392779 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1722550530112369231, guid: 341178132686ee84386bf7dc115459cb,
     type: 3}
   m_PrefabInstance: {fileID: 6744154986112755780}
   m_PrefabAsset: {fileID: 0}
