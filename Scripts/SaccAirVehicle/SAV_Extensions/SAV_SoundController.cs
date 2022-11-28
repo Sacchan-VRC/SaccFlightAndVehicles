@@ -39,6 +39,8 @@ namespace SaccFlightAndVehicles
         public AudioSource[] SonicBoom;
         [Tooltip("Sounds that can be played when vehicle explodes")]
         public AudioSource[] Explosion;
+        [Tooltip("Sounds that can be played when vehicle explodes while underwater")]
+        public AudioSource[] Explosion_Water;
         [Tooltip("Sounds that can be played when vehicle gets hit by something")]
         public AudioSource[] BulletHit;
         [Tooltip("Sound that plays when vehicle is hit by a missile")]
@@ -158,6 +160,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool TouchDownWaterNull = true;
         [System.NonSerializedAttribute] public bool SonicBoomNull = true;
         [System.NonSerializedAttribute] public bool ExplosionNull = true;
+        [System.NonSerializedAttribute] public bool Explosion_WaterNull = true;
         [System.NonSerializedAttribute] public bool BulletHitNull = true;
         [System.NonSerializedAttribute] public bool MissileHitNULL = true;
         [System.NonSerializedAttribute] public bool SmallCrashNULL = true;
@@ -231,20 +234,21 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             IsOwner = EntityControl.IsOwner;
-            MissileHitNULL = MissileHit.Length < 1;
-            PlaneIdleNull = PlaneIdle.Length < 1;
-            ThrustNull = Thrust.Length < 1;
-            TouchDownNull = TouchDown.Length < 1;
-            TouchDownWaterNull = TouchDownWater.Length < 1;
-            SonicBoomNull = SonicBoom.Length < 1;
-            ExplosionNull = Explosion.Length < 1;
-            BulletHitNull = BulletHit.Length < 1;
-            SmallCrashNULL = SmallCrash.Length < 1;
-            MediumCrashNULL = MediumCrash.Length < 1;
-            BigCrashNULL = BigCrash.Length < 1;
-            SmallCrashInsideNULL = SmallCrashInside.Length < 1;
-            MediumCrashInsideNULL = MediumCrashInside.Length < 1;
-            BigCrashInsideNULL = BigCrashInside.Length < 1;
+            MissileHitNULL = MissileHit.Length == 0;
+            PlaneIdleNull = PlaneIdle.Length == 0;
+            ThrustNull = Thrust.Length == 0;
+            TouchDownNull = TouchDown.Length == 0;
+            TouchDownWaterNull = TouchDownWater.Length == 0;
+            SonicBoomNull = SonicBoom.Length == 0;
+            ExplosionNull = Explosion.Length == 0;
+            Explosion_WaterNull = Explosion_Water.Length == 0;
+            BulletHitNull = BulletHit.Length == 0;
+            SmallCrashNULL = SmallCrash.Length == 0;
+            MediumCrashNULL = MediumCrash.Length == 0;
+            BigCrashNULL = BigCrash.Length == 0;
+            SmallCrashInsideNULL = SmallCrashInside.Length == 0;
+            MediumCrashInsideNULL = MediumCrashInside.Length == 0;
+            BigCrashInsideNULL = BigCrashInside.Length == 0;
 
             //save original positions of all the crash sounds because non-owners can't set them to the collision contact point
             SmallCrashPos = new Vector3[SmallCrash.Length];
@@ -647,7 +651,6 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_Explode()
         {
-            ResetSounds();
             //play the sonic boom that is coming towards you, after the vehicle explodes with the correct delay
             if (playsonicboom && silent)
             {
@@ -665,7 +668,15 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
-            if (!ExplosionNull)
+            if (InWater && !Explosion_WaterNull)
+            {
+                int rand = Random.Range(0, Explosion_Water.Length);
+                if (Explosion_Water[rand])
+                {
+                    Explosion_Water[rand].Play();
+                }
+            }
+            else if (!ExplosionNull)
             {
                 int rand = Random.Range(0, Explosion.Length);
                 if (Explosion[rand])
@@ -673,6 +684,7 @@ namespace SaccFlightAndVehicles
                     Explosion[rand].Play();
                 }
             }
+            ResetSounds();
         }
         public void SFEXT_G_PilotEnter()
         { Occupied = true; }

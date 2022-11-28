@@ -28,6 +28,8 @@ namespace SaccFlightAndVehicles
         public AudioSource DamageFeedBack;
         [Tooltip("Sounds that can be played when vehicle explodes")]
         public AudioSource[] Explosion;
+        [Tooltip("Sounds that can be played when vehicle explodes underwater")]
+        public AudioSource[] Explosion_Water;
         [Tooltip("Sounds that can be played when vehicle gets hit by something")]
         public AudioSource[] BulletHit;
         [Tooltip("Sounds that can play when vehicle has a small crash")]
@@ -91,6 +93,7 @@ namespace SaccFlightAndVehicles
         private float FullFuelDivider;
         private float FullHealthDivider;
         [System.NonSerializedAttribute] public bool ExplosionNull = true;
+        [System.NonSerializedAttribute] public bool Explosion_WaterNull = true;
         [System.NonSerializedAttribute] public bool BulletHitNull = true;
         VRCPlayerApi localPlayer;
         public void SFEXT_L_EntityStart()
@@ -114,14 +117,15 @@ namespace SaccFlightAndVehicles
             FullFuelDivider = 1f / (float)SGVControl.GetProgramVariable("Fuel");
             RevLimiter = (float)SGVControl.GetProgramVariable("RevLimiter");
             EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
-            ExplosionNull = Explosion.Length < 1;
-            BulletHitNull = BulletHit.Length < 1;
-            SmallCrashNULL = SmallCrash.Length < 1;
-            MediumCrashNULL = MediumCrash.Length < 1;
-            BigCrashNULL = BigCrash.Length < 1;
-            SmallCrashInsideNULL = SmallCrashInside.Length < 1;
-            MediumCrashInsideNULL = MediumCrashInside.Length < 1;
-            BigCrashInsideNULL = BigCrashInside.Length < 1;
+            ExplosionNull = Explosion.Length == 0;
+            Explosion_WaterNull = Explosion_Water.Length == 0;
+            BulletHitNull = BulletHit.Length == 0;
+            SmallCrashNULL = SmallCrash.Length == 0;
+            MediumCrashNULL = MediumCrash.Length == 0;
+            BigCrashNULL = BigCrash.Length == 0;
+            SmallCrashInsideNULL = SmallCrashInside.Length == 0;
+            MediumCrashInsideNULL = MediumCrashInside.Length == 0;
+            BigCrashInsideNULL = BigCrashInside.Length == 0;
 
             //save original positions of all the crash sounds because non-owners can't set them to the collision contact point
             SmallCrashPos = new Vector3[SmallCrash.Length];
@@ -477,7 +481,15 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetBool("dead", true);
             VehicleAnimator.SetInteger("missilesincoming", 0);
             if (!InEditor) { VehicleAnimator.SetBool("occupied", false); }
-            if (!ExplosionNull)
+            if (InWater && !Explosion_WaterNull)
+            {
+                int rand = Random.Range(0, Explosion_Water.Length);
+                if (Explosion_Water[rand])
+                {
+                    Explosion_Water[rand].Play();
+                }
+            }
+            else if (!ExplosionNull)
             {
                 int rand = Random.Range(0, Explosion.Length);
                 if (Explosion[rand])
