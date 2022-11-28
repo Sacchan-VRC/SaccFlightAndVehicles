@@ -456,6 +456,9 @@ namespace SaccFlightAndVehicles
                     WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
                     WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
                 }
+                WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, ForwardSpeed, (ForceUsed / WheelWeight));
+                WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
+                WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
                 // if (PrintDebugValues)
                 // {
                 //     Debug.Log(string.Concat("(Mathf.Abs(ForwardSlip)): ", ((Mathf.Abs(ForwardSlip))).ToString()));
