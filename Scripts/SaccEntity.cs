@@ -279,6 +279,7 @@ namespace SaccFlightAndVehicles
                 index = pname.LastIndexOf(':');
             }
             int dmg = 1;
+            bool More = true;
             if (index > -1)
             {
                 pname = pname.Substring(index);
@@ -291,16 +292,18 @@ namespace SaccFlightAndVehicles
                             //damage reduction using case:
                             dmg = pname[2] - 48;
                             LastHitBulletDamageMulti = 1 / (float)(dmg);
+                            More = false;
                         }
                     }
                     else if (pname[1] >= '0' && pname[1] <= '9')
                     {
                         if (pname[2] >= '0' && pname[2] <= '9')
                         {
-                            //damage reduction using case:
+                            //damage increase using case:
                             dmg = 10 * (pname[1] - 48);
                             dmg += pname[2] - 48;
                             LastHitBulletDamageMulti = dmg == 1 ? 1 : Mathf.Pow(2, dmg);
+                            More = true;
                         }
                     }
                 }
@@ -329,7 +332,7 @@ namespace SaccFlightAndVehicles
                 { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
             }
             SendEventToExtensions("SFEXT_L_BulletHit");
-            SendDamageEvent(dmg, true);
+            SendDamageEvent(dmg, More);
             if (LastAttacker) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
         private void SendDefaultDamage()

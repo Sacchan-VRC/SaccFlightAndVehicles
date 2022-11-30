@@ -464,7 +464,8 @@ namespace SaccFlightAndVehicles
             {
                 if (Time.time - LastHitTime > 2)
                 {
-                    PredictedHealth = Health - BulletDamageTaken;
+                    PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
+                    LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
                     if (PredictedHealth <= 0)
                     {
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
@@ -472,45 +473,40 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    PredictedHealth -= BulletDamageTaken;
+                    PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
+                    LastHitTime = Time.time;
                     if (PredictedHealth <= 0)
                     {
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
-                LastHitTime = Time.time;
             }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBulletHit));
         }
         public void SFEXT_G_BulletHit()
         {
-            HPRepairTimer = HPRepairDelay - HPRepairHitTimer;
             if (!EntityControl._dead)
             {
                 if (IsOwner)
                 {
-                    Health -= BulletDamageTaken;
-                    if (Health <= 0)
+                    Health -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
+                    if (PredictDamage && Health <= 0)//the attacker calls the explode function in this case
                     {
-                        if (PredictDamage)//the attacker calls the explode function in this case
-                        {
-                            Health = 0.1f;
-                            //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
-                            SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself}
-                        }
-                        else
-                        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode)); }
+                        Health = 0.0911f;
+                        //if two people attacked us, and neither predicted they killed us but we took enough damage to die, we must still die.
+                        SendCustomEventDelayedSeconds(nameof(CheckLaggyKilled), .25f);//give enough time for the explode event to happen if they did predict we died, otherwise do it ourself
                     }
                 }
-                AAGunAnimator.SetFloat("health", Health * FullHealthDivider);
             }
         }
         public void CheckLaggyKilled()
         {
-            //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
-            if (Health == 0.1f)
+            if (!EntityControl._dead)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
+                if (Health == 0.0911f)
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                }
             }
         }
         private void AAMTargeting(float Lock_Angle)
