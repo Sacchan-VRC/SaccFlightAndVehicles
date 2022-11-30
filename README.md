@@ -1,13 +1,20 @@
 # SaccFlightAndVehicles
-
-This is a prefab for VRChat containing the vehicles I've made. It is made in such a way that people can use it to create their own vehicles by altering the prefabs.
-
-As of version 1.5 it has become quite modular, allowing for much greater customization, and easy addition of custom code.
+This is a package for VRChat containing my avatar flight script and the vehicles I've made.
+Making your own vehicles requires good knowledge of Unity. Check Instructions.txt and the wiki for more info.
 
 # License
-
 This project is licensed under the MIT License - see the LICENSE.md file for details.
 
-# Support
-
+# Support me
 If you like my work, please consider buying me a coffee at https://ko-fi.com/sacchanvrc !
+
+## Related Projects / addons
+
+### Open World Movement Logic by ZhakamiZhako
+https://github.com/zhakamizhako/VRCOpenWorldMovementLogic
+
+### KitKat's SaccFlight addons
+https://github.com/KitKat4191/SaccFlightAddons
+
+### Esnya's SF Addons
+https://github.com/esnya/EsnyaSFAddons

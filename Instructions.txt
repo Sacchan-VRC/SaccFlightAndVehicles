@@ -1,12 +1,267 @@
 ﻿Sacchan's Flight and Vehicles Prefab
 FOR VRChat SDK3 WITH UDONSHARP: USE VRC'S CREATOR COMPANION APP TO CREATE YOUR PROJECT
-Usage instructions are below changelog.
+Changelog is at the bottom
 
 Contact:
 https://discord.gg/Z7bUDc8
 https://twitter.com/Sacchan_VRC
 Please support me if you like this project:
 https://ko-fi.com/sacchanvrc
+
+Migrating a 1.6 project to 1.61 info:
+Floatscript: Divide existing vehicle's Water Sideways Drag and Water Forward Drag by 4
+Delete SaccFlightAndVehicles.Runtime.asmdef AND SaccFlightAndVehicles.Runtime.asset
+The SF-1 mesh has been updated, so if you are using it's afterburner mesh, you need to fix the mesh reference on your mesh filters.
+
+Known Issues:
+The SaccWheel is not completely framerate dependant. Playing with a higher FixedUpdate rate will cause your vehicle to accelerate a bit faster. FixedUpdate rate in VRC is matched to headset's refresh rate.
+Racing with 90hz against someone with 144hz is not a fair race.
+I don't think I can fix this.
+
+The SaccFlightMenu.cs editor script now sets up some things automatically when entering play mode, or building the scene. Things like the WindController no longer need you to manually assign all vehicles to them, it's done automatically.
+I have done this with everything that requires simple lists to be filled out, or if there's only one of something in a scene that should be always be used. Things should be a little less fiddly to set up now. I plan to add more editor script stuff in future.
+If you wish to run the code that does that stuff while in the editor, the option SaccFlight->Debug_OnBuild_SetReferences runs the function.
+If you haven't set up a reference camera in your VRCWorld when you try to build the scene, It will be done automatically, matching how it's set up in Test Pilots.
+
+Explanation of some scripts:
+SaccEntity:
+Main object script, sends events, has rigidbody on it.
+SaccAirVehicle/SaccSeaVehicle/SaccGroundVehicle:
+Main vehicle control scripts
+SAV_EffectsController/SAV_SoundController:
+Visual effects and audio effects for SaccAirVehicle
+SGV_EffectsController:
+Both visual effects and audio effects for SaccGroundVehicle
+SaccWheel:
+Wheel physics AND effects+sounds for the wheel
+WaterTrigger:
+Tells the vehicle when it enters and leaves water
+SyncScript:
+The custom position sync script
+KillTracker:
+Not required, used to make the KillsBoard work. Can be used without the killboard if you want to use the events that it sends for something else.
+
+Function dials:
+SaccEntity has 2 arrays, one for left dial functions, and right dial functions.
+Any number of functions can be placed in each array. The code divides the dial up automatically for selection. (Not visually, just for control input, you must make the visuals yourself)
+The order they are input into that array is the order they'll work on the dial, clockwise. (First function is in straight up, unless the 'Left/RightDialDivideStraightUp' is ticked, in which case it's to the right of straight up. The ST-Baron's function dial uses this, if you need an example, the StickDisplay mesh is rotated negatively by half of a function)
+The visuals of the function dial must be set up manually. Look at the dials in the vehicle prefabs in order to understand how.
+The MFD.fbx file containts 12 divider meshes for function dials for dials with those number of functions. Named StickDisplay2-12 (the old default, 8, is just named 'StickDisplay')
+Function dial scripts contain a 'funcon' (function on) reference if they are toggles. It's the mesh that appears to highlight the function on the dial when it's enabled.
+To set the 'funcon' rotations, you can type '360/7' for example, into its Z rotation(if you have 7 functions). Then multiply the result by the dial position -1, then multiply by -1.
+More info here: https://github.com/Sacchan-VRC/SaccFlightAndVehicles/wiki/Adding-and-Moving-Function-Dials-Functions
+
+================================================================================================================
+
+Inside the /Prefabs folder are individual prefabs for each vehicle, you can place them and they should work right away.
+Open the example scene 'SaccFlightExample.unity' to see an example of vehicles set up to work with the Killsboard and racing scripts.
+
+Race set up:
+There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object, It should be disabled by default, it's enabled when a race is selected with the racebutton.
+The RaceToggleButton has a list of SaccRaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tells all racingtriggers to switch to the selected race.
+You must place a reference to every Race, inside the RaceToggleButton.
+Each race has its own script called SaccRaceCourseAndScoreBoard. This contains references for its race's checkpoints, and has text objects for displaying the times.
+The RacingTrigger detects checkpoints, tracks your time, and sends your time to the SaccRaceCourseAndScoreBoard script for the selected race when you finish.
+Race checkpoints have an animation that enables guidance objects when the checkpoint is next or after next.
+
+Killsboard set up:
+Place the killboard anywhere in the world, each vehicle that uses it must have its own SAV_KillTracker, referenced in it's SaccEntity's Extension Udon Behaviours list.
+
+Some of the animations use the 'Motion Time' feature (formerly 'Normalized Time'), which makes the animation be controlled by a float parameter (which is controlled by effectscontroller).
+float value 0(or less) = play the first frame of the animation
+float value 1(or more) = play the last frame of the animation
+and everything in between accordingly.
+
+The MachVapor for example uses the mach10 variable. This variable = 1 at mach10, and 0 when not moving. The animation is 1000 frames long, and the MachVapor is enabled on frame 97 and disabled on frame 102, which corresponds to transitioning mach1.
+This variable can be used to do other things like F-14 wings moving back at a certain speed.
+
+The angle of attack variable is 0 at 0 AoA, and 1 at 180.
+
+In Unity play mode testing using ClientSim, The SaccFlight script will cause your player to have 0 gravity (ClientSim bug). Just look straight down and hold F to fly down.
+
+Making your own vehicles:
+
+Aircraft:
+When making a new vehicle, place the prefab that is closest in type to your desired vehicle and Unpack Prefab. Now your objective is to replace the mesh object (PlaneBody on the SF-1) completely.
+I recommend just disabling it at first(delete it once you're done using it as a reference), and placing your mesh next to it on the hierarchy. The first thing you should do is set the VehicleMesh to your new mesh in the SaccAirVehicle script.
+Next add colliders to your mesh(or armature), any collider types are fine. If your vehicle has wheels, i recommend copying the wheel colliders from the SF-1, and adjusting the size to fit your wheels.
+Now go through the entire hierarchy and move all the empties, effects, and sounds to the proper position for your new vehicle.
+Finally, duplicate the Animator for the vehicle prefab you used, rename it, place it in a new folder, apply it to your vehicle, and go through each layer and replace any animations that need replacing.
+When you're done look at the EffectsController and SoundController, and make sure no array references are empty (the ones that you can change the length of), they're likely to crash if any are.
+
+Tips for modifying basic flight characteristics of aircraft:
+If it's having trouble taking off, try adjusting the center of mass and pitch moment positions, as well as the ground effect settings.
+The Strength and Friction values for pitch, yaw, and roll are important, and both play off each other. You may need to set them to very high values, especially if you make a large plane.
+Rot Multi Max Speed will need to be adjusted for planes with different speeds. It's the speed at which (in meters per second) the plane reaches maximum responsiveness.
+Vel Straighten Str Pitch/Yaw are Very important to the handling of the plane. They push the nose toward the velocity direction. (they also interact with pitch and yaw strength)
+Lift and Max Lift are also very important, and a bit tricky to tweak. If max lift is too high you can end up with a plane that can fly in circles extremely quickly. Reducing Max Lift will make the plane bleed much more speed in turns which is more realistic. Try around 3.
+The Vel Lift/Max values are used to prevent the plane's nose from dropping constantly (counter gravity). Find a Vel Lift Max value that keeps the nose steady, Max is 10 by default but technically should be 9.81 to counter gravity exactly
+Vel Lift value is used to decide how quickly the plane reaches Vel Lift Max.
+Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue.
+
+If you use the 'Auto Adjust Values To Mass' option, you can set the rigidbody mass to any value you wish with no effect on the performance of the vehicle.
+Using this option you will notice a lot of the SaccAirVehicle's values change when entering play mode. If you wish to tweak values during play mode, set the rigidbody mass to 1 temporarily so that they don't change.
+
+Tips for VTOL Only aircraft:
+For helicopters, keep the VTOL Thrust Vec values at 1, and adjust Pitch Yaw and Roll Strength
+Pitch Down Lift Multi has a pretty big effect on how fast the vehicle can move forwards
+The constant friction values are intended for helicopters (gyroscopic forces stop rotation)
+You can make the blade tilt angle larger than implied in order to make the vehicle faster
+Set Adverse yaw to 0 if you don't want the helicopter to spin when increasing the throttle
+the Vel Straighten values are just as important for the handling of helicopters as planes
+
+This file used to contain explanations of every variable in every script, that information is now contained in the tooltips of the variables. Hold the mouse still over a variable name in unity to see a description of what it does.
+
+Guns work by having one particle system of visible bullets, and one particle system of invisible bullets that actually do damage which is only enabled for the firer. The Visible one is known as Gunparticle_other, and the pilot's damage one is known as GunParticle_pilot. Make sure if you change one, you change the other!
+The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with layer (OnBoardVehicleLayer(31)). The plane is set to OnBoardVehicleLayer you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
+To make a gun do a different amount of damage, create a child empty game object under the 'GunParticle_pilot' particle system, and name it:
+Damage:02 (2x damage). Damage:03 (4x damage), Damage:04 (8x damage), Damage:05 (16x damage). All the way up to Damage:14 works.
+To do less damage use:
+Damage:x2 (half damage), Damage:x3 (one third damage), Damage:x4 (quarter damage), Damage:x5 (fifth damage), Up to Damage:x9 works (one ninth damage)
+
+The hud can be made to appear smaller by moving all children of the 'bigstuff' object +Z local. 'bigstuff' is a child of HudController.
+The one exception is hud_elevation, it's position must be 0,0,0 in order for it to move correctly, the only resizing you can do to it and have its functionality remain correct is on the X axis.
+
+Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController or modular functions).
+Doing animations using the animator is most performant, so I've used it where possible. Some HUD stuff included.
+When making a custom plane, you must customize a number of the animations, I recommend duplicating the SF-1's animation controller and animations, and modifying the animations that need changing.
+Likely to need replacing animations:
+AAMs
+AGMs
+Bombs
+Brake
+CanopyOpen
+Explode
+FlapsOn
+Mach
+GearUp
+TailHook
+TailHookHooked
+ThrottleSlider
+EngineOutput
+EngineOutputAB
+Pitch
+Yaw
+Roll
+Remember for animations that are controlled by floats that use motion time, set the animation curves to linear.
+Joystick animation is done in the Pitch Yaw and Roll animations. Each one rotates a seperate empty of which the joystick is the last child of.
+
+Hierarchy:
+PlaneBody--------
+Everything in here is visual, except that it also contains colliders, and wheel colliders. Objects can be placed as children of this if they need to move with parts of it (SS-1)
+SaccAirVehicle(formally SaccAirVehicle)--------
+Children of this are transforms used by the SaccAirVehicle, and weapon objects for cloning and launching.
+EffectsController--------
+The children of this are mostly particle systems, visual effects used by EffectsController and the animator.
+SoundController--------
+The children are all the sounds the plane uses. The AttachedSounds object contains all sounds that are disabled instantly when the plane explodes. The 'beeps' empty contains all the cockpit beep sounds, just move the 'beeps' object instead of all children individually.
+InVehicleOnly--------
+The children of this are all things that are disabled when you're not inside the plane. Many different objects are in here including the HUD, joystick, MFDs(Multi-Function-Display).
+HUDController's 'bigstuff' child object is scaled to 720 to make the hud appear to be on the sky like a real HUD(roughly 1km away). You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
+PilotSeat--------
+A custom station with seat adjustment code for entering the plane
+PassengerSeat--------
+AAMs--------
+AGMs--------
+Bombs--------
+These 3 objects just contain meshes to visually represent how many missiles etc you have left. Controlled by the animator.
+
+Cars:
+Place the car prefab that matches closest with the car you want to create. You need to replace the mesh, animations, update the references and move everything into position.
+Break the prefab completely, and place your new vehicle's mesh above the current mesh object. Set the position and rotation of the new mesh to 0,0,0, set Y rotation to match the original vehicle if necessary.
+Disable the original vehicle mesh for now, we will copy some stuff from it soon.
+Add collder to your new mesh, and modify it to fit. Any number of colliders is fine, but you cannot use mesh colliders that are not set to Convex.
+Set mesh's main object to the Walkthrough layer (17)
+The next step is to set up the wheels, which require a specific rig setup to work.
+The hierarchy is as follows: The main wheel transform must be at the bottom of the tire, where it touches the ground, It should have a child that contains the mesh of the wheel.
+The main wheel's transform orientation should be as follows: With 'Pivot' and 'Local' transform options selected, and the move tool selected, The blue arrow should point towards the front of the car, red to the right, and green up.
+With this set up, the wheel's position you see in the editor will be the fully compressed suspension position. The ST-Baron is set up a bit weird because it was the first vehicle I created.
+Copy the wheel script from the original car, and paste it on to each of your wheel's main transforms, (front and back wheel settings are usually a bit different, so you can copy the back to the back, and the front to the front)
+Set each wheel's Wheel Point transform input to it's own gameobject, and Wheel Visual to the child object that contains the wheel mesh.
+Move the gameobjects named SkidAudio_Tarmac, SkidAudio_Grass, SkidParticle_Tarmac, SkidParticle_Grass from the original mesh's wheels into each of your wheels, and make sure the references for them are set up in the 'Surface Type_Skid Sounds', and the 'Surface Type_Skid Particles' arrays.
+You can now delete the original mesh object.
+In the SaccGroundVehicle Object, update the references for:
+Vehicle Mesh -> The mesh object you placed to replace the original
+Main Object Renderer -> Place the largest Mesh renderer/SkinnedMeshRenderer on your new mesh in this slot
+Drive Wheels -> Put all wheels that are used to accelerate the car in here, usually the back wheels.
+Steer Wheels -> Put all the wheels used for steering in here
+Other Wheels -> Put in any other wheels
+The functions for brake and handbrake also need to reference the wheels that they used. Go to DialFunctions/L/DFUNC_Brake and DFUNC_HandBrake and fix the missing references in the 'Brake Wheels_Front' and 'Brake Wheels_Back' arrays.
+In each Wheel script, set the wheel radius to match your car's wheels. You can experiment with suspension values too. I recommend doing so in play mode. Make sure you're sitting in the driver seat so that the physics doesn't fall asleep.
+Move the CoM object to where the center of mass for your new vehicle should be.
+If you test your vehicle now it should be able to drive forward, but the suspension may be strange, and it won't be able to steer.
+Steering is done through an animation. Duplicate the original vehicle's Animations folder and move it into your own folder.
+Rename the animation controller in that folder to the name of your vehicle, and apply it to your vehicle's animator (it's on the vehicle's main object, same object as the rigidbody).
+Go through each layer of the animator and replace each of the animation node's animations with the duplicates
+Go through each of the animations and set them up with your new mesh. Refer to the original prefabs to see how they should be. The 'SteeringWheel' animation contains the movement of the steeringwheel and wheels.
+Go through the whole hierarchy of the vehicle, and move everything to match the position of the new mesh. The eye position of seats is the 'TargetHeight' child object.
+
+Info about surface types for SaccWheel scripts:
+There's and array called 'Surface Type_Grips' with 10 entries. The object that the wheel is touching's name is checked,
+and if it ends with a number, that number becomes the new surface type.
+The grip of the wheel is multiplied by the corresponding element in this array, and the corresponding elements from the skid particles and sounds array are used for skids.
+By default: 0 = Tarmac, 1 = Dirt/Grass, 2 = Ice. 4-9 are for you to define, but by default have same grip as tarmac. Any object without a number will be treated as tarmac.
+There's a menu item at 'SaccFlight->Make All Static Colliders Tarmac...' that will rename all static colliders so that they are tarmac, you will then have to rename all dirt/other manually.
+
+How to animate engine pitch:
+In the 'Revs' animation, you will notice that the engine sound's audiosource's X Scale is animated. This is a workaround for setting engine pitch whilst also using doppler.
+The code takes the X scale of the audiosource, applies doppler, then sets it to the pitch of the sound. Never animate the pitch directly.
+If you wish to blend different engine sounds, it's possible to do it in this animation.
+It's using motion time, so frame 0 = 0 revs, last frame = whatever revs SaccGroundVehicle's 'Rev Limiter' variable is set to.
+
+
+
+Custom Layers:
+Vehicle colliders must be set to Walkthrough layer in order to be targeted by AAMs. (Raycast looks for this layer)
+Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
+To rename the layers for SaccFlight, there is a menu option under SaccFlight->RenameLayers, clicking it will instantly change the layer names.
+References to the layers will be retained and will work, but they will appear blank until named in Unity. Layers are as follows
+23:Hook Cable
+24:Catapult
+25:AAMTargets
+26:AGMTargets
+27:Resupply
+28:Racing
+The trigger objects that you may need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of SaccAirVehicle(If it's not, it will not be treated like a vehicle(untargetable on ground etc).
+The AAMTarget object on a plane MUST be a first child of the SaccAirVehicle object, or the code to play the radar lock warning tone will fail.
+
+
+This package also contains a few prefabs that can be used with the vehicles. Explanations follow.
+
+AAMDummyTarget
+Target object that can be placed on anything that you want air-to-air missiles to be able to lock on to. MUST be enabled at game start or planes will not detect it during initial target enumeration in Start(). After Start(), it can be disabled to become untargetable.
+
+AGMLockTarget
+object that if detected when attempting to lock target close to it with the AGM targeting system, will cause the targeted spot to snap to this location.
+The trigger must be on the correct layer, the one selected in the DFUNC_AGM.
+
+Arresting Cable
+A prefab containing a cable mesh and a trigger designed to be placed on short runways or aircraft carriers to enable short landings.
+The trigger must be on the correct layer, the one selected in the DFUNC_Hook.
+
+Catapult
+A prefab containing a catapult mesh and a trigger to enable the plane to launch quickly with no runway
+The trigger must be on the correct layer, the one selected in the DFUNC_Catapult.
+Catapult launches are controlled by an animation. The point in the animation where the trigger is disabled is the point at which the plane is released.
+
+ResupplyZone
+A prefab containing a square outline mesh with a trigger beneath it, used to reload, repair and refuel planes. Remove the mesh and just use the trigger if you want.
+The trigger must be on the correct layer, the one selected in the ResupplyTrigger.
+
+Target
+A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc. May not sync perfectly.
+
+Changelog:
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Medium update 1.61
+SF-1 and SH-1 now use SkinnedMeshRenderer/bones
+Big improvement to vehicle sync smoothness
+New vehicles: SH-1, ST-Thunder, S-GRVR
+New vehicle functions: Grapple, 3DThrust, Consent
+Radio scripts added
+Added remote vehicle enterer
+Vehicle seat yaw calibration
+Improved Limits functionality
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Large Update 1.6
 Added ground vehicle code and 3 car prefabs
@@ -240,252 +495,3 @@ Added option to disable thrust vectoring
 Implemented (unrealistic) increased lift at higher speeds, you can now fall down faster at low speed
 the two above combined should allow for more boring plane physics
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-1.6 Known Issues:
-The SaccWheel is not completely framerate dependant. Playing with a higher FixedUpdate rate will cause your vehicle to accelerate a bit faster. FixedUpdate rate is based on the VR headset's refresh rate.
-Racing with 90hz against someone with 144hz is not a fair race.
-This will be a high priority to fix for 1.61.
-
-Migrating a 1.51 project to 1.6 info:
-For coders: Now using namespace SaccFlightAndVehicles.
-For the most part, things should work after just replacing the package.
-If your project is not currently using VRC Creator Companion, you should update to it to get the latest version of UdonSharp.
-It seems that there are currently some issues with UdonSharp's handling of prefabs (Version 1.0.1). They will hopefully be fixed soon, check your UdonSharp version in Creator Companion.
-If your vehicles are losing references when entering play mode, try editing or breaking the prefab.
-
-The SaccFlightMenu.cs editor script now sets up some things automatically when entering play mode, or building the scene. Things like the WindController no longer need you to manually assign all vehicles to them, it's done automatically.
-I have done this with everything that requires simple lists to be filled out, or if there's only one of something in a scene that should be always be used. Things should be a little less fiddly to set up now. I plan to add more editor script stuff in future.
-If you wish to run the code that does that stuff while in the editor, the option SaccFlight->Debug_OnBuild_SetReferences runs the function.
-If you haven't set up a reference camera in your VRCWorld when you try to build the scene, It will be done automatically, matching how it's set up in Test Pilots.
-
-Explanation of some scripts:
-SaccEntity:
-Main object script, sends events, has rigidbody on it.
-SaccAirVehicle/SaccSeaVehicle/SaccGroundVehicle:
-Main vehicle control scripts
-SAV_EffectsController/SAV_SoundController:
-Visual effects and audio effects for SaccAirVehicle
-SGV_EffectsController:
-Both visual effects and audio effects for SaccGroundVehicle
-SaccWheel:
-Wheel physics AND effects+sounds for the wheel
-WaterTrigger:
-Tells the vehicle when it enters and leaves water
-SyncScript:
-The custom position sync script
-KillTracker:
-Not required, used to make the KillsBoard work. Can be used without the killboard if you want to use the events that it sends for something else.
-
-Function dials:
-SaccEntity has 2 arrays, one for left dial functions, and right dial functions.
-Any number of functions can be placed in each array. The code divides the dial up automatically for selection. (Not visually, just for control input, you must make the visuals yourself)
-The order they are input into that array is the order they'll work on the dial, clockwise. (First function is in straight up, unless the 'Left/RightDialDivideStraightUp' is ticked, in which case it's to the right of straight up. The ST-Baron's function dial uses this, if you need an example, the StickDisplay mesh is rotated negatively by half of a function)
-The visuals of the function dial must be set up manually. Look at the dials in the vehicle prefabs in order to understand how.
-The MFD.fbx file containts 12 divider meshes for function dials for dials with those number of functions. Named StickDisplay2-12 (the old default, 8, is just named 'StickDisplay')
-Function dial scripts contain a 'funcon' (function on) reference if they are toggles. It's the mesh that appears to highlight the function on the dial when it's enabled.
-To set the 'funcon' rotations, you can type '360/7' for example, into its Z rotation(if you have 7 functions). Then multiply the result by the dial position -1, then multiply by -1.
-
-Due to the new custom position syncing script, more network data is being used, and the maximum limit for number of vehicles has decreased.
-The limit is around 12 with default settings, probably more if you increase Update Interval.
-
-Esnya has made some addon scripts that may make your life easier. This document assumes you aren't using them, and I don't use them myself.
-https://github.com/esnya/EsnyaSFAddons
-================================================================================================================
-
-Inside the /Prefabs folder are individual prefabs for each vehicle, you can place them and they should work right away.
-Open the example scene 'SaccFlightExample.unity' to see an example of vehicles set up to work with the Killsboard and racing scripts.
-
-Race set up:
-There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object, It should be disabled by default, it's enabled when a race is selected with the racebutton.
-The RaceToggleButton has a list of SaccRaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tells all racingtriggers to switch to the selected race.
-You must place a reference to every Race, inside the RaceToggleButton.
-Each race has its own script called SaccRaceCourseAndScoreBoard. This contains references for its race's checkpoints, and has text objects for displaying the times.
-The RacingTrigger detects checkpoints, tracks your time, and sends your time to the SaccRaceCourseAndScoreBoard script for the selected race when you finish.
-Race checkpoints have an animation that enables guidance objects when the checkpoint is next or after next.
-
-Killsboard set up:
-Place the killboard anywhere in the world, each vehicle that uses it must have its own SAV_KillTracker, referenced in it's SaccEntity's Extension Udon Behaviours list.
-
-Some of the animations use the 'Motion Time' feature (formerly 'Normalized Time'), which makes the animation be controlled by a float parameter (which is controlled by effectscontroller).
-float value 0(or less) = play the first frame of the animation
-float value 1(or more) = play the last frame of the animation
-and everything in between accordingly.
-
-The MachVapor for example uses the mach10 variable. This variable = 1 at mach10, and 0 when not moving. The animation is 1000 frames long, and the MachVapor is enabled on frame 97 and disabled on frame 102, which corresponds to transitioning mach1.
-This variable can be used to do other things like F-14 wings moving back at a certain speed.
-
-The angle of attack variable is 0 at 0 AoA, and 1 at 180.
-
-In Unity play mode testing using ClientSim, The SaccFlight script will cause your player to have 0 gravity (ClientSim bug). Just look straight down and hold F to fly down.
-
-Making your own vehicles:
-
-Aircraft:
-When making a new vehicle, place the prefab that is closest in type to your desired vehicle and Unpack Prefab. Now your objective is to replace the mesh object (PlaneBody on the SF-1) completely.
-I recommend just disabling it at first(delete it once you're done using it as a reference), and placing your mesh next to it on the hierarchy. The first thing you should do is set the VehicleMesh to your new mesh in the SaccAirVehicle script.
-Next add colliders to your mesh(or armature), any collider types are fine. If your vehicle has wheels, i recommend copying the wheel colliders from the SF-1, and adjusting the size to fit your wheels.
-Now go through the entire hierarchy and move all the empties, effects, and sounds to the proper position for your new vehicle.
-Finally, duplicate the Animator for the vehicle prefab you used, rename it, place it in a new folder, apply it to your vehicle, and go through each layer and replace any animations that need replacing.
-When you're done look at the EffectsController and SoundController, and make sure no array references are empty (the ones that you can change the length of), they're likely to crash if any are.
-
-Tips for modifying basic flight characteristics of aircraft:
-If it's having trouble taking off, try adjusting the center of mass and pitch moment positions, as well as the ground effect settings.
-The Strength and Friction values for pitch, yaw, and roll are important, and both play off each other. You may need to set them to very high values, especially if you make a large plane.
-Rot Multi Max Speed will need to be adjusted for planes with different speeds. It's the speed at which (in meters per second) the plane reaches maximum responsiveness.
-Vel Straighten Str Pitch/Yaw are Very important to the handling of the plane. They push the nose toward the velocity direction. (they also interact with pitch and yaw strength)
-Lift and Max Lift are also very important, and a bit tricky to tweak. If max lift is too high you can end up with a plane that can fly in circles extremely quickly. Reducing Max Lift will make the plane bleed much more speed in turns which is more realistic. Try around 3.
-The Vel Lift/Max values are used to prevent the plane's nose from dropping constantly (counter gravity). Find a Vel Lift Max value that keeps the nose steady, Max is 10 by default but technically should be 9.81 to counter gravity exactly
-Vel Lift value is used to decide how quickly the plane reaches Vel Lift Max.
-Don't change the angular drag or drag of the rigidbody, drag is handled by the script, and angular drag is set by the script as a workaround for a sync issue.
-
-If you use the 'Auto Adjust Values To Mass' option, you can set the rigidbody mass to any value you wish with no effect on the performance of the vehicle.
-Using this option you will notice a lot of the SaccAirVehicle's values change when entering play mode. If you wish to tweak values during play mode, set the rigidbody mass to 1 temporarily so that they don't change.
-
-Tips for VTOL Only aircraft:
-For helicopters, keep the VTOL Thrust Vec values at 1, and adjust Pitch Yaw and Roll Strength
-Pitch Down Lift Multi has a pretty big effect on how fast the vehicle can move forwards
-The constant friction values are intended for helicopters (gyroscopic forces stop rotation)
-You can make the blade tilt angle larger than implied in order to make the vehicle faster
-Set Adverse yaw to 0 if you don't want the helicopter to spin when increasing the throttle
-the Vel Straighten values are just as important for the handling of helicopters as planes
-
-This file used to contain explanations of every variable in every script, that information is now contained in the tooltips of the variables. Hold the mouse still over a variable name in unity to see a description of what it does.
-
-Guns work by having one particle system of visible bullets, and one particle system of invisible bullets that actually do damage which is only enabled for the firer. The Visible one is known as Gunparticle_other, and the pilot's damage one is known as GunParticle_pilot. Make sure if you change one, you change the other!
-The Gun_pilot particle is what does damage to enemy planes. It is set to not collide with layer (OnBoardVehicleLayer(31)). The plane is set to OnBoardVehicleLayer you enter, so that you can't shoot your own plane, and reverted back to previous when you leave.
-To make a gun do a different amount of damage, create a child empty game object under the 'GunParticle_pilot' particle system, and name it:
-Damage:02 (2x damage). Damage:03 (4x damage), Damage:04 (8x damage), Damage:05 (16x damage). All the way up to Damage:14 works.
-To do less damage use:
-Damage:x2 (half damage), Damage:x3 (one third damage), Damage:x4 (quarter damage), Damage:x5 (fifth damage), Up to Damage:x9 works (one ninth damage)
-
-The hud can be made to appear smaller by moving all children of the 'bigstuff' object +Z local. 'bigstuff' is a child of HudController.
-The one exception is hud_elevation, it's position must be 0,0,0 in order for it to move correctly, the only resizing you can do to it and have its functionality remain correct is on the X axis.
-
-Visual animations are done by either EffectsController directly, HudController if they're local/only when you're in the plane, or through the animator (via values sent to it by EffectsController or modular functions).
-Doing animations using the animator is most performant, so I've used it where possible. Some HUD stuff included.
-When making a custom plane, you must customize a number of the animations, I recommend duplicating the SF-1's animation controller and animations, and modifying the animations that need changing.
-Likely to need replacing animations:
-AAMs
-AGMs
-Bombs
-Brake
-CanopyOpen
-Explode
-FlapsOn
-Mach
-GearUp
-TailHook
-TailHookHooked
-ThrottleSlider
-EngineOutput
-EngineOutputAB
-Pitch
-Yaw
-Roll
-Remember for animations that are controlled by floats that use motion time, set the animation curves to linear.
-Joystick animation is done in the Pitch Yaw and Roll animations. Each one rotates a seperate empty of which the joystick is the last child of.
-
-Hierarchy:
-PlaneBody--------
-Everything in here is visual, except that it also contains colliders, and wheel colliders. Objects can be placed as children of this if they need to move with parts of it (SS-1)
-SaccAirVehicle(formally SaccAirVehicle)--------
-Children of this are transforms used by the SaccAirVehicle, and weapon objects for cloning and launching.
-EffectsController--------
-The children of this are mostly particle systems, visual effects used by EffectsController and the animator.
-SoundController--------
-The children are all the sounds the plane uses. The AttachedSounds object contains all sounds that are disabled instantly when the plane explodes. The 'beeps' empty contains all the cockpit beep sounds, just move the 'beeps' object instead of all children individually.
-InVehicleOnly--------
-The children of this are all things that are disabled when you're not inside the plane. Many different objects are in here including the HUD, joystick, MFDs(Multi-Function-Display).
-HUDController's 'bigstuff' child object is scaled to 720 to make the hud appear to be on the sky like a real HUD(roughly 1km away). You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
-PilotSeat--------
-A custom station with seat adjustment code for entering the plane
-PassengerSeat--------
-AAMs--------
-AGMs--------
-Bombs--------
-These 3 objects just contain meshes to visually represent how many missiles etc you have left. Controlled by the animator.
-
-Cars:
-Place the car prefab that matches closest with the car you want to create. You need to replace the mesh, animations, update the references and move everything into position.
-Break the prefab completely, and place your new vehicle's mesh above the current mesh object. Set the position and rotation of the new mesh to 0,0,0, set Y rotation to match the original vehicle if necessary.
-Disable the original vehicle mesh for now, we will copy some stuff from it soon.
-Add collder to your new mesh, and modify it to fit. Any number of colliders is fine, but you cannot use mesh colliders that are not set to Convex.
-Set mesh's main object to the Walkthrough layer (17)
-The next step is to set up the wheels, which require a specific rig setup to work.
-The hierarchy is as follows: The main wheel transform must be at the bottom of the tire, where it touches the ground, It should have a child that contains the mesh of the wheel.
-The main wheel's transform orientation should be as follows: With 'Pivot' and 'Local' transform options selected, and the move tool selected, The blue arrow should point towards the front of the car, red to the right, and green up.
-With this set up, the wheel's position you see in the editor will be the fully compressed suspension position. The ST-Baron is set up a bit weird because it was the first vehicle I created.
-Copy the wheel script from the original car, and paste it on to each of your wheel's main transforms, (front and back wheel settings are usually a bit different, so you can copy the back to the back, and the front to the front)
-Set each wheel's Wheel Point transform input to it's own gameobject, and Wheel Visual to the child object that contains the wheel mesh.
-Move the gameobjects named SkidAudio_Tarmac, SkidAudio_Grass, SkidParticle_Tarmac, SkidParticle_Grass from the original mesh's wheels into each of your wheels, and make sure the references for them are set up in the 'Surface Type_Skid Sounds', and the 'Surface Type_Skid Particles' arrays.
-You can now delete the original mesh object.
-In the SaccGroundVehicle Object, update the references for:
-Vehicle Mesh -> The mesh object you placed to replace the original
-Main Object Renderer -> Place the largest Mesh renderer/SkinnedMeshRenderer on your new mesh in this slot
-Drive Wheels -> Put all wheels that are used to accelerate the car in here, usually the back wheels.
-Steer Wheels -> Put all the wheels used for steering in here
-Other Wheels -> Put in any other wheels
-The functions for brake and handbrake also need to reference the wheels that they used. Go to DialFunctions/L/DFUNC_Brake and DFUNC_HandBrake and fix the missing references in the 'Brake Wheels_Front' and 'Brake Wheels_Back' arrays.
-In each Wheel script, set the wheel radius to match your car's wheels. You can experiment with suspension values too. I recommend doing so in play mode. Make sure you're sitting in the driver seat so that the physics doesn't fall asleep.
-Move the CoM object to where the center of mass for your new vehicle should be.
-If you test your vehicle now it should be able to drive forward, but the suspension may be strange, and it won't be able to steer.
-Steering is done through an animation. Duplicate the original vehicle's Animations folder and move it into your own folder.
-Rename the animation controller in that folder to the name of your vehicle, and apply it to your vehicle's animator (it's on the vehicle's main object, same object as the rigidbody).
-Go through each layer of the animator and replace each of the animation node's animations with the duplicates
-Go through each of the animations and set them up with your new mesh. Refer to the original prefabs to see how they should be. The 'SteeringWheel' animation contains the movement of the steeringwheel and wheels.
-Go through the whole hierarchy of the vehicle, and move everything to match the position of the new mesh. The eye position of seats is the 'TargetHeight' child object.
-
-Info about surface types for SaccWheel scripts:
-There's and array called 'Surface Type_Grips' with 10 entries. The object that the wheel is touching's name is checked,
-and if it ends with a number, that number becomes the new surface type.
-The grip of the wheel is multiplied by the corresponding element in this array, and the corresponding elements from the skid particles and sounds array are used for skids.
-By default: 0 = Tarmac, 1 = Dirt/Grass, 2 = Ice. 4-9 are for you to define, but by default have same grip as tarmac. Any object without a number will be treated as tarmac.
-There's a menu item at 'SaccFlight->Make All Static Colliders Tarmac...' that will rename all static colliders so that they are tarmac, you will then have to rename all dirt/other manually.
-
-How to animate engine pitch:
-In the 'Revs' animation, you will notice that the engine sound's audiosource's X Scale is animated. This is a workaround for setting engine pitch whilst also using doppler.
-The code takes the X scale of the audiosource, applies doppler, then sets it to the pitch of the sound. Never animate the pitch directly.
-If you wish to blend different engine sounds, it's possible to do it in this animation.
-It's using motion time, so frame 0 = 0 revs, last frame = whatever revs SaccGroundVehicle's 'Rev Limiter' variable is set to.
-
-
-
-Custom Layers:
-Vehicle colliders must be set to Walkthrough layer in order to be targeted by AAMs. (Raycast looks for this layer)
-Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
-To rename the layers for SaccFlight, there is a menu option under SaccFlight->RenameLayers, clicking it will instantly change the layer names.
-References to the layers will be retained and will work, but they will appear blank until named in Unity. Layers are as follows
-23:Hook Cable
-24:Catapult
-25:AAMTargets
-26:AGMTargets
-27:Resupply
-28:Racing
-The trigger objects that you may need to change the layer of are in the prefabs listed below. The plane's AAMTarget is a child of SaccAirVehicle(If it's not, it will not be treated like a vehicle(untargetable on ground etc).
-The AAMTarget object on a plane MUST be a first child of the SaccAirVehicle object, or the code to play the radar lock warning tone will fail.
-
-
-This package also contains a few prefabs that can be used with the vehicles. Explanations follow.
-
-AAMDummyTarget
-Target object that can be placed on anything that you want air-to-air missiles to be able to lock on to. MUST be enabled at game start or planes will not detect it during initial target enumeration in Start(). After Start(), it can be disabled to become untargetable.
-
-AGMLockTarget
-object that if detected when attempting to lock target close to it with the AGM targeting system, will cause the targeted spot to snap to this location.
-The trigger must be on the correct layer, the one selected in the DFUNC_AGM.
-
-Arresting Cable
-A prefab containing a cable mesh and a trigger designed to be placed on short runways or aircraft carriers to enable short landings.
-The trigger must be on the correct layer, the one selected in the DFUNC_Hook.
-
-Catapult
-A prefab containing a catapult mesh and a trigger to enable the plane to launch quickly with no runway
-The trigger must be on the correct layer, the one selected in the DFUNC_Catapult.
-Catapult launches are controlled by an animation. The point in the animation where the trigger is disabled is the point at which the plane is released.
-
-ResupplyZone
-A prefab containing a square outline mesh with a trigger beneath it, used to reload, repair and refuel planes. Remove the mesh and just use the trigger if you want.
-The trigger must be on the correct layer, the one selected in the ResupplyTrigger.
-
-Target
-A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc. May not sync perfectly.
