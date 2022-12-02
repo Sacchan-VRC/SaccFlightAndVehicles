@@ -117,9 +117,11 @@ namespace SaccFlightAndVehicles
             {
                 SETransforms[i] = SEs[i].transform;
             }
+            var RZs = GetAllSaccRadioZones().ToArray();
             for (int i = 0; i < RBs.Length; i++)
             {
                 RBs[i].AllPlanes = SETransforms;
+                RBs[i].RadioZones = RZs;
                 PrefabUtility.RecordPrefabInstancePropertyModifications(RBs[i]);
                 EditorUtility.SetDirty(RBs[i]);
             }
@@ -285,6 +287,16 @@ namespace SaccFlightAndVehicles
             foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
             {
                 var objs = g.GetComponentsInChildren<SaccRadioBase>(true);
+                ls.AddRange(objs);
+            }
+            return ls;
+        }
+        static List<SaccRadioZone> GetAllSaccRadioZones()
+        {
+            var ls = new List<SaccRadioZone>();
+            foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects())
+            {
+                var objs = g.GetComponentsInChildren<SaccRadioZone>(true);
                 ls.AddRange(objs);
             }
             return ls;
