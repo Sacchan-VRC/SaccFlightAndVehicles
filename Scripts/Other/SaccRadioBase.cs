@@ -30,6 +30,7 @@ namespace SaccFlightAndVehicles
         private int NextPlane;
         private int NextZone;
         private int NumZones;
+        private bool DoZones = false;
         void Start()
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
@@ -41,6 +42,7 @@ namespace SaccFlightAndVehicles
                 if (_AllPlanes_ENT[i]) { _AllPlanes_RD[i] = (SAV_Radio)_AllPlanes_ENT[i].GetExtention("SAV_Radio"); }
             }
             NumZones = RadioZones.Length;
+            if (NumZones != 0) { DoZones = true; }
         }
         public void SetRadioVoiceVolumes()
         {
@@ -62,17 +64,24 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
+            if (DoZones)
+            {
+                SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2);//separate in frames for optimization
+            }
+        }
+        public void SetRadioVoiceVolumes_Zones()
+        {
             NextZone++;
             if (NextZone >= NumZones) { NextZone = 0; }
             SaccRadioZone NextRZ = RadioZones[NextZone];
-            VRCPlayerApi[] players = NextRZ.playersinside;
+            VRCPlayerApi[] RZ_players = NextRZ.playersinside;
             if (NextRZ != MyZone)
             {
                 for (int i = 0; i < NextRZ.numPlayersInside; i++)
                 {
-                    players[i].SetVoiceDistanceNear(VoiceNear);
-                    players[i].SetVoiceDistanceFar(VoiceFar);
-                    players[i].SetVoiceGain(VoiceGain);
+                    RZ_players[i].SetVoiceDistanceNear(VoiceNear);
+                    RZ_players[i].SetVoiceDistanceFar(VoiceFar);
+                    RZ_players[i].SetVoiceGain(VoiceGain);
                 }
             }
         }
