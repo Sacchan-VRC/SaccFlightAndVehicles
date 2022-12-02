@@ -69,16 +69,22 @@ namespace SaccFlightAndVehicles
             {
                 if (SAV)
                 {
-                    SAV.SetProgramVariable("EngineOnOnEnter", AutoEngine);
-                    SAV.SetProgramVariable("EngineOffOnExit", AutoEngine);
+                    if (((SaccEntity)SAV.GetProgramVariable("EntityControl")).GetExtention(GetUdonTypeName<DFUNC_ToggleEngine>()))
+                    {
+                        SAV.SetProgramVariable("EngineOnOnEnter", AutoEngine);
+                        SAV.SetProgramVariable("EngineOffOnExit", AutoEngine);
+                    }
                 }
             }
             foreach (UdonSharpBehaviour SSV in SaccSeaVehicles)
             {
                 if (SSV)
                 {
-                    SSV.SetProgramVariable("EngineOnOnEnter", AutoEngine);
-                    SSV.SetProgramVariable("EngineOffOnExit", AutoEngine);
+                    if (((SaccEntity)SSV.GetProgramVariable("EntityControl")).GetExtention(GetUdonTypeName<DFUNC_ToggleEngine>()))
+                    {
+                        SSV.SetProgramVariable("EngineOnOnEnter", AutoEngine);
+                        SSV.SetProgramVariable("EngineOffOnExit", AutoEngine);
+                    }
                 }
             }
         }

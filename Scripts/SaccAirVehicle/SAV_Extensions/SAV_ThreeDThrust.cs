@@ -172,7 +172,7 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     }
     private void LateUpdate()
     {
-        if (IsOwner)
+        if (IsOwner && EngineOn)
         {
             if (InVR)
             {
@@ -378,6 +378,11 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     { InWater = true; }
     public void SFEXT_G_ExitWater()
     { InWater = false; }
+    private bool EngineOn;
+    public void SFEXT_G_EngineOn()
+    { EngineOn = true; }
+    public void SFEXT_G_EngineOff()
+    { EngineOn = false; }
     private void FixedUpdate()
     {
         if (IsOwner)
