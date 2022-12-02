@@ -37,10 +37,12 @@ namespace SaccFlightAndVehicles
         public float RotationSpeedLerpTime = 10f;
         [Tooltip("Teleports owned vehicles forward by real time * velocity if frame takes too long to render and simulation slows down. Prevents other players from seeing you warp.")]
         public bool AntiWarp = true;
+        [Tooltip("Enable physics whilst not owner of the vehicle, can prevent some clipping through walls/ground, probably some performance hit. Not recommended for Quest")]
+        public bool NonOwnerEnablePhysics = false;
         [Header("DEBUG:")]
-        [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE IN TEST MODE")]
+        [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE WITH CLIENT SIM")]
         public Transform TestTransform;
-        [Tooltip("UNCOMMENT THE CODE TO USE THIS. LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE IN TEST MODE, If TestTransform is empty and this is filled you can see the raw position in multiplayer")]
+        [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE WITH CLIENT SIM")]
         public Transform TestTransform_Raw;
         private Transform VehicleTransform;
         private double nextUpdateTime = double.MaxValue;
@@ -162,7 +164,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                VehicleRigid.isKinematic = true;
+                if (!NonOwnerEnablePhysics) { VehicleRigid.isKinematic = true; }
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime + Random.Range(0f, updateInterval));
@@ -188,7 +190,7 @@ namespace SaccFlightAndVehicles
             ExtrapDirection_Smooth = O_CurVel;
             RotExtrapolation_Raw = RotationLerper = /* O_LastRotation2 = */ O_LastRotation = O_Rotation_Q;
             LastCurAngMom = CurAngMom = Quaternion.identity;
-            VehicleRigid.isKinematic = true;
+            if (!NonOwnerEnablePhysics) { VehicleRigid.isKinematic = true; }
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             VehicleRigid.drag = 9999;
             VehicleRigid.angularDrag = 9999;
