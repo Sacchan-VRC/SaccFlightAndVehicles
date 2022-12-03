@@ -18,6 +18,7 @@ namespace SaccFlightAndVehicles
         float VoiceNear;
         float VoiceFar;
         float VoiceGain;
+        bool InZone;
         void Start()
         {
             SendCustomEventDelayedFrames(nameof(CheckPlayersInside), Random.Range(0, 7));
@@ -37,17 +38,24 @@ namespace SaccFlightAndVehicles
             VRCPlayerApi nextAPI = players[nextplayer];
             if (Vector3.Distance(nextAPI.GetPosition(), transform.position) < ZoneRadius)
             {
-                if (nextAPI.isLocal) { RadioBase.MyZone = this; }
-                AddPlayer(nextAPI);
+                if (nextAPI.isLocal)
+                { RadioBase.MyZone = this; InZone = true; }
+                else
+                { AddPlayer(nextAPI); }
             }
             else
             {
                 if (nextAPI.isLocal)
                 {
-                    RadioBase.MyZone = null;
-                    SetAllVoicesDefault();
+                    if (InZone)
+                    {
+                        RadioBase.MyZone = null;
+                        InZone = false;
+                        SetAllVoicesDefault();
+                    }
                 }
-                RemovePlayer(nextAPI);
+                else
+                { RemovePlayer(nextAPI); }
             }
         }
         public void SetAllVoicesDefault()
