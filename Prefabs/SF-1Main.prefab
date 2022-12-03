@@ -47694,11 +47694,8 @@ MonoBehaviour:
   SwitchFunctionSound: {fileID: 4371473019709341094}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
-  AAMTargets:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  ExternalSeats: []
+  AAMTargets: []
 --- !u!114 &4371473018401239850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54063,7 +54060,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 2341975304134924734}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &4371473019235475175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65349,6 +65345,7 @@ MonoBehaviour:
   - {fileID: 4371473018870298480}
   Explosion:
   - {fileID: 4371473018023411007}
+  Explosion_Water: []
   BulletHit:
   - {fileID: 4371473019180008309}
   MissileHit:
@@ -81179,7 +81176,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 543805048618571905}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &4371473019733388728
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -104410,6 +104406,7 @@ MonoBehaviour:
   CorrectionTime_Rotation: 1
   RotationSpeedLerpTime: 10
   AntiWarp: 1
+  NonOwnerEnablePhysics: 0
   TestTransform: {fileID: 0}
   TestTransform_Raw: {fileID: 0}
   LagSimDelay: 0
