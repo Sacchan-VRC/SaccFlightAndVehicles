@@ -439,8 +439,8 @@ namespace SaccFlightAndVehicles
                             TargetEntityControl.SendEventToExtensions("SFEXT_L_MissileHit75");
                         }
                     }
+                    EntityControl.SendEventToExtensions("SFEXT_L_DamageFeedback");
                 }
-                EntityControl.SendEventToExtensions("SFEXT_L_DamageFeedback");
             }
             MissileAnimator.SetTrigger("explode");
             MissileAnimator.SetBool("hitwater", hitwater);
