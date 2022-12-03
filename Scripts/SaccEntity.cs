@@ -333,7 +333,7 @@ namespace SaccFlightAndVehicles
             }
             SendEventToExtensions("SFEXT_L_BulletHit");
             SendDamageEvent(dmg, More);
-            if (LastAttacker) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
+            if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
         private void SendDefaultDamage()
         {

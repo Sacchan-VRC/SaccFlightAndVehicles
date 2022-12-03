@@ -28,8 +28,11 @@ namespace SaccFlightAndVehicles
             float time = Time.time;
             if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 5 && ((time - EntityControl.PilotExitTime) < 5))))
             {
-                EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
-                EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotAKill");
+                if (EntityControl.LastAttacker != EntityControl)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
+                    EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotAKill");
+                }
             }
             if (localPlayer.IsOwner(KillsBoard.gameObject)) { KillsBoard.PlaneDied(); }
         }
