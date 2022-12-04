@@ -576,7 +576,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 515467600}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &706443860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -703,7 +702,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 2246501683413073306}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &747948962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21812,7 +21810,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 3411756929047500885}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &3818207961936412323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -27704,6 +27701,7 @@ MonoBehaviour:
   CorrectionTime_Rotation: 1
   RotationSpeedLerpTime: 10
   AntiWarp: 1
+  NonOwnerEnablePhysics: 0
   TestTransform: {fileID: 0}
   TestTransform_Raw: {fileID: 0}
   LagSimDelay: 0
@@ -62333,8 +62331,9 @@ MonoBehaviour:
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
   _syncMethod: 1
-  serializedProgramAsset: {fileID: 0}
-  programSource: {fileID: 0}
+  serializedProgramAsset: {fileID: 11400000, guid: d930df17313e3c34d8ed3821ed65bb13,
+    type: 2}
+  programSource: {fileID: 11400000, guid: b9a4126076ea7af48b5be84d2473e31b, type: 2}
   serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgIAAAAAAAAAAi8CAAAAAUsAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgACAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAErAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIASABhAHMARABvAG4AZQBTAGMAZQBuAGUAVQBwAGcAcgBhAGQAZQBfAF8AXwAnAQQAAAB0AHkAcABlAAEYAAAAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAKwEFAAAAVgBhAGwAdQBlAAEHBQIvAwAAAAFJAAAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQBgADEAWwBbAFMAeQBzAHQAZQBtAC4ASQBuAHQAMwAyACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgADAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAEfAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIAVgBlAHIAcwBpAG8AbgBfAF8AXwAnAQQAAAB0AHkAcABlAAEWAAAAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgAXAQUAAABWAGEAbAB1AGUAAgAAAAcFBwUHBQ==
   publicVariablesUnityEngineObjects: []
   publicVariablesSerializationDataFormat: 0
@@ -67939,7 +67938,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 627682400261023669}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &7105509204448147700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82762,6 +82760,7 @@ MonoBehaviour:
   SonicBoom: []
   Explosion:
   - {fileID: 3716760049986994699}
+  Explosion_Water: []
   BulletHit:
   - {fileID: 7105509204235363686}
   MissileHit:
@@ -83160,7 +83159,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 1554130111}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &7105509204755205035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85530,7 +85528,10 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
-  AAMTargets: []
+  AAMTargets:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &7105509205546161465
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86216,7 +86217,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 2415259330074371874}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &793195262885574237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86343,7 +86343,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 4057865969602712601}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &6685914054707775335
 MonoBehaviour:
   m_ObjectHideFlags: 0
