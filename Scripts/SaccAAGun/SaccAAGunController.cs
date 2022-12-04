@@ -249,12 +249,13 @@ namespace SaccFlightAndVehicles
                             JoystickZeroPoint = RotDif * JoystickZeroPoint;//zero point rotates with the plane so it appears still to the pilot
                             if (!JoystickGripLastFrame)//first frame you gripped joystick
                             {
+                                EntityControl.SendEventToExtensions("SFEXT_O_JoystickGrabbed");
                                 RotDif = Quaternion.identity;
                                 JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;//rotation of the controller relative to the plane when it was pressed
                                 if (SwitchHandsJoyThrottle)
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                                 else
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                             }
                             JoystickGripLastFrame = true;
                             //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint, finally rotated by the vehicles rotation to turn it back to vehicle space
@@ -272,9 +273,9 @@ namespace SaccFlightAndVehicles
                             {
                                 EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped");
                                 if (SwitchHandsJoyThrottle)
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                                 else
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                             }
                             VRPitchYawInput = Vector3.zero;
                             JoystickGripLastFrame = false;

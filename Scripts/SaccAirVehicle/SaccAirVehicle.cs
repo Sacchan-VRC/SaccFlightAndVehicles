@@ -889,12 +889,12 @@ namespace SaccFlightAndVehicles
                                 if (SwitchHandsJoyThrottle)
                                 {
                                     JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation;
-                                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35);
+                                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35);
                                 }//rotation of the controller relative to the plane when it was pressed
                                 else
                                 {
                                     JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
-                                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35);
+                                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35);
                                 }
                             }
                             //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint, finally rotated by the vehicles rotation to turn it back to vehicle space
@@ -921,7 +921,7 @@ namespace SaccFlightAndVehicles
                                 if (!JoystickGripLastFrame)
                                 {
                                     JoystickZeroPosition = joystickPosition;
-                                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35);
+                                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35);
                                 }
                                 VRJoystickPos.x = Mathf.Clamp((joystickPosition.z - JoystickZeroPosition.z) / JoystickPushPullDistance, -1.0f, 1.0f);
                             }
@@ -935,9 +935,9 @@ namespace SaccFlightAndVehicles
                             {
                                 EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped");
                                 if (SwitchHandsJoyThrottle)
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                                 else
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                             }
                             JoystickGripLastFrame = false;
                         }
@@ -974,9 +974,9 @@ namespace SaccFlightAndVehicles
                             if (!ThrottleGripLastFrame)
                             {
                                 if (SwitchHandsJoyThrottle)
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                                 else
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                                 EntityControl.SendEventToExtensions("SFEXT_O_ThrottleGrabbed");
                                 ThrottleZeroPoint = HandThrottleAxis;
                                 TempThrottle = PlayerThrottle;
@@ -1004,9 +1004,9 @@ namespace SaccFlightAndVehicles
                             {
                                 EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
                                 if (SwitchHandsJoyThrottle)
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                                 else
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                             }
                             ThrottleGripLastFrame = false;
                         }

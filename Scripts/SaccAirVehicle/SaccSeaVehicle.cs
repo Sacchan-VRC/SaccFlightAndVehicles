@@ -641,6 +641,10 @@ namespace SaccFlightAndVehicles
                                 JoystickValueLastFrame = 0;
                                 CompareAngleLastFrame = Vector3.up;
                                 JoystickValueLastFrame = 0;
+                                if (SwitchHandsJoyThrottle)
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                else
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                             }
                             JoystickGripLastFrame = true;
                             //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
@@ -664,6 +668,10 @@ namespace SaccFlightAndVehicles
                             if (JoystickGripLastFrame)//first frame you let go of joystick
                             { EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped"); }
                             JoystickGripLastFrame = false;
+                            if (SwitchHandsJoyThrottle)
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                            else
+                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                         }
                         //Throttle
                         if (UseTwistThrottle)
@@ -685,6 +693,10 @@ namespace SaccFlightAndVehicles
                                     ThrottleValueLastFrame = 0;
                                     CompareAngleLastFrameThrottle = Vector3.up;
                                     ThrottleValueLastFrame = 0;
+                                    if (SwitchHandsJoyThrottle)
+                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                    else
+                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                                 }
                                 ThrottleGripLastFrame = true;
                                 //difference between the vehicle and the hand's rotation, and then the difference between that and the ThrottleZeroPoint
@@ -708,6 +720,10 @@ namespace SaccFlightAndVehicles
                                 if (ThrottleGripLastFrame)//first frame you let go of Throttle
                                 { EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped"); }
                                 ThrottleGripLastFrame = false;
+                                if (SwitchHandsJoyThrottle)
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                else
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                             }
                         }
                         else
@@ -738,6 +754,10 @@ namespace SaccFlightAndVehicles
                                     ThrottleZeroPoint = HandThrottleAxis;
                                     TempThrottle = PlayerThrottle;
                                     HandDistanceZLastFrame = 0;
+                                    if (SwitchHandsJoyThrottle)
+                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                    else
+                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                                 }
                                 float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
                                 ThrottleDifference *= ThrottleSensitivity;
@@ -759,6 +779,10 @@ namespace SaccFlightAndVehicles
                                 if (ThrottleGripLastFrame)
                                 {
                                     EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                                    if (SwitchHandsJoyThrottle)
+                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                    else
+                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                                 }
                                 ThrottleGripLastFrame = false;
                             }

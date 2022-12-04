@@ -1123,6 +1123,7 @@ namespace SaccFlightAndVehicles
                     else { JoyStickValueR = -YawInput * SteeringWheelDegrees; }
                     JoystickValueLastFrameR = 0f;
                     CompareAngleLastFrameR = Vector3.up;
+                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35);
                 }
                 WheelGripLastFrameR = true;
                 //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
@@ -1146,6 +1147,7 @@ namespace SaccFlightAndVehicles
                     EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedR");
                     WheelGripLastFrameL = false;
                     //LHandSteeringWheel hasn't run yet so don't need to do anything else
+                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35);
                 }
                 WheelGripLastFrameR = false;
             }
@@ -1195,6 +1197,7 @@ namespace SaccFlightAndVehicles
                     else { JoyStickValueL = -YawInput * SteeringWheelDegrees; }
                     JoystickValueLastFrameL = 0f;
                     CompareAngleLastFrameL = Vector3.up;
+                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35);
                 }
                 WheelGripLastFrameL = true;
                 //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPointL
@@ -1215,6 +1218,7 @@ namespace SaccFlightAndVehicles
                 if (WheelGripLastFrameL)//first frame you let go of wheel
                 {
                     EntityControl.SendEventToExtensions("SFEXT_O_WheelDroppedL");
+                    localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35);
                     if (WheelGripLastFrameR)
                     {
                         WheelGripLastFrameR = false;
