@@ -441,21 +441,6 @@ namespace SaccFlightAndVehicles
             {
                 //this almost always goes to else, which means the wheels almost never visually wheelspin, but it still sounds like they do (because SkidVectorFX's forward componant is a hack).
                 //setting wheelweight very high does allow for proper wheel spins, but the vehicle physics gets ruined
-                float SlipGrip = (Mathf.Abs(ForwardSlip) * Time.fixedDeltaTime) - (ForceUsed / WheelWeight);
-
-                if (SlipGrip > 0)//vehicle isn't fully gripping
-                {
-                    WheelRotationSpeedSurf += (ForceUsed / WheelWeight);
-                    WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
-                    WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-
-                }
-                else//vehicle is fully gripping
-                {
-                    WheelRotationSpeedSurf = ForwardSpeed;
-                    WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
-                    WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-                }
                 WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, ForwardSpeed, (ForceUsed / WheelWeight));
                 WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
                 WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
