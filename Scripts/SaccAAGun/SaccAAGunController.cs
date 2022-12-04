@@ -752,7 +752,7 @@ namespace SaccFlightAndVehicles
             AAMLocking.gameObject.SetActive(false);
             AAMLockedOn.gameObject.SetActive(false);
             AAGunAnimator.SetBool("inside", false);
-            if (RotatingSound) { RotatingSound.Play(); }
+            if (RotatingSound) { RotatingSound.Stop(); }
         }
         public void SFEXT_O_TakeOwnership()
         {
