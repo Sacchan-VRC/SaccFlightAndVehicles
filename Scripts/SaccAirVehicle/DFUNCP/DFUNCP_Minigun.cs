@@ -130,7 +130,6 @@ namespace SaccFlightAndVehicles
         {
             func_active = true;
             TriggerLastFrame = true;
-            LastFireTime = Time.time;
             if (!InVR) { DFUNC_Selected(); }
             if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(true); }
             AmmoBar.gameObject.SetActive(true);
