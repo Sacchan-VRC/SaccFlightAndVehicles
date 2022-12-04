@@ -250,7 +250,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (Mathf.Abs(TargetRelative.y) > 0.01f)
                         {
-                            SeatAdjustedPos -= transform.InverseTransformDirection(TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y));
+                            SeatAdjustedPos -= Seat.InverseTransformDirection(TargetEyePosition.up * FindNearestPowerOf2Below(TargetRelative.y));//YAW CALIBRATION use transform instead of Seat (breaks AAGun)
                         }
                         else
                         {
@@ -264,7 +264,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (Mathf.Abs(TargetRelative.z) > 0.01f)
                         {
-                            SeatAdjustedPos -= transform.InverseTransformDirection(TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z));
+                            SeatAdjustedPos -= Seat.InverseTransformDirection(TargetEyePosition.forward * FindNearestPowerOf2Below(TargetRelative.z));//YAW CALIBRATION use transform instead of Seat (breaks AAGun)
                         }
                         else
                         {
