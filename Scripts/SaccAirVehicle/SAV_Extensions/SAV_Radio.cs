@@ -25,7 +25,7 @@ public class SAV_Radio : UdonSharpBehaviour
         if (RadioBase)
         {
             RadioBase.SetProgramVariable("MyVehicle", null);
-            RadioBase.SendCustomEvent("SetRadioVoiceVolumesDefault");
+            RadioBase.SendCustomEvent("SetAllVoiceVolumesDefault");
         }
     }
     public void Init()
@@ -57,7 +57,7 @@ public class SAV_Radio : UdonSharpBehaviour
         if (RadioBase)
         {
             RadioBase.SetProgramVariable("MyVehicle", null);
-            RadioBase.SendCustomEvent("SetRadioVoiceVolumesDefault");
+            RadioBase.SendCustomEvent("SetAllVoiceVolumesDefault");
         }
     }
 }

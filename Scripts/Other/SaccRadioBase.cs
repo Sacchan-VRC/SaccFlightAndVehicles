@@ -48,6 +48,8 @@ namespace SaccFlightAndVehicles
         {
             SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes), 5);
             if ((!MyVehicle || !RadioEnabled) && !MyZone) { return; }
+            if (DoZones)
+            { SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2); }//separate in frames for optimization
             NextPlane++;
             if (NextPlane == _AllPlanes_RD.Length) { NextPlane = 0; }
             if (_AllPlanes_RD[NextPlane])
@@ -64,13 +66,10 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
-            if (DoZones)
-            {
-                SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2);//separate in frames for optimization
-            }
         }
         public void SetRadioVoiceVolumes_Zones()
         {
+            if ((!MyVehicle || !RadioEnabled) && !MyZone) { return; }
             NextZone++;
             if (NextZone >= NumZones) { NextZone = 0; }
             SaccRadioZone NextRZ = RadioZones[NextZone];
@@ -85,23 +84,16 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void SetRadioVoiceVolumesDefault()
+        public void SetAllVoiceVolumesDefault()
         {
-            for (int i = 0; i < _AllPlanes_RD.Length; i++)
+            VRCPlayerApi[] AllPlayers = new VRCPlayerApi[100];
+            VRCPlayerApi.GetPlayers(AllPlayers);
+            int numplayers = VRCPlayerApi.GetPlayerCount();
+            for (int i = 0; i < numplayers; i++)
             {
-                if (_AllPlanes_RD[i])
-                {
-                    for (int o = 0; o < _AllPlanes_ENT[i].VehicleSeats.Length; o++)
-                    {
-                        VRCPlayerApi thisplayer = _AllPlanes_ENT[i].VehicleSeats[o].SeatedPlayer;
-                        if (thisplayer != null)
-                        {
-                            thisplayer.SetVoiceDistanceNear(0);
-                            thisplayer.SetVoiceDistanceFar(25);
-                            thisplayer.SetVoiceGain(15);
-                        }
-                    }
-                }
+                AllPlayers[i].SetVoiceDistanceNear(0);
+                AllPlayers[i].SetVoiceDistanceFar(25);
+                AllPlayers[i].SetVoiceGain(15);
             }
         }
         public void ToggleRadio()
