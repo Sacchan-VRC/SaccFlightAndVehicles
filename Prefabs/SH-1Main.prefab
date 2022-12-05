@@ -67,6 +67,7 @@ MonoBehaviour:
   CorrectionTime_Rotation: 1
   RotationSpeedLerpTime: 10
   AntiWarp: 1
+  NonOwnerEnablePhysics: 0
   TestTransform: {fileID: 0}
   TestTransform_Raw: {fileID: 0}
   LagSimDelay: 0
@@ -68941,7 +68942,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 2653143539570689386}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115238084813638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70120,7 +70120,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 388422482105506395}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115238229734847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86993,7 +86992,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 2653143539710161896}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115238828317008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87334,7 +87332,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 2653143540183886235}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115238922619061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -108810,6 +108807,7 @@ MonoBehaviour:
   - {fileID: 8333115239204434117}
   Explosion:
   - {fileID: 8333115239169581613}
+  Explosion_Water: []
   BulletHit:
   - {fileID: 8333115238222141776}
   MissileHit:
@@ -114024,6 +114022,7 @@ MonoBehaviour:
   SwitchFunctionSound: {fileID: 8333115238311187226}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
+  ExternalSeats: []
   AAMTargets: []
 --- !u!114 &8333115239819171336
 MonoBehaviour:
@@ -124582,7 +124581,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 2653143541454527584}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 1651320211060793692}
 --- !u!114 &8333115240067380491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124845,7 +124843,6 @@ MonoBehaviour:
   TargetEyePosition: {fileID: 2653143541203552689}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &8333115240080910066
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140478,7 +140475,7 @@ PrefabInstance:
     - target: {fileID: -8794883849837921433, guid: c70148a519f38b644b6a1131cd7a0160,
         type: 3}
       propertyPath: m_BlendShapeWeights.Array.data[0]
-      value: 45
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -3420833915818761575, guid: c70148a519f38b644b6a1131cd7a0160,
         type: 3}
