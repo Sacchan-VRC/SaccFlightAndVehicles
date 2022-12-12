@@ -26,6 +26,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Extra height on the raycast origin to prevent the wheel from sticking through the floor")]
         public float ExtraRayCastDistance = .5f;
         public float Grip = 7f;
+        private float _Grip = 7f;
         public AnimationCurve GripCurve = AnimationCurve.Linear(0, 1, 1, 1);
         private float WheelSlowDown = 0f;
         [Tooltip("Torque, kindof. How quickly the wheel matches the speed of the ground when in contact with it")]
@@ -220,6 +221,7 @@ namespace SaccFlightAndVehicles
         }
         private void ChangeSurface()
         {
+            _Grip = Grip * SurfaceType_Grips[SurfaceType];
             WheelSlowDown = SurfaceType_Slowdown[SurfaceType];
             StopSkidSound();
             if (SurfaceType < SurfaceType_SkidSounds.Length)
@@ -406,7 +408,7 @@ namespace SaccFlightAndVehicles
                 Vector3 GripForce3;
                 //SusForce has deltatime built in
                 float SusForceMag = SusForce.magnitude;
-                GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (Grip * (SusForceMag / Time.fixedDeltaTime / 90f))) * Grip * SusForceMag;
+                GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (_Grip * (SusForceMag / Time.fixedDeltaTime / 90f))) * _Grip * SusForceMag;
                 //Add the Grip forces to the rigidbody
                 //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
                 CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
@@ -421,8 +423,8 @@ namespace SaccFlightAndVehicles
                                     Debug.Log(string.Concat("GripForce3.magnitude / Time.fixedDeltaTime: ", (GripForce3.magnitude / Time.fixedDeltaTime).ToString()));
                                     Debug.Log(string.Concat("GripForce: ", (ForceUsed / Time.fixedDeltaTime).ToString()));
                                     Debug.Log(string.Concat("SusForce.magnitude / Time.fixedDeltaTime: ", (SusForce.magnitude / Time.fixedDeltaTime).ToString()));//no delta problems
-                                    Debug.Log(string.Concat("(FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f): ", (FullSkidMag / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
-                                    Debug.Log(string.Concat("GRIPCRUVEEVAL : ", GripCurve.Evaluate((FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
+                                    Debug.Log(string.Concat("(FullSkidMag) / (Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f): ", (FullSkidMag / (_Grip * (SusForce.magnitude / Time.fixedDeltaTime / 90f))).ToString()));
+                                    Debug.Log(string.Concat("_CRUVEEVAL : ", GripCurve.Evaluate((FullSkidMag) / (_Grip * (SusForce.magnitude / Time.fixedDeltaTime _/ 90f))).ToString()));
                                 } */
                 //ENDOFDEBUG
             }
