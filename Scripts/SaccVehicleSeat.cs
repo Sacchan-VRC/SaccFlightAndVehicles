@@ -15,7 +15,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Object that is enabled only when sitting in this seat")]
         public GameObject ThisSeatOnly;
         public bool AdjustSeatPosition = true;
-        public bool AdjustSeatRotation = true;
+        // public bool AdjustSeatRotation = true; //YAWCALIBRATION
         public Transform TargetEyePosition;
         [Tooltip("Let other scripts know that this seat is on the outside of the vehicle (stop sound changing when closing canopy)")]
         public bool SeatOutSideVehicle;
