@@ -54056,7 +54056,6 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2341975304134924734}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -65340,7 +65339,8 @@ MonoBehaviour:
   TouchDownSoundSpeed: 35
   PlaneWind: {fileID: 4371473019482881605}
   PlaneWindMultiplier: 0.25
-  PlaneWindMaxVolSpeed: 1000
+  PlaneWindMinAoAtest: 3
+  PlaneWindMaxVolSpeed: 400
   SonicBoom:
   - {fileID: 4371473018870298480}
   Explosion:
@@ -81172,7 +81172,6 @@ MonoBehaviour:
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 4371473018583758445}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 543805048618571905}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25

@@ -29579,7 +29579,8 @@ MonoBehaviour:
   TouchDownSoundSpeed: 35
   PlaneWind: {fileID: 0}
   PlaneWindMultiplier: 0.25
-  PlaneWindMaxVolSpeed: 1000
+  PlaneWindMinVol: 3
+  PlaneWindMaxVolSpeed: 50
   SonicBoom:
   - {fileID: 2934804654972944781}
   Explosion:
@@ -51674,7 +51675,6 @@ MonoBehaviour:
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 2934804655512785824}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 374746152193602298}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -99037,7 +99037,6 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2809707790251052369}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -99279,7 +99278,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2934804655656756582}
   serializedVersion: 2
-  m_Mass: 208
+  m_Mass: 450
   m_Drag: 0
   m_AngularDrag: 0
   m_UseGravity: 1
