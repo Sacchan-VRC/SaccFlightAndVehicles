@@ -52,7 +52,6 @@ namespace SaccFlightAndVehicles
         [UdonSynced] private short O_RotationX;
         [UdonSynced] private short O_RotationY;
         [UdonSynced] private short O_RotationZ;
-        //sending velocity improves quality but will cause laggy movment if someone has very low fps.
         [UdonSynced] private Vector3 O_CurVel = Vector3.zero;
         private Vector3 O_CurVelLast = Vector3.zero;
         private Vector3 O_Rotation;
@@ -241,7 +240,7 @@ namespace SaccFlightAndVehicles
                 {
                     ResetSyncTimes();
                     time = Networking.GetServerTimeInSeconds();//because we just ResetSyncTimes()'d
-                    if (AntiWarp)//let's see if we can fix the physics jerkiness for observers if the FPS is extremely low
+                    if (AntiWarp)//let's see if we can fix the movement jerkiness for observers if the FPS is extremely low
                     {
                         double acctime = time;
                         double accuratedelta = acctime - lastframetime;
@@ -321,7 +320,7 @@ namespace SaccFlightAndVehicles
             Vector3 Deriv = Vector3.zero;
             Vector3 Correction = (Extrapolation_Raw - TestTransform.position) * CorrectionTime;
             float Error = Vector3.Distance(TestTransform.position, Extrapolation_Raw);
-            if (Time.deltaTime > .099f)
+            if (deltatime > .099f)
             {
                 time = Networking.GetServerTimeInSeconds();
                 deltatime = (float)(time - lastframetime_extrap);
