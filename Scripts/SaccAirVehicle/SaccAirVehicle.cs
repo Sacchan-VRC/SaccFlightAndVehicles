@@ -277,6 +277,7 @@ namespace SaccFlightAndVehicles
                     {
                         EntityControl.SendEventToExtensions("SFEXT_G_EngineOn");
                         VehicleAnimator.SetBool("EngineOn", true);
+                        WakeUp();
                     }
 
 
@@ -1486,6 +1487,7 @@ namespace SaccFlightAndVehicles
         {
             Asleep = false;
             EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
+            VehicleRigidbody.WakeUp();
         }
         private void FallAsleep()
         {
