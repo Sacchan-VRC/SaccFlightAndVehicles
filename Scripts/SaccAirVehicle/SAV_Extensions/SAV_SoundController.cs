@@ -33,8 +33,10 @@ namespace SaccFlightAndVehicles
         public AudioSource PlaneWind;
         [Tooltip("How quickly when pulling AoA the wind will get louder")]
         public float PlaneWindMultiplier = .25f;
+        [Tooltip("Increase this number to increase the minimum volume of the Plane Wind sound as speed increases")]
+        public float PlaneWindMinVol = 3f;
         [Tooltip("How fast before the planewind stops getting louder when pulling AoA")]
-        public float PlaneWindMaxVolSpeed = 1000f;
+        public float PlaneWindMaxVolSpeed = 400f;
         [Tooltip("Sounds that can be played when vehicle causes a sonic boom")]
         public AudioSource[] SonicBoom;
         [Tooltip("Sounds that can be played when vehicle explodes")]
@@ -378,7 +380,7 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.smoothDeltaTime;
             if (DoSound > 35f)
             {
-                if (!soundsoff && (!InVehicle_Sounds || !AllDoorsClosed))//disable all the sounds that always play, re-enabled in pilotseat
+                if (!soundsoff && (!InVehicle || !AllDoorsClosed))//disable all the sounds that always play, re-enabled in pilotseat
                 {
                     if (PlaneDistant) { PlaneDistant.Stop(); }
                     if (PlaneWind) { PlaneWind.Stop(); }
@@ -467,6 +469,13 @@ namespace SaccFlightAndVehicles
             }
 
             //Piloting = true in editor play mode w/o cyanemu
+            if (InVehicle)
+            {
+                if (PlaneWind)
+                {
+                    PlaneWind.volume = Mathf.Min(Mathf.Max((float)SAVControl.GetProgramVariable("AngleOfAttack"), PlaneWindMinVol) * ((float)SAVControl.GetProgramVariable("Speed") * PlaneWindMaxVolSpeedDivider) * PlaneWindMultiplier, PlaneWindInitialVolume);
+                }
+            }
             if (InVehicle_Sounds && AllDoorsClosed)
             {
                 if (!RollingOnWater && _rolling)
@@ -485,10 +494,6 @@ namespace SaccFlightAndVehicles
                         PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, PlaneInsideTargetVolume, PlaneInsideVolLerpValueOn * DeltaTime);
                     }
                     PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, engineout * PlaneThrustTargetVolume * InVehicleThrustVolumeFactor, PlaneThrustVolLerpValueOn * DeltaTime);
-                    if (PlaneWind)
-                    {
-                        PlaneWind.volume = Mathf.Min((float)SAVControl.GetProgramVariable("AngleOfAttack") * ((float)SAVControl.GetProgramVariable("Speed") * PlaneWindMaxVolSpeedDivider) * PlaneWindMultiplier, PlaneWindInitialVolume);
-                    }
                 }
                 else//you're a passenger and engine is off
                 {
@@ -498,10 +503,6 @@ namespace SaccFlightAndVehicles
                         PlaneInside.volume = Mathf.Lerp(PlaneInside.volume, 0, PlaneInsideVolLerpValueOff * DeltaTime);
                     }
                     PlaneThrustVolume = Mathf.Lerp(PlaneThrustVolume, 0, PlaneThrustVolLerpValueOff * DeltaTime);
-                    if (PlaneWind)
-                    {
-                        PlaneWind.volume = Mathf.Min((float)SAVControl.GetProgramVariable("AngleOfAttack") * ((float)SAVControl.GetProgramVariable("Speed") * PlaneWindMaxVolSpeedDivider) * PlaneWindMultiplier, PlaneWindInitialVolume);
-                    }
                 }
             }
             else if (EngineStarted)//someone else is piloting
@@ -700,6 +701,8 @@ namespace SaccFlightAndVehicles
             }
             if (AllDoorsClosed && InVehicle_Sounds)
             { SetSoundsInside(); }
+            if (PlaneWind && !PlaneWind.isPlaying)
+            { PlaneWind.volume = 0; PlaneWind.Play(); }
             if (InWater) { if (UnderWater) { UnderWater.Play(); } }
         }
         public void SFEXT_O_PilotExit()
@@ -708,6 +711,8 @@ namespace SaccFlightAndVehicles
             InVehicle = InVehicle_Sounds = false;
             if (UnderWater) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
             SetSoundsOutside();
+            if (PlaneWind && PlaneWind.isPlaying)
+            { PlaneWind.Stop(); }
         }
         public void SFEXT_P_PassengerEnter()
         {
@@ -720,6 +725,8 @@ namespace SaccFlightAndVehicles
             }
             if (AllDoorsClosed && InVehicle_Sounds)
             { SetSoundsInside(); }
+            if (PlaneWind && !PlaneWind.isPlaying)
+            { PlaneWind.volume = 0; PlaneWind.Play(); }
             if (InWater) { if (UnderWater) { UnderWater.Play(); } }
         }
         public void SFEXT_P_PassengerExit()
@@ -727,6 +734,8 @@ namespace SaccFlightAndVehicles
             Passenger = false;
             InVehicle = InVehicle_Sounds = false;
             if (UnderWater) { if (UnderWater.isPlaying) { UnderWater.Stop(); } }
+            if (PlaneWind && PlaneWind.isPlaying)
+            { PlaneWind.Stop(); }
             SetSoundsOutside();
         }
         public void SFEXT_G_EngineStartup()
@@ -1052,8 +1061,6 @@ namespace SaccFlightAndVehicles
             }
             if (PlaneDistant && PlaneDistant.isPlaying)
             { PlaneDistant.Stop(); }
-            if (PlaneWind && !PlaneWind.isPlaying)
-            { PlaneWind.volume = 0; PlaneWind.Play(); }
             if (PlaneInside && !PlaneInside.isPlaying)
             { PlaneInside.Play(); }
             if (!PlaneIdleNull && PlaneIdle[0].isPlaying)
@@ -1068,8 +1075,6 @@ namespace SaccFlightAndVehicles
             SoundsOutside = true;
             if (RadarLocked) { RadarLocked.Stop(); }
             if (!RollingOnWater && _rolling) { _rolling.Stop(); }
-            if (PlaneInside) { PlaneInside.Stop(); }
-            if (PlaneWind) { PlaneWind.Stop(); }
             if (EngineStartupInside) { EngineStartupInside.Stop(); }
             if (EngineStartupCancelInside) { EngineStartupCancelInside.Stop(); }
             if (EngineTurnOffInside) { EngineTurnOffInside.Stop(); }
