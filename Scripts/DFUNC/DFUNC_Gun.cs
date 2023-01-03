@@ -35,9 +35,10 @@ namespace SaccFlightAndVehicles
         public bool AnimBoolStayTrueOnExit;
         [Tooltip("Allow gun to fire while vehicle is on the ground?")]
         public bool AllowFiringGrounded = true;
+        [Tooltip("Enable these objects when GUN selected")]
+        public GameObject[] EnableOnSelected;
         private bool Grounded;
         private SaccEntity EntityControl;
-        private float boolToggleTime;
         private bool AnimOn;
         private int AnimBool_STRING;
         private bool UseLeftTrigger = false;
@@ -155,6 +156,8 @@ namespace SaccFlightAndVehicles
         {
             if (HudCrosshairGun) { HudCrosshairGun.SetActive(true); }
             if (HudCrosshair) { HudCrosshair.SetActive(false); }
+            for (int i = 0; i < EnableOnSelected.Length; i++)
+            { EnableOnSelected[i].SetActive(true); }
         }
         public void Set_Unselected()
         {
@@ -162,6 +165,8 @@ namespace SaccFlightAndVehicles
             if (HudCrosshair) { HudCrosshair.SetActive(true); }
             if (TargetIndicator) { TargetIndicator.gameObject.SetActive(false); }
             if (GUNLeadIndicator) { GUNLeadIndicator.gameObject.SetActive(false); }
+            for (int i = 0; i < EnableOnSelected.Length; i++)
+            { EnableOnSelected[i].SetActive(false); }
         }
         public void Set_Active()
         {
@@ -485,13 +490,11 @@ namespace SaccFlightAndVehicles
         }
         public void SetBoolOn()
         {
-            boolToggleTime = Time.time;
             AnimOn = true;
             GunAnimator.SetBool(AnimBoolName, AnimOn);
         }
         public void SetBoolOff()
         {
-            boolToggleTime = Time.time;
             AnimOn = false;
             GunAnimator.SetBool(AnimBoolName, AnimOn);
         }
