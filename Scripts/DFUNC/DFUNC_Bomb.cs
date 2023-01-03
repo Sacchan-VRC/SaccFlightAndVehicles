@@ -22,8 +22,13 @@ namespace SaccFlightAndVehicles
         public float BombDelay = 0f;
         [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
         public Transform[] BombLaunchPoints;
+        public AudioSource LaunchSound;
         [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
         public bool AllowFiringWhenGrounded = false;
+        [Tooltip("How much the vehicle should be pushed back when dropping a 'bomb' (useful for making cannons)")]
+        public float Recoil = 0f;
+        [Tooltip("Backwards vector of this transform is the direction along which the recoil force is applied (backwards so it can default to VehicleTransform)")]
+        public Transform RecoilDirection;
         public bool DoAnimBool = false;
         [Tooltip("Animator bool that is true when this function is selected")]
         public string AnimBoolName = "BombSelected";
@@ -36,6 +41,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Dropped bombs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
         public Camera AtGCam;
+        public bool SetAtGCamSettings = true;
         public GameObject AtGScreen;
         [UdonSynced, FieldChangeCallback(nameof(BombFire))] private ushort _BombFire;
         public ushort BombFire
@@ -59,6 +65,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int FullBombs;
         private float FullBombsDivider;
         private Transform VehicleTransform;
+        private Rigidbody VehicleRigid;
         private float reloadspeed;
         private bool LeftDial = false;
         private bool Piloting = false;
@@ -78,11 +85,13 @@ namespace SaccFlightAndVehicles
             FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
             reloadspeed = FullBombs / FullReloadTimeSec;
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+            VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             BombAnimator = EntityControl.GetComponent<Animator>();
             CenterOfMass = EntityControl.CenterOfMass;
             VehicleTransform = EntityControl.transform;
             localPlayer = Networking.LocalPlayer;
             IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            if (!RecoilDirection) { RecoilDirection = VehicleTransform; }
 
             FindSelf();
 
@@ -139,8 +148,11 @@ namespace SaccFlightAndVehicles
             if (AtGCam)
             {
                 AtGCam.gameObject.SetActive(true);
-                AtGCam.fieldOfView = 60;
-                AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
+                if (SetAtGCamSettings)
+                {
+                    AtGCam.fieldOfView = 60;
+                    AtGCam.transform.localRotation = Quaternion.Euler(110, 0, 0);
+                }
             }
         }
         public void DFUNC_Deselected()
@@ -249,6 +261,8 @@ namespace SaccFlightAndVehicles
                 BombPoint++;
                 if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
             }
+            VehicleRigid.AddForce(-RecoilDirection.forward * Recoil, ForceMode.VelocityChange);
+            if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
             UpdateAmmoVisuals();
         }
         private void FindSelf()
