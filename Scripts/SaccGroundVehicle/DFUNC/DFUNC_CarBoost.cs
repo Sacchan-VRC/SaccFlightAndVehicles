@@ -16,45 +16,6 @@ namespace SaccFlightAndVehicles
         public float ResupplyTime = 10f;
         public Animator BoostAnimator;
         public KeyCode BoostKey;
-        [Header("Use AddForce instead of increasing DriveSpeed?")]
-        public bool BoostType_Force;
-        [Tooltip("Amount of Force added when boosting using BoostType_Force")]
-        public float BoostForce = 100f;
-        public Transform BoostPoint;
-        public bool UseMainFuel = false;
-        [Tooltip("If using main fuel, use this much per second")]
-        public float MainFuelUsePerSecond = 30f;
-        private Rigidbody VehicleRigidbody;
-        [Header("Debug")]
-        [UdonSynced, FieldChangeCallback(nameof(Boosting))] public float _Boosting;
-        public float Boosting
-        {
-            set
-            {
-                BoostAnimator.SetFloat(BOOSTING_STRING, value);
-                _Boosting = value;
-            }
-            get => _Boosting;
-        }
-        private float StartDriveSpeed;
-        [UdonSynced, FieldChangeCallback(nameof(BoostRemaining))] public float _BoostRemaining;
-        public float BoostRemaining
-        {
-            set
-            {
-                BoostAnimator.SetFloat(BOOSTREMAINING_STRING, value * BoostRemainingDivider);
-                _BoostRemaining = value;
-            }
-            get => _BoostRemaining;
-        }
-        private float BoostRemainingDivider;
-        private float LastUpdateTime;
-        private float RevLimiter;
-        private bool Selected = false;
-        private bool Piloting = false;
-        private bool boostingLast = false;
-        private bool UseLeftTrigger = false;
-        private bool ApplyBoostForce = false;
         private int BOOSTING_STRING = Animator.StringToHash("boosting");
         [FieldChangeCallback(nameof(BoostingAnimFloatName))] public string _BoostingAnimFloatName = "boosting";
         public string BoostingAnimFloatName
@@ -77,6 +38,45 @@ namespace SaccFlightAndVehicles
             }
             get => _BoostRemainingAnimFloatName;
         }
+        [Header("Use AddForce instead of increasing DriveSpeed?")]
+        public bool BoostType_Force;
+        [Tooltip("Amount of Force added when boosting using BoostType_Force")]
+        public float BoostForce = 100f;
+        public Transform BoostPoint;
+        public bool UseMainFuel = false;
+        [Tooltip("If using main fuel, use this much per second")]
+        public float MainFuelUsePerSecond = 30f;
+        [Header("Debug")]
+        [UdonSynced, FieldChangeCallback(nameof(Boosting))] public float _Boosting;
+        public float Boosting
+        {
+            set
+            {
+                BoostAnimator.SetFloat(BOOSTING_STRING, value);
+                _Boosting = value;
+            }
+            get => _Boosting;
+        }
+        private float StartDriveSpeed;
+        [UdonSynced, FieldChangeCallback(nameof(BoostRemaining))] public float _BoostRemaining;
+        public float BoostRemaining
+        {
+            set
+            {
+                BoostAnimator.SetFloat(BOOSTREMAINING_STRING, value * BoostRemainingDivider);
+                _BoostRemaining = value;
+            }
+            get => _BoostRemaining;
+        }
+        private Rigidbody VehicleRigidbody;
+        private float BoostRemainingDivider;
+        private float LastUpdateTime;
+        private float RevLimiter;
+        private bool Selected = false;
+        private bool Piloting = false;
+        private bool boostingLast = false;
+        private bool UseLeftTrigger = false;
+        private bool ApplyBoostForce = false;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         void Start()
