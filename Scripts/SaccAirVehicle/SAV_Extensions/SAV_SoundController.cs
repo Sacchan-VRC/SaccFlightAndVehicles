@@ -1076,6 +1076,7 @@ namespace SaccFlightAndVehicles
             if (RadarLocked) { RadarLocked.Stop(); }
             if (!RollingOnWater && _rolling) { _rolling.Stop(); }
             if (EngineStartupInside) { EngineStartupInside.Stop(); }
+            if (PlaneInside) { PlaneInside.Stop(); }
             if (EngineStartupCancelInside) { EngineStartupCancelInside.Stop(); }
             if (EngineTurnOffInside) { EngineTurnOffInside.Stop(); }
 
