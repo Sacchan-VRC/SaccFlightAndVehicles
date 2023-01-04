@@ -802,10 +802,8 @@ namespace SaccFlightAndVehicles
                 //synced variables because rigidbody values aren't accessable by non-owner players
                 CurrentVel = VehicleRigidbody.velocity;//CurrentVel is set by SAV_SyncScript for non owners
                 Speed = CurrentVel.magnitude;
-                bool VehicleMoving;
                 if (Piloting)
                 {
-                    VehicleMoving = true;
                     WindAndAoA();
                     DoRepeatingWorld();
 
@@ -1153,15 +1151,12 @@ namespace SaccFlightAndVehicles
                 {
                     if (Speed > .01f)
                     {
-                        VehicleMoving = true;//check this bool later for more optimizations
                         WindAndAoA();
                     }
                     else if (!Asleep && GroundedLastFrame)
                     {
                         FallAsleep();
-                        VehicleMoving = false;
                     }
-                    else { VehicleMoving = false; }
                     if (Taxiing)
                     {
                         StillWindMulti = Mathf.Min(Speed * .1f, 1);
@@ -1203,7 +1198,7 @@ namespace SaccFlightAndVehicles
                     float SpeedLiftFactor_pd = 0;
                     float rotlift = 0;
 
-                    if (VehicleMoving)//optimization
+                    if (!Asleep)//optimization
                     {
                         //used to create air resistance for updown and sideways if your movement direction is in those directions
                         //to add physics to plane's yaw and pitch, accel angvel towards velocity, and add force to the plane
@@ -1238,7 +1233,7 @@ namespace SaccFlightAndVehicles
                         VelLift = pitch = yaw = roll = 0;
                     }
 
-                    if ((VehicleMoving) && !_OverrideConstantForce)
+                    if ((!Asleep) && !_OverrideConstantForce)
                     {
                         //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                         //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
