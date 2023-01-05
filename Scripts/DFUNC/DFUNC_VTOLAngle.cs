@@ -46,6 +46,7 @@ namespace SaccFlightAndVehicles
             IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
             float vtolangledif = (float)SAVControl.GetProgramVariable("VTOLMaxAngle") - (float)SAVControl.GetProgramVariable("VTOLMinAngle");
             VTOLAngleDivider = (float)SAVControl.GetProgramVariable("VTOLAngleTurnRate") / vtolangledif;
+            VTOLMover = VTOLAngleLast = NewVTOLAngle = VTOLAngle = (float)SAVControl.GetProgramVariable("VTOLAngle");
         }
         public void SFEXT_O_PilotEnter()
         {
