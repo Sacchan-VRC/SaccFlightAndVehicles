@@ -31,6 +31,7 @@ namespace SaccFlightAndVehicles
         public float PullReductionStrength = 5f;
         [Tooltip("Snap rigidbody target connection points to just above their CoM?")]
         public bool HoldTargetUpright = false;
+        [Tooltip("Select the function instead of just instantly firing it with keyboard input?")]
         public bool KeyboardSelectMode = false;
         public LineRenderer Rope_Line;
         public Transform RopeBasePoint;
@@ -66,7 +67,11 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                if (!Initialized || !Occupied || !_HookLaunched) { _HookAttachPoint = value; return; }
+                if (!Initialized) { _HookAttachPoint = value; return; }
+                if (!_HookLaunched)//hook launch and attach was recieved on same update
+                {
+                    LaunchHook(true);
+                }
                 float spheresize = SphereCastAccuracy;
                 int hitlen = 0;
                 RaycastHit[] hits = new RaycastHit[0];
@@ -242,12 +247,14 @@ namespace SaccFlightAndVehicles
                 if (value)
                 {
                     _HookLaunched = value;
-                    LaunchHook();
+                    if (!HookAttached)
+                    { LaunchHook(false); }
                 }
                 else
                 {
                     ResetHook();
                     _HookLaunched = value;
+                    if (!Occupied && !IsOwner) { gameObject.SetActive(false); }
                 }
             }
             get => _HookLaunched;
@@ -267,9 +274,9 @@ namespace SaccFlightAndVehicles
             foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
             FindSelf();
         }
-        public void LaunchHook()
+        public void LaunchHook(bool InstantHit)
         {
-            if (!Initialized || !Occupied) { return; }
+            if (!Initialized) { return; }
             Rope_Line.gameObject.SetActive(true);
             HookLaunchTime = Time.time;
             HookLaunchRot = Hook.rotation;
@@ -277,7 +284,7 @@ namespace SaccFlightAndVehicles
             LaunchSpeed = LaunchVec.magnitude;
             Hook.parent = VehicleRB.transform.parent;
             Hook.position = HookLaunchPoint.position;
-            HookFlyLoop();
+            if (!InstantHit) { HookFlyLoop(); }
             HookLaunch.Play();
         }
         public void HookFlyLoop()
@@ -299,10 +306,11 @@ namespace SaccFlightAndVehicles
             }
             Hook.position += LaunchVec * Time.deltaTime;
             HookLength = Vector3.Distance(HookLaunchPoint.position, Hook.position);
-            if (HookLength > HookRange)
+            if (IsOwner && HookLength > HookRange)
             {
                 HookLaunched = false;
-                if (IsOwner) { RequestSerialization(); }
+                if (!Occupied) { SendCustomEventDelayedSeconds(nameof(DisableThis), 2f); }
+                RequestSerialization();
                 return;
             }
             if (Rope_Line)
@@ -418,20 +426,23 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_Explode()
         {
-            Debug.Log("SFEXT_G_Explode");
-            ResetHook();
+            if (IsOwner)
+            {
+                if (_HookLaunched)
+                { HookLaunched = false; RequestSerialization(); }
+            }
+            //make sure this happens because the one in the HookLaunched Set may not be reliable because synced variables are faster than events
+            SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
         }
+        public void DisableThis() { if (!Occupied) { gameObject.SetActive(false); } }
         public void SFEXT_O_PilotExit()
         {
-            Debug.Log("SFEXT_O_PilotExit");
             Selected = false;
             if (!InVr && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); } }
         }
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
-            if (_HookLaunched)
-            { HookLaunched = false; RequestSerialization(); }
         }
         public void SFEXT_O_LoseOwnership()
         {
@@ -439,10 +450,6 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
-            PlayReelIn = false;
-            HookLaunched = false;
-            PlayReelIn = true;
-            RequestSerialization();
             if (!InVr && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(true); } }
         }
         public void SFEXT_G_PilotEnter()
@@ -450,13 +457,19 @@ namespace SaccFlightAndVehicles
             Occupied = true;
             gameObject.SetActive(true);
         }
+        public void SFEXT_O_RespawnButton()
+        {
+            PlayReelIn = false;
+            HookLaunched = false;
+            PlayReelIn = true;
+            RequestSerialization();
+            SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
+        }
         public void SFEXT_G_PilotExit()
         {
-            Debug.Log("SFEXT_G_PilotExit");
             Occupied = false;
-            if (_HookLaunched)
-            { HookLaunched = false; }
-            gameObject.SetActive(false);
+            if (!_HookLaunched)
+            { SendCustomEventDelayedSeconds(nameof(DisableThis), 2f); }
         }
         public void KeyboardInput()
         {
