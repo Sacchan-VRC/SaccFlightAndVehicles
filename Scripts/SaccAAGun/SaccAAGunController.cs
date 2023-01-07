@@ -26,6 +26,8 @@ namespace SaccFlightAndVehicles
         public AudioSource AAMLocking;
         [Tooltip("Sound that plays when locked onto a target")]
         public AudioSource AAMLockedOn;
+        [Tooltip("Sound that plays when a target is hit")]
+        public AudioSource DamageFeedBack;
         [Tooltip("Joystick object that moves around in to show rotation inputs")]
         public Transform JoyStick;
         [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
@@ -776,6 +778,10 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
+        }
+        public void SFEXT_L_DamageFeedback()
+        {
+            if (DamageFeedBack) { DamageFeedBack.PlayOneShot(DamageFeedBack.clip); }
         }
     }
 }
