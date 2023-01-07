@@ -344,6 +344,7 @@ namespace SaccFlightAndVehicles
                 if (HookedEntity.Using)
                 {
                     Networking.SetOwner(Networking.LocalPlayer, HookedEntity.gameObject);
+                    HookedEntity.SendEventToExtensions("SFEXT_L_SetEngineOn");
                 }
                 HookedEntity = null;
             }
