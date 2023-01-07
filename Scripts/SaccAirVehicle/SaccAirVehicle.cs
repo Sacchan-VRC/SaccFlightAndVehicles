@@ -322,14 +322,16 @@ namespace SaccFlightAndVehicles
             }
             get => _EngineOn;
         }
+        public void SFEXT_G_SetEngineOn() { EngineOn = true; }
+        public void SFEXT_G_SetEngineOff() { EngineOn = false; }
+        public void SFEXT_L_SetEngineOn()//send this event from other scripts locally to turn engine on for everyone (grapple uses it)
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn)); }
+        public void SFEXT_L_SetEngineOff()
+        { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff)); }
         public void SetEngineOn()
-        {
-            EngineOn = true;
-        }
+        { EntityControl.SendEventToExtensions("SFEXT_G_SetEngineOn"); }
         public void SetEngineOff()
-        {
-            EngineOn = false;
-        }
+        { EntityControl.SendEventToExtensions("SFEXT_G_SetEngineOff"); }
         [System.NonSerializedAttribute] public float AllGs;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
