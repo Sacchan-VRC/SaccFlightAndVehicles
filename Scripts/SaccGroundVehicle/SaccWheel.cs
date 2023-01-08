@@ -26,9 +26,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Extra height on the raycast origin to prevent the wheel from sticking through the floor")]
         public float ExtraRayCastDistance = .5f;
         public float Grip = 7f;
-        private float _Grip = 7f;
         public AnimationCurve GripCurve = AnimationCurve.Linear(0, 1, 1, 1);
-        private float WheelSlowDown = 0f;
         [Tooltip("Torque, kindof. How quickly the wheel matches the speed of the ground when in contact with it")]
         public float WheelWeight = 0.1f;
         public float BrakeStrength = 500f;
@@ -56,26 +54,25 @@ namespace SaccFlightAndVehicles
         [Tooltip("Skip sound and skid effects completely")]
         public bool DisableEffects = false;
         [Header("Debug")]
-        public bool IsDriveWheel = false;
+        public float CurrentGrip = 7f;
+        public float CurrentWheelSlowDown = 0f;
+        private bool IsDriveWheel = false;
         private AudioSource SkidSound;
         private ParticleSystem SkidParticle;
         private ParticleSystem.EmissionModule SkidParticleEM;
         private Vector3 SkidVectorFX;
         [UdonSynced(UdonSyncMode.Linear)] private float SkidLength;
-        public int SurfaceType = -1;
         public float Clutch = 1f;
         public float WheelRotation;
         public float WheelRotationSpeedRPS;
         public float WheelRotationSpeedRPM;
         public float WheelRotationSpeedSurf;
         public float EngineRevs = 0;
-        public bool DrawGripCurve;
-        public GameObject CurveObject;
-        public Transform VecDebug;
         public bool Grounded;
         [System.NonSerialized] public float HandBrake;
         [System.NonSerialized] public float Brake;
         public bool Sleeping;
+        private int SurfaceType = -1;
         private float SkidVolumeMulti = 1;
         private bool SkidSoundPlayingLast;
         private bool SkidParticlePlayingLast;
@@ -221,8 +218,8 @@ namespace SaccFlightAndVehicles
         }
         private void ChangeSurface()
         {
-            _Grip = Grip * SurfaceType_Grips[SurfaceType];
-            WheelSlowDown = SurfaceType_Slowdown[SurfaceType];
+            CurrentGrip = Grip * SurfaceType_Grips[SurfaceType];
+            CurrentWheelSlowDown = SurfaceType_Slowdown[SurfaceType];
             StopSkidSound();
             if (SurfaceType < SurfaceType_SkidSounds.Length)
             {
@@ -298,6 +295,9 @@ namespace SaccFlightAndVehicles
             //ENDOFDEBUG
             if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
             {
+#if UNITY_EDITOR
+                ContactPoint = SusOut.point;
+#endif
                 Grounded = true;
                 //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop
                 if (Vector3.Angle(SusOut.normal, Vector3.up) < 20)
@@ -383,8 +383,6 @@ namespace SaccFlightAndVehicles
 
                 //add both skid axis together to get total 'skid'
                 Vector3 FullSkid = SideSkid + ForwardSkid;
-                //enable to see the skid vector
-                //if (VecDebug) { VecDebug.position = FullSkid + transform.position; }
                 float FullSkidMag = FullSkid.magnitude;
 
                 //find out how much of the skid is on the forward axis 
@@ -408,11 +406,15 @@ namespace SaccFlightAndVehicles
                 Vector3 GripForce3;
                 //SusForce has deltatime built in
                 float SusForceMag = SusForce.magnitude;
-                GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (_Grip * (SusForceMag / Time.fixedDeltaTime / 90f))) * _Grip * SusForceMag;
+                GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / Time.fixedDeltaTime / 90f))) * CurrentGrip * SusForceMag;
                 //Add the Grip forces to the rigidbody
                 //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
                 CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
                 ForceUsed = (GripForce3.magnitude * ForwardSideRatio);
+#if UNITY_EDITOR
+                ForceVector = GripForce3;
+                ForceUsedDBG = ForceUsed;
+#endif
                 //DEBUG
                 /*                 if (PrintDebugValues)
                                 {
@@ -457,7 +459,7 @@ namespace SaccFlightAndVehicles
                 SkidVectorFX += (Vector3.forward * Mathf.Abs(ForwardSlip));
             }
             //wheels slow down due to ?friction
-            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, Time.fixedDeltaTime * WheelSlowDown);
+            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, Time.fixedDeltaTime * CurrentWheelSlowDown);
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
             WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
@@ -658,5 +660,19 @@ namespace SaccFlightAndVehicles
             WheelRotationSpeedRPM = 0;
             WheelRotationSpeedSurf = 0;
         }
+#if UNITY_EDITOR
+        [Header("Editor Only, use in play mode")]
+        public bool ShowWheelForceLines;
+        public float ForceUsedDBG;
+        public Vector3 ContactPoint;
+        public Vector3 ForceVector;
+        private void OnDrawGizmosSelected()
+        {
+            if (ShowWheelForceLines)
+            {
+                Gizmos.DrawLine(ContactPoint, ContactPoint + ForceVector);
+            }
+        }
+#endif
     }
 }
