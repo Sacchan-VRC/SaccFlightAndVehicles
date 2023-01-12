@@ -164,7 +164,7 @@ namespace SaccFlightAndVehicles
                 CenterOfMass = gameObject.transform;
                 Debug.Log(string.Concat(gameObject.name, ": ", "No Center Of Mass Set"));
             }
-            VehicleStations = (VRC.SDK3.Components.VRCStation[])GetComponentsInChildren(typeof(VRC.SDK3.Components.VRCStation), true);
+            VehicleStations = GetComponentsInChildren<VRCStation>(true);
             //add EXTRASEATS to VehicleStations list
             if (ExternalSeats.Length > 0)
             {
