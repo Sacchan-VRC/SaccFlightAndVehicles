@@ -271,8 +271,11 @@ namespace SaccFlightAndVehicles
             HookStartPos = Hook.localPosition;
             HookStartRot = Hook.localRotation;
             InVr = Networking.LocalPlayer.IsUserInVR();
+            Dial_Funcon.SetActive(false);
             foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
             FindSelf();
+            gameObject.SetActive(true);
+            SendCustomEventDelayedSeconds(nameof(DisableThis), 10f);
         }
         public void LaunchHook(bool InstantHit)
         {
@@ -435,7 +438,7 @@ namespace SaccFlightAndVehicles
             //make sure this happens because the one in the HookLaunched Set may not be reliable because synced variables are faster than events
             SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
         }
-        public void DisableThis() { if (!Occupied) { gameObject.SetActive(false); } }
+        public void DisableThis() { if (!Occupied && !_HookLaunched) { gameObject.SetActive(false); } }
         public void SFEXT_O_PilotExit()
         {
             Selected = false;
@@ -458,13 +461,17 @@ namespace SaccFlightAndVehicles
             Occupied = true;
             gameObject.SetActive(true);
         }
+        public void SFEXT_G_RespawnButton()
+        {
+            gameObject.SetActive(true);
+            SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
+        }
         public void SFEXT_O_RespawnButton()
         {
             PlayReelIn = false;
             HookLaunched = false;
             PlayReelIn = true;
             RequestSerialization();
-            SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
         }
         public void SFEXT_G_PilotExit()
         {
@@ -542,8 +549,10 @@ namespace SaccFlightAndVehicles
             Selected = false;
             foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
         }
+        public Transform TESTCUBE;
         private void Update()
         {
+            if (TESTCUBE) TESTCUBE.gameObject.SetActive(!TESTCUBE.gameObject.activeSelf);
             if (Selected)
             {
                 float Trigger;
