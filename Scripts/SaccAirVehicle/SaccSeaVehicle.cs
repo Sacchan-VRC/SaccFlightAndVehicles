@@ -902,7 +902,7 @@ namespace SaccFlightAndVehicles
                     {
                         WindAndAoA();
                     }
-                    else if (!Asleep && GroundedLastFrame)
+                    else if (!Asleep && GroundedLastFrame && !KeepAwake)
                     {
                         FallAsleep();
                     }
@@ -1089,6 +1089,9 @@ namespace SaccFlightAndVehicles
             Asleep = false;
             EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
         }
+        private bool KeepAwake = false;
+        public void SFEXT_L_KeepAwake() { KeepAwake = true; }
+        public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
         private void FallAsleep()
         {
             Asleep = true;
