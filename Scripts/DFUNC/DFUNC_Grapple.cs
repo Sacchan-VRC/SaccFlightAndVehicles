@@ -101,7 +101,10 @@ namespace SaccFlightAndVehicles
                                         HookedEntity = hit.collider.attachedRigidbody.GetComponent<SaccFlightAndVehicles.SaccEntity>();
                                         if (HookedEntity == EntityControl) { HitSelf = true; continue; } //skip if raycast finds own vehicle
                                         else
-                                        { HookedEntity.SendEventToExtensions("SFEXT_L_WakeUp"); }
+                                        {
+                                            HookedEntity.SendEventToExtensions("SFEXT_L_WakeUp");
+                                            HookedEntity.SendEventToExtensions("SFEXT_L_KeepAwake");
+                                        }
                                     }
                                     else { HookedEntity = null; }
                                     NearestDist = tempdist;
@@ -343,6 +346,7 @@ namespace SaccFlightAndVehicles
             Hook.localRotation = HookStartRot;
             if (HookedEntity)
             {
+                HookedEntity.SendEventToExtensions("SFEXT_L_KeepAwakeFalse");
                 UndoHookOverrides();
                 if (HookedEntity.Using)
                 {
@@ -549,10 +553,8 @@ namespace SaccFlightAndVehicles
             Selected = false;
             foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
         }
-        public Transform TESTCUBE;
         private void Update()
         {
-            if (TESTCUBE) TESTCUBE.gameObject.SetActive(!TESTCUBE.gameObject.activeSelf);
             if (Selected)
             {
                 float Trigger;

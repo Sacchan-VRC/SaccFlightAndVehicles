@@ -163,6 +163,9 @@ namespace SaccFlightAndVehicles
             DoEffects = 0f;
             Sleeping = false;
         }
+        private bool KeepAwake = false;
+        public void SFEXT_L_KeepAwake() { KeepAwake = true; }
+        public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
         private void LateUpdate()
         {
             if (DoEffects > 10)
@@ -171,7 +174,7 @@ namespace SaccFlightAndVehicles
                 { return; }
                 else
                 {
-                    if ((float)SGVControl.GetProgramVariable("VehicleSpeed") < 1)
+                    if (!KeepAwake && (float)SGVControl.GetProgramVariable("VehicleSpeed") < 1)
                     { FallAsleep(); }
                     else
                     { DoEffects--; }
