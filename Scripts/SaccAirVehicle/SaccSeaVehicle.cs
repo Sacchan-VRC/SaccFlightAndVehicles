@@ -545,10 +545,8 @@ namespace SaccFlightAndVehicles
                 //synced variables because rigidbody values aren't accessable by non-owner players
                 CurrentVel = VehicleRigidbody.velocity;
                 Speed = CurrentVel.magnitude;
-                bool VehicleMoving;
                 if (Piloting)
                 {
-                    VehicleMoving = true;
                     WindAndAoA();
                     DoRepeatingWorld();
 
@@ -902,15 +900,12 @@ namespace SaccFlightAndVehicles
                 {
                     if (Speed > .01f)
                     {
-                        VehicleMoving = true;//check this bool later for more optimizations
                         WindAndAoA();
                     }
                     else if (!Asleep && GroundedLastFrame)
                     {
                         FallAsleep();
-                        VehicleMoving = false;
                     }
-                    else { VehicleMoving = false; }
                     if (Taxiing)
                     {
                         StillWindMulti = Mathf.Min(Speed * .1f, 1);
@@ -936,7 +931,7 @@ namespace SaccFlightAndVehicles
                     else
                     { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); }
 
-                    if (VehicleMoving)//optimization
+                    if (!Asleep)//optimization
                     {
                         float rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
