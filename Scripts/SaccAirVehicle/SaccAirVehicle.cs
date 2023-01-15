@@ -402,7 +402,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float Speed;
         [System.NonSerializedAttribute] public float AirSpeed;
         [System.NonSerializedAttribute] public bool IsOwner = false;
-        private Vector3 FinalWind;//includes Gusts
+        [System.NonSerializedAttribute] public Vector3 FinalWind;//includes Gusts
         [System.NonSerializedAttribute] public Vector3 AirVel;
         private float StillWindMulti;//multiplies the speed of the wind by the speed of the plane when taxiing to prevent still planes flying away
         private int ThrustVecGrounded;

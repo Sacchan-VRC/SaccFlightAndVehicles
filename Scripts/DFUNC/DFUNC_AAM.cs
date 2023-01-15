@@ -32,6 +32,8 @@ namespace SaccFlightAndVehicles
         public bool SendLockWarning = true;
         [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
         public bool AllowFiringWhenGrounded = false;
+        [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
+        public bool DisallowFireIfWind = false;
         [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
         public bool AllowNoAmmoLock = false;
         [Tooltip("GameObject that is enabled by the missile script for 1 second when the missile enters pitbull mode to let the pilot know he no longer has to track the target. Use if creating FOX-3 missiles.")]
@@ -323,6 +325,11 @@ namespace SaccFlightAndVehicles
                     {
                         if (!TriggerLastFrame)
                         {
+                            if (DisallowFireIfWind)
+                            {
+                                if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
+                                { return; }
+                            }
                             if (NumAAM > 0 && AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                             {
                                 AAMFire++;//launch AAM using set

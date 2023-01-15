@@ -30,6 +30,8 @@ namespace SaccFlightAndVehicles
         public LayerMask LockableLayers = 133121;
         [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
         public bool AllowFiringWhenGrounded = false;
+        [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
+        public bool DisallowFireIfWind = false;
         [Tooltip("Send the boolean(AnimBoolName) true to the animator when selected?")]
         public bool DoAnimBool = false;
         [Tooltip("Animator bool that is true when this function is selected")]
@@ -68,7 +70,7 @@ namespace SaccFlightAndVehicles
         private float TriggerTapTime;
         [System.NonSerializedAttribute] public int FullAGMs;
         public Transform AGMLaunchPoint;
-        public LayerMask AGMTargetsLayer =  1 << 26;
+        public LayerMask AGMTargetsLayer = 1 << 26;
         private float FullAGMsDivider;
         private int NumChildrenStart;
         [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(AGMTarget))] public Vector3 _AGMTarget;
@@ -286,6 +288,11 @@ namespace SaccFlightAndVehicles
                             {//locked on, launch missile
                                 if (NumAGM > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
                                 {
+                                    if (DisallowFireIfWind)
+                                    {
+                                        if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
+                                        { return; }
+                                    }
                                     AGMFire++;//launch AGM using set
                                     RequestSerialization();
                                     if (IsOwner)

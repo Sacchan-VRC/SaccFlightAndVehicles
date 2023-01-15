@@ -25,6 +25,8 @@ namespace SaccFlightAndVehicles
         public AudioSource LaunchSound;
         [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
         public bool AllowFiringWhenGrounded = false;
+        [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
+        public bool DisallowFireIfWind = false;
         [Tooltip("How much the vehicle should be pushed back when dropping a 'bomb' (useful for making cannons)")]
         public float Recoil = 0f;
         [Tooltip("Backwards vector of this transform is the direction along which the recoil force is applied (backwards so it can default to VehicleTransform)")]
@@ -221,6 +223,11 @@ namespace SaccFlightAndVehicles
                 {
                     if (!TriggerLastFrame)
                     {
+                        if (DisallowFireIfWind)
+                        {
+                            if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
+                            { return; }
+                        }
                         if (NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
                         {
                             BombFire++;

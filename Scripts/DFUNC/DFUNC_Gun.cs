@@ -35,6 +35,8 @@ namespace SaccFlightAndVehicles
         public bool AnimBoolStayTrueOnExit;
         [Tooltip("Allow gun to fire while vehicle is on the ground?")]
         public bool AllowFiringGrounded = true;
+        [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
+        public bool DisallowFireIfWind = false;
         [Tooltip("Enable these objects when GUN selected")]
         public GameObject[] EnableOnSelected;
         private bool Grounded;
@@ -203,6 +205,11 @@ namespace SaccFlightAndVehicles
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                     if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0))
                     {
+                        if (DisallowFireIfWind)
+                        {
+                            if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
+                            { return; }
+                        }
                         if (!_firing)
                         {
                             Firing = true;
