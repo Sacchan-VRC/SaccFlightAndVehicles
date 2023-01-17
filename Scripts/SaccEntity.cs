@@ -64,6 +64,10 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int RStickNumFuncs;
         [System.NonSerializedAttribute] public bool DoDialLeft;
         [System.NonSerializedAttribute] public bool DoDialRight;
+        //specially used by limits function
+        //this stuff can be used by DFUNCs
+        //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
+        //the bools exists to save externs every frame
         [System.NonSerializedAttribute] public bool _DisableLeftDial;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableLeftDial_))] public int DisableLeftDial = 0;
         public int DisableLeftDial_
@@ -96,6 +100,25 @@ namespace SaccFlightAndVehicles
                 DisallowOwnerShipTransfer = value;
             }
             get => DisallowOwnerShipTransfer;
+        }
+        [System.NonSerializedAttribute] public bool KeepAwake = false;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(KeepAwake_))] public int _KeepAwake = 0;
+        public int KeepAwake_
+        {
+            set
+            {
+                if (value > 0 && _KeepAwake == 0)
+                {
+                    SendEventToExtensions("SFEXT_L_KeepAwake");
+                }
+                else if (value == 0 && _KeepAwake > 0)
+                {
+                    SendEventToExtensions("SFEXT_L_KeepAwakeFalse");
+                }
+                KeepAwake = value > 0;
+                _KeepAwake = value;
+            }
+            get => _KeepAwake;
         }
         [System.NonSerializedAttribute] public bool[] LStickNULL;
         [System.NonSerializedAttribute] public bool[] RStickNULL;

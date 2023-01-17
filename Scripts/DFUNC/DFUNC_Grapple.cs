@@ -61,6 +61,7 @@ namespace SaccFlightAndVehicles
         private bool Occupied = false;
         private bool LeftDial = false;
         private int DialPosition = -999;
+        private bool KeepingHEAwake = false;
         private bool Overriding_DisallowOwnerShipTransfer = false;
         [UdonSynced, FieldChangeCallback(nameof(HookAttachPoint))] private Vector3 _HookAttachPoint;
         public Vector3 HookAttachPoint
@@ -99,11 +100,18 @@ namespace SaccFlightAndVehicles
                                     if (hit.collider.attachedRigidbody)
                                     {
                                         HookedEntity = hit.collider.attachedRigidbody.GetComponent<SaccFlightAndVehicles.SaccEntity>();
-                                        if (HookedEntity == EntityControl) { HitSelf = true; continue; } //skip if raycast finds own vehicle
-                                        else
+                                        if (HookedEntity)
                                         {
-                                            HookedEntity.SendEventToExtensions("SFEXT_L_WakeUp");
-                                            HookedEntity.SendEventToExtensions("SFEXT_L_KeepAwake");
+                                            if (HookedEntity == EntityControl) { HitSelf = true; continue; } //skip if raycast finds own vehicle
+                                            else
+                                            {
+                                                if (!KeepingHEAwake)
+                                                {
+                                                    KeepingHEAwake = true;
+                                                    HookedEntity.SendEventToExtensions("SFEXT_L_WakeUp");
+                                                    HookedEntity.KeepAwake_++;
+                                                }
+                                            }
                                         }
                                     }
                                     else { HookedEntity = null; }
@@ -346,7 +354,11 @@ namespace SaccFlightAndVehicles
             Hook.localRotation = HookStartRot;
             if (HookedEntity)
             {
-                HookedEntity.SendEventToExtensions("SFEXT_L_KeepAwakeFalse");
+                if (KeepingHEAwake)
+                {
+                    KeepingHEAwake = false;
+                    HookedEntity.KeepAwake_--;
+                }
                 UndoHookOverrides();
                 if (HookedEntity.Using)
                 {
