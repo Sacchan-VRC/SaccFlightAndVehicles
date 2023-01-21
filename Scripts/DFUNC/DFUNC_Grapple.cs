@@ -63,16 +63,24 @@ namespace SaccFlightAndVehicles
         private int DialPosition = -999;
         private bool KeepingHEAwake = false;
         private bool Overriding_DisallowOwnerShipTransfer = false;
-        [UdonSynced, FieldChangeCallback(nameof(HookAttachPoint))] private Vector3 _HookAttachPoint;
+        public override void OnDeserialization()
+        {
+            if (_HookLaunched != _HookLaunchedPrev)
+            {
+                HookLaunched = _HookLaunchedPrev = _HookLaunched;
+            }
+            if (_HookAttachPoint != _HookAttachPointPrev)
+            {
+                HookAttachPoint = _HookAttachPointPrev = _HookAttachPoint;
+            }
+        }
+        private Vector3 _HookAttachPointPrev;
+        [UdonSynced] private Vector3 _HookAttachPoint;
         public Vector3 HookAttachPoint
         {
             set
             {
-                if (!Initialized) { _HookAttachPoint = value; return; }
-                if (!_HookLaunched)//hook launch and attach was recieved on same update
-                {
-                    LaunchHook(true);
-                }
+                if (!Initialized || !_HookLaunched) { _HookAttachPoint = value; return; }
                 float spheresize = SphereCastAccuracy;
                 int hitlen = 0;
                 RaycastHit[] hits = new RaycastHit[0];
@@ -110,6 +118,7 @@ namespace SaccFlightAndVehicles
                                                     KeepingHEAwake = true;
                                                     HookedEntity.SendEventToExtensions("SFEXT_L_WakeUp");
                                                     HookedEntity.KeepAwake_++;
+                                                    HookedEntity.SendEventToExtensions("SFEXT_L_GrappleAttach");
                                                 }
                                             }
                                         }
@@ -125,63 +134,56 @@ namespace SaccFlightAndVehicles
                                         HookedRB = HookedCollider.attachedRigidbody;
                                         if (HookedRB)
                                         {
-                                            if (HookedRB.isKinematic && !HookedEntity)
+                                            if (HoldTargetUpright)
                                             {
-                                                HookedRB = null;//don't try to pull kinematic objects by weight ratio
-                                            }
-                                            else
-                                            {
-                                                if (HoldTargetUpright)
+                                                HookedTransform = HookedRB.transform;
+                                                Vector3 targCoMPos = HookedRB.position + HookedRB.centerOfMass;
+                                                Vector3 abovedist = (HookedTransform.up * Vector3.Distance(targCoMPos, HookLaunchPoint.position) /* / 2f */);
+                                                Vector3 raypoint = targCoMPos + abovedist;
+                                                Vector3 raydir = targCoMPos - raypoint;
+                                                RaycastHit hit2;
+                                                if (Physics.Raycast(raypoint, raydir, out hit2, abovedist.magnitude + 10f, HookLayers, QueryTriggerInteraction.Ignore))
                                                 {
-                                                    HookedTransform = HookedRB.transform;
-                                                    Vector3 targCoMPos = HookedRB.position + HookedRB.centerOfMass;
-                                                    Vector3 abovedist = (HookedTransform.up * Vector3.Distance(targCoMPos, HookLaunchPoint.position) / 2f);
-                                                    Vector3 raypoint = targCoMPos + abovedist;
-                                                    Vector3 raydir = targCoMPos - raypoint;
-                                                    RaycastHit hit2;
-                                                    if (Physics.Raycast(raypoint, raydir, out hit2, abovedist.magnitude + 10f, HookLayers, QueryTriggerInteraction.Ignore))
-                                                    {
-                                                        HookedTransformOffset = HookedTransform.InverseTransformPoint(hit2.point);
-                                                    }
+                                                    HookedTransformOffset = HookedTransform.InverseTransformPoint(hit2.point);
                                                 }
-                                                if (TwoWayForces_LocalForceMode)
+                                            }
+                                            if (TwoWayForces_LocalForceMode)
+                                            {
+                                                var objpickup = (VRC.SDK3.Components.VRCPickup)HookedRB.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
+                                                if (IsOwner)
                                                 {
-                                                    var objpickup = (VRC.SDK3.Components.VRCPickup)HookedRB.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
-                                                    if (IsOwner)
+                                                    if ((!objpickup || !objpickup.IsHeld) && (!HookedEntity || !HookedEntity.Occupied))
                                                     {
-                                                        if ((!objpickup || !objpickup.IsHeld) && (!HookedEntity || !HookedEntity.Occupied))
-                                                        {
-                                                            Networking.SetOwner(Networking.LocalPlayer, HookedRB.gameObject);
-                                                        }
-                                                        else
-                                                        {
-                                                            NonLocalAttached_Pilot = true;
-                                                        }
+                                                        Networking.SetOwner(Networking.LocalPlayer, HookedRB.gameObject);
                                                     }
                                                     else
                                                     {
-                                                        if (Networking.LocalPlayer.IsOwner(HookedRB.gameObject))
-                                                        {
-                                                            NonLocalAttached = true;
-                                                        }
+                                                        NonLocalAttached_Pilot = true;
                                                     }
                                                 }
                                                 else
                                                 {
-                                                    if (IsOwner)
+                                                    if (Networking.LocalPlayer.IsOwner(HookedRB.gameObject))
                                                     {
-                                                        Networking.SetOwner(Networking.LocalPlayer, HookedRB.gameObject);
+                                                        NonLocalAttached = true;
                                                     }
                                                 }
-                                                //people cant take ownership while vehicle is being held.
-                                                //localforcemode is only active if someone is in the vehicle when its grabbed
-                                                if (HookedEntity && (!TwoWayForces_LocalForceMode || !HookedEntity.Occupied))
+                                            }
+                                            else
+                                            {
+                                                if (IsOwner)
                                                 {
-                                                    if (!Overriding_DisallowOwnerShipTransfer)
-                                                    {
-                                                        HookedEntity.SetProgramVariable("DisallowOwnerShipTransfer", (int)HookedEntity.GetProgramVariable("DisallowOwnerShipTransfer") + 1);
-                                                        Overriding_DisallowOwnerShipTransfer = true;
-                                                    }
+                                                    Networking.SetOwner(Networking.LocalPlayer, HookedRB.gameObject);
+                                                }
+                                            }
+                                            //people cant take ownership while vehicle is being held.
+                                            //localforcemode is only active if someone is in the vehicle when its grabbed
+                                            if (HookedEntity && (!TwoWayForces_LocalForceMode || !HookedEntity.Occupied))
+                                            {
+                                                if (!Overriding_DisallowOwnerShipTransfer)
+                                                {
+                                                    HookedEntity.SetProgramVariable("DisallowOwnerShipTransfer", (int)HookedEntity.GetProgramVariable("DisallowOwnerShipTransfer") + 1);
+                                                    Overriding_DisallowOwnerShipTransfer = true;
                                                 }
                                             }
                                         }
@@ -250,7 +252,8 @@ namespace SaccFlightAndVehicles
         private Transform HookParentStart;
         private bool IsOwner;
         private bool Initialized;
-        [UdonSynced, FieldChangeCallback(nameof(HookLaunched))] private bool _HookLaunched;
+        private bool _HookLaunchedPrev;
+        [UdonSynced] private bool _HookLaunched;
         public bool HookLaunched
         {
             set
@@ -354,6 +357,7 @@ namespace SaccFlightAndVehicles
             Hook.localRotation = HookStartRot;
             if (HookedEntity)
             {
+                HookedEntity.SendEventToExtensions("SFEXT_L_GrappleDetach");
                 if (KeepingHEAwake)
                 {
                     KeepingHEAwake = false;
@@ -405,7 +409,7 @@ namespace SaccFlightAndVehicles
                 Vector3 forceDirection = (_HookAttachPoint - HookLaunchPoint.position).normalized;
                 float WeightRatio = 1;
 
-                if (HookedRB)
+                if (HookedRB && !HookedRB.isKinematic)
                 {
                     WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass);
                     Vector3 forceDirection_HookedRB = (HookLaunchPoint.position - _HookAttachPoint).normalized;
