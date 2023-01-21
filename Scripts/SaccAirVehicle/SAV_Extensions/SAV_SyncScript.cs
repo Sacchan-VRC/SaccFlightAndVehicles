@@ -39,11 +39,14 @@ namespace SaccFlightAndVehicles
         public bool AntiWarp = true;
         [Tooltip("Enable physics whilst not owner of the vehicle, can prevent some clipping through walls/ground, probably some performance hit. Not recommended for Quest")]
         public bool NonOwnerEnablePhysics = false;
+        [Header("Fill SyncRigid to enable Object Mode (No SAVControl)")]
+        public Rigidbody SyncRigid;
+        private bool ObjectMode;
         [Header("DEBUG:")]
         [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE WITH CLIENT SIM")]
-        public Transform TestTransform;
+        public Transform SyncTransform;
         [Tooltip("LEAVE THIS EMPTY UNLESS YOU WANT TO TEST THE NETCODE OFFLINE WITH CLIENT SIM")]
-        public Transform TestTransform_Raw;
+        public Transform SyncTransform_Raw;
         private Transform VehicleTransform;
         private double nextUpdateTime = double.MaxValue;
         [UdonSynced] private double O_UpdateTime;
@@ -102,23 +105,48 @@ namespace SaccFlightAndVehicles
         private bool TestMode;
 #endif
         private float ErrorLastFrame;
+        private float StartDrag;
+        private float StartAngDrag;
         private void Start()
         {
-            if (!VehicleRigid)
+            if (SyncRigid)
             {
-                VehicleRigid = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Rigidbody>();
+                ObjectMode = true;
+                VehicleRigid = SyncRigid;
+                VehicleTransform = SyncRigid.transform;
+                StartDrag = VehicleRigid.drag;
+                StartAngDrag = VehicleRigid.angularDrag;
+                if (!SyncTransform)
+                { SyncTransform = VehicleRigid.transform; }
+                SFEXT_L_EntityStart();
             }
-            if (!TestTransform)
-            { TestTransform = VehicleRigid.transform; }
+            else
+            {
+                if (!VehicleRigid)
+                {
+                    VehicleRigid = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Rigidbody>();
+                }
+                if (!SyncTransform)
+                { SyncTransform = VehicleRigid.transform; }
 #if UNITY_EDITOR
-            else { TestMode = true; }
+                else { TestMode = true; }
 #endif
+            }
         }
         public void SFEXT_L_EntityStart()
         {
             Initialized = true;
-            VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
-            VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
+            if (SyncRigid)
+            {
+                ObjectMode = true;
+                VehicleRigid = SyncRigid;
+                VehicleTransform = SyncRigid.transform;
+            }
+            else
+            {
+                VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
+                VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
+            }
             Extrapolation_Raw /* = L_LastPingAdjustedPosition */ = L_PingAdjustedPosition = O_Position = VehicleTransform.position;
             /* O_LastRotation2 = */
             O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
@@ -129,8 +157,16 @@ namespace SaccFlightAndVehicles
                 if (localPlayer.isMaster)
                 {
                     IsOwner = true;
-                    VehicleRigid.drag = 0;
-                    VehicleRigid.angularDrag = 0;
+                    if (ObjectMode)
+                    {
+                        VehicleRigid.drag = StartDrag;
+                        VehicleRigid.angularDrag = StartAngDrag;
+                    }
+                    else
+                    {
+                        VehicleRigid.drag = 0;
+                        VehicleRigid.angularDrag = 0;
+                    }
                 }
                 else
                 {
@@ -172,16 +208,33 @@ namespace SaccFlightAndVehicles
         { ExitIdleMode(); }
         public void SFEXT_O_TakeOwnership()
         {
+            TakeOwnerStuff();
+        }
+        public void SFEXT_O_LoseOwnership()
+        {
+            LoseOwnerStuff();
+        }
+        private void TakeOwnerStuff()
+        {
             L_UpdateTime = lastframetime = StartupServerTime + (double)(Time.time - StartupLocalTime);
             IsOwner = true;
             VehicleRigid.isKinematic = false;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-            VehicleRigid.drag = 0;
-            VehicleRigid.angularDrag = 0;
+            if (ObjectMode)
+            {
+                VehicleRigid.drag = StartDrag;
+                VehicleRigid.angularDrag = StartAngDrag;
+            }
+            else
+            {
+                VehicleRigid.drag = 0;
+                VehicleRigid.angularDrag = 0;
+            }
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
         }
-        public void SFEXT_O_LoseOwnership()
+        private void LoseOwnerStuff()
         {
+            IsOwner = false;
             O_LastUpdateTime = L_UpdateTime = lastframetime_extrap = StartupServerTime + (double)(Time.time - StartupLocalTime);
             O_LastUpdateTime -= updateInterval;
             IsOwner = false;
@@ -318,8 +371,8 @@ namespace SaccFlightAndVehicles
             float deltatime = Time.deltaTime;
             double time;
             Vector3 Deriv = Vector3.zero;
-            Vector3 Correction = (Extrapolation_Raw - TestTransform.position) * CorrectionTime;
-            float Error = Vector3.Distance(TestTransform.position, Extrapolation_Raw);
+            Vector3 Correction = (Extrapolation_Raw - SyncTransform.position) * CorrectionTime;
+            float Error = Vector3.Distance(SyncTransform.position, Extrapolation_Raw);
             if (deltatime > .099f)
             {
                 time = Networking.GetServerTimeInSeconds();
@@ -347,19 +400,19 @@ namespace SaccFlightAndVehicles
 
             //apply positional update
             Extrapolation_Raw += ExtrapolationDirection * deltatime;
-            TestTransform.position += ExtrapDirection_Smooth * deltatime;
+            SyncTransform.position += ExtrapDirection_Smooth * deltatime;
             //apply rotational update
             Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime);
             RotExtrapolation_Raw = FrameRotExtrap * RotExtrapolation_Raw;
             Quaternion FrameRotExtrap_Smooth = RealSlerp(Quaternion.identity, RotExtrapDirection_Smooth, deltatime);
-            TestTransform.rotation = FrameRotExtrap_Smooth * TestTransform.rotation;
+            SyncTransform.rotation = FrameRotExtrap_Smooth * SyncTransform.rotation;
             //correct rotational desync
-            TestTransform.rotation = RealSlerp(TestTransform.rotation, RotExtrapolation_Raw, CorrectionTime_Rotation * deltatime);
+            SyncTransform.rotation = RealSlerp(SyncTransform.rotation, RotExtrapolation_Raw, CorrectionTime_Rotation * deltatime);
 #if UNITY_EDITOR
-            if (TestTransform_Raw)
+            if (SyncTransform_Raw)
             {
-                TestTransform_Raw.position = Extrapolation_Raw;
-                TestTransform_Raw.rotation = RotExtrapolation_Raw;
+                SyncTransform_Raw.position = Extrapolation_Raw;
+                SyncTransform_Raw.rotation = RotExtrapolation_Raw;
             }
 #endif
         }
@@ -470,7 +523,7 @@ namespace SaccFlightAndVehicles
             RotExtrapolation_Raw = FrameRotExtrap * L_PingAdjustedRotation;//undo 1 frame worth of movement because its done again in update()
 
             //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
-            SAVControl.SetProgramVariable("CurrentVel", L_CurVel);
+            if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", L_CurVel); }
             ExtrapolationDirection = L_CurVel + Acceleration;
             L_PingAdjustedPosition = O_Position + (ExtrapolationDirection * Ping);
 
@@ -485,7 +538,7 @@ namespace SaccFlightAndVehicles
                 // LastPing = Ping;
                 // O_LastRotation2 = O_LastRotation = O_Rotation_Q;
                 LastCurAngMom = CurAngMom;
-                TestTransform.position = Extrapolation_Raw;
+                SyncTransform.position = Extrapolation_Raw;
             }
             // O_LastRotation2 = O_LastRotation;//O_LastRotation2 is needed for use in Update() as O_LastRotation is the same as O_Rotation_Q there
             O_LastUpdateTime = O_UpdateTime;
