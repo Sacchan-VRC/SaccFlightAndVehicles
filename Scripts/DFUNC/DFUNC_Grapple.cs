@@ -15,8 +15,7 @@ namespace SaccFlightAndVehicles
         public GameObject Dial_Funcon;
         public float HookSpeed = 300f;
         public float SwingStrength = 20f;
-        public UdonSharpBehaviour SAVControl;
-        private SaccFlightAndVehicles.SaccEntity EntityControl;
+        [System.NonSerialized] public SaccFlightAndVehicles.SaccEntity EntityControl;
         private Rigidbody VehicleRB;
         [Tooltip("Hook launches from here, in this transform's forward direction")]
         public Transform HookLaunchPoint;
@@ -277,9 +276,8 @@ namespace SaccFlightAndVehicles
         {
             Initialized = true;
             if (!ForceApplyPoint) { ForceApplyPoint = HookLaunchPoint; }
-            VehicleRB = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
-            EntityControl = (SaccFlightAndVehicles.SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            VehicleRB = EntityControl.GetComponent<Rigidbody>();
+            IsOwner = (bool)EntityControl.GetProgramVariable("IsOwner");
             HookedTransform = transform;//avoid null
             HookParentStart = Hook.parent;
             HookStartPos = Hook.localPosition;
@@ -297,9 +295,9 @@ namespace SaccFlightAndVehicles
             Rope_Line.gameObject.SetActive(true);
             HookLaunchTime = Time.time;
             HookLaunchRot = Hook.rotation;
-            LaunchVec = (Vector3)SAVControl.GetProgramVariable("CurrentVel") + HookLaunchPoint.forward * HookSpeed;
+            LaunchVec = (VehicleRB ? VehicleRB.velocity : Vector3.zero) + HookLaunchPoint.forward * HookSpeed;
             LaunchSpeed = LaunchVec.magnitude;
-            Hook.parent = VehicleRB.transform.parent;
+            Hook.parent = EntityControl.transform.parent;
             Hook.position = HookLaunchPoint.position;
             if (!InstantHit) { HookFlyLoop(); }
             HookLaunch.Play();
@@ -411,17 +409,23 @@ namespace SaccFlightAndVehicles
 
                 if (HookedRB && !HookedRB.isKinematic)
                 {
-                    WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass);
+                    if (!VehicleRB || VehicleRB.isKinematic)
+                    { WeightRatio = 0f; }
+                    else
+                    { WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass); }
                     Vector3 forceDirection_HookedRB = (HookLaunchPoint.position - _HookAttachPoint).normalized;
                     HookedRB.AddForceAtPosition((forceDirection_HookedRB * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection_HookedRB * SwingForce) + (forceDirection_HookedRB * PullReduction * PullReductionStrength)) * (1f - WeightRatio), _HookAttachPoint, ForceMode.VelocityChange);
                 }
-                if (UseForceApplyPoint)
+                if (VehicleRB)
                 {
-                    VehicleRB.AddForceAtPosition((forceDirection * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection * SwingForce) + (forceDirection * PullReduction * PullReductionStrength)) * WeightRatio, ForceApplyPoint.position, ForceMode.VelocityChange);
-                }
-                else
-                {
-                    VehicleRB.AddForce((forceDirection * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection * SwingForce) + (forceDirection * PullReduction * PullReductionStrength)) * WeightRatio, ForceMode.VelocityChange);
+                    if (UseForceApplyPoint)
+                    {
+                        VehicleRB.AddForceAtPosition((forceDirection * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection * SwingForce) + (forceDirection * PullReduction * PullReductionStrength)) * WeightRatio, ForceApplyPoint.position, ForceMode.VelocityChange);
+                    }
+                    else
+                    {
+                        VehicleRB.AddForce((forceDirection * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection * SwingForce) + (forceDirection * PullReduction * PullReductionStrength)) * WeightRatio, ForceMode.VelocityChange);
+                    }
                 }
             }
             else if (NonLocalAttached)
@@ -442,7 +446,11 @@ namespace SaccFlightAndVehicles
 
                     Vector3 forceDirection = (_HookAttachPoint - HookLaunchPoint.position).normalized;
 
-                    float WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass);
+                    float WeightRatio;
+                    if (!VehicleRB || VehicleRB.isKinematic)
+                    { WeightRatio = 0f; }
+                    else
+                    { WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass); }
                     Vector3 forceDirection_HookedRB = (HookLaunchPoint.position - _HookAttachPoint).normalized;
                     HookedRB.AddForceAtPosition((forceDirection_HookedRB * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection_HookedRB * SwingForce) + (forceDirection_HookedRB * PullReduction * PullReductionStrength)) * (1f - WeightRatio), _HookAttachPoint, ForceMode.VelocityChange);
                 }
