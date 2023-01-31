@@ -21,8 +21,10 @@ namespace SaccFlightAndVehicles
         public Transform HookLaunchPoint;
         [Tooltip("Pull grappled rigidbodies towards the vehicle?")]
         public bool TwoWayForces = true;
-        [Tooltip("Force is applied by the client in the vehicle that got hooked, less technical issues, but very janky movement")]
+        [Tooltip("Force is applied by the client in the vehicle that got hooked, less technical issues, but very janky movement. Requires TwoWayForces_LocalForceMode to be false.")]
         public bool TwoWayForces_LocalForceMode = true;
+        [Tooltip("Don't apply two way forces if someone else is in the vehicle")]
+        public bool TwoWayForces_DisableIfOccupied = false;
         [Tooltip("Apply the forces to this vehicle at ForceApplyPoint or CoM?")]
         public bool UseForceApplyPoint = true;
         [Tooltip("Apply the forces at this point, requires tickbox above to be ticked")]
@@ -44,6 +46,11 @@ namespace SaccFlightAndVehicles
         public AudioSource HookAttach;
         public AudioSource HookReelIn;
         public GameObject[] EnableOnSelect;
+        public bool HandHeldGunMode;
+        [Tooltip("How heavy the player is for interactions with rigidbodies")]
+        public float PlayerMass = 150f;
+        [Tooltip("Disable these objects whilst object is held (SaccFlight?)")]
+        public GameObject[] DisableOnPickup;
         private float HookLaunchTime;
         private Vector3 HookStartPos;
         private Transform HookedTransform;
@@ -52,9 +59,9 @@ namespace SaccFlightAndVehicles
         private GameObject HookedGameObject;
         private Rigidbody HookedRB;
         private bool InVr;
+        private VRCPlayerApi localPlayer;
         private SaccFlightAndVehicles.SaccEntity HookedEntity;
         //these 2 variables are only used if TwoWayForces_LocalForceMode is true
-        private bool NonLocalAttached_Pilot;//so pilot of this vehicle knows if the vehicle that's attached is owner by someone else
         private bool NonLocalAttached;//if you are in a vehicle that is attached
         private bool PlayReelIn = false;
         private bool Occupied = false;
@@ -80,23 +87,36 @@ namespace SaccFlightAndVehicles
             set
             {
                 if (!Initialized || !_HookLaunched) { _HookAttachPoint = value; return; }
+
+                //first just check if there's a collider at the exact coordinates
+                Vector3 rayDir = (value - HookLaunchPoint.position).normalized * .1f;
+                RaycastHit firstRay;
+                bool firstrayhit = Physics.Raycast(value - rayDir, rayDir, out firstRay, .11f, HookLayers, QueryTriggerInteraction.Ignore);
+
                 float spheresize = SphereCastAccuracy;
                 int hitlen = 0;
                 RaycastHit[] hits = new RaycastHit[0];
-                bool HitSelf = false;
-                while (spheresize < 17 && hitlen == 0 && !HitSelf)
+                bool hitSelf = false;
+                while (spheresize < 17 && hitlen == 0 && !hitSelf)
                 {
                     hits = Physics.SphereCastAll(value, spheresize, Vector3.up, 0, HookLayers, QueryTriggerInteraction.Ignore);
                     spheresize *= 2;
-                    hitlen = hits.Length;
+                    RaycastHit[] hitstemp = new RaycastHit[hits.Length + 1];
+                    if (firstrayhit)//add the collider at the coordinates to the list to check against
+                    {
+                        hits.CopyTo(hitstemp, 0);
+                        hitstemp[hits.Length] = firstRay;
+                        hits = hitstemp;
+                    }
 
+                    hitlen = hits.Length;
                     if (hitlen > 0)
                     {
                         HookedTransform = null;
                         if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
                         foreach (RaycastHit hit in hits)
                         {
-                            HitSelf = false;
+                            hitSelf = false;
                             if (hit.collider)
                             {
                                 float NearestDist = float.MaxValue;
@@ -109,7 +129,7 @@ namespace SaccFlightAndVehicles
                                         HookedEntity = hit.collider.attachedRigidbody.GetComponent<SaccFlightAndVehicles.SaccEntity>();
                                         if (HookedEntity)
                                         {
-                                            if (HookedEntity == EntityControl) { HitSelf = true; continue; } //skip if raycast finds own vehicle
+                                            if (HookedEntity == EntityControl) { hitSelf = true; continue; } //skip if raycast finds own vehicle
                                             else
                                             {
                                                 if (!KeepingHEAwake)
@@ -128,7 +148,7 @@ namespace SaccFlightAndVehicles
                                     HookedGameObject = hit.collider.gameObject;
                                     HookedTransform = hit.collider.transform;
                                     HookedTransformOffset = HookedTransform.InverseTransformPoint(hit.collider.ClosestPoint(value));
-                                    if (TwoWayForces)
+                                    if (TwoWayForces && (!HookedEntity || (!TwoWayForces_DisableIfOccupied || (!HookedEntity.Occupied && !HookedEntity.Held))))
                                     {
                                         HookedRB = HookedCollider.attachedRigidbody;
                                         if (HookedRB)
@@ -151,13 +171,12 @@ namespace SaccFlightAndVehicles
                                                 var objpickup = (VRC.SDK3.Components.VRCPickup)HookedRB.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
                                                 if (IsOwner)
                                                 {
-                                                    if ((!objpickup || !objpickup.IsHeld) && (!HookedEntity || !HookedEntity.Occupied))
+                                                    if ((!objpickup || !objpickup.IsHeld) && (!HookedEntity || (!HookedEntity.Occupied && !HookedEntity.Held)))
                                                     {
-                                                        Networking.SetOwner(Networking.LocalPlayer, HookedRB.gameObject);
-                                                    }
-                                                    else
-                                                    {
-                                                        NonLocalAttached_Pilot = true;
+                                                        if (!Overriding_DisallowOwnerShipTransfer)
+                                                        {
+                                                            Networking.SetOwner(Networking.LocalPlayer, HookedRB.gameObject);
+                                                        }
                                                     }
                                                 }
                                                 else
@@ -170,14 +189,14 @@ namespace SaccFlightAndVehicles
                                             }
                                             else
                                             {
-                                                if (IsOwner)
+                                                if (IsOwner && !Overriding_DisallowOwnerShipTransfer)
                                                 {
                                                     Networking.SetOwner(Networking.LocalPlayer, HookedRB.gameObject);
                                                 }
                                             }
                                             //people cant take ownership while vehicle is being held.
                                             //localforcemode is only active if someone is in the vehicle when its grabbed
-                                            if (HookedEntity && (!TwoWayForces_LocalForceMode || !HookedEntity.Occupied))
+                                            if (HookedEntity && (!TwoWayForces_LocalForceMode || (!HookedEntity.Occupied && !HookedEntity.Held)))
                                             {
                                                 if (!Overriding_DisallowOwnerShipTransfer)
                                                 {
@@ -261,7 +280,7 @@ namespace SaccFlightAndVehicles
                 {
                     _HookLaunched = value;
                     if (!HookAttached)
-                    { LaunchHook(false); }
+                    { LaunchHook(); }
                 }
                 else
                 {
@@ -282,24 +301,25 @@ namespace SaccFlightAndVehicles
             HookParentStart = Hook.parent;
             HookStartPos = Hook.localPosition;
             HookStartRot = Hook.localRotation;
-            InVr = Networking.LocalPlayer.IsUserInVR();
-            Dial_Funcon.SetActive(false);
+            localPlayer = Networking.LocalPlayer;
+            InVr = localPlayer.IsUserInVR();
+            if (Dial_Funcon) Dial_Funcon.SetActive(false);
             foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
             FindSelf();
             gameObject.SetActive(true);
             SendCustomEventDelayedSeconds(nameof(DisableThis), 10f);
         }
-        public void LaunchHook(bool InstantHit)
+        public void LaunchHook()
         {
             if (!Initialized) { return; }
             Rope_Line.gameObject.SetActive(true);
             HookLaunchTime = Time.time;
             HookLaunchRot = Hook.rotation;
-            LaunchVec = (VehicleRB ? VehicleRB.velocity : Vector3.zero) + HookLaunchPoint.forward * HookSpeed;
+            LaunchVec = ((HandHeldGunMode ? localPlayer.GetVelocity() : VehicleRB ? VehicleRB.velocity : Vector3.zero)) + (HookLaunchPoint.forward * HookSpeed);
             LaunchSpeed = LaunchVec.magnitude;
             Hook.parent = EntityControl.transform.parent;
             Hook.position = HookLaunchPoint.position;
-            if (!InstantHit) { HookFlyLoop(); }
+            HookFlyLoop();
             HookLaunch.Play();
         }
         public void HookFlyLoop()
@@ -350,7 +370,6 @@ namespace SaccFlightAndVehicles
             Hook.parent = HookParentStart;
             HookAttached = false;
             NonLocalAttached = false;
-            NonLocalAttached_Pilot = false;
             Hook.localPosition = HookStartPos;
             Hook.localRotation = HookStartRot;
             if (HookedEntity)
@@ -385,7 +404,7 @@ namespace SaccFlightAndVehicles
             {
                 if ((HookedCollider && !HookedCollider.enabled)
                  || !HookedTransform.gameObject.activeInHierarchy
-                 || (HookedEntity && (HookedEntity.dead || (!HookedEntity.IsOwner && TwoWayForces && !TwoWayForces_LocalForceMode))))
+                 || (HookedEntity && (HookedEntity.dead)))
                 {
                     HookLaunched = false;
                     RequestSerialization(); return;
@@ -409,14 +428,30 @@ namespace SaccFlightAndVehicles
 
                 if (HookedRB && !HookedRB.isKinematic)
                 {
-                    if (!VehicleRB || VehicleRB.isKinematic)
-                    { WeightRatio = 0f; }
+                    if (HandHeldGunMode)
+                    {
+                        WeightRatio = HookedRB.mass / (HookedRB.mass + PlayerMass);
+                    }
                     else
-                    { WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass); }
+                    {
+                        if (!VehicleRB || VehicleRB.isKinematic)
+                        { WeightRatio = 0f; }
+                        else
+                        { WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass); }
+                    }
                     Vector3 forceDirection_HookedRB = (HookLaunchPoint.position - _HookAttachPoint).normalized;
                     HookedRB.AddForceAtPosition((forceDirection_HookedRB * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection_HookedRB * SwingForce) + (forceDirection_HookedRB * PullReduction * PullReductionStrength)) * (1f - WeightRatio), _HookAttachPoint, ForceMode.VelocityChange);
                 }
-                if (VehicleRB)
+                if (HandHeldGunMode)
+                {
+                    Vector3 newPlayerVelocity = localPlayer.GetVelocity() + (((forceDirection * HookStrength * Time.fixedDeltaTime) + (forceDirection * SwingForce)) * WeightRatio * PullStrOverDist.Evaluate(dist));
+#if UNITY_EDITOR
+                    //SetVelocity overrides all other forces in clientsim so we need to add gravity ourselves
+                    newPlayerVelocity += -Vector3.up * 9.81f * Time.deltaTime;
+#endif
+                    localPlayer.SetVelocity(newPlayerVelocity);
+                }
+                else if (VehicleRB)
                 {
                     if (UseForceApplyPoint)
                     {
@@ -427,6 +462,7 @@ namespace SaccFlightAndVehicles
                         VehicleRB.AddForce((forceDirection * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection * SwingForce) + (forceDirection * PullReduction * PullReductionStrength)) * WeightRatio, ForceMode.VelocityChange);
                     }
                 }
+
             }
             else if (NonLocalAttached)
             {
@@ -447,10 +483,17 @@ namespace SaccFlightAndVehicles
                     Vector3 forceDirection = (_HookAttachPoint - HookLaunchPoint.position).normalized;
 
                     float WeightRatio;
-                    if (!VehicleRB || VehicleRB.isKinematic)
-                    { WeightRatio = 0f; }
+                    if (HandHeldGunMode)
+                    {
+                        WeightRatio = HookedRB.mass / (HookedRB.mass + PlayerMass);
+                    }
                     else
-                    { WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass); }
+                    {
+                        if (!VehicleRB || VehicleRB.isKinematic)
+                        { WeightRatio = 0f; }
+                        else
+                        { WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass); }
+                    }
                     Vector3 forceDirection_HookedRB = (HookLaunchPoint.position - _HookAttachPoint).normalized;
                     HookedRB.AddForceAtPosition((forceDirection_HookedRB * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection_HookedRB * SwingForce) + (forceDirection_HookedRB * PullReduction * PullReductionStrength)) * (1f - WeightRatio), _HookAttachPoint, ForceMode.VelocityChange);
                 }
@@ -531,6 +574,42 @@ namespace SaccFlightAndVehicles
                 FireHook();
             }
         }
+        public void SFEXT_O_OnPickup()
+        {
+            SFEXT_O_PilotEnter();
+            for (int i = 0; i < DisableOnPickup.Length; i++)
+            {
+                if (DisableOnPickup[i]) { DisableOnPickup[i].SetActive(false); }
+            }
+        }
+        public void SFEXT_O_OnDrop()
+        {
+            SFEXT_O_PilotExit();
+            if (_HookLaunched)
+            { HookLaunched = false; RequestSerialization(); }
+            SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
+            for (int i = 0; i < DisableOnPickup.Length; i++)
+            {
+                if (DisableOnPickup[i]) { DisableOnPickup[i].SetActive(true); }
+            }
+        }
+        public void SFEXT_G_OnPickup()
+        {
+            SFEXT_G_PilotEnter();
+        }
+        public void SFEXT_G_OnDrop()
+        {
+            SFEXT_G_PilotExit();
+        }
+        public void SFEXT_O_OnPickupUseDown()
+        {
+            KeyboardInput();
+        }
+        public void SFEXT_O_OnPickupUseUp()
+        {
+            if (_HookLaunched)
+            { HookLaunched = false; RequestSerialization(); }
+        }
         public void FireHook()
         {
             HookLaunched = !HookLaunched;
@@ -579,7 +658,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (Selected)
+            if (Selected && !HandHeldGunMode)
             {
                 float Trigger;
                 if (UseLeftTrigger)
@@ -595,6 +674,14 @@ namespace SaccFlightAndVehicles
                     TriggerLastFrame = true;
                 }
                 else { TriggerLastFrame = false; }
+            }
+        }
+        public override void OnPlayerRespawn(VRCPlayerApi player)
+        {
+            if (IsOwner && player.isLocal)
+            {
+                if (_HookLaunched)
+                { HookLaunched = false; RequestSerialization(); }
             }
         }
     }
