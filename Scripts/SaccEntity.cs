@@ -26,7 +26,7 @@ namespace SaccFlightAndVehicles
         public bool LeftDialDivideStraightUp = false;
         [Tooltip("See above")]
         public bool RightDialDivideStraightUp = false;
-        [Tooltip("Layer to spherecast to find all triggers on to use as AAM targets")]
+        [Tooltip("Layer to find all objects on to use as AAM targets")]
         public LayerMask AAMTargetsLayer = 1 << 25;//layer 25
         [Tooltip("Object that is enabled when entering vehicle in any seat")]
         public GameObject InVehicleOnly;
@@ -38,6 +38,8 @@ namespace SaccFlightAndVehicles
         public bool DoVoiceVolumeChange = true;
         [Tooltip("Double tap the exit vehicle button to exit the vehicle?")]
         public bool DoubleTapToExit = false;
+        [Tooltip("Double tap the exit vehicle button to exit the vehicle?")]
+        public bool DisableBulletHitEvent = false;
         [Header("Selection Sound")]
 
         [Tooltip("Oneshot sound played each time function selection changes")]
@@ -157,6 +159,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float PilotExitTime;
         [System.NonSerializedAttribute] public float PilotEnterTime;
         [System.NonSerializedAttribute] public bool Holding;
+        [System.NonSerializedAttribute] public bool Held;
         //end of old Leavebutton stuff
         public void Init() { Start(); }
         private void Start()
@@ -177,7 +180,8 @@ namespace SaccFlightAndVehicles
                 InVehicle = true;
                 Occupied = true;
             }
-
+            Spawnposition = transform.localPosition;
+            Spawnrotation = transform.localRotation;
             if (CenterOfMass)
             {
                 SetCoM();
@@ -185,7 +189,7 @@ namespace SaccFlightAndVehicles
             else
             {
                 CenterOfMass = gameObject.transform;
-                Debug.Log(string.Concat(gameObject.name, ": ", "No Center Of Mass Set"));
+                Debug.Log(gameObject.name + ": " + "No Center Of Mass Set");
             }
             VehicleStations = GetComponentsInChildren<VRCStation>(true);
             //add EXTRASEATS to VehicleStations list
@@ -282,7 +286,7 @@ namespace SaccFlightAndVehicles
                     RStickCheckAngle.y = angle.z;
                 }
             }
-            //if in editor play mode without cyanemu
+            //if in editor play mode without clientsim
             if (InEditor)
             {
                 PilotEnterVehicleLocal();
@@ -291,7 +295,7 @@ namespace SaccFlightAndVehicles
         }
         void OnParticleCollision(GameObject other)
         {
-            if (!other || dead) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
+            if (!other || dead || DisableBulletHitEvent) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
             LastHitParticle = other;
 
             int index = -1;
@@ -621,7 +625,12 @@ namespace SaccFlightAndVehicles
             Using = true;
             if (HoldingOnly) { HoldingOnly.SetActive(true); }
             if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
+            if (LStickNumFuncs == 1)
+            { Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected"); }
+            if (RStickNumFuncs == 1)
+            { Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected"); }
             SendEventToExtensions("SFEXT_O_OnPickup");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Event_Pickup));
         }
         public override void OnDrop()
         {
@@ -629,6 +638,17 @@ namespace SaccFlightAndVehicles
             Using = false;
             if (HoldingOnly) { HoldingOnly.SetActive(false); }
             SendEventToExtensions("SFEXT_O_OnDrop");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Event_Drop));
+        }
+        public void Event_Pickup()
+        {
+            Held = true;
+            SendEventToExtensions("SFEXT_G_OnPickup");
+        }
+        public void Event_Drop()
+        {
+            Held = false;
+            SendEventToExtensions("SFEXT_G_OnDrop");
         }
         public override void OnPickupUseDown()
         {
@@ -734,7 +754,32 @@ namespace SaccFlightAndVehicles
             if (MySeat > -1 && MySeat < VehicleStations.Length)
             { VehicleStations[MySeat].ExitStation(localPlayer); }
         }
-
+        [System.NonSerializedAttribute] public Vector3 Spawnposition;
+        [System.NonSerializedAttribute] public Quaternion Spawnrotation;
+        public void EntityRespawn()//can be used by simple items to respawn
+        {
+            if (!Occupied && !_dead && !Held)
+            {
+                Networking.SetOwner(localPlayer, gameObject);
+                IsOwner = true;
+                VRC.SDK3.Components.VRCObjectSync ObjectSync = (VRC.SDK3.Components.VRCObjectSync)gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
+                if (ObjectSync)
+                {
+                    ObjectSync.Respawn();
+                }
+                else
+                {
+                    transform.localPosition = Spawnposition;
+                    transform.localRotation = Spawnrotation;
+                }
+                Rigidbody rb = GetComponent<Rigidbody>();
+                if (rb)
+                {
+                    rb.velocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;//editor needs this
+                }
+            }
+        }
         // ToDo: Use static to better performance on U#1.0
         // public static UdonSharpBehaviour GetExtention(SaccEntity entity, string udonTypeName)
         public UdonSharpBehaviour GetExtention(string udonTypeName)
