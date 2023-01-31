@@ -37,6 +37,7 @@ namespace SaccFlightAndVehicles
         public float RotationSpeedLerpTime = 10f;
         [Tooltip("Teleports owned vehicles forward by real time * velocity if frame takes too long to render and simulation slows down. Prevents other players from seeing you warp.")]
         public bool AntiWarp = true;
+        private bool _AntiWarp = false;
         [Tooltip("Enable physics whilst not owner of the vehicle, can prevent some clipping through walls/ground, probably some performance hit. Not recommended for Quest")]
         public bool NonOwnerEnablePhysics = false;
         [Header("Fill SyncRigid to enable Object Mode (No SAVControl)")]
@@ -203,6 +204,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime + Random.Range(0f, updateInterval));
+            _AntiWarp = AntiWarp; //prevent from running early as it causes vehicle to teleport 500ft in the air for some reason
         }
         public void SFEXT_L_OwnershipTransfer()
         { ExitIdleMode(); }
@@ -293,7 +295,7 @@ namespace SaccFlightAndVehicles
                 {
                     ResetSyncTimes();
                     time = Networking.GetServerTimeInSeconds();//because we just ResetSyncTimes()'d
-                    if (AntiWarp)//let's see if we can fix the movement jerkiness for observers if the FPS is extremely low
+                    if (_AntiWarp)//let's see if we can fix the movement jerkiness for observers if the FPS is extremely low
                     {
                         double acctime = time;
                         double accuratedelta = acctime - lastframetime;
