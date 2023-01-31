@@ -296,6 +296,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             InVehicle = true;
+            SetSoundsInside();
             VehicleAnimator.SetBool("insidevehicle", true);
             VehicleAnimator.SetBool("piloting", true);
 
@@ -304,6 +305,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             InVehicle = false;
+            SetSoundsOutside();
             VehicleAnimator.SetBool("insidevehicle", false);
             VehicleAnimator.SetBool("piloting", false);
             if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
@@ -313,6 +315,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerEnter()
         {
             InVehicle = true;
+            SetSoundsInside();
             VehicleAnimator.SetBool("insidevehicle", true);
             VehicleAnimator.SetBool("passenger", true);
 
@@ -321,11 +324,21 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerExit()
         {
             InVehicle = false;
+            SetSoundsOutside();
             VehicleAnimator.SetBool("insidevehicle", false);
             VehicleAnimator.SetBool("passenger", false);
             if (UnderWater) { if (UnderWater.isPlaying) UnderWater.Stop(); }
 
             SendWheelExit();
+        }
+        //for later when I add opening doors and stuff, for parity with aircraft
+        public void SetSoundsInside()
+        {
+            VehicleAnimator.SetBool("insidesounds", true);
+        }
+        public void SetSoundsOutside()
+        {
+            VehicleAnimator.SetBool("insidesounds", false);
         }
         public void SendWheelExit()
         {
