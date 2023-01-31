@@ -204,8 +204,9 @@ MonoBehaviour:
   RotationSpeedLerpTime: 10
   AntiWarp: 1
   NonOwnerEnablePhysics: 0
-  TestTransform: {fileID: 0}
-  TestTransform_Raw: {fileID: 0}
+  SyncRigid: {fileID: 0}
+  SyncTransform: {fileID: 0}
+  SyncTransform_Raw: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &1344609028
@@ -31628,6 +31629,7 @@ MonoBehaviour:
   CenterOfMass: {fileID: 914079682221963062}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
+  DisableBulletHitEvent: 0
   SwitchFunctionSound: {fileID: 914079681947988394}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -42876,7 +42878,8 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 914079681930388931}
   EntityControl: {fileID: 8560298986138584170}
-  EventName: SFEXT_O_RespawnButton
+  EntityEvent_Name: SFEXT_O_RespawnButton
+  Event_Name: 
   Global: 0
 --- !u!114 &914079681930388931
 MonoBehaviour:
@@ -59013,6 +59016,7 @@ MonoBehaviour:
   AnimBoolName: GunSelected
   AnimBoolStayTrueOnExit: 1
   AllowFiringGrounded: 1
+  DisallowFireIfWind: 0
   EnableOnSelected: []
   HUDControl: {fileID: 6993950238987410200}
   MaxTargetDistance: 6000
@@ -95310,6 +95314,23 @@ MonoBehaviour:
   Dial_Funcon: {fileID: 4740379954118337855}
   GLimiter: 12
   AoALimiter: 15
+  AltHoldPitchProportional: 1
+  AltHoldPitchIntegral: 1
+  AltHoldPitchDerivative: 0.1
+  AltHoldRollProportional: 0.02
+  AltHoldRollDerivative: 0.01
+  AltHoldYawProportional: 15
+  AltHoldYawDerivative: 0.3
+  HelicopterMode: 0
+  CruiseProportional: 0.1
+  CruiseIntegral: 0.1
+  CruiseDerivative: 0.6
+  AutoHoverStrengthPitch: 5
+  AutoHoverMaxPitch: 10
+  AutoHoverStrengthRoll: 5
+  AutoHoverMaxRoll: 10
+  AutoHoverMaxAngleSpeedPitch: 20
+  AutoHoverMaxAngleSpeedRoll: 20
 --- !u!114 &914079683049502570
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95869,6 +95890,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 914079683213325385}
   SAVControl: {fileID: -1791885612027421787}
+  VehicleAnimator: {fileID: 914079681580794731}
   PlaneIdle:
   - {fileID: 914079681662839307}
   PlaneInside: {fileID: 914079682582196871}

@@ -340,8 +340,9 @@ MonoBehaviour:
   RotationSpeedLerpTime: 10
   AntiWarp: 1
   NonOwnerEnablePhysics: 0
-  TestTransform: {fileID: 0}
-  TestTransform_Raw: {fileID: 0}
+  SyncRigid: {fileID: 0}
+  SyncTransform: {fileID: 0}
+  SyncTransform_Raw: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &1538257256
@@ -29701,6 +29702,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2934804653617218437}
   SAVControl: {fileID: 2926696625540112212}
+  VehicleAnimator: {fileID: 2934804655656756586}
   PlaneIdle:
   - {fileID: 2934804655446578392}
   PlaneInside: {fileID: 2934804655595733582}
@@ -30301,6 +30303,7 @@ MonoBehaviour:
   AnimBoolName: GunSelected
   AnimBoolStayTrueOnExit: 0
   AllowFiringGrounded: 1
+  DisallowFireIfWind: 0
   EnableOnSelected: []
   HUDControl: {fileID: -1311050107183977077}
   MaxTargetDistance: 6000
@@ -97187,7 +97190,8 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2934804655299911390}
   EntityControl: {fileID: -5424269735798070188}
-  EventName: SFEXT_O_RespawnButton
+  EntityEvent_Name: SFEXT_O_RespawnButton
+  Event_Name: 
   Global: 0
 --- !u!114 &2934804655299911390
 MonoBehaviour:
@@ -99487,6 +99491,7 @@ MonoBehaviour:
   CenterOfMass: {fileID: 2934804654583356880}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
+  DisableBulletHitEvent: 0
   SwitchFunctionSound: {fileID: 2934804655618455735}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1

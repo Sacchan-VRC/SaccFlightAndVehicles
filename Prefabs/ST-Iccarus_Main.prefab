@@ -468,17 +468,14 @@ MonoBehaviour:
   SkidVolInVehicleMulti: 0.3
   EngineInfluence: 225
   DisableEffects: 0
-  IsDriveWheel: 0
-  SurfaceType: -1
+  CurrentGrip: 7
+  CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
   WheelRotationSpeedSurf: 0
   EngineRevs: 0
-  DrawGripCurve: 0
-  CurveObject: {fileID: 0}
-  VecDebug: {fileID: 0}
   Grounded: 0
   Sleeping: 0
   _GearRatio: 0
@@ -487,6 +484,10 @@ MonoBehaviour:
   Debugslip: 0
   CurrentlyDistant: 1
   printWheelRotSpeed: 0
+  ShowWheelForceLines: 0
+  ForceUsedDBG: 0
+  ContactPoint: {x: 0, y: 0, z: 0}
+  ForceVector: {x: 0, y: 0, z: 0}
 --- !u!114 &1803049917166894449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1236,17 +1237,14 @@ MonoBehaviour:
   SkidVolInVehicleMulti: 0.3
   EngineInfluence: 225
   DisableEffects: 0
-  IsDriveWheel: 0
-  SurfaceType: -1
+  CurrentGrip: 7
+  CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
   WheelRotationSpeedSurf: 0
   EngineRevs: 0
-  DrawGripCurve: 0
-  CurveObject: {fileID: 0}
-  VecDebug: {fileID: 0}
   Grounded: 0
   Sleeping: 0
   _GearRatio: 0
@@ -1255,6 +1253,10 @@ MonoBehaviour:
   Debugslip: 0
   CurrentlyDistant: 1
   printWheelRotSpeed: 0
+  ShowWheelForceLines: 0
+  ForceUsedDBG: 0
+  ContactPoint: {x: 0, y: 0, z: 0}
+  ForceVector: {x: 0, y: 0, z: 0}
 --- !u!1 &1353338371229019721
 GameObject:
   m_ObjectHideFlags: 0
@@ -1687,17 +1689,14 @@ MonoBehaviour:
   SkidVolInVehicleMulti: 0.3
   EngineInfluence: 225
   DisableEffects: 0
-  IsDriveWheel: 0
-  SurfaceType: -1
+  CurrentGrip: 7
+  CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
   WheelRotationSpeedSurf: 0
   EngineRevs: 0
-  DrawGripCurve: 0
-  CurveObject: {fileID: 0}
-  VecDebug: {fileID: 0}
   Grounded: 0
   Sleeping: 0
   _GearRatio: 0
@@ -1706,6 +1705,10 @@ MonoBehaviour:
   Debugslip: 0
   CurrentlyDistant: 1
   printWheelRotSpeed: 0
+  ShowWheelForceLines: 0
+  ForceUsedDBG: 0
+  ContactPoint: {x: 0, y: 0, z: 0}
+  ForceVector: {x: 0, y: 0, z: 0}
 --- !u!114 &1803049917166894447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1861,17 +1864,14 @@ MonoBehaviour:
   SkidVolInVehicleMulti: 0.3
   EngineInfluence: 225
   DisableEffects: 0
-  IsDriveWheel: 0
-  SurfaceType: -1
+  CurrentGrip: 7
+  CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
   WheelRotationSpeedRPS: 0
   WheelRotationSpeedRPM: 0
   WheelRotationSpeedSurf: 0
   EngineRevs: 0
-  DrawGripCurve: 0
-  CurveObject: {fileID: 0}
-  VecDebug: {fileID: 0}
   Grounded: 0
   Sleeping: 0
   _GearRatio: 0
@@ -1880,6 +1880,10 @@ MonoBehaviour:
   Debugslip: 0
   CurrentlyDistant: 1
   printWheelRotSpeed: 0
+  ShowWheelForceLines: 0
+  ForceUsedDBG: 0
+  ContactPoint: {x: 0, y: 0, z: 0}
+  ForceVector: {x: 0, y: 0, z: 0}
 --- !u!114 &1803049917166894446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22938,11 +22942,9 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 1803049918173235745}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &1803049917701134627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -62834,6 +62836,7 @@ MonoBehaviour:
   DamageFeedBack: {fileID: 0}
   Explosion:
   - {fileID: 7545207850356807991}
+  Explosion_Water: []
   BulletHit:
   - {fileID: 6910043721858669898}
   SmallCrash:
@@ -63191,7 +63194,8 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 3243243056451226300}
   EntityControl: {fileID: 3243243057054021813}
-  EventName: SFEXT_O_RespawnButton
+  EntityEvent_Name: SFEXT_O_RespawnButton
+  Event_Name: 
   Global: 0
 --- !u!114 &3243243056451226300
 MonoBehaviour:
@@ -63345,11 +63349,9 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2687378976475800917}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &3243243056561536689
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63624,8 +63626,10 @@ MonoBehaviour:
   CorrectionTime_Rotation: 2
   RotationSpeedLerpTime: 10
   AntiWarp: 1
-  TestTransform: {fileID: 0}
-  TestTransform_Raw: {fileID: 0}
+  NonOwnerEnablePhysics: 0
+  SyncRigid: {fileID: 0}
+  SyncTransform: {fileID: 0}
+  SyncTransform_Raw: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &3243243056881722325
@@ -63750,11 +63754,9 @@ MonoBehaviour:
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 3288998196763310016}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 3243243056396766826}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
-  RotationCalibrationTarget: {fileID: 0}
 --- !u!114 &3243243056892148395
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63980,9 +63982,9 @@ Rigidbody:
   m_AngularDrag: 0
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 2
   m_Constraints: 14
-  m_CollisionDetection: 0
+  m_CollisionDetection: 2
 --- !u!65 &3243243057054021817
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -64048,6 +64050,7 @@ MonoBehaviour:
   CenterOfMass: {fileID: 8924013770782945331}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
+  DisableBulletHitEvent: 0
   SwitchFunctionSound: {fileID: 0}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -64697,13 +64700,15 @@ MonoBehaviour:
   ResupplyTime: 10
   BoostAnimator: {fileID: 3243243057054021814}
   BoostKey: 304
+  _BoostingAnimFloatName: boosting
+  _BoostRemainingAnimFloatName: boostremaining
   BoostType_Force: 1
   BoostForce: 20
   BoostPoint: {fileID: 1803049916630535086}
+  UseMainFuel: 0
+  MainFuelUsePerSecond: 30
   _Boosting: 0
   _BoostRemaining: 0
-  _BoostingAnimFloatName: boosting
-  _BoostRemainingAnimFloatName: boostremaining
 --- !u!114 &1152787862393203574
 MonoBehaviour:
   m_ObjectHideFlags: 0

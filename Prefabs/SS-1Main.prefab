@@ -572,7 +572,6 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 1209846102}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 515467600}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -698,7 +697,6 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 865498790}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2246501683413073306}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -21806,7 +21804,6 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 3411756929047500885}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -27702,8 +27699,9 @@ MonoBehaviour:
   RotationSpeedLerpTime: 10
   AntiWarp: 1
   NonOwnerEnablePhysics: 0
-  TestTransform: {fileID: 0}
-  TestTransform_Raw: {fileID: 0}
+  SyncRigid: {fileID: 0}
+  SyncTransform: {fileID: 0}
+  SyncTransform_Raw: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &2849390445293511764
@@ -62952,6 +62950,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 133121
   AllowFiringWhenGrounded: 1
+  DisallowFireIfWind: 0
   DoAnimBool: 0
   AnimBoolName: AGMSelected
   AnimFloatName: AGMs
@@ -67934,7 +67933,6 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 627682400261023669}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -82743,6 +82741,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 7105509204671563318}
   SAVControl: {fileID: -2400341428957135530}
+  VehicleAnimator: {fileID: 7105509206176202441}
   PlaneIdle:
   - {fileID: 7105509204915353736}
   PlaneInside: {fileID: 0}
@@ -82756,6 +82755,7 @@ MonoBehaviour:
   TouchDownSoundSpeed: 35
   PlaneWind: {fileID: 0}
   PlaneWindMultiplier: 0.25
+  PlaneWindMinVol: 3
   PlaneWindMaxVolSpeed: 1000
   SonicBoom: []
   Explosion:
@@ -83155,7 +83155,6 @@ MonoBehaviour:
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 7105509205904838782}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 1554130111}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -83518,7 +83517,8 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 7105509204878781824}
   EntityControl: {fileID: 7149063361215606383}
-  EventName: SFEXT_O_RespawnButton
+  EntityEvent_Name: SFEXT_O_RespawnButton
+  Event_Name: 
   Global: 0
 --- !u!114 &7105509204878781824
 MonoBehaviour:
@@ -85524,6 +85524,7 @@ MonoBehaviour:
   CenterOfMass: {fileID: 7105509205716476651}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
+  DisableBulletHitEvent: 0
   SwitchFunctionSound: {fileID: 7105509204779129781}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -86213,7 +86214,6 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 2415259330074371874}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
@@ -86339,7 +86339,6 @@ MonoBehaviour:
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
   AdjustSeatPosition: 1
-  AdjustSeatRotation: 1
   TargetEyePosition: {fileID: 4057865969602712601}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
