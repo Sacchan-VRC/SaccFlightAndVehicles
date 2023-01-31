@@ -95,7 +95,11 @@ namespace SaccFlightAndVehicles
                     if (Trigger > 0.75)
                     {
                         UpdatingVR = true;
-                        Vector3 handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                        Vector3 handpos;
+                        if (UseLeftTrigger)
+                        { handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
+                        else
+                        { handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }
                         handpos = ControlsRoot.InverseTransformDirection(handpos);
 
                         if (!TriggerLastFrame)
