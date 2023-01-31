@@ -11,6 +11,8 @@ namespace SaccFlightAndVehicles
     public class SAV_SoundController : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
+        [Tooltip("Currently only used to send the InsideSounds boolean")]
+        public Animator VehicleAnimator;
         [Tooltip("Vehicle engine's 'Idle' sound, plays all the time vehicle is occupied, and pitches up with engine's output")]
         public AudioSource[] PlaneIdle;
         [Tooltip("Same as PlaneIdle but only plays when inside the vehicle with all doors closed")]
@@ -1035,6 +1037,7 @@ namespace SaccFlightAndVehicles
         private void SetSoundsInside()
         {
             if (!SoundsOutside) { return; }
+            if (VehicleAnimator) { VehicleAnimator.SetBool("insidesounds", true); }
             SoundsOutside = false;
             //change stuff when you get in/canopy closes
             if (ABOnOutside) { ABOnOutside.Stop(); }
@@ -1072,6 +1075,7 @@ namespace SaccFlightAndVehicles
         private void SetSoundsOutside()//sets sound values to give continuity of engine sound when exiting the plane or opening canopy
         {
             if (SoundsOutside) { return; }
+            if (VehicleAnimator) { VehicleAnimator.SetBool("InsideSounds", false); }
             SoundsOutside = true;
             if (RadarLocked) { RadarLocked.Stop(); }
             if (!RollingOnWater && _rolling) { _rolling.Stop(); }
