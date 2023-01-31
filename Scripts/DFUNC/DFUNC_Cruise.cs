@@ -22,7 +22,7 @@ namespace SaccFlightAndVehicles
         private VRCPlayerApi localPlayer;
         private float CruiseTemp;
         private float SpeedZeroPoint;
-        private float TriggerTapTime = 1;
+        private float TriggerTapTime = 0;
         [System.NonSerializedAttribute] public bool Cruise;
         private float CruiseProportional = .1f;
         private float CruiseIntegral = .1f;
@@ -61,7 +61,6 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             if (!Cruise) { gameObject.SetActive(false); }
-            TriggerTapTime = 1;
             Selected = false;
         }
         public void SFEXT_O_PilotEnter()
@@ -78,7 +77,6 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             Piloting = false;
-            TriggerTapTime = 1;
             Selected = false;
         }
         public void SFEXT_G_EngineOn()
@@ -149,16 +147,13 @@ namespace SaccFlightAndVehicles
                                     if ((!(bool)SAVControl.GetProgramVariable("Taxiing") || AllowCruiseGrounded) && !InVTOL && !InReverse)
                                     { SetCruiseOn(); }
                                 }
-                                if (TriggerTapTime > .4f)//no double tap
-                                {
-                                    TriggerTapTime = 0;
-                                }
-                                else//double tap detected, turn off cruise
+                                if (Time.time - TriggerTapTime < .4f)//double tap detected, turn off cruise
                                 {
                                     SetCruiseOff();
                                 }
                                 SpeedZeroPoint = handpos.z;
                                 CruiseTemp = SetSpeed;
+                                TriggerTapTime = Time.time;
                             }
                             float SpeedDifference = (SpeedZeroPoint - handpos.z) * 250;
                             SetSpeed = Mathf.Clamp(CruiseTemp + SpeedDifference, 0, 2000);
@@ -207,8 +202,6 @@ namespace SaccFlightAndVehicles
 
                     SAVControl.SetProgramVariable("ThrottleOverride", Mathf.Clamp((CruiseProportional * error) + (CruiseIntegral * CruiseIntegrator), 0, 1));
                     //ThrottleInput += Derivative * Derivator; //works but spazzes out real bad
-
-                    TriggerTapTime += DeltaTime;
                 }
             }
 
@@ -263,7 +256,6 @@ namespace SaccFlightAndVehicles
                 SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
                 CruiseThrottleOverridden = false;
             }
-            TriggerTapTime = 1;
             SAVControl.SetProgramVariable("PlayerThrottle", (float)SAVControl.GetProgramVariable("ThrottleInput"));
             Cruise = false;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
