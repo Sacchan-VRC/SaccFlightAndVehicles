@@ -50,7 +50,8 @@ namespace SaccFlightAndVehicles
             if (InvertVRGearChangeToggle) { InvertVRGearChangeDefault = InvertVRGearChangeToggle.isOn; ToggleInvertVRGearChange(); }
             if (LeftGripClutchToggle) { LeftGripClutchDefault = LeftGripClutchToggle.isOn; ToggleLeftGripClutch(); }
             if (SwitchHandsToggle) { SwitchHandsDefault = SwitchHandsToggle.isOn; }//don't run this one because it can be on or off by default and running it would toggle it
-            if (DoubleTapToExit) { DoubleTapToExitDefault = SwitchHandsToggle.isOn; }//don't run this one because it can be on or off by default and running it would toggle it
+            if (DoubleTapToExit) { DoubleTapToExitDefault = DoubleTapToExit.isOn; ToggleDoubleTapToExit(); }
+            if (StickSteering) { StickSteeringDefault = StickSteering.isOn; ToggleStickSteering(); }
             //sliders
             if (DialSensSlider) { DialSensDefault = DialSensSlider.value; SetDialSensitivity(); }
             if (GripSensitivitySlider) { GripSensitivityDefault = GripSensitivitySlider.value; SetGripSensitivity(); }
@@ -262,6 +263,19 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public Toggle StickSteering;
+        private bool StickSteeringDefault;
+        public void ToggleStickSteering()
+        {
+            bool stickSteer = StickSteering.isOn;
+            foreach (UdonSharpBehaviour SGV in SaccGroundVehicles)
+            {
+                if (SGV)
+                {
+                    SGV.SetProgramVariable("UseStickSteering", stickSteer);
+                }
+            }
+        }
         [System.NonSerialized] public float SaccFlightStrengthDefault;
         public Slider SaccFlightStrengthSlider;
         public Text SaccFlightStrengthSliderNumber;
@@ -290,6 +304,7 @@ namespace SaccFlightAndVehicles
             if (LeftGripClutchToggle) { LeftGripClutchToggle.isOn = LeftGripClutchDefault; }
             if (AutoEngineToggle) { AutoEngineToggle.isOn = AutoEngineDefault; }
             if (DoubleTapToExit) { DoubleTapToExit.isOn = DoubleTapToExitDefault; }
+            if (StickSteering) { StickSteering.isOn = StickSteeringDefault; }
             if (SaccFlight) { SaccFlightStrengthSlider.value = SaccFlightStrengthDefault; }
         }
         [Header("Debug")]

@@ -113,6 +113,7 @@ namespace SaccFlightAndVehicles
         public float SteeringReturnSpeedDT = .3f;
         [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
         public float SteeringReturnSpeedVR = 5f;
+        public bool UseStickSteering;
         [Header("Bike")]
         [Tooltip("Max roll angle of head for leaning on bike")]
         public float LeanSensitivity_Roll = 25f;
@@ -512,37 +513,23 @@ namespace SaccFlightAndVehicles
                             AutoSteerLerper = YawInput;
                         }
                     }
-                    float SteerInput = -VRSteerInput + Ai + Di;
-                    //AUTOSTEER DRIFT FIX(BROKEN)
-                    //float AutoSteer = Vector3.SignedAngle(Quaternion.AngleAxis(SteeringDegrees * YawInput, VehicleTransform.up) * VehicleTransform.forward, Vector3.ProjectOnPlane(VehicleVel, VehicleTransform.up), VehicleTransform.up);
-
+                    float SteerInput;
+                    if (UseStickSteering)
+                    {
+                        SteerInput = Ai + Di + Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                    }
+                    else
+                    {
+                        SteerInput = -VRSteerInput + Ai + Di;
+                    }
                     float AutoSteer = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(VehicleVel, VehicleTransform.up), VehicleTransform.up);
                     if (Mathf.Abs(AutoSteer) > 110)
                     { AutoSteer = 0; }
 
-                    /*     float SteerFalloff = Mathf.Abs(AutoSteer) / 90;
-                        if (SteerFalloff > 1) { SteerFalloff -= 1; }
-                        //Desmos: (1-\left(\left(x-.5\right)\cdot2\right)^{2}\ )^{.5}\ 
-                        SteerFalloff = Mathf.Pow(1 - Mathf.Pow(((Mathf.Abs(SteerFalloff) - .5f) * 2), 2), AutoSteerCurve);
-                    */
-                    //Desmos: \left(\left(\sin\left(\left(x-.25\right)\cdot\pi\cdot2\right)\right)\cdot.5\right)\ +.5
-                    //SteerFalloff = ((Mathf.Sin((SteerFalloff - .25f) * Mathf.PI * 2f)) * .5f) + .5f;
-
-                    //Desmos: \sin\ x\ \cdot\pi
-                    /*     if (SteerFalloff >= 1) { SteerFalloff -= 1; }
-                        SteerFalloff = Mathf.Sin(SteerFalloff * Mathf.PI); */
-
-                    /*                 if (Mathf.Abs(AutoSteer) > 90)
-                                    { AutoSteer = Mathf.Clamp(-AutoSteer / SteeringDegrees, -1, 1); }
-                                    else
-                                    { AutoSteer = Mathf.Clamp(AutoSteer / SteeringDegrees, -1, 1); } */
-                    //AUTOSTEER DRIFT FIX(BROKEN)
-                    //AutoSteer += YawInput;
-
                     { AutoSteer = Mathf.Clamp(AutoSteer / SteeringDegrees, -1, 1); }
 
                     float GroundedwheelsRatio = NumGroundedWheels / SteerWheels.Length;
-                    if (InVR)
+                    if (InVR && !UseStickSteering)
                     {
                         AutoSteerLerper = Mathf.Lerp(AutoSteerLerper, AutoSteer, VehicleSpeed * AutoSteerStrength * GroundedwheelsRatio * DeltaTime);
                         float YawAddAmount = SteerInput;
@@ -569,11 +556,33 @@ namespace SaccFlightAndVehicles
                             }
                         }
                     }
+                    else if (UseStickSteering)
+                    {
+                        if (SteeringMaxSpeedDTDisabled || _HandBrakeOn)//no steering limit when handbarke on
+                        {
+                            YawInput = Mathf.Clamp(SteerInput, -1, 1);
+                        }
+                        else
+                        {
+                            float SpeedSteeringLimitUpper = 1 - (VehicleSpeed / SteeringMaxSpeedDT);
+                            SpeedSteeringLimitUpper = Mathf.Clamp(SpeedSteeringLimitUpper, DesktopMinSteering, 1);
+                            float SpeedSteeringLimitLower = -SpeedSteeringLimitUpper;
+
+                            if (AutoSteer < 0)
+                            {
+                                SpeedSteeringLimitLower = Mathf.Min(SpeedSteeringLimitLower, AutoSteer - DesktopMinSteering);
+                                YawInput = SteerInput * -SpeedSteeringLimitLower;
+                            }
+                            else
+                            {
+                                SpeedSteeringLimitUpper = Mathf.Max(SpeedSteeringLimitUpper, AutoSteer + DesktopMinSteering);
+                                YawInput = SteerInput * SpeedSteeringLimitUpper;
+                            }
+                        }
+                    }
                     else
                     {
                         float YawAddAmount = SteerInput * DeltaTime * (1f / SteeringKeyboardSecsToMax);
-
-                        float LStickPosX = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
                         if (YawAddAmount != 0f)
                         {
                             if (SteeringMaxSpeedDTDisabled || _HandBrakeOn)//no steering limit when handbarke on
@@ -595,18 +604,6 @@ namespace SaccFlightAndVehicles
                                     SpeedSteeringLimitUpper = Mathf.Max(SpeedSteeringLimitUpper, AutoSteer + DesktopMinSteering);
                                 }
                                 YawInput = Mathf.Clamp(YawInput + YawAddAmount, SpeedSteeringLimitLower, SpeedSteeringLimitUpper);
-                            }
-                        }
-                        else if (LStickPosX != 0f)//controller input (relying on VRC's deadzone)
-                        {
-                            if (Drift_AutoSteer)
-                            {
-                                AutoSteerLerper = Mathf.Lerp(AutoSteerLerper, AutoSteer, VehicleSpeed * AutoSteerStrength * GroundedwheelsRatio * DeltaTime);
-                                YawInput = Mathf.Clamp(AutoSteerLerper + LStickPosX, -1f, 1f);
-                            }
-                            else
-                            {
-                                YawInput = LStickPosX;
                             }
                         }
                         else
