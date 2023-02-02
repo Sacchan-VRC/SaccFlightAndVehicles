@@ -52,6 +52,7 @@ namespace SaccFlightAndVehicles
         public GameObject[] AAMTargets;
         [System.NonSerializedAttribute] public bool InEditor = true;
         private VRCPlayerApi localPlayer;
+        [System.NonSerializedAttribute] public VRC_Pickup EntityPickup;
         [System.NonSerializedAttribute] public bool Piloting;
         [System.NonSerializedAttribute] public int UsersID;
         [System.NonSerializedAttribute] public string UsersName;
@@ -159,7 +160,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float PilotExitTime;
         [System.NonSerializedAttribute] public float PilotEnterTime;
         [System.NonSerializedAttribute] public bool Holding;
-        [System.NonSerializedAttribute] public bool Held;
         //end of old Leavebutton stuff
         public void Init() { Start(); }
         private void Start()
@@ -211,24 +211,7 @@ namespace SaccFlightAndVehicles
                 VehicleSeats[i] = (SaccVehicleSeat)VehicleStations[i].GetComponent<SaccVehicleSeat>();
                 if (VehicleSeats[i]) { VehicleSeats[i].InitializeSeat(); }
             }
-
-            TellDFUNCsLR();
-
-            foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
-            {
-                if (EXT) EXT.SetProgramVariable("EntityControl", this);
-            }
-            foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
-            {
-                if (EXT) EXT.SetProgramVariable("EntityControl", this);
-            }
-            foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
-            {
-                if (EXT) EXT.SetProgramVariable("EntityControl", this);
-            }
-
-            SendEventToExtensions("SFEXT_L_EntityStart");
-
+            EntityPickup = (VRC_Pickup)gameObject.GetComponent<VRC_Pickup>();
 
             //Dial Stuff
             LStickNumFuncs = Dial_Functions_L.Length;
@@ -286,6 +269,24 @@ namespace SaccFlightAndVehicles
                     RStickCheckAngle.y = angle.z;
                 }
             }
+
+            TellDFUNCsLR();
+
+            foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
+            {
+                if (EXT) EXT.SetProgramVariable("EntityControl", this);
+            }
+            foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
+            {
+                if (EXT) EXT.SetProgramVariable("EntityControl", this);
+            }
+            foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+            {
+                if (EXT) EXT.SetProgramVariable("EntityControl", this);
+            }
+
+            SendEventToExtensions("SFEXT_L_EntityStart");
+
             //if in editor play mode without clientsim
             if (InEditor)
             {
@@ -642,12 +643,10 @@ namespace SaccFlightAndVehicles
         }
         public void Event_Pickup()
         {
-            Held = true;
             SendEventToExtensions("SFEXT_G_OnPickup");
         }
         public void Event_Drop()
         {
-            Held = false;
             SendEventToExtensions("SFEXT_G_OnDrop");
         }
         public override void OnPickupUseDown()
@@ -758,7 +757,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Quaternion Spawnrotation;
         public void EntityRespawn()//can be used by simple items to respawn
         {
-            if (!Occupied && !_dead && !Held)
+            if (!Occupied && !_dead && (!EntityPickup || EntityPickup.IsHeld))
             {
                 Networking.SetOwner(localPlayer, gameObject);
                 IsOwner = true;

@@ -148,7 +148,7 @@ namespace SaccFlightAndVehicles
                                     HookedGameObject = hit.collider.gameObject;
                                     HookedTransform = hit.collider.transform;
                                     HookedTransformOffset = HookedTransform.InverseTransformPoint(hit.collider.ClosestPoint(value));
-                                    if (TwoWayForces && (!HookedEntity || (!TwoWayForces_DisableIfOccupied || (!HookedEntity.Occupied && !HookedEntity.Held))))
+                                    if (TwoWayForces && (!HookedEntity || (!TwoWayForces_DisableIfOccupied || (!HookedEntity.Occupied && (!HookedEntity.EntityPickup || !HookedEntity.EntityPickup.IsHeld)))))
                                     {
                                         HookedRB = HookedCollider.attachedRigidbody;
                                         if (HookedRB)
@@ -171,7 +171,7 @@ namespace SaccFlightAndVehicles
                                                 var objpickup = (VRC.SDK3.Components.VRCPickup)HookedRB.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
                                                 if (IsOwner)
                                                 {
-                                                    if ((!objpickup || !objpickup.IsHeld) && (!HookedEntity || (!HookedEntity.Occupied && !HookedEntity.Held)))
+                                                    if ((!objpickup || !objpickup.IsHeld) && (!HookedEntity || (!HookedEntity.Occupied && (!HookedEntity.EntityPickup || !HookedEntity.EntityPickup.IsHeld))))
                                                     {
                                                         if (!Overriding_DisallowOwnerShipTransfer)
                                                         {
@@ -196,7 +196,7 @@ namespace SaccFlightAndVehicles
                                             }
                                             //people cant take ownership while vehicle is being held.
                                             //localforcemode is only active if someone is in the vehicle when its grabbed
-                                            if (HookedEntity && (!TwoWayForces_LocalForceMode || (!HookedEntity.Occupied && !HookedEntity.Held)))
+                                            if (HookedEntity && (!TwoWayForces_LocalForceMode || (!HookedEntity.Occupied && (!HookedEntity.EntityPickup || !HookedEntity.EntityPickup.IsHeld))))
                                             {
                                                 if (!Overriding_DisallowOwnerShipTransfer)
                                                 {

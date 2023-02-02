@@ -13,6 +13,7 @@ public class SAV_Radio : UdonSharpBehaviour
     [UdonSynced] public bool RadioOn = true;
     private bool Initialized;
     private VRCPlayerApi localPlayer;
+    private int CurrentOwnerID;
     public void SFEXT_P_PassengerEnter()
     {
         if (RadioBase)
@@ -32,6 +33,7 @@ public class SAV_Radio : UdonSharpBehaviour
     {
         Initialized = true;
         localPlayer = Networking.LocalPlayer;
+        CurrentOwnerID = Networking.GetOwner(EntityControl.gameObject).playerId;
     }
     void Start()
     {
@@ -58,6 +60,30 @@ public class SAV_Radio : UdonSharpBehaviour
         {
             RadioBase.SetProgramVariable("MyVehicle", null);
             RadioBase.SendCustomEvent("SetAllVoiceVolumesDefault");
+        }
+    }
+    public void SFEXT_L_OwnershipTransfer()
+    {
+        //reset current owner's voice volume
+        RadioBase.SetProgramVariable("SingleVVPlayerID", CurrentOwnerID);
+        RadioBase.SendCustomEvent("SetSingleVoiceVolumeDefault");
+        CurrentOwnerID = Networking.GetOwner(EntityControl.gameObject).playerId;
+    }
+    public void SFEXT_O_OnPickup()
+    {
+        SFEXT_O_PilotEnter();
+    }
+    public void SFEXT_O_OnDrop()
+    {
+        SFEXT_O_PilotExit();
+    }
+    public void SFEXT_G_OnDrop()
+    {
+        if (CurrentOwnerID == Networking.GetOwner(EntityControl.gameObject).playerId)
+        {
+            //reset current owner's voice volume
+            RadioBase.SetProgramVariable("SetSingleVoiceVolumeID", CurrentOwnerID);
+            RadioBase.SendCustomEvent("SetSingleVoiceVolumeDefault");
         }
     }
 }

@@ -65,6 +65,16 @@ namespace SaccFlightAndVehicles
                         thisplayer.SetVoiceGain(VoiceGain);
                     }
                 }
+                if (_AllPlanes_ENT[NextPlane].EntityPickup && _AllPlanes_ENT[NextPlane].EntityPickup.IsHeld)
+                {
+                    VRCPlayerApi thisplayer = Networking.GetOwner(_AllPlanes_ENT[NextPlane].gameObject);
+                    if (thisplayer != null)
+                    {
+                        thisplayer.SetVoiceDistanceNear(VoiceNear);
+                        thisplayer.SetVoiceDistanceFar(VoiceFar);
+                        thisplayer.SetVoiceGain(VoiceGain);
+                    }
+                }
             }
         }
         public void SetRadioVoiceVolumes_Zones()
@@ -95,6 +105,15 @@ namespace SaccFlightAndVehicles
                 AllPlayers[i].SetVoiceDistanceFar(25);
                 AllPlayers[i].SetVoiceGain(15);
             }
+        }
+        private int SetSingleVoiceVolumeID;
+        public void SetSingleVoiceVolumeDefault()
+        {
+            VRCPlayerApi SingleVV = VRCPlayerApi.GetPlayerById(SetSingleVoiceVolumeID);
+            if (SingleVV == null) { return; }
+            SingleVV.SetVoiceDistanceNear(0);
+            SingleVV.SetVoiceDistanceFar(25);
+            SingleVV.SetVoiceGain(15);
         }
         public void ToggleRadio()
         {

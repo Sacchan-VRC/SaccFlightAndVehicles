@@ -139,7 +139,7 @@ namespace SaccFlightAndVehicles
             StingerObjectSync = (VRC.SDK3.Components.VRCObjectSync)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
             Spawnposition = StingerTransform.position;
             Spawnrotation = StingerTransform.rotation;
-            StingerPickup = (VRC_Pickup)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
+            StingerPickup = (VRC_Pickup)EntityControl.gameObject.GetComponent<VRC_Pickup>();
             HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
 
             NumChildrenStart = transform.childCount;
