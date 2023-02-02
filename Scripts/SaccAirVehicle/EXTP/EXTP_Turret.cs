@@ -48,8 +48,18 @@ namespace SaccFlightAndVehicles
         public bool SendAnimTrigger = false;
         public Animator TurretAnimator;
         public string AnimTriggerName = "TurretFire";
+
         [Tooltip("Fired projectiles will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
+
+        [Tooltip("Audio source that plays when rotating")]
+        public AudioSource RotatingSound;
+        public float RotatingSoundMulti = .02f;
+        [Header("Recoil: Applied by Vehicle's owner, will be laggy for firer")]
+        [Tooltip("How much the vehicle should be pushed back when dropping a 'bomb' (useful for making cannons)")]
+        public float Recoil = 0f;
+        [Tooltip("Backwards vector of this transform is the direction along which the recoil force is applied (backwards so it can default to VehicleTransform)")]
+        public Transform RecoilDirection;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         private float LastFireTime = 0f;
         private int FullAmmo;
@@ -84,6 +94,9 @@ namespace SaccFlightAndVehicles
         private bool TriggerLastFrame = true;
         private bool Manning;
         private int NumChildrenStart;
+        private float RotateSoundVol;
+        private Rigidbody VehicleRigid;
+        private bool DoRecoil;
         Quaternion ControlsRotLastFrame;
         Quaternion JoystickZeroPoint;
         [System.NonSerializedAttribute] public bool IsOwner;//required by the bomb script, not actually related to being the owner of the object
@@ -94,6 +107,7 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+            VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             if (!ControlsRoot) { ControlsRoot = TurretRotatorHor; }
 
             nextUpdateTime = Time.time + Random.Range(0f, updateInterval);
@@ -114,6 +128,8 @@ namespace SaccFlightAndVehicles
                     InstantiateWeapon();
                 }
             }
+            DoRecoil = VehicleRigid && RecoilDirection;
+            if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
         }
         private GameObject InstantiateWeapon()
         {
@@ -132,6 +148,7 @@ namespace SaccFlightAndVehicles
             if (AmmoBar) { AmmoBar.gameObject.SetActive(true); }
             if (ViewCamera) { ViewCamera.gameObject.SetActive(true); }
             if (ViewCameraScreen) { ViewCameraScreen.gameObject.SetActive(true); }
+            if (RotatingSound) { RotatingSound.Play(); }
         }
         public void SFEXTP_O_UserExit()
         {
@@ -143,6 +160,7 @@ namespace SaccFlightAndVehicles
             if (ViewCameraScreen) { ViewCameraScreen.gameObject.SetActive(false); }
             RotationSpeedX = 0;
             RotationSpeedY = 0;
+            if (RotatingSound) { RotatingSound.Stop(); }
         }
         public void Set_Active()
         {
@@ -176,6 +194,11 @@ namespace SaccFlightAndVehicles
             }
             if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
             if (SendAnimTrigger) { TurretAnimator.SetTrigger(AnimTriggerName); }
+
+            if (EntityControl.IsOwner && DoRecoil)
+            {
+                VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange);
+            }
         }
         public void SFEXTP_G_ReSupply()
         {
@@ -312,6 +335,12 @@ namespace SaccFlightAndVehicles
                     O_GunRotation = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.localEulerAngles.y);
                     RequestSerialization();
                     nextUpdateTime = Time.time + updateInterval;
+                }
+                if (RotatingSound)
+                {
+                    float turnvol = new Vector2(RotationSpeedX, RotationSpeedY).magnitude * RotatingSoundMulti;
+                    RotatingSound.volume = Mathf.Min(turnvol, RotateSoundVol);
+                    RotatingSound.pitch = turnvol;
                 }
             }
             else

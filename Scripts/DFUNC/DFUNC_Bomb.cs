@@ -268,7 +268,7 @@ namespace SaccFlightAndVehicles
                 BombPoint++;
                 if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
             }
-            VehicleRigid.AddForce(-RecoilDirection.forward * Recoil, ForceMode.VelocityChange);
+            VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange);
             if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
             UpdateAmmoVisuals();
         }
