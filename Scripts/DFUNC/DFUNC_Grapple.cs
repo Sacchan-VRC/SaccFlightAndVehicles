@@ -58,6 +58,7 @@ namespace SaccFlightAndVehicles
         private Collider HookedCollider;
         private GameObject HookedGameObject;
         private Rigidbody HookedRB;
+        private VRC_Pickup EntityPickup;
         private bool InVr;
         private VRCPlayerApi localPlayer;
         private SaccFlightAndVehicles.SaccEntity HookedEntity;
@@ -168,10 +169,9 @@ namespace SaccFlightAndVehicles
                                             }
                                             if (TwoWayForces_LocalForceMode)
                                             {
-                                                var objpickup = (VRC.SDK3.Components.VRCPickup)HookedRB.GetComponent(typeof(VRC.SDK3.Components.VRCPickup));
                                                 if (IsOwner)
                                                 {
-                                                    if ((!objpickup || !objpickup.IsHeld) && (!HookedEntity || (!HookedEntity.Occupied && (!HookedEntity.EntityPickup || !HookedEntity.EntityPickup.IsHeld))))
+                                                    if ((!EntityPickup || !EntityPickup.IsHeld) && (!HookedEntity || (!HookedEntity.Occupied && (!HookedEntity.EntityPickup || !HookedEntity.EntityPickup.IsHeld))))
                                                     {
                                                         if (!Overriding_DisallowOwnerShipTransfer)
                                                         {
@@ -297,6 +297,7 @@ namespace SaccFlightAndVehicles
             if (!ForceApplyPoint) { ForceApplyPoint = HookLaunchPoint; }
             VehicleRB = EntityControl.GetComponent<Rigidbody>();
             IsOwner = (bool)EntityControl.GetProgramVariable("IsOwner");
+            EntityPickup = EntityControl.GetComponent<VRC_Pickup>();
             HookedTransform = transform;//avoid null
             HookParentStart = Hook.parent;
             HookStartPos = Hook.localPosition;
@@ -509,7 +510,7 @@ namespace SaccFlightAndVehicles
             //make sure this happens because the one in the HookLaunched Set may not be reliable because synced variables are faster than events
             SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
         }
-        public void DisableThis() { if (!Occupied && !_HookLaunched) { gameObject.SetActive(false); } }
+        public void DisableThis() { if (!Occupied && !_HookLaunched && (!EntityPickup || !EntityPickup.IsHeld)) { gameObject.SetActive(false); } }
         public void SFEXT_O_PilotExit()
         {
             Selected = false;
