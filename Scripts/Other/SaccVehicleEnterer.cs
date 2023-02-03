@@ -120,8 +120,10 @@ namespace SaccFlightAndVehicles
         }
         public void EnterVehicle()
         {
+            bool breaknow = false;
             for (int i = 0; i < AllPlanes.Length; i++)
             {
+                if (breaknow) { break; }
                 SaccEntity ve = AllPlanes[i].GetComponent<SaccEntity>();
                 if (ve)
                 {
@@ -136,7 +138,8 @@ namespace SaccFlightAndVehicles
                                 {
                                     if (!seats[o].SeatOccupied)
                                     {
-                                        ve.VehicleStations[seats[o].ThisStationID].UseStation(localPlayer);
+                                        seats[o].Interact();
+                                        breaknow = true;
                                         break;
                                     }
                                 }
