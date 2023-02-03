@@ -2064,7 +2064,9 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 6873395543557872215}
+  InVehicleOnly: {fileID: 0}
+  EnableInVehicle:
+  - {fileID: 6873395543557872215}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 5061191818139185407}
   DoVoiceVolumeChange: 1
@@ -2383,6 +2385,7 @@ MonoBehaviour:
   AutoSteerStrength: 0.8
   SteeringReturnSpeedDT: 0.3
   SteeringReturnSpeedVR: 5
+  UseStickSteering: 0
   LeanSensitivity_Roll: 25
   LeanSensitivity_Pitch: 2.5
   RespawnDelay: 10

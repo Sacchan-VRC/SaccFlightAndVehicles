@@ -99486,7 +99486,9 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 2934804654959112473}
+  InVehicleOnly: {fileID: 0}
+  EnableInVehicle:
+  - {fileID: 2934804654959112473}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 2934804654583356880}
   DoVoiceVolumeChange: 1
@@ -100338,7 +100340,7 @@ MonoBehaviour:
   VelLift: 0
   VelLiftMax: 0
   MaxGs: 20
-  GDamage: 4
+  GDamage: 20
   GroundEffectMaxDistance: 0
   GroundEffectStrength: 0
   GroundEffectLiftMax: 0

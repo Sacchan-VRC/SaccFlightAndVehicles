@@ -37592,6 +37592,7 @@ MonoBehaviour:
   MaxAttachAngle: 15
   CatapultLayer: 24
   GearFunc: {fileID: 106387176060799081}
+  AnimTriggerLaunchName: catapultlaunch
 --- !u!114 &4371473018679933881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47840,7 +47841,9 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 4371473019321031449}
+  InVehicleOnly: {fileID: 0}
+  EnableInVehicle:
+  - {fileID: 4371473019321031449}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 4371473018504201464}
   DoVoiceVolumeChange: 1

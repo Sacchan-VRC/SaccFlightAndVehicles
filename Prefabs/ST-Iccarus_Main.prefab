@@ -63505,6 +63505,7 @@ MonoBehaviour:
   AutoSteerStrength: 0.8
   SteeringReturnSpeedDT: 0.3
   SteeringReturnSpeedVR: 5
+  UseStickSteering: 0
   LeanSensitivity_Roll: 25
   LeanSensitivity_Pitch: 2.5
   RespawnDelay: 10
@@ -64045,7 +64046,9 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 7099842138338204315}
+  InVehicleOnly: {fileID: 0}
+  EnableInVehicle:
+  - {fileID: 7099842138338204315}
   HoldingOnly: {fileID: 0}
   CenterOfMass: {fileID: 8924013770782945331}
   DoVoiceVolumeChange: 1
@@ -70180,6 +70183,7 @@ MonoBehaviour:
   MaxAttachAngle: 15
   CatapultLayer: 24
   GearFunc: {fileID: 0}
+  AnimTriggerLaunchName: catapultlaunch
 --- !u!114 &7031151205847888667
 MonoBehaviour:
   m_ObjectHideFlags: 0
