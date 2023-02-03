@@ -25,13 +25,11 @@ namespace SaccFlightAndVehicles
         public void NextPilot()
         {
             int numPlayers = 0;
-            int myID;
+            players_choosepilot = new VRCPlayerApi[100];
             VRCPlayerApi.GetPlayers(players_choosepilot);
             for (int i = 0; i < players_choosepilot.Length; i++)
             {
-                VRCPlayerApi plyr = players_choosepilot[i];
-                if (plyr == localPlayer) { myID = i; }
-                if (plyr == null) { numPlayers = i; break; }
+                if (players_choosepilot[i] == null) { numPlayers = i; break; }
             }
             MyPilotCheck++;
             if (MyPilotCheck >= numPlayers)
@@ -66,7 +64,6 @@ namespace SaccFlightAndVehicles
                     MyPilotCheck = numPlayers;
                     PilotName.text = "Choose Pilot";
                     MyPilotID = -1;
-                    Debug.Log("PrevPilot(): this while loop wouldn't have ended");
                     break;
                 }
             }
@@ -74,6 +71,7 @@ namespace SaccFlightAndVehicles
         public void PrevPilot()
         {
             int numPlayers = 0;
+            players_choosepilot = new VRCPlayerApi[100];
             VRCPlayerApi.GetPlayers(players_choosepilot);
             for (int i = 0; i < players_choosepilot.Length; i++)
             {
@@ -113,7 +111,6 @@ namespace SaccFlightAndVehicles
                     MyPilotCheck = numPlayers;
                     PilotName.text = "Choose Pilot";
                     MyPilotID = -1;
-                    Debug.Log("PrevPilot(): this while loop wouldn't have ended");
                     break;
                 }
             }
