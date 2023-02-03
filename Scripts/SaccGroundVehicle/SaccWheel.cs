@@ -48,11 +48,13 @@ namespace SaccFlightAndVehicles
         public float SkidSound_Pitch = 1f;
         [Tooltip("Reduce volume of skid swhilst in the car")]
         public float SkidVolInVehicleMulti = .4f;
+        [Tooltip("Skip sound and skid effects completely")]
         public bool DisableEffects = false;
+        [Range(0, 2), Tooltip("3 Different ways to calculate amount of engine force used when sliding + accelerating, for testing. 0 = old way, 1 = keeps more energy, 2 = loses more energy")]
+        public int SkidRatioMode = 0;
         [Header("Drive Wheels Only")]
         [Tooltip("How much the wheel slowing down/speeding up changes the engine speed")]
         public float EngineInfluence = 225f;
-        [Tooltip("Skip sound and skid effects completely")]
         [Header("Debug")]
         public float CurrentGrip = 7f;
         public float CurrentNumParticles = 0f;
@@ -390,13 +392,25 @@ namespace SaccFlightAndVehicles
                 //find out how much of the skid is on the forward axis 
                 if (FullSkidMag != 0)
                 {
-                    ForwardSideRatio = Vector3.Dot(ForwardSkid / FullSkidMag, FullSkid / FullSkidMag);
-                    //these might produce different/more arcadey feel idk
-                    // float ForwardLen = ForwardSkid.magnitude;
-                    // float SideLen = SideSkid.magnitude;
-                    // float fullLen = ForwardLen + SideLen;
-                    // ForwardSideRatio = ForwardLen / fullLen;
-                    // ForwardSideRatio = ForwardLen / FullSkidMag;
+                    if (SkidRatioMode == 0)
+                    {
+                        ForwardSideRatio = Vector3.Dot(ForwardSkid / FullSkidMag, FullSkid / FullSkidMag);
+                    }
+                    else
+                    {
+                        //these might produce different/more arcadey feel idk
+                        float ForwardLen = ForwardSkid.magnitude;
+                        float SideLen = SideSkid.magnitude;
+                        float fullLen = ForwardLen + SideLen;
+                        if (SkidRatioMode == 1)
+                        {
+                            ForwardSideRatio = ForwardLen / fullLen;
+                        }
+                        else
+                        {
+                            ForwardSideRatio = ForwardLen / FullSkidMag;
+                        }
+                    }
                 }
                 else
                 { ForwardSideRatio = 0f; }
