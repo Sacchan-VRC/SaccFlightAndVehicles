@@ -631,7 +631,6 @@ namespace SaccFlightAndVehicles
             if (RStickNumFuncs == 1)
             { Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected"); }
             SendEventToExtensions("SFEXT_O_OnPickup");
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Event_Pickup));
         }
         public override void OnDrop()
         {
@@ -639,15 +638,6 @@ namespace SaccFlightAndVehicles
             Using = false;
             if (HoldingOnly) { HoldingOnly.SetActive(false); }
             SendEventToExtensions("SFEXT_O_OnDrop");
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Event_Drop));
-        }
-        public void Event_Pickup()
-        {
-            SendEventToExtensions("SFEXT_G_OnPickup");
-        }
-        public void Event_Drop()
-        {
-            SendEventToExtensions("SFEXT_G_OnDrop");
         }
         public override void OnPickupUseDown()
         {
@@ -757,7 +747,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Quaternion Spawnrotation;
         public void EntityRespawn()//can be used by simple items to respawn
         {
-            if (!Occupied && !_dead && (!EntityPickup || EntityPickup.IsHeld))
+            if (!Occupied && !_dead && (!EntityPickup || !EntityPickup.IsHeld))
             {
                 Networking.SetOwner(localPlayer, gameObject);
                 IsOwner = true;
