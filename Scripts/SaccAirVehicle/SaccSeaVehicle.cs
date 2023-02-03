@@ -1325,26 +1325,26 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_RespawnButton()//called when using respawn button
         {
-            if (!Occupied && !EntityControl._dead)
+            VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
+            bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && Speed > .2f;
+            if (Occupied || EntityControl._dead || BlockedCheck) { return; }
+            Networking.SetOwner(localPlayer, EntityControl.gameObject);
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
+            IsOwner = true;
+            //synced variables
+            Health = FullHealth;
+            Fuel = FullFuel;
+            if (InEditor || UsingManualSync)
             {
-                Networking.SetOwner(localPlayer, EntityControl.gameObject);
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
-                IsOwner = true;
-                //synced variables
-                Health = FullHealth;
-                Fuel = FullFuel;
-                if (InEditor || UsingManualSync)
-                {
-                    VehicleTransform.localPosition = Spawnposition;
-                    VehicleTransform.localRotation = Spawnrotation;
-                    VehicleRigidbody.velocity = Vector3.zero;
-                }
-                else
-                {
-                    VehicleObjectSync.Respawn();
-                }
-                VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
+                VehicleTransform.localPosition = Spawnposition;
+                VehicleTransform.localRotation = Spawnrotation;
+                VehicleRigidbody.velocity = Vector3.zero;
             }
+            else
+            {
+                VehicleObjectSync.Respawn();
+            }
+            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
         }
         public void ResetStatus()//called globally when using respawn button
         {

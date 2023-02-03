@@ -1443,11 +1443,8 @@ namespace SaccFlightAndVehicles
             EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
             if (IsOwner)
             {
-                if (!UsingManualSync)
-                {
-                    VehicleRigidbody.drag = 0;
-                    VehicleRigidbody.angularDrag = 0;
-                }
+                VehicleRigidbody.drag = 0;
+                VehicleRigidbody.angularDrag = 0;
                 VehicleConstantForce.relativeForce = Vector3.zero;
                 VehicleConstantForce.relativeTorque = Vector3.zero;
                 VehicleRigidbody.WakeUp();
@@ -1748,31 +1745,31 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_RespawnButton()//called when using respawn button
         {
-            if (!Occupied && !EntityControl._dead)
+            VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
+            bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && Speed > .2f;
+            if (Occupied || EntityControl._dead || BlockedCheck) { return; }
+            Networking.SetOwner(localPlayer, EntityControl.gameObject);
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
+            IsOwner = true;
+            Atmosphere = 1;//vehiclemoving optimization requires this to be here
+                           //synced variables
+            Health = FullHealth;
+            Fuel = FullFuel;
+            EngineOutput = 0;
+            VTOLAngle = VTOLDefaultValue;
+            VTOLAngleInput = VTOLDefaultValue;
+            VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
+            if (InEditor || UsingManualSync)
             {
-                Networking.SetOwner(localPlayer, EntityControl.gameObject);
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
-                IsOwner = true;
-                Atmosphere = 1;//vehiclemoving optimization requires this to be here
-                               //synced variables
-                Health = FullHealth;
-                Fuel = FullFuel;
-                EngineOutput = 0;
-                VTOLAngle = VTOLDefaultValue;
-                VTOLAngleInput = VTOLDefaultValue;
-                VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
-                if (InEditor || UsingManualSync)
-                {
-                    VehicleTransform.localPosition = Spawnposition;
-                    VehicleTransform.localRotation = Spawnrotation;
-                    VehicleRigidbody.velocity = Vector3.zero;
-                }
-                else
-                {
-                    VehicleObjectSync.Respawn();
-                }
-                VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
+                VehicleTransform.localPosition = Spawnposition;
+                VehicleTransform.localRotation = Spawnrotation;
+                VehicleRigidbody.velocity = Vector3.zero;
             }
+            else
+            {
+                VehicleObjectSync.Respawn();
+            }
+            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
         }
         public void ResetStatus()//called globally when using respawn button
         {

@@ -775,23 +775,23 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool UsingManualSync = true;
         public void SFEXT_O_RespawnButton()//called when using respawn button
         {
-            if (!Occupied && !EntityControl._dead)
+            VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
+            bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && VehicleSpeed > .2f;
+            if (Occupied || EntityControl._dead || BlockedCheck) { return; }
+            Networking.SetOwner(localPlayer, EntityControl.gameObject);
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
+            IsOwner = true;
+            Fuel = FullFuel;
+            Health = FullHealth;
+            YawInput = 0;
+            AutoSteerLerper = 0;
+            if (InEditor || UsingManualSync)
             {
-                Networking.SetOwner(localPlayer, EntityControl.gameObject);
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
-                IsOwner = true;
-                Fuel = FullFuel;
-                Health = FullHealth;
-                YawInput = 0;
-                AutoSteerLerper = 0;
-                if (InEditor || UsingManualSync)
-                {
-                    VehicleTransform.localPosition = Spawnposition;
-                    VehicleTransform.localRotation = Spawnrotation;
-                    VehicleRigidbody.velocity = Vector3.zero;
-                }
-                VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
+                VehicleTransform.localPosition = Spawnposition;
+                VehicleTransform.localRotation = Spawnrotation;
+                VehicleRigidbody.velocity = Vector3.zero;
             }
+            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
         }
         public void ResetStatus()//called globally when using respawn button
         {
