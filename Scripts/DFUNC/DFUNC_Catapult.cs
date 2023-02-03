@@ -21,6 +21,7 @@ namespace SaccFlightAndVehicles
         public int CatapultLayer = 24;
         [Tooltip("Reference to the landing gear function so we can tell it to be disabled when on a catapult")]
         public UdonSharpBehaviour GearFunc;
+        public string AnimTriggerLaunchName = "catapultlaunch";
         private SaccEntity EntityControl;
         private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
@@ -309,6 +310,7 @@ namespace SaccFlightAndVehicles
         {
             if (!IsOwner) { EnableOneFrameToFindAnimator(); }
             SendCustomEventDelayedFrames(nameof(LaunchCatapult), 3);
+            if (VehicleAnimator) { VehicleAnimator.SetTrigger(AnimTriggerLaunchName); }
         }
         public void LaunchCatapult()
         {
@@ -320,7 +322,7 @@ namespace SaccFlightAndVehicles
         public void CatapultLockIn()
         {
             OnCatapult = true;
-            VehicleAnimator.SetBool("oncatapult", true);
+            if (VehicleAnimator) { VehicleAnimator.SetBool("oncatapult", true); }
             if (CatapultLock) { CatapultLock.Play(); }
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
             EntityControl.SendEventToExtensions("SFEXT_G_CatapultLockIn");
@@ -328,7 +330,7 @@ namespace SaccFlightAndVehicles
         public void CatapultLockOff()
         {
             OnCatapult = false;
-            VehicleAnimator.SetBool("oncatapult", false);
+            if (VehicleAnimator) { VehicleAnimator.SetBool("oncatapult", false); }
             EntityControl.SendEventToExtensions("SFEXT_G_CatapultLockOff");
         }
     }
