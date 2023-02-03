@@ -48,13 +48,14 @@ namespace SaccFlightAndVehicles
         public float SkidSound_Pitch = 1f;
         [Tooltip("Reduce volume of skid swhilst in the car")]
         public float SkidVolInVehicleMulti = .4f;
+        public bool DisableEffects = false;
         [Header("Drive Wheels Only")]
         [Tooltip("How much the wheel slowing down/speeding up changes the engine speed")]
         public float EngineInfluence = 225f;
         [Tooltip("Skip sound and skid effects completely")]
-        public bool DisableEffects = false;
         [Header("Debug")]
         public float CurrentGrip = 7f;
+        public float CurrentNumParticles = 0f;
         public float CurrentWheelSlowDown = 0f;
         private bool IsDriveWheel = false;
         private AudioSource SkidSound;
@@ -220,6 +221,7 @@ namespace SaccFlightAndVehicles
         {
             CurrentGrip = Grip * SurfaceType_Grips[SurfaceType];
             CurrentWheelSlowDown = SurfaceType_Slowdown[SurfaceType];
+            CurrentNumParticles = SurfaceType_SkidParticles_NumParticles[SurfaceType];
             StopSkidSound();
             if (SurfaceType < SurfaceType_SkidSounds.Length)
             {
@@ -517,7 +519,7 @@ namespace SaccFlightAndVehicles
                             {
                                 StartSkidParticle();
                             }
-                            SkidParticleEM.rateOverTime = SkidLength * SurfaceType_SkidParticles_NumParticles[SurfaceType];
+                            SkidParticleEM.rateOverTime = SkidLength * CurrentNumParticles;
                         }
                     }
                     else
