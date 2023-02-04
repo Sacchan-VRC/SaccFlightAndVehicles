@@ -8,6 +8,11 @@ https://twitter.com/Sacchan_VRC
 Please support me if you like this project:
 https://ko-fi.com/sacchanvrc
 
+Migrating a 1.61 project to 1.62 info:
+In windows file explorer, delete the SaccFlightAndVehicles folder and replace it with the new version
+The 'InVehicleOnly' reference in SaccEntity will be removed in version 1.7. There is currently 'InVehicleOnly' AND 'EnableInVehicle' array move your InVehicleOnly references into the new array to be ready.
+There is a new folder inside the Prefabs called called 'Accessories' it's all the non-vehicle stuff and each part of 'SaccFlightAccessories.prefab' now has its own prefab
+
 Migrating a 1.6 project to 1.61 info:
 See the github's wiki for most up to date migration info.
 Floatscript: Divide existing vehicle's Water Sideways Drag and Water Forward Drag by 4
@@ -43,6 +48,12 @@ SyncScript:
 The custom position sync script
 KillTracker:
 Not required, used to make the KillsBoard work. Can be used without the killboard if you want to use the events that it sends for something else.
+DFUNC_*
+Pilot function dial scripts
+DFUNCP_*
+Passenger function dial scripts
+EXTP_*
+Specific passenger functionality that isn't compatable with function dials (only the turret atm)
 
 Function dials:
 SaccEntity has 2 arrays, one for left dial functions, and right dial functions.
@@ -254,7 +265,38 @@ The trigger must be on the correct layer, the one selected in the ResupplyTrigge
 Target
 A basic example target object with configurable health that respawns, replace with your own mesh to create destroyable buildings, etc. May not sync perfectly.
 
+Killsboard
+The board that tells you who has the biggest kill streak and number of vehicles destroyed, requires setup, see above
+
+RadioBase
+Contains the scipt for the radio system and a radio zone (stand inside to enable radio), vehicles require a SAV_Radio extension behaviour set up in their SaccEntity to work with the radio.
+
+SaccFlight
+Avatar flight script container
+
+SaccFlightAccessories
+Depracated. A bunch of stuff together, contains the iconic cuboid
+
+SaccFlightMenu
+Menu for the vehicle options
+
+SaccViewScreen
+View screen where you can watch vehicles/camera points
+
+VehicleEnterer
+A small menu that allows you to enter anyones vehicle
+
+WindControl
+A pickup with sliders on it that allow you to control the strength and direction of the wind. Click while holding to apply wind.
+
 Changelog:
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SMall update 1.62
+Many bug fixes
+Grappling hook code improvements
+Blocking players and respawning their plane no longer possible
+Thumbstick steering option for cars
+Animator boolean for 'invehiclesounds'
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Medium update 1.61
 SF-1 and SH-1 now use SkinnedMeshRenderer/bones
