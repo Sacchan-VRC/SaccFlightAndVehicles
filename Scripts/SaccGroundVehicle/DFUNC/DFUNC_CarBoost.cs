@@ -74,12 +74,13 @@ namespace SaccFlightAndVehicles
         private float RevLimiter;
         private bool Selected = false;
         private bool Piloting = false;
+        private bool DoBoostRemainingAnim = false;
         private bool boostingLast = false;
         private bool UseLeftTrigger = false;
         private bool ApplyBoostForce = false;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
-        void Start()
+        public void SFEXT_L_EntityStart()
         {
             VehicleRigidbody = (Rigidbody)SGVControl.GetProgramVariable("VehicleRigidbody");
             if (!BoostType_Force)
@@ -87,15 +88,19 @@ namespace SaccFlightAndVehicles
                 StartDriveSpeed = (float)SGVControl.GetProgramVariable("DriveSpeed");
                 RevLimiter = (float)SGVControl.GetProgramVariable("RevLimiter");
             }
-            if (UseMainFuel)
-            { BoostRemaining = 0; }
-            else
-            { BoostRemaining = BoostInSeconds; }
             BoostingAnimFloatName = _BoostingAnimFloatName;
-            BoostRemainingDivider = 1 / BoostInSeconds;
             BoostRemainingAnimFloatName = _BoostRemainingAnimFloatName;
-            BoostAnimator.SetFloat(BOOSTREMAINING_STRING, 1);
-            BoostAnimator.SetFloat(BOOSTING_STRING, 0);
+            BoostRemainingDivider = 1 / BoostInSeconds;
+            if (UseMainFuel)
+            { _BoostRemaining = 0; }
+            else
+            {
+                if (_BoostRemainingAnimFloatName != string.Empty)//prevent missing parameter warning
+                { BoostRemaining = BoostInSeconds; }
+                else
+                { _BoostRemaining = BoostInSeconds; }
+            }
+            Boosting = 0;
         }
         private void Update()
         {
@@ -112,7 +117,7 @@ namespace SaccFlightAndVehicles
                 float BoostKeyb = Input.GetKey(BoostKey) ? 1f : 0f;
                 float PilotBoosting = Mathf.Max(Trigger, BoostKeyb);
 
-                if (PilotBoosting > 0 && (BoostRemaining > 0 || UseMainFuel && (float)SGVControl.GetProgramVariable("Fuel") > 0))
+                if (PilotBoosting > 0 && (_BoostRemaining > 0 || UseMainFuel && (float)SGVControl.GetProgramVariable("Fuel") > 0))
                 {
                     if (BoostType_Force)
                     {
@@ -160,12 +165,12 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_ReSupply()
         {
             if (UseMainFuel) { return; }
-            if (BoostRemaining != BoostInSeconds)
+            if (_BoostRemaining != BoostInSeconds)
             {
                 SGVControl.SetProgramVariable("ReSupplied", (int)SGVControl.GetProgramVariable("ReSupplied") + 1);
                 if ((bool)SGVControl.GetProgramVariable("IsOwner"))
                 {
-                    BoostRemaining = Mathf.Min(BoostRemaining + (BoostInSeconds / ResupplyTime), BoostInSeconds);
+                    BoostRemaining = Mathf.Min(_BoostRemaining + (BoostInSeconds / ResupplyTime), BoostInSeconds);
                     RequestSerialization();
                 }
             }
