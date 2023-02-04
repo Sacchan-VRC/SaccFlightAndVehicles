@@ -184,7 +184,7 @@ namespace SaccFlightAndVehicles
         }
         private GameObject InstantiateWeapon()
         {
-            GameObject NewWeap = VRCInstantiate(AAM);
+            GameObject NewWeap = Object.Instantiate(AAM);
             NewWeap.transform.SetParent(transform);
             return NewWeap;
         }
