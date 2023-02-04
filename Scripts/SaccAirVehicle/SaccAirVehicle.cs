@@ -1387,7 +1387,7 @@ namespace SaccFlightAndVehicles
 
             EntityControl.SendEventToExtensions("SFEXT_G_Explode");
 
-            SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay);
+            SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay + Time.fixedDeltaTime * 2);//the deltatime*2 makes sure it happens after the animation is over, probably (fix for it retaining some angular momentum on spawn)
             SendCustomEventDelayedSeconds(nameof(NotDead), RespawnDelay + InvincibleAfterSpawn);
 
             if (IsOwner)

@@ -1001,7 +1001,7 @@ namespace SaccFlightAndVehicles
 
             EntityControl.SendEventToExtensions("SFEXT_G_Explode");
 
-            SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay);
+            SendCustomEventDelayedSeconds(nameof(ReAppear), RespawnDelay + Time.fixedDeltaTime * 2);
             SendCustomEventDelayedSeconds(nameof(NotDead), RespawnDelay + InvincibleAfterSpawn);
 
             if (IsOwner)
