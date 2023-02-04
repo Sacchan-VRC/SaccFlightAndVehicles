@@ -640,6 +640,7 @@ namespace SaccFlightAndVehicles
             if (RStickNumFuncs == 1)
             { Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected"); }
             SendEventToExtensions("SFEXT_O_OnPickup");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Pickup));
         }
         public override void OnDrop()
         {
@@ -647,6 +648,15 @@ namespace SaccFlightAndVehicles
             Using = false;
             if (HoldingOnly) { HoldingOnly.SetActive(false); }
             SendEventToExtensions("SFEXT_O_OnDrop");
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Drop));
+        }
+        public void SendEvent_Pickup()
+        {
+            SendEventToExtensions("SFEXT_G_OnPickup");
+        }
+        public void SendEvent_Drop()
+        {
+            SendEventToExtensions("SFEXT_G_OnDrop");
         }
         public override void OnPickupUseDown()
         {
