@@ -9,6 +9,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class DFUNC_Grapple : UdonSharpBehaviour
     {
+        public Animator GrappleAnimator;
         public Transform Hook;
         public Transform HookRopePoint;
         [Tooltip("Object enabled when function is active (used on MFD)")]
@@ -34,6 +35,7 @@ namespace SaccFlightAndVehicles
         public bool HoldTargetUpright = false;
         [Tooltip("Select the function instead of just instantly firing it with keyboard input?")]
         public bool KeyboardSelectMode = false;
+        public bool ResetHookOnExitVehicle = false;
         public LineRenderer Rope_Line;
         public Transform RopeBasePoint;
         public LayerMask HookLayers;
@@ -44,6 +46,7 @@ namespace SaccFlightAndVehicles
         public AnimationCurve PullStrOverDist;
         public AudioSource HookLaunch;
         public AudioSource HookAttach;
+        public AudioSource HookAttachConfirm;
         public AudioSource HookReelIn;
         public GameObject[] EnableOnSelect;
         public bool HandHeldGunMode;
@@ -52,6 +55,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("Disable these objects whilst object is held (SaccFlight?)")]
         public GameObject[] DisableOnPickup;
         private float HookLaunchTime;
+        public Transform PredictedHitPoint;
+        private float AprHookFlyTime;
+        private bool DoHitPrediction;
         private Vector3 HookStartPos;
         private Transform HookedTransform;
         private Vector3 HookedTransformOffset;
@@ -64,12 +70,13 @@ namespace SaccFlightAndVehicles
         private SaccFlightAndVehicles.SaccEntity HookedEntity;
         //these 2 variables are only used if TwoWayForces_LocalForceMode is true
         private bool NonLocalAttached;//if you are in a vehicle that is attached
-        private bool PlayReelIn = false;
+        private bool PlayReelIn = true;
         private bool Occupied = false;
         private bool LeftDial = false;
         private int DialPosition = -999;
         private bool KeepingHEAwake = false;
         private bool Overriding_DisallowOwnerShipTransfer = false;
+        private Vector3 PredictedHitPointStartScale;
         public override void OnDeserialization()
         {
             if (_HookLaunched != _HookLaunchedPrev)
@@ -136,7 +143,6 @@ namespace SaccFlightAndVehicles
                                                 if (!KeepingHEAwake)
                                                 {
                                                     KeepingHEAwake = true;
-                                                    HookedEntity.SendEventToExtensions("SFEXT_L_WakeUp");
                                                     HookedEntity.KeepAwake_++;
                                                     HookedEntity.SendEventToExtensions("SFEXT_L_GrappleAttach");
                                                 }
@@ -302,6 +308,7 @@ namespace SaccFlightAndVehicles
             HookParentStart = Hook.parent;
             HookStartPos = Hook.localPosition;
             HookStartRot = Hook.localRotation;
+            if (PredictedHitPoint) { PredictedHitPointStartScale = PredictedHitPoint.localScale; }
             localPlayer = Networking.LocalPlayer;
             InVr = localPlayer.IsUserInVR();
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
@@ -309,6 +316,12 @@ namespace SaccFlightAndVehicles
             FindSelf();
             gameObject.SetActive(true);
             SendCustomEventDelayedSeconds(nameof(DisableThis), 10f);
+            InitializeChangeableValues();
+        }
+        public void InitializeChangeableValues()
+        {
+            AprHookFlyTime = HookRange / HookSpeed;
+            DoHitPrediction = PredictedHitPoint || GrappleAnimator;
         }
         public void LaunchHook()
         {
@@ -334,20 +347,29 @@ namespace SaccFlightAndVehicles
             {
                 if (Physics.Raycast(Hook.position, LaunchVec, out hookhit, LaunchSpeed * Time.deltaTime, HookLayers, QueryTriggerInteraction.Ignore))
                 {
-                    HookAttachPoint = hookhit.point;
+                    float checklength = Vector3.Distance(HookLaunchPoint.position, hookhit.point);
+                    if (checklength < HookRange)
+                    {
+                        HookAttachPoint = hookhit.point;
+                        if (HookAttachConfirm) { HookAttachConfirm.Play(); }
+                        RequestSerialization();
+                        Hook.position = hookhit.point;
+                        return;
+                    }
+                }
+                Hook.position += LaunchVec * Time.deltaTime;
+                HookLength = Vector3.Distance(HookLaunchPoint.position, Hook.position);
+                if (HookLength > HookRange)
+                {
+                    HookLaunched = false;
+                    if (!Occupied) { SendCustomEventDelayedSeconds(nameof(DisableThis), 2f); }
                     RequestSerialization();
-                    Hook.position = hookhit.point;
                     return;
                 }
             }
-            Hook.position += LaunchVec * Time.deltaTime;
-            HookLength = Vector3.Distance(HookLaunchPoint.position, Hook.position);
-            if (IsOwner && HookLength > HookRange)
+            else
             {
-                HookLaunched = false;
-                if (!Occupied) { SendCustomEventDelayedSeconds(nameof(DisableThis), 2f); }
-                RequestSerialization();
-                return;
+                Hook.position += LaunchVec * Time.deltaTime;
             }
             if (Rope_Line)
             {
@@ -389,7 +411,8 @@ namespace SaccFlightAndVehicles
                 }
                 HookedEntity = null;
             }
-            if (PlayReelIn) { HookReelIn.Play(); }
+            if (PlayReelIn && HookReelIn) { HookReelIn.Play(); }
+            if (HookAttach && HookAttach.isPlaying) { HookAttach.Stop(); }
         }
         public void UpdateRopeLine()
         {
@@ -514,10 +537,17 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             Selected = false;
+            if (ResetHookOnExitVehicle)
+            {
+                if (_HookLaunched)
+                { ResetHook(); }
+            }
             if (!InVr && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); } }
         }
         public void SFEXT_O_TakeOwnership()
         {
+            if (HandHeldGunMode && _HookLaunched)
+            { ResetHook(); }
             IsOwner = true;
         }
         public void SFEXT_O_LoseOwnership()
@@ -577,22 +607,26 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPickup()
         {
+            if (_HookLaunched) { ResetHook(); }
             SFEXT_O_PilotEnter();
             for (int i = 0; i < DisableOnPickup.Length; i++)
             {
                 if (DisableOnPickup[i]) { DisableOnPickup[i].SetActive(false); }
             }
+            if (GrappleAnimator) { GrappleAnimator.SetBool("held", true); }
         }
         public void SFEXT_O_OnDrop()
         {
             SFEXT_O_PilotExit();
             if (_HookLaunched)
             { HookLaunched = false; RequestSerialization(); }
+            PredictionOff();
             SendCustomEventDelayedSeconds(nameof(DisableThis), 2f);
             for (int i = 0; i < DisableOnPickup.Length; i++)
             {
                 if (DisableOnPickup[i]) { DisableOnPickup[i].SetActive(true); }
             }
+            if (GrappleAnimator) { GrappleAnimator.SetBool("held", false); }
         }
         public void SFEXT_G_OnPickup()
         {
@@ -659,23 +693,54 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (Selected && !HandHeldGunMode)
+            if (Selected)
             {
-                float Trigger;
-                if (UseLeftTrigger)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if (Trigger > 0.75 || Input.GetKey(KeyCode.Space))
+                if (!HandHeldGunMode)
                 {
-                    if (!TriggerLastFrame)
+                    float Trigger;
+                    if (UseLeftTrigger)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                    if (Trigger > 0.75 || Input.GetKey(KeyCode.Space))
                     {
-                        FireHook();
+                        if (!TriggerLastFrame)
+                        {
+                            FireHook();
+                        }
+                        TriggerLastFrame = true;
                     }
-                    TriggerLastFrame = true;
+                    else { TriggerLastFrame = false; }
                 }
-                else { TriggerLastFrame = false; }
+                if (DoHitPrediction)
+                {
+                    Vector3 playervel = localPlayer.GetVelocity();
+                    Vector3 checkdir = (((HandHeldGunMode ? playervel : VehicleRB ? VehicleRB.velocity : Vector3.zero)) + (HookLaunchPoint.forward * HookSpeed)).normalized;
+                    RaycastHit targetcheck;
+                    Vector3 predictedhookflight = checkdir * HookRange + playervel * AprHookFlyTime;
+                    if (Physics.Raycast(HookLaunchPoint.position, checkdir, out targetcheck, predictedhookflight.magnitude, HookLayers, QueryTriggerInteraction.Ignore))
+                    {
+                        if (GrappleAnimator) { GrappleAnimator.SetBool("hitpredicted", true); }
+                        if (PredictedHitPoint)
+                        {
+                            PredictedHitPoint.gameObject.SetActive(true);
+                            PredictedHitPoint.position = targetcheck.point;
+                            Vector3 eyespoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position;
+                            PredictedHitPoint.localScale = PredictedHitPointStartScale * Vector3.Distance(eyespoint, PredictedHitPoint.position);
+                        }
+                    }
+                    else
+                    {
+                        PredictionOff();
+                    }
+                }
             }
+        }
+        private void PredictionOff()
+        {
+            if (GrappleAnimator) { GrappleAnimator.SetBool("hitpredicted", false); }
+            if (PredictedHitPoint)
+            { PredictedHitPoint.gameObject.SetActive(false); }
         }
         public override void OnPlayerRespawn(VRCPlayerApi player)
         {
