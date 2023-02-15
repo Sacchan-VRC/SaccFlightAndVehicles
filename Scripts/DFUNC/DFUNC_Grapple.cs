@@ -333,7 +333,7 @@ namespace SaccFlightAndVehicles
             LaunchSpeed = LaunchVec.magnitude;
             Hook.parent = EntityControl.transform.parent;
             Hook.position = HookLaunchPoint.position;
-            HookFlyLoop();
+            SendCustomEventDelayedFrames(nameof(HookFlyLoop), 1);//1 frame delayed makes it fly with you instead of 1 frame ahead
             HookLaunch.Play();
         }
         public void HookFlyLoop()
