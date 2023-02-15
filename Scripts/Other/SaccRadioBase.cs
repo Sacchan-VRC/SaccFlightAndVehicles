@@ -11,7 +11,7 @@ namespace SaccFlightAndVehicles
     public class SaccRadioBase : UdonSharpBehaviour
     {
         [Header("Vehicles must have SAV_Radio extension for this to work")]
-        private SaccFlightAndVehicles.SaccEntity[] _AllPlanes_ENT;
+        private SaccEntity[] _AllPlanes_ENT;
         private SAV_Radio[] _AllPlanes_RD;
         public float VoiceNear = 199999;
         public float VoiceFar = 200000;
@@ -25,7 +25,8 @@ namespace SaccFlightAndVehicles
         public Transform[] AllPlanes;
         public SaccRadioZone[] RadioZones;
         [Header("Debug, leave empty:")]
-        public SaccFlightAndVehicles.SaccEntity MyVehicle;
+        public SaccEntity MyVehicle;
+        [System.NonSerialized] public int MyVehicleSetTimes;//number of times MyVehicle has been set (for when holding 2 objects with radio, and dropping one) //Used by SAV_Radio
         [System.NonSerialized] public SaccRadioZone MyZone;
         private int NextPlane;
         private int NextZone;
@@ -34,11 +35,11 @@ namespace SaccFlightAndVehicles
         void Start()
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
-            _AllPlanes_ENT = new SaccFlightAndVehicles.SaccEntity[AllPlanes.Length];
+            _AllPlanes_ENT = new SaccEntity[AllPlanes.Length];
             _AllPlanes_RD = new SAV_Radio[AllPlanes.Length];
             for (int i = 0; i < AllPlanes.Length; i++)
             {
-                _AllPlanes_ENT[i] = (SaccFlightAndVehicles.SaccEntity)AllPlanes[i].GetComponent<SaccFlightAndVehicles.SaccEntity>();
+                _AllPlanes_ENT[i] = (SaccEntity)AllPlanes[i].GetComponent<SaccEntity>();
                 if (_AllPlanes_ENT[i]) { _AllPlanes_RD[i] = (SAV_Radio)_AllPlanes_ENT[i].GetExtention("SAV_Radio"); }
             }
             NumZones = RadioZones.Length;

@@ -14,21 +14,6 @@ public class SAV_Radio : UdonSharpBehaviour
     private bool Initialized;
     private VRCPlayerApi localPlayer;
     private int CurrentOwnerID;
-    public void SFEXT_P_PassengerEnter()
-    {
-        if (RadioBase)
-        {
-            RadioBase.SetProgramVariable("MyVehicle", EntityControl);
-        }
-    }
-    public void SFEXT_P_PassengerExit()
-    {
-        if (RadioBase)
-        {
-            RadioBase.SetProgramVariable("MyVehicle", null);
-            RadioBase.SendCustomEvent("SetAllVoiceVolumesDefault");
-        }
-    }
     public void Init()
     {
         Initialized = true;
@@ -47,19 +32,44 @@ public class SAV_Radio : UdonSharpBehaviour
     }
     public void SFEXT_O_PilotEnter()
     {
-        if (RadioBase)
-        {
-            RadioBase.SetProgramVariable("MyVehicle", EntityControl);
-            RadioOn = (bool)RadioBase.GetProgramVariable("RadioEnabled");
-            RequestSerialization();
-        }
+        EnterVehicle();
     }
     public void SFEXT_O_PilotExit()
     {
+        ExitVehicle();
+    }
+    public void SFEXT_P_PassengerEnter()
+    {
+        EnterVehicle();
+    }
+    public void SFEXT_P_PassengerExit()
+    {
+        ExitVehicle();
+    }
+    public void EnterVehicle()
+    {
         if (RadioBase)
         {
-            RadioBase.SetProgramVariable("MyVehicle", null);
-            RadioBase.SendCustomEvent("SetAllVoiceVolumesDefault");
+            RadioBase.SetProgramVariable("MyVehicleSetTimes", (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") + 1);
+            RadioBase.SetProgramVariable("MyVehicle", EntityControl);
+            if (EntityControl.IsOwner)
+            {
+                RadioOn = (bool)RadioBase.GetProgramVariable("RadioEnabled");
+                RequestSerialization();
+            }
+        }
+    }
+    public void ExitVehicle()
+    {
+        if (RadioBase)
+        {
+            int mvst = (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") - 1;
+            RadioBase.SetProgramVariable("MyVehicleSetTimes", mvst);
+            if (mvst == 0)
+            {
+                RadioBase.SetProgramVariable("MyVehicle", null);
+                RadioBase.SendCustomEvent("SetAllVoiceVolumesDefault");
+            }
         }
     }
     public void SFEXT_L_OwnershipTransfer()
