@@ -247,6 +247,10 @@ namespace SaccFlightAndVehicles
         {
             WakeUp();
         }
+        public void SFEXT_L_GrappleAttach()
+        {
+            WakeUp();
+        }
         public void WakeUp()
         {
             Sleeping = false;

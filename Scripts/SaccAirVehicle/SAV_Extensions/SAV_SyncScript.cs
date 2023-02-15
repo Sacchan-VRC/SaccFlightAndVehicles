@@ -262,10 +262,6 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotExit()
         { Occupied = false; }
-        public void SFEXT_G_TakeOff()
-        {
-            Grounded = false;
-        }
         public void SFEXT_O_PilotExit()
         { Piloting = false; }
         public void SFEXT_O_RespawnButton()
@@ -582,6 +578,18 @@ namespace SaccFlightAndVehicles
             Grounded = true;
         }
         public void SFEXT_G_TouchDownWater()
+        {
+            Grounded = true;
+        }
+        public void SFEXT_G_TakeOff()
+        {
+            Grounded = false;
+        }
+        public void SFEXT_O_Airborne()
+        {
+            Grounded = false;
+        }
+        public void SFEXT_O_Grounded()
         {
             Grounded = true;
         }
