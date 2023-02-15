@@ -143,6 +143,7 @@ namespace SaccFlightAndVehicles
                     for (int x = 0; x < DriveWheels.Length; x++)
                     {
                         DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggleOriginalValues[i]);
+                        DriveWheels[x].SendCustomEvent("ChangeSurface");
                     }
                 }
                 for (int i = 0; i < floatSteerWheelsNames.Length; i++)
@@ -150,6 +151,7 @@ namespace SaccFlightAndVehicles
                     for (int x = 0; x < SteerWheels.Length; x++)
                     {
                         SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggleOriginalValues[i]);
+                        SteerWheels[x].SendCustomEvent("ChangeSurface");
                     }
                 }
                 for (int i = 0; i < floatOtherWheelsNames.Length; i++)
@@ -157,6 +159,7 @@ namespace SaccFlightAndVehicles
                     for (int x = 0; x < OtherWheels.Length; x++)
                     {
                         OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggleOriginalValues[i]);
+                        OtherWheels[x].SendCustomEvent("ChangeSurface");
                     }
                 }
                 Toggled = false;
@@ -185,6 +188,7 @@ namespace SaccFlightAndVehicles
                     for (int x = 0; x < DriveWheels.Length; x++)
                     {
                         DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggledValues[i]);
+                        DriveWheels[x].SendCustomEvent("ChangeSurface");
                     }
                 }
                 for (int i = 0; i < floatSteerWheelsNames.Length; i++)
@@ -192,6 +196,7 @@ namespace SaccFlightAndVehicles
                     for (int x = 0; x < SteerWheels.Length; x++)
                     {
                         SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggledValues[i]);
+                        SteerWheels[x].SendCustomEvent("ChangeSurface");
                     }
                 }
                 for (int i = 0; i < floatOtherWheelsNames.Length; i++)
@@ -199,6 +204,7 @@ namespace SaccFlightAndVehicles
                     for (int x = 0; x < OtherWheels.Length; x++)
                     {
                         OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggledValues[i]);
+                        OtherWheels[x].SendCustomEvent("ChangeSurface");
                     }
                 }
                 Toggled = true;

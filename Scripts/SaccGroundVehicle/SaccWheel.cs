@@ -219,8 +219,9 @@ namespace SaccFlightAndVehicles
             }
             DoSurface = Random.Range(0, 6);
         }
-        private void ChangeSurface()
+        public void ChangeSurface()
         {
+            if (SurfaceType < 0) { return; }
             CurrentGrip = Grip * SurfaceType_Grips[SurfaceType];
             CurrentWheelSlowDown = SurfaceType_Slowdown[SurfaceType];
             CurrentNumParticles = SurfaceType_SkidParticles_NumParticles[SurfaceType];
@@ -412,8 +413,6 @@ namespace SaccFlightAndVehicles
                         }
                     }
                 }
-                else
-                { ForwardSideRatio = 0f; }
 
                 //SkidVectorFX is just used for effects, it has to take the forward after the grip forces
                 //because we don't know how much of the forward skid will be gripped yet
@@ -594,10 +593,8 @@ namespace SaccFlightAndVehicles
             }
             SkidSoundPlayingLast = false;
         }
-        public bool printWheelRotSpeed;
         private void RotateWheelOwner()
         {
-            if (printWheelRotSpeed) Debug.Log(WheelRotationSpeedRPS);
             WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
             Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
             WheelVisual.localRotation = newrot;

@@ -2050,7 +2050,7 @@ MonoBehaviour:
   Dial_Functions_L:
   - {fileID: 8724087983031032889}
   - {fileID: 1184794920445975396}
-  - {fileID: 5535944664052969815}
+  - {fileID: 6286279440692619681}
   - {fileID: 465045989419287067}
   - {fileID: 2515495976410963957}
   - {fileID: 4521235861021871180}
@@ -2067,7 +2067,7 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 6873395543557872215}
-  HoldingOnly: {fileID: 0}
+  EnableWhenHolding: []
   CenterOfMass: {fileID: 5061191818139185407}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
@@ -18991,7 +18991,7 @@ MonoBehaviour:
   Lfunc1key: 0
   Lfunc2: {fileID: 1184794920445975396}
   Lfunc2key: 116
-  Lfunc3: {fileID: 5535944664052969815}
+  Lfunc3: {fileID: 6286279440692619681}
   Lfunc3key: 103
   Lfunc4: {fileID: 0}
   Lfunc4key: 0
@@ -20113,9 +20113,11 @@ MonoBehaviour:
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
-  EngineInfluence: 225
   DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
   CurrentGrip: 7
+  CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
@@ -20130,7 +20132,6 @@ MonoBehaviour:
   IsOwner: 0
   Debugslip: 0
   CurrentlyDistant: 1
-  printWheelRotSpeed: 0
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -60155,9 +60156,11 @@ MonoBehaviour:
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
-  EngineInfluence: 225
   DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
   CurrentGrip: 7
+  CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
@@ -60172,7 +60175,6 @@ MonoBehaviour:
   IsOwner: 0
   Debugslip: 0
   CurrentlyDistant: 1
-  printWheelRotSpeed: 0
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -60624,9 +60626,11 @@ MonoBehaviour:
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
-  EngineInfluence: 225
   DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
   CurrentGrip: 7
+  CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
@@ -60641,7 +60645,6 @@ MonoBehaviour:
   IsOwner: 0
   Debugslip: 0
   CurrentlyDistant: 1
-  printWheelRotSpeed: 0
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -61172,9 +61175,11 @@ MonoBehaviour:
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
-  EngineInfluence: 225
   DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
   CurrentGrip: 7
+  CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
@@ -61189,7 +61194,6 @@ MonoBehaviour:
   IsOwner: 0
   Debugslip: 0
   CurrentlyDistant: 1
-  printWheelRotSpeed: 0
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -66783,8 +66787,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7707675014902911233}
-  - component: {fileID: 5535944664052969815}
-  - component: {fileID: 9218887952457208504}
+  - component: {fileID: 6286279440692619681}
+  - component: {fileID: 8645561969618739443}
   m_Layer: 17
   m_Name: DFUNC_ToggleHandling
   m_TagString: Untagged
@@ -66806,7 +66810,7 @@ Transform:
   m_Father: {fileID: 4117501714141346054}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5535944664052969815
+--- !u!114 &6286279440692619681
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -66827,7 +66831,7 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 9218887952457208504}
+  _udonSharpBackingUdonBehaviour: {fileID: 8645561969618739443}
   SGVControl: {fileID: 1217889975697026386}
   Dial_Funcon: {fileID: 1393999204366328446}
   ToggledCoMPos: {fileID: 0}
@@ -66851,7 +66855,7 @@ MonoBehaviour:
   - 5
   floatOtherWheelsNames: []
   floatOtherWheelsToggledValues: []
---- !u!114 &9218887952457208504
+--- !u!114 &8645561969618739443
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
