@@ -60,6 +60,7 @@ namespace SaccFlightAndVehicles
         private bool Selected;
         private bool JoyStickOveridden;
         private bool StickHeld;
+        private bool Piloting;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
@@ -86,11 +87,13 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
-            gameObject.SetActive(false);
+            Piloting = true;
+            if (!AltHold) { gameObject.SetActive(false); }
             if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
         }
         public void SFEXT_O_PilotExit()
         {
+            Piloting = false;
             Selected = false;
             StickHeld = false;
         }
@@ -158,7 +161,7 @@ namespace SaccFlightAndVehicles
             }
             if (Dial_Funcon) { Dial_Funcon.SetActive(AltHold); }
             if (HudHold) { HudHold.SetActive(AltHold); }
-            if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOn"); }
+            EntityControl.SendEventToExtensions("SFEXT_G_AltHoldOn");
             if (HelicopterMode)
             { SetCruiseOn(); }
         }
@@ -177,7 +180,7 @@ namespace SaccFlightAndVehicles
             SAVControl.SetProgramVariable("JoystickOverride", Vector3.zero);
             RotationInputs = Vector3.zero;
             AltHoldPitchIntegrator = 0;
-            if (IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_AltHoldOff"); }
+            EntityControl.SendEventToExtensions("SFEXT_G_AltHoldOff");
             if (HelicopterMode)
             { SetCruiseOff(); }
         }
@@ -278,7 +281,7 @@ namespace SaccFlightAndVehicles
                 {
                     if (EngineOn)
                     {
-                        if (!InVR)
+                        if (!InVR && Piloting)
                         {
                             bool ShiftCtrl = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.LeftControl);
                             if (ShiftCtrl)
