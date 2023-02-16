@@ -14,6 +14,8 @@ namespace SaccFlightAndVehicles
         public bool IsPilotSeat = false;
         [Tooltip("Object that is enabled only when sitting in this seat")]
         public GameObject ThisSeatOnly;
+        [Tooltip("Objects that are enabled only when sitting in this seat")]
+        public GameObject[] EnableInSeat;
         public bool AdjustSeatPosition = true;
         // public bool AdjustSeatRotation = true; //YAWCALIBRATION
         public Transform TargetEyePosition;
@@ -66,7 +68,12 @@ namespace SaccFlightAndVehicles
             Seat = Station.stationEnterPlayerLocation;
             SeatStartRot = Seat.localRotation;
             SeatAdjustedPos = SeatStartPos = Seat.localPosition;
-            if (InEditor && ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
+            if (InEditor)
+            {
+                if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
+                for (int i = 0; i < EnableInSeat.Length; i++)
+                { if (EnableInSeat[i]) EnableInSeat[i].SetActive(true); }
+            }
             DT180SeatCalcCounter = Random.Range(0, 10);
         }
         public override void Interact()//entering the vehicle
@@ -99,6 +106,8 @@ namespace SaccFlightAndVehicles
                     else
                     { EntityControl.PassengerEnterVehicleLocal(); }
                     if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
+                    for (int i = 0; i < EnableInSeat.Length; i++)
+                    { if (EnableInSeat[i]) EnableInSeat[i].SetActive(true); }
 
                     if (!Fake && AdjustSeatPosition && TargetEyePosition)
                     {
@@ -191,6 +200,8 @@ namespace SaccFlightAndVehicles
                         }
                     }
                     if (ThisSeatOnly) { ThisSeatOnly.SetActive(false); }
+                    for (int i = 0; i < EnableInSeat.Length; i++)
+                    { if (EnableInSeat[i]) EnableInSeat[i].SetActive(false); }
                 }
             }
         }

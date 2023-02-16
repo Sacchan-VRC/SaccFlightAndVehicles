@@ -21,6 +21,8 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     private bool Swapped;
     private GameObject PilotThisSeatOnly;
     private GameObject ThisThisSeatOnly;
+    private GameObject[] PilotEnableInSeat;
+    private GameObject[] ThisEnableInSeat;
     private VRCPlayerApi SeatAPI;
     private VRCPlayerApi PilotSeatAPI;
     private SaccAirVehicle SAVControl;
@@ -34,6 +36,8 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
         PilotSVSeat = EntityControl.VehicleStations[EntityControl.PilotSeat].GetComponent<SaccVehicleSeat>();
         PilotThisSeatOnly = PilotSVSeat.ThisSeatOnly;
         ThisThisSeatOnly = ThisSVSeat.ThisSeatOnly;
+        PilotEnableInSeat = PilotSVSeat.EnableInSeat;
+        ThisEnableInSeat = ThisSVSeat.EnableInSeat;
         SAVControl = (SaccAirVehicle)EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
         int mtlen = MoveTransforms.Length;
         MoveTransformsPos_Orig = new Vector3[mtlen];
@@ -79,6 +83,8 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
 
         PilotSVSeat.ThisSeatOnly = ThisThisSeatOnly;
         ThisSVSeat.ThisSeatOnly = PilotThisSeatOnly;
+        PilotSVSeat.EnableInSeat = ThisEnableInSeat;
+        ThisSVSeat.EnableInSeat = PilotEnableInSeat;
         PilotSVSeat.IsPilotSeat = false;
         ThisSVSeat.IsPilotSeat = true;
 
@@ -123,6 +129,8 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
 
         PilotSVSeat.ThisSeatOnly = PilotThisSeatOnly;
         ThisSVSeat.ThisSeatOnly = ThisThisSeatOnly;
+        PilotSVSeat.EnableInSeat = PilotEnableInSeat;
+        ThisSVSeat.EnableInSeat = ThisEnableInSeat;
         PilotSVSeat.IsPilotSeat = true;
         ThisSVSeat.IsPilotSeat = false;
 
