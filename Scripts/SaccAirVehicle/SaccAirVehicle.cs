@@ -405,7 +405,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Vector3 FinalWind;//includes Gusts
         [System.NonSerializedAttribute] public Vector3 AirVel;
         private float StillWindMulti;//multiplies the speed of the wind by the speed of the plane when taxiing to prevent still planes flying away
-        private int ThrustVecGrounded;
+        private int ThrustVecGrounded = 1;
         private float SoundBarrier;
         [System.NonSerializedAttribute] public float FullFuel;
         private float LowFuelDivider;
@@ -1124,26 +1124,29 @@ namespace SaccFlightAndVehicles
                         if (VTOLenabled)
                         {
                             SetVTOLRotValues();
-                            if (VTOLAngleDegrees > EnterVTOLEvent_Angle && VTOLAngleDegrees < 360 - EnterVTOLEvent_Angle)
+                            if (!VTOLOnly)
                             {
-                                if (!InVTOL)
+                                if (VTOLAngleDegrees > EnterVTOLEvent_Angle && VTOLAngleDegrees < 360 - EnterVTOLEvent_Angle)
                                 {
-                                    EntityControl.SendEventToExtensions("SFEXT_O_EnterVTOL");
-                                    InVTOL = true;
-                                    if (!VTOLAllowAfterburner)
+                                    if (!InVTOL)
                                     {
-                                        if (AfterburnerOn)
-                                        { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                        EntityControl.SendEventToExtensions("SFEXT_O_EnterVTOL");
+                                        InVTOL = true;
+                                        if (!VTOLAllowAfterburner)
+                                        {
+                                            if (AfterburnerOn)
+                                            { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                        }
                                     }
                                 }
-                            }
-                            else
-                            {
-                                if (InVTOL)
+                                else
                                 {
-                                    //check angle
-                                    EntityControl.SendEventToExtensions("SFEXT_O_ExitVTOL");
-                                    InVTOL = false;
+                                    if (InVTOL)
+                                    {
+                                        //check angle
+                                        EntityControl.SendEventToExtensions("SFEXT_O_ExitVTOL");
+                                        InVTOL = false;
+                                    }
                                 }
                             }
                         }
@@ -1162,8 +1165,9 @@ namespace SaccFlightAndVehicles
                     if (Taxiing)
                     {
                         StillWindMulti = Mathf.Min(Speed * .1f, 1);
+                        ThrustVecGrounded = 0;
                     }
-                    else { StillWindMulti = 1; }
+                    else { StillWindMulti = 1; ThrustVecGrounded = 1; }
                     if (_EngineOn)
                     {
                         //this should allow remote piloting using extensions
@@ -1174,7 +1178,6 @@ namespace SaccFlightAndVehicles
                     if (_JoystickOverridden)
                     {
                         RotationInputs = JoystickOverride;
-                        //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
                         SetRotInputs();
                     }
                     DoRepeatingWorld();
@@ -1320,7 +1323,6 @@ namespace SaccFlightAndVehicles
                         //create values for use in fixedupdate (control input and straightening forces)
                         Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
                         Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
-
                         VehicleConstantForce.relativeForce = FinalInputAcc;
                         VehicleConstantForce.relativeTorque = FinalInputRot;
                     }
@@ -1584,6 +1586,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetRotInputs()
         {
+            //if moving backwards, controls invert (if thrustvectoring is set to 0 strength for that axis)
             if ((Vector3.Dot(AirVel, VehicleTransform.forward) > 0))//normal, moving forward
             {
                 ReversingPitchStrength = 1;
@@ -2003,7 +2006,7 @@ namespace SaccFlightAndVehicles
             AllGs = 0f;
             VehicleRigidbody.velocity = CurrentVel;
             LastFrameVel = CurrentVel;
-            if (_EngineOn && EntityControl.Piloting)
+            if (_EngineOn /* && EntityControl.Piloting */)
             { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
             else
             {
