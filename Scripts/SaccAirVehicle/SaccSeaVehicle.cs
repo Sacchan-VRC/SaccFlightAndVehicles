@@ -643,8 +643,8 @@ namespace SaccFlightAndVehicles
                                 { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                                 else
                                 { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                JoystickGripLastFrame = true;
                             }
-                            JoystickGripLastFrame = true;
                             //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
                             Quaternion JoystickDifference;
                             JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
@@ -664,12 +664,14 @@ namespace SaccFlightAndVehicles
                         {
                             VRJoystickPos = 0;
                             if (JoystickGripLastFrame)//first frame you let go of joystick
-                            { EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped"); }
-                            JoystickGripLastFrame = false;
-                            if (SwitchHandsJoyThrottle)
-                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
-                            else
-                            { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                            {
+                                EntityControl.SendEventToExtensions("SFEXT_O_JoystickDropped");
+                                JoystickGripLastFrame = false;
+                                if (SwitchHandsJoyThrottle)
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                else
+                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                            }
                         }
                         //Throttle
                         if (UseTwistThrottle)
@@ -695,8 +697,8 @@ namespace SaccFlightAndVehicles
                                     { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                                     else
                                     { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                    ThrottleGripLastFrame = true;
                                 }
-                                ThrottleGripLastFrame = true;
                                 //difference between the vehicle and the hand's rotation, and then the difference between that and the ThrottleZeroPoint
                                 Quaternion ThrottleDifference;
                                 ThrottleDifference = Quaternion.Inverse(ControlsRoot.rotation) *
@@ -716,12 +718,14 @@ namespace SaccFlightAndVehicles
                             {
                                 PlayerThrottle = Mathf.Max(AccelKeyi - DecelKeyi, 0);
                                 if (ThrottleGripLastFrame)//first frame you let go of Throttle
-                                { EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped"); }
-                                ThrottleGripLastFrame = false;
-                                if (SwitchHandsJoyThrottle)
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
-                                else
-                                { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                {
+                                    EntityControl.SendEventToExtensions("SFEXT_O_ThrottleDropped");
+                                    ThrottleGripLastFrame = false;
+                                    if (SwitchHandsJoyThrottle)
+                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
+                                    else
+                                    { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                }
                             }
                         }
                         else
@@ -756,6 +760,7 @@ namespace SaccFlightAndVehicles
                                     { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                                     else
                                     { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                    ThrottleGripLastFrame = true;
                                 }
                                 float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
                                 ThrottleDifference *= ThrottleSensitivity;
@@ -770,7 +775,6 @@ namespace SaccFlightAndVehicles
                                     PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, ThrottleAfterburnerPoint);
                                 }
                                 HandDistanceZLastFrame = HandThrottleAxis;
-                                ThrottleGripLastFrame = true;
                             }
                             else
                             {
@@ -781,8 +785,8 @@ namespace SaccFlightAndVehicles
                                     { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                                     else
                                     { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
+                                    ThrottleGripLastFrame = false;
                                 }
-                                ThrottleGripLastFrame = false;
                             }
                         }
                         //keyboard control for afterburner
@@ -1466,7 +1470,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerExit()
         {
             Passenger = false;
-            localPlayer.SetVelocity(CurrentVel);
+            if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
             SetCollidersLayer(VehicleLayer);
         }
         public void SFEXT_G_PassengerEnter()
@@ -1556,7 +1560,7 @@ namespace SaccFlightAndVehicles
             JoystickGripLastFrame = false;
             DoAAMTargeting = false;
             Yawing = Vector3.zero;
-            localPlayer.SetVelocity(CurrentVel);
+            if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
 
             //set vehicle's collider's layers back
             SetCollidersLayer(VehicleLayer);

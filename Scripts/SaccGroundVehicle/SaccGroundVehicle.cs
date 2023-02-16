@@ -882,7 +882,7 @@ namespace SaccFlightAndVehicles
                 DriveWheels[i].SetProgramVariable("EngineRevs", 0f);
             }
             SetCollidersLayer(OutsideVehicleLayer);
-            localPlayer.SetVelocity(CurrentVel);
+            if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
         }
         public void SFEXT_P_PassengerEnter()
         {
@@ -892,7 +892,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerExit()
         {
             Passenger = false;
-            localPlayer.SetVelocity(CurrentVel);
+            if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
             SetCollidersLayer(OutsideVehicleLayer);
         }
         public void SFEXT_G_PassengerEnter()

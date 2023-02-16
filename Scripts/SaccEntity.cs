@@ -33,7 +33,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Object that is enabled when entering vehicle in any seat")]
         public GameObject[] EnableInVehicle;
         [Tooltip("Object that is enabled when holding this object")]
-        public GameObject HoldingOnly;
+        public GameObject[] EnableWhenHolding;
         [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
         public Transform CenterOfMass;
         [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
@@ -60,6 +60,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public string UsersName;
         private Vector2 RStickCheckAngle;
         private Vector2 LStickCheckAngle;
+        [System.NonSerializedAttribute] public bool MySeatIsExternal;
         [System.NonSerializedAttribute] public GameObject LastHitParticle;
         [System.NonSerializedAttribute] public float LStickFuncDegrees;
         [System.NonSerializedAttribute] public float RStickFuncDegrees;
@@ -204,10 +205,10 @@ namespace SaccFlightAndVehicles
                 for (int i = temp.Length; i < temp.Length + ExternalSeats.Length; i++)
                 { VehicleStations[i] = ExternalSeats[i - temp.Length]; }
             }
-            VehicleSeats = new SaccVehicleSeat[VehicleStations.Length];
             SeatedPlayers = new int[VehicleStations.Length];
             for (int i = 0; i != SeatedPlayers.Length; i++)
             { SeatedPlayers[i] = -1; }
+            VehicleSeats = new SaccVehicleSeat[VehicleStations.Length];
             for (int i = 0; i < VehicleSeats.Length; i++)
             {
                 VehicleSeats[i] = (SaccVehicleSeat)VehicleStations[i].GetComponent<SaccVehicleSeat>();
@@ -633,7 +634,11 @@ namespace SaccFlightAndVehicles
         {
             Holding = true;
             Using = true;
-            if (HoldingOnly) { HoldingOnly.SetActive(true); }
+            if (EnableWhenHolding.Length > 0)
+            {
+                for (int i = 0; i < EnableWhenHolding.Length; i++)
+                { EnableWhenHolding[i].SetActive(true); }
+            }
             if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
             if (LStickNumFuncs == 1)
             { Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected"); }
@@ -646,7 +651,11 @@ namespace SaccFlightAndVehicles
         {
             Holding = false;
             Using = false;
-            if (HoldingOnly) { HoldingOnly.SetActive(false); }
+            if (EnableWhenHolding.Length > 0)
+            {
+                for (int i = 0; i < EnableWhenHolding.Length; i++)
+                { EnableWhenHolding[i].SetActive(false); }
+            }
             SendEventToExtensions("SFEXT_O_OnDrop");
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Drop));
         }

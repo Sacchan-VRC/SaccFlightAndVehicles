@@ -1983,7 +1983,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerExit()
         {
             Passenger = false;
-            localPlayer.SetVelocity(CurrentVel);
+            if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
             MissilesIncomingHeat = 0;
             MissilesIncomingRadar = 0;
             MissilesIncomingOther = 0;
@@ -2096,7 +2096,7 @@ namespace SaccFlightAndVehicles
             MissilesIncomingOther = 0;
             Pitching = Vector3.zero;
             Yawing = Vector3.zero;
-            localPlayer.SetVelocity(CurrentVel);
+            if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
             if (EngineOffOnExit)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));

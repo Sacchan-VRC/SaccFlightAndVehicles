@@ -97,6 +97,12 @@ namespace SaccFlightAndVehicles
                 SeatedPlayer = player;
                 if (player.isLocal)
                 {
+                    for (int i = 0; i < EntityControl.ExternalSeats.Length; i++)
+                    {
+                        if (Station == EntityControl.ExternalSeats[i])
+                        { EntityControl.MySeatIsExternal = true; break; }
+                        EntityControl.MySeatIsExternal = false;
+                    }
                     InSeat = true;
                     if (!localPlayer.IsOwner(gameObject))
                     { Networking.SetOwner(localPlayer, gameObject); }
