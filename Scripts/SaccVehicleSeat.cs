@@ -60,6 +60,7 @@ namespace SaccFlightAndVehicles
         private Vector3 SeatStartPos;
         private Quaternion SeatStartRot;
         private int DT180SeatCalcCounter;
+        private bool ThisSeatExternal = false;
         private void Start()
         {
             localPlayer = Networking.LocalPlayer;
@@ -75,6 +76,11 @@ namespace SaccFlightAndVehicles
                 { if (EnableInSeat[i]) EnableInSeat[i].SetActive(true); }
             }
             DT180SeatCalcCounter = Random.Range(0, 10);
+            for (int i = 0; i < EntityControl.ExternalSeats.Length; i++)
+            {
+                if (Station == EntityControl.ExternalSeats[i])
+                { ThisSeatExternal = true; break; }
+            }
         }
         public override void Interact()//entering the vehicle
         {
@@ -97,12 +103,7 @@ namespace SaccFlightAndVehicles
                 SeatedPlayer = player;
                 if (player.isLocal)
                 {
-                    for (int i = 0; i < EntityControl.ExternalSeats.Length; i++)
-                    {
-                        if (Station == EntityControl.ExternalSeats[i])
-                        { EntityControl.MySeatIsExternal = true; break; }
-                        EntityControl.MySeatIsExternal = false;
-                    }
+                    EntityControl.MySeatIsExternal = ThisSeatExternal;
                     InSeat = true;
                     if (!localPlayer.IsOwner(gameObject))
                     { Networking.SetOwner(localPlayer, gameObject); }
