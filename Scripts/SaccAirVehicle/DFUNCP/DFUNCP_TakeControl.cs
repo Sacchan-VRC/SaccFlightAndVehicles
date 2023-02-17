@@ -1,9 +1,9 @@
 ﻿
+using SaccFlightAndVehicles;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
-using SaccFlightAndVehicles;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNCP_TakeControl : UdonSharpBehaviour
@@ -213,5 +213,11 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     {
         if (Networking.LocalPlayer.IsOwner(gameObject) && Swapped)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LateJoinerSwap)); }
+    }
+
+    public void KeyboardInput()
+    {
+        if (UseLeftTrigger) EntityControl.ToggleStickSelectionLeft(this);
+        else EntityControl.ToggleStickSelectionRight(this);
     }
 }
