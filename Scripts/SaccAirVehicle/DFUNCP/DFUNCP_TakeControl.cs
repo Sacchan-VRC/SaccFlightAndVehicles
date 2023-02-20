@@ -1,4 +1,5 @@
-﻿
+
+using System;
 using SaccFlightAndVehicles;
 using UdonSharp;
 using UnityEngine;
@@ -9,6 +10,7 @@ using VRC.Udon;
 public class DFUNCP_TakeControl : UdonSharpBehaviour
 {
     public SaccEntity EntityControl;
+    [NonSerialized] public SAV_PassengerFunctionsController PassengerFunctionsController;
     private SaccVehicleSeat[] VehicleSeats;
     public SaccVehicleSeat ThisSVSeat;
     public Transform[] MoveTransforms;
@@ -217,7 +219,14 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
 
     public void KeyboardInput()
     {
-        if (UseLeftTrigger) EntityControl.ToggleStickSelectionLeft(this);
-        else EntityControl.ToggleStickSelectionRight(this);
+        if (PassengerFunctionsController)
+        {
+            if (UseLeftTrigger) PassengerFunctionsController.ToggleStickSelectionLeft(this);
+            else PassengerFunctionsController.ToggleStickSelectionRight(this);
+        } else
+        {
+            if (UseLeftTrigger) EntityControl.ToggleStickSelectionLeft(this);
+            else EntityControl.ToggleStickSelectionRight(this);
+        }
     }
 }
