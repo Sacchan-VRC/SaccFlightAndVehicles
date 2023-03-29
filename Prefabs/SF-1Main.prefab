@@ -5553,7 +5553,7 @@ WheelCollider:
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
   m_Mass: 0.1
-  m_WheelDampingRate: 20
+  m_WheelDampingRate: 5
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1
@@ -31274,6 +31274,7 @@ MonoBehaviour:
   CanopyDragMulti: 1.2
   AnimCanopyBool: canopyopen
   AnimCanopyBroken: canopybroken
+  DoCanopyOpenDrag: 1
 --- !u!114 &4371473018416049387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47844,7 +47845,7 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 4371473019321031449}
-  HoldingOnly: {fileID: 0}
+  EnableWhenHolding: []
   CenterOfMass: {fileID: 4371473018504201464}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
@@ -54216,6 +54217,7 @@ MonoBehaviour:
   EntityControl: {fileID: -2692614534935363141}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2341975304134924734}
   SeatOutSideVehicle: 0
@@ -81338,6 +81340,7 @@ MonoBehaviour:
   EntityControl: {fileID: -2692614534935363141}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 4371473018583758445}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 543805048618571905}
   SeatOutSideVehicle: 0
@@ -92731,7 +92734,7 @@ WheelCollider:
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
   m_Mass: 0.1
-  m_WheelDampingRate: 20
+  m_WheelDampingRate: 5
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1
@@ -94052,7 +94055,7 @@ WheelCollider:
   m_SuspensionDistance: 0.45
   m_ForceAppPointDistance: 0.6
   m_Mass: 0.1
-  m_WheelDampingRate: 20
+  m_WheelDampingRate: 5
   m_ForwardFriction:
     m_ExtremumSlip: 0.1
     m_ExtremumValue: 1

@@ -574,7 +574,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 706443860}
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 1209846102}
+  ThisSeatOnly: {fileID: 0}
+  EnableInSeat:
+  - {fileID: 1209846102}
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 515467600}
   SeatOutSideVehicle: 0
@@ -699,7 +701,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 747948962}
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 865498790}
+  ThisSeatOnly: {fileID: 0}
+  EnableInSeat:
+  - {fileID: 865498790}
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2246501683413073306}
   SeatOutSideVehicle: 0
@@ -21807,6 +21811,7 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 3411756929047500885}
   SeatOutSideVehicle: 0
@@ -67936,6 +67941,7 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 627682400261023669}
   SeatOutSideVehicle: 0
@@ -83158,6 +83164,7 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 7105509205904838782}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 1554130111}
   SeatOutSideVehicle: 0
@@ -85526,7 +85533,7 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 7105509204358593802}
-  HoldingOnly: {fileID: 0}
+  EnableWhenHolding: []
   CenterOfMass: {fileID: 7105509205716476651}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
@@ -86219,6 +86226,7 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2415259330074371874}
   SeatOutSideVehicle: 0
@@ -86480,6 +86488,7 @@ MonoBehaviour:
   EntityControl: {fileID: 7149063361215606383}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 4057865969602712601}
   SeatOutSideVehicle: 0
