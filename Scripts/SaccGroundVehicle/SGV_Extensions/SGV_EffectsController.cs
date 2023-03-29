@@ -517,7 +517,6 @@ namespace SaccFlightAndVehicles
                     Explosion[rand].Play();
                 }
             }
-            FallAsleep();
         }
         public void SFEXT_O_Grounded()
         {
