@@ -29,6 +29,8 @@ namespace SaccFlightAndVehicles
         public float ToggleMinDelay;
         [Tooltip("Objects to turn on/off with the toggle")]
         public GameObject[] ToggleObjects;
+        [Tooltip("Objects to turn off/on with the toggle")]
+        public GameObject[] ToggleObjects_Off;
         [Tooltip("Particle systems to turn on/off emission with the toggle")]
         public ParticleSystem[] ToggleEmission;
         public bool AllowToggleFlying = true;
@@ -200,6 +202,8 @@ namespace SaccFlightAndVehicles
             { SoundControl.SendCustomEvent("DoorOpen"); }
             foreach (GameObject obj in ToggleObjects)
             { obj.SetActive(true); }
+            foreach (GameObject obj in ToggleObjects_Off)
+            { obj.SetActive(false); }
             for (int i = 0; i < ParticleLength; i++)
             { ToggleEmission_em[i].enabled = true; }
         }
@@ -215,6 +219,8 @@ namespace SaccFlightAndVehicles
             { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); }
             foreach (GameObject obj in ToggleObjects)
             { obj.SetActive(false); }
+            foreach (GameObject obj in ToggleObjects_Off)
+            { obj.SetActive(true); }
             for (int i = 0; i < ParticleLength; i++)
             { ToggleEmission_em[i].enabled = false; }
         }
