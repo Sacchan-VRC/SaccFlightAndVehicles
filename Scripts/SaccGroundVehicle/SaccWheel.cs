@@ -207,7 +207,8 @@ namespace SaccFlightAndVehicles
             SurfaceType_SkidParticlesEM = new ParticleSystem.EmissionModule[SurfaceType_SkidParticles.Length];
             for (int i = 0; i < SurfaceType_SkidParticles.Length; i++)
             {
-                SurfaceType_SkidParticlesEM[i] = SurfaceType_SkidParticles[i].emission;
+                if (SurfaceType_SkidParticles[i])
+                { SurfaceType_SkidParticlesEM[i] = SurfaceType_SkidParticles[i].emission; }
             }
             if (SurfaceType_SkidParticles.Length > 0)
             {
