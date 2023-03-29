@@ -193,16 +193,7 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(true);
             VehicleRigid.constraints = RigidbodyConstraints.None;
-            if (IsOwner)
-            {
-                VehicleRigid.isKinematic = false;
-                VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-            }
-            else
-            {
-                if (!NonOwnerEnablePhysics) { VehicleRigid.isKinematic = true; }
-                VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
-            }
+            SetPhysics();
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime + Random.Range(0f, updateInterval));
             _AntiWarp = AntiWarp; //prevent from running early as it causes vehicle to teleport 500ft in the air for some reason
         }
@@ -317,7 +308,7 @@ namespace SaccFlightAndVehicles
                     if (!Networking.IsClogged || Piloting)
                     {
                         //check if the vehicle has moved enough from it's last sent location and rotation to bother exiting idle mode
-                        bool Still = !Piloting && Grounded && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
+                        bool Still = !Piloting && (Grounded || VehicleRigid.isKinematic) && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
 
                         if (Still)
                         {
@@ -549,7 +540,7 @@ namespace SaccFlightAndVehicles
             StartupServerTime = Networking.GetServerTimeInSeconds();
             StartupLocalTime = Time.time;
         }
-        public void SFEXT_O_Explode()//all the things players see happen when the vehicle explodes
+        public void SFEXT_O_Explode()
         {
             if (IsOwner && FreezePositionOnDeath)
             {
@@ -592,6 +583,20 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_Grounded()
         {
             Grounded = true;
+        }
+        public void SFEXT_L_SetPhysics() { SetPhysics(); }//not used in base prefab
+        public void SetPhysics()
+        {
+            if (IsOwner)
+            {
+                VehicleRigid.isKinematic = false;
+                VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            }
+            else
+            {
+                if (!NonOwnerEnablePhysics) { VehicleRigid.isKinematic = true; }
+                VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
+            }
         }
         //unity slerp always uses shortest route to orientation rather than slerping to the actual quat. This undoes that
         public Quaternion RealSlerp(Quaternion p, Quaternion q, float t)
