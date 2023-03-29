@@ -10,7 +10,8 @@ public class SAV_Radio : UdonSharpBehaviour
 {
     public SaccEntity EntityControl;
     public UdonSharpBehaviour RadioBase;
-    [UdonSynced] public bool RadioOn = true;
+    public bool RadioOn = true;
+    [UdonSynced] public byte Channel = 0;
     private bool Initialized;
     private VRCPlayerApi localPlayer;
     private int CurrentOwnerID;
@@ -55,6 +56,10 @@ public class SAV_Radio : UdonSharpBehaviour
             if (EntityControl.IsOwner)
             {
                 RadioOn = (bool)RadioBase.GetProgramVariable("RadioEnabled");
+                if (RadioOn)
+                { Channel = (byte)RadioBase.GetProgramVariable("Channel"); }
+                else
+                { Channel = 0; }
                 RequestSerialization();
             }
         }

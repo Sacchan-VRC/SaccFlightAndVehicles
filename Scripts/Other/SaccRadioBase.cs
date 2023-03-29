@@ -21,9 +21,11 @@ namespace SaccFlightAndVehicles
         [Tooltip("Make this text object darker when radio is disabled. Not required.")]
         public TextMeshProUGUI RadioEnabledTxt;
         public bool RadioEnabled = true;
+        public byte Channel = 1;
         [Header("All Planes and RadioZones are filled automatically on build.")]
         public Transform[] AllPlanes;
         public SaccRadioZone[] RadioZones;
+        public TextMeshProUGUI ChannelText;
         [Header("Debug, leave empty:")]
         public SaccEntity MyVehicle;
         [System.NonSerialized] public int MyVehicleSetTimes;//number of times MyVehicle has been set (for when holding 2 objects with radio, and dropping one) //Used by SAV_Radio
@@ -55,7 +57,9 @@ namespace SaccFlightAndVehicles
             if (NextPlane == _AllPlanes_RD.Length) { NextPlane = 0; }
             if (_AllPlanes_RD[NextPlane])
             {
-                if (!_AllPlanes_RD[NextPlane].RadioOn || MyVehicle == _AllPlanes_ENT[NextPlane]) { return; }
+                if (MyVehicle == _AllPlanes_ENT[NextPlane]
+                    || (byte)_AllPlanes_RD[NextPlane].Channel != Channel
+                    || Channel == 0) { return; }
                 for (int o = 0; o < _AllPlanes_ENT[NextPlane].VehicleSeats.Length; o++)
                 {
                     VRCPlayerApi thisplayer = _AllPlanes_ENT[NextPlane].VehicleSeats[o].SeatedPlayer;
@@ -120,6 +124,18 @@ namespace SaccFlightAndVehicles
         {
             RadioEnabled = !RadioEnabled;
             if (RadioEnabledTxt) RadioEnabledTxt.color = RadioEnabled ? Color.white : Color.gray;
+        }
+        public void IncreaseChannel()
+        {
+            if (Channel + 1 > 16) { return; }
+            Channel++;
+            ChannelText.text = Channel.ToString();
+        }
+        public void DecreaseChannel()
+        {
+            if (Channel - 1 < 1) { return; }
+            Channel--;
+            ChannelText.text = Channel.ToString();
         }
     }
 }
