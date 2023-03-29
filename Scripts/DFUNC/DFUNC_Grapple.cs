@@ -50,6 +50,8 @@ namespace SaccFlightAndVehicles
         public AudioSource HookReelIn;
         public GameObject[] EnableOnSelect;
         public bool HandHeldGunMode;
+        [Tooltip("If player drops gun in the air, teleport it to them until they land?")]
+        public bool MoveGunToSelfOnAirDrop = true;
         [Tooltip("How heavy the player is for interactions with rigidbodies")]
         public float PlayerMass = 150f;
         [Tooltip("Disable these objects whilst object is held (SaccFlight?)")]
@@ -333,8 +335,9 @@ namespace SaccFlightAndVehicles
             LaunchSpeed = LaunchVec.magnitude;
             Hook.parent = EntityControl.transform.parent;
             Hook.position = HookLaunchPoint.position;
-            SendCustomEventDelayedFrames(nameof(HookFlyLoop), 1);//1 frame delayed makes it fly with you instead of 1 frame ahead
+            HookFlyLoop();
             HookLaunch.Play();
+            //Something can probably be done here to do with HookFlyLoops()'s timing to make it look smoother when fired at high speed
         }
         public void HookFlyLoop()
         {
@@ -627,6 +630,23 @@ namespace SaccFlightAndVehicles
                 if (DisableOnPickup[i]) { DisableOnPickup[i].SetActive(true); }
             }
             if (GrappleAnimator) { GrappleAnimator.SetBool("held", false); }
+            if (MoveGunToSelfOnAirDrop && !localPlayer.IsPlayerGrounded())
+            {
+                TeleportingGunToMe = true;
+                TelePortGunToMe();
+            }
+        }
+        private bool TeleportingGunToMe;
+        public void TelePortGunToMe()
+        {
+            if (TeleportingGunToMe && !EntityControl.Holding && !localPlayer.IsPlayerGrounded())
+            {
+                SendCustomEventDelayedFrames(nameof(TelePortGunToMe), 1, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
+                var head = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head);
+                float tall = Vector3.Distance(localPlayer.GetPosition(), head.position);
+                EntityControl.transform.position = head.position + ((head.rotation * Vector3.forward) * tall * .5f);
+            }
+            else { TeleportingGunToMe = false; }
         }
         public void SFEXT_G_OnPickup()
         {
