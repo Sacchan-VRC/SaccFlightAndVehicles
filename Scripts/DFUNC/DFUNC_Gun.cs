@@ -91,6 +91,13 @@ namespace SaccFlightAndVehicles
             }
             if (distance_from_head == 0) { distance_from_head = 1.333f; }
         }
+        public void ReInitAmmo()//set FullAAMs then run this to change vehicles max gun ammo
+        {
+            GunAmmoInSeconds = FullGunAmmoInSeconds;
+            reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
+            FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
+            UpdateAmmoVisuals();
+        }
         public void DFUNC_Selected()
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Selected));
@@ -328,7 +335,7 @@ namespace SaccFlightAndVehicles
                 { AAMTargetChecker = 0; }
                 else if (AAMTargetChecker == AAMTarget)
                 { AAMTargetChecker++; }
-                else if (AAMTargetChecker > NumAAMTargets - 1)
+                else if (AAMTargetChecker == NumAAMTargets)
                 { AAMTargetChecker = 0; }
 
                 //if target is currently in front of plane, lock onto it
