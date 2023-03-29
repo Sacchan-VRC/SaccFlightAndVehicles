@@ -88,7 +88,6 @@ namespace SaccFlightAndVehicles
     public class SetObjectReferences : Editor, IVRCSDKBuildRequestedCallback
     {
         public int callbackOrder => 10;
-        const string TransformPrefix = ":campos";
         public bool OnBuildRequested(VRCSDKRequestedBuildType requestedBuildType)
         {
             SaccFlightSetup();
@@ -148,6 +147,8 @@ namespace SaccFlightAndVehicles
             foreach (var se in SEs)
             {
                 if (se.InVehicleOnly && se.InVehicleOnly.activeInHierarchy) { se.InVehicleOnly.SetActive(false); }
+                for (int i = 0; i < se.EnableInVehicle.Length; i++)
+                { if (se.EnableInVehicle[i]) se.EnableInVehicle[i].SetActive(false); }
                 PrefabUtility.RecordPrefabInstancePropertyModifications(se);
                 EditorUtility.SetDirty(se);
             }
@@ -259,12 +260,15 @@ namespace SaccFlightAndVehicles
         public static void SetUpCameras()
         {
             var SVS = GetAllSaccViewScreenControllers();
-            var campositions = GetAllSceneCameraPoints().ToArray();
             foreach (var screen in SVS)
             {
-                PutCamPositionsInArray(screen, campositions);
-                PrefabUtility.RecordPrefabInstancePropertyModifications(screen);
-                EditorUtility.SetDirty(screen);
+                if (screen.CamPosAutoFill)
+                {
+                    var campositions = GetAllSceneCameraPoints(screen.CamposSuffix).ToArray();
+                    PutCamPositionsInArray(screen, campositions);
+                    PrefabUtility.RecordPrefabInstancePropertyModifications(screen);
+                    EditorUtility.SetDirty(screen);
+                }
             }
         }
         public static void PutCamPositionsInArray(SaccViewScreenController viewscreen, Transform[] CamTransform)
@@ -301,17 +305,17 @@ namespace SaccFlightAndVehicles
             }
             return ls;
         }
-        static List<Transform> GetAllSceneCameraPoints(Transform tr = null, List<Transform> ls = null)
+        static List<Transform> GetAllSceneCameraPoints(string CamSuffix, Transform tr = null, List<Transform> ls = null)
         {
             if (tr == null)
             {
                 ls = ls ?? new List<Transform>();
-                foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects()) GetAllSceneCameraPoints(g.transform, ls);
+                foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects()) GetAllSceneCameraPoints(CamSuffix, g.transform, ls);
             }
             else
             {
-                if (tr.name.StartsWith(TransformPrefix, System.StringComparison.InvariantCultureIgnoreCase)) ls.Add(tr);
-                foreach (Transform t in tr) GetAllSceneCameraPoints(t, ls);
+                if (tr.name.StartsWith(CamSuffix, System.StringComparison.InvariantCultureIgnoreCase)) ls.Add(tr);
+                foreach (Transform t in tr) GetAllSceneCameraPoints(CamSuffix, t, ls);
             }
             return ls;
         }
@@ -520,16 +524,15 @@ namespace SaccFlightAndVehicles
     [CustomEditor(typeof(SaccViewScreenController))]
     public class SaccViewScreenControllerEditor : Editor
     {
-        const string TransformPrefix = ":campos";
         public override void OnInspectorGUI()
         {
             SaccViewScreenController _target = target as SaccViewScreenController;
             if (UdonSharpGUI.DrawDefaultUdonSharpBehaviourHeader(target)) return;
             DrawDefaultInspector();
-            if (GUILayout.Button("Find Campositions In Scene"))
+            if (GUILayout.Button("Find Campositions In Scene") && _target.CamPosAutoFill)
             {
                 Undo.RecordObject(target, "Array objects changed");
-                var AllCamsArray = GetAllSceneCameraPositions().ToArray();
+                var AllCamsArray = GetAllSceneCameraPositions(_target.CamposSuffix).ToArray();
                 PutCamPositionsInArray(_target, AllCamsArray);
                 PrefabUtility.RecordPrefabInstancePropertyModifications(target);
                 EditorUtility.SetDirty(_target);//needed
@@ -539,17 +542,17 @@ namespace SaccFlightAndVehicles
         {
             input.CamPositions = pos;
         }
-        List<Transform> GetAllSceneCameraPositions(Transform tr = null, List<Transform> ls = null)
+        List<Transform> GetAllSceneCameraPositions(string CamSuffix, Transform tr = null, List<Transform> ls = null)
         {
             if (tr == null)
             {
                 ls = ls ?? new List<Transform>();
-                foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects()) GetAllSceneCameraPositions(g.transform, ls);
+                foreach (GameObject g in SceneManager.GetActiveScene().GetRootGameObjects()) GetAllSceneCameraPositions(CamSuffix, g.transform, ls);
             }
             else
             {
-                if (tr.name.StartsWith(TransformPrefix, System.StringComparison.InvariantCultureIgnoreCase)) ls.Add(tr);
-                foreach (Transform t in tr) GetAllSceneCameraPositions(t, ls);
+                if (tr.name.StartsWith(CamSuffix, System.StringComparison.InvariantCultureIgnoreCase)) ls.Add(tr);
+                foreach (Transform t in tr) GetAllSceneCameraPositions(CamSuffix, t, ls);
             }
             return ls;
         }
