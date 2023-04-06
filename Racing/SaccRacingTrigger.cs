@@ -142,52 +142,54 @@ namespace SaccFlightAndVehicles
                     { CurrentCheckPointAnimator.SetBool("Current", false); }
                     StartCheckPointAnims();
 
-
-
-                    CurrentCourse.MyVehicleType = PlaneName;
-                    if (TrackForward || !CurrentTrackAllowReverse)
+                    CurrentCourse.TimeReporter.MyLastRace_Reverse = !TrackForward;
+                    if (TrackForward || !CurrentTrackAllowReverse)//track was finished forward
                     {
-                        CurrentCourse.MyTime = RaceTime;
+                        //if i am not on board, AND my time is better than the worst time on board OR
+                        //if i am on board, and my time is better than my previous time
+                        //add submit my time
+                        CurrentCourse.TimeReporter.MyLastTime = RaceTime;
+                        CurrentCourse.TimeReporter.MyLastVehicle = PlaneName;
                         CurrentCourse.UpdateMyLastTime();
-                        if (RaceTime < CurrentCourse.MyRecordTime)
+                        int mypos = CurrentCourse.CheckIfOnBoard(localPlayer.displayName, ref CurrentCourse.PlayerNames);
+                        if (mypos < 0)//i am not on the board
                         {
-                            CurrentCourse.MyRecordTime = CurrentCourse.MyTime = RaceTime;
-                            CurrentCourse.UpdateMyRecord();
-
-                            if (!CheckRecordDisallowedRace() && RaceTime < CurrentCourse.BestTime)
+                            if (CurrentCourse.PlayerTimes.Length > 0)
                             {
-                                if (!InEditor && !localPlayer.IsOwner(CurrentCourse.gameObject))
-                                {
-                                    Networking.SetOwner(localPlayer, CurrentCourse.gameObject);
-                                }
-                                CurrentCourse.BestTime = RaceTime;
-                                CurrentCourse.UpdateInstanceRecord();
-                                CurrentCourse.RequestSerialization();
+                                if (RaceTime < CurrentCourse.PlayerTimes[CurrentCourse.PlayerTimes.Length - 1] || CurrentCourse.PlayerTimes.Length < CurrentCourse.MaxRecordedTimes)
+                                { SendMyTime(false); }
                             }
+                            else
+                            { SendMyTime(false); }
+                        }
+                        else//i am on the board
+                        {
+                            if (RaceTime < CurrentCourse.PlayerTimes[mypos])
+                            { SendMyTime(false); }
                         }
                     }
-                    else
+                    else//track was finished backward
                     {
-                        CurrentCourse.MyTimeReverse = RaceTime;
+                        CurrentCourse.TimeReporter.MyLastTime_R = RaceTime;
+                        CurrentCourse.TimeReporter.MyLastVehicle_R = PlaneName;
                         CurrentCourse.UpdateMyLastTime();
-                        if (RaceTime < CurrentCourse.MyRecordTimeReverse)
+                        int mypos = CurrentCourse.CheckIfOnBoard(localPlayer.displayName, ref CurrentCourse.PlayerNames_R);
+                        if (mypos < 0)//i am not on the board
                         {
-                            CurrentCourse.MyRecordTimeReverse = CurrentCourse.MyTimeReverse = RaceTime;
-                            CurrentCourse.UpdateMyRecord();
-
-                            if (!CheckRecordDisallowedRace() && RaceTime < CurrentCourse.BestTimeReverse)
+                            if (CurrentCourse.PlayerTimes_R.Length > 0)
                             {
-                                if (!InEditor && !localPlayer.IsOwner(CurrentCourse.gameObject))
-                                {
-                                    Networking.SetOwner(localPlayer, CurrentCourse.gameObject);
-                                }
-                                CurrentCourse.BestTimeReverse = RaceTime;
-                                CurrentCourse.UpdateInstanceRecordReverse();
-                                CurrentCourse.RequestSerialization();
+                                if (RaceTime < CurrentCourse.PlayerTimes[CurrentCourse.PlayerTimes.Length - 1] || CurrentCourse.PlayerTimes.Length < CurrentCourse.MaxRecordedTimes)
+                                { SendMyTime(true); }
                             }
+                            else
+                            { SendMyTime(true); }
+                        }
+                        else//i am on the board
+                        {
+                            if (RaceTime < CurrentCourse.PlayerTimes_R[mypos])
+                            { SendMyTime(true); }
                         }
                     }
-
 
                     RaceTime = 0;
                     TimeText_Cockpit.text = LastTime.ToString();
@@ -233,6 +235,14 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
+        }
+        private void SendMyTime(bool reverse)
+        {
+            Networking.SetOwner(localPlayer, CurrentCourse.TimeReporter.gameObject);
+            CurrentCourse.TimeReporter.ReportedVehicle = PlaneName;
+            CurrentCourse.TimeReporter.Reported_RaceReverse = reverse;
+            CurrentCourse.TimeReporter.ReportedTime = RaceTime;
+            RequestSerialization();
         }
         public void SetCourse()
         {

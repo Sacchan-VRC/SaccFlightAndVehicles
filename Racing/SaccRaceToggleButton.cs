@@ -65,7 +65,7 @@ namespace SaccFlightAndVehicles
                 if (EnableWhenNoneSelected) { EnableWhenNoneSelected.SetActive(false); }
                 SaccRaceCourseAndScoreboard race = Races[CurrentCourseSelection].GetComponent<SaccRaceCourseAndScoreboard>();
                 race.RaceObjects.SetActive(true);
-                race.UpdateTimes();
+                // race.UpdateTimes();
 
                 foreach (SaccRacingTrigger RaceTrig in RacingTriggers)
                 {
