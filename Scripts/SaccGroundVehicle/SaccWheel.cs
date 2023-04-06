@@ -375,10 +375,11 @@ namespace SaccFlightAndVehicles
 
                 //GRIP//
                 //Wheel's velocity vector projected to the normal of the ground
-                //WheelGroundSpeed is speed of the ground below the wheel
-                Vector3 WheelGroundSpeed = Vector3.ProjectOnPlane(CarRigid.GetPointVelocity(SusOut.point), SusOut.normal);
+                Vector3 WheelGroundUp = Vector3.ProjectOnPlane(SusOut.normal, WheelPoint.right).normalized;
+                Vector3 pv = CarRigid.GetPointVelocity(SusOut.point);
                 //Wheel's velocity vector projected to be only forward/back
-                Vector3 WheelForwardSpeed = Vector3.ProjectOnPlane(WheelGroundSpeed, WheelPoint.right);
+                Vector3 WheelForwardSpeed = Vector3.ProjectOnPlane(pv, WheelPoint.right);
+                WheelForwardSpeed -= Vector3.Project(WheelForwardSpeed, WheelGroundUp);
                 float ForwardSpeed_abs = WheelForwardSpeed.magnitude;
                 ForwardSpeed = ForwardSpeed_abs;
                 if (Vector3.Dot(WheelForwardSpeed, WheelPoint.forward) < 0f)
@@ -389,7 +390,8 @@ namespace SaccFlightAndVehicles
                 //How much the wheel is slipping (difference between speed of wheel rotation at it's surface, and the speed of the ground beneath it), as a vector3
                 Vector3 ForwardSkid = Vector3.ProjectOnPlane(WheelPoint.forward, SusOut.normal).normalized * ForwardSlip;
 
-                Vector3 SideSkid = Vector3.ProjectOnPlane(WheelGroundSpeed, WheelPoint.forward);
+                Vector3 SideSkid = Vector3.ProjectOnPlane(pv, WheelForwardSpeed);
+                SideSkid = Vector3.ProjectOnPlane(SideSkid, SusOut.normal);
 
                 //add both skid axis together to get total 'skid'
                 Vector3 FullSkid = SideSkid + ForwardSkid;
@@ -426,7 +428,6 @@ namespace SaccFlightAndVehicles
                 Vector3 GripForce3;
                 //SusForce has deltatime built in
                 float SusForceMag = SusForce.magnitude;
-                GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / Time.fixedDeltaTime / 90f))) * CurrentGrip * SusForceMag;
                 Vector3 GripForceForward = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / Time.fixedDeltaTime / 90f))) * CurrentGrip * SusForceMag;
                 if (SeparateLongLatGrip)
                 {
