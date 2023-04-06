@@ -372,8 +372,52 @@ MonoBehaviour:
   DampingForce_BottomOutMulti: 5
   MaxSuspensionForce: 20
   ExtraRayCastDistance: 0.5
-  Grip: 310
+  Grip: 387.5
   GripCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SeparateLongLatGrip: 1
+  LateralGrip: 0.75
+  GripCurveLateral:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -417,7 +461,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   WheelWeight: 0.3
   BrakeStrength: 1000
-  HandBrakeStrength: 7
+  HandBrakeStrength: 70
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
@@ -466,9 +510,11 @@ MonoBehaviour:
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
-  EngineInfluence: 225
   DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
   CurrentGrip: 7
+  CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
@@ -483,7 +529,6 @@ MonoBehaviour:
   IsOwner: 0
   Debugslip: 0
   CurrentlyDistant: 1
-  printWheelRotSpeed: 0
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -1141,8 +1186,52 @@ MonoBehaviour:
   DampingForce_BottomOutMulti: 5
   MaxSuspensionForce: 20
   ExtraRayCastDistance: 0.5
-  Grip: 240
+  Grip: 300
   GripCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SeparateLongLatGrip: 1
+  LateralGrip: 0.75
+  GripCurveLateral:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -1186,7 +1275,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   WheelWeight: 0.3
   BrakeStrength: 1000
-  HandBrakeStrength: 7
+  HandBrakeStrength: 70
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
@@ -1235,9 +1324,11 @@ MonoBehaviour:
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
-  EngineInfluence: 225
   DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
   CurrentGrip: 7
+  CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
@@ -1252,7 +1343,6 @@ MonoBehaviour:
   IsOwner: 0
   Debugslip: 0
   CurrentlyDistant: 1
-  printWheelRotSpeed: 0
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -1593,8 +1683,52 @@ MonoBehaviour:
   DampingForce_BottomOutMulti: 5
   MaxSuspensionForce: 20
   ExtraRayCastDistance: 0.5
-  Grip: 240
+  Grip: 300
   GripCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SeparateLongLatGrip: 1
+  LateralGrip: 0.75
+  GripCurveLateral:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -1638,7 +1772,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   WheelWeight: 0.3
   BrakeStrength: 1000
-  HandBrakeStrength: 7
+  HandBrakeStrength: 70
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
@@ -1687,9 +1821,11 @@ MonoBehaviour:
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
-  EngineInfluence: 225
   DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
   CurrentGrip: 7
+  CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
@@ -1704,7 +1840,6 @@ MonoBehaviour:
   IsOwner: 0
   Debugslip: 0
   CurrentlyDistant: 1
-  printWheelRotSpeed: 0
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -1768,8 +1903,52 @@ MonoBehaviour:
   DampingForce_BottomOutMulti: 5
   MaxSuspensionForce: 20
   ExtraRayCastDistance: 0.5
-  Grip: 310
+  Grip: 387.5
   GripCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SeparateLongLatGrip: 1
+  LateralGrip: 0.75
+  GripCurveLateral:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
@@ -1813,7 +1992,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   WheelWeight: 0.3
   BrakeStrength: 1000
-  HandBrakeStrength: 7
+  HandBrakeStrength: 70
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
@@ -1862,9 +2041,11 @@ MonoBehaviour:
   SkidSound_PitchIncrease: 0.013
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.3
-  EngineInfluence: 225
   DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
   CurrentGrip: 7
+  CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
   Clutch: 1
   WheelRotation: 0
@@ -1879,7 +2060,6 @@ MonoBehaviour:
   IsOwner: 0
   Debugslip: 0
   CurrentlyDistant: 1
-  printWheelRotSpeed: 0
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -22941,6 +23121,7 @@ MonoBehaviour:
   EntityControl: {fileID: 3243243057054021813}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 1803049918173235745}
   SeatOutSideVehicle: 0
@@ -63348,6 +63529,7 @@ MonoBehaviour:
   EntityControl: {fileID: 3243243057054021813}
   IsPilotSeat: 0
   ThisSeatOnly: {fileID: 0}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2687378976475800917}
   SeatOutSideVehicle: 0
@@ -63754,6 +63936,7 @@ MonoBehaviour:
   EntityControl: {fileID: 3243243057054021813}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 3288998196763310016}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 3243243056396766826}
   SeatOutSideVehicle: 0
@@ -64049,7 +64232,7 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 7099842138338204315}
-  HoldingOnly: {fileID: 0}
+  EnableWhenHolding: []
   CenterOfMass: {fileID: 8924013770782945331}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
@@ -70057,6 +70240,7 @@ MonoBehaviour:
   ToggleMinDelay: 0
   ToggleObjects:
   - {fileID: 5017952649996745700}
+  ToggleObjects_Off: []
   ToggleEmission: []
   AllowToggleFlying: 1
   AllowToggleGrounded: 1

@@ -27,10 +27,14 @@ namespace SaccFlightAndVehicles
         public float ExtraRayCastDistance = .5f;
         public float Grip = 7f;
         public AnimationCurve GripCurve = AnimationCurve.Linear(0, 1, 1, 1);
+        public bool SeparateLongLatGrip = false;
+        [Tooltip("Multiply forward grip by this value for sideways grip")]
+        public float LateralGrip = .8f;
+        public AnimationCurve GripCurveLateral = AnimationCurve.Linear(0, 1, 1, 1);
         [Tooltip("Torque, kindof. How quickly the wheel matches the speed of the ground when in contact with it")]
         public float WheelWeight = 0.1f;
         public float BrakeStrength = 500f;
-        public float HandBrakeStrength = 7f;
+        public float HandBrakeStrength = 70f;
         public LayerMask WheelLayers;
         public float[] SurfaceType_Grips = { 1f, 0.7f, 0.2f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
         public float[] SurfaceType_Slowdown = { 0.1f, 4f, 0.05f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f };
@@ -268,13 +272,13 @@ namespace SaccFlightAndVehicles
             if (IsDriveWheel && !GearNeutral)
             {
                 //somehow, not using deltatime here, and then also not using it at the part that updates SGVControl.Revs near the end of the fucntion works better than have it in both places.
-                WheelRotationSpeedRPM = Mathf.Lerp(WheelRotationSpeedRPM, EngineRevs * _GearRatio, (1f - Clutch) * (1f - HandBrake) * ClutchStrength /* * Time.fixedDeltaTime * 90f */);
+                WheelRotationSpeedRPM = Mathf.Lerp(WheelRotationSpeedRPM, EngineRevs * _GearRatio, (1f - Clutch) * ClutchStrength /* * Time.fixedDeltaTime * 90f */);
                 WheelRotationSpeedRPS = WheelRotationSpeedRPM / 60f;
                 WheelRotationSpeedSurf = WheelCircumference * WheelRotationSpeedRPS;
             }
-            float WheelRotationSpeedSurfLPrev = WheelRotationSpeedSurf;
+            float WheelRotationSpeedSurfPrev = WheelRotationSpeedSurf;
             WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * Brake * BrakeStrength);
-            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * HandBrake * HandBrakeStrength);
+            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * HandBrake * HandBrakeStrength);
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
             WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
@@ -423,6 +427,14 @@ namespace SaccFlightAndVehicles
                 //SusForce has deltatime built in
                 float SusForceMag = SusForce.magnitude;
                 GripForce3 = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / Time.fixedDeltaTime / 90f))) * CurrentGrip * SusForceMag;
+                Vector3 GripForceForward = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / Time.fixedDeltaTime / 90f))) * CurrentGrip * SusForceMag;
+                if (SeparateLongLatGrip)
+                {
+                    Vector3 GripForceSide = -FullSkid.normalized * GripCurveLateral.Evaluate((FullSkidMag) / (CurrentGrip * LateralGrip * (SusForceMag / Time.fixedDeltaTime / 90f))) * CurrentGrip * LateralGrip * SusForceMag;
+                    GripForce3 = Vector3.Lerp(GripForceSide, GripForceForward, ForwardSideRatio);
+                }
+                else
+                { GripForce3 = GripForceForward; }
                 //Add the Grip forces to the rigidbody
                 //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
                 CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
@@ -486,9 +498,8 @@ namespace SaccFlightAndVehicles
                 //gear ratio shouldnt be used here but would have to change engineinfluence in all prefabs to compensate
                 SGVControl.Revs = Mathf.MoveTowards(SGVControl.Revs, (WheelRotationSpeedRPM / _GearRatio), ((ForceUsed * Mathf.Abs(_GearRatio)) * EngineInfluence * (1f - Clutch)));
                 //lerp engine towards wheel speed of handbrake is being used
-                SGVControl.Revs = Mathf.Lerp(SGVControl.Revs, (WheelRotationSpeedRPM / _GearRatio), HandBrake * (1f - Clutch) * 90f * Time.fixedDeltaTime);
             }
-            SkidVectorFX += Vector3.forward * (WheelRotationSpeedSurf - WheelRotationSpeedSurfLPrev);//works but stupid
+            SkidVectorFX += Vector3.forward * (WheelRotationSpeedSurf - WheelRotationSpeedSurfPrev);//works but stupid
             //this would be a better way to do it, but slipgrip is broken so you would never get forward skidding sounds
             //SkidVectorFX += Vector3.forward * SlipGrip;
             SkidLength = SkidVectorFX.magnitude;
