@@ -15,25 +15,38 @@ namespace SaccFlightAndVehicles
         public string RaceName;
         [Tooltip("All checkpoint objects for this race in order, animations are sent to them as they are passed")]
         public GameObject[] RaceCheckpoints;
+        [Tooltip("Laps mode. To finish the race you must enter the first checkpoint again, which starts the race again")]
+        public bool LoopRace;
         [Tooltip("Parent of all objects related to this race, including scoreboard and checkpoints")]
         public GameObject RaceObjects;
         public bool AllowReverse = true;
         public AudioSource NewTimeAdded_Snd;
         public AudioSource NewTopRecord_Snd;
+        public string LineHeightTxt = "<line-height=.286>";
+        [Tooltip("If RaceToggleButton.AutomaticRaceSelection is enabled, enable race when you are within this distance of the beginning")]
+        public float Autotoggler_EnableDist_Forward = 100;
+        [Tooltip("If RaceToggleButton.AutomaticRaceSelection is enabled, enable race in reverse mode when you are within this distance of the End")]
+        public float Autotoggler_EnableDist_Reverse = 100;
+        [System.NonSerializedAttribute] public float[] SplitTimes;
+        [System.NonSerializedAttribute] public float[] SplitTimes_R;
         [System.NonSerializedAttribute] public string MyLastTime = "My Last Time : None";
         [System.NonSerializedAttribute] public string MyLastTime_R = "(R)My Last Time : None";
         public void UpdateMyLastTime()
         {
             if (!MyLastTime_text) { return; }
-            MyLastTime_text.text = MyLastTime = "My Last Time : " + TimeReporter._MyLastTime.ToString("F3") + " In: " + TimeReporter.MyLastVehicle.ToString();
-
+            if (TimeReporter._MyLastTime != 0f)
+            {
+                MyLastTime_text.text = MyLastTime = "My Last Time : " + TimeReporter._MyLastTime.ToString("F3") + " In: " + TimeReporter.MyLastVehicle.ToString();
+            }
             if (!MyLastTime_R_text) { return; }
-            if (AllowReverse)
+            if (AllowReverse && TimeReporter._MyLastTime_R != 0f)
             {
                 MyLastTime_R_text.text = MyLastTime_R = "My Last Time : " + TimeReporter._MyLastTime_R.ToString("F3") + " In: " + TimeReporter.MyLastVehicle_R.ToString();
             }
             else { MyLastTime_R_text.text = string.Empty; }
         }
+        [System.NonSerialized] public float MyBestTime;
+        [System.NonSerialized] public float MyBestTime_R;
         [Header("Scoreboard:")]
         [Tooltip("Record the top MaxRecordedTimes number of records, forget about the rest")]
         public int MaxRecordedTimes = 15;
@@ -53,9 +66,12 @@ namespace SaccFlightAndVehicles
         [UdonSynced] public float[] PlayerTimes_R;
         [UdonSynced] public string[] PlayerVehicles_R;
         [UdonSynced] public string[] PlayerNames_R;
+        [System.NonSerialized] public bool RaceInProgress;
         private void Start()
         {
-            SendCustomEventDelayedSeconds(nameof(SendScoreboardUpdate_Delayed), 5);
+            SendCustomEventDelayedSeconds(nameof(UpdateScoreBoards_Vis), 15);
+            SplitTimes = new float[RaceCheckpoints.Length];
+            SplitTimes_R = new float[RaceCheckpoints.Length];
         }
         public void AddNewPlayerToBoard(string playername, float time, string vehicle, ref string[] playernames, ref float[] playertimes, ref string[] playervehicles)
         {
@@ -199,6 +215,7 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
+                    if (newtime > PlayerTimes[posonboard]) { return; }
                     if (newtime < PlayerTimes[0]) { NewTopRcrd = true; }
                     PlayerNames[posonboard] = playername;
                     PlayerTimes[posonboard] = newtime;
@@ -242,33 +259,34 @@ namespace SaccFlightAndVehicles
         public void UpdateScoreBoards_Vis()
         {
             //forward
-            Names_text.text = string.Empty;
+            if (!Times_text) { return; }
+            Names_text.text = LineHeightTxt + "Names\n";
             for (int i = 0; i < PlayerNames.Length; i++)
             {
                 Names_text.text += PlayerNames[i] + "\n";
             }
-            Times_text.text = string.Empty;
+            Times_text.text = LineHeightTxt + "Times\n";
             for (int i = 0; i < PlayerTimes.Length; i++)
             {
                 Times_text.text += PlayerTimes[i].ToString("F3") + "\n";
             }
-            Vehicles_text.text = string.Empty;
+            Vehicles_text.text = LineHeightTxt + "Vehicles\n";
             for (int i = 0; i < PlayerVehicles.Length; i++)
             {
                 Vehicles_text.text += PlayerVehicles[i] + "\n";
             }
             //reverse
-            Names_R_text.text = string.Empty;
+            Names_R_text.text = LineHeightTxt + "Names\n";
             for (int i = 0; i < PlayerNames_R.Length; i++)
             {
                 Names_R_text.text += PlayerNames_R[i] + "\n";
             }
-            Times_R_text.text = string.Empty;
+            Times_R_text.text = LineHeightTxt + "Times\n";
             for (int i = 0; i < PlayerTimes_R.Length; i++)
             {
                 Times_R_text.text += PlayerTimes_R[i].ToString("F3") + "\n";
             }
-            Vehicles_R_text.text = string.Empty;
+            Vehicles_R_text.text = LineHeightTxt + "Vehicles\n";
             for (int i = 0; i < PlayerVehicles_R.Length; i++)
             {
                 Vehicles_R_text.text += PlayerVehicles_R[i] + "\n";

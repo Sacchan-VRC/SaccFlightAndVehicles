@@ -37,7 +37,7 @@ namespace SaccFlightAndVehicles
         }
         [UdonSynced] public string ReportedVehicle;
         [UdonSynced] public bool Reported_RaceReverse = false;
-        [FieldChangeCallback(nameof(MyLastTime))] public float _MyLastTime;
+        [FieldChangeCallback(nameof(MyLastTime))] public float _MyLastTime = 0f;
         public float MyLastTime
         {
             set
@@ -47,7 +47,7 @@ namespace SaccFlightAndVehicles
             }
             get => _MyLastTime;
         }
-        [FieldChangeCallback(nameof(MyLastTime_R))] public float _MyLastTime_R;
+        [FieldChangeCallback(nameof(MyLastTime_R))] public float _MyLastTime_R = 0f;
         public float MyLastTime_R
         {
             set
@@ -68,10 +68,15 @@ namespace SaccFlightAndVehicles
         {
             Checking_reverse = MyLastRace_Reverse;
             if (MyLastRace_Reverse)
-            { Checking_time = _MyLastTime_R; }
+            {
+                Checking_time = _MyLastTime_R;
+                Checking_vehicle = MyLastVehicle;
+            }
             else
-            { Checking_time = MyLastTime; }
-            Checking_vehicle = ReportedVehicle;
+            {
+                Checking_time = MyLastTime;
+                Checking_vehicle = MyLastVehicle_R;
+            }
         }
         public void CheckIfRecordRecieved()
         {
@@ -126,9 +131,9 @@ namespace SaccFlightAndVehicles
         private void SendMyTime(bool reverse)
         {
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
-            ReportedTime = Checking_time;
             ReportedVehicle = Checking_vehicle;
             Reported_RaceReverse = Checking_reverse;
+            ReportedTime = Checking_time;
             RequestSerialization();
         }
     }

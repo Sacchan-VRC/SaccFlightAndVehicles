@@ -240,9 +240,9 @@ namespace SaccFlightAndVehicles
             {
                 foreach (SaccRacingTrigger SRT in RacingTriggers)
                 {
-                    if (!SRT.Button)
+                    if (!SRT.RaceToggler)
                     {
-                        SRT.Button = RaceToggleButtons[0];
+                        SRT.RaceToggler = RaceToggleButtons[0];
                         PrefabUtility.RecordPrefabInstancePropertyModifications(SRT);
                         EditorUtility.SetDirty(SRT);
                     }
