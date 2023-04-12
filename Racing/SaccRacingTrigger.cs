@@ -1,4 +1,4 @@
-﻿
+
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
@@ -61,7 +61,6 @@ namespace SaccFlightAndVehicles
         private void Initialize()
         {
             Initialized = true;
-            // _TrackForward = true;//Why is this needed?
             GameObject Objs = gameObject;
             //checking if a rigidbody is null in a while loop doesnt work in udon for some reason, use official vrchat workaround
             while (!Utilities.IsValid(PlaneRigidbody) && Objs.transform.parent)
@@ -73,63 +72,65 @@ namespace SaccFlightAndVehicles
             ThisObjLayer = 1 << gameObject.layer;
             localPlayer = Networking.LocalPlayer;
             if (localPlayer == null) { InEditor = true; }
-        }
-        void Start()
-        {
             TimerTextCounter++; SetTimerEmpty();
             SplitTextCounter++; SetSplitEmpty();
         }
         private string SecsToMinsSec(float Seconds)
         {
+            bool neg = false;
+            if (Seconds < 0) { Seconds = -Seconds; neg = true; }
             float mins = Mathf.Floor(Seconds / 60f);
             float secs = Seconds % 60f;
             if (mins > 0)
             {
-                return mins.ToString("F0") + ":" + secs.ToString("F3");//There's probably a better way to format this but idk
+                if (neg) { mins = -mins; }
+                return mins.ToString("F0") + ":" + (secs < 10 ? secs.ToString("F3").PadLeft(6, '0') : secs.ToString("F3"));
             }
+            if (neg) { secs = -secs; }
             return secs.ToString("F3");
         }
+        public void TESTSTMS()
+        {
+            DBGOUTPUT = SecsToMinsSec(DBGINPUT);
+        }
+        public float DBGINPUT = 1;
+        public string DBGOUTPUT;
         private void Update()
         {
             if (RaceOn)
             {
                 RaceTime = Time.realtimeSinceStartup - RaceStartTime;
-                if (Time_text) { Time_text.text = SecsToMinsSec(RaceTime).PadLeft(6, '0'); }
+                if (Time_text) { Time_text.text = SecsToMinsSec(RaceTime); }
             }
         }
         private int CurrentSplit = 0;
-        private void UpdateSplitTime()
+        private void UpdateSplitTime(bool RaceEnded = false)
         {
-            CurrentSplits[CurrentSplit] = RaceTime + CalcSubFrameTime();
+            CurrentSplits[CurrentSplit] = (Time.realtimeSinceStartup - RaceStartTime - CalcSubFrameTime());
             float splitdif;
             if (TrackForward)
             {
                 splitdif = CurrentSplits[CurrentSplit] - CurrentCourse.SplitTimes[CurrentSplit];
                 bool faster = splitdif < 0;
-                bool firstrun = CurrentCourse.SplitTimes[CurrentSplit] == 0;
-                if (SplitTime_text) { SplitTime_text.text = (!firstrun ? (faster ? "<color=green>" : "<color=red>+") + SecsToMinsSec(splitdif) : string.Empty) + "\n<color=white>" + CurrentSplits[CurrentSplit].ToString("F3").PadLeft(6, '0'); }
+                bool firstrun = CurrentCourse.MyBestTime == 0f;
+                if (SplitTime_text) { SplitTime_text.text = (!firstrun ? (faster ? "<color=green>" : "<color=red>+") + SecsToMinsSec(splitdif) : "<color=green>") + (RaceEnded ? "\n" : "\n<color=white>") + SecsToMinsSec(CurrentSplits[CurrentSplit]); }
             }
             else
             {
                 splitdif = CurrentSplits[CurrentSplit] - CurrentCourse.SplitTimes_R[CurrentSplit];
                 bool faster = splitdif < 0;
-                bool firstrun = CurrentCourse.SplitTimes_R[CurrentSplit] == 0;
-                if (SplitTime_text) { SplitTime_text.text = (!firstrun ? (faster ? "<color=green>" : "<color=red>+") + SecsToMinsSec(splitdif) : string.Empty) + "\n<color=white>" + CurrentSplits[CurrentSplit].ToString("F3").PadLeft(6, '0'); }
+                bool firstrun = CurrentCourse.MyBestTime_R == 0f;
+                if (SplitTime_text) { SplitTime_text.text = (!firstrun ? (faster ? "<color=green>" : "<color=red>+") + SecsToMinsSec(splitdif) : "<color=green>") + (RaceEnded ? "\n" : "\n<color=white>") + SecsToMinsSec(CurrentSplits[CurrentSplit]); }
             }
             CurrentSplit++;
             SetSplitEmptyDelayed(3f);
         }
-        private void SetSplitEmptyDelayed(float delay)
-        {
-            SplitTextCounter++;
-            SendCustomEventDelayedSeconds(nameof(SetSplitEmpty), delay);
-        }
+        int TimerTextCounter = 0;
         private void SetTimerEmptyDelayed(float delay)
         {
             TimerTextCounter++;
             SendCustomEventDelayedSeconds(nameof(SetTimerEmpty), delay);
         }
-        int TimerTextCounter = 0;
         public void SetTimerEmpty()
         {
             TimerTextCounter--;
@@ -137,6 +138,11 @@ namespace SaccFlightAndVehicles
             if (Time_text) { Time_text.text = string.Empty; }
         }
         int SplitTextCounter = 0;
+        private void SetSplitEmptyDelayed(float delay)
+        {
+            SplitTextCounter++;
+            SendCustomEventDelayedSeconds(nameof(SetSplitEmpty), delay);
+        }
         public void SetSplitEmpty()
         {
             SplitTextCounter--;
@@ -174,22 +180,6 @@ namespace SaccFlightAndVehicles
             //Debug.Log("Finish Race!");
             RaceFinishTime = Time.realtimeSinceStartup;
             RaceTime = LastTime = (RaceFinishTime - RaceStartTime - CalcSubFrameTime());
-            if (TrackForward)
-            {
-                if (RaceTime < CurrentCourse.MyBestTime || CurrentCourse.MyBestTime == 0f)
-                {
-                    CurrentCourse.MyBestTime = RaceTime;
-                    CurrentCourse.SplitTimes = CurrentSplits;
-                }
-            }
-            else
-            {
-                if (RaceTime < CurrentCourse.MyBestTime_R || CurrentCourse.MyBestTime_R == 0f)
-                {
-                    CurrentCourse.MyBestTime_R = RaceTime;
-                    CurrentCourse.SplitTimes_R = CurrentSplits;
-                }
-            }
             CurrentCourse.TimeReporter.MyLastRace_Reverse = !TrackForward;
             if (TrackForward || !CurrentTrackAllowReverse)//track was finished forward
             {
@@ -238,84 +228,113 @@ namespace SaccFlightAndVehicles
                     { SendMyTime(true); }
                 }
             }
-
-            RaceTime = 0;
-            if (TrackForward && !CurrentCourse.LoopRace)
+            if (TrackForward)
             {
-                string TimeImproved = LastTime < CurrentCourse.MyBestTime ? "<color=green>" : "<color=red>";
-                if (Time_text) { Time_text.text = TimeImproved + LastTime.ToString("F3"); }
+                bool TimeImproved = RaceTime < CurrentCourse.MyBestTime || CurrentCourse.MyBestTime == 0;
+                if (!CurrentCourse.LoopRace)
+                {
+                    string TimeColor = TimeImproved ? "<color=green>" : "<color=red>";
+                    if (Time_text) { Time_text.text = TimeColor + SecsToMinsSec(RaceTime); }
+                }
+                if (TimeImproved || CurrentCourse.MyBestTime == 0f)
+                {
+                    CurrentCourse.MyBestTime = RaceTime;
+                    CurrentCourse.SplitTimes = CurrentSplits;
+                }
             }
             else
             {
-                string TimeImproved = LastTime < CurrentCourse.MyBestTime_R ? "<color=green>" : "<color=red>";
-                if (Time_text) { Time_text.text = TimeImproved + LastTime.ToString("F3"); }
+                bool TimeImproved = RaceTime < CurrentCourse.MyBestTime_R || CurrentCourse.MyBestTime_R == 0;
+                if (!CurrentCourse.LoopRace)
+                {
+                    string TimeColor = TimeImproved ? "<color=green>" : "<color=red>";
+                    if (Time_text) { Time_text.text = TimeColor + SecsToMinsSec(RaceTime); }
+                }
+                if (TimeImproved || CurrentCourse.MyBestTime_R == 0f)
+                {
+                    CurrentCourse.MyBestTime_R = RaceTime;
+                    CurrentCourse.SplitTimes_R = CurrentSplits;
+                }
             }
+            RaceTime = 0;
             SetTimerEmptyDelayed(3f);
         }
         void OnTriggerEnter(Collider other)
         {
-            if (Time.realtimeSinceStartup - RaceFinishTime < 2f && !CurrentCourse.LoopRace) { return; }
-            if (CurrentCourseSelection != -1 && (other && other.gameObject == CurrentCourse.RaceCheckpoints[NextCheckpoint]))
+            if (
+                (Time.realtimeSinceStartup - RaceFinishTime < 2f && !CurrentCourse.LoopRace)
+                || (CurrentCourseSelection == -1 || (other && other.gameObject != CurrentCourse.RaceCheckpoints[NextCheckpoint]))
+                ) { return; }
+            if (NextCheckpoint == FinalCheckpoint)//end of the race
             {
-                if (NextCheckpoint == FinalCheckpoint)//end of the race
+                NextCheckpoint = FirstCheckPoint;
+                if (Utilities.IsValid(CurrentCheckPointAnimator))
+                { CurrentCheckPointAnimator.SetBool("Current", false); }
+                StartCheckPointAnims();
+                if (CurrentCourse.LoopRace)
                 {
-                    NextCheckpoint = FirstCheckPoint;
-                    if (Utilities.IsValid(CurrentCheckPointAnimator))
-                    { CurrentCheckPointAnimator.SetBool("Current", false); }
-                    StartCheckPointAnims();
-                    if (CurrentCourse.LoopRace)
-                    {
-                        LoopFinalSplit = true;
-                        UpdateSplitTime();
-                    }
-                    else
-                    {
-                        CurrentSplit = 0;
-                        if (InProgress)
-                        {
-                            RaceToggler.RacesInProgress--;
-                            InProgress = false;
-                            CurrentCourse.RaceInProgress = false;
-                        }
-                        RaceOn = false;
-                        ReportTime();
-                    }
-                }
-                else if (NextCheckpoint == FirstCheckPoint)//starting the race
-                {
-                    if (LoopFinalSplit)
-                    {
-                        UpdateSplitTime();
-                        ReportTime();
-                        LoopFinalSplit = false;
-                        CurrentSplit = 0;
-                    }
-                    CurrentSplits = new float[CurrentCourse.RaceCheckpoints.Length];
-                    //subframe accuracy is done on the first and last checkpoint, the code for the last checkpoint(above) is commented
-                    RaceTime = 0;
-
-                    //Debug.Log("Start Race!");
-                    RaceStartTime = Time.realtimeSinceStartup - CalcSubFrameTime();
-                    RaceOn = true;
-                    if (!InProgress)
-                    {
-                        RaceToggler.RacesInProgress++;
-                        InProgress = true;
-                        CurrentCourse.RaceInProgress = true;
-                    }
-                    if (CurrentCourse.LoopRace && !TrackForward && CurrentCourse.RaceCheckpoints[NextCheckpoint] == CurrentCourse.RaceCheckpoints[0]) { NextCheckpoint = CurrentCourse.RaceCheckpoints.Length; }
-                    NextCheckpoint += TrackDirection;
-                    if (CurrentCourse.LoopRace && !TrackForward) { TrackDirection = -1; }
-                    ProgressCheckPointAnims();
+                    LoopFinalSplit = true;
+                    UpdateSplitTime();
                 }
                 else
                 {
-                    //Debug.Log("CheckPoint!");
-                    NextCheckpoint += TrackDirection;
-                    ProgressCheckPointAnims();
-                    UpdateSplitTime();
-                    //check if the next checkpoint is the end of the race, because if it is we need to get subframe time
+                    UpdateSplitTime(true);
+                    CurrentSplit = 0;
+                    if (InProgress)
+                    {
+                        RaceToggler.RacesInProgress--;
+                        InProgress = false;
+                        CurrentCourse.RaceInProgress = false;
+                    }
+                    RaceOn = false;
+                    ReportTime();
                 }
+            }
+            else if (NextCheckpoint == FirstCheckPoint)//starting the race
+            {
+                if (LoopFinalSplit)
+                {
+                    UpdateSplitTime(true);
+                    ReportTime();
+                    LoopFinalSplit = false;
+                    CurrentSplit = 0;
+                }
+                CurrentSplits = new float[CurrentCourse.RaceCheckpoints.Length];
+                //subframe accuracy is done on the first and last checkpoint, the code for the last checkpoint(above) is commented
+                RaceTime = 0;
+
+                //Debug.Log("Start Race!");
+                RaceStartTime = Time.realtimeSinceStartup - CalcSubFrameTime();
+                RaceOn = true;
+                if (!InProgress)
+                {
+                    RaceToggler.RacesInProgress++;
+                    InProgress = true;
+                    CurrentCourse.RaceInProgress = true;
+                }
+                NextCheckpoint += TrackDirection;
+                if (CurrentCourse.LoopRace)
+                {
+                    if (!TrackForward)
+                    {
+                        if (NextCheckpoint < 0)
+                        { NextCheckpoint = CurrentCourse.RaceCheckpoints.Length - 1; }
+                    }
+                    else
+                    {
+                        if (NextCheckpoint > CurrentCourse.RaceCheckpoints.Length - 1)
+                        { NextCheckpoint = 0; }
+                    }
+                }
+                ProgressCheckPointAnims();
+            }
+            else
+            {
+                //Debug.Log("CheckPoint!");
+                NextCheckpoint += TrackDirection;
+                ProgressCheckPointAnims();
+                UpdateSplitTime();
+                //check if the next checkpoint is the end of the race, because if it is we need to get subframe time
             }
         }
         private float CalcSubFrameTime()
@@ -340,11 +359,11 @@ namespace SaccFlightAndVehicles
             CurrentCourse.TimeReporter.ReportedVehicle = PlaneName;
             CurrentCourse.TimeReporter.Reported_RaceReverse = reverse;
             CurrentCourse.TimeReporter.ReportedTime = RaceTime;
-            RequestSerialization();
+            CurrentCourse.TimeReporter.RequestSerialization();
         }
         public void SetCourse()
         {
-            TurnOffeCurrentCheckPoints();
+            TurnOffCurrentCheckPoints();
             CurrentCourseSelection = RaceToggler.CurrentCourseSelection;
             if (CurrentCourseSelection != -1)
             {
@@ -389,17 +408,16 @@ namespace SaccFlightAndVehicles
             { if (Racename_text) { Racename_text.text = RaceToggler.Races[CurrentCourseSelection].RaceName; } }
             SetCourse();
         }
-        void OnEnable()//Happens when you get in a plane, if a race is enabled
+        void OnEnable()//Happens when you get in a vehicle, if a race is enabled
         {
             SetUpNewRace();
             StartCheckPointAnims();
-            SetTimerEmpty();
         }
         void OnDisable()
         {
-            TurnOffeCurrentCheckPoints();
+            TurnOffCurrentCheckPoints();
         }
-        public void TurnOffeCurrentCheckPoints()
+        public void TurnOffCurrentCheckPoints()
         {
             if (CurrentCourse)
             {
@@ -433,6 +451,7 @@ namespace SaccFlightAndVehicles
             }
             CurrentCheckPointAnimator = NextCheckPointAnimator;
             int next2 = NextCheckpoint + TrackDirection;
+            if (CurrentCourse.LoopRace && next2 == CurrentCourse.RaceCheckpoints.Length) { next2 = 0; }
             if (next2 > -1 && next2 < CurrentCourse.RaceCheckpoints.Length)
             {
                 NextCheckPointAnimator = CurrentCourse.RaceCheckpoints[next2].GetComponent<Animator>();
@@ -455,7 +474,6 @@ namespace SaccFlightAndVehicles
                     {
                         CurrentCheckPointAnimator.SetBool("Reverse", !_TrackForward);
                         CurrentCheckPointAnimator.SetBool("Current", true);
-                        CurrentCheckPointAnimator.SetBool("Reverse", !_TrackForward);
                         CurrentCheckPointAnimator.SetBool("Next", false);
                     }
                 }
