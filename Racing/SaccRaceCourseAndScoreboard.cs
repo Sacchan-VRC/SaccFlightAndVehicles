@@ -11,8 +11,9 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SaccRaceCourseAndScoreboard : UdonSharpBehaviour
     {
-        [Tooltip("Can be used by other scripts to get the races name.")]
+        [Tooltip("Used by other scripts to get the races name.")]
         public string RaceName;
+        public SaccRaceTimeReporter TimeReporter;
         [Tooltip("All checkpoint objects for this race in order, animations are sent to them as they are passed")]
         public GameObject[] RaceCheckpoints;
         [Tooltip("Laps mode. To finish the race you must enter the first checkpoint again, which starts the race again")]
@@ -27,10 +28,12 @@ namespace SaccFlightAndVehicles
         public float Autotoggler_EnableDist_Forward = 100;
         [Tooltip("If RaceToggleButton.AutomaticRaceSelection is enabled, enable race in reverse mode when you are within this distance of the End")]
         public float Autotoggler_EnableDist_Reverse = 100;
+        public GameObject[] StartPointFX;
+        public GameObject[] EndPointFX;
         [System.NonSerializedAttribute] public float[] SplitTimes;
         [System.NonSerializedAttribute] public float[] SplitTimes_R;
-        [System.NonSerializedAttribute] public string MyLastTime = "My Last Time : None";
-        [System.NonSerializedAttribute] public string MyLastTime_R = "(R)My Last Time : None";
+        [System.NonSerializedAttribute] public string MyLastTime = string.Empty;
+        [System.NonSerializedAttribute] public string MyLastTime_R = string.Empty;
         public void UpdateMyLastTime()
         {
             if (!MyLastTime_text) { return; }
@@ -38,6 +41,7 @@ namespace SaccFlightAndVehicles
             {
                 MyLastTime_text.text = MyLastTime = "My Last Time : " + TimeReporter._MyLastTime.ToString("F3") + " In: " + TimeReporter.MyLastVehicle.ToString();
             }
+            else { MyLastTime_text.text = string.Empty; }
             if (!MyLastTime_R_text) { return; }
             if (AllowReverse && TimeReporter._MyLastTime_R != 0f)
             {
@@ -50,16 +54,15 @@ namespace SaccFlightAndVehicles
         [Header("Scoreboard:")]
         [Tooltip("Record the top MaxRecordedTimes number of records, forget about the rest")]
         public int MaxRecordedTimes = 15;
-        public SaccRaceTimeReporter TimeReporter;
-        public TextMeshProUGUI Trackname_text;
         public TextMeshProUGUI Names_text;
         public TextMeshProUGUI Times_text;
         public TextMeshProUGUI Vehicles_text;
+        public TextMeshProUGUI MyLastTime_text;
         public TextMeshProUGUI Names_R_text;
         public TextMeshProUGUI Times_R_text;
         public TextMeshProUGUI Vehicles_R_text;
-        public TextMeshProUGUI MyLastTime_text;
         public TextMeshProUGUI MyLastTime_R_text;
+        [Header("Debug:")]
         [UdonSynced] public float[] PlayerTimes;
         [UdonSynced] public string[] PlayerVehicles;
         [UdonSynced] public string[] PlayerNames;
@@ -69,6 +72,8 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public bool RaceInProgress;
         private void Start()
         {
+            UpdateMyLastTime();
+            UpdateScoreBoards_Vis();
             SendCustomEventDelayedSeconds(nameof(UpdateScoreBoards_Vis), 15);
             SplitTimes = new float[RaceCheckpoints.Length];
             SplitTimes_R = new float[RaceCheckpoints.Length];
@@ -141,7 +146,7 @@ namespace SaccFlightAndVehicles
             }
             return -1;
         }
-        public bool SortAsc = true;
+        // public bool SortAsc = true;
         public void SortScoreboard(ref string[] playernames, ref float[] playertimes, ref string[] playervehicles)//currently sorts backwards
         {
             int length = playertimes.Length;
@@ -151,42 +156,42 @@ namespace SaccFlightAndVehicles
                 var keytimes = playertimes[i];
                 var keyvehicles = playervehicles[i];
                 var flag = false;
-                if (SortAsc)
+                // if (SortAsc)
+                // {
+                for (int j = i - 1; j >= 0 && flag != true;)
                 {
-                    for (int j = i - 1; j >= 0 && flag != true;)
+                    if (keytimes < playertimes[j])
                     {
-                        if (keytimes < playertimes[j])
-                        {
-                            int jp1 = j + 1;
-                            playernames[jp1] = playernames[j];
-                            playertimes[jp1] = playertimes[j];
-                            playervehicles[jp1] = playervehicles[j];
-                            j--; jp1--;
-                            playernames[jp1] = keynames;
-                            playertimes[jp1] = keytimes;
-                            playervehicles[jp1] = keyvehicles;
-                        }
-                        else flag = true;
+                        int jp1 = j + 1;
+                        playernames[jp1] = playernames[j];
+                        playertimes[jp1] = playertimes[j];
+                        playervehicles[jp1] = playervehicles[j];
+                        j--; jp1--;
+                        playernames[jp1] = keynames;
+                        playertimes[jp1] = keytimes;
+                        playervehicles[jp1] = keyvehicles;
                     }
+                    else flag = true;
                 }
-                else
-                {
-                    for (int j = i - 1; j >= 0 && flag != true;)
-                    {
-                        if (keytimes > playertimes[j])
-                        {
-                            int jp1 = j + 1;
-                            playernames[jp1] = playernames[j];
-                            playertimes[jp1] = playertimes[j];
-                            playervehicles[jp1] = playervehicles[j];
-                            j--; jp1--;
-                            playernames[jp1] = keynames;
-                            playertimes[jp1] = keytimes;
-                            playervehicles[jp1] = keyvehicles;
-                        }
-                        else flag = true;
-                    }
-                }
+                // }
+                // else
+                // {
+                //     for (int j = i - 1; j >= 0 && flag != true;)
+                //     {
+                //         if (keytimes > playertimes[j])
+                //         {
+                //             int jp1 = j + 1;
+                //             playernames[jp1] = playernames[j];
+                //             playertimes[jp1] = playertimes[j];
+                //             playervehicles[jp1] = playervehicles[j];
+                //             j--; jp1--;
+                //             playernames[jp1] = keynames;
+                //             playertimes[jp1] = keytimes;
+                //             playervehicles[jp1] = keyvehicles;
+                //         }
+                //         else flag = true;
+                //     }
+                // }
             }
             SendCustomEventDelayedFrames(nameof(SendScoreboardUpdate_Delayed), 1);
         }

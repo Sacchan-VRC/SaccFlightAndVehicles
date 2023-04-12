@@ -72,15 +72,13 @@ namespace SaccFlightAndVehicles
             ThisCapsuleCollider = gameObject.GetComponent<CapsuleCollider>();
             ThisObjLayer = 1 << gameObject.layer;
             localPlayer = Networking.LocalPlayer;
-            SetSplitEmpty();
             if (localPlayer == null) { InEditor = true; }
         }
-        public void SetTimerEmpty()
-        { if (Time_text) { Time_text.text = string.Empty; } }
-        public void SetSplitEmpty()
-        { if (Time_text) { SplitTime_text.text = string.Empty; } }
         void Start()
-        { SetTimerEmpty(); }
+        {
+            TimerTextCounter++; SetTimerEmpty();
+            SplitTextCounter++; SetSplitEmpty();
+        }
         private string SecsToMinsSec(float Seconds)
         {
             float mins = Mathf.Floor(Seconds / 60f);
@@ -119,7 +117,31 @@ namespace SaccFlightAndVehicles
                 if (SplitTime_text) { SplitTime_text.text = (!firstrun ? (faster ? "<color=green>" : "<color=red>+") + SecsToMinsSec(splitdif) : string.Empty) + "\n<color=white>" + CurrentSplits[CurrentSplit].ToString("F3").PadLeft(6, '0'); }
             }
             CurrentSplit++;
-            SendCustomEventDelayedSeconds(nameof(SetSplitEmpty), 3);
+            SetSplitEmptyDelayed(3f);
+        }
+        private void SetSplitEmptyDelayed(float delay)
+        {
+            SplitTextCounter++;
+            SendCustomEventDelayedSeconds(nameof(SetSplitEmpty), delay);
+        }
+        private void SetTimerEmptyDelayed(float delay)
+        {
+            TimerTextCounter++;
+            SendCustomEventDelayedSeconds(nameof(SetTimerEmpty), delay);
+        }
+        int TimerTextCounter = 0;
+        public void SetTimerEmpty()
+        {
+            TimerTextCounter--;
+            if (TimerTextCounter != 0f) { return; }
+            if (Time_text) { Time_text.text = string.Empty; }
+        }
+        int SplitTextCounter = 0;
+        public void SetSplitEmpty()
+        {
+            SplitTextCounter--;
+            if (SplitTextCounter != 0f) { return; }
+            if (SplitTime_text) { SplitTime_text.text = string.Empty; }
         }
         private void FixedUpdate()
         {
@@ -149,14 +171,25 @@ namespace SaccFlightAndVehicles
         }
         void ReportTime()
         {
-            if (TrackForward)
-            { CurrentCourse.SplitTimes = CurrentSplits; }
-            else
-            { CurrentCourse.SplitTimes_R = CurrentSplits; }
-            RaceTime = 0;
             //Debug.Log("Finish Race!");
             RaceFinishTime = Time.realtimeSinceStartup;
             RaceTime = LastTime = (RaceFinishTime - RaceStartTime - CalcSubFrameTime());
+            if (TrackForward)
+            {
+                if (RaceTime < CurrentCourse.MyBestTime || CurrentCourse.MyBestTime == 0f)
+                {
+                    CurrentCourse.MyBestTime = RaceTime;
+                    CurrentCourse.SplitTimes = CurrentSplits;
+                }
+            }
+            else
+            {
+                if (RaceTime < CurrentCourse.MyBestTime_R || CurrentCourse.MyBestTime_R == 0f)
+                {
+                    CurrentCourse.MyBestTime_R = RaceTime;
+                    CurrentCourse.SplitTimes_R = CurrentSplits;
+                }
+            }
             CurrentCourse.TimeReporter.MyLastRace_Reverse = !TrackForward;
             if (TrackForward || !CurrentTrackAllowReverse)//track was finished forward
             {
@@ -217,11 +250,11 @@ namespace SaccFlightAndVehicles
                 string TimeImproved = LastTime < CurrentCourse.MyBestTime_R ? "<color=green>" : "<color=red>";
                 if (Time_text) { Time_text.text = TimeImproved + LastTime.ToString("F3"); }
             }
-            SendCustomEventDelayedSeconds(nameof(SetTimerEmpty), 3);
+            SetTimerEmptyDelayed(3f);
         }
         void OnTriggerEnter(Collider other)
         {
-            if (Time.realtimeSinceStartup - RaceFinishTime < 1f) { return; }
+            if (Time.realtimeSinceStartup - RaceFinishTime < 2f && !CurrentCourse.LoopRace) { return; }
             if (CurrentCourseSelection != -1 && (other && other.gameObject == CurrentCourse.RaceCheckpoints[NextCheckpoint]))
             {
                 if (NextCheckpoint == FinalCheckpoint)//end of the race

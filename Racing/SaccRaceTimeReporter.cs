@@ -61,8 +61,8 @@ namespace SaccFlightAndVehicles
         private float Checking_time;
         private string Checking_vehicle;
         private bool Checking_reverse;
-        public string MyLastVehicle;
-        public string MyLastVehicle_R;
+        public string MyLastVehicle = "None";
+        public string MyLastVehicle_R = "None";
         public bool MyLastRace_Reverse = false;
         public void SetUpCheck()
         {
