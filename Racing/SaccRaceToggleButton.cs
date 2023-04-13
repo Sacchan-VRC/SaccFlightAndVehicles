@@ -24,9 +24,9 @@ namespace SaccFlightAndVehicles
                 for (int i = 0; i < Races.Length; i++)
                 {
                     for (int u = 0; u < Races[i].StartPointFX.Length; u++)
-                    {
-                        Races[i].StartPointFX[u].SetActive(value);
-                    }
+                    { Races[i].StartPointFX[u].SetActive(value); }
+                    for (int u = 0; u < Races[i].EndPointFX.Length; u++)
+                    { Races[i].EndPointFX[u].SetActive(value); }
                 }
                 if (_AutomaticRaceSelection == value) { return; }
                 _AutomaticRaceSelection = value;
@@ -56,6 +56,15 @@ namespace SaccFlightAndVehicles
             set
             {
                 RacesInProgress_ = value > 0;
+                bool FXActive = _AutomaticRaceSelection && !RacesInProgress_;
+                for (int i = 0; i < Races.Length; i++)
+                {
+                    bool ThisRaceActive = FXActive && CurrentCourseSelection != i;
+                    for (int u = 0; u < Races[i].StartPointFX.Length; u++)
+                    { Races[i].StartPointFX[u].SetActive(ThisRaceActive); }
+                    for (int u = 0; u < Races[i].EndPointFX.Length; u++)
+                    { Races[i].EndPointFX[u].SetActive(ThisRaceActive); }
+                }
                 _RacesInProgress = value;
             }
             get => _RacesInProgress;

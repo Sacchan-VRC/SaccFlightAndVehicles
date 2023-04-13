@@ -25,7 +25,6 @@ namespace SaccFlightAndVehicles
             set
             {
                 _TrackForward = value;
-                // SetUpNewRace();
             }
             get => _TrackForward;
         }
@@ -89,12 +88,6 @@ namespace SaccFlightAndVehicles
             if (neg) { secs = -secs; }
             return secs.ToString("F3");
         }
-        public void TESTSTMS()
-        {
-            DBGOUTPUT = SecsToMinsSec(DBGINPUT);
-        }
-        public float DBGINPUT = 1;
-        public string DBGOUTPUT;
         private void Update()
         {
             if (RaceOn)
@@ -257,7 +250,7 @@ namespace SaccFlightAndVehicles
                 }
             }
             RaceTime = 0;
-            SetTimerEmptyDelayed(3f);
+            SetTimerEmptyDelayed(6f);
         }
         void OnTriggerEnter(Collider other)
         {
@@ -365,6 +358,7 @@ namespace SaccFlightAndVehicles
         {
             TurnOffCurrentCheckPoints();
             CurrentCourseSelection = RaceToggler.CurrentCourseSelection;
+            if (Racename_text) { Racename_text.text = RaceToggler.Races[CurrentCourseSelection].RaceName; }
             if (CurrentCourseSelection != -1)
             {
                 CurrentCourse = RaceToggler.Races[CurrentCourseSelection].GetComponent<SaccRaceCourseAndScoreboard>();
@@ -404,8 +398,6 @@ namespace SaccFlightAndVehicles
                 CurrentCourseSelection = -1;
                 return;
             }
-            if (CurrentCourseSelection != -1)
-            { if (Racename_text) { Racename_text.text = RaceToggler.Races[CurrentCourseSelection].RaceName; } }
             SetCourse();
         }
         void OnEnable()//Happens when you get in a vehicle, if a race is enabled
@@ -416,6 +408,7 @@ namespace SaccFlightAndVehicles
         void OnDisable()
         {
             TurnOffCurrentCheckPoints();
+            TimerTextCounter++; SetTimerEmpty();
         }
         public void TurnOffCurrentCheckPoints()
         {
