@@ -290,11 +290,10 @@ namespace SaccFlightAndVehicles
                     UpdateSplitTime(true);
                     ReportTime();
                     LoopFinalSplit = false;
-                    CurrentSplit = 0;
                 }
-                CurrentSplits = new float[CurrentCourse.RaceCheckpoints.Length];
-                //subframe accuracy is done on the first and last checkpoint, the code for the last checkpoint(above) is commented
                 RaceTime = 0;
+                CurrentSplits = new float[CurrentCourse.RaceCheckpoints.Length];
+                CurrentSplit = 0;
 
                 //Debug.Log("Start Race!");
                 RaceStartTime = Time.realtimeSinceStartup - CalcSubFrameTime();

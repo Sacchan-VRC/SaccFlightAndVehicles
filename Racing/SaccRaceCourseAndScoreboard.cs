@@ -273,7 +273,7 @@ namespace SaccFlightAndVehicles
             Times_text.text = LineHeightTxt + "Times\n";
             for (int i = 0; i < PlayerTimes.Length; i++)
             {
-                Times_text.text += PlayerTimes[i].ToString("F3") + "\n";
+                Times_text.text += SecsToMinsSec(PlayerTimes[i]) + "\n";
             }
             Vehicles_text.text = LineHeightTxt + "Vehicles\n";
             for (int i = 0; i < PlayerVehicles.Length; i++)
@@ -289,13 +289,27 @@ namespace SaccFlightAndVehicles
             Times_R_text.text = LineHeightTxt + "Times\n";
             for (int i = 0; i < PlayerTimes_R.Length; i++)
             {
-                Times_R_text.text += PlayerTimes_R[i].ToString("F3") + "\n";
+                Times_R_text.text += SecsToMinsSec(PlayerTimes_R[i]) + "\n";
             }
             Vehicles_R_text.text = LineHeightTxt + "Vehicles\n";
             for (int i = 0; i < PlayerVehicles_R.Length; i++)
             {
                 Vehicles_R_text.text += PlayerVehicles_R[i] + "\n";
             }
+        }
+        private string SecsToMinsSec(float Seconds)
+        {
+            bool neg = false;
+            if (Seconds < 0) { Seconds = -Seconds; neg = true; }
+            float mins = Mathf.Floor(Seconds / 60f);
+            float secs = Seconds % 60f;
+            if (mins > 0)
+            {
+                if (neg) { mins = -mins; }
+                return mins.ToString("F0") + ":" + (secs < 10 ? secs.ToString("F3").PadLeft(6, '0') : secs.ToString("F3"));
+            }
+            if (neg) { secs = -secs; }
+            return secs.ToString("F3");
         }
     }
 }
