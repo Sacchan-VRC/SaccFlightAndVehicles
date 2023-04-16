@@ -371,104 +371,103 @@ namespace SaccFlightAndVehicles
             LastHitBulletDamageMulti = 1;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
         }
-        private void Update()
+        public void InVehicleControls()
         {
-            if (Using)
+            if (!Using) { return; }
+            SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
+            Vector2 LStickPos = Vector2.zero;
+            Vector2 RStickPos = Vector2.zero;
+            float LTrigger = 0;
+            float RTrigger = 0;
+            if (!InEditor)
             {
-                Vector2 LStickPos = Vector2.zero;
-                Vector2 RStickPos = Vector2.zero;
-                float LTrigger = 0;
-                float RTrigger = 0;
-                if (!InEditor)
+                LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+            }
+
+            //LStick Selection wheel
+            if (DoDialLeft && !_DisableLeftDial)
+            {
+                if (InVR && LStickPos.magnitude > DialSensitivity)
                 {
-                    LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                    LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                    RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                    RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                    LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                    RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                    float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
+
+                    stickdir = -(stickdir - 180);
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
+                    if (!LStickNULL[newselection])
+                    { LStickSelection = newselection; }
                 }
-
-                //LStick Selection wheel
-                if (DoDialLeft && !_DisableLeftDial)
+                if (LStickSelection != LStickSelectionLastFrame)
                 {
-                    if (InVR && LStickPos.magnitude > DialSensitivity)
+                    //new function selected, send deselected to old one
+                    if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
                     {
-                        float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
-
-                        stickdir = -(stickdir - 180);
-                        int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
-                        if (!LStickNULL[newselection])
-                        { LStickSelection = newselection; }
+                        Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
-                    if (LStickSelection != LStickSelectionLastFrame)
+                    //get udonbehaviour for newly selected function and then send selected
+                    if (LStickSelection > -1)
                     {
-                        //new function selected, send deselected to old one
-                        if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
+                        if (Dial_Functions_L[LStickSelection] != null)
                         {
-                            Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
+                            Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
-                        //get udonbehaviour for newly selected function and then send selected
-                        if (LStickSelection > -1)
-                        {
-                            if (Dial_Functions_L[LStickSelection] != null)
-                            {
-                                Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
-                            }
-                        }
-                        if (PlaySelectSoundLeft && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
-                        if (LStickDisplayHighlighter)
-                        {
-                            if (LStickSelection < 0)
-                            { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
-                            else
-                            {
-                                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -LStickFuncDegrees * LStickSelection);
-                            }
-                        }
-                        LStickSelectionLastFrame = LStickSelection;
                     }
+                    if (PlaySelectSoundLeft && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (LStickDisplayHighlighter)
+                    {
+                        if (LStickSelection < 0)
+                        { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+                        else
+                        {
+                            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -LStickFuncDegrees * LStickSelection);
+                        }
+                    }
+                    LStickSelectionLastFrame = LStickSelection;
                 }
+            }
 
-                //RStick Selection wheel
-                if (DoDialRight && !_DisableRightDial)
+            //RStick Selection wheel
+            if (DoDialRight && !_DisableRightDial)
+            {
+                if (InVR && RStickPos.magnitude > DialSensitivity)
                 {
-                    if (InVR && RStickPos.magnitude > DialSensitivity)
-                    {
-                        float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
+                    float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
 
-                        stickdir = -(stickdir - 180);
-                        int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
-                        if (!RStickNULL[newselection])
-                        { RStickSelection = newselection; }
-                    }
-                    if (RStickSelection != RStickSelectionLastFrame)
+                    stickdir = -(stickdir - 180);
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
+                    if (!RStickNULL[newselection])
+                    { RStickSelection = newselection; }
+                }
+                if (RStickSelection != RStickSelectionLastFrame)
+                {
+                    //new function selected, send deselected to old one
+                    if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame])
                     {
-                        //new function selected, send deselected to old one
-                        if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame])
-                        {
-                            Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
-                        }
-                        //get udonbehaviour for newly selected function and then send selected
-                        if (RStickSelection > -1)
-                        {
-                            if (Dial_Functions_R[RStickSelection])
-                            {
-                                Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
-                            }
-                        }
-                        if (PlaySelectSoundRight && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
-                        if (RStickDisplayHighlighter)
-                        {
-                            if (RStickSelection < 0)
-                            { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
-                            else
-                            {
-                                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -RStickFuncDegrees * RStickSelection);
-                            }
-                        }
-                        RStickSelectionLastFrame = RStickSelection;
+                        Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
+                    //get udonbehaviour for newly selected function and then send selected
+                    if (RStickSelection > -1)
+                    {
+                        if (Dial_Functions_R[RStickSelection])
+                        {
+                            Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
+                        }
+                    }
+                    if (PlaySelectSoundRight && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (RStickDisplayHighlighter)
+                    {
+                        if (RStickSelection < 0)
+                        { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+                        else
+                        {
+                            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -RStickFuncDegrees * RStickSelection);
+                        }
+                    }
+                    RStickSelectionLastFrame = RStickSelection;
                 }
             }
 
@@ -498,7 +497,7 @@ namespace SaccFlightAndVehicles
             else
             {
                 if (Time.time - LastJumpInput < .3f)
-                { ExitStation(); }
+                { ExitStation(); return; }
                 LastJumpInput = Time.time;
             }
         }
@@ -536,7 +535,7 @@ namespace SaccFlightAndVehicles
         }
         public void PilotEnterVehicleLocal()//called from PilotSeat
         {
-            Using = true;
+            Using = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             Piloting = true;
             InVehicle = true;
             Occupied = true;
