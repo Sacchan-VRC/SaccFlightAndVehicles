@@ -50,6 +50,8 @@ namespace SaccFlightAndVehicles
         public AudioSource HookReelIn;
         public GameObject[] EnableOnSelect;
         public bool HandHeldGunMode;
+        [Tooltip("Apply force at player instead of gun (prevent player from 'pulling' themself faster for competitive)")]
+        public bool DisablePulling = false;
         [Tooltip("If player drops gun in the air, teleport it to them until they land?")]
         public bool MoveGunToSelfOnAirDrop = true;
         [Tooltip("How heavy the player is for interactions with rigidbodies")]
@@ -350,18 +352,29 @@ namespace SaccFlightAndVehicles
             {
                 if (Physics.Raycast(Hook.position, LaunchVec, out hookhit, LaunchSpeed * Time.deltaTime, HookLayers, QueryTriggerInteraction.Ignore))
                 {
-                    float checklength = Vector3.Distance(HookLaunchPoint.position, hookhit.point);
+                    float checklength;
+                    if (HandHeldGunMode && DisablePulling)
+                    { checklength = Vector3.Distance((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f, hookhit.point); }
+                    else
+                    { checklength = Vector3.Distance(HookLaunchPoint.position, hookhit.point); }
                     if (checklength < HookRange)
                     {
                         HookAttachPoint = hookhit.point;
                         if (HookAttachConfirm) { HookAttachConfirm.Play(); }
                         RequestSerialization();
                         Hook.position = hookhit.point;
+                        if (HandHeldGunMode && DisablePulling)
+                        { HookLength = Vector3.Distance((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f, _HookAttachPoint); }
+                        else
+                        { HookLength = Vector3.Distance(HookLaunchPoint.position, Hook.position); }
                         return;
                     }
                 }
                 Hook.position += LaunchVec * Time.deltaTime;
-                HookLength = Vector3.Distance(HookLaunchPoint.position, Hook.position);
+                if (HandHeldGunMode && DisablePulling)
+                { HookLength = Vector3.Distance((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f, Hook.position); }
+                else
+                { HookLength = Vector3.Distance(HookLaunchPoint.position, Hook.position); }
                 if (HookLength > HookRange)
                 {
                     HookLaunched = false;
@@ -438,7 +451,11 @@ namespace SaccFlightAndVehicles
                 }
                 Hook.position = _HookAttachPoint = HookedTransform.TransformPoint(HookedTransformOffset);
 
-                float dist = Vector3.Distance(HookLaunchPoint.position, _HookAttachPoint);
+                float dist;
+                if (HandHeldGunMode && DisablePulling)
+                { dist = Vector3.Distance((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f, _HookAttachPoint); }
+                else
+                { dist = Vector3.Distance(HookLaunchPoint.position, _HookAttachPoint); }
                 float PullReduction = 0f;
 
                 float SwingForce = dist - HookLength;
@@ -738,7 +755,9 @@ namespace SaccFlightAndVehicles
                     Vector3 checkdir = (((HandHeldGunMode ? playervel : VehicleRB ? VehicleRB.velocity : Vector3.zero)) + (HookLaunchPoint.forward * HookSpeed)).normalized;
                     RaycastHit targetcheck;
                     Vector3 predictedhookflight = checkdir * HookRange + playervel * AprHookFlyTime;
-                    if (Physics.Raycast(HookLaunchPoint.position, checkdir, out targetcheck, predictedhookflight.magnitude, HookLayers, QueryTriggerInteraction.Ignore))
+                    float predictedflightdist = predictedhookflight.magnitude;
+                    if (DisablePulling && HandHeldGunMode) { predictedflightdist -= (HookLaunchPoint.position - ((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f)).magnitude; }
+                    if (Physics.Raycast(HookLaunchPoint.position, checkdir, out targetcheck, predictedflightdist, HookLayers, QueryTriggerInteraction.Ignore))
                     {
                         if (GrappleAnimator) { GrappleAnimator.SetBool("hitpredicted", true); }
                         if (PredictedHitPoint)
@@ -764,7 +783,7 @@ namespace SaccFlightAndVehicles
         }
         public override void OnPlayerRespawn(VRCPlayerApi player)
         {
-            if (IsOwner && player.isLocal)
+            if (player.isLocal && IsOwner)
             {
                 if (_HookLaunched)
                 { HookLaunched = false; RequestSerialization(); }
