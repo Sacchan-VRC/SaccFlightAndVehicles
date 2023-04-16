@@ -852,6 +852,12 @@ namespace SaccFlightAndVehicles
 
             return finalResult;
         }
+        public void SetDeadFor(float deadtime)
+        {
+            dead = true;
+            SendCustomEventDelayedSeconds(nameof(UnsetSetDead), deadtime);
+        }
+        public void UnsetSetDead() { dead = false; }
         public void SendDamageEvent(int dmg, bool More)
         {
             if (More)//More than default damage
