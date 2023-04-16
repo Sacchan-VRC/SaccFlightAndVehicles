@@ -114,7 +114,10 @@ namespace SaccFlightAndVehicles
                     {
                         if (!EntityControl._dead)
                         {
-                            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(JustEngineOn)); }
+                            if (!(bool)SAVControl.GetProgramVariable("_EngineOn") && !(bool)SAVControl.GetProgramVariable("_PreventEngineToggle"))
+                            {
+                                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(JustEngineOn)); }
+                            }
                         }
                     }
                 }
@@ -148,10 +151,13 @@ namespace SaccFlightAndVehicles
         }
         public void EngineOn()
         {
-            ToggleTime = Time.time;
-            SAVControl.SetProgramVariable("_EngineOn", true);
-            if (DoEngineStartupAnimBool)
-            { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
+            if (!(bool)SAVControl.GetProgramVariable("_EngineOn") && !(bool)SAVControl.GetProgramVariable("_PreventEngineToggle"))
+            {
+                ToggleTime = Time.time;
+                SAVControl.SetProgramVariable("_EngineOn", true);
+                if (DoEngineStartupAnimBool)
+                { EngineAnimator.SetBool(AnimEngineStartupAnimBool, true); }
+            }
         }
         public void JustEngineOn()
         {
@@ -159,7 +165,7 @@ namespace SaccFlightAndVehicles
         }
         public void EngineOff()
         {
-            if ((bool)SAVControl.GetProgramVariable("_EngineOn"))
+            if ((bool)SAVControl.GetProgramVariable("_EngineOn") && !(bool)SAVControl.GetProgramVariable("_PreventEngineToggle"))
             {
                 ToggleTime = Time.time - StartUpTime;
                 SAVControl.SetProgramVariable("_EngineOn", false);

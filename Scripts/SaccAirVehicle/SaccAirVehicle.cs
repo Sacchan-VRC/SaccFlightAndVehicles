@@ -322,16 +322,14 @@ namespace SaccFlightAndVehicles
             }
             get => _EngineOn;
         }
-        public void SFEXT_G_SetEngineOn() { EngineOn = true; }
-        public void SFEXT_G_SetEngineOff() { EngineOn = false; }
         public void SFEXT_L_SetEngineOn()//send this event from other scripts locally to turn engine on for everyone (grapple uses it)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn)); }
         public void SFEXT_L_SetEngineOff()
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff)); }
         public void SetEngineOn()
-        { EntityControl.SendEventToExtensions("SFEXT_G_SetEngineOn"); }
+        { EngineOn = true; EntityControl.SendEventToExtensions("SFEXT_G_SetEngineOn"); }
         public void SetEngineOff()
-        { EntityControl.SendEventToExtensions("SFEXT_G_SetEngineOff"); }
+        { EngineOn = false; EntityControl.SendEventToExtensions("SFEXT_G_SetEngineOff"); }
         [System.NonSerializedAttribute] public float AllGs;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
@@ -589,6 +587,25 @@ namespace SaccFlightAndVehicles
             get => JoystickOverridden;
         }
         [System.NonSerializedAttribute] public Vector3 JoystickOverride;
+        [System.NonSerializedAttribute] public bool _PreventEngineToggle;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(PreventEngineToggle_))] public int PreventEngineToggle = 0;
+        public int PreventEngineToggle_
+        {
+            set
+            {
+                if (value > 0 && PreventEngineToggle == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_PreventEngineToggle_Activated");
+                }
+                else if (value == 0 && PreventEngineToggle > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_PreventEngineToggle_Deactivated");
+                }
+                _PreventEngineToggle = value > 0;
+                PreventEngineToggle = value;
+            }
+            get => PreventEngineToggle;
+        }
 
 
         [System.NonSerializedAttribute] public int ReSupplied = 0;
@@ -2051,7 +2068,7 @@ namespace SaccFlightAndVehicles
             AllGs = 0;
             VehicleRigidbody.velocity = CurrentVel;
             LastFrameVel = CurrentVel;
-            if (EngineOnOnEnter && Fuel > 0)
+            if (EngineOnOnEnter && Fuel > 0 && !_PreventEngineToggle)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
             }
@@ -2092,7 +2109,7 @@ namespace SaccFlightAndVehicles
             Pitching = Vector3.zero;
             Yawing = Vector3.zero;
             if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
-            if (EngineOffOnExit)
+            if (EngineOffOnExit && _PreventEngineToggle)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
                 ThrottleInput = 0; ;
