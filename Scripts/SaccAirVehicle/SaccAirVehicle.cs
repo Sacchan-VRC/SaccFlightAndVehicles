@@ -57,7 +57,7 @@ namespace SaccFlightAndVehicles
         public Vector3 MaxJoyAngles = new Vector3(45, 45, 45);
         [Tooltip("Joystick pitch input to be a slider-style yoke.")]
         public bool JoystickPushPullPitch = false;
-        [Tooltip("Joystick sensitivity for adove option.")]
+        [Tooltip("Joystick sensitivity for above option.")]
         public float JoystickPushPullDistance = 0.2f;
         [Tooltip("How far down you have to push the grip button to grab the joystick and throttle")]
         public float GripSensitivity = .75f;
@@ -413,7 +413,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool Asleep;
         private bool Initialized;
         [System.NonSerializedAttribute] public bool IsAirVehicle = true;//could be checked by any script targeting/checking this vehicle to see if it is the kind of vehicle they're looking for
-        [System.NonSerializedAttribute] public bool dead = false;
         [System.NonSerializedAttribute] public float FullGunAmmo;
         //use these for whatever, Only MissilesIncomingHeat is used by the prefab
         [System.NonSerializedAttribute] public int MissilesIncomingHeat = 0;
@@ -758,7 +757,7 @@ namespace SaccFlightAndVehicles
                     //G/crash Damage
                     if (GDamageToTake > 0)
                     {
-                        Health -= GDamageToTake * DeltaTime * GDamage;//take damage of GDamage per second per G above MaxGs
+                        Health -= GDamageToTake * .01f * GDamage;//take damage of GDamage per second per G above MaxGs
                         GDamageToTake = 0;
                     }
                     if (Health <= 0f)//vehicle is ded
@@ -2069,10 +2068,6 @@ namespace SaccFlightAndVehicles
             Occupied = false;
             RotationInputs = Vector3.zero;
         }
-        public void SFEXT_G_NotDead()
-        { dead = false; }
-        public void SFEXT_G_Dead()
-        { dead = true; }
         public void SFEXT_O_PilotExit()
         {
             //zero control values
