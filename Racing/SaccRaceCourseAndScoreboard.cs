@@ -39,13 +39,13 @@ namespace SaccFlightAndVehicles
             if (!MyLastTime_text) { return; }
             if (TimeReporter._MyLastTime != 0f)
             {
-                MyLastTime_text.text = MyLastTime = "My Last Time : " + TimeReporter._MyLastTime.ToString("F3") + " In: " + TimeReporter.MyLastVehicle.ToString();
+                MyLastTime_text.text = MyLastTime = "My Last Time : " + SecsToMinsSec(TimeReporter._MyLastTime) + " In: " + TimeReporter.MyLastVehicle.ToString();
             }
             else { MyLastTime_text.text = string.Empty; }
             if (!MyLastTime_R_text) { return; }
             if (AllowReverse && TimeReporter._MyLastTime_R != 0f)
             {
-                MyLastTime_R_text.text = MyLastTime_R = "My Last Time : " + TimeReporter._MyLastTime_R.ToString("F3") + " In: " + TimeReporter.MyLastVehicle_R.ToString();
+                MyLastTime_R_text.text = MyLastTime_R = "My Last Time : " + SecsToMinsSec(TimeReporter._MyLastTime_R) + " In: " + TimeReporter.MyLastVehicle_R.ToString();
             }
             else { MyLastTime_R_text.text = string.Empty; }
         }
