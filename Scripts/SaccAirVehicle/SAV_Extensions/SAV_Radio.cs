@@ -15,6 +15,7 @@ public class SAV_Radio : UdonSharpBehaviour
     private bool Initialized;
     private VRCPlayerApi localPlayer;
     private int CurrentOwnerID;
+    private bool ChannelSwapped;
     public void Init()
     {
         Initialized = true;
@@ -35,6 +36,18 @@ public class SAV_Radio : UdonSharpBehaviour
     {
         EnterVehicle();
     }
+    public void SFEXT_G_PilotEnter()
+    {
+        if (EntityControl.Passenger) { SendCustomEventDelayedSeconds(nameof(UpdateChannel), 2); }
+    }
+    public void UpdateChannel()
+    {
+        if (!EntityControl.Piloting)
+        {
+            ChannelSwapped = true;
+            RadioBase.SetProgramVariable("CurrentChannel", Channel);
+        }
+    }
     public void SFEXT_O_PilotExit()
     {
         ExitVehicle();
@@ -51,13 +64,15 @@ public class SAV_Radio : UdonSharpBehaviour
     {
         if (RadioBase)
         {
+            //if not pilot, set my channel on radiobase to vehicle's and set back on exit
+            UpdateChannel();
             RadioBase.SetProgramVariable("MyVehicleSetTimes", (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") + 1);
             RadioBase.SetProgramVariable("MyVehicle", EntityControl);
             if (EntityControl.IsOwner)
             {
                 RadioOn = (bool)RadioBase.GetProgramVariable("RadioEnabled");
                 if (RadioOn)
-                { Channel = (byte)RadioBase.GetProgramVariable("Channel"); }
+                { Channel = (byte)RadioBase.GetProgramVariable("MyChannel"); }
                 else
                 { Channel = 0; }
                 RequestSerialization();
@@ -68,6 +83,11 @@ public class SAV_Radio : UdonSharpBehaviour
     {
         if (RadioBase)
         {
+            if (ChannelSwapped)
+            {
+                ChannelSwapped = false;
+                RadioBase.SetProgramVariable("CurrentChannel", (byte)RadioBase.GetProgramVariable("MyChannel"));
+            }
             int mvst = (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") - 1;
             RadioBase.SetProgramVariable("MyVehicleSetTimes", mvst);
             if (mvst == 0)

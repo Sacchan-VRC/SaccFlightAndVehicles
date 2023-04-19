@@ -3,10 +3,11 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
+using TMPro;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SaccRadioZone : UdonSharpBehaviour
     {
         [Header("Stand inside the radius to enable radio, can be attached to a moving object")]
@@ -14,11 +15,24 @@ namespace SaccFlightAndVehicles
         public float ZoneRadius;
         public VRCPlayerApi[] playersinside = new VRCPlayerApi[100];
         [System.NonSerialized] public int numPlayersInside = 0;
+        public TextMeshProUGUI ChannelText;
+        [UdonSynced, SerializeField, FieldChangeCallback(nameof(Channel))] private byte _Channel = 1;
+        public byte Channel
+        {
+            set
+            {
+                _Channel = value;
+                if (InZone) { SetAllVoicesDefault(); UpdateChannel(); }
+                if (ChannelText) { ChannelText.text = value.ToString(); }
+            }
+            get => _Channel;
+        }
         int nextplayer;
         float VoiceNear;
         float VoiceFar;
         float VoiceGain;
         bool InZone;
+        private bool ChannelSwapped;
         void Start()
         {
             SendCustomEventDelayedFrames(nameof(CheckPlayersInside), Random.Range(0, 7));
@@ -39,7 +53,10 @@ namespace SaccFlightAndVehicles
             if (Vector3.Distance(nextAPI.GetPosition(), transform.position) < ZoneRadius)
             {
                 if (nextAPI.isLocal)
-                { RadioBase.MyZone = this; InZone = true; }
+                {
+                    RadioBase.MyZone = this; InZone = true;
+                    UpdateChannel();
+                }
                 else
                 { AddPlayer(nextAPI); }
             }
@@ -52,11 +69,22 @@ namespace SaccFlightAndVehicles
                         RadioBase.MyZone = null;
                         InZone = false;
                         SetAllVoicesDefault();
+                        ResetChannel();
                     }
                 }
                 else
                 { RemovePlayer(nextAPI); }
             }
+        }
+        public void UpdateChannel()
+        {
+            ChannelSwapped = true;
+            RadioBase.SetProgramVariable("CurrentChannel", _Channel);
+        }
+        public void ResetChannel()
+        {
+            ChannelSwapped = false;
+            RadioBase.SetProgramVariable("CurrentChannel", (byte)RadioBase.GetProgramVariable("MyCHannel"));
         }
         public void SetAllVoicesDefault()
         {
@@ -120,6 +148,20 @@ namespace SaccFlightAndVehicles
         private void OnDrawGizmos()
         {
             Gizmos.DrawWireSphere(transform.position, ZoneRadius);
+        }
+        public void IncreaseChannel()
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            if (Channel + 1 > 16) { return; }
+            Channel++;
+            RequestSerialization();
+        }
+        public void DecreaseChannel()
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            if (Channel - 1 < 1) { return; }
+            Channel--;
+            RequestSerialization();
         }
     }
 }
