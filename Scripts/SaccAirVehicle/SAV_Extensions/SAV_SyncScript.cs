@@ -182,7 +182,6 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.drag = 9999;
                 VehicleRigid.angularDrag = 9999;
             }
-            ResetSyncTimes();
             O_LastUpdateTime = L_UpdateTime = lastframetime = lastframetime_extrap = Networking.GetServerTimeInMilliseconds();
             O_LastUpdateTime -= updateInterval;
             EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
@@ -191,6 +190,7 @@ namespace SaccFlightAndVehicles
         }
         public void ActivateScript()
         {
+            ResetSyncTimes();
             gameObject.SetActive(true);
             VehicleRigid.constraints = RigidbodyConstraints.None;
             SetPhysics();
