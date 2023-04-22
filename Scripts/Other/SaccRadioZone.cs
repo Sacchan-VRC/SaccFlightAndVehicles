@@ -84,7 +84,7 @@ namespace SaccFlightAndVehicles
         public void ResetChannel()
         {
             ChannelSwapped = false;
-            RadioBase.SetProgramVariable("CurrentChannel", (byte)RadioBase.GetProgramVariable("MyCHannel"));
+            RadioBase.SetProgramVariable("CurrentChannel", (byte)RadioBase.GetProgramVariable("MyChannel"));
         }
         public void SetAllVoicesDefault()
         {

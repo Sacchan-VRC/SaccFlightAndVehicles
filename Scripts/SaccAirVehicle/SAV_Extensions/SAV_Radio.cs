@@ -11,6 +11,7 @@ public class SAV_Radio : UdonSharpBehaviour
     public SaccEntity EntityControl;
     public UdonSharpBehaviour RadioBase;
     public bool RadioOn = true;
+    [Header("Debug:")]
     [UdonSynced] public byte Channel = 0;
     private bool Initialized;
     private VRCPlayerApi localPlayer;
@@ -42,7 +43,7 @@ public class SAV_Radio : UdonSharpBehaviour
     }
     public void UpdateChannel()
     {
-        if (!EntityControl.Piloting)
+        if (!EntityControl.Using)
         {
             ChannelSwapped = true;
             RadioBase.SetProgramVariable("CurrentChannel", Channel);
