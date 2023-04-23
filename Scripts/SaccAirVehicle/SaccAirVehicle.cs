@@ -278,21 +278,20 @@ namespace SaccFlightAndVehicles
                         EntityControl.SendEventToExtensions("SFEXT_G_EngineOn");
                         VehicleAnimator.SetBool("EngineOn", true);
                         WakeUp();
-                    }
 
+                        PitchThrustVecMulti = PitchThrustVecMultiStart;
+                        YawThrustVecMulti = YawThrustVecMultiStart;
+                        RollThrustVecMulti = RollThrustVecMultiStart;
+                        ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
+                        ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
+                        ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
 
-                    PitchThrustVecMulti = PitchThrustVecMultiStart;
-                    YawThrustVecMulti = YawThrustVecMultiStart;
-                    RollThrustVecMulti = RollThrustVecMultiStart;
-                    ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
-                    ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
-                    ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
-
-                    //replaces StickyWheelWorkaround
-                    if (HasWheelColliders)
-                    {
-                        foreach (WheelCollider wheel in VehicleWheelColliders)
-                        { wheel.motorTorque = 0.00000000000000000000000000000000001f; }
+                        //replaces StickyWheelWorkaround
+                        if (HasWheelColliders)
+                        {
+                            foreach (WheelCollider wheel in VehicleWheelColliders)
+                            { wheel.motorTorque = 0.00000000000000000000000000000000001f; }
+                        }
                     }
                 }
                 else
@@ -302,20 +301,19 @@ namespace SaccFlightAndVehicles
                         EntityControl.SendEventToExtensions("SFEXT_G_EngineOff");
                         Taxiinglerper = 0;
                         VehicleAnimator.SetBool("EngineOn", false);
-                    }
 
+                        PitchThrustVecMulti = 0;
+                        YawThrustVecMulti = 0;
+                        RollThrustVecMulti = 0;
+                        ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
+                        ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
+                        ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
 
-                    PitchThrustVecMulti = 0;
-                    YawThrustVecMulti = 0;
-                    RollThrustVecMulti = 0;
-                    ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
-                    ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
-                    ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
-
-                    if (HasWheelColliders)
-                    {
-                        foreach (WheelCollider wheel in VehicleWheelColliders)
-                        { wheel.motorTorque = 0; }
+                        if (HasWheelColliders)
+                        {
+                            foreach (WheelCollider wheel in VehicleWheelColliders)
+                            { wheel.motorTorque = 0; }
+                        }
                     }
                 }
                 _EngineOn = value;
@@ -1388,7 +1386,7 @@ namespace SaccFlightAndVehicles
             if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
             FallAsleep();
             EntityControl.dead = true;
-            EngineOn = false;
+            SetEngineOff();
             PlayerThrottle = 0;
             ThrottleInput = 0;
             EngineOutput = 0;
@@ -1810,7 +1808,7 @@ namespace SaccFlightAndVehicles
         {
             if (_EngineOn)
             {
-                EngineOn = false;
+                SetEngineOff();
                 PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;
             }
             if (HasAfterburner) { SetAfterburnerOff(); }
