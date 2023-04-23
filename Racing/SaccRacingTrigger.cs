@@ -357,9 +357,9 @@ namespace SaccFlightAndVehicles
         {
             TurnOffCurrentCheckPoints();
             CurrentCourseSelection = RaceToggler.CurrentCourseSelection;
-            if (Racename_text) { Racename_text.text = RaceToggler.Races[CurrentCourseSelection].RaceName; }
             if (CurrentCourseSelection != -1)
             {
+                if (Racename_text) { Racename_text.text = RaceToggler.Races[CurrentCourseSelection].RaceName; }
                 CurrentCourse = RaceToggler.Races[CurrentCourseSelection].GetComponent<SaccRaceCourseAndScoreboard>();
                 CurrentTrackAllowReverse = CurrentCourse.AllowReverse;
                 if (TrackForward || !CurrentTrackAllowReverse)

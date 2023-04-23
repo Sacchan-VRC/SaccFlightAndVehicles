@@ -86,6 +86,7 @@ namespace SaccFlightAndVehicles
                     { RaceTrig.gameObject.SetActive(true); }
                 }
             }
+            AutomaticRaceSelection = _AutomaticRaceSelection;
             if (AutomaticRaceSelection)
             { RaceSelectionLoop(); }
             else
@@ -203,7 +204,7 @@ namespace SaccFlightAndVehicles
             float checkdistend = Vector3.Distance(Races[AutoEnableRace_NextRace].RaceCheckpoints[Races[AutoEnableRace_NextRace].RaceCheckpoints.Length - 1].transform.position, Networking.LocalPlayer.GetPosition());
             if (checkdiststart < checkdistend || !Races[AutoEnableRace_NextRace].AllowReverse || Races[AutoEnableRace_NextRace].LoopRace)
             {
-                if (checkdiststart < ClosestRaceDist)
+                if (checkdiststart < ClosestRaceDist && checkdiststart < Races[AutoEnableRace_NextRace].Autotoggler_EnableDist_Forward)
                 {
                     if (Races[AutoEnableRace_NextRace].LoopRace)
                     {
@@ -225,7 +226,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                if (checkdistend < ClosestRaceDist)
+                if (checkdistend < ClosestRaceDist && checkdistend < Races[AutoEnableRace_NextRace].Autotoggler_EnableDist_Reverse)
                 {
                     ClosestRaceDist = checkdistend;
                     ClosestRace_forward = false;
@@ -242,15 +243,18 @@ namespace SaccFlightAndVehicles
                 else if (!ClosestRace_forward && !Reverse)
                 { SetTrack_Reverse(); }
 
-                if (ClosestRace_forward || Races[ClosestRace].LoopRace)
+                if (ClosestRace > -1)
                 {
-                    if (ClosestRaceDist > Races[ClosestRace].Autotoggler_EnableDist_Forward)
-                    { ClosestRace = -1; }
-                }
-                else
-                {
-                    if (ClosestRaceDist > Races[ClosestRace].Autotoggler_EnableDist_Reverse)
-                    { ClosestRace = -1; }
+                    if (ClosestRace_forward || Races[ClosestRace].LoopRace)
+                    {
+                        if (ClosestRaceDist > Races[ClosestRace].Autotoggler_EnableDist_Forward)
+                        { ClosestRace = -1; }
+                    }
+                    else
+                    {
+                        if (ClosestRaceDist > Races[ClosestRace].Autotoggler_EnableDist_Reverse)
+                        { ClosestRace = -1; }
+                    }
                 }
                 bool coursechanged = CurrentCourseSelection != ClosestRace;
                 if (coursechanged)
