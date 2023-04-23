@@ -175,7 +175,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 2088120759931859403}
-  - {fileID: 7218327389853417816}
+  - {fileID: 383121887723072762}
   m_Father: {fileID: 4895705958288998379}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -423,6 +423,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7631671217672649820}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3715591802870470323
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 383121887723072762}
+  m_Layer: 13
+  m_Name: LaserRotator
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &383121887723072762
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3715591802870470323}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.098999836, z: 0.2332482}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 7218327389853417816}
+  m_Father: {fileID: 3578168801157195038}
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4895705956742534295
 GameObject:
@@ -1660,11 +1691,11 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8242504159182647689}
   m_LocalRotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0.099, z: 2.228}
+  m_LocalPosition: {x: 0, y: 0, z: 1.9947522}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 3578168801157195038}
-  m_RootOrder: 1
+  m_Father: {fileID: 383121887723072762}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!198 &3126991216776750563
 ParticleSystem:
@@ -1856,7 +1887,7 @@ ParticleSystem:
       serializedVersion: 2
       minMaxState: 0
       minColor: {r: 1, g: 1, b: 1, a: 1}
-      maxColor: {r: 1, g: 0, b: 0, a: 1}
+      maxColor: {r: 0, g: 1, b: 0, a: 1}
       maxGradient:
         serializedVersion: 2
         key0: {r: 1, g: 1, b: 1, a: 1}
@@ -11312,6 +11343,7 @@ MonoBehaviour:
   MoveGunToSelfOnAirDrop: 1
   PlayerMass: 150
   DisableOnPickup: []
+  TargetingLaser: {fileID: 383121887723072762}
   PredictedHitPoint: {fileID: 545477308762061883}
 --- !u!114 &6641467028475506691
 MonoBehaviour:
@@ -11418,18 +11450,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 43bcddf8198c7b845b9ad9014804953e, type: 3}
---- !u!23 &5563456467786658674 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -1400085464352517348, guid: 43bcddf8198c7b845b9ad9014804953e,
-    type: 3}
-  m_PrefabInstance: {fileID: 2424268788855824494}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &5835004629026401672 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 8169145260055825894, guid: 43bcddf8198c7b845b9ad9014804953e,
-    type: 3}
-  m_PrefabInstance: {fileID: 2424268788855824494}
-  m_PrefabAsset: {fileID: 0}
 --- !u!23 &3919589901723761898 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 43bcddf8198c7b845b9ad9014804953e,
@@ -11439,6 +11459,18 @@ MeshRenderer:
 --- !u!4 &2751139596374640517 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 43bcddf8198c7b845b9ad9014804953e,
+    type: 3}
+  m_PrefabInstance: {fileID: 2424268788855824494}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &5563456467786658674 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -1400085464352517348, guid: 43bcddf8198c7b845b9ad9014804953e,
+    type: 3}
+  m_PrefabInstance: {fileID: 2424268788855824494}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5835004629026401672 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8169145260055825894, guid: 43bcddf8198c7b845b9ad9014804953e,
     type: 3}
   m_PrefabInstance: {fileID: 2424268788855824494}
   m_PrefabAsset: {fileID: 0}

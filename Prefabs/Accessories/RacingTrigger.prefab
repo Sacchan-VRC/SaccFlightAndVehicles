@@ -312,7 +312,6 @@ MonoBehaviour:
   Racename_text: {fileID: 4224810569086307015}
   Time_text: {fileID: 6992835223295058443}
   SplitTime_text: {fileID: 4828753004649965444}
-  NextCheckpoint: 0
 --- !u!114 &2427669004923879690
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -642,7 +641,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0.0167}
-  m_SizeDelta: {x: 0.104, y: 0.016}
+  m_SizeDelta: {x: 0.104, y: 0.02}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8906529873376576864
 CanvasRenderer:
@@ -701,9 +700,9 @@ MonoBehaviour:
   m_fontSize: 0.015
   m_fontSizeBase: 0.015
   m_fontWeight: 400
-  m_enableAutoSizing: 0
-  m_fontSizeMin: 18
-  m_fontSizeMax: 72
+  m_enableAutoSizing: 1
+  m_fontSizeMin: 0.01
+  m_fontSizeMax: 0.05
   m_fontStyle: 0
   m_HorizontalAlignment: 1
   m_VerticalAlignment: 512
@@ -714,9 +713,9 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_enableWordWrapping: 0
   m_wordWrappingRatios: 0.4
-  m_overflowMode: 0
+  m_overflowMode: 1
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
