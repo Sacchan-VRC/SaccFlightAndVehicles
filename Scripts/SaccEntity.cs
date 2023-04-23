@@ -373,8 +373,16 @@ namespace SaccFlightAndVehicles
         }
         public void InVehicleControls()
         {
-            if (!Using) { return; }
+            if (!InVehicle) { return; }
             SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
+            if (Input.GetKeyDown(KeyCode.Return))
+            {
+                if (!InEditor)
+                {
+                    ExitVehicleCheck();
+                }
+            }
+            if (!Piloting) { return; }
             Vector2 LStickPos = Vector2.zero;
             Vector2 RStickPos = Vector2.zero;
             float LTrigger = 0;
@@ -535,9 +543,9 @@ namespace SaccFlightAndVehicles
         }
         public void PilotEnterVehicleLocal()//called from PilotSeat
         {
-            Using = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
+            Using = true;
             Piloting = true;
-            InVehicle = true;
+            InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             Occupied = true;
             if (LStickNumFuncs == 1)
             {
@@ -599,7 +607,7 @@ namespace SaccFlightAndVehicles
         public void PassengerEnterVehicleLocal()
         {
             Passenger = true;
-            InVehicle = true;
+            InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             if (LStickDisplayHighlighter)
             { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             if (RStickDisplayHighlighter)
