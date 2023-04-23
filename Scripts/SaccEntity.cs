@@ -520,7 +520,7 @@ namespace SaccFlightAndVehicles
             if (player.isLocal)
             {
                 IsOwner = true;
-                if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
+                TakeOwnerShipOfExtensions();
                 SendEventToExtensions("SFEXT_O_TakeOwnership");
             }
             else
@@ -556,8 +556,11 @@ namespace SaccFlightAndVehicles
             if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
             for (int i = 0; i < EnableInVehicle.Length; i++)
             { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(true); }
-            Networking.SetOwner(localPlayer, gameObject);
-            if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
+            if (!_DisallowOwnerShipTransfer)
+            {
+                Networking.SetOwner(localPlayer, gameObject);
+                TakeOwnerShipOfExtensions();
+            }
             SendEventToExtensions("SFEXT_O_PilotEnter");
         }
         public void PilotEnterVehicleGlobal(VRCPlayerApi player)
@@ -735,7 +738,7 @@ namespace SaccFlightAndVehicles
         }
         public void TakeOwnerShipOfExtensions()
         {
-            if (!_DisallowOwnerShipTransfer && !InEditor)
+            if (!InEditor)
             {
                 foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
