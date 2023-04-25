@@ -58,6 +58,8 @@ namespace SaccFlightAndVehicles
         public float PlayerMass = 150f;
         [Tooltip("Disable these objects whilst object is held (SaccFlight?)")]
         public GameObject[] DisableOnPickup;
+        [Tooltip("Object that points towards launch direction")]
+        public Transform TargetingLaser;
         private float HookLaunchTime;
         public Transform PredictedHitPoint;
         private float AprHookFlyTime;
@@ -81,6 +83,7 @@ namespace SaccFlightAndVehicles
         private bool KeepingHEAwake = false;
         private bool Overriding_DisallowOwnerShipTransfer = false;
         private Vector3 PredictedHitPointStartScale;
+        private Vector3 HoldHeight;
         public override void OnDeserialization()
         {
             if (_HookLaunched != _HookLaunchedPrev)
@@ -354,7 +357,7 @@ namespace SaccFlightAndVehicles
                 {
                     float checklength;
                     if (HandHeldGunMode && DisablePulling)
-                    { checklength = Vector3.Distance((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f, hookhit.point); }
+                    { checklength = Vector3.Distance(localPlayer.GetPosition() + HoldHeight, hookhit.point); }
                     else
                     { checklength = Vector3.Distance(HookLaunchPoint.position, hookhit.point); }
                     if (checklength < HookRange)
@@ -364,7 +367,7 @@ namespace SaccFlightAndVehicles
                         RequestSerialization();
                         Hook.position = hookhit.point;
                         if (HandHeldGunMode && DisablePulling)
-                        { HookLength = Vector3.Distance((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f, _HookAttachPoint); }
+                        { HookLength = Vector3.Distance(localPlayer.GetPosition() + HoldHeight, _HookAttachPoint); }
                         else
                         { HookLength = Vector3.Distance(HookLaunchPoint.position, Hook.position); }
                         return;
@@ -372,7 +375,7 @@ namespace SaccFlightAndVehicles
                 }
                 Hook.position += LaunchVec * Time.deltaTime;
                 if (HandHeldGunMode && DisablePulling)
-                { HookLength = Vector3.Distance((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f, Hook.position); }
+                { HookLength = Vector3.Distance(localPlayer.GetPosition() + HoldHeight, Hook.position); }
                 else
                 { HookLength = Vector3.Distance(HookLaunchPoint.position, Hook.position); }
                 if (HookLength > HookRange)
@@ -452,10 +455,20 @@ namespace SaccFlightAndVehicles
                 Hook.position = _HookAttachPoint = HookedTransform.TransformPoint(HookedTransformOffset);
 
                 float dist;
+                Vector3 forceDirection;
+                Vector3 holdpos;
                 if (HandHeldGunMode && DisablePulling)
-                { dist = Vector3.Distance((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f, _HookAttachPoint); }
+                {
+                    holdpos = localPlayer.GetPosition() + HoldHeight;
+                    dist = Vector3.Distance(holdpos, _HookAttachPoint);
+                    forceDirection = (_HookAttachPoint - holdpos).normalized;
+                }
                 else
-                { dist = Vector3.Distance(HookLaunchPoint.position, _HookAttachPoint); }
+                {
+                    holdpos = HookLaunchPoint.position;
+                    dist = Vector3.Distance(holdpos, _HookAttachPoint);
+                    forceDirection = (_HookAttachPoint - HookLaunchPoint.position).normalized;
+                }
                 float PullReduction = 0f;
 
                 float SwingForce = dist - HookLength;
@@ -467,7 +480,6 @@ namespace SaccFlightAndVehicles
                 else { SwingForce *= SwingStrength; }
                 HookLength = Mathf.Min(dist, HookRange);
 
-                Vector3 forceDirection = (_HookAttachPoint - HookLaunchPoint.position).normalized;
                 float WeightRatio = 1;
 
                 if (HookedRB && !HookedRB.isKinematic)
@@ -483,7 +495,7 @@ namespace SaccFlightAndVehicles
                         else
                         { WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass); }
                     }
-                    Vector3 forceDirection_HookedRB = (HookLaunchPoint.position - _HookAttachPoint).normalized;
+                    Vector3 forceDirection_HookedRB = -forceDirection;
                     HookedRB.AddForceAtPosition((forceDirection_HookedRB * HookStrength * PullStrOverDist.Evaluate(dist) * Time.fixedDeltaTime + (forceDirection_HookedRB * SwingForce)) * (1f - WeightRatio), _HookAttachPoint, ForceMode.VelocityChange);
                 }
                 if (HandHeldGunMode)
@@ -627,6 +639,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPickup()
         {
+            HoldHeight = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position - localPlayer.GetPosition();//imrpove this if there's ever a way to get player avatar height or something
             if (_HookLaunched) { ResetHook(); }
             SFEXT_O_PilotEnter();
             for (int i = 0; i < DisableOnPickup.Length; i++)
@@ -756,9 +769,11 @@ namespace SaccFlightAndVehicles
                     RaycastHit targetcheck;
                     Vector3 predictedhookflight = checkdir * HookRange + playervel * AprHookFlyTime;
                     float predictedflightdist = predictedhookflight.magnitude;
-                    if (DisablePulling && HandHeldGunMode) { predictedflightdist -= (HookLaunchPoint.position - ((localPlayer.GetPosition() + localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).position) * .5f)).magnitude; }
+                    if (DisablePulling && HandHeldGunMode) { predictedflightdist -= (HookLaunchPoint.position - (localPlayer.GetPosition() + HoldHeight)).magnitude; }
+                    bool InRange = false;
                     if (Physics.Raycast(HookLaunchPoint.position, checkdir, out targetcheck, predictedflightdist, HookLayers, QueryTriggerInteraction.Ignore))
                     {
+                        InRange = true;
                         if (GrappleAnimator) { GrappleAnimator.SetBool("hitpredicted", true); }
                         if (PredictedHitPoint)
                         {
@@ -771,6 +786,17 @@ namespace SaccFlightAndVehicles
                     else
                     {
                         PredictionOff();
+                    }
+                    if (TargetingLaser)
+                    {
+                        if (InRange)
+                        {
+                            TargetingLaser.LookAt(PredictedHitPoint, Vector3.up);
+                        }
+                        else
+                        {
+                            TargetingLaser.LookAt(TargetingLaser.position + checkdir, Vector3.up);
+                        }
                     }
                 }
             }
