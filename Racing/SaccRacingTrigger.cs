@@ -209,7 +209,7 @@ namespace SaccFlightAndVehicles
                 {
                     if (CurrentCourse.PlayerTimes_R.Length > 0)
                     {
-                        if (RaceTime < CurrentCourse.PlayerTimes[CurrentCourse.PlayerTimes.Length - 1] || CurrentCourse.PlayerTimes.Length < CurrentCourse.MaxRecordedTimes)
+                        if (RaceTime < CurrentCourse.PlayerTimes_R[CurrentCourse.PlayerTimes_R.Length - 1] || CurrentCourse.PlayerTimes_R.Length < CurrentCourse.MaxRecordedTimes)
                         { SendMyTime(true); }
                     }
                     else
