@@ -235,6 +235,7 @@ namespace SaccFlightAndVehicles
                 Vector3 hookedpoint = HookedTransform.TransformPoint(HookedTransformOffset);
                 HookLength = Vector3.Distance(HookLaunchPoint.position, hookedpoint);
                 HookAttached = true;
+                SkippedFrames = 1;
                 SetHookPos();
                 HookAttach.Play();
                 _HookAttachPoint = hookedpoint;
@@ -441,6 +442,8 @@ namespace SaccFlightAndVehicles
                 Rope_Line.SetPosition(1, HookRopePoint.position);
             }
         }
+        private int SkippedFrames; // delete me if bug is fixed
+        private Vector3 PlayerPosLast; // delete me if bug is fixed
         private void FixedUpdate()
         {
             if (HookAttached && IsOwner)
@@ -457,21 +460,40 @@ namespace SaccFlightAndVehicles
                 float dist;
                 Vector3 forceDirection;
                 Vector3 holdpos;
+                int _skippedFrames = 1;
+                Vector3 playerpos = localPlayer.GetPosition();
+                // this 'SkippedFrames' business is to workaround this bug. It's not perfect but it works well enough
+                // https://feedback.vrchat.com/vrchat-udon-closed-alpha-feedback/p/vrcplayerapis-physics-values-are-only-updated-in-update
+                // Remove if fixed
+                if (HandHeldGunMode)
+                {
+                    if (playerpos == PlayerPosLast)
+                    {
+                        if (Time.fixedDeltaTime * (SkippedFrames + 1) > 0.0501f) { return; }
+                        SkippedFrames = SkippedFrames++; return;
+                    }
+                    else
+                    {
+                        _skippedFrames = SkippedFrames;
+                        SkippedFrames = 1;
+                    }
+                    PlayerPosLast = playerpos;
+                }
                 if (HandHeldGunMode && DisablePulling)
                 {
                     holdpos = localPlayer.GetPosition() + HoldHeight;
                     dist = Vector3.Distance(holdpos, _HookAttachPoint);
-                    forceDirection = (_HookAttachPoint - holdpos).normalized;
+                    forceDirection = (_HookAttachPoint - holdpos).normalized * _skippedFrames;//simpler just to pre-multiply this than do it later
                 }
                 else
                 {
                     holdpos = HookLaunchPoint.position;
                     dist = Vector3.Distance(holdpos, _HookAttachPoint);
-                    forceDirection = (_HookAttachPoint - HookLaunchPoint.position).normalized;
+                    forceDirection = (_HookAttachPoint - HookLaunchPoint.position).normalized * _skippedFrames;//simpler just to pre-multiply this than do it later
                 }
                 float PullReduction = 0f;
 
-                float SwingForce = dist - HookLength;
+                float SwingForce = (dist - HookLength) / _skippedFrames;//this measures the difference between frames so it has 'deltatime' including skipped frames built in, so we need to remove the pre-multiplication
                 if (SwingForce < 0)
                 {
                     PullReduction = SwingForce;
