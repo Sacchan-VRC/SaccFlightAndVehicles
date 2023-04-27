@@ -478,17 +478,6 @@ namespace SaccFlightAndVehicles
                     RStickSelectionLastFrame = RStickSelection;
                 }
             }
-
-            if (InVehicle)
-            {
-                if (Input.GetKeyDown(KeyCode.Return))
-                {
-                    if (!InEditor)
-                    {
-                        ExitVehicleCheck();
-                    }
-                }
-            }
         }
         private float LastJumpInput = 0f;
         public override void InputJump(bool value, VRC.Udon.Common.UdonInputEventArgs args)
