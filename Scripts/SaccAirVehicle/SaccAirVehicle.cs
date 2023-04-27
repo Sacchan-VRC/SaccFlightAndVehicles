@@ -1369,7 +1369,7 @@ namespace SaccFlightAndVehicles
                                                                                                      //apply yawing using yaw moment
                 VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
                 //calc Gs
-                float gravity = 9.81f * DeltaTime;
+                float gravity = -Physics.gravity.y * DeltaTime;
                 LastFrameVel.y -= gravity; //add gravity
 
                 Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);

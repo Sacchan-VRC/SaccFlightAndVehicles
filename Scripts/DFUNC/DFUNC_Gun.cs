@@ -456,7 +456,7 @@ namespace SaccFlightAndVehicles
 
                     //use the distance to the new predicted position to add the bullet drop prediction
                     BulletHitTime = Vector3.Distance(transform.position, TargetPos + PredictedPos) / BulletSpeed;
-                    Vector3 gravity = new Vector3(0, 9.81f * .5f * BulletHitTime * BulletHitTime, 0);//Bulletdrop
+                    Vector3 gravity = new Vector3(0, -Physics.gravity.y * .5f * BulletHitTime * BulletHitTime, 0);//Bulletdrop
                     PredictedPos += gravity;
 
                     GUNLeadIndicator.position = TargetPos + PredictedPos;
