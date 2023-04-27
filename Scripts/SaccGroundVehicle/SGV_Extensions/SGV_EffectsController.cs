@@ -177,7 +177,7 @@ namespace SaccFlightAndVehicles
                     if (!KeepAwake && (float)SGVControl.GetProgramVariable("VehicleSpeed") < 1)
                     { FallAsleep(); }
                     else
-                    { DoEffects--; }
+                    { DoEffects = 5f; }
                 }
             }
             if (dopplecounter > 4)
@@ -470,6 +470,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
+            DoEffects = 5f;
         }
         public void SFEXT_O_LoseOwnership()
         {
@@ -517,7 +518,6 @@ namespace SaccFlightAndVehicles
                     Explosion[rand].Play();
                 }
             }
-            FallAsleep();
         }
         public void SFEXT_O_Grounded()
         {

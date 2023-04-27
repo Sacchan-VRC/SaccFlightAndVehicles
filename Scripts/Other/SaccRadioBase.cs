@@ -21,9 +21,12 @@ namespace SaccFlightAndVehicles
         [Tooltip("Make this text object darker when radio is disabled. Not required.")]
         public TextMeshProUGUI RadioEnabledTxt;
         public bool RadioEnabled = true;
+        private byte CurrentChannel = 1;
+        public byte MyChannel = 1;
         [Header("All Planes and RadioZones are filled automatically on build.")]
         public Transform[] AllPlanes;
         public SaccRadioZone[] RadioZones;
+        public TextMeshProUGUI ChannelText;
         [Header("Debug, leave empty:")]
         public SaccEntity MyVehicle;
         [System.NonSerialized] public int MyVehicleSetTimes;//number of times MyVehicle has been set (for when holding 2 objects with radio, and dropping one) //Used by SAV_Radio
@@ -35,6 +38,7 @@ namespace SaccFlightAndVehicles
         void Start()
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
+            CurrentChannel = MyChannel;
             _AllPlanes_ENT = new SaccEntity[AllPlanes.Length];
             _AllPlanes_RD = new SAV_Radio[AllPlanes.Length];
             for (int i = 0; i < AllPlanes.Length; i++)
@@ -55,7 +59,9 @@ namespace SaccFlightAndVehicles
             if (NextPlane == _AllPlanes_RD.Length) { NextPlane = 0; }
             if (_AllPlanes_RD[NextPlane])
             {
-                if (!_AllPlanes_RD[NextPlane].RadioOn || MyVehicle == _AllPlanes_ENT[NextPlane]) { return; }
+                if (MyVehicle == _AllPlanes_ENT[NextPlane]
+                    || (byte)_AllPlanes_RD[NextPlane].Channel != CurrentChannel
+                    || CurrentChannel == 0) { return; }
                 for (int o = 0; o < _AllPlanes_ENT[NextPlane].VehicleSeats.Length; o++)
                 {
                     VRCPlayerApi thisplayer = _AllPlanes_ENT[NextPlane].VehicleSeats[o].SeatedPlayer;
@@ -85,6 +91,16 @@ namespace SaccFlightAndVehicles
             if (NextZone >= NumZones) { NextZone = 0; }
             SaccRadioZone NextRZ = RadioZones[NextZone];
             VRCPlayerApi[] RZ_players = NextRZ.playersinside;
+            if (CurrentChannel != NextRZ.Channel)
+            {
+                for (int i = 0; i < NextRZ.numPlayersInside; i++)
+                {
+                    RZ_players[i].SetVoiceDistanceNear(0);
+                    RZ_players[i].SetVoiceDistanceFar(25);
+                    RZ_players[i].SetVoiceGain(15);
+                }
+                return;
+            }
             if (NextRZ != MyZone)
             {
                 for (int i = 0; i < NextRZ.numPlayersInside; i++)
@@ -120,6 +136,20 @@ namespace SaccFlightAndVehicles
         {
             RadioEnabled = !RadioEnabled;
             if (RadioEnabledTxt) RadioEnabledTxt.color = RadioEnabled ? Color.white : Color.gray;
+        }
+        public void IncreaseChannel()
+        {
+            if (MyChannel + 1 > 16) { return; }
+            MyChannel++;
+            ChannelText.text = MyChannel.ToString();
+            CurrentChannel = MyChannel;
+        }
+        public void DecreaseChannel()
+        {
+            if (MyChannel - 1 < 1) { return; }
+            MyChannel--;
+            ChannelText.text = MyChannel.ToString();
+            CurrentChannel = MyChannel;
         }
     }
 }

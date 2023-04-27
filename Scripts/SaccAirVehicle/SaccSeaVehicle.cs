@@ -151,16 +151,22 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                if (value && !_EngineOn)
+                if (value)
                 {
-                    EntityControl.SendEventToExtensions("SFEXT_G_EngineOn");
-                    VehicleAnimator.SetBool("EngineOn", true);
+                    if (!_EngineOn)
+                    {
+                        EntityControl.SendEventToExtensions("SFEXT_G_EngineOn");
+                        VehicleAnimator.SetBool("EngineOn", true);
+                    }
                 }
-                else if (!value && _EngineOn)
+                else
                 {
-                    EntityControl.SendEventToExtensions("SFEXT_G_EngineOff");
-                    Taxiinglerper = 0;
-                    VehicleAnimator.SetBool("EngineOn", false);
+                    if (_EngineOn)
+                    {
+                        EntityControl.SendEventToExtensions("SFEXT_G_EngineOff");
+                        Taxiinglerper = 0;
+                        VehicleAnimator.SetBool("EngineOn", false);
+                    }
                 }
                 _EngineOn = value;
             }
@@ -386,6 +392,25 @@ namespace SaccFlightAndVehicles
                 JoystickOverridden = value;
             }
             get => JoystickOverridden;
+        }
+        [System.NonSerializedAttribute] public bool _PreventEngineToggle;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(PreventEngineToggle_))] public int PreventEngineToggle = 0;
+        public int PreventEngineToggle_
+        {
+            set
+            {
+                if (value > 0 && PreventEngineToggle == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_PreventEngineToggle_Activated");
+                }
+                else if (value == 0 && PreventEngineToggle > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_PreventEngineToggle_Deactivated");
+                }
+                _PreventEngineToggle = value > 0;
+                PreventEngineToggle = value;
+            }
+            get => PreventEngineToggle;
         }
         [System.NonSerializedAttribute] public Vector3 JoystickOverride;
         private float JoystickGrabValue;
@@ -995,7 +1020,7 @@ namespace SaccFlightAndVehicles
         {
             if (EntityControl._dead) { return; }
             EntityControl.dead = true;
-            EngineOn = false;
+            SetEngineOff();
             PlayerThrottle = 0;
             ThrottleInput = 0;
             EngineOutput = 0;
@@ -1354,7 +1379,7 @@ namespace SaccFlightAndVehicles
         {
             if (_EngineOn)
             {
-                EngineOn = false;
+                SetEngineOff();
                 PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;
             }
             if (HasAfterburner) { SetAfterburnerOff(); }
@@ -1526,25 +1551,21 @@ namespace SaccFlightAndVehicles
             VertGs = 0;
             AllGs = 0;
             LastFrameVel = CurrentVel;
-
+            if (EngineOnOnEnter && Fuel > 0 && !_PreventEngineToggle)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
+            }
             SetCollidersLayer(OnboardVehicleLayer);
         }
         public void SFEXT_G_PilotEnter()
         {
             Occupied = true;
             EntityControl.dead = false;//vehicle stops being invincible if someone gets in, also acts as redundancy incase someone missed the notdead event
-            if (EngineOnOnEnter && Fuel > 0)
-            { EngineOn = true; }
         }
         public void SFEXT_G_PilotExit()
         {
             Occupied = false;
-            if (EngineOffOnExit)
-            {
-                EngineOn = false;
-                if (HasAfterburner)
-                { SetAfterburnerOff(); }
-            }
+            RotationInputs = Vector3.zero;
         }
         public void SFEXT_O_PilotExit()
         {
@@ -1561,6 +1582,11 @@ namespace SaccFlightAndVehicles
             DoAAMTargeting = false;
             Yawing = Vector3.zero;
             if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
+            if (EngineOffOnExit && !_PreventEngineToggle)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
+                ThrottleInput = 0; ;
+            }
 
             //set vehicle's collider's layers back
             SetCollidersLayer(VehicleLayer);

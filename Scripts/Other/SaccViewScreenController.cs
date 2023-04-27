@@ -16,7 +16,11 @@ namespace SaccFlightAndVehicles
         public Camera Cam;
         [Tooltip("Screen that is enabled when turned on")]
         public GameObject ViewScreen;
-        [Header("Campositions is overriden on build, check it's tooltip")]
+        public bool DisableSwitchToDead;
+        [Header("Campositions are filled on build, check it's tooltip")]
+        [Tooltip("Disable the auto fill?")]
+        public bool CamPosAutoFill = true;
+        public string CamposSuffix = ":campos";
         [Tooltip("Click Find Campositions in Scene to test if your cameraposition is added, this function is run on build.\nName an object in the scene :campos<name> in order for it to get added to this list\n add FOV:60 to the end of the name to set FOV\nExample name: :camposVehicleCamFOV:20")]
         public Transform[] CamPositions;
         public Text ChannelNumberText;
@@ -55,9 +59,7 @@ namespace SaccFlightAndVehicles
             StartFov = Cam.fieldOfView;
             localPlayer = Networking.LocalPlayer;
             if (localPlayer != null) { InEditor = false; }
-            //get array of AAM Targets
 
-            //populate AAMTargets list
             CamTargets = new GameObject[CamPositions.Length];
             for (int i = 0; i < CamPositions.Length; i++)
             {
@@ -145,15 +147,25 @@ namespace SaccFlightAndVehicles
             int nextcam = CurrentTarget + 1;
             if (nextcam >= NumCameras) { nextcam = 0; }
             int numchecks = 0;
-            while (!CamPositions[nextcam] || !CamPositions[nextcam].gameObject.activeInHierarchy)
+
+            SaccEntity nextTargEntity;
+            if (CamTargets[nextcam])
+            { nextTargEntity = CamTargets[nextcam].GetComponent<SaccEntity>(); }
+            else { nextTargEntity = null; }
+            while (!CamPositions[nextcam] || !CamPositions[nextcam].gameObject.activeInHierarchy || (DisableSwitchToDead && (!nextTargEntity || nextTargEntity.dead == true)))
             {
                 if (numchecks >= NumCameras)
                 {
-                    Debug.LogWarning("ViewScreen: No valid cameras");
+                    // Debug.LogWarning("ViewScreen: No valid cameras");
                     return;
                 }
+                if (CamTargets[nextcam])
+                { nextTargEntity = CamTargets[nextcam].GetComponent<SaccEntity>(); }
+                else
+                { nextTargEntity = null; }
                 nextcam++;
                 if (nextcam >= NumCameras) { nextcam = 0; }
+                numchecks++;
             }
             CurrentTarget = nextcam;
             RequestSerialization();
@@ -168,15 +180,25 @@ namespace SaccFlightAndVehicles
             int nextcam = CurrentTarget - 1;
             if (nextcam < 0) { nextcam = NumCameras - 1; }
             int numchecks = 0;
-            while (!CamPositions[nextcam] || !CamPositions[nextcam].gameObject.activeInHierarchy)
+
+            SaccEntity nextTargEntity;
+            if (CamTargets[nextcam])
+            { nextTargEntity = CamTargets[nextcam].GetComponent<SaccEntity>(); }
+            else { nextTargEntity = null; }
+            while (!CamPositions[nextcam] || !CamPositions[nextcam].gameObject.activeInHierarchy || (DisableSwitchToDead && (!nextTargEntity || nextTargEntity.dead == true)))
             {
                 if (numchecks >= NumCameras)
                 {
-                    Debug.LogWarning("ViewScreen: No valid cameras");
+                    // Debug.LogWarning("ViewScreen: No valid cameras");
                     return;
                 }
+                if (CamTargets[nextcam])
+                { nextTargEntity = CamTargets[nextcam].GetComponent<SaccEntity>(); }
+                else
+                { nextTargEntity = null; }
                 nextcam--;
                 if (nextcam < 0) { nextcam = NumCameras - 1; }
+                numchecks++;
             }
             CurrentTarget = nextcam;
             RequestSerialization();

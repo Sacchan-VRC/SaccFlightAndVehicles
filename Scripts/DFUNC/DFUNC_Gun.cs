@@ -91,6 +91,13 @@ namespace SaccFlightAndVehicles
             }
             if (distance_from_head == 0) { distance_from_head = 1.333f; }
         }
+        public void ReInitAmmo()//set FullAAMs then run this to change vehicles max gun ammo
+        {
+            GunAmmoInSeconds = FullGunAmmoInSeconds;
+            reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
+            FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
+            UpdateAmmoVisuals();
+        }
         public void DFUNC_Selected()
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Selected));
@@ -328,7 +335,7 @@ namespace SaccFlightAndVehicles
                 { AAMTargetChecker = 0; }
                 else if (AAMTargetChecker == AAMTarget)
                 { AAMTargetChecker++; }
-                else if (AAMTargetChecker > NumAAMTargets - 1)
+                else if (AAMTargetChecker == NumAAMTargets)
                 { AAMTargetChecker = 0; }
 
                 //if target is currently in front of plane, lock onto it
@@ -449,7 +456,7 @@ namespace SaccFlightAndVehicles
 
                     //use the distance to the new predicted position to add the bullet drop prediction
                     BulletHitTime = Vector3.Distance(transform.position, TargetPos + PredictedPos) / BulletSpeed;
-                    Vector3 gravity = new Vector3(0, 9.81f * .5f * BulletHitTime * BulletHitTime, 0);//Bulletdrop
+                    Vector3 gravity = new Vector3(0, -Physics.gravity.y * .5f * BulletHitTime * BulletHitTime, 0);//Bulletdrop
                     PredictedPos += gravity;
 
                     GUNLeadIndicator.position = TargetPos + PredictedPos;

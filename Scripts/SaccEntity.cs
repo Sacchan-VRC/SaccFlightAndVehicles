@@ -371,115 +371,111 @@ namespace SaccFlightAndVehicles
             LastHitBulletDamageMulti = 1;
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
         }
-        private void Update()
+        public void InVehicleControls()
         {
-            if (Using)
+            if (!InVehicle) { return; }
+            SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
+            if (Input.GetKeyDown(KeyCode.Return))
             {
-                Vector2 LStickPos = Vector2.zero;
-                Vector2 RStickPos = Vector2.zero;
-                float LTrigger = 0;
-                float RTrigger = 0;
                 if (!InEditor)
                 {
-                    LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-                    LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-                    RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-                    RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
-                    LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
-                    RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+                    ExitVehicleCheck();
                 }
+            }
+            if (!Piloting) { return; }
+            Vector2 LStickPos = Vector2.zero;
+            Vector2 RStickPos = Vector2.zero;
+            float LTrigger = 0;
+            float RTrigger = 0;
+            if (!InEditor)
+            {
+                LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+            }
 
-                //LStick Selection wheel
-                if (DoDialLeft && !_DisableLeftDial)
+            //LStick Selection wheel
+            if (DoDialLeft && !_DisableLeftDial)
+            {
+                if (InVR && LStickPos.magnitude > DialSensitivity)
                 {
-                    if (InVR && LStickPos.magnitude > DialSensitivity)
-                    {
-                        float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
+                    float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
 
-                        stickdir = -(stickdir - 180);
-                        int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
-                        if (!LStickNULL[newselection])
-                        { LStickSelection = newselection; }
-                    }
-                    if (LStickSelection != LStickSelectionLastFrame)
-                    {
-                        //new function selected, send deselected to old one
-                        if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
-                        {
-                            Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
-                        }
-                        //get udonbehaviour for newly selected function and then send selected
-                        if (LStickSelection > -1)
-                        {
-                            if (Dial_Functions_L[LStickSelection] != null)
-                            {
-                                Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
-                            }
-                        }
-                        if (PlaySelectSoundLeft && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
-                        if (LStickDisplayHighlighter)
-                        {
-                            if (LStickSelection < 0)
-                            { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
-                            else
-                            {
-                                LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -LStickFuncDegrees * LStickSelection);
-                            }
-                        }
-                        LStickSelectionLastFrame = LStickSelection;
-                    }
+                    stickdir = -(stickdir - 180);
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
+                    if (!LStickNULL[newselection])
+                    { LStickSelection = newselection; }
                 }
-
-                //RStick Selection wheel
-                if (DoDialRight && !_DisableRightDial)
+                if (LStickSelection != LStickSelectionLastFrame)
                 {
-                    if (InVR && RStickPos.magnitude > DialSensitivity)
+                    //new function selected, send deselected to old one
+                    if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
                     {
-                        float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
-
-                        stickdir = -(stickdir - 180);
-                        int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
-                        if (!RStickNULL[newselection])
-                        { RStickSelection = newselection; }
+                        Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
-                    if (RStickSelection != RStickSelectionLastFrame)
+                    //get udonbehaviour for newly selected function and then send selected
+                    if (LStickSelection > -1)
                     {
-                        //new function selected, send deselected to old one
-                        if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame])
+                        if (Dial_Functions_L[LStickSelection] != null)
                         {
-                            Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
+                            Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
-                        //get udonbehaviour for newly selected function and then send selected
-                        if (RStickSelection > -1)
-                        {
-                            if (Dial_Functions_R[RStickSelection])
-                            {
-                                Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
-                            }
-                        }
-                        if (PlaySelectSoundRight && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
-                        if (RStickDisplayHighlighter)
-                        {
-                            if (RStickSelection < 0)
-                            { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
-                            else
-                            {
-                                RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -RStickFuncDegrees * RStickSelection);
-                            }
-                        }
-                        RStickSelectionLastFrame = RStickSelection;
                     }
+                    if (PlaySelectSoundLeft && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (LStickDisplayHighlighter)
+                    {
+                        if (LStickSelection < 0)
+                        { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+                        else
+                        {
+                            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -LStickFuncDegrees * LStickSelection);
+                        }
+                    }
+                    LStickSelectionLastFrame = LStickSelection;
                 }
             }
 
-            if (InVehicle)
+            //RStick Selection wheel
+            if (DoDialRight && !_DisableRightDial)
             {
-                if (Input.GetKeyDown(KeyCode.Return))
+                if (InVR && RStickPos.magnitude > DialSensitivity)
                 {
-                    if (!InEditor)
+                    float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
+
+                    stickdir = -(stickdir - 180);
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
+                    if (!RStickNULL[newselection])
+                    { RStickSelection = newselection; }
+                }
+                if (RStickSelection != RStickSelectionLastFrame)
+                {
+                    //new function selected, send deselected to old one
+                    if (RStickSelectionLastFrame != -1 && Dial_Functions_R[RStickSelectionLastFrame])
                     {
-                        ExitVehicleCheck();
+                        Dial_Functions_R[RStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
+                    //get udonbehaviour for newly selected function and then send selected
+                    if (RStickSelection > -1)
+                    {
+                        if (Dial_Functions_R[RStickSelection])
+                        {
+                            Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
+                        }
+                    }
+                    if (PlaySelectSoundRight && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (RStickDisplayHighlighter)
+                    {
+                        if (RStickSelection < 0)
+                        { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+                        else
+                        {
+                            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -RStickFuncDegrees * RStickSelection);
+                        }
+                    }
+                    RStickSelectionLastFrame = RStickSelection;
                 }
             }
         }
@@ -498,7 +494,7 @@ namespace SaccFlightAndVehicles
             else
             {
                 if (Time.time - LastJumpInput < .3f)
-                { ExitStation(); }
+                { ExitStation(); return; }
                 LastJumpInput = Time.time;
             }
         }
@@ -521,7 +517,7 @@ namespace SaccFlightAndVehicles
             if (player.isLocal)
             {
                 IsOwner = true;
-                if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
+                TakeOwnerShipOfExtensions();
                 SendEventToExtensions("SFEXT_O_TakeOwnership");
             }
             else
@@ -538,7 +534,7 @@ namespace SaccFlightAndVehicles
         {
             Using = true;
             Piloting = true;
-            InVehicle = true;
+            InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             Occupied = true;
             if (LStickNumFuncs == 1)
             {
@@ -557,8 +553,11 @@ namespace SaccFlightAndVehicles
             if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
             for (int i = 0; i < EnableInVehicle.Length; i++)
             { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(true); }
-            Networking.SetOwner(localPlayer, gameObject);
-            if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
+            if (!_DisallowOwnerShipTransfer)
+            {
+                Networking.SetOwner(localPlayer, gameObject);
+                TakeOwnerShipOfExtensions();
+            }
             SendEventToExtensions("SFEXT_O_PilotEnter");
         }
         public void PilotEnterVehicleGlobal(VRCPlayerApi player)
@@ -597,7 +596,7 @@ namespace SaccFlightAndVehicles
         public void PassengerEnterVehicleLocal()
         {
             Passenger = true;
-            InVehicle = true;
+            InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             if (LStickDisplayHighlighter)
             { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             if (RStickDisplayHighlighter)
@@ -736,7 +735,7 @@ namespace SaccFlightAndVehicles
         }
         public void TakeOwnerShipOfExtensions()
         {
-            if (!_DisallowOwnerShipTransfer && !InEditor)
+            if (!InEditor)
             {
                 foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
@@ -852,8 +851,7 @@ namespace SaccFlightAndVehicles
             System.Array.Copy(result, finalResult, count);
 
             return finalResult;
-        }
-
+        
         public void ToggleStickSelectionLeft(UdonSharpBehaviour dfunc)
         {
             var index = System.Array.IndexOf(Dial_Functions_L, dfunc);
@@ -883,7 +881,12 @@ namespace SaccFlightAndVehicles
                 dfunc.SendCustomEvent("DFUNC_Selected");
             }
         }
-
+        public void SetDeadFor(float deadtime)
+        {
+            dead = true;
+            SendCustomEventDelayedSeconds(nameof(UnsetSetDead), deadtime);
+        }
+        public void UnsetSetDead() { dead = false; }
         public void SendDamageEvent(int dmg, bool More)
         {
             if (More)//More than default damage
