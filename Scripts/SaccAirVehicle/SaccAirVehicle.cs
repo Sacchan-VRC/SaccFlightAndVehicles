@@ -285,12 +285,12 @@ namespace SaccFlightAndVehicles
                         ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
                         ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
                         ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
-
-                        //replaces StickyWheelWorkaround
-                        if (HasWheelColliders)
+                    if (HasWheelColliders)
+                    {
+                        foreach (WheelCollider wheel in VehicleWheelColliders)
                         {
-                            foreach (WheelCollider wheel in VehicleWheelColliders)
-                            { wheel.motorTorque = 0.00000000000000000000000000000000001f; }
+                            wheel.motorTorque = 0.00000000000000000000000000000000001f;
+                            wheel.brakeTorque = 0;
                         }
                     }
                 }
@@ -447,6 +447,10 @@ namespace SaccFlightAndVehicles
         private int JoyStickReleaseCount;
         private float LastGripTime;
         [System.NonSerializedAttribute] public WheelCollider[] VehicleWheelColliders;
+
+        private float[] initSuspensionDistance;
+        private float[] initTargetPosition;
+
         [System.NonSerializedAttribute] public bool LowFuelLastFrame;
         [System.NonSerializedAttribute] public bool NoFuelLastFrame;
         [System.NonSerializedAttribute] public float ThrottleStrengthAB;
@@ -655,7 +659,21 @@ namespace SaccFlightAndVehicles
             IsOwner = EntityControl.IsOwner;
 
             VehicleWheelColliders = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
-            if (VehicleWheelColliders.Length != 0) { HasWheelColliders = true; }
+            if (VehicleWheelColliders.Length != 0)
+            {
+                HasWheelColliders = true;
+
+                initSuspensionDistance = new float[VehicleWheelColliders.Length];
+                initTargetPosition = new float[VehicleWheelColliders.Length];
+
+                for (int wheelIndex = 0; wheelIndex < VehicleWheelColliders.Length; wheelIndex++)
+                {
+                    WheelCollider wheel = VehicleWheelColliders[wheelIndex];
+                    initSuspensionDistance[wheelIndex] = wheel.suspensionDistance;
+                    initTargetPosition[wheelIndex] = wheel.suspensionSpring.targetPosition;
+                }
+            }
+
 
             if (AutoAdjustValuesToMass)
             {
@@ -1337,7 +1355,22 @@ namespace SaccFlightAndVehicles
                         //create values for use in fixedupdate (control input and straightening forces)
                         Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
                         Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
+
                         VehicleConstantForce.relativeForce = FinalInputAcc;
+                        if (HasWheelColliders)
+                        {
+                            float suspensionDownCof = FinalInputAcc.y / VehicleRigidbody.mass / 9.81f;
+                            suspensionDownCof = Mathf.Clamp(suspensionDownCof, 0, 1);
+                            for (int wheelIndex = 0; wheelIndex < VehicleWheelColliders.Length; wheelIndex++)
+                            {
+                                WheelCollider wheel = VehicleWheelColliders[wheelIndex];
+                                wheel.suspensionDistance = initSuspensionDistance[wheelIndex] - initSuspensionDistance[wheelIndex] * suspensionDownCof * initTargetPosition[wheelIndex];
+                                JointSpring wheelSpring = wheel.suspensionSpring;
+                                wheelSpring.targetPosition = initTargetPosition[wheelIndex] * (1 - suspensionDownCof);
+                                wheel.suspensionSpring = wheelSpring;
+                            }
+                        }
+
                         VehicleConstantForce.relativeTorque = FinalInputRot;
                     }
                     else
