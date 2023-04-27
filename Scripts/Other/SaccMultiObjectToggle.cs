@@ -19,11 +19,16 @@ namespace SaccFlightAndVehicles
         public bool CanToggleToDisabled = false;
         [Tooltip("0 = first page, -1 = disabled")]
         public int DefaultPage = 0;
+        [Tooltip("Overrides Default Page")]
+        public bool StartOnRandomPage = false;
+        [Tooltip("CB_PageChange")]
+        public UdonSharpBehaviour[] PageChangeCallbacks;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(current))] public int _current = -1;
         public int current
         {
             set
             {
+                _current = value;
                 if (value < 0 || value >= ToggleObjs.Length)//set this from another script if you want to disable all
                 {
                     if (EnabledWithAll) { EnabledWithAll.SetActive(false); }
@@ -40,12 +45,14 @@ namespace SaccFlightAndVehicles
                         }
                     }
                 }
-
                 for (int i = 0; i < ToggleObjs.Length; i++)
                 {
                     ToggleObjs[i].SetActive(i == value);
                 }
-                _current = value;
+                for (int i = 0; i < PageChangeCallbacks.Length; i++)
+                {
+                    PageChangeCallbacks[i].SendCustomEvent("CB_PageChange");
+                }
             }
             get => _current;
         }
@@ -68,7 +75,10 @@ namespace SaccFlightAndVehicles
         private void Start()
         {
             localPlayer = Networking.LocalPlayer;
-            current = DefaultPage;
+            if (StartOnRandomPage)
+            { current = Random.Range(0, ToggleObjs.Length); }
+            else
+            { current = DefaultPage; }
         }
         public override void Interact()
         {

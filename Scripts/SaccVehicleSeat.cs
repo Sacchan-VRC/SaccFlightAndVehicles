@@ -12,6 +12,7 @@ namespace SaccFlightAndVehicles
         public SaccEntity EntityControl;
         [Tooltip("Gameobject with script that runs when you enter the seat to edjust your view position")]
         public bool IsPilotSeat = false;
+        [Header("Removing ThisSeatOnly next version. EnableInSeat replaces it.")]
         [Tooltip("Object that is enabled only when sitting in this seat")]
         public GameObject ThisSeatOnly;
         [Tooltip("Objects that are enabled only when sitting in this seat")]
@@ -23,7 +24,9 @@ namespace SaccFlightAndVehicles
         public bool SeatOutSideVehicle;
         [Tooltip("How far to move the seat to the side when looking backwards in desktop")]
         [SerializeField] float HeadXOffset = 0.25f;
-        [Tooltip("Calbrate rotation towards this transform's forward vector, leave empty to use this station's transform")]
+        [Tooltip("Disable the ability for desktop users to turn 180 degrees")]
+        public bool Disable180Rotation = false;
+        // [Tooltip("Calbrate rotation towards this transform's forward vector, leave empty to use this station's transform")]
         // public Transform RotationCalibrationTarget; //YAWCALIBRATION
         private Vector3 SeatAdjustedPos;
         [UdonSynced, FieldChangeCallback(nameof(AdjustedPos))] private Vector2 _adjustedPos;// xy = seat up and forward
@@ -148,7 +151,7 @@ namespace SaccFlightAndVehicles
                         }
                     }
                 }
-                if (!player.IsUserInVR() && !Fake) { ThreeSixtySeat(); }
+                if (!player.IsUserInVR() && !Fake && !Disable180Rotation) { ThreeSixtySeat(); }
                 if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
                 else
                 { EntityControl.PassengerEnterVehicleGlobal(); }

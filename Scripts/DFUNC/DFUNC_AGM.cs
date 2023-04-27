@@ -145,6 +145,13 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void ReInitNumMissiles()//set FullAGMs then run this to change vehicles max AGMs
+        {
+            NumAGM = FullAGMs;
+            reloadspeed = FullAGMs / FullReloadTimeSec;
+            FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
+            if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
+        }
         private GameObject InstantiateWeapon()
         {
             GameObject NewWeap = Object.Instantiate(AGM);

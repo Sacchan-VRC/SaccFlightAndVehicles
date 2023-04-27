@@ -182,6 +182,13 @@ namespace SaccFlightAndVehicles
             { TargetingTransform = VehicleTransform; }
             if (AnimLockedOnBoolName != string.Empty) { DoLockedBool = true; }
         }
+        public void ReInitNumMissiles()//set FullAAMs then run this to change vehicles max AAMs
+        {
+            NumAAM = FullAAMs;
+            reloadspeed = FullAAMs / FullReloadTimeSec;
+            FullAAMsDivider = 1f / (NumAAM > 0 ? NumAAM : 10000000);
+            if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+        }
         private GameObject InstantiateWeapon()
         {
             GameObject NewWeap = Object.Instantiate(AAM);

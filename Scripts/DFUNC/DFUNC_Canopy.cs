@@ -29,6 +29,7 @@ namespace SaccFlightAndVehicles
         public string AnimCanopyBool = "canopyopen";
         [Tooltip("Name of animator boolean that is true when canopy is broken")]
         public string AnimCanopyBroken = "canopybroken";
+        public bool DoCanopyOpenDrag = true;
         private SaccEntity EntityControl;
         private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
@@ -167,7 +168,7 @@ namespace SaccFlightAndVehicles
                 SendCustomEventDelayedFrames(nameof(SendCanopyOpened), 1);
             }
 
-            if (!DragApplied)
+            if (!DragApplied && DoCanopyOpenDrag)
             {
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + CanopyDragMulti);
                 DragApplied = true;
@@ -225,7 +226,7 @@ namespace SaccFlightAndVehicles
             {
                 SendCustomEventDelayedFrames(nameof(SendCanopyBreak), 1);
             }
-            if (!DragApplied)
+            if (!DragApplied && DoCanopyOpenDrag)
             {
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + CanopyDragMulti);
                 DragApplied = true;

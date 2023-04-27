@@ -26,7 +26,7 @@ namespace SaccFlightAndVehicles
         public bool SequentialLaunch = false;
         private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
         private bool UseLeftTrigger = false;
-        private int FullFlares;
+        [System.NonSerialized] public int FullFlares;
         private float reloadspeed;
         private bool func_active;
         private bool TriggerLastFrame;
@@ -65,6 +65,12 @@ namespace SaccFlightAndVehicles
             reloadspeed = FullFlares / FullReloadTimeSec;
             if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+        }
+        public void ReInitNumFlares()//set FullFlares then run this to change vehicles max flares
+        {
+            NumFlares = FullFlares;
+            reloadspeed = FullFlares / FullReloadTimeSec;
+            if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
         }
         public void SFEXT_G_PilotEnter()
         { gameObject.SetActive(true); }
