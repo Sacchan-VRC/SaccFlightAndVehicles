@@ -851,7 +851,7 @@ namespace SaccFlightAndVehicles
             System.Array.Copy(result, finalResult, count);
 
             return finalResult;
-        
+        }
         public void ToggleStickSelectionLeft(UdonSharpBehaviour dfunc)
         {
             var index = System.Array.IndexOf(Dial_Functions_L, dfunc);
@@ -872,7 +872,7 @@ namespace SaccFlightAndVehicles
             var index = System.Array.IndexOf(Dial_Functions_R, dfunc);
             if (RStickSelection == index)
             {
-                 RStickSelection = -1;
+                RStickSelection = -1;
                 dfunc.SendCustomEvent("DFUNC_Deselected");
             }
             else
