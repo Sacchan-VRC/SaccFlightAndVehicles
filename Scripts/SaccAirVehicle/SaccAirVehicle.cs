@@ -285,12 +285,13 @@ namespace SaccFlightAndVehicles
                         ReversingPitchStrengthZero = ReversingPitchStrengthZeroStart;
                         ReversingYawStrengthZero = ReversingYawStrengthZeroStart;
                         ReversingRollStrengthZero = ReversingRollStrengthZeroStart;
-                    if (HasWheelColliders)
-                    {
-                        foreach (WheelCollider wheel in VehicleWheelColliders)
+                        if (HasWheelColliders)
                         {
-                            wheel.motorTorque = 0.00000000000000000000000000000000001f;
-                            wheel.brakeTorque = 0;
+                            foreach (WheelCollider wheel in VehicleWheelColliders)
+                            {
+                                wheel.motorTorque = 0.00000000000000000000000000000000001f;
+                                wheel.brakeTorque = 0;
+                            }
                         }
                     }
                 }
