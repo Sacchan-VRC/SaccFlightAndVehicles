@@ -1,14 +1,16 @@
-﻿
+
+using System;
+using SaccFlightAndVehicles;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
-using SaccFlightAndVehicles;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
 public class DFUNCP_TakeControl : UdonSharpBehaviour
 {
     public SaccEntity EntityControl;
+    [NonSerialized] public SAV_PassengerFunctionsController PassengerFunctionsController;
     private SaccVehicleSeat[] VehicleSeats;
     public SaccVehicleSeat ThisSVSeat;
     public Transform[] MoveTransforms;
@@ -213,5 +215,18 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     {
         if (Networking.LocalPlayer.IsOwner(gameObject) && Swapped)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LateJoinerSwap)); }
+    }
+
+    public void KeyboardInput()
+    {
+        if (PassengerFunctionsController)
+        {
+            if (UseLeftTrigger) PassengerFunctionsController.ToggleStickSelectionLeft(this);
+            else PassengerFunctionsController.ToggleStickSelectionRight(this);
+        } else
+        {
+            if (UseLeftTrigger) EntityControl.ToggleStickSelectionLeft(this);
+            else EntityControl.ToggleStickSelectionRight(this);
+        }
     }
 }

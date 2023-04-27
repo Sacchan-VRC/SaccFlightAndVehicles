@@ -851,6 +851,35 @@ namespace SaccFlightAndVehicles
             System.Array.Copy(result, finalResult, count);
 
             return finalResult;
+        
+        public void ToggleStickSelectionLeft(UdonSharpBehaviour dfunc)
+        {
+            var index = System.Array.IndexOf(Dial_Functions_L, dfunc);
+            if (LStickSelection == index)
+            {
+                LStickSelection = -1;
+                dfunc.SendCustomEvent("DFUNC_Deselected");
+            }
+            else
+            {
+                LStickSelection = index;
+                dfunc.SendCustomEvent("DFUNC_Selected");
+            }
+        }
+
+        public void ToggleStickSelectionRight(UdonSharpBehaviour dfunc)
+        {
+            var index = System.Array.IndexOf(Dial_Functions_R, dfunc);
+            if (RStickSelection == index)
+            {
+                 RStickSelection = -1;
+                dfunc.SendCustomEvent("DFUNC_Deselected");
+            }
+            else
+            {
+                RStickSelection = index;
+                dfunc.SendCustomEvent("DFUNC_Selected");
+            }
         }
         public void SetDeadFor(float deadtime)
         {

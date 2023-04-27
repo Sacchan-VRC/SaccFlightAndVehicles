@@ -1,4 +1,4 @@
-﻿
+
 using System;
 using UdonSharp;
 using UnityEngine;
@@ -81,12 +81,14 @@ namespace SaccFlightAndVehicles
             foreach (UdonSharpBehaviour usb in Dial_Functions_L)
             {
                 if (usb == null) { LStickNULL[u] = true; }
+                else usb.SetProgramVariable("PassengerFunctionsController", this);
                 u++;
             }
             u = 0;
             foreach (UdonSharpBehaviour usb in Dial_Functions_R)
             {
                 if (usb == null) { RStickNULL[u] = true; }
+                else usb.SetProgramVariable("PassengerFunctionsController", this);
                 u++;
             }
             if (LStickNumFuncs == 1) { LeftDialOnlyOne = true; }
@@ -369,5 +371,36 @@ namespace SaccFlightAndVehicles
             if (FunctionsActive)
             { SendEventToExtensions_Gunner("SFEXTP_O_PlayerJoined"); }
         }
+
+        public void ToggleStickSelectionLeft(UdonSharpBehaviour dfunc)
+        {
+            var index = Array.IndexOf(Dial_Functions_L, dfunc);
+            if (LStickSelection == index)
+            {
+                LStickSelection = -1;
+                dfunc.SendCustomEvent("DFUNC_Deselected");
+            }
+            else
+            {
+                LStickSelection = index;
+                dfunc.SendCustomEvent("DFUNC_Selected");
+            }
+        }
+
+        public void ToggleStickSelectionRight(UdonSharpBehaviour dfunc)
+        {
+            var index = Array.IndexOf(Dial_Functions_R, dfunc);
+            if (RStickSelection == index)
+            {
+                 RStickSelection = -1;
+                dfunc.SendCustomEvent("DFUNC_Deselected");
+            }
+            else
+            {
+                RStickSelection = index;
+                dfunc.SendCustomEvent("DFUNC_Selected");
+            }
+        }
+
     }
 }
