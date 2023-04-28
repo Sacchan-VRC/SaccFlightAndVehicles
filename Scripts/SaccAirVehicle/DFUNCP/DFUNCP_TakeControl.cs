@@ -13,6 +13,9 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     [NonSerialized] public SAV_PassengerFunctionsController PassengerFunctionsController;
     private SaccVehicleSeat[] VehicleSeats;
     public SaccVehicleSeat ThisSVSeat;
+    [Tooltip("Require the user to hold down the button to take control?")]
+    [SerializeField] private bool HoldToTake = false;
+    [Tooltip("These tramsforms will be moved to their corresponding _CoPosition when control is switched")]
     public Transform[] MoveTransforms;
     public Transform[] MoveTransforms_CoPosition;
     public KeyCode TakeControlKey = KeyCode.Space;
@@ -173,6 +176,7 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     public void SFEXTP_O_UserEnter()
     {
         IsUser = true;
+        TriggerPressTime = Time.time + 1000f;// prevent activation if you hold the trigger when getting in
     }
     public void SFEXTP_O_UserExit()
     {
@@ -187,6 +191,7 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
     {
         gameObject.SetActive(false);
     }
+    private float TriggerPressTime;
     private void Update()
     {
         float Trigger;
@@ -198,8 +203,16 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
         {
             if (!TriggerLastFrame)
             {
-                TakeControl();
+                if (HoldToTake)
+                {
+                    TriggerPressTime = Time.time;
+                }
+                else { TakeControl(); }
                 TriggerLastFrame = true;
+            }
+            if (HoldToTake && Time.time - TriggerPressTime > 1)
+            {
+                TakeControl();
             }
         }
         else { TriggerLastFrame = false; }
@@ -223,7 +236,8 @@ public class DFUNCP_TakeControl : UdonSharpBehaviour
         {
             if (UseLeftTrigger) PassengerFunctionsController.ToggleStickSelectionLeft(this);
             else PassengerFunctionsController.ToggleStickSelectionRight(this);
-        } else
+        }
+        else
         {
             if (UseLeftTrigger) EntityControl.ToggleStickSelectionLeft(this);
             else EntityControl.ToggleStickSelectionRight(this);
