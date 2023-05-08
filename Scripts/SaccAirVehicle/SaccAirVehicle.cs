@@ -330,12 +330,12 @@ namespace SaccFlightAndVehicles
         public void SetEngineOff()
         { EngineOn = false; }
         [System.NonSerializedAttribute] public float AllGs;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
         [System.NonSerializedAttribute] public float AngleOfAttackPitch;
         [System.NonSerializedAttribute] public float AngleOfAttackYaw;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
         [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
         [System.NonSerialized] public int NumPassengers;
         [System.NonSerializedAttribute] public float VTOLAngle;
@@ -369,7 +369,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float FullHealth;
         [System.NonSerializedAttribute] public bool Taxiing = false;
         [System.NonSerializedAttribute] public bool Floating = false;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
         [System.NonSerializedAttribute] public bool Piloting = false;
         [System.NonSerializedAttribute] public bool Passenger = false;
         [System.NonSerializedAttribute] public bool InEditor = true;
@@ -2070,12 +2070,19 @@ namespace SaccFlightAndVehicles
             AllGs = 0f;
             VehicleRigidbody.velocity = CurrentVel;
             LastFrameVel = CurrentVel;
-            if (_EngineOn /* && EntityControl.Piloting */)
-            { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }
-            else
+            if (_EngineOn)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
-                PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;
+                //the Occupied check is to check if the player just left the instance while in a vehicle
+                //OnPlayerLeft() runs after OnOwnershipTransferred()
+                if ((EntityControl.Piloting || !Occupied))
+                {
+                    PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput;
+                }
+                else
+                {
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
+                    PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;
+                }
             }
             if (!UsingManualSync)
             {
