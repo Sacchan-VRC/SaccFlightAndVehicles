@@ -34,7 +34,6 @@ namespace SaccFlightAndVehicles
         [Tooltip("Snap rigidbody target connection points to just above their CoM?")]
         public bool HoldTargetUpright = false;
         [Tooltip("Select the function instead of just instantly firing it with keyboard input?")]
-        public bool KeyboardSelectMode = false;
         public bool ResetHookOnExitVehicle = false;
         public LineRenderer Rope_Line;
         public Transform RopeBasePoint;
@@ -62,6 +61,14 @@ namespace SaccFlightAndVehicles
         public Transform TargetingLaser;
         private float HookLaunchTime;
         public Transform PredictedHitPoint;
+        public bool KeyboardSelectMode = false;
+        [Tooltip("Run an event on objects that the grappling hook hits?")]
+        public bool RunEventOnTargets = false;
+        [Tooltip("Run Event on any triggers the hook flies through?")]
+        public bool RunEventOnTargets_Triggers = false;
+        [Tooltip("Name of event to run")]
+        public string HitEventName = "_interact";
+        public string HitEventName_Trigger = "_interact";
         private float AprHookFlyTime;
         private bool DoHitPrediction;
         private Vector3 HookStartPos;
@@ -354,6 +361,17 @@ namespace SaccFlightAndVehicles
             RaycastHit hookhit;
             if (IsOwner)
             {
+                if (RunEventOnTargets_Triggers)
+                {
+                    if (Physics.Raycast(Hook.position, LaunchVec, out hookhit, LaunchSpeed * Time.deltaTime, HookLayers, QueryTriggerInteraction.Collide))
+                    {
+                        if (hookhit.collider)//in vrc this will be null if it hits a player
+                        {
+                            UdonSharpBehaviour hitScript = (UdonSharpBehaviour)hookhit.collider.gameObject.GetComponent(typeof(UdonSharpBehaviour));
+                            if (hitScript) { hitScript.SendCustomEvent(HitEventName_Trigger); }
+                        }
+                    }
+                }
                 if (Physics.Raycast(Hook.position, LaunchVec, out hookhit, LaunchSpeed * Time.deltaTime, HookLayers, QueryTriggerInteraction.Ignore))
                 {
                     float checklength;
@@ -363,6 +381,17 @@ namespace SaccFlightAndVehicles
                     { checklength = Vector3.Distance(HookLaunchPoint.position, hookhit.point); }
                     if (checklength < HookRange)
                     {
+                        if (RunEventOnTargets)
+                        {
+                            UdonSharpBehaviour hitScript;
+                            Rigidbody ARB = hookhit.collider.attachedRigidbody;
+                            if (ARB)
+                            { Debug.Log("ASS"); hitScript = (UdonSharpBehaviour)ARB.GetComponent(typeof(UdonSharpBehaviour)); }
+                            else
+                            { Debug.Log("TITS"); hitScript = (UdonSharpBehaviour)hookhit.collider.gameObject.GetComponent(typeof(UdonSharpBehaviour)); }
+                            Debug.Log(hitScript);
+                            if (hitScript) { hitScript.SendCustomEvent(HitEventName); }
+                        }
                         HookAttachPoint = hookhit.point;
                         if (HookAttachConfirm) { HookAttachConfirm.Play(); }
                         RequestSerialization();
