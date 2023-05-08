@@ -8,9 +8,15 @@ https://twitter.com/Sacchan_VRC
 Please support me if you like this project:
 https://ko-fi.com/sacchanvrc
 
+Migrating a 1.61 project to 1.63 info:
+In windows file explorer, delete the SaccFlightAndVehicles folder and replace it with the new version
+The race system has a large update, if you have a racing world you must replace some things. Look at the SaccFlightExample.unity example scene to see it set up.
+	The RacingTrigger now has a prefab in the Prefabs/Accessories folder. Please replace your vehicles RacingTrigger with it.
+The 'ThisSeatOnly' reference in SaccVehihicleSeat will be removed in version 1.7. There is currently 'ThisSeatOnly' AND 'EnableInSeat' array. Move your InVehicleOnly references into the new array to be ready.
+
 Migrating a 1.61 project to 1.62 info:
 In windows file explorer, delete the SaccFlightAndVehicles folder and replace it with the new version
-The 'InVehicleOnly' reference in SaccEntity will be removed in version 1.7. There is currently 'InVehicleOnly' AND 'EnableInVehicle' array move your InVehicleOnly references into the new array to be ready.
+The 'InVehicleOnly' reference in SaccEntity will be removed in version 1.7. There is currently 'InVehicleOnly' AND 'EnableInVehicle' array. Move your InVehicleOnly references into the new array to be ready.
 There is a new folder inside the Prefabs called called 'Accessories' it's all the non-vehicle stuff and each part of 'SaccFlightAccessories.prefab' now has its own prefab
 
 Migrating a 1.6 project to 1.61 info:
@@ -71,12 +77,16 @@ Inside the /Prefabs folder are individual prefabs for each vehicle, you can plac
 Open the example scene 'SaccFlightExample.unity' to see an example of vehicles set up to work with the Killsboard and racing scripts.
 
 Race set up:
-There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object, It should be disabled by default, it's enabled when a race is selected with the racebutton.
-The RaceToggleButton has a list of SaccRaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tells all racingtriggers to switch to the selected race.
-You must place a reference to every Race, inside the RaceToggleButton.
+There's an object called RacingTrigger inside the InVehicleOnly/PilotOnly object, It should be disabled by default, it's enabled when a race is selected by the SaccRaceToggleButton script.
+The SaccRaceToggleButton has a list of SaccRaceCourseAndScoreBoard objects and toggles through them when interacted with, enables the racingtrigger objects if a race is selected, and tells all racingtriggers to switch to the selected race.
+The RaceToggleButton contains a hidden reference to every race, it's set up automatically on build.
 Each race has its own script called SaccRaceCourseAndScoreBoard. This contains references for its race's checkpoints, and has text objects for displaying the times.
-The RacingTrigger detects checkpoints, tracks your time, and sends your time to the SaccRaceCourseAndScoreBoard script for the selected race when you finish.
+The RacingTrigger detects checkpoints, tracks your time, and sends your time to the SaccRaceCourseAndScoreBoard's SaccRaceTimeReporter script for the selected race when you finish.
 Race checkpoints have an animation that enables guidance objects when the checkpoint is next or after next.
+New in 1.63: Races have a full scoreboard showing everyones times. Times are reported by taking ownership of the SaccRaceTimeReporter object when you finish a race.
+	A delayed check is run by the player reporting their time to make sure that their time was actually recieved (if for example two people tried to take ownership/report their times at the same time). Missed times are re-submitted.
+The RaceToggleButton now has a checkbox for [x]Automatic Race Selection
+With this enabled you no longer need to select races, they will automatically enable when you go near either the beginning, or end of a race. Loop race's direction is decided by the direction you go through the start line.
 
 Killsboard set up:
 Place the killboard anywhere in the world, each vehicle that uses it must have its own SAV_KillTracker, referenced in it's SaccEntity's Extension Udon Behaviours list.
@@ -163,18 +173,18 @@ Joystick animation is done in the Pitch Yaw and Roll animations. Each one rotate
 Hierarchy:
 PlaneBody--------
 Everything in here is visual, except that it also contains colliders, and wheel colliders. Objects can be placed as children of this if they need to move with parts of it (SS-1)
-SaccAirVehicle(formally SaccAirVehicle)--------
-Children of this are transforms used by the SaccAirVehicle, and weapon objects for cloning and launching.
+SaccAirVehicle--------
+Children of this are transforms used by the SaccAirVehicle
 EffectsController--------
 The children of this are mostly particle systems, visual effects used by EffectsController and the animator.
 SoundController--------
 The children are all the sounds the plane uses. The AttachedSounds object contains all sounds that are disabled instantly when the plane explodes. The 'beeps' empty contains all the cockpit beep sounds, just move the 'beeps' object instead of all children individually.
 InVehicleOnly--------
-The children of this are all things that are disabled when you're not inside the plane. Many different objects are in here including the HUD, joystick, MFDs(Multi-Function-Display).
+The children of this are all things that are disabled when you're not inside the vehicle. Many different objects are in here including the HUD and menus.
 HUDController's 'bigstuff' child object is scaled to 720 to make the hud appear to be on the sky like a real HUD(roughly 1km away). You may want to scale it down to 1 temporarily if you plan on editing HUD elements.
 PilotSeat--------
-A custom station with seat adjustment code for entering the plane
 PassengerSeat--------
+Custom station with seat adjustment code for entering the plane
 AAMs--------
 AGMs--------
 Bombs--------
@@ -195,7 +205,7 @@ Set each wheel's Wheel Point transform input to it's own gameobject, and Wheel V
 Move the gameobjects named SkidAudio_Tarmac, SkidAudio_Grass, SkidParticle_Tarmac, SkidParticle_Grass from the original mesh's wheels into each of your wheels, and make sure the references for them are set up in the 'Surface Type_Skid Sounds', and the 'Surface Type_Skid Particles' arrays.
 You can now delete the original mesh object.
 In the SaccGroundVehicle Object, update the references for:
-Vehicle Mesh -> The mesh object you placed to replace the original
+Vehicle Mesh -> The mesh object you replaced the original with
 Main Object Renderer -> Place the largest Mesh renderer/SkinnedMeshRenderer on your new mesh in this slot
 Drive Wheels -> Put all wheels that are used to accelerate the car in here, usually the back wheels.
 Steer Wheels -> Put all the wheels used for steering in here
@@ -219,7 +229,7 @@ There's a menu item at 'SaccFlight->Make All Static Colliders Tarmac...' that wi
 
 How to animate engine pitch:
 In the 'Revs' animation, you will notice that the engine sound's audiosource's X Scale is animated. This is a workaround for setting engine pitch whilst also using doppler.
-The code takes the X scale of the audiosource, applies doppler, then sets it to the pitch of the sound. Never animate the pitch directly.
+The code takes the X scale of the audiosource, applies doppler to it, then sets the pitch of the sound to it. Never animate the pitch directly.
 If you wish to blend different engine sounds, it's possible to do it in this animation.
 It's using motion time, so frame 0 = 0 revs, last frame = whatever revs SaccGroundVehicle's 'Rev Limiter' variable is set to.
 
@@ -229,7 +239,7 @@ Custom Layers:
 Vehicle colliders must be set to Walkthrough layer in order to be targeted by AAMs. (Raycast looks for this layer)
 Various functions require custom layers to be set up in order to work(Air-to-air-missiles, Air-to-ground custom targets, resupply zones, Arresting cables, and catapults)
 To rename the layers for SaccFlight, there is a menu option under SaccFlight->RenameLayers, clicking it will instantly change the layer names.
-References to the layers will be retained and will work, but they will appear blank until named in Unity. Layers are as follows
+References to the layers will be retained by prefabs and will work, but they will appear blank until named in Unity. Layers are as follows
 23:Hook Cable
 24:Catapult
 25:AAMTargets
@@ -291,7 +301,17 @@ A pickup with sliders on it that allow you to control the strength and direction
 
 Changelog:
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-SMall update 1.62
+Medium update 1.63
+Added Biplane, Grappling Hook
+Loop races + Race scoreboard
+Radio channels
+Fix a wheel physics issue (vehicles more stable)
+Fix network sleep issue with ground vehicles
+SyncScript initialization fix
+Fix haptics issue on SeaVehicle
+Vehicle teleporter
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Small update 1.62
 Many bug fixes
 Grappling hook code improvements
 Blocking players and respawning their plane no longer possible
