@@ -39,6 +39,7 @@ namespace SaccFlightAndVehicles
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
             CurrentChannel = MyChannel;
+            if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
             _AllPlanes_ENT = new SaccEntity[AllPlanes.Length];
             _AllPlanes_RD = new SAV_Radio[AllPlanes.Length];
             for (int i = 0; i < AllPlanes.Length; i++)
@@ -141,14 +142,14 @@ namespace SaccFlightAndVehicles
         {
             if (MyChannel + 1 > 16) { return; }
             MyChannel++;
-            ChannelText.text = MyChannel.ToString();
+            if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
             CurrentChannel = MyChannel;
         }
         public void DecreaseChannel()
         {
             if (MyChannel - 1 < 1) { return; }
             MyChannel--;
-            ChannelText.text = MyChannel.ToString();
+            if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
             CurrentChannel = MyChannel;
         }
     }
