@@ -110,87 +110,87 @@ namespace SaccFlightAndVehicles
         public bool Debugslip = false;
         public bool CurrentlyDistant = true;
 
-        //DEBUG
-        // public bool SetVel;
-        // public bool PrintDebugValues;
-        // public Vector3 DebugMoveSpeed = Vector3.zero;
-        // public bool DebugFreezeWheel = false;
-        // public float AccelTestLength = 4;
-        // public float DistResultPush;
-        // public float DistResultAccel;
-        // public float SpeedResultAccel;
-        // private Vector3 pushstartpoint;
-        // private Vector3 accelstartpoint;
-        // public void DEBUGPushCar()
-        // {
-        //     pushstartpoint = CarRigid.position;
-        //     CarRigid.velocity = CarRigid.transform.TransformDirection(DebugMoveSpeed);
-        //     WheelRotationSpeedRPM = 0;
-        //     WheelRotationSpeedRPS = 0;
-        //     WheelRotationSpeedSurf = 0;
-        // }
-        // public void DEBUGAccelCar()
-        // {
-        //     CarRigid.velocity = Vector3.zero;
-        //     CarRigid.angularVelocity = Vector3.zero;
-        //     SendCustomEventDelayedSeconds(nameof(DEBUGAccelCar_2), Time.fixedDeltaTime * 2);
-        //     SGVControl.SetProgramVariable("Revs", 0f);
-        //     accelstartpoint = CarRigid.position;
-        //     EngineRevs = 0;
-        //     WheelRotationSpeedRPM = 0;
-        //     WheelRotationSpeedRPS = 0;
-        //     WheelRotationSpeedSurf = 0;
-        // }
-        // public void DEBUGAccelCar_2()
-        // {
-        //     CarRigid.velocity = Vector3.zero;
-        //     CarRigid.angularVelocity = Vector3.zero;
-        //     SendCustomEventDelayedSeconds(nameof(DEBUGMeasureAccel), AccelTestLength);
-        //     SGVControl.SetProgramVariable("ACCELTEST", true);
-        //     SGVControl.SetProgramVariable("Revs", 0f);
-        //     accelstartpoint = CarRigid.position;
-        //     EngineRevs = 0;
-        //     WheelRotationSpeedRPM = 0;
-        //     WheelRotationSpeedRPS = 0;
-        //     WheelRotationSpeedSurf = 0;
-        // }
-        // private bool boolRevingUp;
-        // private int RevUpCount;
-        // public float RevUpResult;
-        // public float RPMTestTarget = 500;
-        // public void DEBUGAccelCar_Revup()
-        // {
-        //     CarRigid.velocity = Vector3.zero;
-        //     CarRigid.angularVelocity = Vector3.zero;
-        //     SendCustomEventDelayedSeconds(nameof(DEBUGAccelCar_Revup_2), Time.fixedDeltaTime * 2);
-        //     SGVControl.SetProgramVariable("Revs", 0f);
-        //     accelstartpoint = CarRigid.position;
-        //     EngineRevs = 0;
-        //     WheelRotationSpeedRPM = 0;
-        //     WheelRotationSpeedRPS = 0;
-        //     WheelRotationSpeedSurf = 0;
-        // }
-        // public void DEBUGAccelCar_Revup_2()
-        // {
-        //     CarRigid.velocity = Vector3.zero;
-        //     CarRigid.angularVelocity = Vector3.zero;
-        //     SGVControl.SetProgramVariable("ACCELTEST", true);
-        //     SGVControl.SetProgramVariable("Revs", 0f);
-        //     accelstartpoint = CarRigid.position;
-        //     EngineRevs = 0;
-        //     WheelRotationSpeedRPM = 0;
-        //     WheelRotationSpeedRPS = 0;
-        //     WheelRotationSpeedSurf = 0;
-        //     boolRevingUp = true;
-        //     RevUpCount = 0;
-        // }
-        // public void DEBUGMeasureAccel()
-        // {
-        //     SGVControl.SetProgramVariable("ACCELTEST", false);
-        //     DistResultAccel = Vector3.Distance(accelstartpoint, CarRigid.position);
-        //     SpeedResultAccel = CarRigid.velocity.magnitude;
-        // }
-        //ENDOFDEBUG
+#if UNITY_EDITOR
+        public bool SetVel;
+        public bool PrintDebugValues;
+        public Vector3 DebugMoveSpeed = Vector3.zero;
+        public bool DebugFreezeWheel = false;
+        public float AccelTestLength = 4;
+        public float DistResultPush;
+        public float DistResultAccel;
+        public float SpeedResultAccel;
+        private Vector3 pushstartpoint;
+        private Vector3 accelstartpoint;
+        public void DEBUGPushCar()
+        {
+            pushstartpoint = CarRigid.position;
+            CarRigid.velocity = CarRigid.transform.TransformDirection(DebugMoveSpeed);
+            WheelRotationSpeedRPM = 0;
+            WheelRotationSpeedRPS = 0;
+            WheelRotationSpeedSurf = 0;
+        }
+        public void DEBUGAccelCar()
+        {
+            CarRigid.velocity = Vector3.zero;
+            CarRigid.angularVelocity = Vector3.zero;
+            SendCustomEventDelayedSeconds(nameof(DEBUGAccelCar_2), Time.fixedDeltaTime * 2);
+            SGVControl.SetProgramVariable("Revs", 0f);
+            accelstartpoint = CarRigid.position;
+            EngineRevs = 0;
+            WheelRotationSpeedRPM = 0;
+            WheelRotationSpeedRPS = 0;
+            WheelRotationSpeedSurf = 0;
+        }
+        public void DEBUGAccelCar_2()
+        {
+            CarRigid.velocity = Vector3.zero;
+            CarRigid.angularVelocity = Vector3.zero;
+            SendCustomEventDelayedSeconds(nameof(DEBUGMeasureAccel), AccelTestLength);
+            SGVControl.SetProgramVariable("ACCELTEST", true);
+            SGVControl.SetProgramVariable("Revs", 0f);
+            accelstartpoint = CarRigid.position;
+            EngineRevs = 0;
+            WheelRotationSpeedRPM = 0;
+            WheelRotationSpeedRPS = 0;
+            WheelRotationSpeedSurf = 0;
+        }
+        private bool boolRevingUp;
+        private int RevUpCount;
+        public float RevUpResult;
+        public float RPMTestTarget = 500;
+        public void DEBUGAccelCar_Revup()
+        {
+            CarRigid.velocity = Vector3.zero;
+            CarRigid.angularVelocity = Vector3.zero;
+            SendCustomEventDelayedSeconds(nameof(DEBUGAccelCar_Revup_2), Time.fixedDeltaTime * 2);
+            SGVControl.SetProgramVariable("Revs", 0f);
+            accelstartpoint = CarRigid.position;
+            EngineRevs = 0;
+            WheelRotationSpeedRPM = 0;
+            WheelRotationSpeedRPS = 0;
+            WheelRotationSpeedSurf = 0;
+        }
+        public void DEBUGAccelCar_Revup_2()
+        {
+            CarRigid.velocity = Vector3.zero;
+            CarRigid.angularVelocity = Vector3.zero;
+            SGVControl.SetProgramVariable("ACCELTEST", true);
+            SGVControl.SetProgramVariable("Revs", 0f);
+            accelstartpoint = CarRigid.position;
+            EngineRevs = 0;
+            WheelRotationSpeedRPM = 0;
+            WheelRotationSpeedRPS = 0;
+            WheelRotationSpeedSurf = 0;
+            boolRevingUp = true;
+            RevUpCount = 0;
+        }
+        public void DEBUGMeasureAccel()
+        {
+            SGVControl.SetProgramVariable("ACCELTEST", false);
+            DistResultAccel = Vector3.Distance(accelstartpoint, CarRigid.position);
+            SpeedResultAccel = CarRigid.velocity.magnitude;
+        }
+#endif
         void Start()
         {
             WheelRenderer = (Renderer)SGVControl.GetProgramVariable("MainObjectRenderer");
@@ -257,9 +257,28 @@ namespace SaccFlightAndVehicles
                 SkidParticle = null;
             }
         }
-        private void FixedUpdate()
+        public int NumItsSec = 200;
+        float Its_Error;
+        public void FixedUpdate()
         {
             if (!IsOwner || Sleeping) { return; }
+            float ItsToDoFloat = ((Time.fixedDeltaTime) * NumItsSec);
+            int ItsToDo = (int)((Time.fixedDeltaTime) * NumItsSec);
+
+            Its_Error += ItsToDoFloat - ItsToDo;
+            float ErrorCheck = Its_Error;
+            if (ErrorCheck > 1)
+            {
+                ItsToDo++;
+                Its_Error = (ErrorCheck - Mathf.Floor(ErrorCheck));
+            }
+            for (int i = 0; i < ItsToDo; i++)
+            {
+                WheelPhysics(ItsToDo);
+            }
+        }
+        private void WheelPhysics(int NumIter)
+        {
             RaycastHit SusOut;
             float compression = 0f;
             float ForwardSpeed = 0f;
@@ -277,32 +296,32 @@ namespace SaccFlightAndVehicles
                 WheelRotationSpeedSurf = WheelCircumference * WheelRotationSpeedRPS;
             }
             float WheelRotationSpeedSurfPrev = WheelRotationSpeedSurf;
-            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * Brake * BrakeStrength);
-            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, Time.fixedDeltaTime * HandBrake * HandBrakeStrength);
+            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, (Time.fixedDeltaTime / NumIter) * Brake * BrakeStrength);
+            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, (Time.fixedDeltaTime / NumIter) * HandBrake * HandBrakeStrength);
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
             WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
-            //DEBUG
-            // DistResultPush = Vector3.Distance(pushstartpoint, CarRigid.position);
-            // if (SetVel) CarRigid.velocity = DebugMoveSpeed;
-            // if (DebugFreezeWheel)
-            // {
-            //     WheelRotationSpeedRPM = 0;
-            //     WheelRotationSpeedRPS = 0;
-            //     WheelRotationSpeedSurf = 0;
-            // }
-            // if (boolRevingUp)
-            // {
-            //     RevUpCount++;
-            //     if (WheelRotationSpeedRPM > RPMTestTarget)
-            //     {
-            //         boolRevingUp = false;
-            //         RevUpResult = Time.fixedDeltaTime * (float)RevUpCount;
+#if UNITY_EDITOR
+            DistResultPush = Vector3.Distance(pushstartpoint, CarRigid.position);
+            if (SetVel) CarRigid.velocity = DebugMoveSpeed;
+            if (DebugFreezeWheel)
+            {
+                WheelRotationSpeedRPM = 0;
+                WheelRotationSpeedRPS = 0;
+                WheelRotationSpeedSurf = 0;
+            }
+            if (boolRevingUp)
+            {
+                RevUpCount++;
+                if (WheelRotationSpeedRPM > RPMTestTarget)
+                {
+                    boolRevingUp = false;
+                    RevUpResult = Time.fixedDeltaTime * (float)RevUpCount;
 
-            //         SGVControl.SetProgramVariable("ACCELTEST", false);
-            //     }
-            // }
-            //ENDOFDEBUG
+                    SGVControl.SetProgramVariable("ACCELTEST", false);
+                }
+            }
+#endif
             if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
             {
 #if UNITY_EDITOR
@@ -340,7 +359,7 @@ namespace SaccFlightAndVehicles
                 //SUSPENSION//
                 compression = 1f - ((SusOut.distance - ExtraRayCastDistance) / SuspensionDistance);
                 //Spring force: More compressed = more force
-                Vector3 SpringForce = (SusDirection/* WheelPoint.up */ * compression * SpringForceMulti) * Time.fixedDeltaTime;
+                Vector3 SpringForce = (SusDirection/* WheelPoint.up */ * compression * SpringForceMulti) * (Time.fixedDeltaTime / NumIter);
                 float damping = (compression - compressionLast);
                 compressionLast = compression;
                 if (compression > 1f)//bottomed out
@@ -355,9 +374,9 @@ namespace SaccFlightAndVehicles
                 Vector3 DampingForce = SusDirection/* WheelPoint.up */ * (damping * DampingForceMulti);
                 SusForce = SpringForce + DampingForce;//The total weight on this suspension
                                                       //limit sus force
-                if (SusForce.magnitude / Time.fixedDeltaTime > MaxSuspensionForce)
+                if (SusForce.magnitude / (Time.fixedDeltaTime / NumIter) > MaxSuspensionForce)
                 {
-                    SusForce *= MaxSuspensionForce * Time.fixedDeltaTime / (SusForce).magnitude;
+                    SusForce *= MaxSuspensionForce * (Time.fixedDeltaTime / NumIter) / (SusForce).magnitude;
                 }
 
                 CarRigid.AddForceAtPosition(SusForce, WheelPoint.position, ForceMode.VelocityChange);
@@ -428,10 +447,10 @@ namespace SaccFlightAndVehicles
                 Vector3 GripForce3;
                 //SusForce has deltatime built in
                 float SusForceMag = SusForce.magnitude;
-                Vector3 GripForceForward = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / Time.fixedDeltaTime / 90f))) * CurrentGrip * SusForceMag;
+                Vector3 GripForceForward = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / (Time.fixedDeltaTime / NumIter) / 90f))) * CurrentGrip * SusForceMag;
                 if (SeparateLongLatGrip)
                 {
-                    Vector3 GripForceSide = -FullSkid.normalized * GripCurveLateral.Evaluate((FullSkidMag) / (CurrentGrip * LateralGrip * (SusForceMag / Time.fixedDeltaTime / 90f))) * CurrentGrip * LateralGrip * SusForceMag;
+                    Vector3 GripForceSide = -FullSkid.normalized * GripCurveLateral.Evaluate((FullSkidMag) / (CurrentGrip * LateralGrip * (SusForceMag / (Time.fixedDeltaTime / NumIter) / 90f))) * CurrentGrip * LateralGrip * SusForceMag;
                     GripForce3 = Vector3.Lerp(GripForceSide, GripForceForward, ForwardSideRatio);
                 }
                 else
@@ -488,7 +507,7 @@ namespace SaccFlightAndVehicles
                 SkidVectorFX += (Vector3.forward * Mathf.Abs(ForwardSlip));
             }
             //wheels slow down due to ?friction
-            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, Time.fixedDeltaTime * CurrentWheelSlowDown);
+            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, (Time.fixedDeltaTime / NumIter) * CurrentWheelSlowDown);
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
             WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
