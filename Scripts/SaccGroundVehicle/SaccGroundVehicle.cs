@@ -201,8 +201,8 @@ namespace SaccFlightAndVehicles
         private Vector3 Spawnposition;
         private Quaternion Spawnrotation;
         private float AutoSteerLerper;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float YawInput;
-        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float ThrottleInput;
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float YawInput;
+        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float ThrottleInput;
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public bool InEditor = true;
         [System.NonSerializedAttribute] public bool Initialized = false;
@@ -841,6 +841,15 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void SetWheelDriver()
+        {
+            for (int i = 0; i < DriveWheels.Length; i++)
+            { DriveWheels[i].SetProgramVariable("Piloting", Piloting); }
+            for (int i = 0; i < SteerWheels.Length; i++)
+            { SteerWheels[i].SetProgramVariable("Piloting", Piloting); }
+            for (int i = 0; i < OtherWheels.Length; i++)
+            { OtherWheels[i].SetProgramVariable("Piloting", Piloting); }
+        }
         /*     public void SetWheelSGV()
             {
                 for (int i = 0; i < DriveWheels.Length; i++)
@@ -870,6 +879,7 @@ namespace SaccFlightAndVehicles
             LastFrameVel = CurrentVel;
             InVR = EntityControl.InVR;
             SetCollidersLayer(OnboardVehicleLayer);
+            SetWheelDriver();
         }
         public void SFEXT_O_PilotExit()
         {
@@ -883,6 +893,7 @@ namespace SaccFlightAndVehicles
             }
             SetCollidersLayer(OutsideVehicleLayer);
             if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
+            SetWheelDriver();
         }
         public void SFEXT_P_PassengerEnter()
         {

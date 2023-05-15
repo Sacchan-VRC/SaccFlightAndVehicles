@@ -107,6 +107,7 @@ namespace SaccFlightAndVehicles
         private float WheelCircumference;
         private float compressionLast;
         public bool IsOwner = false;
+        public bool Piloting = false;
         public bool Debugslip = false;
         public bool CurrentlyDistant = true;
 
@@ -258,34 +259,38 @@ namespace SaccFlightAndVehicles
             }
         }
         public int NumItsSec = 200;
-        float Its_Error;
+        float Iter_Error;
         public void FixedUpdate()
         {
             if (!IsOwner || Sleeping) { return; }
-            float ItsToDoFloat = ((Time.fixedDeltaTime) * NumItsSec);
-            int ItsToDo = (int)((Time.fixedDeltaTime) * NumItsSec);
-
-            Its_Error += ItsToDoFloat - ItsToDo;
-            float ErrorCheck = Its_Error;
-            if (ErrorCheck > 1)
+            if (Piloting)//only do subframe iterations if driving
             {
-                ItsToDo++;
-                Its_Error = (ErrorCheck - Mathf.Floor(ErrorCheck));
+                float iterationsFloat = ((Time.fixedDeltaTime) * NumItsSec);
+                int iterations = (int)((Time.fixedDeltaTime) * NumItsSec);
+                Iter_Error += iterationsFloat - iterations;
+                if (Iter_Error > 1)
+                {
+                    int AddSteps = (int)Mathf.Floor(Iter_Error);//pretty sure this can never be anything but 1 unless refresh rate is changed during play maybe
+                    iterations += AddSteps;
+                    Iter_Error = (Iter_Error - AddSteps);
+                }
+                for (int i = 0; i < iterations; i++)
+                { WheelPhysics(iterations, i); }
             }
-            for (int i = 0; i < ItsToDo; i++)
-            {
-                WheelPhysics(ItsToDo);
-            }
+            else { WheelPhysics(1, 0); }
         }
-        private void WheelPhysics(int NumIter)
+        RaycastHit SusOut;
+        Vector3 SusForce;
+        Vector3 WheelGroundUp = Vector3.up;
+        Vector3 PointVelocity;
+        private void WheelPhysics(int NumIter, int CurIter)
         {
-            RaycastHit SusOut;
+            float WheelPhysicsDelta = Time.fixedDeltaTime / NumIter;
             float compression = 0f;
             float ForwardSpeed = 0f;
             float ForwardSideRatio = 0f;
             float ForceUsed = 0f;
             float ForwardSlip = 0f;
-            Vector3 SusForce = Vector3.zero;
 
 
             if (IsDriveWheel && !GearNeutral)
@@ -296,8 +301,8 @@ namespace SaccFlightAndVehicles
                 WheelRotationSpeedSurf = WheelCircumference * WheelRotationSpeedRPS;
             }
             float WheelRotationSpeedSurfPrev = WheelRotationSpeedSurf;
-            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, (Time.fixedDeltaTime / NumIter) * Brake * BrakeStrength);
-            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, (Time.fixedDeltaTime / NumIter) * HandBrake * HandBrakeStrength);
+            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, WheelPhysicsDelta * Brake * BrakeStrength);
+            WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, 0f, WheelPhysicsDelta * HandBrake * HandBrakeStrength);
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
             WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
@@ -317,87 +322,99 @@ namespace SaccFlightAndVehicles
                 {
                     boolRevingUp = false;
                     RevUpResult = Time.fixedDeltaTime * (float)RevUpCount;
-
                     SGVControl.SetProgramVariable("ACCELTEST", false);
                 }
             }
 #endif
-            if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
+            if (CurIter == 0)//stuff doesn't need to be substepped
             {
+                if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
+                {
+                    float fixedDT = Time.fixedDeltaTime;
+                    Grounded = true;
+                    //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop
+                    if (Vector3.Angle(SusOut.normal, Vector3.up) < 20)
+                    { SusDirection = Vector3.Lerp(Vector3.up, SusOut.normal, (SGVControl.VehicleSpeed / 1f)); }
+                    else
+                    { SusDirection = SusOut.normal; }
+
+                    //last character of surface object is its type
+                    int SurfLastChar = SusOut.collider.gameObject.name[SusOut.collider.gameObject.name.Length - 1];
+                    if (SurfLastChar >= '0' && SurfLastChar <= '9')
+                    {
+                        if (SurfaceType != SurfLastChar - '0')
+                        {
+                            SurfaceType = SurfLastChar - '0';
+                            ChangeSurface();
+                        }
+                    }
+                    else
+                    {
+                        if (SurfaceType != 0)
+                        {
+                            SurfaceType = 0;
+                            ChangeSurface();
+                        }
+                    }
+                    //SUSPENSION//
+                    compression = 1f - ((SusOut.distance - ExtraRayCastDistance) / SuspensionDistance);
+                    //Spring force: More compressed = more force
+                    Vector3 SpringForce = (SusDirection/* WheelPoint.up */ * compression * SpringForceMulti) * fixedDT;
+                    float damping = (compression - compressionLast);
+                    compressionLast = compression;
+                    if (compression > 1f)//bottomed out
+                    {
+                        damping *= DampingForce_BottomOutMulti;
+                    }
+                    if (damping < -MaxNegativeDamping)
+                    {
+                        damping = -MaxNegativeDamping;
+                    }
+                    //Damping force: The more the difference in compression between updates, the more force
+                    Vector3 DampingForce = SusDirection/* WheelPoint.up */ * (damping * DampingForceMulti);
+                    SusForce = SpringForce + DampingForce;//The total weight on this suspension
+                                                          //limit sus force
+                    if (SusForce.magnitude / fixedDT > MaxSuspensionForce)
+                    {
+                        SusForce *= MaxSuspensionForce * fixedDT / (SusForce).magnitude;
+                    }
+
+                    CarRigid.AddForceAtPosition(SusForce, WheelPoint.position, ForceMode.VelocityChange);
+
+                    //set wheel's visual position
+                    if (SusOut.distance > ExtraRayCastDistance)
+                    {
+                        WheelVisual.position = SusOut.point + (WheelPoint.up * WheelRadius);
+                    }
+                    else
+                    {
+                        WheelVisual.position = WheelPoint.position + (WheelPoint.up * WheelRadius);
+                    }
+                    //END OF SUSPENSION//
+                    //GRIP//
+                    //Wheel's velocity vector projected to the normal of the ground
+                    WheelGroundUp = Vector3.ProjectOnPlane(SusOut.normal, WheelPoint.right).normalized;
+                    PointVelocity = CarRigid.GetPointVelocity(SusOut.point);
 #if UNITY_EDITOR
-                ContactPoint = SusOut.point;
+                    ContactPoint = SusOut.point;
 #endif
-                Grounded = true;
-                //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop
-                if (Vector3.Angle(SusOut.normal, Vector3.up) < 20)
-                {
-                    SusDirection = Vector3.Lerp(Vector3.up, SusOut.normal, (SGVControl.VehicleSpeed / 1f));
                 }
                 else
                 {
-                    SusDirection = SusOut.normal;
+                    //wheel not touching ground
+                    if (SkidSoundPlayingLast) { StopSkidSound(); }
+                    if (SkidParticlePlayingLast) { StopSkidParticle(); }
+                    WheelVisual.position = WheelPoint.position - (WheelPoint.up * (SuspensionDistance - WheelRadius));
+                    SusForce = Vector3.zero;
+                    Grounded = false;
+                    compressionLast = 0f;
                 }
-
-                //last character of surface object is its type
-                int SurfLastChar = SusOut.collider.gameObject.name[SusOut.collider.gameObject.name.Length - 1];
-                if (SurfLastChar >= '0' && SurfLastChar <= '9')
-                {
-                    if (SurfaceType != SurfLastChar - '0')
-                    {
-                        SurfaceType = SurfLastChar - '0';
-                        ChangeSurface();
-                    }
-                }
-                else
-                {
-                    if (SurfaceType != 0)
-                    {
-                        SurfaceType = 0;
-                        ChangeSurface();
-                    }
-                }
-                //SUSPENSION//
-                compression = 1f - ((SusOut.distance - ExtraRayCastDistance) / SuspensionDistance);
-                //Spring force: More compressed = more force
-                Vector3 SpringForce = (SusDirection/* WheelPoint.up */ * compression * SpringForceMulti) * (Time.fixedDeltaTime / NumIter);
-                float damping = (compression - compressionLast);
-                compressionLast = compression;
-                if (compression > 1f)//bottomed out
-                {
-                    damping *= DampingForce_BottomOutMulti;
-                }
-                if (damping < -MaxNegativeDamping)
-                {
-                    damping = -MaxNegativeDamping;
-                }
-                //Damping force: The more the difference in compression between updates, the more force
-                Vector3 DampingForce = SusDirection/* WheelPoint.up */ * (damping * DampingForceMulti);
-                SusForce = SpringForce + DampingForce;//The total weight on this suspension
-                                                      //limit sus force
-                if (SusForce.magnitude / (Time.fixedDeltaTime / NumIter) > MaxSuspensionForce)
-                {
-                    SusForce *= MaxSuspensionForce * (Time.fixedDeltaTime / NumIter) / (SusForce).magnitude;
-                }
-
-                CarRigid.AddForceAtPosition(SusForce, WheelPoint.position, ForceMode.VelocityChange);
-
-                //set wheel's visual position
-                if (SusOut.distance > ExtraRayCastDistance)
-                {
-                    WheelVisual.position = SusOut.point + (WheelPoint.up * WheelRadius);
-                }
-                else
-                {
-                    WheelVisual.position = WheelPoint.position + (WheelPoint.up * WheelRadius);
-                }
-                //END OF SUSPENSION//
-
+            }
+            if (Grounded)
+            {
                 //GRIP//
-                //Wheel's velocity vector projected to the normal of the ground
-                Vector3 WheelGroundUp = Vector3.ProjectOnPlane(SusOut.normal, WheelPoint.right).normalized;
-                Vector3 pv = CarRigid.GetPointVelocity(SusOut.point);
                 //Wheel's velocity vector projected to be only forward/back
-                Vector3 WheelForwardSpeed = Vector3.ProjectOnPlane(pv, WheelPoint.right);
+                Vector3 WheelForwardSpeed = Vector3.ProjectOnPlane(PointVelocity, WheelPoint.right);
                 WheelForwardSpeed -= Vector3.Project(WheelForwardSpeed, WheelGroundUp);
                 float ForwardSpeed_abs = WheelForwardSpeed.magnitude;
                 ForwardSpeed = ForwardSpeed_abs;
@@ -409,7 +426,7 @@ namespace SaccFlightAndVehicles
                 //How much the wheel is slipping (difference between speed of wheel rotation at it's surface, and the speed of the ground beneath it), as a vector3
                 Vector3 ForwardSkid = Vector3.ProjectOnPlane(WheelPoint.forward, SusOut.normal).normalized * ForwardSlip;
 
-                Vector3 SideSkid = Vector3.ProjectOnPlane(pv, WheelForwardSpeed);
+                Vector3 SideSkid = Vector3.ProjectOnPlane(PointVelocity, WheelForwardSpeed);
                 SideSkid = Vector3.ProjectOnPlane(SideSkid, SusOut.normal);
 
                 //add both skid axis together to get total 'skid'
@@ -446,11 +463,11 @@ namespace SaccFlightAndVehicles
 
                 Vector3 GripForce3;
                 //SusForce has deltatime built in
-                float SusForceMag = SusForce.magnitude;
-                Vector3 GripForceForward = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / (Time.fixedDeltaTime / NumIter) / 90f))) * CurrentGrip * SusForceMag;
+                float SusForceMag = SusForce.magnitude / NumIter;
+                Vector3 GripForceForward = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / WheelPhysicsDelta / 90f))) * CurrentGrip * SusForceMag;
                 if (SeparateLongLatGrip)
                 {
-                    Vector3 GripForceSide = -FullSkid.normalized * GripCurveLateral.Evaluate((FullSkidMag) / (CurrentGrip * LateralGrip * (SusForceMag / (Time.fixedDeltaTime / NumIter) / 90f))) * CurrentGrip * LateralGrip * SusForceMag;
+                    Vector3 GripForceSide = -FullSkid.normalized * GripCurveLateral.Evaluate((FullSkidMag) / (CurrentGrip * LateralGrip * (SusForceMag / WheelPhysicsDelta / 90f))) * CurrentGrip * LateralGrip * SusForceMag;
                     GripForce3 = Vector3.Lerp(GripForceSide, GripForceForward, ForwardSideRatio);
                 }
                 else
@@ -478,15 +495,6 @@ namespace SaccFlightAndVehicles
                                 } */
                 //ENDOFDEBUG
             }
-            else
-            {
-                //wheel not touching ground
-                if (SkidSoundPlayingLast) { StopSkidSound(); }
-                if (SkidParticlePlayingLast) { StopSkidParticle(); }
-                WheelVisual.position = WheelPoint.position - (WheelPoint.up * (SuspensionDistance - WheelRadius));
-                Grounded = false;
-                compressionLast = 0f;
-            }
 
             //move wheel rotation speed towards its ground speed along its forward axis based on how much of it's forward skid that it gripped
             if (Grounded && HandBrake != 1f)
@@ -507,7 +515,7 @@ namespace SaccFlightAndVehicles
                 SkidVectorFX += (Vector3.forward * Mathf.Abs(ForwardSlip));
             }
             //wheels slow down due to ?friction
-            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, (Time.fixedDeltaTime / NumIter) * CurrentWheelSlowDown);
+            WheelRotationSpeedSurf = Mathf.Lerp(WheelRotationSpeedSurf, 0, WheelPhysicsDelta * CurrentWheelSlowDown);
             WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
             WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
 
@@ -520,8 +528,8 @@ namespace SaccFlightAndVehicles
                 //lerp engine towards wheel speed of handbrake is being used
             }
             SkidVectorFX += Vector3.forward * (WheelRotationSpeedSurf - WheelRotationSpeedSurfPrev);//works but stupid
-            //this would be a better way to do it, but slipgrip is broken so you would never get forward skidding sounds
-            //SkidVectorFX += Vector3.forward * SlipGrip;
+                                                                                                    //this would be a better way to do it, but slipgrip is broken so you would never get forward skidding sounds
+                                                                                                    //SkidVectorFX += Vector3.forward * SlipGrip;
             SkidLength = SkidVectorFX.magnitude;
         }
         private void LateUpdate()
