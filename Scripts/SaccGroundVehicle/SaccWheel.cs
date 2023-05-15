@@ -59,6 +59,8 @@ namespace SaccFlightAndVehicles
         [Header("Drive Wheels Only")]
         [Tooltip("How much the wheel slowing down/speeding up changes the engine speed")]
         public float EngineInfluence = 225f;
+        [Tooltip("Number of steps per second wheel physics should run, minimum, if refresh rate is higher than this number, it will do nothing. Improves vehicle acceleration fairness.")]
+        public int NumStepsSec = 200;
         [Header("Debug")]
         public float CurrentGrip = 7f;
         public float CurrentNumParticles = 0f;
@@ -258,24 +260,24 @@ namespace SaccFlightAndVehicles
                 SkidParticle = null;
             }
         }
-        public int NumItsSec = 200;
-        float Iter_Error;
+        float Steps_Error;
         public void FixedUpdate()
         {
             if (!IsOwner || Sleeping) { return; }
-            if (Piloting)//only do subframe iterations if driving
+            if (Piloting && IsDriveWheel)//only do subframe Stepsations if driving
             {
-                float iterationsFloat = ((Time.fixedDeltaTime) * NumItsSec);
-                int iterations = (int)((Time.fixedDeltaTime) * NumItsSec);
-                Iter_Error += iterationsFloat - iterations;
-                if (Iter_Error > 1)
+                float StepsFloat = ((Time.fixedDeltaTime) * NumStepsSec);
+                int steps = (int)((Time.fixedDeltaTime) * NumStepsSec);
+                Steps_Error += StepsFloat - steps;
+                if (Steps_Error > 1)
                 {
-                    int AddSteps = (int)Mathf.Floor(Iter_Error);//pretty sure this can never be anything but 1 unless refresh rate is changed during play maybe
-                    iterations += AddSteps;
-                    Iter_Error = (Iter_Error - AddSteps);
+                    int AddSteps = (int)Mathf.Floor(Steps_Error);//pretty sure this can never be anything but 1 unless refresh rate is changed during play maybe
+                    steps += AddSteps;
+                    Steps_Error = (Steps_Error - AddSteps);
                 }
-                for (int i = 0; i < iterations; i++)
-                { WheelPhysics(iterations, i); }
+                if (steps < 1) { steps = 1; }//if refresh rate is above NumItsSec just run once per frame, nothing else we can do
+                for (int i = 0; i < steps; i++)
+                { WheelPhysics(steps, i); }
             }
             else { WheelPhysics(1, 0); }
         }
@@ -283,9 +285,9 @@ namespace SaccFlightAndVehicles
         Vector3 SusForce;
         Vector3 WheelGroundUp = Vector3.up;
         Vector3 PointVelocity;
-        private void WheelPhysics(int NumIter, int CurIter)
+        private void WheelPhysics(int NumSteps, int CurSteps)
         {
-            float WheelPhysicsDelta = Time.fixedDeltaTime / NumIter;
+            float WheelPhysicsDelta = Time.fixedDeltaTime / NumSteps;
             float compression = 0f;
             float ForwardSpeed = 0f;
             float ForwardSideRatio = 0f;
@@ -326,7 +328,7 @@ namespace SaccFlightAndVehicles
                 }
             }
 #endif
-            if (CurIter == 0)//stuff doesn't need to be substepped
+            if (CurSteps == 0)//stuff doesn't need to be substepped
             {
                 if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
                 {
@@ -463,7 +465,7 @@ namespace SaccFlightAndVehicles
 
                 Vector3 GripForce3;
                 //SusForce has deltatime built in
-                float SusForceMag = SusForce.magnitude / NumIter;
+                float SusForceMag = SusForce.magnitude / NumSteps;
                 Vector3 GripForceForward = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / WheelPhysicsDelta / 90f))) * CurrentGrip * SusForceMag;
                 if (SeparateLongLatGrip)
                 {
