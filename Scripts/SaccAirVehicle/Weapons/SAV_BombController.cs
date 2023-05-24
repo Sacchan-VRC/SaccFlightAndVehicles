@@ -12,6 +12,8 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour BombLauncherControl;
         [Tooltip("Bomb will explode after this time")]
         public float MaxLifetime = 40;
+        [Tooltip("Maximum liftime of bomb is randomized by +- this many seconds on appearance")]
+        public float MaxLifetimeRadnomization = 2f;
         [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
         public float ExplosionLifeTime = 10;
         [Tooltip("Play a random one of these explosion sounds")]
@@ -45,10 +47,10 @@ namespace SaccFlightAndVehicles
         {
             initialized = true;
             EntityControl = (SaccEntity)BombLauncherControl.GetProgramVariable("EntityControl");
+            if (EntityControl) { VehicleCenterOfMass = EntityControl.CenterOfMass; }
             BombCollider = GetComponent<CapsuleCollider>();
             BombRigid = GetComponent<Rigidbody>();
             BombConstant = GetComponent<ConstantForce>();
-            VehicleCenterOfMass = EntityControl.CenterOfMass;
             transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
             BombAnimator = GetComponent<Animator>();
             ColliderAlwaysActive = ColliderActiveDistance == 0;
@@ -60,15 +62,14 @@ namespace SaccFlightAndVehicles
         private void OnEnable()
         {
             if (!initialized) { Initialize(); }
-            if (ColliderAlwaysActive) { BombCollider.enabled = true; ColliderActive = true; }
+            if (ColliderAlwaysActive || !VehicleCenterOfMass) { BombCollider.enabled = true; ColliderActive = true; }
             else { ColliderActive = false; }
-            if (EntityControl.InEditor) { IsOwner = true; }
+            if (EntityControl && EntityControl.InEditor) { IsOwner = true; }
             else
             { IsOwner = (bool)BombLauncherControl.GetProgramVariable("IsOwner"); }
-            SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+            SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime + Random.Range(-MaxLifetimeRadnomization, MaxLifetimeRadnomization));
             LifeTimeExplodesSent++;
             SendCustomEventDelayedFrames(nameof(AddLaunchSpeed), 1);//doesn't work if done this frame
-
             BombConstant.relativeTorque = Vector3.zero;
             BombConstant.relativeForce = Vector3.zero;
         }
@@ -103,7 +104,7 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             transform.SetParent(BombLauncherControl.transform);
             BombCollider.enabled = false;
-            ColliderActive = false;
+            if (VehicleCenterOfMass) { ColliderActive = false; }
             BombConstant.relativeTorque = Vector3.zero;
             BombConstant.relativeForce = Vector3.zero;
             BombRigid.constraints = RigidbodyConstraints.None;
