@@ -130,6 +130,7 @@ namespace SaccFlightAndVehicles
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleTransform = EntityControl.transform;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
 
             FindSelf();
 

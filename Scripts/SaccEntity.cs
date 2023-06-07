@@ -52,7 +52,7 @@ namespace SaccFlightAndVehicles
         public VRCStation[] ExternalSeats;
         [Header("For debugging, auto filled on build")]
         public GameObject[] AAMTargets;
-        [System.NonSerializedAttribute] public bool InEditor = true;
+        [System.NonSerializedAttribute] public bool InEditor = true;//false if in clientsim
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public VRC_Pickup EntityPickup;
         [System.NonSerializedAttribute] public bool Piloting;
@@ -333,7 +333,7 @@ namespace SaccFlightAndVehicles
                             //damage increase using case:
                             dmg = 10 * (pname[1] - 48);
                             dmg += pname[2] - 48;
-                            LastHitBulletDamageMulti = dmg == 1 ? 1 : Mathf.Pow(2, dmg);
+                            LastHitBulletDamageMulti = dmg == 1 ? 1 : Mathf.Pow(2, dmg - 1);
                             More = true;
                         }
                     }
