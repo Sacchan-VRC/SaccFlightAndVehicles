@@ -469,6 +469,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_TakeOwnership()
         {
+            WakeUp();
             IsOwner = true;
             DoEffects = 5f;
         }
