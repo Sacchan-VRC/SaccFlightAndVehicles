@@ -95,18 +95,10 @@ namespace SaccFlightAndVehicles
             get => HandBrakeOn;
         }
         private Vector3 VehiclePosLastFrame;
-        [Header("Engine")]
-        public float RevLimiter = 8000;
-        [Tooltip("Vehicle will take damage if experiences more Gs that this (Internally Gs are calculated in all directions, the HUD shows only vertical Gs so it will differ slightly")]
-        public float MaxGs = 10;
-        [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
-        public float GDamage = 10f;
-        [Tooltip("Shape of the auto steer response curve, smaller number makes it sharper, around 0.5 might be realistic")]
         public bool Drift_AutoSteer;
-        [Header("AutoSteer Enabled")]
+        [Header("AutoSteer (Drift Mode)")]
         [Tooltip("Put in the max degrees the wheels can turn to in order to make autosteer work properly")]
         public float SteeringDegrees = 60;
-        // public float AutoSteerCurve = 0f;
         public float AutoSteerStrength = 1f;
         [Header("AutoSteer Disabled")]
         [Tooltip("how fast steering wheel returns to neutral position in destop mode 1 = 1 second, .2 = 5 seconds")]
@@ -114,11 +106,12 @@ namespace SaccFlightAndVehicles
         [Tooltip("how fast steering wheel returns to neutral position in VR 1 = 1 second, .2 = 5 seconds")]
         public float SteeringReturnSpeedVR = 5f;
         public bool UseStickSteering;
-        [Header("Bike")]
-        [Tooltip("Max roll angle of head for leaning on bike")]
-        public float LeanSensitivity_Roll = 25f;
-        [Tooltip("How far head has to move to lean forward/back, high number = less movement required")]
-        public float LeanSensitivity_Pitch = 2.5f;
+        [Header("Engine")]
+        public float RevLimiter = 8000;
+        [Tooltip("Vehicle will take damage if experiences more Gs that this (Internally Gs are calculated in all directions, the HUD shows only vertical Gs so it will differ slightly")]
+        public float MaxGs = 10;
+        [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
+        public float GDamage = 10f;
         [Header("Other")]
         [Tooltip("Time until vehicle reappears after exploding")]
         public float RespawnDelay = 10;
@@ -139,12 +132,17 @@ namespace SaccFlightAndVehicles
         public float RefuelTime = 25f;
         [Tooltip("Range at which vehicle becomes 'distant' for optimization")]
         public float DistantRange = 400f;
+        public float RevLimiterDelay = .04f;
+        [Header("Bike Stuff (WIP/Broken)")]
+        [Tooltip("Max roll angle of head for leaning on bike")]
+        public float LeanSensitivity_Roll = 25f;
+        [Tooltip("How far head has to move to lean forward/back, high number = less movement required")]
+        public float LeanSensitivity_Pitch = 2.5f;
+        public bool EnableLeaning = false;
         [Header("Debug")]
         [UdonSynced(UdonSyncMode.Linear)] public float Revs;
         public float Clutch;
         [System.NonSerialized] public int OutsideVehicleLayer;
-        public bool EnableLeaning = false;
-        public float RevLimiterDelay = .04f;
         private float ThrottleNormalizer;
         public int CurrentGear = 0;
         private bool LimitingRev = false;
