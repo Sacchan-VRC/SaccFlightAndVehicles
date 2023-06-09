@@ -8,6 +8,9 @@ https://twitter.com/Sacchan_VRC
 Please support me if you like this project:
 https://ko-fi.com/sacchanvrc
 
+To install: Extract the SaccFlightAndVehicles folder into your Assets folder
+To update: Use your folder browser to delete your old SaccFlightAndVehicles folder, and replace it with the new one. Don't do it inside Unity.
+
 Migrating a 1.62 project to 1.63 info:
 In windows file explorer, delete the SaccFlightAndVehicles folder and replace it with the new version
 The race system has a large update, if you have a racing world you must replace some things. Look at the SaccFlightExample.unity example scene to see it set up.
@@ -300,6 +303,11 @@ WindControl
 A pickup with sliders on it that allow you to control the strength and direction of the wind. Click while holding to apply wind.
 
 Changelog:
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Hotfix update 1.64
+Fixed bug that made ground vehicles not enter sleep mode if ownership taken by prev. owner leaving
+Fixed bug where weapons with increased damage where doing +1 damage level locally
+Increased damage of bombs and AGMs
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Medium update 1.63
 Added Biplane, Grappling Hook
