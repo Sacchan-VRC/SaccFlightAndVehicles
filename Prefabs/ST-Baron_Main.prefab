@@ -5661,6 +5661,7 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
+  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -5675,8 +5676,19 @@ MonoBehaviour:
   _GearRatio: 0
   GearNeutral: 0
   IsOwner: 0
+  Piloting: 0
   Debugslip: 0
   CurrentlyDistant: 1
+  SetVel: 0
+  PrintDebugValues: 0
+  DebugMoveSpeed: {x: 0, y: 0, z: 0}
+  DebugFreezeWheel: 0
+  AccelTestLength: 4
+  DistResultPush: 0
+  DistResultAccel: 0
+  SpeedResultAccel: 0
+  RevUpResult: 0
+  RPMTestTarget: 500
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -15467,7 +15479,7 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0.03
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
@@ -35605,6 +35617,7 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
+  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -35619,8 +35632,19 @@ MonoBehaviour:
   _GearRatio: 0
   GearNeutral: 0
   IsOwner: 0
+  Piloting: 0
   Debugslip: 0
   CurrentlyDistant: 1
+  SetVel: 0
+  PrintDebugValues: 0
+  DebugMoveSpeed: {x: 0, y: 0, z: 0}
+  DebugFreezeWheel: 0
+  AccelTestLength: 4
+  DistResultPush: 0
+  DistResultAccel: 0
+  SpeedResultAccel: 0
+  RevUpResult: 0
+  RPMTestTarget: 500
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -35904,6 +35928,7 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
+  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -35918,8 +35943,19 @@ MonoBehaviour:
   _GearRatio: 0
   GearNeutral: 0
   IsOwner: 0
+  Piloting: 0
   Debugslip: 0
   CurrentlyDistant: 1
+  SetVel: 0
+  PrintDebugValues: 0
+  DebugMoveSpeed: {x: 0, y: 0, z: 0}
+  DebugFreezeWheel: 0
+  AccelTestLength: 4
+  DistResultPush: 0
+  DistResultAccel: 0
+  SpeedResultAccel: 0
+  RevUpResult: 0
+  RPMTestTarget: 500
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -52298,6 +52334,7 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
+  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -52312,8 +52349,19 @@ MonoBehaviour:
   _GearRatio: 0
   GearNeutral: 0
   IsOwner: 0
+  Piloting: 0
   Debugslip: 0
   CurrentlyDistant: 1
+  SetVel: 0
+  PrintDebugValues: 0
+  DebugMoveSpeed: {x: 0, y: 0, z: 0}
+  DebugFreezeWheel: 0
+  AccelTestLength: 4
+  DistResultPush: 0
+  DistResultAccel: 0
+  SpeedResultAccel: 0
+  RevUpResult: 0
+  RPMTestTarget: 500
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -57717,17 +57765,15 @@ MonoBehaviour:
   SwitchHandsJoyThrottle: 0
   SteeringHand_Left: 1
   SteeringHand_Right: 1
-  RevLimiter: 8000
-  MaxGs: 10
-  GDamage: 5
   Drift_AutoSteer: 0
   SteeringDegrees: 60
   AutoSteerStrength: 0.3
   SteeringReturnSpeedDT: 0.3
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
-  LeanSensitivity_Roll: 25
-  LeanSensitivity_Pitch: 2.5
+  RevLimiter: 8000
+  MaxGs: 10
+  GDamage: 5
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
   BulletDamageTaken: 0
@@ -57738,10 +57784,12 @@ MonoBehaviour:
   RepairTime: 30
   RefuelTime: 25
   DistantRange: 400
+  RevLimiterDelay: 0.05
+  LeanSensitivity_Roll: 25
+  LeanSensitivity_Pitch: 2.5
+  EnableLeaning: 0
   Revs: 0
   Clutch: 0
-  EnableLeaning: 0
-  RevLimiterDelay: 0.05
   CurrentGear: 1
   VehicleVel: {x: 0, y: 0, z: 0}
   debugSpeedSteeringMulti: 0
@@ -63681,6 +63729,34 @@ Transform:
   m_Father: {fileID: 6100835885085105368}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!136 &1775498137041162106
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6483636636597866850}
+  m_Material: {fileID: 13400000, guid: c352042ddf1f7c94cbb288c12d0346f0, type: 2}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.05
+  m_Height: 3
+  m_Direction: 0
+  m_Center: {x: 0, y: 0.68, z: -1.31}
+--- !u!136 &5714221698280716271
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6483636636597866850}
+  m_Material: {fileID: 13400000, guid: c352042ddf1f7c94cbb288c12d0346f0, type: 2}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.05
+  m_Height: 2.42
+  m_Direction: 0
+  m_Center: {x: 0, y: 0.68, z: 1.36}
 --- !u!65 &8077005640247095151
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -63733,34 +63809,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.64, y: 0.6482775, z: 2.2022629}
   m_Center: {x: 0, y: 0.8386613, z: -0.7290611}
---- !u!136 &5714221698280716271
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6483636636597866850}
-  m_Material: {fileID: 13400000, guid: c352042ddf1f7c94cbb288c12d0346f0, type: 2}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.05
-  m_Height: 2.42
-  m_Direction: 0
-  m_Center: {x: 0, y: 0.68, z: 1.36}
---- !u!136 &1775498137041162106
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6483636636597866850}
-  m_Material: {fileID: 13400000, guid: c352042ddf1f7c94cbb288c12d0346f0, type: 2}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.05
-  m_Height: 3
-  m_Direction: 0
-  m_Center: {x: 0, y: 0.68, z: -1.31}
 --- !u!1 &6697720587577544913
 GameObject:
   m_ObjectHideFlags: 0

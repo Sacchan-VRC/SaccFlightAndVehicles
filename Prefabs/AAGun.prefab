@@ -172,10 +172,12 @@ MonoBehaviour:
   EntityControl: {fileID: -6981790852263073105}
   IsPilotSeat: 1
   ThisSeatOnly: {fileID: 784884802}
+  EnableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2041867257}
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
+  Disable180Rotation: 0
 --- !u!114 &204394095
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15154,7 +15156,7 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
@@ -30289,7 +30291,7 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
@@ -36005,7 +36007,7 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 784884802}
-  HoldingOnly: {fileID: 0}
+  EnableWhenHolding: []
   CenterOfMass: {fileID: 1947454891}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
