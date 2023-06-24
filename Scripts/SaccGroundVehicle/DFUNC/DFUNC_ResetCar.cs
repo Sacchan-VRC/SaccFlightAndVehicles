@@ -13,6 +13,9 @@ namespace SaccFlightAndVehicles
         private SaccGroundVehicle SGVControl;
         [Tooltip("Height added to vehicle when it's reset")]
         public float AddedHeight = 0f;
+        public bool StopCarOnReset = false;
+        [SerializeField] private float ResetMinDelay = 0;
+        private float RespawnTime;
         private Transform VehicleTransform;
         private bool Selected;
         private bool InVR;
@@ -65,6 +68,13 @@ namespace SaccFlightAndVehicles
         }
         private void ResetCar()
         {
+            if (Time.time - RespawnTime < ResetMinDelay) { return; }
+            RespawnTime = Time.time;
+            if (StopCarOnReset)
+            {
+                Rigidbody rb = EntityControl.GetComponent<Rigidbody>();
+                if (rb) { rb.velocity = Vector3.zero; }
+            }
             VehicleTransform.rotation = Quaternion.Euler(new Vector3(0f, VehicleTransform.rotation.eulerAngles.y, 0f));
             VehicleTransform.position += Vector3.up * AddedHeight;
             if (SGVControl)
