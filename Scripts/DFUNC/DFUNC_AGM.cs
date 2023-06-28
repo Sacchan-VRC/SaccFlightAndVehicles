@@ -10,6 +10,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class DFUNC_AGM : UdonSharpBehaviour
     {
+        [Tooltip("NOT required if 'Hand Held Mode' is enabled")]
         [SerializeField] public UdonSharpBehaviour SAVControl;
         public Animator AGMAnimator;
         [Tooltip("Camera script that is used to see the target")]
@@ -20,6 +21,8 @@ namespace SaccFlightAndVehicles
         public Camera AtGCam;
         [Tooltip("Screen that displays target, that is enabled when selected")]
         public GameObject AtGScreen;
+        public float CamZoomScale = 100f;
+        public float CamZoomScale_Locked = 60f;
         public GameObject Dial_Funcon;
         [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
         public float FullReloadTimeSec = 8;
@@ -43,7 +46,11 @@ namespace SaccFlightAndVehicles
         [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
         public bool AnimBoolStayTrueOnExit;
         [Tooltip("Fired AGMs will be parented to this object, use if you happen to have some kind of moving origin system")]
+        public Transform AGMLaunchPoint;
+        public LayerMask AGMTargetsLayer = 1 << 26;
         public Transform WorldParent;
+        [SerializeField] private bool HandHeldMode = false;
+        [SerializeField] private SaccEntity _EntityControl;
         [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private ushort _AGMFire;
         public ushort AGMFire
         {
@@ -69,8 +76,6 @@ namespace SaccFlightAndVehicles
         private bool TriggerLastFrame;
         private float TriggerTapTime;
         [System.NonSerializedAttribute] public int FullAGMs;
-        public Transform AGMLaunchPoint;
-        public LayerMask AGMTargetsLayer = 1 << 26;
         private float FullAGMsDivider;
         private int NumChildrenStart;
         [System.NonSerializedAttribute, UdonSynced(UdonSyncMode.None), FieldChangeCallback(nameof(AGMTarget))] public Vector3 _AGMTarget;
@@ -127,10 +132,18 @@ namespace SaccFlightAndVehicles
             FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+            if (HandHeldMode)
+            {
+                EntityControl = _EntityControl;
+                IsOwner = _EntityControl.IsOwner;
+            }
+            else
+            {
+                EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+                IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            }
             VehicleTransform = EntityControl.transform;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
 
             FindSelf();
 
@@ -197,7 +210,10 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_ReSupply()
         {
             if (NumAGM != FullAGMs)
-            { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+            {
+                if (SAVControl)
+                { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+            }
             NumAGM = (int)Mathf.Min(NumAGM + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAGMs);
             UpdateAmmoVisuals();
         }
@@ -272,10 +288,14 @@ namespace SaccFlightAndVehicles
                 TriggerTapTime += DeltaTime;
                 AGMUnlockTimer += DeltaTime * AGMUnlocking;//AGMUnlocking is 1 if it was locked and just pressed, else 0, (waits for double tap delay to disable)
                 float Trigger;
-                if (UseLeftTrigger)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                if (!HandHeldMode)
+                {
+                    if (UseLeftTrigger)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                }
+                else { Trigger = UseTrigger; }
                 if (AGMUnlockTimer > 0.4f && AGMLocked == true)
                 {
                     //disable for others because they no longer need to sync
@@ -286,7 +306,7 @@ namespace SaccFlightAndVehicles
                     if (AGMUnlock)
                     { AGMUnlock.Play(); }
                 }
-                if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
+                if (Trigger > 0.75 || (!HandHeldMode && Input.GetKey(KeyCode.Space)))
                 {
                     if (!TriggerLastFrame)
                     {//new button press
@@ -294,15 +314,16 @@ namespace SaccFlightAndVehicles
                         {//double tap detected
                             if (AGMLocked)
                             {//locked on, launch missile
-                                if (NumAGM > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
+                                if (NumAGM > 0 && (HandHeldMode || (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing"))))
                                 {
-                                    if (DisallowFireIfWind)
+                                    if (DisallowFireIfWind && !HandHeldMode)
                                     {
                                         if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
                                         { return; }
                                     }
                                     AGMFire++;//launch AGM using set
                                     RequestSerialization();
+                                    TriggerTapTime += 0.4f;//dont count every tap after first double tap as another double tap
                                     if (IsOwner)
                                     { EntityControl.SendEventToExtensions("SFEXT_O_AGMLaunch"); }
                                 }
@@ -311,43 +332,41 @@ namespace SaccFlightAndVehicles
                         }
                         else if (!AGMLocked)
                         {//lock onto a target
-                            if (AtGCam)
-                            {
-                                //check for agmtargets to lock to
-                                float targetangle = 999;
-                                RaycastHit[] agmtargs = Physics.SphereCastAll(AtGCam.transform.position, 150, AtGCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);
-                                if (agmtargs.Length > 0)
-                                {//found one or more, find lowest angle one
-                                 //find target with lowest angle from crosshair
-                                    foreach (RaycastHit target in agmtargs)
+
+                            //check for agmtargets to lock to
+                            float targetangle = 999;
+                            RaycastHit[] agmtargs = Physics.SphereCastAll(AtGCam.transform.position, 150, AtGCam.transform.forward, Mathf.Infinity, AGMTargetsLayer);
+                            if (agmtargs.Length > 0)
+                            {//found one or more, find lowest angle one
+                             //find target with lowest angle from crosshair
+                                foreach (RaycastHit target in agmtargs)
+                                {
+                                    Vector3 targetdirection = target.point - AtGCam.transform.position;
+                                    float angle = Vector3.Angle(AtGCam.transform.forward, targetdirection);
+                                    if (angle < targetangle)
                                     {
-                                        Vector3 targetdirection = target.point - AtGCam.transform.position;
-                                        float angle = Vector3.Angle(AtGCam.transform.forward, targetdirection);
-                                        if (angle < targetangle)
-                                        {
-                                            targetangle = angle;
-                                            AGMTarget = target.collider.transform.position;
-                                        }
+                                        targetangle = angle;
+                                        AGMTarget = target.collider.transform.position;
                                     }
-                                    //the spherecastall should really be a cone but this works for now
-                                    if (targetangle > 20)
-                                    { RaycastLock(); }
-                                    else
-                                    {
-                                        AGMLocked = true;
-                                        AGMUnlocking = 0;
-                                        if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
-                                        RequestSerialization();
-                                    }
-                                    if (AGMLocked && AGMLock)
-                                    { AGMLock.Play(); }
                                 }
+                                //the spherecastall should really be a cone but this works for now
+                                if (targetangle > 20)
+                                { RaycastLock(); }
                                 else
-                                {//didn't find one, lock onto raycast point
-                                    RaycastLock();
-                                    if (AGMLocked && AGMLock)
-                                    { AGMLock.Play(); }
+                                {
+                                    AGMLocked = true;
+                                    AGMUnlocking = 0;
+                                    if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+                                    RequestSerialization();
                                 }
+                                if (AGMLocked && AGMLock)
+                                { AGMLock.Play(); }
+                            }
+                            else
+                            {//didn't find one, lock onto raycast point
+                                RaycastLock();
+                                if (AGMLocked && AGMLock)
+                                { AGMLock.Play(); }
                             }
                         }
                         else
@@ -363,20 +382,28 @@ namespace SaccFlightAndVehicles
                 if (!AGMLocked)
                 {
                     Quaternion newangle;
-                    if (InVR)
-                    {
-                        if (UseLeftTrigger)
-                        { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
-                        else
-                        { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
-                    }
-                    else if (!InEditor)//desktop mode
-                    {
-                        newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
-                    }
-                    else//editor
+
+                    if (HandHeldMode)
                     {
                         newangle = VehicleTransform.rotation;
+                    }
+                    else
+                    {
+                        if (InVR)
+                        {
+                            if (UseLeftTrigger)
+                            { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
+                            else
+                            { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
+                        }
+                        else if (!InEditor)//desktop mode
+                        {
+                            newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
+                        }
+                        else//editor
+                        {
+                            newangle = VehicleTransform.rotation;
+                        }
                     }
                     float ZoomLevel = AtGCam.fieldOfView / 90;
                     AGMCamRotSlerper = Quaternion.Slerp(AGMCamRotSlerper, newangle, ZoomLevel * 220f * DeltaTime);
@@ -404,7 +431,7 @@ namespace SaccFlightAndVehicles
                         RaycastHit camhit;
                         Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                         //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
-                        float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
+                        float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(CamZoomScale * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
                         AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
                     }
                     else
@@ -438,7 +465,8 @@ namespace SaccFlightAndVehicles
                 else { NewAGM.transform.SetParent(null); }
                 NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.rotation);
                 NewAGM.SetActive(true);
-                NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+                if (!HandHeldMode)
+                { NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
             }
             if (AGMAnimator)
             {
@@ -501,6 +529,18 @@ namespace SaccFlightAndVehicles
                 else
                 { EntityControl.RStickSelection = DialPosition; }
             }
+        }
+        public void SFEXT_O_OnDrop()
+        {
+            DFUNC_Deselected();
+            SFEXT_O_PilotExit();
+        }
+        private float UseTrigger;
+        public void UseTrigZero() { UseTrigger = 0; }
+        public void SFEXT_O_OnPickupUseDown()
+        {
+            UseTrigger = 1;
+            SendCustomEventDelayedFrames(nameof(UseTrigZero), 1, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
         }
     }
 }
