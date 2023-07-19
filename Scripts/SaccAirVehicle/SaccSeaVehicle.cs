@@ -1403,27 +1403,29 @@ namespace SaccFlightAndVehicles
                 if (Time.time - LastHitTime > 2)
                 {
                     PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
+                    LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
                     if (PredictedHealth <= 0)
                     {
+                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
                 else
                 {
                     PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
+                    LastHitTime = Time.time;
                     if (PredictedHealth <= 0)
                     {
+                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
-                LastHitTime = Time.time;
             }
         }
         public void SFEXT_G_BulletHit()
         {
             if (!EntityControl._dead)
             {
-                LastHitTime = Time.time;
                 if (IsOwner)
                 {
                     Health -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;

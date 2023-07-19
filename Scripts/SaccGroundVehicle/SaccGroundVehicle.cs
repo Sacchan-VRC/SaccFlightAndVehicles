@@ -936,32 +936,33 @@ namespace SaccFlightAndVehicles
             {
                 if (Time.time - LastHitTime > 2)
                 {
-                    PredictedHealth = Health - BulletDamageTaken;
+                    PredictedHealth = Health - (BulletDamageTaken * EntityControl.LastHitBulletDamageMulti);
+                    LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
                     if (PredictedHealth <= 0)
                     {
+                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
                 else
                 {
-                    PredictedHealth -= BulletDamageTaken;
+                    PredictedHealth -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
+                    LastHitTime = Time.time;
                     if (PredictedHealth <= 0)
                     {
+                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
-                LastHitTime = Time.time;
             }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBulletHit));
         }
         public void SFEXT_G_BulletHit()
         {
             if (!EntityControl._dead)
             {
-                LastHitTime = Time.time;
                 if (IsOwner)
                 {
-                    Health -= BulletDamageTaken;
+                    Health -= BulletDamageTaken * EntityControl.LastHitBulletDamageMulti;
                     if (PredictDamage && Health <= 0)//the attacker calls the explode function in this case
                     {
                         Health = 0.0911f;
