@@ -796,6 +796,8 @@ namespace SaccFlightAndVehicles
                     }
                     if (Health <= 0f)//vehicle is ded
                     {
+                        if (Piloting)
+                        { EntityControl.SendEventToExtensions("SFEXT_O_Suicide"); }
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                         return;
                     }
@@ -1354,8 +1356,26 @@ namespace SaccFlightAndVehicles
                                 ((LerpedRoll + yawaoarollforce + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVRoll) - (localAngularVelocity.z * RollConstantFriction)) * Atmosphere);// Z Roll
 
                         //create values for use in fixedupdate (control input and straightening forces)
-                        Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere));
-                        Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere));
+
+                        if (PitchMoment)
+                        { Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere)); }
+                        else
+                        {
+                            Pitching =
+                            new Vector3(
+                                ((((LerpedPitch) + (downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere))
+                                , 0, 0);
+                        }
+                        if (YawMoment)
+                        { Yawing = ((((VehicleTransform.right * LerpedYaw) + (VehicleTransform.right * -sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere)); }
+                        else
+                        {
+                            Yawing =
+                            new Vector3(
+                                0,
+                                ((((LerpedYaw) + (-sidespeed * VelStraightenStrYaw * AoALiftYaw * rotlift)) * Atmosphere))
+                                , 0);
+                        }
 
                         VehicleConstantForce.relativeForce = FinalInputAcc;
                         if (HasWheelColliders)
@@ -1399,9 +1419,16 @@ namespace SaccFlightAndVehicles
                 Vector3 VehicleVel = VehicleRigidbody.velocity;
                 VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, ((((AirFriction + SoundBarrier) * ExtraDrag)) * 90) * DeltaTime);
                 //apply pitching using pitch moment
-                VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force);//deltatime is built into ForceMode.Force
-                                                                                                     //apply yawing using yaw moment
-                VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
+                if (PitchMoment)
+                { VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force); }
+                else
+                { VehicleRigidbody.AddRelativeTorque(Pitching, ForceMode.Force); }
+                //deltatime is built into ForceMode.Force
+                //apply yawing using yaw moment
+                if (YawMoment)
+                { VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force); }
+                else
+                { VehicleRigidbody.AddRelativeTorque(-Yawing, ForceMode.Force); }
                 //calc Gs
                 float gravity = -Physics.gravity.y * DeltaTime;
                 LastFrameVel.y -= gravity; //add gravity
@@ -1867,6 +1894,7 @@ namespace SaccFlightAndVehicles
                     LastHitTime = Time.time;//must be updated before sending explode() for checks in explode event to work
                     if (PredictedHealth <= 0)
                     {
+                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
@@ -1876,6 +1904,7 @@ namespace SaccFlightAndVehicles
                     LastHitTime = Time.time;
                     if (PredictedHealth <= 0)
                     {
+                        EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
                         SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                     }
                 }
@@ -2027,6 +2056,7 @@ namespace SaccFlightAndVehicles
                 PredictedHealth = Health - ((FullHealth * Damage) * MissileDamageTakenMultiplier);
                 if (PredictedHealth <= 0)
                 {
+                    EntityControl.SendEventToExtensions("SFEXT_O_MissileKill");
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                 }
             }
@@ -2035,6 +2065,7 @@ namespace SaccFlightAndVehicles
                 PredictedHealth -= ((FullHealth * Damage) * MissileDamageTakenMultiplier);
                 if (PredictedHealth <= 0)
                 {
+                    EntityControl.SendEventToExtensions("SFEXT_O_MissileKill");
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
                 }
             }
