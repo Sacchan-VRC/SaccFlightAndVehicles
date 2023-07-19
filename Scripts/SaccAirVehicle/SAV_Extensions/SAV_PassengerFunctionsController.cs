@@ -366,6 +366,14 @@ namespace SaccFlightAndVehicles
         {
             SendEventToExtensions_Gunner("SFEXTP_G_PassengerExit");
         }
+        public void SFEXT_G_AfterburnerOff()
+        {
+            SendEventToExtensions_Gunner("SFEXTP_G_AfterburnerOff");
+        }
+        public void SFEXT_G_AfterburnerOn()
+        {
+            SendEventToExtensions_Gunner("SFEXTP_G_AfterburnerOn");
+        }
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
             if (FunctionsActive)
@@ -392,7 +400,7 @@ namespace SaccFlightAndVehicles
             var index = Array.IndexOf(Dial_Functions_R, dfunc);
             if (RStickSelection == index)
             {
-                 RStickSelection = -1;
+                RStickSelection = -1;
                 dfunc.SendCustomEvent("DFUNC_Deselected");
             }
             else

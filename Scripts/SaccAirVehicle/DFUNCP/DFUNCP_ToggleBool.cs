@@ -34,6 +34,8 @@ namespace SaccFlightAndVehicles
         public bool AllowToggleGrounded = true;
         [Tooltip("Only for SeaPlanes/Vehicles with floatscript")]
         public bool AllowToggleOnWater = true;
+        [Tooltip("Prevent/turn off when in afterburner")]
+        public bool AllowAfterBurner = true;
         [Tooltip("Send Events to sound script for opening a door?")]
         public bool OpensDoor = false;
         [Header("Door Only:")]
@@ -228,23 +230,66 @@ namespace SaccFlightAndVehicles
                 { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
             }
         }
+        private bool InAir;
+        private bool OnWater;
         public void SFEXTP_G_TakeOff()
         {
-            ToggleAllowed = AllowToggleFlying;
-            if (AnimOn && !AllowToggleFlying)
-            { Toggle(); }
+            InAir = true;
+            OnWater = false;
+            ToggleAllowed =
+                    (AllowToggleFlying || !InAir)
+                && (AllowAfterBurner || !ABOn)
+                && (AllowToggleGrounded || InAir)
+                && (AllowToggleOnWater || !OnWater)
+            ;
+            if (!MasterToggle && AnimOn && !ToggleAllowed)
+            { ToggleWhenPossible(); }
         }
         public void SFEXTP_G_TouchDown()
         {
-            ToggleAllowed = AllowToggleGrounded;
-            if (AnimOn && !AllowToggleGrounded)
-            { Toggle(); }
+            InAir = false;
+            OnWater = false;
+            ToggleAllowed =
+                    (AllowToggleFlying || !InAir)
+                && (AllowAfterBurner || !ABOn)
+                && (AllowToggleGrounded || InAir)
+                && (AllowToggleOnWater || !OnWater)
+            ;
+            if (!MasterToggle && AnimOn && !ToggleAllowed)
+            { ToggleWhenPossible(); }
         }
         public void SFEXTP_G_TouchDownWater()
         {
-            ToggleAllowed = AllowToggleOnWater;
-            if (AnimOn && !AllowToggleOnWater)
+            InAir = false;
+            OnWater = true;
+            ToggleAllowed =
+                    (AllowToggleFlying || !InAir)
+                && (AllowAfterBurner || !ABOn)
+                && (AllowToggleGrounded || InAir)
+                && (AllowToggleOnWater || !OnWater)
+            ;
+            if (!MasterToggle && AnimOn && !ToggleAllowed)
+            { ToggleWhenPossible(); }
+        }
+        private void ToggleWhenPossible()
+        {
+            if (Time.time - ToggleTime > ToggleMinDelay)
             { Toggle(); }
+            else
+            { SendCustomEventDelayedSeconds(nameof(Toggle), Time.time - ToggleTime + .05f); }
+        }
+        private bool ABOn;
+        public void SFEXTP_G_AfterburnerOff()
+        {
+            ABOn = false;
+        }
+        public void SFEXTP_G_AfterburnerOn()
+        {
+            ABOn = true;
+            if (AnimOn && !AllowAfterBurner)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff));
+            }
         }
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {//disable if owner leaves while piloting

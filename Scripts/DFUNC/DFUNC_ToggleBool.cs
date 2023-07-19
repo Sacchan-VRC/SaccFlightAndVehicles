@@ -37,6 +37,8 @@ namespace SaccFlightAndVehicles
         public bool AllowToggleGrounded = true;
         [Tooltip("Only for SeaPlanes/Vehicles with floatscript")]
         public bool AllowToggleOnWater = true;
+        [Tooltip("Prevent/turn off when in afterburner")]
+        public bool AllowAfterBurner = true;
         [Tooltip("Send Events to sound script for opening a door?")]
         [Space(10)]
         public bool OpensDoor = false;
@@ -163,7 +165,7 @@ namespace SaccFlightAndVehicles
             }
             else { TriggerLastFrame = false; }
         }
-        private void Toggle()
+        public void Toggle()
         {
             if (IsSecondary)
             {
@@ -198,8 +200,8 @@ namespace SaccFlightAndVehicles
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, true); }
             foreach (GameObject funcon in Dial_Funcon)
             { funcon.SetActive(true); }
-            if (OpensDoor)
-            { SoundControl.SendCustomEvent("DoorOpen"); }
+            /*             if (OpensDoor)
+                        { SoundControl.SendCustomEvent("DoorOpen"); } */
             foreach (GameObject obj in ToggleObjects)
             { obj.SetActive(true); }
             foreach (GameObject obj in ToggleObjects_Off)
@@ -215,8 +217,8 @@ namespace SaccFlightAndVehicles
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, false); }
             foreach (GameObject funcon in Dial_Funcon)
             { funcon.SetActive(false); }
-            if (OpensDoor)
-            { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); }
+            /*             if (OpensDoor)
+                        { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); } */
             foreach (GameObject obj in ToggleObjects)
             { obj.SetActive(false); }
             foreach (GameObject obj in ToggleObjects_Off)
@@ -234,23 +236,66 @@ namespace SaccFlightAndVehicles
                 { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
             }
         }
+        private bool InAir;
+        private bool OnWater;
         public void SFEXT_G_TakeOff()
         {
-            ToggleAllowed = AllowToggleFlying;
-            if (AnimOn && !AllowToggleFlying)
-            { Toggle(); }
+            InAir = true;
+            OnWater = false;
+            ToggleAllowed =
+                    (AllowToggleFlying || !InAir)
+                && (AllowAfterBurner || !ABOn)
+                && (AllowToggleGrounded || InAir)
+                && (AllowToggleOnWater || !OnWater)
+            ;
+            if (!MasterToggle && AnimOn && !ToggleAllowed)
+            { ToggleWhenPossible(); }
         }
         public void SFEXT_G_TouchDown()
         {
-            ToggleAllowed = AllowToggleGrounded;
-            if (AnimOn && !AllowToggleGrounded)
-            { Toggle(); }
+            InAir = false;
+            OnWater = false;
+            ToggleAllowed =
+                    (AllowToggleFlying || !InAir)
+                && (AllowAfterBurner || !ABOn)
+                && (AllowToggleGrounded || InAir)
+                && (AllowToggleOnWater || !OnWater)
+            ;
+            if (!MasterToggle && AnimOn && !ToggleAllowed)
+            { ToggleWhenPossible(); }
         }
         public void SFEXT_G_TouchDownWater()
         {
-            ToggleAllowed = AllowToggleOnWater;
-            if (AnimOn && !AllowToggleOnWater)
+            InAir = false;
+            OnWater = true;
+            ToggleAllowed =
+                    (AllowToggleFlying || !InAir)
+                && (AllowAfterBurner || !ABOn)
+                && (AllowToggleGrounded || InAir)
+                && (AllowToggleOnWater || !OnWater)
+            ;
+            if (!MasterToggle && AnimOn && !ToggleAllowed)
+            { ToggleWhenPossible(); }
+        }
+        private void ToggleWhenPossible()
+        {
+            if (Time.time - ToggleTime > ToggleMinDelay)
             { Toggle(); }
+            else
+            { SendCustomEventDelayedSeconds(nameof(Toggle), Time.time - ToggleTime + .05f); }
+        }
+        private bool ABOn;
+        public void SFEXT_G_AfterburnerOff()
+        {
+            ABOn = false;
+        }
+        public void SFEXT_G_AfterburnerOn()
+        {
+            ABOn = true;
+            if (AnimOn && !AllowAfterBurner)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff));
+            }
         }
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {//disable if owner leaves while piloting
