@@ -20,6 +20,7 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     public bool DoForwardBackThrust = true;
     public bool DoSideThrust = true;
     public bool DoUPDownThrust = true;
+    public bool AllowMainEngineAndThrust = false;
     [Header("Only for DFUNC Mode")]
     public bool UseThrottleAsForward = true;
     public bool ThrottleAsForward_NoBackThrust = false;
@@ -44,19 +45,23 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     private float ThrottleSensitivity;
     private bool IsOwner;
     private bool Occupied;
-    private bool OverrRidingThrottle = false;
+    private bool OverridingThrottle = false;
     [System.NonSerializedAttribute, FieldChangeCallback(nameof(ThreeDThrustActive))] public bool _ThreeDThrustActive = false;
     public bool ThreeDThrustActive//this can be toggled by a dfunc to switch between normal saccairvehicle flight to thruster only flight
     {
         set
         {
-            if (value && !_ThreeDThrustActive)
+            if (!AllowMainEngineAndThrust)
             {
-                SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
-            }
-            else if (!value && _ThreeDThrustActive)
-            {
-                SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
+                if (value && !_ThreeDThrustActive)
+                {
+                    SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
+                }
+                else if (!value && _ThreeDThrustActive)
+                {
+                    SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") - 1);
+                    SAVControl.SetProgramVariable("ThrottleOverride", 0f);
+                }
             }
             if (Piloting)
             { gameObject.SetActive(value); }
@@ -83,9 +88,9 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
 
         if (!UseThrottleAsForward && !UseAsDFUNC)
         {
-            if (!OverrRidingThrottle)
+            if (!OverridingThrottle && !AllowMainEngineAndThrust)
             {
-                OverrRidingThrottle = true;
+                OverridingThrottle = true;
                 SAVControl.SetProgramVariable("ThrottleOverridden", (int)SAVControl.GetProgramVariable("ThrottleOverridden") + 1);
             }
         }
@@ -122,7 +127,7 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
         ThreeDVRThrottle = Vector3.zero;
         ThreeDKeybThrottle = Vector3.zero;
         ThrustArrow.gameObject.SetActive(false);
-        SAVControl.SetProgramVariable("ThrottleOverride", 0f);
+        if (_ThreeDThrustActive) { SAVControl.SetProgramVariable("ThrottleOverride", 0f); }
     }
     private void ThrottleStuff(float Input)
     {
@@ -258,10 +263,6 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
                     }
                     if (SAVControl.VerticalThrottle)
                     {
-                        if (Input.GetKeyDown(KeyCode.O))
-                        { SAVControl.PlayerThrottle = 1f; }
-                        if (Input.GetKeyUp(KeyCode.U))
-                        { SAVControl.PlayerThrottle = 0f; }
                         if (ThreeDThrottleInput.y != 0)
                         {
                             if (UseThrottleAsForward)
@@ -306,10 +307,6 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
                     }
                     else
                     {
-                        if (Input.GetKeyDown(KeyCode.I))
-                        { SAVControl.PlayerThrottle = 1f; }
-                        if (Input.GetKeyUp(KeyCode.I))
-                        { SAVControl.PlayerThrottle = 0f; }
                         if (ThreeDThrottleInput.z != 0)
                         {
                             if (UseThrottleAsForward)
@@ -358,7 +355,10 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
             {
                 ThrustArrow.localScale = (Vector3.one * ThreeDThrottleInput.magnitude) / ThrottleSensitivity;
             }
-            SAVControl.SetProgramVariable("ThrottleOverride", Mathf.Min(ThreeDThrottleInput.magnitude, 1));
+            if (!AllowMainEngineAndThrust)
+            {
+                SAVControl.SetProgramVariable("ThrottleOverride", Mathf.Min(ThreeDThrottleInput.magnitude, 1));
+            }
         }
         if (Occupied)
         {
