@@ -32,6 +32,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("In seconds")]
         [Range(0.05f, 1f)]
         public float updateInterval = 0.25f;
+        [Tooltip("Stabilize the turrets movement? Easier to aim in moving vehicles")]
+        public bool Stabilize;
         public GameObject Projectile;
         public AudioSource FireSound;
         public Camera ViewCamera;
@@ -61,6 +63,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Backwards vector of this transform is the direction along which the recoil force is applied (backwards so it can default to VehicleTransform)")]
         public Transform RecoilDirection;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        private Transform VehicleTransform;
         private float LastFireTime = 0f;
         private int FullAmmo;
         private float FullAmmoDivider;
@@ -100,6 +103,8 @@ namespace SaccFlightAndVehicles
         Quaternion ControlsRotLastFrame;
         Quaternion JoystickZeroPoint;
         [System.NonSerializedAttribute] public bool IsOwner;//required by the bomb script, not actually related to being the owner of the object
+        private Vector3 LastForward_HOR;
+        private Vector3 LastForward_VERT;
         [UdonSynced(UdonSyncMode.None)] private Vector2 O_GunRotation;
         [UdonSynced(UdonSyncMode.None)] private int O_UpdateTime = 0;
         public void SFEXTP_L_EntityStart()
@@ -107,6 +112,7 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+            VehicleTransform = EntityControl.transform;
             VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             if (!ControlsRoot) { ControlsRoot = TurretRotatorHor; }
 
@@ -307,6 +313,16 @@ namespace SaccFlightAndVehicles
                 InputX *= TurnSpeedMultiX;
                 InputY *= TurnSpeedMultiY;
 
+                float RotationDifferenceY = 0;
+                float RotationDifferenceX = 0;
+                if (Stabilize)
+                {
+                    RotationDifferenceY = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(LastForward_HOR, VehicleTransform.up), VehicleTransform.up);
+                    LastForward_HOR = VehicleTransform.forward;
+
+                    RotationDifferenceX = Vector3.SignedAngle(TurretRotatorHor.forward, Vector3.ProjectOnPlane(LastForward_VERT, TurretRotatorHor.right), TurretRotatorHor.right);
+                    LastForward_VERT = TurretRotatorHor.forward;
+                }
                 RotationSpeedX += -(RotationSpeedX * TurnFriction) + (InputX);
                 RotationSpeedY += -(RotationSpeedY * TurnFriction) + (InputY);
 
@@ -315,19 +331,20 @@ namespace SaccFlightAndVehicles
                 Vector3 rotvert = TurretRotatorVert.localRotation.eulerAngles;
 
                 float NewX = rotvert.x;
-                NewX += RotationSpeedX * DeltaTime;
+                NewX += (RotationSpeedX * DeltaTime) + RotationDifferenceX;
                 if (NewX > 180) { NewX -= 360; }
                 if (NewX > DownAngleMax || NewX < -UpAngleMax) RotationSpeedX = 0;
                 NewX = Mathf.Clamp(NewX, -UpAngleMax, DownAngleMax);//limit angles
 
                 float NewY = rothor.y;
-                NewY += RotationSpeedY * DeltaTime;
+                NewY += (RotationSpeedY * DeltaTime) + RotationDifferenceY;
                 if (NewY > 180) { NewY -= 360; }
                 if (NewY > SideAngleMax || NewY < -SideAngleMax) RotationSpeedY = 0;
                 NewY = Mathf.Clamp(NewY, -SideAngleMax, SideAngleMax);//limit angles
 
                 TurretRotatorHor.localRotation = Quaternion.Euler(new Vector3(0, NewY, 0));
                 TurretRotatorVert.localRotation = Quaternion.Euler(new Vector3(NewX, 0, 0));
+
 
                 if (Time.time > nextUpdateTime)
                 {
