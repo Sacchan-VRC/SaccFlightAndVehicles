@@ -115,9 +115,9 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
         InVR = SAVControl.InVR;
         SwitchHandsJoyThrottle = SAVControl.SwitchHandsJoyThrottle;
         if (!InVR)
-        { ThrustArrow.gameObject.SetActive(false); }
+        { if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); } }
         else
-        { ThrustArrow.gameObject.SetActive(true); }
+        { if (ThrustArrow) { ThrustArrow.gameObject.SetActive(true); } }
     }
     public void SFEXT_O_PilotExit()
     {
@@ -126,7 +126,7 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
         ThreeDThrottle = Vector3.zero;
         ThreeDVRThrottle = Vector3.zero;
         ThreeDKeybThrottle = Vector3.zero;
-        ThrustArrow.gameObject.SetActive(false);
+        if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); }
         if (_ThreeDThrustActive) { SAVControl.SetProgramVariable("ThrottleOverride", 0f); }
     }
     private void ThrottleStuff(float Input)
@@ -147,7 +147,14 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
                 ThrottleZeroPoint = HandPosThrottle;
                 if (ThrustArrow) { ThrustArrow.position = HandPos; }
             }
-            HandPosThrottle = ControlsRoot.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position);
+            if (UseLeftTrigger)
+            {
+                HandPosThrottle = ControlsRoot.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position);
+            }
+            else
+            {
+                HandPosThrottle = ControlsRoot.transform.InverseTransformPoint(localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
+            }
             ThrustArrow.LookAt(HandPos);
             Vector3 ThreeDThrottleDifference = (ThrottleZeroPoint - HandPosThrottle) * ThrottleSensitivity;
             ThreeDVRThrottle.x = Mathf.Clamp(-ThreeDThrottleDifference.x, -1, 1);
@@ -159,7 +166,7 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
         else if (ThreeDThrottleLastFrame)
         {
             ThreeDVRThrottle = Vector3.zero;
-            SAVControl.PlayerThrottle = 0;
+            if (!UseAsDFUNC) { SAVControl.PlayerThrottle = 0; }
             ThreeDThrottleLastFrame = false;
         }
     }
@@ -380,9 +387,16 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     { InWater = false; }
     private bool EngineOn;
     public void SFEXT_G_EngineOn()
-    { EngineOn = true; }
+    {
+        EngineOn = true;
+
+        if (InVR) { if (ThrustArrow) { ThrustArrow.gameObject.SetActive(true); } }
+    }
     public void SFEXT_G_EngineOff()
-    { EngineOn = false; }
+    {
+        EngineOn = false;
+        if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); }
+    }
     private void FixedUpdate()
     {
         if (IsOwner)
