@@ -603,6 +603,10 @@ namespace SaccFlightAndVehicles
                                 }
                                 YawInput = Mathf.Clamp(YawInput + YawAddAmount, SpeedSteeringLimitLower, SpeedSteeringLimitUpper);
                             }
+                            if ((SteerInput > 0 && YawInput < 0) || SteerInput < 0 && YawInput > 0)
+                            {
+                                YawInput = Mathf.MoveTowards(YawInput, 0f, (1f / SteeringReturnSpeedDT) * DeltaTime);
+                            }
                         }
                         else
                         {
