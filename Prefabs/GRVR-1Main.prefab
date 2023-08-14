@@ -30570,7 +30570,7 @@ GameObject:
   - component: {fileID: 1564986658979985651}
   - component: {fileID: 1692452899584071533}
   - component: {fileID: 1564986658979985648}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PilotSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31484,7 +31484,7 @@ GameObject:
   - component: {fileID: 1564986659165521405}
   - component: {fileID: 5213023311102586671}
   - component: {fileID: 1564986659165521402}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31717,8 +31717,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1564986659178906793}
   EntityControl: {fileID: 8496099365134152853}
   EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityEventGlobal: 0
   Event_Name: 
-  Global: 0
+  EventGlobal: 0
 --- !u!114 &1564986659178906793
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -88514,6 +88515,7 @@ MonoBehaviour:
   BoolAnimator: {fileID: 0}
   Dial_Funcon:
   - {fileID: 3559242739225111539}
+  InvertFuncon: 0
   DoAnimBool: 1
   AnimBoolName: AnimBool
   OnDefault: 0
@@ -88529,6 +88531,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
@@ -88976,6 +88981,10 @@ MonoBehaviour:
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
+  CrashDoesDamage: 0
+  SmallCrashDmg: 0.1
+  MediumCrashDmg: 0.25
+  BigCrashDmg: 0.75
   MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080
@@ -94956,6 +94965,7 @@ MonoBehaviour:
   DoForwardBackThrust: 1
   DoSideThrust: 1
   DoUPDownThrust: 1
+  AllowMainEngineAndThrust: 0
   UseThrottleAsForward: 0
   ThrottleAsForward_NoBackThrust: 0
 --- !u!114 &7355186588233618505

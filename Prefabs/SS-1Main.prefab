@@ -405,6 +405,7 @@ MonoBehaviour:
   DownAngleMax: 5
   SideAngleMax: 180
   updateInterval: 0.25
+  Stabilize: 0
   Projectile: {fileID: 6461440781556724388}
   FireSound: {fileID: 1060008484}
   ViewCamera: {fileID: 1469228353}
@@ -493,7 +494,7 @@ GameObject:
   - component: {fileID: 706443861}
   - component: {fileID: -7954324551964418882}
   - component: {fileID: 706443860}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: TurretSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -621,7 +622,7 @@ GameObject:
   - component: {fileID: 747948963}
   - component: {fileID: 9183382337363475509}
   - component: {fileID: 747948962}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: GunnerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1016,6 +1017,7 @@ MonoBehaviour:
   AnimBoolName: searchlight
   Dial_Funcon:
   - {fileID: 1460606752}
+  InvertFuncon: 0
   OnDefault: 0
   UserExitTurnOff: 1
   UserExitTurnOn: 0
@@ -1027,6 +1029,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
@@ -21731,7 +21736,7 @@ GameObject:
   - component: {fileID: 31167485503198850}
   - component: {fileID: 5796846411718360860}
   - component: {fileID: 3818207961936412323}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62954,6 +62959,8 @@ MonoBehaviour:
   HUDText_AGM_ammo: {fileID: 0}
   AtGCam: {fileID: 7105509204632478174}
   AtGScreen: {fileID: 7105509206018492734}
+  CamZoomScale: 100
+  CamZoomScale_Locked: 60
   Dial_Funcon: {fileID: 5480870661610851679}
   FullReloadTimeSec: 8
   AGMLock: {fileID: 7105509205684123337}
@@ -62968,11 +62975,13 @@ MonoBehaviour:
   AnimFloatName: AGMs
   AnimFiredTriggerName: agmlaunched
   AnimBoolStayTrueOnExit: 0
-  WorldParent: {fileID: 0}
   AGMLaunchPoint: {fileID: 7105509205422652095}
   AGMTargetsLayer:
     serializedVersion: 2
     m_Bits: 67108864
+  WorldParent: {fileID: 0}
+  HandHeldMode: 0
+  _EntityControl: {fileID: 0}
 --- !u!114 &7105509204289583361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -67862,7 +67871,7 @@ GameObject:
   - component: {fileID: 7105509204448147701}
   - component: {fileID: 6307802816276226693}
   - component: {fileID: 7105509204448147700}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83086,7 +83095,7 @@ GameObject:
   - component: {fileID: 7105509204755205036}
   - component: {fileID: -3324926799931589969}
   - component: {fileID: 7105509204755205035}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PilotSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -83534,8 +83543,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 7105509204878781824}
   EntityControl: {fileID: 7149063361215606383}
   EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityEventGlobal: 0
   Event_Name: 
-  Global: 0
+  EventGlobal: 0
 --- !u!114 &7105509204878781824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -85871,7 +85881,7 @@ GameObject:
   - component: {fileID: 4844310430031150452}
   - component: {fileID: -418628448922362199}
   - component: {fileID: 793195262885574237}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86134,7 +86144,7 @@ GameObject:
   - component: {fileID: 5533439360647758732}
   - component: {fileID: -2132334359805993615}
   - component: {fileID: 6685914054707775335}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -53627,6 +53627,8 @@ MonoBehaviour:
   HUDText_AGM_ammo: {fileID: 1490522283187972374}
   AtGCam: {fileID: 4371473019587610573}
   AtGScreen: {fileID: 4371473018734145325}
+  CamZoomScale: 100
+  CamZoomScale_Locked: 60
   Dial_Funcon: {fileID: 5918980767821247854}
   FullReloadTimeSec: 8
   AGMLock: {fileID: 4371473018531844314}
@@ -53641,11 +53643,13 @@ MonoBehaviour:
   AnimFloatName: AGMs
   AnimFiredTriggerName: agmlaunched
   AnimBoolStayTrueOnExit: 0
-  WorldParent: {fileID: 0}
   AGMLaunchPoint: {fileID: 4371473018260970668}
   AGMTargetsLayer:
     serializedVersion: 2
     m_Bits: 67108864
+  WorldParent: {fileID: 0}
+  HandHeldMode: 0
+  _EntityControl: {fileID: 0}
 --- !u!114 &4371473019125145362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54036,7 +54040,7 @@ GameObject:
   - component: {fileID: 4371473019235475174}
   - component: {fileID: -5973919266688578872}
   - component: {fileID: 4371473019235475175}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -81160,7 +81164,7 @@ GameObject:
   - component: {fileID: 4371473019733388735}
   - component: {fileID: 7753999942356681807}
   - component: {fileID: 4371473019733388728}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PilotSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86717,8 +86721,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 4371473019873987475}
   EntityControl: {fileID: -2692614534935363141}
   EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityEventGlobal: 0
   Event_Name: 
-  Global: 0
+  EventGlobal: 0
 --- !u!114 &4371473019873987475
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92938,6 +92943,10 @@ MonoBehaviour:
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
+  CrashDoesDamage: 0
+  SmallCrashDmg: 0.1
+  MediumCrashDmg: 0.25
+  BigCrashDmg: 0.75
   MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080

@@ -6640,6 +6640,7 @@ MonoBehaviour:
   Dial_Funcon:
   - {fileID: 1651320211284017606}
   - {fileID: 2653143541489113037}
+  InvertFuncon: 0
   OnDefault: 0
   UserExitTurnOff: 0
   UserExitTurnOn: 0
@@ -6651,6 +6652,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 1
   SoundControl: {fileID: 8333115239632277907}
   DoorCloseTime: 2
@@ -7039,6 +7043,7 @@ MonoBehaviour:
   AnimBoolName: 
   Dial_Funcon:
   - {fileID: 1651320212362696120}
+  InvertFuncon: 0
   OnDefault: 0
   UserExitTurnOff: 1
   UserExitTurnOn: 0
@@ -7051,6 +7056,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
@@ -36869,6 +36877,7 @@ MonoBehaviour:
   MasterToggle: {fileID: -4968335017175674862}
   BoolAnimator: {fileID: 0}
   Dial_Funcon: []
+  InvertFuncon: 0
   DoAnimBool: 1
   AnimBoolName: 
   OnDefault: 0
@@ -36883,6 +36892,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
@@ -42770,6 +42782,10 @@ MonoBehaviour:
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
+  CrashDoesDamage: 0
+  SmallCrashDmg: 0.1
+  MediumCrashDmg: 0.25
+  BigCrashDmg: 0.75
   MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080
@@ -43912,6 +43928,7 @@ MonoBehaviour:
   BoolAnimator: {fileID: 0}
   Dial_Funcon:
   - {fileID: 9073808470481363686}
+  InvertFuncon: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 1
@@ -43927,6 +43944,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
@@ -69178,7 +69198,7 @@ GameObject:
   - component: {fileID: 8333115238084813639}
   - component: {fileID: 5536962972227014780}
   - component: {fileID: 8333115238084813638}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70257,7 +70277,7 @@ GameObject:
   - component: {fileID: 8333115238229734844}
   - component: {fileID: 8173492133762701858}
   - component: {fileID: 8333115238229734847}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PilotSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87138,7 +87158,7 @@ GameObject:
   - component: {fileID: 8333115238828317009}
   - component: {fileID: 131285485830899562}
   - component: {fileID: 8333115238828317008}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87479,7 +87499,7 @@ GameObject:
   - component: {fileID: 8333115238922619058}
   - component: {fileID: 3335687585135616608}
   - component: {fileID: 8333115238922619061}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -87879,8 +87899,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238970575334}
   EntityControl: {fileID: 1439720729650657754}
   EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityEventGlobal: 0
   Event_Name: 
-  Global: 0
+  EventGlobal: 0
 --- !u!114 &8333115238970575334
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97671,6 +97692,8 @@ MonoBehaviour:
   HUDText_AGM_ammo: {fileID: 8333115238833962017}
   AtGCam: {fileID: 8333115239849592805}
   AtGScreen: {fileID: 8333115239949523039}
+  CamZoomScale: 100
+  CamZoomScale_Locked: 60
   Dial_Funcon: {fileID: 1037115320425481401}
   FullReloadTimeSec: 8
   AGMLock: {fileID: 8333115239407741684}
@@ -97685,11 +97708,13 @@ MonoBehaviour:
   AnimFloatName: AGMs
   AnimFiredTriggerName: agmlaunched
   AnimBoolStayTrueOnExit: 0
-  WorldParent: {fileID: 0}
   AGMLaunchPoint: {fileID: 8333115238109980386}
   AGMTargetsLayer:
     serializedVersion: 2
     m_Bits: 67108864
+  WorldParent: {fileID: 0}
+  HandHeldMode: 0
+  _EntityControl: {fileID: 0}
 --- !u!114 &8333115239043645012
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124563,7 +124588,7 @@ GameObject:
   - component: {fileID: 8333115240067380488}
   - component: {fileID: 4978535046727752683}
   - component: {fileID: 8333115240067380491}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: GunnerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124825,7 +124850,7 @@ GameObject:
   - component: {fileID: 8333115240080910067}
   - component: {fileID: -1465497300063645269}
   - component: {fileID: 8333115240080910066}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
