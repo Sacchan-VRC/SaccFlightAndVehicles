@@ -69,8 +69,8 @@ namespace SaccFlightAndVehicles
         public Vector3 ThrowVelocity = new Vector3(0, 0, 0);
         [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
         public bool ThrowSpaceVehicle = true;
-        private string[] MissileTypes = { "MissilesIncomingHeat", "MissilesIncomingRadar", "MissilesIncomingOther" };//names of variables in SaccAirVehicle
-        private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
+        private string[] MissileTypes = { "MissilesIncomingRadar", "MissilesIncomingHeat", "MissilesIncomingOther" };//names of variables in SaccAirVehicle
+        private string[] CMTypes = { "NumActiveChaff", "NumActiveFlares", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
         private SaccEntity EntityControl;
         private int MissileType = 1;
         private UdonSharpBehaviour TargetSAVControl;
@@ -109,6 +109,8 @@ namespace SaccFlightAndVehicles
         private GameObject PitBullIndicator;
         private Animator MissileAnimator;
         GameObject[] AAMTargets;
+        private Vector3 LastRealPos;
+        private Vector3 PredictedPos;
         void Initialize()
         {
             EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
@@ -240,12 +242,23 @@ namespace SaccFlightAndVehicles
                 float EngineTrack;
                 float AspectTrack;
                 bool Dumb;
-                Vector3 Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
+                Vector3 Targetmovedir;
                 TargetPosLastFrame = TargetPos;
-                Vector3 MissileToTargetVector = (TargetPos - Position).normalized;
+                Vector3 MissileToTargetVector;
                 if (TargetSAVControl)
                 {
-                    MissileToTargetVector = (TargetPos - transform.position).normalized;
+                    Targetmovedir = (Vector3)TargetSAVControl.GetProgramVariable("CurrentVel");
+                    //other player's vehicles only move on Update() (low framerate fix)
+                    if (TargetEntityControl.transform.position != LastRealPos)
+                    {
+                        LastRealPos = TargetEntityControl.transform.position;
+                        PredictedPos = LastRealPos;
+                    }
+                    else
+                    {
+                        PredictedPos += Targetmovedir * Time.fixedDeltaTime;
+                    }
+                    MissileToTargetVector = (PredictedPos - transform.position).normalized;
                     Dumb = //Missile just flies straight if it's confused by flares or notched
                            //flare effect
                         Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable(CMTypes[MissileType]) * FlareEffect//if there are flares active, there's a chance it will not track per frame.
@@ -263,6 +276,8 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
+                    MissileToTargetVector = (TargetPos - Position).normalized;
+                    Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
                     EngineTrack = 1;
                     AspectTrack = 1;
                     Dumb = //FOX-1
