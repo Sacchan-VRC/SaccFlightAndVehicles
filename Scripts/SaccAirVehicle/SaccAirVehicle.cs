@@ -150,6 +150,8 @@ namespace SaccFlightAndVehicles
         public float HighPitchAoaMinLift = 0.2f;
         [Tooltip("See above")]
         public float HighYawAoaMinLift = 0.2f;
+        [Tooltip("The angle at which the aircraft's wings produce zero lift. Influenced by the wing's camber angle. A larger camber usually results in a lower ZeroLiftAoA. Helps simulate the plane's natural glide. Usually a negative value.")]
+        public float ZeroLiftAoA = 0f;
         [Tooltip("Degrees per second the vehicle rotates on the ground. Uses simple object rotation with a lerp, no real physics to it.")]
         public float TaxiRotationSpeed = 35f;
         [Tooltip("How lerped the taxi movement rotation is")]
@@ -2239,7 +2241,7 @@ namespace SaccFlightAndVehicles
             AirVel = VehicleRigidbody.velocity - (FinalWind * StillWindMulti);
             AirSpeed = AirVel.magnitude;
             Vector3 VecForward = VehicleTransform.forward;
-            AngleOfAttackPitch = Vector3.SignedAngle(VecForward, Vector3.ProjectOnPlane(AirVel, VehicleTransform.right), VehicleTransform.right);
+            AngleOfAttackPitch = Vector3.SignedAngle(VecForward, Vector3.ProjectOnPlane(AirVel, VehicleTransform.right), VehicleTransform.right) - ZeroLiftAoA;
             AngleOfAttackYaw = Vector3.SignedAngle(VecForward, Vector3.ProjectOnPlane(AirVel, VehicleTransform.up), VehicleTransform.up);
             //angle of attack stuff, pitch and yaw are calculated seperately
             //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
