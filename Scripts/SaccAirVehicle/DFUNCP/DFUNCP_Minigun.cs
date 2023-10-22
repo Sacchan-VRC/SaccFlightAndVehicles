@@ -1,4 +1,3 @@
-﻿
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -17,7 +16,7 @@ namespace SaccFlightAndVehicles
         public Transform MinigunPitch;
         [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
         public Transform GunDamageParticle_Parent;
-        [SerializeField][UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
+        [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
         [Tooltip("How long it takes to fully reload from empty in seconds")]
         public float FullReloadTimeSec = 20;
         public string AnimatorFiringStringName;
@@ -172,15 +171,15 @@ namespace SaccFlightAndVehicles
         {
             if (UseProjectileMode)
             {
-                if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
-                GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+                if (ProjectileAmmo != ProjectileAmmoFULL) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+                ProjectileAmmo = (int)Mathf.Min(ProjectileAmmo + Mathf.Max(Mathf.Floor(reloadspeed), 1), ProjectileAmmoFULL);
             }
             else
             {
-                if (ProjectileAmmo != ProjectileAmmoFULL) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
-                ProjectileAmmo = (int)Mathf.Min(ProjectileAmmo + Mathf.Max(Mathf.Floor(reloadspeed), 1), ProjectileAmmoFULL);
-                UpdateAmmoVisuals();
+                if (GunAmmoInSeconds != FullGunAmmoInSeconds) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
+                GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
             }
+            UpdateAmmoVisuals();
         }
         public void UpdateAmmoVisuals()
         {

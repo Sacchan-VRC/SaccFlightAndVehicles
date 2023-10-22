@@ -25924,7 +25924,7 @@ GameObject:
   - component: {fileID: 914079681445392394}
   - component: {fileID: -6119670499778925268}
   - component: {fileID: 914079681445392395}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -42784,8 +42784,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 914079681930388931}
   EntityControl: {fileID: 8560298986138584170}
   EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityEventGlobal: 0
   Event_Name: 
-  Global: 0
+  EventGlobal: 0
 --- !u!114 &914079681930388931
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -58583,7 +58584,7 @@ GameObject:
   - component: {fileID: 914079682345404374}
   - component: {fileID: -5766991003871838205}
   - component: {fileID: 914079682345404375}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -79772,7 +79773,7 @@ GameObject:
   - component: {fileID: 914079682730908512}
   - component: {fileID: 4778841718541851814}
   - component: {fileID: 914079682730908513}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PilotSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84925,7 +84926,7 @@ GameObject:
   - component: {fileID: 914079682918043357}
   - component: {fileID: 3728610082545195273}
   - component: {fileID: 914079682918043358}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -85054,7 +85055,7 @@ GameObject:
   - component: {fileID: 914079682919084880}
   - component: {fileID: -2123778023033051995}
   - component: {fileID: 914079682919084881}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: PassengerSeat (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -96122,6 +96123,10 @@ MonoBehaviour:
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
+  CrashDoesDamage: 0
+  SmallCrashDmg: 0.1
+  MediumCrashDmg: 0.25
+  BigCrashDmg: 0.75
   MissileDamageTakenMultiplier: 0.45
   MissilePushForce: 1
   SeaLevel: -1080
@@ -101913,6 +101918,7 @@ MonoBehaviour:
   BoolAnimator: {fileID: 914079681580794731}
   Dial_Funcon:
   - {fileID: 4740379953476988092}
+  InvertFuncon: 0
   DoAnimBool: 1
   AnimBoolName: movecabin
   OnDefault: 0
@@ -101927,6 +101933,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2

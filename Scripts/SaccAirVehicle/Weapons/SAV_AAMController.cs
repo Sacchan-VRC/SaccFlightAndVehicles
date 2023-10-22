@@ -71,6 +71,7 @@ namespace SaccFlightAndVehicles
         public bool ThrowSpaceVehicle = true;
         private string[] MissileTypes = { "MissilesIncomingRadar", "MissilesIncomingHeat", "MissilesIncomingOther" };//names of variables in SaccAirVehicle
         private string[] CMTypes = { "NumActiveChaff", "NumActiveFlares", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
+        [SerializeField] private bool TrackThroughWalls = true;
         private SaccEntity EntityControl;
         private int MissileType = 1;
         private UdonSharpBehaviour TargetSAVControl;
@@ -111,6 +112,8 @@ namespace SaccFlightAndVehicles
         GameObject[] AAMTargets;
         private Vector3 LastRealPos;
         private Vector3 PredictedPos;
+        private float AAMMaxTargetDistance;
+        private int OutsideVehicleLayer;
         void Initialize()
         {
             EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
@@ -123,6 +126,7 @@ namespace SaccFlightAndVehicles
             AAMCollider = GetComponent<CapsuleCollider>();
             MissileType = (int)AAMLauncherControl.GetProgramVariable("MissileType");
             PitBullIndicator = (GameObject)AAMLauncherControl.GetProgramVariable("PitBullIndicator");
+            AAMMaxTargetDistance = (float)AAMLauncherControl.GetProgramVariable("AAMMaxTargetDistance");
 
             DoPitBull = PitBullDistance > 0f;
             NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
@@ -156,6 +160,7 @@ namespace SaccFlightAndVehicles
             SplashHit = false;
             LockHack = true;
             TargetLost = false;
+            TargetLineOfSight = true;
             MissileIncoming = false;
             PitBull = false;
             UnlockTimer = 0;
@@ -173,6 +178,7 @@ namespace SaccFlightAndVehicles
                     TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
                     if (TargetSAVControl)
                     {
+                        OutsideVehicleLayer = (int)TargetSAVControl.GetProgramVariable("OutsideVehicleLayer");
                         if (SendAnimInt && ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger")))
                         {
                             TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) + 1);
@@ -184,6 +190,8 @@ namespace SaccFlightAndVehicles
                         TargetABPoint = (float)TargetSAVControl.GetProgramVariable("ThrottleAfterburnerPoint");
                         TargetThrottleNormalizer = 1 / TargetABPoint;
                     }
+                    else
+                    { OutsideVehicleLayer = 17; }//walkthrough                                        
                 }
 
                 if (InEditor || IsOwner || LockHackTime == 0)
@@ -195,6 +203,26 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
             LifeTimeExplodesSent++;
+        }
+        private bool TargetLineOfSight;
+        void Update()
+        {
+            if (!Initialized || TrackThroughWalls) { return; }
+            Vector3 MissileToTargetVector;
+            if (TargetSAVControl)
+            { MissileToTargetVector = (TargetEntityControl.transform.position - transform.position); }
+            else
+            { MissileToTargetVector = (Target.position - transform.position); }
+            RaycastHit rayHit;
+            if (Physics.Raycast(transform.position, MissileToTargetVector, out rayHit, AAMMaxTargetDistance, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
+            {
+                if (rayHit.collider && rayHit.collider.gameObject.layer == OutsideVehicleLayer)
+                { TargetLineOfSight = true; }
+                else
+                { TargetLineOfSight = false; }
+            }
+            else
+            { TargetLineOfSight = false; }
         }
         void FixedUpdate()
         {
@@ -270,6 +298,8 @@ namespace SaccFlightAndVehicles
                         ||
                         //FOX-1
                         ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")] || !AAMLauncherControl.gameObject.activeSelf))
+                        ||
+                        !TargetLineOfSight
                         ;
                     AspectTrack = Vector3.Dot(MissileToTargetVector, -TargetEntityControl.transform.forward) > HighAspectTrack ? HighAspectRotSpeedMulti : 1;
                     EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle

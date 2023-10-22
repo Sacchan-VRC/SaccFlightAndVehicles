@@ -6867,6 +6867,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 2784613538655061535}
   EntityControl: {fileID: 2935594654239514266}
   AddedHeight: 0
+  AllowRespawnSpeed: 9999
+  StopCarOnReset: 0
+  ResetMinDelay: 0
 --- !u!114 &2784613538655061535
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22766,7 +22769,7 @@ GameObject:
   - component: {fileID: 5677037914119964536}
   - component: {fileID: 3437784275195759274}
   - component: {fileID: 11707293986087042}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -22925,7 +22928,7 @@ GameObject:
   - component: {fileID: 2935594653223068941}
   - component: {fileID: 2935594653223068942}
   - component: {fileID: 2935594653223068943}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23295,7 +23298,7 @@ GameObject:
   - component: {fileID: 2935594653914077340}
   - component: {fileID: 2935594653914077341}
   - component: {fileID: 2935594653914077342}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -23521,7 +23524,7 @@ GameObject:
   - component: {fileID: 2935594654126660738}
   - component: {fileID: 2935594654126660739}
   - component: {fileID: 2935594654126660740}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarDriverSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24061,8 +24064,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 2935594654760479891}
   EntityControl: {fileID: 2935594654239514266}
   EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityEventGlobal: 0
   Event_Name: 
-  Global: 0
+  EventGlobal: 0
 --- !u!114 &2935594654760479891
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24207,6 +24211,7 @@ MonoBehaviour:
   BoolAnimator: {fileID: 0}
   AnimBoolName: 0
   Dial_Funcon: []
+  InvertFuncon: 0
   OnDefault: 0
   UserExitTurnOff: 1
   UserExitTurnOn: 0
@@ -24219,6 +24224,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
@@ -24261,7 +24269,7 @@ GameObject:
   - component: {fileID: 8925920003667117955}
   - component: {fileID: 7432687287932162773}
   - component: {fileID: 5870588325563423881}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarGunnerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41203,6 +41211,7 @@ MonoBehaviour:
   BoolAnimator: {fileID: 0}
   Dial_Funcon:
   - {fileID: 6632086278637897514}
+  InvertFuncon: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 0
@@ -41218,6 +41227,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
@@ -57305,7 +57317,7 @@ GameObject:
   - component: {fileID: 7335683461819437676}
   - component: {fileID: 2212646322914819899}
   - component: {fileID: 253449787524344531}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -97446,7 +97458,7 @@ GameObject:
   - component: {fileID: 3620230014146126437}
   - component: {fileID: 3599083168281888707}
   - component: {fileID: 9026632105835266004}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

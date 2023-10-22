@@ -1367,6 +1367,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 2529876106233307184}
   EntityControl: {fileID: 3243243057054021813}
   AddedHeight: 0
+  AllowRespawnSpeed: 9999
+  StopCarOnReset: 0
+  ResetMinDelay: 0
 --- !u!114 &2529876106233307184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22988,7 +22991,7 @@ GameObject:
   - component: {fileID: 1803049917701134625}
   - component: {fileID: 1803049917701134624}
   - component: {fileID: 1803049917701134627}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63224,8 +63227,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 3243243056451226300}
   EntityControl: {fileID: 3243243057054021813}
   EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityEventGlobal: 0
   Event_Name: 
-  Global: 0
+  EventGlobal: 0
 --- !u!114 &3243243056451226300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63295,7 +63299,7 @@ GameObject:
   - component: {fileID: 3243243056561536691}
   - component: {fileID: 3243243056561536690}
   - component: {fileID: 3243243056561536689}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63703,7 +63707,7 @@ GameObject:
   - component: {fileID: 3243243056892148397}
   - component: {fileID: 3243243056892148396}
   - component: {fileID: 3243243056892148395}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarDriverSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -70002,6 +70006,7 @@ MonoBehaviour:
   BoolAnimator: {fileID: 0}
   Dial_Funcon:
   - {fileID: 3331551201660380663}
+  InvertFuncon: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 0
@@ -70017,6 +70022,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2

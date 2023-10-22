@@ -45872,6 +45872,7 @@ MonoBehaviour:
   BoolAnimator: {fileID: 0}
   Dial_Funcon:
   - {fileID: 2418253124114833097}
+  InvertFuncon: 0
   DoAnimBool: 0
   AnimBoolName: AnimBool
   OnDefault: 0
@@ -45887,6 +45888,9 @@ MonoBehaviour:
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
   AllowToggleOnWater: 1
+  AllowAfterBurner: 1
+  AllowToggleEngineOff: 1
+  AllowToggleEngineOn: 1
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
@@ -57558,8 +57562,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 6141758679900960112}
   EntityControl: {fileID: 6141758680382097273}
   EntityEvent_Name: SFEXT_O_RespawnButton
+  EntityEventGlobal: 0
   Event_Name: 
-  Global: 0
+  EventGlobal: 0
 --- !u!114 &6141758679900960112
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -57841,7 +57846,7 @@ GameObject:
   - component: {fileID: 6141758680061051263}
   - component: {fileID: 6141758680061051262}
   - component: {fileID: 6141758680061051261}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -57998,7 +58003,7 @@ GameObject:
   - component: {fileID: 6141758680273700193}
   - component: {fileID: 6141758680273700192}
   - component: {fileID: 6141758680273700199}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarDriverSeat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58556,7 +58561,7 @@ GameObject:
   - component: {fileID: 6141758680559467798}
   - component: {fileID: 6141758680559467797}
   - component: {fileID: 6141758680559467796}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -58715,7 +58720,7 @@ GameObject:
   - component: {fileID: 6141758681580453102}
   - component: {fileID: 6141758681580453101}
   - component: {fileID: 6141758681580453100}
-  m_Layer: 17
+  m_Layer: 31
   m_Name: CarPassengerSeat (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -74602,6 +74607,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 6566904050605154300}
   EntityControl: {fileID: 6141758680382097273}
   AddedHeight: 0
+  AllowRespawnSpeed: 9999
+  StopCarOnReset: 0
+  ResetMinDelay: 0
 --- !u!114 &6566904050605154300
 MonoBehaviour:
   m_ObjectHideFlags: 0
