@@ -163,6 +163,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXTP_G_RespawnButton()
         {
+            ProjectileAmmo = ProjectileAmmoFULL;
             GunAmmoInSeconds = FullGunAmmoInSeconds;
             Minigun.localRotation = Quaternion.identity;
             GunRotation = Vector2.zero;
