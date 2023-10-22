@@ -249,6 +249,11 @@ namespace SaccFlightAndVehicles
         public float MediumCrashSpeed = 8f;
         [Tooltip("Impact speed that defines a big crash")]
         public float BigCrashSpeed = 25f;
+        [Tooltip("Do a fixed amount of damage per crash? This is on top of G damage caused by crashes, use if you want damage from crashing, but no G damage.")]
+        public bool CrashDoesDamage = false;
+        public float SmallCrashDmg = .1f;
+        public float MediumCrashDmg = .25f;
+        public float BigCrashDmg = .75f;
         [Tooltip("Multiply how much damage is done by missiles")]
         public float MissileDamageTakenMultiplier = 1f;
         [Tooltip("Strength of force that pushes the vehicle when a missile hits it")]
@@ -1952,28 +1957,31 @@ namespace SaccFlightAndVehicles
                 float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
                 if (colmag > BigCrashSpeed)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBigCrash));
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BigCrash));
                 }
                 else if (colmag > MediumCrashSpeed)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendMediumCrash));
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(MediumCrash));
                 }
                 else if (colmag > SmallCrashSpeed)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendSmallCrash));
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SmallCrash));
                 }
             }
         }
-        public void SendSmallCrash()
+        public void SmallCrash()
         {
+            if (CrashDoesDamage) { Health -= FullHealth * SmallCrashDmg; }
             EntityControl.SendEventToExtensions("SFEXT_G_SmallCrash");
         }
-        public void SendMediumCrash()
+        public void MediumCrash()
         {
+            if (CrashDoesDamage) { Health -= FullHealth * MediumCrashDmg; }
             EntityControl.SendEventToExtensions("SFEXT_G_MediumCrash");
         }
-        public void SendBigCrash()
+        public void BigCrash()
         {
+            if (CrashDoesDamage) { Health -= FullHealth * BigCrashDmg; }
             EntityControl.SendEventToExtensions("SFEXT_G_BigCrash");
         }
         //Add .001 to each value of damage taken to prevent float comparison bullshit
