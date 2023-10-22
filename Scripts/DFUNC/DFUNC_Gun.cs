@@ -14,6 +14,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Animator bool that is true when the gun is firing")]
         public string GunFiringBoolName = "gunfiring";
         [Tooltip("Transform of which its X scale scales with ammo")]
+        public Transform AmmoBar;
         public Transform[] AmmoBars;
         [Tooltip("Position at which recoil forces are added, not required for recoil to work. Only use this if you want the vehicle to rotate when shooting")]
         public Transform GunRecoilEmpty;
@@ -62,6 +63,7 @@ namespace SaccFlightAndVehicles
         private bool LeftDial = false;
         private bool InVehicle = false;
         private int DialPosition = -999;
+        private Vector3 AmmoBarScaleStart;
         private Vector3[] AmmoBarScaleStarts;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -70,6 +72,7 @@ namespace SaccFlightAndVehicles
             FullGunAmmoInSeconds = GunAmmoInSeconds;
             reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
 
+            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
             AmmoBarScaleStarts = new Vector3[AmmoBars.Length];
             for (int i = 0; i < AmmoBars.Length; i++)
             {
@@ -161,6 +164,7 @@ namespace SaccFlightAndVehicles
 
         public void UpdateAmmoVisuals()
         {
+            if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
             for (int i = 0; i < AmmoBars.Length; i++)
             {
                 AmmoBars[i].localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStarts[i].x, AmmoBarScaleStarts[i].y, AmmoBarScaleStarts[i].z);
@@ -452,7 +456,7 @@ namespace SaccFlightAndVehicles
                     Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
                     Vector3 PredictedPos = TargetDir
                         + (((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
-                                                                          //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
+                            //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
                             + (TargetAccel * .125f * BulletHitTime))//Acceleration
                                     * BulletHitTime);
 
