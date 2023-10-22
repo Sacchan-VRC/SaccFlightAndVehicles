@@ -158,6 +158,8 @@ namespace SaccFlightAndVehicles
         public bool DisallowTaxiRotationWhileStill = false;
         [Tooltip("When the above is ticked, This is the speed at which the vehicle will reach its full turning speed. Meters/second.")]
         public float TaxiFullTurningSpeed = 20f;
+        [Tooltip("Changes suspension paramater ally to disable suspension down on V1 speed to avoid sticky wheels.")]
+        public bool WheelSuspension = false;
         [Tooltip("Adjust how steep the lift curve is. Higher = more lift")]
         public float Lift = 0.00015f;
         [Tooltip("How much angle of attack on yaw turns the vehicle. Yaw steering strength in air")]
@@ -1383,7 +1385,7 @@ namespace SaccFlightAndVehicles
                         }
 
                         VehicleConstantForce.relativeForce = FinalInputAcc;
-                        if (HasWheelColliders)
+                        if (HasWheelColliders && WheelSuspension)
                         {
                             float suspensionDownCof = FinalInputAcc.y / VehicleRigidbody.mass / 9.81f;
                             suspensionDownCof = Mathf.Clamp(suspensionDownCof, 0, 1);
