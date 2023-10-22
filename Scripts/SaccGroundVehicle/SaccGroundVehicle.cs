@@ -29,6 +29,9 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour[] SteerWheels;
         [Tooltip("All of the rest of the wheels")]
         public UdonSharpBehaviour[] OtherWheels;
+        [Tooltip("Wing scripts to enable while doing vehicle physics")]
+        public UdonSharpBehaviour[] LiftSurfaces;
+        private bool LiftSurfacesEnabled = true;
         //public Transform[] DriveWheelsTrans;
         //public sustest[] SteeringWheels;
         //public Transform[] SteeringWheelsTrans;
@@ -809,12 +812,14 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody.velocity = CurrentVel;
             LastFrameVel = CurrentVel;
             SetWheelIsOwner();
+
         }
         public void SFEXT_O_LoseOwnership()
         {
             VehiclePosLastFrame = VehicleTransform.position;
             IsOwner = false;
             SetWheelIsOwner();
+            EnableLiftSurfaces(false);
         }
         public void SetWheelIsOwner()
         {
@@ -882,6 +887,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             SetCollidersLayer(OnboardVehicleLayer);
             SetWheelDriver();
+            EnableLiftSurfaces(true);
         }
         public void SFEXT_O_PilotExit()
         {
@@ -923,12 +929,23 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody.angularVelocity = Vector3.zero;
             VehicleSpeed = 0;
             Sleeping = true;
+            EnableLiftSurfaces(false);
         }
         public void SFEXT_L_WakeUp()
         {
             VehicleRigidbody.WakeUp();
             VehicleRigidbody.useGravity = true;
             Sleeping = false;
+            EnableLiftSurfaces(IsOwner);
+        }
+        public void EnableLiftSurfaces(bool enable)
+        {
+            if (enable == LiftSurfacesEnabled) { return; }
+            LiftSurfacesEnabled = enable;
+            for (int i = 0; i < LiftSurfaces.Length; i++)
+            {
+                LiftSurfaces[i].gameObject.SetActive(enable);
+            }
         }
         public void SendBulletHit()
         {
