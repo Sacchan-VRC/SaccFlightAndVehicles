@@ -13,23 +13,22 @@ namespace SaccFlightAndVehicles
         public AnimationCurve YawLift = AnimationCurve.Linear(1, 1, 1, 1);
         public Rigidbody VehicleRigidbody;
         // private Transform VehicleTransform;
+        [Header("WingSize^2 and LiftStrength are multiplied together")]
         public float WingSize = 1;
-        public float LiftStrength = 1;
+        [Header("Make LiftStrength the same on all, then adjust WingSize visually")]
+        public float LiftStrength = 0.001f;
+        [Space(10)]
         public bool DoGroundEffect;
         public float GroundEffectRange;
         public float GroundEffectStrength;
-        public bool DrawDebugGizmos;
+        public bool DrawDebugGizmos = true;
         private VRCPlayerApi localPlayer;
         GameObject vehicle;
         void Start()
         {
             localPlayer = Networking.LocalPlayer;
             vehicle = VehicleRigidbody.gameObject;
-            // VehicleTransform = VehicleRigidbody.transform;
-            if (Rotator) { RotatorStartRot = Rotator.localRotation; }
         }
-        public Transform Rotator;
-        private Quaternion RotatorStartRot;
         private void FixedUpdate()
         {
             // if (!Networking.LocalPlayer.IsOwner(vehicle)) { return; }
@@ -41,7 +40,7 @@ namespace SaccFlightAndVehicles
             // float AoA_Yaw = Vector3.Angle(transform.forward, Vector3.ProjectOnPlane(vel, transform.up));
             float AoA_Pitch_LiftMulti = PitchLift.Evaluate(AoA_Pitch);
             float AoA_Yaw_LiftMulti = YawLift.Evaluate(AoA_Yaw);
-            float liftForce = WingSize * AoA_Pitch_LiftMulti * AoA_Yaw_LiftMulti * speed * speed * LiftStrength;
+            float liftForce = WingSize * WingSize * AoA_Pitch_LiftMulti * AoA_Yaw_LiftMulti * speed * speed * LiftStrength;
             Vector3 GroundEffect = Vector3.zero;
             if (DoGroundEffect)
             {
@@ -56,18 +55,16 @@ namespace SaccFlightAndVehicles
                 GEDEBUGVEC = GroundEffect;
 #endif
             }
-            VehicleRigidbody.AddForceAtPosition(transform.up * liftForce + GroundEffect, transform.position, ForceMode.VelocityChange);
+            VehicleRigidbody.AddForceAtPosition(transform.up * liftForce + GroundEffect, transform.position, ForceMode.Acceleration);
 #if UNITY_EDITOR
             liftdebug = liftForce;
             AOAYAWDEBUG = AoA_Yaw;
             AOAPITCHDEBUG = AoA_Pitch;
-            PITCHDEBUG = AoA_Pitch;
 #endif
         }
 #if UNITY_EDITOR
         public float AOAYAWDEBUG;
         public float AOAPITCHDEBUG;
-        public float PITCHDEBUG;
         public Vector3 GEDEBUGVEC;
         public float liftdebug;
         public float DebugLineSize = 100f;

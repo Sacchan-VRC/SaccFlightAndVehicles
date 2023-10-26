@@ -44,6 +44,9 @@ namespace SaccFlightAndVehicles
         public float ThrottleAfterburnerPoint = 0.8f;
         [Tooltip("Disable Thrust/VTOL rotation values transition calculations and assume VTOL mode always (for helicopters)")]
         public bool VTOLOnly = false;
+        [Tooltip("Wing scripts to enable while doing vehicle physics")]
+        public UdonSharpBehaviour[] LiftSurfaces;
+        private bool LiftSurfacesEnabled = true;
         [Header("Response:")]
         [Tooltip("Vehicle thrust at max throttle without afterburner")]
         public float ThrottleStrength = 20f;
@@ -169,7 +172,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Maximum value for lift, as it's exponential it's wise to stop it at some point?")]
         public float MaxLift = 10f;
         [Tooltip("Push the vehicle up based on speed. Used to counter the fact that without it, the plane's nose will droop down due to gravity. Slower planes need a higher value.")]
-        public float VelLift = 1f;
+        public float VelLift = 0.00015f;
         [Tooltip("Maximum Vel Lift, to stop the nose being pushed up. Technically should probably be 9.81 to counter gravity exactly")]
         public float VelLiftMax = 10f;
         [Tooltip("Vehicle will take damage if experiences more Gs that this (Internally Gs are calculated in all directions, the HUD shows only vertical Gs so it will differ slightly")]
@@ -668,6 +671,8 @@ namespace SaccFlightAndVehicles
             InEditor = EntityControl.InEditor;
             IsOwner = EntityControl.IsOwner;
 
+            EnableLiftSurfaces(IsOwner);
+
             VehicleWheelColliders = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
             if (VehicleWheelColliders.Length != 0)
             {
@@ -705,6 +710,7 @@ namespace SaccFlightAndVehicles
                 PitchAoaPitchForceMulti *= RBMass;
                 Lift *= RBMass;
                 MaxLift *= RBMass;
+                VelLift *= RBMass;
                 VelLiftMax *= RBMass;
                 AdverseRoll *= RBMass;
                 AdverseYaw *= RBMass;
@@ -1244,6 +1250,7 @@ namespace SaccFlightAndVehicles
                     float sidespeed = 0;
                     float downspeed = 0;
                     float SpeedLiftFactor = 0;
+                    float SpeedLiftFactor_Lift = 0;
                     float SpeedLiftFactor_pd = 0;
                     float rotlift = 0;
 
@@ -1255,7 +1262,8 @@ namespace SaccFlightAndVehicles
                         sidespeed = Vector3.Dot(AirVel, VehicleTransform.right);
                         downspeed = -Vector3.Dot(AirVel, VehicleTransform.up);
                         PitchDown = downspeed < 0;//air is hitting plane from above?
-                        SpeedLiftFactor = Mathf.Min(AirSpeed * AirSpeed * Lift, MaxLift);
+                        SpeedLiftFactor = AirSpeed * AirSpeed;
+                        SpeedLiftFactor_Lift = Mathf.Min(SpeedLiftFactor * Lift, MaxLift);
                         SpeedLiftFactor_pd = Mathf.Min(AirSpeed * AirSpeed * Lift, PitchDown ? MaxLift * PitchDownLiftMulti : MaxLift);
 
                         rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
@@ -1286,7 +1294,7 @@ namespace SaccFlightAndVehicles
                     {
                         //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                         //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
-                        Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor * AoALiftYaw,// X Sideways
+                        Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor_Lift * AoALiftYaw,// X Sideways
                                 ((PitchDown ? downspeed * PitchDownLiftMulti : downspeed) * ExtraLift * SpeedLiftFactor_pd * AoALiftPitch),// Y Up
                                 0);//Z Forward
 
@@ -1581,6 +1589,7 @@ namespace SaccFlightAndVehicles
             Asleep = false;
             EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
             VehicleRigidbody.WakeUp();
+            EnableLiftSurfaces(IsOwner);
         }
         private bool KeepAwake = false;
         public void SFEXT_L_KeepAwake() { KeepAwake = true; }
@@ -1594,6 +1603,7 @@ namespace SaccFlightAndVehicles
             GDamageToTake = 0;
             VertGs = 0;
             LastFrameVel = Vector3.zero;
+            EnableLiftSurfaces(false);
         }
         public void SFEXT_L_CoMSet()
         {
@@ -2136,6 +2146,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
+            EnableLiftSurfaces(false);
             if (!UsingManualSync)
             {
                 VehicleRigidbody.drag = 9999;
@@ -2401,6 +2412,15 @@ namespace SaccFlightAndVehicles
             //x = throttle amount (0-1), y = afterburner amount (0-1)
             return new Vector2(Mathf.Min(Throttle, ThrottleAfterburnerPoint) * ThrottleNormalizer,
             Mathf.Max((Mathf.Max(Throttle, ThrottleAfterburnerPoint) - ThrottleAfterburnerPoint) * ABNormalizer, 0));
+        }
+        public void EnableLiftSurfaces(bool enable)
+        {
+            if (enable == LiftSurfacesEnabled) { return; }
+            LiftSurfacesEnabled = enable;
+            for (int i = 0; i < LiftSurfaces.Length; i++)
+            {
+                LiftSurfaces[i].gameObject.SetActive(enable);
+            }
         }
     }
 }
