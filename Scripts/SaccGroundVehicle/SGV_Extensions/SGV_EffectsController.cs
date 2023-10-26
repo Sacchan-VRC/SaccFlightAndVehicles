@@ -13,6 +13,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Engine sounds to set pitch and doppler, DO NOT ANIMATE PITCH IN THE REVS ANIMATION")]
         public AudioSource[] EngineSounds;
         private Transform[] EngineSoundsT;
+        public bool DespawnIfUnused = false;
+        [SerializeField] private float DespawnDist = 50f;
         [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
         public AudioSource[] DopplerSounds;
         [Tooltip("Particle system that plays when vehicle enters water")]
@@ -231,6 +233,11 @@ namespace SaccFlightAndVehicles
         }
         public void FallAsleep()
         {
+            if (DespawnIfUnused)
+            {
+                CheckingToDisable = true;
+                CheckDisableLoop();
+            }
             Sleeping = true;
             VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
             VehicleAnimator.SetFloat(REVS_STRING, 0);
@@ -253,6 +260,11 @@ namespace SaccFlightAndVehicles
         }
         public void WakeUp()
         {
+            if (DespawnIfUnused && !EntityControl.gameObject.activeSelf)
+            {
+                EntityControl.gameObject.SetActive(true);
+            }
+            CheckingToDisable = false;
             Sleeping = false;
             DoEffects = 0f;
             EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
@@ -477,6 +489,13 @@ namespace SaccFlightAndVehicles
         {
             IsOwner = false;
         }
+        public void SFEXT_L_OwnershipTransfer()
+        {
+            if (DespawnIfUnused)
+            {
+                WakeUp();//ensure no desync
+            }
+        }
         public void SFEXT_G_BulletHit()
         {
             if (!BulletHitNull)
@@ -558,6 +577,21 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_DamageFeedback()
         {
             if (DamageFeedBack) { DamageFeedBack.PlayOneShot(DamageFeedBack.clip); }
+        }
+        private bool CheckingToDisable;
+        public void CheckDisableLoop()
+        {
+            if (!CheckingToDisable) { return; }
+            //don't disable unless owner is far away
+            if (EntityControl.OwnerAPI != null && Vector3.Distance(EntityControl.OwnerAPI.GetPosition(), EntityControl.transform.position) > DespawnDist)
+            {
+                EntityControl.gameObject.SetActive(false);
+                CheckingToDisable = false;
+            }
+            else
+            {
+                SendCustomEventDelayedSeconds(nameof(CheckDisableLoop), 1);
+            }
         }
     }
 }
