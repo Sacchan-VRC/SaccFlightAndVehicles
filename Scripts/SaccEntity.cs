@@ -30,10 +30,12 @@ namespace SaccFlightAndVehicles
         public LayerMask AAMTargetsLayer = 1 << 25;//layer 25
         [Tooltip("Object that is enabled when entering vehicle in any seat. Will be removed"), Header("Removing InVehicleOnly next version.")]
         public GameObject InVehicleOnly;
-        [Tooltip("Object that is enabled when entering vehicle in any seat")]
+        [Tooltip("Objects that is enabled when entering vehicle in any seat")]
         public GameObject[] EnableInVehicle;
-        [Tooltip("Object that is enabled when holding this object")]
+        [Tooltip("Objects that is enabled when holding this object")]
         public GameObject[] EnableWhenHolding;
+        [Tooltip("Objects that are enabled when owner of this object")]
+        public GameObject[] EnableWhenOwner;
         [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
         public Transform CenterOfMass;
         [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
@@ -54,6 +56,7 @@ namespace SaccFlightAndVehicles
         public GameObject[] AAMTargets;
         [System.NonSerializedAttribute] public bool InEditor = true;//false if in clientsim
         private VRCPlayerApi localPlayer;
+        [System.NonSerialized] public VRCPlayerApi OwnerAPI;
         [System.NonSerializedAttribute] public VRC_Pickup EntityPickup;
         [System.NonSerializedAttribute] public bool Piloting;
         [System.NonSerializedAttribute] public int UsersID;
@@ -152,8 +155,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool InVR = false;
         [System.NonSerializedAttribute] public bool IsOwner;
         [System.NonSerializedAttribute] public bool Initialized;
-
-        //old Leavebutton Stuff
         [System.NonSerializedAttribute] public int PilotSeat = -1;
         [System.NonSerializedAttribute] public int MySeat = -1;
         [System.NonSerializedAttribute] public int[] SeatedPlayers;
@@ -163,7 +164,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float PilotExitTime;
         [System.NonSerializedAttribute] public float PilotEnterTime;
         [System.NonSerializedAttribute] public bool Holding;
-        //end of old Leavebutton stuff
         public void Init() { Start(); }
         private void Start()
         {
@@ -178,11 +178,15 @@ namespace SaccFlightAndVehicles
             }
             else
             {
+                Holding = true;
+                Piloting = true;
                 IsOwner = true;
                 Using = true;
                 InVehicle = true;
                 Occupied = true;
             }
+            for (int i = 0; i < EnableWhenOwner.Length; i++)
+            { if (EnableWhenOwner[i]) { EnableWhenOwner[i].SetActive(IsOwner); } }
             Spawnposition = transform.localPosition;
             Spawnrotation = transform.localRotation;
             if (CenterOfMass)
@@ -289,6 +293,8 @@ namespace SaccFlightAndVehicles
             }
 
             SendEventToExtensions("SFEXT_L_EntityStart");
+
+            OwnerAPI = Networking.GetOwner(gameObject);
 
             //if in editor play mode without clientsim
             if (InEditor)
@@ -514,9 +520,12 @@ namespace SaccFlightAndVehicles
         }
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {
+            OwnerAPI = player;
             if (player.isLocal)
             {
                 IsOwner = true;
+                for (int i = 0; i < EnableWhenOwner.Length; i++)
+                { if (EnableWhenOwner[i]) { EnableWhenOwner[i].SetActive(true); } }
                 TakeOwnerShipOfExtensions();
                 SendEventToExtensions("SFEXT_O_TakeOwnership");
             }
@@ -525,6 +534,8 @@ namespace SaccFlightAndVehicles
                 if (IsOwner)
                 {
                     IsOwner = false;
+                    for (int i = 0; i < EnableWhenOwner.Length; i++)
+                    { if (EnableWhenOwner[i]) { EnableWhenOwner[i].SetActive(false); } }
                     SendEventToExtensions("SFEXT_O_LoseOwnership");
                 }
             }

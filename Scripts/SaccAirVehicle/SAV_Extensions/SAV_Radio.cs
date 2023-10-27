@@ -9,10 +9,24 @@ using VRC.Udon;
 public class SAV_Radio : UdonSharpBehaviour
 {
     public SaccEntity EntityControl;
-    public UdonSharpBehaviour RadioBase;
+    [System.NonSerialized] public SaccRadioBase RadioBase;
     public bool RadioOn = true;
     [Header("Debug:")]
-    [UdonSynced] public byte Channel = 0;
+    [UdonSynced, FieldChangeCallback(nameof(Channel))] private byte _Channel;
+    public byte Channel
+    {
+        set
+        {
+            _Channel = value;
+            if (EntityControl.InVehicle)
+            {
+                UpdateChannel();
+                RadioBase.SetAllVoiceVolumesDefault();
+            }
+            RadioBase.SetVehicleVolumeDefault(EntityControl);
+        }
+        get => _Channel;
+    }
     private bool Initialized;
     private VRCPlayerApi localPlayer;
     private int CurrentOwnerID;
@@ -22,11 +36,6 @@ public class SAV_Radio : UdonSharpBehaviour
         Initialized = true;
         localPlayer = Networking.LocalPlayer;
         CurrentOwnerID = Networking.GetOwner(EntityControl.gameObject).playerId;
-    }
-    void Start()
-    {
-        if (!Initialized)
-        { Init(); }
     }
     public void SFEXT_L_EntityStart()
     {
@@ -65,19 +74,23 @@ public class SAV_Radio : UdonSharpBehaviour
     {
         if (RadioBase)
         {
-            //if not pilot, set my channel on radiobase to vehicle's and set back on exit
-            UpdateChannel();
             RadioBase.SetProgramVariable("MyVehicleSetTimes", (int)RadioBase.GetProgramVariable("MyVehicleSetTimes") + 1);
             RadioBase.SetProgramVariable("MyVehicle", EntityControl);
-            if (EntityControl.IsOwner)
-            {
-                RadioOn = (bool)RadioBase.GetProgramVariable("RadioEnabled");
-                if (RadioOn)
-                { Channel = (byte)RadioBase.GetProgramVariable("MyChannel"); }
-                else
-                { Channel = 0; }
-                RequestSerialization();
-            }
+            //if not pilot, set my channel on radiobase to vehicle's and set back on exit
+            NewChannel();
+            UpdateChannel();
+        }
+    }
+    public void NewChannel()
+    {
+        if (EntityControl.Piloting)
+        {
+            RadioOn = (bool)RadioBase.GetProgramVariable("RadioEnabled");
+            if (RadioOn)
+            { Channel = (byte)RadioBase.GetProgramVariable("MyChannel"); }
+            else
+            { Channel = 0; }
+            RequestSerialization();
         }
     }
     public void ExitVehicle()
@@ -101,8 +114,8 @@ public class SAV_Radio : UdonSharpBehaviour
     public void SFEXT_L_OwnershipTransfer()
     {
         //reset current owner's voice volume
-        RadioBase.SetProgramVariable("SingleVVPlayerID", CurrentOwnerID);
-        RadioBase.SendCustomEvent("SetSingleVoiceVolumeDefault");
+        VRCPlayerApi ownerAPI = VRCPlayerApi.GetPlayerById(CurrentOwnerID);
+        RadioBase.SetSingleVoiceVolumeDefault(ownerAPI);
         CurrentOwnerID = Networking.GetOwner(EntityControl.gameObject).playerId;
     }
     public void SFEXT_O_OnPickup()

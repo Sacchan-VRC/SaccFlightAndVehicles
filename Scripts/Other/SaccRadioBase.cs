@@ -12,7 +12,7 @@ namespace SaccFlightAndVehicles
     {
         [Header("Vehicles must have SAV_Radio extension for this to work")]
         private SaccEntity[] _AllPlanes_ENT;
-        private SAV_Radio[] _AllPlanes_RD;
+        public SAV_Radio[] _AllPlanes_RD;
         public float VoiceNear = 199999;
         public float VoiceFar = 200000;
         // public float VoiceVolumetric = 1500;
@@ -47,8 +47,42 @@ namespace SaccFlightAndVehicles
                 _AllPlanes_ENT[i] = (SaccEntity)AllPlanes[i].GetComponent<SaccEntity>();
                 if (_AllPlanes_ENT[i]) { _AllPlanes_RD[i] = (SAV_Radio)_AllPlanes_ENT[i].GetExtention("SAV_Radio"); }
             }
+            PruneRadiosArray();
+            for (int i = 0; i < _AllPlanes_RD.Length; i++)
+            {
+                _AllPlanes_RD[i].RadioBase = this;
+                _AllPlanes_RD[i].Init();
+            }
             NumZones = RadioZones.Length;
             if (NumZones != 0) { DoZones = true; }
+        }
+        private void PruneRadiosArray()
+        {
+            int len = _AllPlanes_RD.Length;
+            bool[] valid = new bool[len];
+            int numvalid = 0;
+            for (int i = 0; i < len; i++)
+            {
+                if (_AllPlanes_RD[i])
+                {
+                    valid[i] = true;
+                    numvalid++;
+                }
+            }
+            SAV_Radio[] RD_New = new SAV_Radio[numvalid];
+            int offset = 0;
+            for (int i = 0; i < len; i++)
+            {
+                if (!valid[i])
+                {
+                    offset++;
+                }
+                else
+                {
+                    RD_New[i - offset] = _AllPlanes_RD[i];
+                }
+            }
+            _AllPlanes_RD = RD_New;
         }
         public void SetRadioVoiceVolumes()
         {
@@ -58,30 +92,27 @@ namespace SaccFlightAndVehicles
             { SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2); }//separate in frames for optimization
             NextPlane++;
             if (NextPlane == _AllPlanes_RD.Length) { NextPlane = 0; }
-            if (_AllPlanes_RD[NextPlane])
+            if (MyVehicle == _AllPlanes_ENT[NextPlane]
+                || (byte)_AllPlanes_RD[NextPlane].Channel != CurrentChannel
+                || CurrentChannel == 0) { return; }
+            for (int o = 0; o < _AllPlanes_ENT[NextPlane].VehicleSeats.Length; o++)
             {
-                if (MyVehicle == _AllPlanes_ENT[NextPlane]
-                    || (byte)_AllPlanes_RD[NextPlane].Channel != CurrentChannel
-                    || CurrentChannel == 0) { return; }
-                for (int o = 0; o < _AllPlanes_ENT[NextPlane].VehicleSeats.Length; o++)
+                VRCPlayerApi thisplayer = _AllPlanes_ENT[NextPlane].VehicleSeats[o].SeatedPlayer;
+                if (thisplayer != null)
                 {
-                    VRCPlayerApi thisplayer = _AllPlanes_ENT[NextPlane].VehicleSeats[o].SeatedPlayer;
-                    if (thisplayer != null)
-                    {
-                        thisplayer.SetVoiceDistanceNear(VoiceNear);
-                        thisplayer.SetVoiceDistanceFar(VoiceFar);
-                        thisplayer.SetVoiceGain(VoiceGain);
-                    }
+                    thisplayer.SetVoiceDistanceNear(VoiceNear);
+                    thisplayer.SetVoiceDistanceFar(VoiceFar);
+                    thisplayer.SetVoiceGain(VoiceGain);
                 }
-                if (_AllPlanes_ENT[NextPlane].EntityPickup && _AllPlanes_ENT[NextPlane].EntityPickup.IsHeld)
+            }
+            if (_AllPlanes_ENT[NextPlane].EntityPickup && _AllPlanes_ENT[NextPlane].EntityPickup.IsHeld)
+            {
+                VRCPlayerApi thisplayer = Networking.GetOwner(_AllPlanes_ENT[NextPlane].gameObject);
+                if (thisplayer != null)
                 {
-                    VRCPlayerApi thisplayer = Networking.GetOwner(_AllPlanes_ENT[NextPlane].gameObject);
-                    if (thisplayer != null)
-                    {
-                        thisplayer.SetVoiceDistanceNear(VoiceNear);
-                        thisplayer.SetVoiceDistanceFar(VoiceFar);
-                        thisplayer.SetVoiceGain(VoiceGain);
-                    }
+                    thisplayer.SetVoiceDistanceNear(VoiceNear);
+                    thisplayer.SetVoiceDistanceFar(VoiceFar);
+                    thisplayer.SetVoiceGain(VoiceGain);
                 }
             }
         }
@@ -124,33 +155,54 @@ namespace SaccFlightAndVehicles
                 AllPlayers[i].SetVoiceGain(15);
             }
         }
-        private int SetSingleVoiceVolumeID;
-        public void SetSingleVoiceVolumeDefault()
+        public void SetVehicleVolumeDefault(SaccEntity Vehicle)
         {
-            VRCPlayerApi SingleVV = VRCPlayerApi.GetPlayerById(SetSingleVoiceVolumeID);
-            if (SingleVV == null) { return; }
-            SingleVV.SetVoiceDistanceNear(0);
-            SingleVV.SetVoiceDistanceFar(25);
-            SingleVV.SetVoiceGain(15);
+            for (int i = 0; i < Vehicle.VehicleSeats.Length; i++)
+            {
+                SetSingleVoiceVolumeDefault(Vehicle.VehicleSeats[i].SeatedPlayer);
+            }
+        }
+        public void SetSingleVoiceVolumeDefault(VRCPlayerApi player)
+        {
+            if (player == null) { return; }
+            player.SetVoiceDistanceNear(0);
+            player.SetVoiceDistanceFar(25);
+            player.SetVoiceGain(15);
         }
         public void ToggleRadio()
         {
             RadioEnabled = !RadioEnabled;
             if (RadioEnabledTxt) RadioEnabledTxt.color = RadioEnabled ? Color.white : Color.gray;
+            UpdateRadioScripts();
         }
         public void IncreaseChannel()
         {
-            if (MyChannel + 1 > 16) { return; }
-            MyChannel++;
+            if (MyChannel + 1 > 16) { MyChannel = 1; }
+            else
+            {
+                MyChannel++;
+            }
             if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
             CurrentChannel = MyChannel;
+            UpdateRadioScripts();
         }
         public void DecreaseChannel()
         {
-            if (MyChannel - 1 < 1) { return; }
-            MyChannel--;
+            if (MyChannel - 1 < 1) { MyChannel = 16; }
+            else
+            {
+                MyChannel--;
+            }
             if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
             CurrentChannel = MyChannel;
+            UpdateRadioScripts();
+        }
+        void UpdateRadioScripts()
+        {
+            for (int i = 0; i < _AllPlanes_RD.Length; i++)
+            {
+                _AllPlanes_RD[i].NewChannel();
+            }
         }
     }
 }
