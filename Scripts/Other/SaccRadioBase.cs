@@ -197,6 +197,19 @@ namespace SaccFlightAndVehicles
             CurrentChannel = MyChannel;
             UpdateRadioScripts();
         }
+        public void SetChannel(int inChannel)
+        {
+            inChannel--;
+            inChannel = mod(inChannel, 16);
+            inChannel++;
+            CurrentChannel = MyChannel = (byte)(inChannel);
+            if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
+            UpdateRadioScripts();
+        }
+        int mod(int x, int m)
+        {
+            return (x % m + m) % m;
+        }
         void UpdateRadioScripts()
         {
             for (int i = 0; i < _AllPlanes_RD.Length; i++)
