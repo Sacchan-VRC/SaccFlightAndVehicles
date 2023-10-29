@@ -59,6 +59,7 @@ namespace SaccFlightAndVehicles
         }
         private float FullGunAmmoDivider;
         private bool Selected = false;
+        private bool Selected_HUD = false;
         private float reloadspeed;
         private bool LeftDial = false;
         private bool InVehicle = false;
@@ -146,7 +147,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotExit()
         {
             InVehicle = false;
-            if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
+            if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected)); }//unselect 
             Selected = false;
             if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(false); }
         }
@@ -184,6 +185,7 @@ namespace SaccFlightAndVehicles
             if (HudCrosshair) { HudCrosshair.SetActive(false); }
             for (int i = 0; i < EnableOnSelected.Length; i++)
             { EnableOnSelected[i].SetActive(true); }
+            Selected_HUD = true;
         }
         public void Set_Unselected()
         {
@@ -193,6 +195,7 @@ namespace SaccFlightAndVehicles
             if (GUNLeadIndicator) { GUNLeadIndicator.gameObject.SetActive(false); }
             for (int i = 0; i < EnableOnSelected.Length; i++)
             { EnableOnSelected[i].SetActive(false); }
+            Selected_HUD = false;
         }
         public void Set_Active()
         {
@@ -206,8 +209,10 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_TakeOwnership()
         {
-            if (_firing)//if someone times out, tell weapon to stop firing if you take ownership.
+            if (gameObject.activeSelf)//if someone times out, tell weapon to stop firing if you take ownership.
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
+            if (Selected_HUD)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected)); }
         }
         public void SFEXT_G_Explode()
         {
