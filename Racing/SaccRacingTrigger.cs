@@ -407,6 +407,7 @@ namespace SaccFlightAndVehicles
         void OnDisable()
         {
             TurnOffCurrentCheckPoints();
+            RaceOn = false;
             TimerTextCounter++; SetTimerEmpty();
         }
         public void TurnOffCurrentCheckPoints()

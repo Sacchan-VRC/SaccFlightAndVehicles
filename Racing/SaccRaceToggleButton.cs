@@ -236,7 +236,6 @@ namespace SaccFlightAndVehicles
             AutoEnableRace_NextRace++;
             if (AutoEnableRace_NextRace >= Races.Length)
             {
-                //set up new race
                 bool DirectionCheck = !ClosestRace_forward != Reverse;
                 if (ClosestRace_forward && Reverse)
                 { SetTrack_Forward(); }
