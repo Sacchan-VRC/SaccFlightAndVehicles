@@ -31,13 +31,17 @@ namespace SaccFlightAndVehicles
         }
         private bool Initialized;
         private VRCPlayerApi localPlayer;
-        private int CurrentOwnerID;
+        private int CurrentOwnerID = -1;
         private bool ChannelSwapped;
         public void Init()
         {
             Initialized = true;
             localPlayer = Networking.LocalPlayer;
-            CurrentOwnerID = Networking.GetOwner(EntityControl.gameObject).playerId;
+            VRCPlayerApi ownerAPI = Networking.GetOwner(EntityControl.gameObject);
+            if (Utilities.IsValid(ownerAPI))
+            {
+                CurrentOwnerID = ownerAPI.playerId;
+            }
         }
         public void SFEXT_L_EntityStart()
         {
@@ -117,7 +121,10 @@ namespace SaccFlightAndVehicles
         {
             //reset current owner's voice volume
             VRCPlayerApi ownerAPI = VRCPlayerApi.GetPlayerById(CurrentOwnerID);
-            RadioBase.SetSingleVoiceVolumeDefault(ownerAPI);
+            if (Utilities.IsValid(ownerAPI))
+            {
+                RadioBase.SetSingleVoiceVolumeDefault(ownerAPI);
+            }
             CurrentOwnerID = Networking.GetOwner(EntityControl.gameObject).playerId;
         }
         public void SFEXT_O_OnPickup()
@@ -130,11 +137,12 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_OnDrop()
         {
-            if (CurrentOwnerID == Networking.GetOwner(EntityControl.gameObject).playerId)
+            VRCPlayerApi ownerAPI = Networking.GetOwner(EntityControl.gameObject);
+            if (ownerAPI == null) { return; }
+            if (CurrentOwnerID == ownerAPI.playerId)
             {
                 //reset current owner's voice volume
-                RadioBase.SetProgramVariable("SetSingleVoiceVolumeID", CurrentOwnerID);
-                RadioBase.SendCustomEvent("SetSingleVoiceVolumeDefault");
+                RadioBase.SetSingleVoiceVolumeDefault(ownerAPI);
             }
         }
     }

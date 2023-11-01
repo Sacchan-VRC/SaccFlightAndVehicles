@@ -11,8 +11,7 @@ namespace SaccFlightAndVehicles
     public class SaccRadioBase : UdonSharpBehaviour
     {
         [Header("Vehicles must have SAV_Radio extension for this to work")]
-        private SaccEntity[] _AllPlanes_ENT;
-        public SAV_Radio[] _AllPlanes_RD;
+        private SAV_Radio[] _AllPlanes_RD;
         public float VoiceNear = 199999;
         public float VoiceFar = 200000;
         // public float VoiceVolumetric = 1500;
@@ -40,12 +39,13 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
             CurrentChannel = MyChannel;
             if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
-            _AllPlanes_ENT = new SaccEntity[AllPlanes.Length];
+            SaccEntity[] _AllPlanes_ENT = new SaccEntity[AllPlanes.Length];
             _AllPlanes_RD = new SAV_Radio[AllPlanes.Length];
+            string radioname = GetUdonTypeName<SAV_Radio>();
             for (int i = 0; i < AllPlanes.Length; i++)
             {
                 _AllPlanes_ENT[i] = (SaccEntity)AllPlanes[i].GetComponent<SaccEntity>();
-                if (_AllPlanes_ENT[i]) { _AllPlanes_RD[i] = (SAV_Radio)_AllPlanes_ENT[i].GetExtention("SAV_Radio"); }
+                if (_AllPlanes_ENT[i]) { _AllPlanes_RD[i] = (SAV_Radio)_AllPlanes_ENT[i].GetExtention(radioname); }
             }
             PruneRadiosArray();
             for (int i = 0; i < _AllPlanes_RD.Length; i++)
@@ -92,12 +92,13 @@ namespace SaccFlightAndVehicles
             { SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2); }//separate in frames for optimization
             NextPlane++;
             if (NextPlane == _AllPlanes_RD.Length) { NextPlane = 0; }
-            if (MyVehicle == _AllPlanes_ENT[NextPlane]
+            SaccEntity NextVehicle = _AllPlanes_RD[NextPlane].EntityControl;
+            if (MyVehicle == _AllPlanes_RD[NextPlane].EntityControl
                 || (byte)_AllPlanes_RD[NextPlane].Channel != CurrentChannel
                 || CurrentChannel == 0) { return; }
-            for (int o = 0; o < _AllPlanes_ENT[NextPlane].VehicleSeats.Length; o++)
+            for (int o = 0; o < NextVehicle.VehicleSeats.Length; o++)
             {
-                VRCPlayerApi thisplayer = _AllPlanes_ENT[NextPlane].VehicleSeats[o].SeatedPlayer;
+                VRCPlayerApi thisplayer = NextVehicle.VehicleSeats[o].SeatedPlayer;
                 if (thisplayer != null)
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
@@ -105,9 +106,9 @@ namespace SaccFlightAndVehicles
                     thisplayer.SetVoiceGain(VoiceGain);
                 }
             }
-            if (_AllPlanes_ENT[NextPlane].EntityPickup && _AllPlanes_ENT[NextPlane].EntityPickup.IsHeld)
+            if (NextVehicle.EntityPickup && NextVehicle.EntityPickup.IsHeld)
             {
-                VRCPlayerApi thisplayer = Networking.GetOwner(_AllPlanes_ENT[NextPlane].gameObject);
+                VRCPlayerApi thisplayer = Networking.GetOwner(NextVehicle.gameObject);
                 if (thisplayer != null)
                 {
                     thisplayer.SetVoiceDistanceNear(VoiceNear);
