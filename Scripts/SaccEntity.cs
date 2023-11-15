@@ -291,10 +291,9 @@ namespace SaccFlightAndVehicles
             {
                 if (EXT) EXT.SetProgramVariable("EntityControl", this);
             }
+            OwnerAPI = Networking.GetOwner(gameObject);
 
             SendEventToExtensions("SFEXT_L_EntityStart");
-
-            OwnerAPI = Networking.GetOwner(gameObject);
 
             //if in editor play mode without clientsim
             if (InEditor)
