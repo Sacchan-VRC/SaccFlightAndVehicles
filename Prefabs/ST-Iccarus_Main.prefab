@@ -394,18 +394,18 @@ MonoBehaviour:
   SurfaceType_SkidParticles:
   - {fileID: 1803049916815297499}
   - {fileID: 1803049916193196982}
-  SurfaceType_SkidParticles_NumParticles:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  ClutchStrength: 0.33
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
   SkidSound_Min: 3
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.013
@@ -414,7 +414,6 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
-  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -1220,18 +1219,18 @@ MonoBehaviour:
   SurfaceType_SkidParticles:
   - {fileID: 1803049917873616706}
   - {fileID: 1803049917421000045}
-  SurfaceType_SkidParticles_NumParticles:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  ClutchStrength: 0.33
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
   SkidSound_Min: 3
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.013
@@ -1240,7 +1239,6 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
-  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -1732,18 +1730,18 @@ MonoBehaviour:
   SurfaceType_SkidParticles:
   - {fileID: 1803049917855966338}
   - {fileID: 1803049917757327259}
-  SurfaceType_SkidParticles_NumParticles:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  ClutchStrength: 0.33
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
   SkidSound_Min: 3
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.013
@@ -1752,7 +1750,6 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
-  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -1964,18 +1961,18 @@ MonoBehaviour:
   SurfaceType_SkidParticles:
   - {fileID: 1803049918218006545}
   - {fileID: 1803049917727204585}
-  SurfaceType_SkidParticles_NumParticles:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  ClutchStrength: 0.33
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
   SkidSound_Min: 3
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.013
@@ -1984,7 +1981,6 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
-  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -6782,13 +6778,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -12413,13 +12409,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -22501,13 +22497,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -27845,13 +27841,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -32903,13 +32899,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -37792,13 +37788,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -42681,13 +42677,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -52582,13 +52578,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -62961,6 +62957,8 @@ MonoBehaviour:
   SGVControl: {fileID: 3243243056628280734}
   EngineSounds:
   - {fileID: 3243243056983666413}
+  DespawnIfUnused: 0
+  DespawnDist: 50
   DopplerSounds: []
   SplashParticle: {fileID: 5549615386644902855}
   PlaySplashSpeed: 7
@@ -63475,6 +63473,7 @@ MonoBehaviour:
   OnboardVehicleLayer: 31
   Health: 200
   VehicleAnimator: {fileID: 3243243057054021814}
+  NumStepsSec: 300
   DriveWheels:
   - {fileID: 1803049917166894443}
   - {fileID: 1803049917166894442}
@@ -63482,8 +63481,6 @@ MonoBehaviour:
   - {fileID: 1803049917166894445}
   - {fileID: 1803049917166894452}
   OtherWheels: []
-  LiftSurfaces:
-  - {fileID: 7377890417625902054}
   DriveSpeed: 33000
   EngineSlowDown: 1.2
   MinThrottle: 0.08
@@ -63572,6 +63569,7 @@ MonoBehaviour:
   NumGroundedWheels: 0
   CurrentDistance: 0
   CurrentlyDistant: 0
+  ACCELTEST: 0
 --- !u!114 &3243243056628280735
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -64957,15 +64955,13 @@ MonoBehaviour:
     m_RotationOrder: 4
   VehicleRigidbody: {fileID: 3243243057054021818}
   WingSize: 1
-  LiftStrength: 0.00001
+  LiftStrength: 0.0009
   DoGroundEffect: 0
   GroundEffectRange: 0
   GroundEffectStrength: 0
   DrawDebugGizmos: 1
-  Rotator: {fileID: 0}
   AOAYAWDEBUG: 0
   AOAPITCHDEBUG: 0
-  PITCHDEBUG: 0
   GEDEBUGVEC: {x: 0, y: 0, z: 0}
   liftdebug: 0
   DebugLineSize: 100
@@ -70155,7 +70151,7 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0

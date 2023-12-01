@@ -409,6 +409,109 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+--- !u!1 &476783171758462567
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1014124301488985411}
+  - component: {fileID: 3808940217977537824}
+  - component: {fileID: 1075987479568571898}
+  m_Layer: 17
+  m_Name: DFUNC_ToggleHandling (1)
+  m_TagString: EditorOnly
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &1014124301488985411
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476783171758462567}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4117501714141346054}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3808940217977537824
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476783171758462567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aecb613c9e31b90438dfd82a08016950, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _udonSharpBackingUdonBehaviour: {fileID: 1075987479568571898}
+  SGVControl: {fileID: 1217889975697026386}
+  Dial_Funcon: {fileID: 1393999204366328446}
+  ToggledCoMPos: {fileID: 0}
+  floatSGVNames: []
+  floatSGVToggledValues:
+  - 0
+  boolSGVNames:
+  - Drift_AutoSteer
+  - SteeringMaxSpeedDTDisabled
+  floatSteerWheelsNames:
+  - Grip
+  - SpringForceMulti
+  floatSteerWheelsToggledValues:
+  - 280
+  - 5
+  floatDriveWheelsNames:
+  - Grip
+  - SpringForceMulti
+  floatDriveWheelsToggledValues:
+  - 200
+  - 5
+  floatOtherWheelsNames: []
+  floatOtherWheelsToggledValues: []
+--- !u!114 &1075987479568571898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476783171758462567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactTextPlacement: {fileID: 0}
+  interactText: Use
+  interactTextGO: {fileID: 0}
+  proximity: 2
+  SynchronizePosition: 0
+  AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
+  _syncMethod: 0
+  serializedProgramAsset: {fileID: 11400000, guid: 4c622c84b0c02534eac9b46ae1786b5c,
+    type: 2}
+  programSource: {fileID: 11400000, guid: 24e25bf53a7e8d540aa0f4cf92189d66, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
+  publicVariablesUnityEngineObjects: []
+  publicVariablesSerializationDataFormat: 0
 --- !u!1 &523941734697514640
 GameObject:
   m_ObjectHideFlags: 0
@@ -2250,6 +2353,7 @@ MonoBehaviour:
   OnboardVehicleLayer: 31
   Health: 73
   VehicleAnimator: {fileID: 1217889975573313658}
+  NumStepsSec: 300
   DriveWheels:
   - {fileID: 5034242082547958647}
   - {fileID: 5034242082547958640}
@@ -2257,8 +2361,6 @@ MonoBehaviour:
   - {fileID: 5034242082547958644}
   - {fileID: 5034242082547958641}
   OtherWheels: []
-  LiftSurfaces:
-  - {fileID: 1931339256508014819}
   DriveSpeed: 33000
   EngineSlowDown: 1.2
   MinThrottle: 0.08
@@ -2347,6 +2449,7 @@ MonoBehaviour:
   NumGroundedWheels: 0
   CurrentDistance: 0
   CurrentlyDistant: 0
+  ACCELTEST: 0
 --- !u!114 &1217889975697026387
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7542,6 +7645,8 @@ MonoBehaviour:
   SGVControl: {fileID: 1217889975697026386}
   EngineSounds:
   - {fileID: 1217889975643270689}
+  DespawnIfUnused: 0
+  DespawnDist: 50
   DopplerSounds: []
   SplashParticle: {fileID: 8133696434336199435}
   PlaySplashSpeed: 7
@@ -19877,18 +19982,18 @@ MonoBehaviour:
   SurfaceType_SkidParticles:
   - {fileID: 5034242081854379897}
   - {fileID: 5034242082915683883}
-  SurfaceType_SkidParticles_NumParticles:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  ClutchStrength: 0.33
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
   SkidSound_Min: 3
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.013
@@ -19897,7 +20002,6 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
-  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -24835,13 +24939,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -29588,13 +29692,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -34341,13 +34445,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -39290,13 +39394,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -44179,13 +44283,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -49897,13 +50001,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -54807,13 +54911,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -59560,13 +59664,13 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
   m_EnableGPUInstancing: 1
   m_ApplyActiveColorSpace: 1
-  m_AllowRoll: 1
+  m_AllowRoll: 0
   m_VertexStreams: 00010304
   m_Mesh: {fileID: 0}
   m_Mesh1: {fileID: 0}
@@ -59823,6 +59927,7 @@ Transform:
   - {fileID: 4899807629236095542}
   - {fileID: 6775814316806409087}
   - {fileID: 5319666538493399008}
+  - {fileID: 1014124301488985411}
   m_Father: {fileID: 1258682882271126488}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -59980,18 +60085,18 @@ MonoBehaviour:
   SurfaceType_SkidParticles:
   - {fileID: 5034242081223864271}
   - {fileID: 5034242082883694242}
-  SurfaceType_SkidParticles_NumParticles:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  ClutchStrength: 0.33
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
   SkidSound_Min: 3
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.013
@@ -60000,7 +60105,6 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
-  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -60506,18 +60610,18 @@ MonoBehaviour:
   SurfaceType_SkidParticles:
   - {fileID: 5034242082579995010}
   - {fileID: 5034242081569295819}
-  SurfaceType_SkidParticles_NumParticles:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  ClutchStrength: 0.33
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
   SkidSound_Min: 3
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.013
@@ -60526,7 +60630,6 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
-  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -60839,15 +60942,13 @@ MonoBehaviour:
     m_RotationOrder: 4
   VehicleRigidbody: {fileID: 1217889975573313654}
   WingSize: 1
-  LiftStrength: 0.00001
+  LiftStrength: 0.0009
   DoGroundEffect: 0
   GroundEffectRange: 0
   GroundEffectStrength: 0
-  DrawDebugGizmos: 0
-  Rotator: {fileID: 0}
+  DrawDebugGizmos: 1
   AOAYAWDEBUG: 0
   AOAPITCHDEBUG: 0
-  PITCHDEBUG: 0
   GEDEBUGVEC: {x: 0, y: 0, z: 0}
   liftdebug: 0
   DebugLineSize: 100
@@ -61327,18 +61428,18 @@ MonoBehaviour:
   SurfaceType_SkidParticles:
   - {fileID: 5034242081763461519}
   - {fileID: 5034242081098430808}
-  SurfaceType_SkidParticles_NumParticles:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  ClutchStrength: 0.33
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
   SkidSound_Min: 3
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.013
@@ -61347,7 +61448,6 @@ MonoBehaviour:
   DisableEffects: 0
   SkidRatioMode: 0
   EngineInfluence: 225
-  NumStepsSec: 200
   CurrentGrip: 7
   CurrentNumParticles: 0
   CurrentWheelSlowDown: 0
@@ -67026,13 +67126,13 @@ MonoBehaviour:
   - Grip
   - SpringForceMulti
   floatSteerWheelsToggledValues:
-  - 280
+  - 330
   - 5
   floatDriveWheelsNames:
   - Grip
   - SpringForceMulti
   floatDriveWheelsToggledValues:
-  - 200
+  - 250
   - 5
   floatOtherWheelsNames: []
   floatOtherWheelsToggledValues: []
@@ -82313,7 +82413,7 @@ ParticleSystemRenderer:
   m_SortingFudge: 0
   m_NormalDirection: 0
   m_ShadowBias: 0
-  m_RenderAlignment: 0
+  m_RenderAlignment: 3
   m_Pivot: {x: 0, y: 0, z: 0}
   m_Flip: {x: 0, y: 0, z: 0}
   m_UseCustomVertexStreams: 0
@@ -82653,9 +82753,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2c818a5f08de956489dcf2628e3de3fc, type: 3}
---- !u!4 &2162537333681921343 stripped
+--- !u!1 &5268175074725543634 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4780432453592769640 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -2603123743937421636, guid: 2c818a5f08de956489dcf2628e3de3fc,
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
@@ -82677,51 +82783,21 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &8170026611739050717 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3800188621729415518, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &7364986246367640479 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -6635887507701925860, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &4961246404153861350 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -9149946848031643803, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &4780432453592769640 stripped
+--- !u!4 &8170026611739050717 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2c818a5f08de956489dcf2628e3de3fc,
+  m_CorrespondingSourceObject: {fileID: 3800188621729415518, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &5268175074725543634 stripped
+--- !u!1 &6242393052301810531 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &5585182490498224298 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -8619971727969430743, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &7994176259569690008 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -6112444127010675173, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &9163595173999141445 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -4974619675986239034, guid: 2c818a5f08de956489dcf2628e3de3fc,
+  m_CorrespondingSourceObject: {fileID: -7819278198318245664, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
@@ -82731,15 +82807,39 @@ SkinnedMeshRenderer:
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5585182490498224298 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8619971727969430743, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9163595173999141445 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -4974619675986239034, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7994176259569690008 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6112444127010675173, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7364986246367640479 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6635887507701925860, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &193890125170155256 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4076339807878308485, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &6242393052301810531 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -7819278198318245664, guid: 2c818a5f08de956489dcf2628e3de3fc,
+--- !u!4 &2162537333681921343 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -2603123743937421636, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}

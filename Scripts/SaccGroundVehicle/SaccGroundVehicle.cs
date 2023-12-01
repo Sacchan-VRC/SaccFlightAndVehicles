@@ -23,15 +23,14 @@ namespace SaccFlightAndVehicles
         public Animator VehicleAnimator;
         [System.NonSerialized] public Transform VehicleTransform;
         [System.NonSerialized] public Rigidbody VehicleRigidbody;
+        [Tooltip("Number of steps per second engine+wheel physics should run, if refresh rate is higher than this number, it will do nothing. Higher number = more fair physics over different refreshrates at cost of performance.")]
+        public int NumStepsSec = 300;
         [Tooltip("List of wheels to send Engine values to and from")]
         public UdonSharpBehaviour[] DriveWheels;
         [Tooltip("Wheels to get the 'Grounded' value from for autosteering")]
         public UdonSharpBehaviour[] SteerWheels;
         [Tooltip("All of the rest of the wheels")]
         public UdonSharpBehaviour[] OtherWheels;
-        [Tooltip("Wing scripts to enable while doing vehicle physics")]
-        public UdonSharpBehaviour[] LiftSurfaces;
-        private bool LiftSurfacesEnabled = true;
         //public Transform[] DriveWheelsTrans;
         //public sustest[] SteeringWheels;
         //public Transform[] SteeringWheelsTrans;
@@ -254,6 +253,11 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             if (!Initialized) { Init(); }
+            if (NumStepsSec < 1f / Time.fixedDeltaTime)
+            {
+                Debug.LogWarning("NumStepsSec lower than FixedUpdate rate, setting it to FixedUpdate rate. Physics will be unfair in VR.");
+                NumStepsSec = (int)(Mathf.Round(1f / Time.fixedDeltaTime));
+            }
 
             FullHealth = Health;
             FullFuel = Fuel;
@@ -306,6 +310,9 @@ namespace SaccFlightAndVehicles
                 SendCustomEventDelayedSeconds(nameof(ReEnableRevs), RevLimiterDelay);
             }
         }
+#if UNITY_EDITOR
+        public bool ACCELTEST;
+#endif
         private void LateUpdate()
         {
             float DeltaTime = Time.deltaTime;
@@ -397,7 +404,12 @@ namespace SaccFlightAndVehicles
                     if (!_DisableInput)
                     {
                         //inputs as ints
+
+#if UNITY_EDITOR
+                        Wi = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) || ACCELTEST ? 1 : 0;
+#else
                         Wi = Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.UpArrow) ? 1 : 0;
+#endif
                         //int Si = Input.GetKey(KeyCode.S) ? -1 : 0;
                         Ai = Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.LeftArrow) ? -1 : 0;
                         Di = Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.RightArrow) ? 1 : 0;
@@ -665,7 +677,7 @@ namespace SaccFlightAndVehicles
                     }
                     Fuel -= Mathf.Max(FuelConsumption * Time.deltaTime * (Revs / RevLimiter), 0);
                 }
-                VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, Drag * Time.deltaTime);
+                // VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, Drag * Time.deltaTime);
             }
             else //TODO: Move this to an effects script / Have a timer to not do it while empty for more than 10s
             {
@@ -675,23 +687,26 @@ namespace SaccFlightAndVehicles
                 MovingForward = Vector3.Dot(VehicleTransform.forward, VehicleVel) < 0f;
             }
         }
+        float Steps_Error;
         private void FixedUpdate()
         {
             if (!IsOwner) { return; }
             float DeltaTime = Time.fixedDeltaTime;
             if (Piloting)
             {
-                Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, EngineSlowDown * DeltaTime), 0f);
-                if (!LimitingRev)
+                float StepsFloat = ((Time.fixedDeltaTime) * NumStepsSec);
+                int steps = (int)((Time.fixedDeltaTime) * NumStepsSec);
+                Steps_Error += StepsFloat - steps;
+                if (Steps_Error > 1)
                 {
-                    Revs += FinalThrottle * DriveSpeed * DeltaTime * EngineResponseCurve.Evaluate(Revs / RevLimiter);
-                    if (Revs > RevLimiter)
-                    {
-                        Revs = RevLimiter;
-                        LimitingRev = true;
-                        SendCustomEventDelayedSeconds(nameof(ReEnableRevs), RevLimiterDelay);
-                    }
+                    int AddSteps = (int)Mathf.Floor(Steps_Error);//pretty sure this can never be anything but 1 unless refresh rate is changed during play maybe
+                    steps += AddSteps;
+                    Steps_Error = (Steps_Error - AddSteps);
                 }
+                if (steps < 1) { steps = 1; }//if refresh rate is above NumItsSec just run once per frame, nothing else we can do
+                for (int i = 0; i < steps; i++)
+                { RevUp(steps); }
+
                 for (int i = 0; i < DriveWheels.Length; i++)
                 {
                     DriveWheels[i].SetProgramVariable("EngineRevs", Revs);
@@ -699,7 +714,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, EngineSlowDown * DeltaTime), 0f);
+                Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, Time.fixedDeltaTime * EngineSlowDown)), 0f);
             }
 
             VehicleVel = VehicleRigidbody.velocity;
@@ -708,6 +723,21 @@ namespace SaccFlightAndVehicles
             AllGs = Vector3.Distance(LastFrameVel, VehicleVel) / gravity;
             GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
             LastFrameVel = VehicleVel;
+        }
+        private void RevUp(int NumSteps)
+        {
+            float PhysicsDelta = Time.fixedDeltaTime / NumSteps;
+            Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, PhysicsDelta * EngineSlowDown)), 0f);
+            if (!LimitingRev)
+            {
+                Revs += FinalThrottle * DriveSpeed * PhysicsDelta * EngineResponseCurve.Evaluate(Revs / RevLimiter);
+                if (Revs > RevLimiter)
+                {
+                    Revs = RevLimiter;
+                    LimitingRev = true;
+                    SendCustomEventDelayedSeconds(nameof(ReEnableRevs), RevLimiterDelay);
+                }
+            }
         }
         public void Explode()
         {
@@ -812,14 +842,12 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody.velocity = CurrentVel;
             LastFrameVel = CurrentVel;
             SetWheelIsOwner();
-
         }
         public void SFEXT_O_LoseOwnership()
         {
             VehiclePosLastFrame = VehicleTransform.position;
             IsOwner = false;
             SetWheelIsOwner();
-            EnableLiftSurfaces(false);
         }
         public void SetWheelIsOwner()
         {
@@ -887,7 +915,6 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             SetCollidersLayer(OnboardVehicleLayer);
             SetWheelDriver();
-            EnableLiftSurfaces(true);
         }
         public void SFEXT_O_PilotExit()
         {
@@ -929,23 +956,12 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody.angularVelocity = Vector3.zero;
             VehicleSpeed = 0;
             Sleeping = true;
-            EnableLiftSurfaces(false);
         }
         public void SFEXT_L_WakeUp()
         {
             VehicleRigidbody.WakeUp();
             VehicleRigidbody.useGravity = true;
             Sleeping = false;
-            EnableLiftSurfaces(IsOwner);
-        }
-        public void EnableLiftSurfaces(bool enable)
-        {
-            if (enable == LiftSurfacesEnabled) { return; }
-            LiftSurfacesEnabled = enable;
-            for (int i = 0; i < LiftSurfaces.Length; i++)
-            {
-                LiftSurfaces[i].gameObject.SetActive(enable);
-            }
         }
         public void SendBulletHit()
         {
