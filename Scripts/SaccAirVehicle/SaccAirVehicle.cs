@@ -3,7 +3,7 @@ using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
 using VRC.Udon;
-
+//
 namespace SaccFlightAndVehicles
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
@@ -399,6 +399,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float Taxiinglerper;
         [System.NonSerializedAttribute] public float ExtraDrag = 1;
         [System.NonSerializedAttribute] public float ExtraLift = 1;
+        [System.NonSerializedAttribute] public float ExtraVelLift = 1;
         private float ReversingPitchStrength;
         private float ReversingYawStrength;
         private float ReversingRollStrength;
@@ -2294,14 +2295,14 @@ namespace SaccFlightAndVehicles
             {
                 float GroundEffect = ((-GE.distance + GroundEffectMaxDistance) / GroundEffectMaxDistance) * GEStrength;
                 if (VTOL) { return 1 + GroundEffect; }
-                GroundEffect *= ExtraLift;
+                GroundEffect *= ExtraVelLift;
                 VelLift = VelLiftStart + GroundEffect;
                 VelLiftMax = Mathf.Max(VelLiftMaxStart, VTOL ? 999999999f : GroundEffectLiftMax);
             }
             else//set non-groundeffect'd vel lift values
             {
                 if (VTOL) { return 1; }
-                VelLift = VelLiftStart;
+                VelLift = VelLiftStart * ExtraVelLift;
                 VelLiftMax = VelLiftMaxStart;
             }
             return Mathf.Min(speedliftfac * AoALiftPitch * VelLift, VelLiftMax);
