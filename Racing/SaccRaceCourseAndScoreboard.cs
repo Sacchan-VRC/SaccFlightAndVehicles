@@ -34,6 +34,7 @@ namespace SaccFlightAndVehicles
         public float CountDownLength = 3f;
         [Tooltip("If StartFromStill=true, teleport car here to start")]
         public Transform StartPoint;
+        public Transform StartPoint_Reverse;
         public GameObject[] StartPointFX;
         public GameObject[] EndPointFX;
         [System.NonSerializedAttribute] public float[] SplitTimes;

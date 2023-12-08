@@ -192,7 +192,21 @@ namespace SaccFlightAndVehicles
                 Vector3 angvel = PlaneRigidbody.angularVelocity;
                 vel.y = 0; vel.z = 0;
                 PlaneRigidbody.angularVelocity = angvel;
-                Vector3 newpos = new Vector3(CurrentCourse.StartPoint.position.x, PlaneRigidbody.position.y, CurrentCourse.StartPoint.position.z);
+                Vector3 newpos = PlaneRigidbody.position;
+                if (TrackForward)
+                {
+                    if (CurrentCourse.StartPoint)
+                    {
+                        newpos = new Vector3(CurrentCourse.StartPoint.position.x, PlaneRigidbody.position.y, CurrentCourse.StartPoint.position.z);
+                    }
+                }
+                else
+                {
+                    if (CurrentCourse.StartPoint_Reverse)
+                    {
+                        newpos = new Vector3(CurrentCourse.StartPoint_Reverse.position.x, PlaneRigidbody.position.y, CurrentCourse.StartPoint_Reverse.position.z);
+                    }
+                }
                 PlaneRigidbody.position = newpos;
             }
         }
@@ -200,12 +214,29 @@ namespace SaccFlightAndVehicles
         {
             PlaneRigidbody.velocity = Vector3.zero;
             PlaneRigidbody.angularVelocity = Vector3.zero;
-            PlaneRigidbody.position = CurrentCourse.StartPoint.position;
-            PlaneRigidbody.rotation = CurrentCourse.StartPoint.rotation;
+            if (TrackForward)
+            {
+                if (CurrentCourse.StartPoint)
+                {
+                    PlaneRigidbody.position = CurrentCourse.StartPoint.position;
+                    PlaneRigidbody.rotation = CurrentCourse.StartPoint.rotation;
+                }
+                else { Debug.LogWarning(CurrentCourse.name + ": Race Start Point is null"); }
+            }
+            else
+            {
+                if (CurrentCourse.StartPoint_Reverse)
+                {
+                    PlaneRigidbody.position = CurrentCourse.StartPoint_Reverse.position;
+                    PlaneRigidbody.rotation = CurrentCourse.StartPoint_Reverse.rotation;
+                }
+                else { Debug.LogWarning(CurrentCourse.name + ": Reverse Race Start Point is null"); }
+            }
         }
         public void SetFreezeCarFalse()
         {
             FreezeCar = false;
+            Vehicle_EntityControl.dead = false;//disable invincibility
         }
         public void SetRaceCountdownFalse()
         {
@@ -355,25 +386,22 @@ namespace SaccFlightAndVehicles
                 }
                 if (CurrentCourse.StartFromStill)
                 {
-                    if (CurrentCourse.StartPoint)
+                    if (PlaneRigidbody)
                     {
-                        if (PlaneRigidbody)
+                        RaceCountdown = true;
+                        FreezeCar = true;
+                        NumCountDowns++;
+                        Vehicle_EntityControl.dead = true;//make invincible for teleport
+                        SendCustomEventDelayedSeconds(nameof(SetRaceCountdownFalse), CurrentCourse.CountDownLength);
+                        SendCustomEventDelayedSeconds(nameof(SetFreezeCarFalse), .2f);
+                        if (CountDownAnimation)
+                        { CountDownAnimation.SetActive(true); }
+                        if (!OverridingClutch)
                         {
-                            RaceCountdown = true;
-                            FreezeCar = true;
-                            NumCountDowns++;
-                            SendCustomEventDelayedSeconds(nameof(SetRaceCountdownFalse), CurrentCourse.CountDownLength);
-                            SendCustomEventDelayedSeconds(nameof(SetFreezeCarFalse), .2f);
-                            MoveCarToStart();
-                            if (CountDownAnimation)
-                            { CountDownAnimation.SetActive(true); }
-                            if (!OverridingClutch)
+                            OverridingClutch = true;
+                            if (Vehicle_GearBox)
                             {
-                                OverridingClutch = true;
-                                if (Vehicle_GearBox)
-                                {
-                                    Vehicle_GearBox.ClutchOverride_++;
-                                }
+                                Vehicle_GearBox.ClutchOverride_++;
                             }
                         }
                     }
