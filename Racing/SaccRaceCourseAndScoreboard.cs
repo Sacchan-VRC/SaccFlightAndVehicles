@@ -28,6 +28,12 @@ namespace SaccFlightAndVehicles
         public float Autotoggler_EnableDist_Forward = 100;
         [Tooltip("If RaceToggleButton.AutomaticRaceSelection is enabled, enable race in reverse mode when you are within this distance of the End")]
         public float Autotoggler_EnableDist_Reverse = 100;
+        [Tooltip("Race starts from a standstill?")]
+        public bool StartFromStill = false;
+        [Tooltip("How long til race starts?")]
+        public float CountDownLength = 3f;
+        [Tooltip("If StartFromStill=true, teleport car here to start")]
+        public Transform StartPoint;
         public GameObject[] StartPointFX;
         public GameObject[] EndPointFX;
         [System.NonSerializedAttribute] public float[] SplitTimes;

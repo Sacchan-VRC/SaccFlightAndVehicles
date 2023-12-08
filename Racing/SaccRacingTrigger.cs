@@ -19,6 +19,13 @@ namespace SaccFlightAndVehicles
         public TextMeshProUGUI Racename_text;
         public TextMeshProUGUI Time_text;
         public TextMeshProUGUI SplitTime_text;
+        [Tooltip("This game object is enabled while waiting for race to start")]
+        public GameObject CountDownAnimation;
+        private int NumCountDowns;
+        private int NumCountDownDisables;
+        private SaccEntity Vehicle_EntityControl;//This script is not an SaccEntity extension behaviour
+        private SGV_GearBox Vehicle_GearBox;
+        private bool OverridingClutch;
         [System.NonSerialized, FieldChangeCallback(nameof(TrackForward))] public bool _TrackForward = true;
         public bool TrackForward
         {
@@ -57,6 +64,8 @@ namespace SaccFlightAndVehicles
         private float RaceFinishTime;
         private bool LoopFinalSplit = false;
         private bool Initialized = false;
+        private bool RaceCountdown = false;
+        private bool FreezeCar = false;
         private void Initialize()
         {
             Initialized = true;
@@ -67,6 +76,8 @@ namespace SaccFlightAndVehicles
                 Objs = Objs.transform.parent.gameObject;
                 PlaneRigidbody = Objs.GetComponent<Rigidbody>();
             }
+            Vehicle_EntityControl = PlaneRigidbody.GetComponent<SaccEntity>();
+            Vehicle_GearBox = (SGV_GearBox)Vehicle_EntityControl.GetExtention(GetUdonTypeName<SGV_GearBox>());
             ThisCapsuleCollider = gameObject.GetComponent<CapsuleCollider>();
             ThisObjLayer = 1 << gameObject.layer;
             localPlayer = Networking.LocalPlayer;
@@ -90,7 +101,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (RaceOn)
+            if (RaceOn && !RaceCountdown)
             {
                 RaceTime = Time.realtimeSinceStartup - RaceStartTime;
                 if (Time_text) { Time_text.text = SecsToMinsSec(RaceTime); }
@@ -167,6 +178,57 @@ namespace SaccFlightAndVehicles
                             Debug.Log("racetrigger miss");
                         } */
             ThisCapsuleCollider.enabled = true;
+            if (RaceCountdown)
+            {
+                if (FreezeCar)
+                {
+                    MoveCarToStart();
+                    return;
+                }
+                RaceStartTime = Time.realtimeSinceStartup;
+                Vector3 vel = PlaneRigidbody.velocity;
+                vel.x = 0; vel.z = 0;
+                PlaneRigidbody.velocity = vel;
+                Vector3 angvel = PlaneRigidbody.angularVelocity;
+                vel.y = 0; vel.z = 0;
+                PlaneRigidbody.angularVelocity = angvel;
+                Vector3 newpos = new Vector3(CurrentCourse.StartPoint.position.x, PlaneRigidbody.position.y, CurrentCourse.StartPoint.position.z);
+                PlaneRigidbody.position = newpos;
+            }
+        }
+        public void MoveCarToStart()
+        {
+            PlaneRigidbody.velocity = Vector3.zero;
+            PlaneRigidbody.angularVelocity = Vector3.zero;
+            PlaneRigidbody.position = CurrentCourse.StartPoint.position;
+            PlaneRigidbody.rotation = CurrentCourse.StartPoint.rotation;
+        }
+        public void SetFreezeCarFalse()
+        {
+            FreezeCar = false;
+        }
+        public void SetRaceCountdownFalse()
+        {
+            NumCountDowns--;
+            NumCountDownDisables++;
+            SendCustomEventDelayedSeconds(nameof(DisableCountDownAnimation), 3f);
+            if (NumCountDowns != 0) { return; }
+            RaceCountdown = false;
+            if (OverridingClutch)
+            {
+                OverridingClutch = false;
+                if (Vehicle_GearBox)
+                {
+                    Vehicle_GearBox.ClutchOverride_--;
+                }
+            }
+        }
+        public void DisableCountDownAnimation()
+        {
+            NumCountDownDisables--;
+            if (NumCountDownDisables != 0) { return; }
+            if (CountDownAnimation)
+            { CountDownAnimation.SetActive(false); }
         }
         void ReportTime()
         {
@@ -291,6 +353,31 @@ namespace SaccFlightAndVehicles
                     ReportTime();
                     LoopFinalSplit = false;
                 }
+                if (CurrentCourse.StartFromStill)
+                {
+                    if (CurrentCourse.StartPoint)
+                    {
+                        if (PlaneRigidbody)
+                        {
+                            RaceCountdown = true;
+                            FreezeCar = true;
+                            NumCountDowns++;
+                            SendCustomEventDelayedSeconds(nameof(SetRaceCountdownFalse), CurrentCourse.CountDownLength);
+                            SendCustomEventDelayedSeconds(nameof(SetFreezeCarFalse), .2f);
+                            MoveCarToStart();
+                            if (CountDownAnimation)
+                            { CountDownAnimation.SetActive(true); }
+                            if (!OverridingClutch)
+                            {
+                                OverridingClutch = true;
+                                if (Vehicle_GearBox)
+                                {
+                                    Vehicle_GearBox.ClutchOverride_++;
+                                }
+                            }
+                        }
+                    }
+                }
                 RaceTime = 0;
                 CurrentSplits = new float[CurrentCourse.RaceCheckpoints.Length];
                 CurrentSplit = 0;
@@ -409,6 +496,18 @@ namespace SaccFlightAndVehicles
             TurnOffCurrentCheckPoints();
             RaceOn = false;
             TimerTextCounter++; SetTimerEmpty();
+            if (CountDownAnimation)
+            { CountDownAnimation.SetActive(false); }
+            if (OverridingClutch)
+            {
+                OverridingClutch = false;
+                if (Vehicle_GearBox)
+                {
+                    Vehicle_GearBox.ClutchOverride_--;
+                }
+            }
+            RaceCountdown = false;
+            SetFreezeCarFalse();
         }
         public void TurnOffCurrentCheckPoints()
         {
