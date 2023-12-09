@@ -19,14 +19,22 @@ namespace SaccFlightAndVehicles
         public float FlapsDragMulti = 1.4f;
         [Tooltip("Multiply Vehicle's lift by this amount while flaps are enabled")]
         public float FlapsLiftMulti = 1.35f;
+        [Tooltip("Multiply Vehicle's vel lift by this amount while flaps are enabled")]
+        public float FlapsVelLiftMulti = 1f;
         [Tooltip("Add this much to aircraft's Max Lift by this amount while flaps are enabled")]
         public float FlapsExtraMaxLift = 0;
+        [Tooltip("Add this much to aircraft's Straighten values while flaps are enabled")]
+        public float FlapsStraightenMulti = 1;
+        private float StraightenStartValue_Pitch;
+        private float StraightenStartValue_Yaw;
         private SaccEntity EntityControl;
         private bool UseLeftTrigger = false;
         [System.NonSerializedAttribute] public bool Flaps = false;
         private bool TriggerLastFrame;
         private bool DragApplied;
         private bool LiftApplied;
+        private bool VelLiftApplied;
+        private bool StraightenApplied;
         private bool MaxLiftApplied;
         private bool InVR = false;
         private bool Selected;
@@ -54,6 +62,10 @@ namespace SaccFlightAndVehicles
             //to match how the old values worked
             FlapsDragMulti -= 1f;
             FlapsLiftMulti -= 1f;
+            FlapsVelLiftMulti -= 1f;
+
+            StraightenStartValue_Pitch = (float)SAVControl.GetProgramVariable("VelStraightenStrPitch");
+            StraightenStartValue_Yaw = (float)SAVControl.GetProgramVariable("VelStraightenStrYaw");
 
             if ((bool)SAVControl.GetProgramVariable("AutoAdjustValuesToMass"))
             { FlapsExtraMaxLift *= ((Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody")).mass; }
@@ -167,6 +179,17 @@ namespace SaccFlightAndVehicles
                 SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") - FlapsLiftMulti);
                 LiftApplied = false;
             }
+            if (VelLiftApplied)
+            {
+                SAVControl.SetProgramVariable("ExtraVelLift", (float)SAVControl.GetProgramVariable("ExtraVelLift") - FlapsVelLiftMulti);
+                VelLiftApplied = false;
+            }
+            if (StraightenApplied)
+            {
+                SAVControl.SetProgramVariable("VelStraightenStrYaw", StraightenStartValue_Yaw);
+                SAVControl.SetProgramVariable("VelStraightenStrPitch", StraightenStartValue_Pitch);
+                StraightenApplied = false;
+            }
             if (MaxLiftApplied)
             {
                 SAVControl.SetProgramVariable("MaxLift", (float)SAVControl.GetProgramVariable("MaxLift") - FlapsExtraMaxLift);
@@ -194,6 +217,17 @@ namespace SaccFlightAndVehicles
             {
                 SAVControl.SetProgramVariable("ExtraLift", (float)SAVControl.GetProgramVariable("ExtraLift") + FlapsLiftMulti);
                 LiftApplied = true;
+            }
+            if (!VelLiftApplied)
+            {
+                SAVControl.SetProgramVariable("ExtraVelLift", (float)SAVControl.GetProgramVariable("ExtraVelLift") + FlapsVelLiftMulti);
+                VelLiftApplied = true;
+            }
+            if (!StraightenApplied)
+            {
+                SAVControl.SetProgramVariable("VelStraightenStrYaw", StraightenStartValue_Yaw * FlapsStraightenMulti);
+                SAVControl.SetProgramVariable("VelStraightenStrPitch", StraightenStartValue_Pitch * FlapsStraightenMulti);
+                StraightenApplied = true;
             }
             if (!MaxLiftApplied)
             {
