@@ -14,6 +14,7 @@ namespace SaccFlightAndVehicles
         public Animator BoolAnimator;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject[] Dial_Funcon;
+        [SerializeField] private bool InvertFuncon = false;
         public bool DoAnimBool = true;
         public string AnimBoolName = "AnimBool";
         public bool OnDefault = false;
@@ -39,6 +40,10 @@ namespace SaccFlightAndVehicles
         public bool AllowToggleOnWater = true;
         [Tooltip("Prevent/turn off when in afterburner")]
         public bool AllowAfterBurner = true;
+        [Tooltip("Prevent/turn engine is off")]
+        public bool AllowToggleEngineOff = true;
+        [Tooltip("Prevent/turn engine is on")]
+        public bool AllowToggleEngineOn = true;
         [Tooltip("Send Events to sound script for opening a door?")]
         [Space(10)]
         public bool OpensDoor = false;
@@ -73,7 +78,7 @@ namespace SaccFlightAndVehicles
                     SetBoolOn();
                 }
                 foreach (GameObject funcon in Dial_Funcon)
-                { funcon.SetActive(OnDefault); }
+                { funcon.SetActive(InvertFuncon ? !OnDefault : OnDefault); }
             }
             ParticleLength = ToggleEmission.Length;
             ToggleEmission_em = new ParticleSystem.EmissionModule[ParticleLength];
@@ -199,7 +204,7 @@ namespace SaccFlightAndVehicles
             AnimOn = true;
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, true); }
             foreach (GameObject funcon in Dial_Funcon)
-            { funcon.SetActive(true); }
+            { funcon.SetActive(InvertFuncon ? !true : true); }
             /*             if (OpensDoor)
                         { SoundControl.SendCustomEvent("DoorOpen"); } */
             foreach (GameObject obj in ToggleObjects)
@@ -216,7 +221,7 @@ namespace SaccFlightAndVehicles
             AnimOn = false;
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, false); }
             foreach (GameObject funcon in Dial_Funcon)
-            { funcon.SetActive(false); }
+            { funcon.SetActive(InvertFuncon ? !false : false); }
             /*             if (OpensDoor)
                         { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); } */
             foreach (GameObject obj in ToggleObjects)
@@ -242,37 +247,29 @@ namespace SaccFlightAndVehicles
         {
             InAir = true;
             OnWater = false;
-            ToggleAllowed =
-                    (AllowToggleFlying || !InAir)
-                && (AllowAfterBurner || !ABOn)
-                && (AllowToggleGrounded || InAir)
-                && (AllowToggleOnWater || !OnWater)
-            ;
-            if (!MasterToggle && AnimOn && !ToggleAllowed)
-            { ToggleWhenPossible(); }
+            CheckToggleAllowed();
         }
         public void SFEXT_G_TouchDown()
         {
             InAir = false;
             OnWater = false;
-            ToggleAllowed =
-                    (AllowToggleFlying || !InAir)
-                && (AllowAfterBurner || !ABOn)
-                && (AllowToggleGrounded || InAir)
-                && (AllowToggleOnWater || !OnWater)
-            ;
-            if (!MasterToggle && AnimOn && !ToggleAllowed)
-            { ToggleWhenPossible(); }
+            CheckToggleAllowed();
         }
         public void SFEXT_G_TouchDownWater()
         {
             InAir = false;
             OnWater = true;
+            CheckToggleAllowed();
+        }
+        private void CheckToggleAllowed()
+        {
             ToggleAllowed =
                     (AllowToggleFlying || !InAir)
                 && (AllowAfterBurner || !ABOn)
                 && (AllowToggleGrounded || InAir)
                 && (AllowToggleOnWater || !OnWater)
+                && (AllowToggleEngineOff || EngineOn)
+                && (AllowToggleEngineOn || !EngineOn)
             ;
             if (!MasterToggle && AnimOn && !ToggleAllowed)
             { ToggleWhenPossible(); }
@@ -288,14 +285,23 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_AfterburnerOff()
         {
             ABOn = false;
+            CheckToggleAllowed();
         }
         public void SFEXT_G_AfterburnerOn()
         {
             ABOn = true;
-            if (AnimOn && !AllowAfterBurner)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff));
-            }
+            CheckToggleAllowed();
+        }
+        private bool EngineOn;
+        public void SFEXT_G_EngineOn()
+        {
+            EngineOn = true;
+            CheckToggleAllowed();
+        }
+        public void SFEXT_G_EngineOff()
+        {
+            EngineOn = false;
+            CheckToggleAllowed();
         }
         public override void OnOwnershipTransferred(VRCPlayerApi player)
         {//disable if owner leaves while piloting
