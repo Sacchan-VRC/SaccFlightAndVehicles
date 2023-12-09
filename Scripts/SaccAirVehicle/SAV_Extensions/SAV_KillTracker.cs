@@ -15,6 +15,7 @@ namespace SaccFlightAndVehicles
         public SaccScoreboard_Kills KillsBoard;
         private bool InEditor;
         private VRCPlayerApi localPlayer;
+        [SerializeField] private UdonSharpBehaviour KillFeed;
         public void SFEXT_L_EntityStart()
         {
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
@@ -26,10 +27,11 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_Explode()
         {
             float time = Time.time;
-            if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 5 && ((time - EntityControl.PilotExitTime) < 5))))
+            if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 2 && ((time - EntityControl.PilotExitTime) < 5))))
             {
                 if (EntityControl.LastAttacker != EntityControl)
                 {
+                    if (KillFeed) { KillFeed.SetProgramVariable("KilledPlayerID", EntityControl.UsersID); }
                     EntityControl.SendEventToExtensions("SFEXT_O_GotKilled");
                     EntityControl.LastAttacker.SendEventToExtensions("SFEXT_O_GotAKill");
                 }
@@ -43,26 +45,47 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_GotAKill()
         {
             //Debug.Log("SFEXT_O_GotAKill");
-            if (KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))
+            if (!(KillsBoard && (bool)SAVControl.GetProgramVariable("Piloting"))) { return; }
+            KillsBoard.MyKills++;
+            if (KillsBoard.MyKills > KillsBoard.MyBestKills)
             {
-                KillsBoard.MyKills++;
-                if (KillsBoard.MyKills > KillsBoard.MyBestKills)
+                KillsBoard.MyBestKills = KillsBoard.MyKills;
+            }
+            if (KillsBoard.MyKills > KillsBoard.TopKills)
+            {
+                if (InEditor)
                 {
-                    KillsBoard.MyBestKills = KillsBoard.MyKills;
+                    KillsBoard.TopKiller = "Player";
+                    KillsBoard.TopKills = KillsBoard.MyKills;
                 }
-                if (KillsBoard.MyKills > KillsBoard.TopKills)
+                else
                 {
-                    if (InEditor)
-                    {
-                        KillsBoard.TopKiller = "Player";
-                        KillsBoard.TopKills = KillsBoard.MyKills;
-                    }
-                    else
-                    {
-                        KillsBoard.SendCustomEvent("UpdateTopKiller");
-                    }
+                    KillsBoard.SendCustomEvent("UpdateTopKiller");
                 }
             }
+            if (KillFeed)
+            {
+                Networking.SetOwner(localPlayer, KillFeed.gameObject);
+                KillFeed.SetProgramVariable("Suicide", false);
+                KillFeed.SendCustomEvent("AddNewKill");
+            }
+        }
+        public void SFEXT_O_Suicide()
+        {
+            if (KillFeed)
+            {
+                Networking.SetOwner(localPlayer, KillFeed.gameObject);
+                KillFeed.SetProgramVariable("WeaponType", (short)-1);
+                KillFeed.SendCustomEvent("AddNewKill");
+            }
+        }
+        public void SFEXT_O_GunKill()
+        {
+            KillFeed.SetProgramVariable("WeaponType", (short)0);
+        }
+        public void SFEXT_O_MissileKill()
+        {
+            KillFeed.SetProgramVariable("WeaponType", (short)1);
         }
     }
 }
