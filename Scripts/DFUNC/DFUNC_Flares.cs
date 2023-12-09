@@ -11,6 +11,8 @@ namespace SaccFlightAndVehicles
     public class DFUNC_Flares : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
+        [Tooltip("Only needs to be set if you want to be able to hold down the launch key to spam flares")]
+        public KeyCode LaunchKey = KeyCode.None;
         public int NumFlares = 60;
         [Range(0, 2)]
         [Tooltip("1 = Flare(Heat), 1 = Chaff(Radar), 2 = Other. Controls what variable is added to in SaccAirVehicle to count active countermeasures, (NumActiveFlares MissilesIncomingHeat, NumActiveChaff MissilesIncomingRadar, NumActiveOtherCM MissilesIncomingOther)")]
@@ -24,11 +26,15 @@ namespace SaccFlightAndVehicles
         public Text HUDText_flare_ammo;
         [Tooltip("Launch one particle system per click, cycling through, instead of all at once")]
         public bool SequentialLaunch = false;
-        private string[] CMTypes = { "NumActiveFlares", "NumActiveChaff", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
+        public bool Hol = false;
+        public int NumFlare_PerShot = 1;
+        [Tooltip("Delay between flares drops when holding the trigger")]
+        public float FlareHoldDelay = 0.3f;
+        private string[] CMTypes = { "NumActiveChaff", "NumActiveFlares", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
         private bool UseLeftTrigger = false;
         [System.NonSerialized] public int FullFlares;
         private float reloadspeed;
-        private bool func_active;
+        private bool Piloting, InVR, Selected;
         private bool TriggerLastFrame;
         private SaccEntity EntityControl;
         private float FlareLaunchTime;
@@ -39,7 +45,12 @@ namespace SaccFlightAndVehicles
             {
                 _SendLaunchFlare = value;
                 if (value > -1)
-                { LaunchFlare(); }
+                {
+                    for (int i = 0; i < NumFlare_PerShot; i++)
+                    {
+                        Send_LaunchFlare();
+                    }
+                }
             }
             get => _SendLaunchFlare;
         }
@@ -47,12 +58,12 @@ namespace SaccFlightAndVehicles
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void DFUNC_Selected()
         {
+            Selected = true;
             TriggerLastFrame = true;
-            func_active = true;
         }
         public void DFUNC_Deselected()
         {
-            func_active = false;
+            Selected = false;
             if (SequentialLaunch)
             {
                 _SendLaunchFlare = (short)-1;
@@ -65,6 +76,7 @@ namespace SaccFlightAndVehicles
             reloadspeed = FullFlares / FullReloadTimeSec;
             if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
+            InVR = EntityControl.InVR;
         }
         public void ReInitNumFlares()//set FullFlares then run this to change vehicles max flares
         {
@@ -78,6 +90,7 @@ namespace SaccFlightAndVehicles
         { gameObject.SetActive(false); }
         public void SFEXT_O_PilotEnter()
         {
+            Piloting = true;
             if (SequentialLaunch)
             {
                 _SendLaunchFlare = (short)-1;
@@ -86,7 +99,8 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotExit()
         {
-            func_active = false;
+            Piloting = false;
+            Selected = false;
             if (SequentialLaunch)
             {
                 _SendLaunchFlare = (short)-1;
@@ -112,7 +126,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (func_active)
+            if ((Piloting && !InVR) || Selected)
             {
                 float Trigger;
                 if (UseLeftTrigger)
@@ -120,20 +134,28 @@ namespace SaccFlightAndVehicles
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
 
-                if (Trigger > 0.75)
+                if (Trigger > 0.75 || (Input.GetKey(LaunchKey)))
                 {
                     if (!TriggerLastFrame)
                     {
                         if (NumFlares > 0)
                         {
-                            Send_LaunchFlare();
+                            sendlaunchflare++;
+                            RequestSerialization();
                         }
+                    }
+                    else if (NumFlares > 0 && ((Time.time - FlareLaunchTime) > FlareHoldDelay))
+                    {///launch every FlareHoldDelay
+                        sendlaunchflare++;
+                        RequestSerialization();
+                        EntityControl.SendEventToExtensions("SFEXT_G_LaunchFlare");
                     }
                     TriggerLastFrame = true;
                 }
                 else { TriggerLastFrame = false; }
             }
         }
+        private int NextFlare;
         public void LaunchFlare()
         {
             FlareLaunchTime = Time.time;
@@ -143,17 +165,23 @@ namespace SaccFlightAndVehicles
             int d = FlareParticles.Length;
             if (SequentialLaunch)
             {
-                if (_SendLaunchFlare > -1 && _SendLaunchFlare < FlareParticles.Length)
+                if (Time.time - FlareLaunchTime > 5) { NextFlare = 0; }
+                if (NextFlare < FlareParticles.Length)
                 {
-                    if (FlareParticles[_SendLaunchFlare])
+                    if (FlareParticles[NextFlare])
                     {
-                        if (FlareParticles[_SendLaunchFlare].emission.burstCount > 0)
+                        if (FlareParticles[NextFlare].emission.burstCount > 0)
                         {
-                            FlareParticles[_SendLaunchFlare].Emit((int)FlareParticles[_SendLaunchFlare].emission.GetBurst(0).count.constant);
+                            FlareParticles[NextFlare].Emit((int)FlareParticles[NextFlare].emission.GetBurst(0).count.constant);
                         }
                         else
-                        { FlareParticles[_SendLaunchFlare].Emit(1); }
+                        { FlareParticles[NextFlare].Emit(1); }
                     }
+                }
+                NextFlare++;
+                if (NextFlare == FlareParticles.Length)
+                {
+                    NextFlare = 0;
                 }
             }
             else
@@ -180,29 +208,7 @@ namespace SaccFlightAndVehicles
         }
         public void Send_LaunchFlare()
         {
-            if (SequentialLaunch)
-            {
-                if (_SendLaunchFlare + 1 == FlareParticles.Length || Time.time - FlareLaunchTime > 5)
-                { sendlaunchflare = 0; }
-                else
-                {
-                    sendlaunchflare++;
-                }
-                if (sendlaunchflare == 0) { SendCustomEventDelayedSeconds(nameof(CheckForReset), 5); }
-            }
-            else
-            {
-                sendlaunchflare++;
-            }
-            RequestSerialization();
-        }
-        public void CheckForReset()
-        {
-            if (sendlaunchflare == 0)
-            {
-                sendlaunchflare = (short)-1;
-                RequestSerialization();
-            }
+            LaunchFlare();
         }
         public void KeyboardInput()
         {
