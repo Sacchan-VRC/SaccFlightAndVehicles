@@ -37,7 +37,7 @@ namespace SaccFlightAndVehicles
         void Start()
         {
             SendCustomEventDelayedSeconds(nameof(SetRadioVoiceVolumes), 5);
-            CurrentChannel = MyChannel;
+            CurrentChannel = MyChannel = 1;
             if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
             SaccEntity[] _AllPlanes_ENT = new SaccEntity[AllPlanes.Length];
             _AllPlanes_RD = new SAV_Radio[AllPlanes.Length];
