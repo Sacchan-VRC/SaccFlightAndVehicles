@@ -858,13 +858,5 @@ namespace SaccFlightAndVehicles
             if (PredictedHitPoint)
             { PredictedHitPoint.gameObject.SetActive(false); }
         }
-        public override void OnPlayerRespawn(VRCPlayerApi player)
-        {
-            if (player.isLocal && IsOwner)
-            {
-                if (_HookLaunched)
-                { HookLaunched = false; RequestSerialization(); }
-            }
-        }
     }
 }
