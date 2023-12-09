@@ -174,7 +174,7 @@ namespace SaccFlightAndVehicles
                         SmokeColorLast = SmokeColor;
                     }
                     //Smoke Color Indicator
-                    SmokeColorIndicatorMaterial.color = SmokeColor_Color;
+                    if (SmokeColorIndicatorMaterial) { SmokeColorIndicatorMaterial.color = SmokeColor_Color; }
                 }
             }
             if (localSmoking && AllowChangeColor)
