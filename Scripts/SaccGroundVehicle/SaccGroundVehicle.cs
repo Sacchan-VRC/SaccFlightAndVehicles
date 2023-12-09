@@ -206,9 +206,11 @@ namespace SaccFlightAndVehicles
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public bool InEditor = true;
         [System.NonSerializedAttribute] public bool Initialized = false;
+        private Vector3 LastTouchedTransform_Speed = Vector3.zero;
         private Transform CenterOfMass;
         public float NumGroundedSteerWheels = 0;
         public float NumGroundedWheels = 0;
+        public int NumWheels = 4;
         public float CurrentDistance;
         public bool CurrentlyDistant = true;
         int HandsOnWheel;
@@ -258,6 +260,8 @@ namespace SaccFlightAndVehicles
                 Debug.LogWarning("NumStepsSec lower than FixedUpdate rate, setting it to FixedUpdate rate. Physics will be unfair in VR.");
                 NumStepsSec = (int)(Mathf.Round(1f / Time.fixedDeltaTime));
             }
+
+            NumWheels = DriveWheels.Length + SteerWheels.Length + OtherWheels.Length;
 
             FullHealth = Health;
             FullFuel = Fuel;
@@ -535,7 +539,18 @@ namespace SaccFlightAndVehicles
                     {
                         SteerInput = -VRSteerInput + Ai + Di;
                     }
-                    float AutoSteer = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(VehicleVel, VehicleTransform.up), VehicleTransform.up);
+                    //get the average transform movement that the steering wheels are touching
+                    LastTouchedTransform_Speed = Vector3.zero;
+                    for (int i = 0; i < SteerWheels.Length; i++)
+                    {
+                        LastTouchedTransform_Speed += (Vector3)SteerWheels[i].GetProgramVariable("LastTouchedTransform_Speed");
+                    }
+                    for (int i = 0; i < DriveWheels.Length; i++)
+                    {
+                        LastTouchedTransform_Speed += (Vector3)DriveWheels[i].GetProgramVariable("LastTouchedTransform_Speed");
+                    }
+                    LastTouchedTransform_Speed = LastTouchedTransform_Speed / (SteerWheels.Length + DriveWheels.Length);
+                    float AutoSteer = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(VehicleVel - LastTouchedTransform_Speed, VehicleTransform.up), VehicleTransform.up);
                     if (Mathf.Abs(AutoSteer) > 110)
                     { AutoSteer = 0; }
 
@@ -677,7 +692,6 @@ namespace SaccFlightAndVehicles
                     }
                     Fuel -= Mathf.Max(FuelConsumption * Time.deltaTime * (Revs / RevLimiter), 0);
                 }
-                // VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, Drag * Time.deltaTime);
             }
             else //TODO: Move this to an effects script / Have a timer to not do it while empty for more than 10s
             {
@@ -692,6 +706,15 @@ namespace SaccFlightAndVehicles
         {
             if (!IsOwner) { return; }
             float DeltaTime = Time.fixedDeltaTime;
+
+            Vector3 absVel = VehicleRigidbody.velocity;
+            VehicleVel = absVel - LastTouchedTransform_Speed;
+            float gravity = 9.81f * DeltaTime;
+            LastFrameVel.y -= gravity; //add gravity
+            AllGs = Vector3.Distance(LastFrameVel, absVel) / gravity;
+            GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
+            LastFrameVel = absVel;
+
             if (Piloting)
             {
                 float StepsFloat = ((Time.fixedDeltaTime) * NumStepsSec);
@@ -717,12 +740,7 @@ namespace SaccFlightAndVehicles
                 Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, Time.fixedDeltaTime * EngineSlowDown)), 0f);
             }
 
-            VehicleVel = VehicleRigidbody.velocity;
-            float gravity = 9.81f * DeltaTime;
-            LastFrameVel.y -= gravity; //add gravity
-            AllGs = Vector3.Distance(LastFrameVel, VehicleVel) / gravity;
-            GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
-            LastFrameVel = VehicleVel;
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, 1 - Mathf.Pow(0.5f, Drag * Time.fixedDeltaTime));
         }
         private void RevUp(int NumSteps)
         {

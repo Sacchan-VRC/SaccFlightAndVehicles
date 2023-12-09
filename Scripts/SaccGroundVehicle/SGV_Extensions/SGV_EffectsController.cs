@@ -176,7 +176,7 @@ namespace SaccFlightAndVehicles
                 { return; }
                 else
                 {
-                    if (!KeepAwake && (float)SGVControl.GetProgramVariable("VehicleSpeed") < 1)
+                    if (!KeepAwake && (float)SGVControl.GetProgramVariable("VehicleSpeed") < 0.1f)
                     { FallAsleep(); }
                     else
                     { DoEffects = 5f; }

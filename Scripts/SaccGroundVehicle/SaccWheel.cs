@@ -61,6 +61,10 @@ namespace SaccFlightAndVehicles
         public float EngineInfluence = 225f;
         private int NumStepsSec;
         [Header("Debug")]
+        public Transform LastTouchedTransform;
+        public Rigidbody LastTouchedTransform_RB;
+        public Vector3 LastTouchedTransform_Position;
+        public Vector3 LastTouchedTransform_Speed;
         public float CurrentGrip = 7f;
         public float CurrentNumParticles = 0f;
         public float CurrentWheelSlowDown = 0f;
@@ -224,7 +228,7 @@ namespace SaccFlightAndVehicles
                     SkidParticleEM = SurfaceType_SkidParticlesEM[0];
                 }
             }
-            DoSurface = Random.Range(0, 6);
+            DoSurface = Random.Range(0, 4);
         }
         public void ChangeSurface()
         {
@@ -295,6 +299,7 @@ namespace SaccFlightAndVehicles
             float compression = 0f;
             if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
             {
+                GetTouchingTransformSpeed();
                 float fixedDT = Time.fixedDeltaTime;
                 Grounded = true;
                 //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop
@@ -303,24 +308,7 @@ namespace SaccFlightAndVehicles
                 else
                 { SusDirection = SusOut.normal; }
 
-                //last character of surface object is its type
-                int SurfLastChar = SusOut.collider.gameObject.name[SusOut.collider.gameObject.name.Length - 1];
-                if (SurfLastChar >= '0' && SurfLastChar <= '9')
-                {
-                    if (SurfaceType != SurfLastChar - '0')
-                    {
-                        SurfaceType = SurfLastChar - '0';
-                        ChangeSurface();
-                    }
-                }
-                else
-                {
-                    if (SurfaceType != 0)
-                    {
-                        SurfaceType = 0;
-                        ChangeSurface();
-                    }
-                }
+                CheckSurface();
                 //SUSPENSION//
                 compression = 1f - ((SusOut.distance - ExtraRayCastDistance) / SuspensionDistance);
                 //Spring force: More compressed = more force
@@ -360,7 +348,7 @@ namespace SaccFlightAndVehicles
                 //GRIP//
                 //Wheel's velocity vector projected to the normal of the ground
                 WheelGroundUp = Vector3.ProjectOnPlane(SusOut.normal, WheelPoint.right).normalized;
-                PointVelocity = CarRigid.GetPointVelocity(SusOut.point);
+                PointVelocity = CarRigid.GetPointVelocity(SusOut.point) - LastTouchedTransform_Speed;
 #if UNITY_EDITOR
                 ContactPoint = SusOut.point;
 #endif
@@ -479,6 +467,15 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 { GripForce3 = GripForceForward; }
+                // two way forces for wheel grip on rigidbodies, many problems
+                /* float WeightRatio = 1;
+                if (LastTouchedTransform_RB && !LastTouchedTransform_RB.isKinematic)
+                {
+
+                    WeightRatio = CarRigid.mass / (CarRigid.mass + LastTouchedTransform_RB.mass);
+                    LastTouchedTransform_RB.AddForceAtPosition((-GripForce3 * WeightRatio), SusOut.point, ForceMode.VelocityChange);
+                    GripForce3 *= 1 - WeightRatio;
+                } */
                 //Add the Grip forces to the rigidbody
                 //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
                 CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
@@ -634,7 +631,7 @@ namespace SaccFlightAndVehicles
         }
         private void RotateWheelOther()
         {
-            float speed = (float)SGVControl.GetProgramVariable("VehicleSpeed");
+            float speed = SGVControl.VehicleSpeed;
             WheelRotationSpeedRPS = speed / WheelCircumference;
             if ((bool)SGVControl.GetProgramVariable("MovingForward")) { WheelRotationSpeedRPS = -WheelRotationSpeedRPS; }
             WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
@@ -644,6 +641,7 @@ namespace SaccFlightAndVehicles
         public void FallAsleep()
         {
             SkidLength = 0;
+            LastTouchedTransform_Speed = Vector3.zero;
             Sleeping = true;
             StopSkidSound();
             StopSkidParticle();
@@ -651,37 +649,76 @@ namespace SaccFlightAndVehicles
         public void WakeUp()
         {
             Sleeping = false;
+            LastTouchedTransform_Speed = Vector3.zero;
+        }
+        private void GetTouchingTransformSpeed()
+        {
+            //Surface Movement
+            if (SusOut.collider.transform != LastTouchedTransform)
+            {
+                LastTouchedTransform = SusOut.collider.transform;
+                LastTouchedTransform_Position = LastTouchedTransform.position;
+                LastTouchedTransform_RB = LastTouchedTransform.GetComponent<Rigidbody>();
+                if (LastTouchedTransform_RB && !LastTouchedTransform_RB.isKinematic)
+                {
+                    LastTouchedTransform_Speed = LastTouchedTransform_RB.GetPointVelocity(SusOut.point);
+                }
+                else
+                {
+                    LastTouchedTransform_Speed = Vector3.zero;
+                }
+            }
+            else
+            {
+                if (LastTouchedTransform_RB && !LastTouchedTransform_RB.isKinematic)
+                {
+                    LastTouchedTransform_Speed = LastTouchedTransform_RB.GetPointVelocity(SusOut.point);
+                }
+                else
+                {
+                    LastTouchedTransform_Speed = (LastTouchedTransform.position - LastTouchedTransform_Position) / Time.fixedDeltaTime;
+                    LastTouchedTransform_Position = LastTouchedTransform.position;
+                }
+            }
         }
         private int DoSurface;
+        private void CheckSurface()
+        {
+            //last character of surface object is its type
+            int SurfLastChar = SusOut.collider.gameObject.name[SusOut.collider.gameObject.name.Length - 1];
+            if (SurfLastChar >= '0' && SurfLastChar <= '9')
+            {
+                if (SurfaceType != SurfLastChar - '0')
+                {
+                    SurfaceType = SurfLastChar - '0';
+                    ChangeSurface();
+                }
+            }
+            else
+            {
+                if (SurfaceType != 0)
+                {
+                    SurfaceType = 0;
+                    ChangeSurface();
+                }
+            }
+        }
         private void Suspension_VisualOnly()
         {
-            RaycastHit SusOut;
             if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
             {
+                // disabled because not worth it just to see wheels spinning properly on other people's cars when they're on a moving object
+                // also needs code in other places to work properly (subtract from value from Velocity)
+                // GetTouchingTransformSpeed();
+
                 Grounded = true;
-                //last character of surface object is its type
                 //only check surface for vehicles that aren't mine once every 5 frames
                 DoSurface++;
                 if (DoSurface > 4)
                 {
+                    //Surface Type
                     DoSurface = 0;
-                    int SurfLastChar = SusOut.collider.gameObject.name[SusOut.collider.gameObject.name.Length - 1];
-                    if (SurfLastChar >= '0' && SurfLastChar <= '9')
-                    {
-                        if (SurfaceType != SurfLastChar - '0')
-                        {
-                            SurfaceType = SurfLastChar - '0';
-                            ChangeSurface();
-                        }
-                    }
-                    else
-                    {
-                        if (SurfaceType != 0)
-                        {
-                            SurfaceType = 0;
-                            ChangeSurface();
-                        }
-                    }
+                    CheckSurface();
                 }
                 if (SusOut.distance > ExtraRayCastDistance)
                 {
