@@ -117,6 +117,7 @@ namespace SaccFlightAndVehicles
         private Quaternion AGMCamRotSlerper;
         private Quaternion AGMCamRotLastFrame;
         private bool func_active;
+        private bool DoAnimFiredTrigger = false;
         private float reloadspeed;
         private bool LeftDial = false;
         private int DialPosition = -999;
@@ -132,6 +133,7 @@ namespace SaccFlightAndVehicles
             FullAGMsDivider = 1f / (NumAGM > 0 ? NumAGM : 10000000);
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
+            if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
             if (HandHeldMode)
             {
                 EntityControl = _EntityControl;
@@ -453,6 +455,7 @@ namespace SaccFlightAndVehicles
 
         public void LaunchAGM()
         {
+            if (AGMAnimator && DoAnimFiredTrigger) { AGMAnimator.SetTrigger(AnimFiredTriggerName); }
             if (NumAGM > 0) { NumAGM--; }
             if (AGM)
             {

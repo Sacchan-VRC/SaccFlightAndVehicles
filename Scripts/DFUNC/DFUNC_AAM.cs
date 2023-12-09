@@ -129,6 +129,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool IsOwner;
         [System.NonSerializedAttribute] public bool InEditor;
         private float reloadspeed;
+        private bool DoAnimFiredTrigger;
         private int NumChildrenStart;
         private bool LeftDial = false;
         private int DialPosition = -999;
@@ -150,6 +151,7 @@ namespace SaccFlightAndVehicles
             InEditor = localPlayer == null;
             HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
             IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
 
             if (LockTimeABDivide <= 0)
             { LockTimeABDivide = 0.0001f; }
@@ -573,7 +575,7 @@ namespace SaccFlightAndVehicles
         {
             AAMLastFiredTime = Time.time;
             if (NumAAM > 0) { NumAAM--; }//so it doesn't go below 0 when desync occurs
-            if (AAMAnimator) { AAMAnimator.SetTrigger(AnimFiredTriggerName); }
+            if (AAMAnimator && DoAnimFiredTrigger) { AAMAnimator.SetTrigger(AnimFiredTriggerName); }
             if (AAM)
             {
                 GameObject NewAAM;
