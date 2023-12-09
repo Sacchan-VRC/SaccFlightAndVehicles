@@ -85,8 +85,8 @@ namespace SaccFlightAndVehicles
             PilotSeatAPI = PilotSVSeat.SeatedPlayer;
             ThisSVSeat.Fake = true;
             PilotSVSeat.Fake = true;
-            ThisSVSeat.OnStationExited(ThisSVSeat.SeatedPlayer);
-            PilotSVSeat.OnStationExited(PilotSVSeat.SeatedPlayer);
+            ThisSVSeat.OnStationExited(SeatAPI);
+            PilotSVSeat.OnStationExited(PilotSeatAPI);
 
             PilotSVSeat.ThisSeatOnly = ThisThisSeatOnly;
             ThisSVSeat.ThisSeatOnly = PilotThisSeatOnly;
@@ -131,8 +131,8 @@ namespace SaccFlightAndVehicles
             PilotSeatAPI = PilotSVSeat.SeatedPlayer;
             ThisSVSeat.Fake = true;
             PilotSVSeat.Fake = true;
-            ThisSVSeat.OnStationExited(ThisSVSeat.SeatedPlayer);
-            PilotSVSeat.OnStationExited(PilotSVSeat.SeatedPlayer);
+            ThisSVSeat.OnStationExited(SeatAPI);
+            PilotSVSeat.OnStationExited(PilotSeatAPI);
 
             PilotSVSeat.ThisSeatOnly = PilotThisSeatOnly;
             ThisSVSeat.ThisSeatOnly = ThisThisSeatOnly;
