@@ -309,8 +309,8 @@ namespace SaccFlightAndVehicles
                     return;
                 }
             }
-            AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, BrakeInput, 2f * DeltaTime);
-            BrakeAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper);
+            AirbrakeLerper = Mathf.Lerp(AirbrakeLerper, BrakeInput, 1 - Mathf.Pow(0.5f, 2f * DeltaTime));
+            if (BrakeAnimator) { BrakeAnimator.SetFloat(BRAKE_STRING, AirbrakeLerper); }
             if (InVehicle && Airbrake_snd)
             {
                 Airbrake_snd.pitch = AirbrakeLerper * .2f + .9f;
