@@ -16,6 +16,7 @@ namespace SaccFlightAndVehicles
         public float FullReloadTimeSec = 8;
         public Text HUDText_Bomb_ammo;
         public int NumBomb = 4;
+        public int NumBomb_PerShot = 1;
         [Tooltip("Delay between bomb drops when holding the trigger")]
         public float BombHoldDelay = 0.5f;
         [Tooltip("Minimum delay between bomb drops")]
@@ -31,15 +32,19 @@ namespace SaccFlightAndVehicles
         public float Recoil = 0f;
         [Tooltip("Backwards vector of this transform is the direction along which the recoil force is applied (backwards so it can default to VehicleTransform)")]
         public Transform RecoilDirection;
+        public bool BombInheritVelocity = true;
         public bool DoAnimBool = false;
         [Tooltip("Animator bool that is true when this function is selected")]
         public string AnimBoolName = "BombSelected";
         [Tooltip("Animator float that represents how many bombs are left")]
         public string AnimFloatName = "bombs";
         [Tooltip("Animator trigger that is set when a bomb is dropped")]
-        public string AnimFiredTriggerName = "bomblaunched";
+        public string AnimFiredTriggerName = string.Empty;
         [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
         public bool AnimBoolStayTrueOnExit;
+        public bool HandHeld_MachineGun = false;
+        public bool HandHeld_UseEventToFire = false;
+        private bool Held = false;
         [Tooltip("Dropped bombs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
         public Camera AtGCam;
@@ -51,7 +56,12 @@ namespace SaccFlightAndVehicles
             set
             {
                 if (value > _BombFire)//if _BombFire is higher locally, it's because a late joiner just took ownership or value was reset, so don't launch
-                { LaunchBomb(); }
+                {
+                    for (int i = 0; i < NumBomb_PerShot; i++)
+                    {
+                        LaunchBomb();
+                    }
+                }
                 _BombFire = value;
             }
             get => _BombFire;
@@ -75,6 +85,7 @@ namespace SaccFlightAndVehicles
         private bool func_active = false;
         private int DialPosition = -999;
         private int NumChildrenStart;
+        private bool DoAnimFiredTrigger = false;
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         [System.NonSerializedAttribute] public bool IsOwner;
@@ -86,14 +97,14 @@ namespace SaccFlightAndVehicles
             if (BombHoldDelay < BombDelay) { BombHoldDelay = BombDelay; }
             FullBombsDivider = 1f / (NumBomb > 0 ? NumBomb : 10000000);
             reloadspeed = FullBombs / FullReloadTimeSec;
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-            VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
+            VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             BombAnimator = EntityControl.GetComponent<Animator>();
             CenterOfMass = EntityControl.CenterOfMass;
             VehicleTransform = EntityControl.transform;
             localPlayer = Networking.LocalPlayer;
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            IsOwner = EntityControl.IsOwner;
             if (!RecoilDirection) { RecoilDirection = VehicleTransform; }
+            if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
 
             FindSelf();
 
@@ -160,6 +171,7 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             func_active = false;
+            HoldingTrigger = false;
             gameObject.SetActive(false);
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
@@ -185,7 +197,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_ReSupply()
         {
-            if (NumBomb != FullBombs)
+            if (SAVControl && NumBomb != FullBombs)
             { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
             NumBomb = (int)Mathf.Min(NumBomb + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullBombs);
             BombPoint = 0;
@@ -193,9 +205,45 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_TakeOwnership() { IsOwner = true; }
         public void SFEXT_O_LoseOwnership() { IsOwner = false; }
+        private bool HoldingTrigger = false;
+        public void SFEXT_O_OnPickupUseDown()
+        {
+            if (!func_active) { return; }
+            if (HandHeld_MachineGun)
+            {
+                HoldingTrigger = true;
+                return;
+            }
+            else if (HandHeld_UseEventToFire)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchBombs_Event));
+                return;
+            }
+        }
+        public void LaunchBombs_Event()
+        {
+            for (int i = 0; i < NumBomb_PerShot; i++)
+            {
+                LaunchBomb();
+            }
+        }
+        public void SFEXT_O_OnPickupUseUp()
+        {
+            HoldingTrigger = false;
+        }
+        public void SFEXT_O_OnPickup()
+        {
+            Held = true;
+        }
+        public void SFEXT_O_OnDrop()
+        {
+            Held = false;
+            HoldingTrigger = false;
+            DFUNC_Deselected();
+        }
         public void UpdateAmmoVisuals()
         {
-            BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider);
+            if (BombAnimator) { BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider); }
             if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
         }
         public void EnableForOthers()
@@ -219,29 +267,25 @@ namespace SaccFlightAndVehicles
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if (Trigger > 0.75 || (Input.GetKey(KeyCode.Space)))
+                if (Trigger > 0.75 || HoldingTrigger || (!Held && (Input.GetKey(KeyCode.Space))))
                 {
                     if (!TriggerLastFrame)
                     {
                         if (DisallowFireIfWind)
                         {
-                            if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
+                            if (SAVControl && ((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
                             { return; }
                         }
-                        if (NumBomb > 0 && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
+                        if (NumBomb > 0 && (AllowFiringWhenGrounded || (!SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing"))) && ((Time.time - LastBombDropTime) > BombDelay))
                         {
                             BombFire++;
                             RequestSerialization();
-                            if (IsOwner)
-                            { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                         }
                     }
-                    else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && (AllowFiringWhenGrounded || !(bool)SAVControl.GetProgramVariable("Taxiing")))
+                    else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && (AllowFiringWhenGrounded || (!SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing"))))
                     {///launch every BombHoldDelay
                         BombFire++;
                         RequestSerialization();
-                        if (IsOwner)
-                        { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
                     }
                     TriggerLastFrame = true;
                 }
@@ -252,7 +296,7 @@ namespace SaccFlightAndVehicles
         {
             LastBombDropTime = Time.time;
             if (NumBomb > 0) { NumBomb--; }
-            BombAnimator.SetTrigger(AnimFiredTriggerName);
+            if (BombAnimator && DoAnimFiredTrigger) { BombAnimator.SetTrigger(AnimFiredTriggerName); }
             if (Bomb)
             {
                 GameObject NewBomb;
@@ -264,13 +308,25 @@ namespace SaccFlightAndVehicles
                 else { NewBomb.transform.SetParent(null); }
                 NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, BombLaunchPoints[BombPoint].rotation);
                 NewBomb.SetActive(true);
-                NewBomb.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+                if (BombInheritVelocity)
+                {
+                    Rigidbody newBombRigid = NewBomb.GetComponent<Rigidbody>();
+                    if (newBombRigid)
+                    {
+                        if (SAVControl)
+                        { NewBomb.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
+                        else
+                        { NewBomb.GetComponent<Rigidbody>().velocity = VehicleRigid.velocity; }
+                    }
+                }
                 BombPoint++;
                 if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
             }
             VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange);
             if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
             UpdateAmmoVisuals();
+            if (IsOwner)
+            { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
         }
         private void FindSelf()
         {
@@ -302,13 +358,13 @@ namespace SaccFlightAndVehicles
         {
             boolToggleTime = Time.time;
             AnimOn = true;
-            BombAnimator.SetBool(AnimBoolName, AnimOn);
+            if (BombAnimator) { BombAnimator.SetBool(AnimBoolName, AnimOn); }
         }
         public void SetBoolOff()
         {
             boolToggleTime = Time.time;
             AnimOn = false;
-            BombAnimator.SetBool(AnimBoolName, AnimOn);
+            if (BombAnimator) { BombAnimator.SetBool(AnimBoolName, AnimOn); }
         }
         public void KeyboardInput()
         {
