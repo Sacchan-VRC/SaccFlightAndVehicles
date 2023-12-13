@@ -27,6 +27,8 @@ namespace SaccFlightAndVehicles
 
         [Tooltip("Just use the direction that hand is pointing to aim?")]
         public bool Aim_HandDirection;
+        [Tooltip("Use look direction for aiming, even in VR")]
+        public bool Aim_HeadDirectionVR;
         [Tooltip("Limit the angle the gun can turn to?")]
         public bool LimitTurnAngle;
         public float AngleLimitLeft = 45f;
@@ -254,7 +256,7 @@ namespace SaccFlightAndVehicles
                         firing = false;
                     }
                 }
-                if (InVR)
+                if (InVR && !Aim_HeadDirectionVR)
                 {
                     if (Aim_HandDirection)
                     {
