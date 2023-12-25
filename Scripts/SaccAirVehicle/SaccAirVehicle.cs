@@ -342,18 +342,19 @@ namespace SaccFlightAndVehicles
         public void SetEngineOff()
         { EngineOn = false; }
         [System.NonSerializedAttribute] public float AllGs;
-        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
+        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float EngineOutput = 0f;
         [System.NonSerializedAttribute] public Vector3 CurrentVel = Vector3.zero;
-        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
+        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float VertGs = 1f;
         [System.NonSerializedAttribute] public float AngleOfAttackPitch;
         [System.NonSerializedAttribute] public float AngleOfAttackYaw;
-        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
+        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float AngleOfAttack;//MAX of yaw & pitch aoa //used by effectscontroller and hudcontroller
         [System.NonSerializedAttribute] public bool Occupied = false; //this is true if someone is sitting in pilot seat
         [System.NonSerialized] public int NumPassengers;
         [System.NonSerializedAttribute] public float VTOLAngle;
 
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
-        [System.NonSerializedAttribute] public ConstantForce VehicleConstantForce;
+        public Vector3 VehicleForce;
+        public Vector3 VehicleTorque;
         [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
         [System.NonSerializedAttribute] public Transform VehicleTransform;
         [System.NonSerializedAttribute] public float VTOLAngleForward90;//dot converted to angle, 0=0 90=1 max 1, for adjusting values that change with engine angle
@@ -381,7 +382,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float FullHealth;
         [System.NonSerializedAttribute] public bool Taxiing = false;
         [System.NonSerializedAttribute] public bool Floating = false;
-        [System.NonSerializedAttribute] [UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
+        [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public Vector3 RotationInputs;
         [System.NonSerializedAttribute] public bool Piloting = false;
         [System.NonSerializedAttribute] public bool Passenger = false;
         [System.NonSerializedAttribute] public bool InEditor = true;
@@ -504,25 +505,6 @@ namespace SaccFlightAndVehicles
             }
             get => DisablePhysicsAndInputs;
         }
-        [System.NonSerializedAttribute] public bool _OverrideConstantForce;
-        [System.NonSerializedAttribute, FieldChangeCallback(nameof(OverrideConstantForce_))] public int OverrideConstantForce = 0;
-        public int OverrideConstantForce_
-        {
-            set
-            {
-                if (value > 0 && OverrideConstantForce == 0)
-                {
-                    EntityControl.SendEventToExtensions("SFEXT_O_OverrideConstantForce_Activated");
-                }
-                else if (value == 0 && OverrideConstantForce > 0)
-                {
-                    EntityControl.SendEventToExtensions("SFEXT_O_OverrideConstantForce_Deactivated");
-                }
-                _OverrideConstantForce = value > 0;
-                OverrideConstantForce = value;
-            }
-            get => OverrideConstantForce;
-        }
         [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
         [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
         [System.NonSerializedAttribute] public bool _DisableTaxiRotation;
@@ -625,13 +607,17 @@ namespace SaccFlightAndVehicles
 
 
         [System.NonSerializedAttribute] public int ReSupplied = 0;
+#if UNITY_EDITOR
+        [Header("Debug:")]
+        public bool SetVel;
+        public Vector3 VelToSet;
+#endif
         public void SFEXT_L_EntityStart()
         {
             Initialized = true;
             VehicleGameObj = EntityControl.gameObject;
             VehicleTransform = EntityControl.transform;
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
-            VehicleConstantForce = EntityControl.GetComponent<ConstantForce>();
             VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)VehicleGameObj.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
             if (VehicleObjectSync == null)
             {
@@ -1291,7 +1277,7 @@ namespace SaccFlightAndVehicles
                         VelLift = pitch = yaw = roll = 0;
                     }
 
-                    if ((!Asleep) && !_OverrideConstantForce)
+                    if ((!Asleep))
                     {
                         //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
                         //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
@@ -1353,7 +1339,7 @@ namespace SaccFlightAndVehicles
                             FinalInputAcc *= Atmosphere;
                         }
 
-                        float outputdif = (EngineOutput - EngineOutputLastFrame) / DeltaTime;//divide by deltatime to counter the *deltatime added by the constantforce
+                        float outputdif = (EngineOutput - EngineOutputLastFrame) / DeltaTime;
                         float ADVYaw = outputdif * AdverseYaw;
                         float ADVRoll = (1 - rotlift) * AdverseRoll * EngineOutput;
                         EngineOutputLastFrame = EngineOutput;
@@ -1395,7 +1381,7 @@ namespace SaccFlightAndVehicles
                                 , 0);
                         }
 
-                        VehicleConstantForce.relativeForce = FinalInputAcc;
+                        VehicleForce = FinalInputAcc;
                         if (HasWheelColliders && WheelSuspension)
                         {
                             float suspensionDownCof = FinalInputAcc.y / VehicleRigidbody.mass / 9.81f;
@@ -1410,12 +1396,12 @@ namespace SaccFlightAndVehicles
                             }
                         }
 
-                        VehicleConstantForce.relativeTorque = FinalInputRot;
+                        VehicleTorque = FinalInputRot;
                     }
                     else
                     {
-                        VehicleConstantForce.relativeForce = CFRelativeForceOverride;
-                        VehicleConstantForce.relativeTorque = CFRelativeTorqueOverride;
+                        VehicleForce = CFRelativeForceOverride;
+                        VehicleTorque = CFRelativeTorqueOverride;
                     }
                 }
 
@@ -1430,8 +1416,17 @@ namespace SaccFlightAndVehicles
         }
         private void FixedUpdate()
         {
+#if UNITY_EDITOR
+            if (SetVel)
+            {
+                VehicleRigidbody.velocity = VelToSet;
+            }
+#endif
             if (IsOwner && !Asleep)
             {
+                VehicleRigidbody.AddRelativeForce(VehicleForce, ForceMode.Force);
+                VehicleRigidbody.AddRelativeTorque(VehicleTorque, ForceMode.Force);
+
                 float DeltaTime = Time.fixedDeltaTime;
                 //lerp velocity toward 0 to simulate air friction
                 Vector3 VehicleVel = VehicleRigidbody.velocity;
@@ -1488,8 +1483,8 @@ namespace SaccFlightAndVehicles
 
             if (IsOwner)
             {
-                VehicleConstantForce.relativeForce = Vector3.zero;
-                VehicleConstantForce.relativeTorque = Vector3.zero;
+                VehicleForce = Vector3.zero;
+                VehicleTorque = Vector3.zero;
                 VehicleRigidbody.velocity = Vector3.zero;
                 VehicleRigidbody.angularVelocity = Vector3.zero;
                 if (!UsingManualSync)
@@ -1540,15 +1535,15 @@ namespace SaccFlightAndVehicles
             WakeUp();
             if (IsOwner)
             {
-                SendCustomEventDelayedFrames(nameof(SetRespawnPos), 1);//have to do this delayed 1 frame because the ConstantForce gets some mysterious torque when re-enabling colliders or something
+                SetRespawnPos();
             }
         }
         public void SetRespawnPos()
         {
             VehicleRigidbody.drag = 0;
             VehicleRigidbody.angularDrag = 0;
-            VehicleConstantForce.relativeForce = Vector3.zero;
-            VehicleConstantForce.relativeTorque = Vector3.zero;
+            VehicleForce = Vector3.zero;
+            VehicleTorque = Vector3.zero;
             VehicleRigidbody.angularVelocity = Vector3.zero;
             VehicleRigidbody.velocity = Vector3.zero;
             if (InEditor || UsingManualSync)
@@ -1901,8 +1896,8 @@ namespace SaccFlightAndVehicles
             if (NoFuelLastFrame)
             { SendNotNoFuel(); }
             EntityControl.SendEventToExtensions("SFEXT_G_RespawnButton");
-            VehicleConstantForce.relativeForce = Vector3.zero;
-            VehicleConstantForce.relativeTorque = Vector3.zero;
+            VehicleForce = Vector3.zero;
+            VehicleTorque = Vector3.zero;
         }
         public void SFEXT_L_BulletHit()
         {
