@@ -1,4 +1,5 @@
 
+using System.Drawing.Text;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -26,7 +27,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("How long after attaching does it take to launch automatically? Should have a minimum of about 1 to allow time for sync")]
         [SerializeField] private float AutoLaunchDelay = 1f;
         public string AnimTriggerLaunchName = "catapultlaunch";
-        private SaccEntity EntityControl;
+        [Tooltip("Align vehicle to catapult when attaching to it?")]
+        [SerializeField] private bool AlignToCatapult = true;
+        [System.NonSerialized] public SaccEntity EntityControl;
         private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
         private bool Selected;
@@ -57,7 +60,6 @@ namespace SaccFlightAndVehicles
         {
             InEditor = Networking.LocalPlayer == null;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleTransform = EntityControl.transform;
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
             VehicleAnimator = EntityControl.GetComponent<Animator>();
@@ -165,22 +167,29 @@ namespace SaccFlightAndVehicles
                                     Quaternion newrotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
                                     //flip the plane 360 degrees if the quaternion is the wrong way round, so that syncscript doesnt make other players see you do a 360
                                     bool InvertQuat = Quaternion.Dot(VehicleTransform.rotation, newrotation) < 0;
-                                    VehicleTransform.rotation = newrotation;
-                                    if (InvertQuat)
+
+                                    if (AlignToCatapult)
                                     {
-                                        VehicleTransform.Rotate(new Vector3(0, 360, 0));
+                                        VehicleTransform.rotation = newrotation;
+                                        if (InvertQuat)
+                                        {
+                                            VehicleTransform.Rotate(new Vector3(0, 360, 0));
+                                        }
+                                        //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
+
+                                        float PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
+                                        VehicleTransform.position = CatapultTransform.position - (CatapultTransform.up * PlaneCatapultUpDistance);
+                                        //move the plane back so that the catapult is aligned to the catapult detector
+                                        float PlaneCatapultBackDistance = VehicleTransform.InverseTransformDirection(VehicleTransform.position - transform.position).z;
+                                        VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
+                                        PlaneCatapultOffset = -(CatapultTransform.up * PlaneCatapultUpDistance) + (CatapultTransform.forward * PlaneCatapultBackDistance);
+                                        PlaneCatapultRotDif = VehicleTransform.rotation * Quaternion.Inverse(CatapultTransform.rotation);
                                     }
-                                    //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
-                                    float PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
-                                    VehicleTransform.position = CatapultTransform.position;
-                                    VehicleTransform.position -= CatapultTransform.up * PlaneCatapultUpDistance;
-
-                                    //move the plane back so that the catapult is aligned to the catapult detector
-                                    float PlaneCatapultBackDistance = VehicleTransform.InverseTransformDirection(VehicleTransform.position - transform.position).z;
-                                    VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
-
-                                    PlaneCatapultOffset = -(CatapultTransform.up * PlaneCatapultUpDistance) + (CatapultTransform.forward * PlaneCatapultBackDistance);
-                                    PlaneCatapultRotDif = VehicleTransform.rotation * Quaternion.Inverse(CatapultTransform.rotation);
+                                    else
+                                    {
+                                        PlaneCatapultOffset = VehicleTransform.position - CatapultTransform.position;
+                                        PlaneCatapultRotDif = VehicleTransform.rotation * Quaternion.Inverse(CatapultTransform.rotation);
+                                    }
 
                                     if (!DisableGearToggle && GearFunc)
                                     {
