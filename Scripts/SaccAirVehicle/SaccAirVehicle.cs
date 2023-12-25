@@ -1058,8 +1058,9 @@ namespace SaccFlightAndVehicles
                             float TaxiingStillMulti = 1;
                             if (DisallowTaxiRotationWhileStill)
                             { TaxiingStillMulti = Mathf.Min(Speed * TaxiFullTurningSpeedDivider, 1); }
-                            Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
+                            Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * DeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
                             VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
+                            VehicleRigidbody.rotation = VehicleTransform.rotation;//Unity 2022.3.6f1 bug workaround
 
                             StillWindMulti = Mathf.Min(Speed * .1f, 1);
                             ThrustVecGrounded = 0;
@@ -1622,6 +1623,7 @@ namespace SaccFlightAndVehicles
                 VehicleTransform.GetChild(i).position -= CoMOffset;
             }
             VehicleTransform.position += CoMOffset;
+            VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
             SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
             Spawnposition = VehicleTransform.localPosition;
             Spawnrotation = VehicleTransform.localRotation;
@@ -1873,6 +1875,8 @@ namespace SaccFlightAndVehicles
                 VehicleTransform.localPosition = Spawnposition;
                 VehicleTransform.localRotation = Spawnrotation;
                 VehicleRigidbody.velocity = Vector3.zero;
+                VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
+                VehicleRigidbody.rotation = VehicleTransform.rotation;//Unity 2022.3.6f1 bug workaround
             }
             else
             {
