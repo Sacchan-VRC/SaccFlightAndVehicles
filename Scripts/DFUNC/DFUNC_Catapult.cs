@@ -7,6 +7,7 @@ using VRC.Udon;
 
 namespace SaccFlightAndVehicles
 {
+    [DefaultExecutionOrder(10000)]
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_Catapult : UdonSharpBehaviour
     {
@@ -50,7 +51,7 @@ namespace SaccFlightAndVehicles
         //these bools exist to make sure this script only ever adds/removes 1 from the value in enginecontroller
         private bool DisableTaxiRotation = false;
         private bool DisableGearToggle = false;
-        private bool OverrideConstantForce = false;
+        private bool DisablePhysicsApplication = false;
         private bool InEditor;
         private bool IsOwner;
         private float AttachTime;
@@ -201,12 +202,12 @@ namespace SaccFlightAndVehicles
                                         SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") + 1);
                                         DisableTaxiRotation = true;
                                     }
-                                    if (!OverrideConstantForce)
+                                    if (!DisablePhysicsApplication)
                                     {
-                                        SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") + 1);
+                                        SAVControl.SetProgramVariable("DisablePhysicsApplication", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication") + 1);
                                         SAVControl.SetProgramVariable("CFRelativeForceOverride", Vector3.zero);
                                         SAVControl.SetProgramVariable("CFRelativeTorqueOverride", Vector3.zero);
-                                        OverrideConstantForce = true;
+                                        DisablePhysicsApplication = true;
                                     }
                                     //use dead to make plane invincible for x frames when entering the catapult to prevent taking G damage from stopping instantly
                                     EntityControl.dead = true;
@@ -269,6 +270,8 @@ namespace SaccFlightAndVehicles
 
                 VehicleTransform.rotation = PlaneCatapultRotDif * CatapultTransform.rotation;
                 VehicleTransform.position = CatapultTransform.position + PlaneCatapultOffset;
+                VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
+                VehicleRigidbody.rotation = VehicleTransform.rotation;//Unity 2022.3.6f1 bug workaround
                 VehicleRigidbody.velocity = Vector3.zero;
                 VehicleRigidbody.angularVelocity = Vector3.zero;
                 Quaternion CatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(CatapultRotLastFrame);
@@ -307,10 +310,10 @@ namespace SaccFlightAndVehicles
                 SAVControl.SetProgramVariable("DisableTaxiRotation", (int)SAVControl.GetProgramVariable("DisableTaxiRotation") - 1);
                 DisableTaxiRotation = false;
             }
-            if (OverrideConstantForce)
+            if (DisablePhysicsApplication)
             {
-                SAVControl.SetProgramVariable("OverrideConstantForce", (int)SAVControl.GetProgramVariable("OverrideConstantForce") - 1);
-                OverrideConstantForce = false;
+                SAVControl.SetProgramVariable("DisablePhysicsApplication", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication") - 1);
+                DisablePhysicsApplication = false;
             }
         }
         public void deadfalse()

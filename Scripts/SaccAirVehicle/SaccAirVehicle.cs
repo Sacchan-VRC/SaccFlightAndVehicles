@@ -505,8 +505,6 @@ namespace SaccFlightAndVehicles
             }
             get => DisablePhysicsAndInputs;
         }
-        [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
-        [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
         [System.NonSerializedAttribute] public bool _DisableTaxiRotation;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableTaxiRotation_))] public int DisableTaxiRotation = 0;
         public int DisableTaxiRotation_
@@ -604,8 +602,25 @@ namespace SaccFlightAndVehicles
             }
             get => PreventEngineToggle;
         }
-
-
+        [System.NonSerializedAttribute] public bool _DisablePhysicsApplication;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisablePhysicsApplication_))] public int DisablePhysicsApplication = 0;
+        public int DisablePhysicsApplication_
+        {
+            set
+            {
+                if (value > 0 && DisablePhysicsApplication == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisablePhysicsApplication_Activated");
+                }
+                else if (value == 0 && DisablePhysicsApplication > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_DisablePhysicsApplication_Deactivated");
+                }
+                _DisablePhysicsApplication = value > 0;
+                DisablePhysicsApplication = value;
+            }
+            get => DisablePhysicsApplication;
+        }
         [System.NonSerializedAttribute] public int ReSupplied = 0;
 #if UNITY_EDITOR
         [Header("Debug:")]
@@ -1399,11 +1414,6 @@ namespace SaccFlightAndVehicles
 
                         VehicleTorque = FinalInputRot;
                     }
-                    else
-                    {
-                        VehicleForce = CFRelativeForceOverride;
-                        VehicleTorque = CFRelativeTorqueOverride;
-                    }
                 }
 
                 SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
@@ -1425,24 +1435,27 @@ namespace SaccFlightAndVehicles
 #endif
             if (IsOwner && !Asleep)
             {
-                VehicleRigidbody.AddRelativeForce(VehicleForce, ForceMode.Force);
-                VehicleRigidbody.AddRelativeTorque(VehicleTorque, ForceMode.Force);
-
                 float DeltaTime = Time.fixedDeltaTime;
                 //lerp velocity toward 0 to simulate air friction
                 Vector3 VehicleVel = VehicleRigidbody.velocity;
-                VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, 1 - Mathf.Pow(0.5f, (AirFriction + SoundBarrier) * ExtraDrag * 90 * DeltaTime));
-                //apply pitching using pitch moment
-                if (PitchMoment)
-                { VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force); }
-                else
-                { VehicleRigidbody.AddRelativeTorque(Pitching, ForceMode.Force); }
-                //deltatime is built into ForceMode.Force
-                //apply yawing using yaw moment
-                if (YawMoment)
-                { VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force); }
-                else
-                { VehicleRigidbody.AddRelativeTorque(-Yawing, ForceMode.Force); }
+                if (!_DisablePhysicsApplication)
+                {
+                    VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, 1 - Mathf.Pow(0.5f, (AirFriction + SoundBarrier) * ExtraDrag * 90 * DeltaTime));
+                    //Apply forces calculated in update()
+                    VehicleRigidbody.AddRelativeForce(VehicleForce, ForceMode.Force);
+                    VehicleRigidbody.AddRelativeTorque(VehicleTorque, ForceMode.Force);
+                    //apply pitching using pitch moment
+                    if (PitchMoment)
+                    { VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force); }
+                    else
+                    { VehicleRigidbody.AddRelativeTorque(Pitching, ForceMode.Force); }
+                    //deltatime is built into ForceMode.Force
+                    //apply yawing using yaw moment
+                    if (YawMoment)
+                    { VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force); }
+                    else
+                    { VehicleRigidbody.AddRelativeTorque(-Yawing, ForceMode.Force); }
+                }
                 //calc Gs
                 float gravity = -Physics.gravity.y * DeltaTime;
                 LastFrameVel.y -= gravity; //add gravity
