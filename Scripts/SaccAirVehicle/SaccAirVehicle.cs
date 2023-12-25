@@ -2281,7 +2281,7 @@ namespace SaccFlightAndVehicles
             AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
 
             float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) * 0.0111111111f/* same as divide by 90 */, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) * 0.0111111111f/* same as divide by 90 */);//linear version to 90 for high aoa
-            AoALiftYawMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighYawAoaMinControl, 0, 1);
+            AoALiftYawMin = Mathf.Clamp((-AoALiftYawMin + 1) * HighYawAoaMinControl, 0, 1);
             AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
 
             AngleOfAttack = Mathf.Max(Mathf.Abs(AngleOfAttackPitch), Mathf.Abs(AngleOfAttackYaw));
