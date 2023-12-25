@@ -7,13 +7,14 @@ using VRC.Udon;
 namespace SaccFlightAndVehicles
 {
     [DefaultExecutionOrder(1500)]
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+    // [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class SaccWheel : UdonSharpBehaviour
     {
         public Rigidbody CarRigid;
         public SaccGroundVehicle SGVControl;
         public Transform WheelPoint;
         public Transform WheelVisual;
+        public Transform WheelVisual_Ground;
         public float SuspensionDistance;
         public float WheelRadius;
         public float SpringForceMulti = .25f;
@@ -68,7 +69,9 @@ namespace SaccFlightAndVehicles
         public float CurrentGrip = 7f;
         public float CurrentNumParticles = 0f;
         public float CurrentWheelSlowDown = 0f;
-        private bool IsDriveWheel = false;
+        [System.NonSerialized] public bool IsDriveWheel = false;
+        [System.NonSerialized] public bool IsSteerWheel = false;
+        [System.NonSerialized] public bool IsOtherWheel = false;
         private AudioSource SkidSound;
         private ParticleSystem SkidParticle;
         private ParticleSystem.EmissionModule SkidParticleEM;
@@ -94,7 +97,7 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                if (value == 0f)
+                if (value == 0f && !(bool)SGVControl.GetProgramVariable("TankMode"))
                 {
                     GearNeutral = true;
                 }
@@ -279,6 +282,7 @@ namespace SaccFlightAndVehicles
                     Steps_Error = (Steps_Error - AddSteps);
                 }
                 Suspension();
+                EngineRevs = (float)SGVControl.GetProgramVariable("Revs");
                 if (steps < 1) { steps = 1; }//if refresh rate is above NumItsSec just run once per frame, nothing else we can do
                 for (int i = 0; i < steps; i++)
                 { WheelPhysics(steps); }
@@ -339,10 +343,12 @@ namespace SaccFlightAndVehicles
                 if (SusOut.distance > ExtraRayCastDistance)
                 {
                     WheelVisual.position = SusOut.point + (WheelPoint.up * WheelRadius);
+                    if (WheelVisual_Ground) { WheelVisual_Ground.position = SusOut.point; }
                 }
                 else
                 {
                     WheelVisual.position = WheelPoint.position + (WheelPoint.up * WheelRadius);
+                    if (WheelVisual_Ground) { WheelVisual_Ground.position = WheelPoint.position; }
                 }
                 //END OF SUSPENSION//
                 //GRIP//
@@ -359,6 +365,7 @@ namespace SaccFlightAndVehicles
                 if (SkidSoundPlayingLast) { StopSkidSound(); }
                 if (SkidParticlePlayingLast) { StopSkidParticle(); }
                 WheelVisual.position = WheelPoint.position - (WheelPoint.up * (SuspensionDistance - WheelRadius));
+                if (WheelVisual_Ground) { WheelVisual_Ground.position = WheelPoint.position - (WheelPoint.up * (SuspensionDistance)); }
                 SusForce = Vector3.zero;
                 Grounded = false;
                 compressionLast = 0f;
@@ -723,10 +730,12 @@ namespace SaccFlightAndVehicles
                 if (SusOut.distance > ExtraRayCastDistance)
                 {
                     WheelVisual.position = SusOut.point + (WheelPoint.up * WheelRadius);
+                    if (WheelVisual_Ground) { WheelVisual_Ground.position = SusOut.point; }
                 }
                 else
                 {
                     WheelVisual.position = WheelPoint.position + (WheelPoint.up * WheelRadius);
+                    if (WheelVisual_Ground) { WheelVisual_Ground.position = WheelPoint.position; }
                 }
             }
             else
@@ -734,6 +743,7 @@ namespace SaccFlightAndVehicles
                 StopSkidSound();
                 StopSkidParticle();
                 WheelVisual.position = WheelPoint.position - (WheelPoint.up * (SuspensionDistance - WheelRadius));
+                if (WheelVisual_Ground) { WheelVisual_Ground.position = WheelPoint.position - (WheelPoint.up * (SuspensionDistance)); }
                 Grounded = false;
             }
         }
