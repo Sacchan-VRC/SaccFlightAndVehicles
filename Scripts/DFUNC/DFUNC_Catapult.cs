@@ -25,6 +25,8 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour GearFunc;
         [Tooltip("Allow Catapult to be used not as DFUNC, just launch automatically")]
         public bool AutoLaunch = false;
+        [Tooltip("Launch automatically only after going to full throttle? (SAV only)")]
+        public bool AutoLaunch_FullThrottle = false;
         [Tooltip("How long after attaching does it take to launch automatically? Should have a minimum of about 1 to allow time for sync")]
         [SerializeField] private float AutoLaunchDelay = 1f;
         public string AnimTriggerLaunchName = "catapultlaunch";
@@ -55,6 +57,8 @@ namespace SaccFlightAndVehicles
         private bool InEditor;
         private bool IsOwner;
         private float AttachTime;
+        private float FullThrottleTime;
+        private bool Launching_AB;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
@@ -162,6 +166,7 @@ namespace SaccFlightAndVehicles
                                 if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
                                 {
                                     AttachTime = Time.time;
+                                    Launching_AB = false;
                                     CatapultPosLastFrame = CatapultTransform.position;
                                     //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
                                     //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
@@ -234,7 +239,26 @@ namespace SaccFlightAndVehicles
             {
                 if (AutoLaunch)
                 {
-                    if (!Launching)
+                    if (AutoLaunch_FullThrottle)
+                    {
+                        if (!Launching)
+                        {
+                            if (SAVControl && (float)SAVControl.GetProgramVariable("ThrottleInput") == 1f)
+                            {
+                                if (!Launching_AB)
+                                {
+                                    Launching_AB = true;
+                                    FullThrottleTime = Time.time;
+                                }
+                            }
+                            else { Launching_AB = false; }
+                            if (Launching_AB && Time.time - FullThrottleTime > AutoLaunchDelay)
+                            {
+                                CatapultLaunchNow();
+                            }
+                        }
+                    }
+                    else if (!Launching)
                     {
                         if (Time.time - AttachTime > AutoLaunchDelay)
                         {
