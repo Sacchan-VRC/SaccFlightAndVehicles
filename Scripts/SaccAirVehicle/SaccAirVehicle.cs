@@ -1058,8 +1058,8 @@ namespace SaccFlightAndVehicles
                             float TaxiingStillMulti = 1;
                             if (DisallowTaxiRotationWhileStill)
                             { TaxiingStillMulti = Mathf.Min(Speed * TaxiFullTurningSpeedDivider, 1); }
-                            Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * DeltaTime * TaxiingStillMulti, TaxiRotationResponse * DeltaTime);
-                            VehicleTransform.Rotate(Vector3.up, Taxiinglerper);
+                            Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, 1 - Mathf.Pow(0.5f, TaxiRotationResponse * DeltaTime));
+                            VehicleTransform.Rotate(VehicleTransform.up, Taxiinglerper);
                             VehicleRigidbody.rotation = VehicleTransform.rotation;//Unity 2022.3.6f1 bug workaround
 
                             StillWindMulti = Mathf.Min(Speed * .1f, 1);
@@ -1227,13 +1227,13 @@ namespace SaccFlightAndVehicles
                     if (_EngineOn)
                     {
                         if (EngineOutput < ThrottleInput)
-                        { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * DeltaTime); }
+                        { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, 1 - Mathf.Pow(0.5f, AccelerationResponse * DeltaTime)); }
                         else
-                        { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime); }
+                        { EngineOutput = Mathf.Lerp(EngineOutput, ThrottleInput, 1 - Mathf.Pow(0.5f, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime)); }
                     }
                     else
                     {
-                        EngineOutput = Mathf.Lerp(EngineOutput, 0, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime);
+                        EngineOutput = Mathf.Lerp(EngineOutput, 0, 1 - Mathf.Pow(0.5f, AccelerationResponse * EngineSpoolDownSpeedMulti * DeltaTime));
                     }
                     float sidespeed = 0;
                     float downspeed = 0;
@@ -1269,9 +1269,9 @@ namespace SaccFlightAndVehicles
                         AoALift_Min = Mathf.Min(AoALiftYaw, AoALiftPitch);
 
                         //Lerp the inputs for 'rotation response'
-                        LerpedRoll = Mathf.Lerp(LerpedRoll, roll, RollResponse * DeltaTime);
-                        LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, PitchResponse * DeltaTime);
-                        LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, YawResponse * DeltaTime);
+                        LerpedRoll = Mathf.Lerp(LerpedRoll, roll, 1 - Mathf.Pow(0.5f, RollResponse * DeltaTime));
+                        LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, 1 - Mathf.Pow(0.5f, PitchResponse * DeltaTime));
+                        LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, 1 - Mathf.Pow(0.5f, YawResponse * DeltaTime));
                     }
                     else
                     {
@@ -1431,7 +1431,7 @@ namespace SaccFlightAndVehicles
                 float DeltaTime = Time.fixedDeltaTime;
                 //lerp velocity toward 0 to simulate air friction
                 Vector3 VehicleVel = VehicleRigidbody.velocity;
-                VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, ((((AirFriction + SoundBarrier) * ExtraDrag)) * 90) * DeltaTime);
+                VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, 1 - Mathf.Pow(0.5f, (AirFriction + SoundBarrier) * ExtraDrag * 90 * DeltaTime));
                 //apply pitching using pitch moment
                 if (PitchMoment)
                 { VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force); }
