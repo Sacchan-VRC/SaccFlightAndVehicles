@@ -21,6 +21,10 @@ namespace SaccFlightAndVehicles
         public int CatapultLayer = 24;
         [Tooltip("Reference to the landing gear function so we can tell it to be disabled when on a catapult")]
         public UdonSharpBehaviour GearFunc;
+        [Tooltip("Allow Catapult to be used not as DFUNC, just launch automatically")]
+        public bool AutoLaunch = false;
+        [Tooltip("How long after attaching does it take to launch automatically? Should have a minimum of about 1 to allow time for sync")]
+        [SerializeField] private float AutoLaunchDelay = 1f;
         public string AnimTriggerLaunchName = "catapultlaunch";
         private SaccEntity EntityControl;
         private bool UseLeftTrigger = false;
@@ -46,6 +50,7 @@ namespace SaccFlightAndVehicles
         private bool OverrideConstantForce = false;
         private bool InEditor;
         private bool IsOwner;
+        private float AttachTime;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
@@ -153,6 +158,7 @@ namespace SaccFlightAndVehicles
                                 //Hit detected, check if the plane is facing in the right direction..
                                 if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
                                 {
+                                    AttachTime = Time.time;
                                     CatapultPosLastFrame = CatapultTransform.position;
                                     //then lock the plane to the catapult! Works with the catapult in any orientation whatsoever.
                                     //match plane rotation to catapult excluding pitch because some planes have shorter front or back wheels
@@ -216,22 +222,35 @@ namespace SaccFlightAndVehicles
         {
             if ((Piloting && OnCatapult) || Launching)
             {
-                if (!Launching && Selected)
+                if (AutoLaunch)
                 {
-                    float Trigger;
-                    if (UseLeftTrigger)
-                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                    else
-                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                    if (Trigger > 0.75)
+                    if (!Launching)
                     {
-                        if (!TriggerLastFrame)
+                        if (Time.time - AttachTime > AutoLaunchDelay)
                         {
                             CatapultLaunchNow();
                         }
-                        TriggerLastFrame = true;
                     }
-                    else { TriggerLastFrame = false; }
+                }
+                else
+                {
+                    if (!Launching && Selected)
+                    {
+                        float Trigger;
+                        if (UseLeftTrigger)
+                        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                        else
+                        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                        if (Trigger > 0.75)
+                        {
+                            if (!TriggerLastFrame)
+                            {
+                                CatapultLaunchNow();
+                            }
+                            TriggerLastFrame = true;
+                        }
+                        else { TriggerLastFrame = false; }
+                    }
                 }
                 if (EntityControl._dead)
                 {
