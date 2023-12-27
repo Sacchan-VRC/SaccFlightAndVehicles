@@ -10,6 +10,8 @@ namespace SaccFlightAndVehicles
     // [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class SaccWheel : UdonSharpBehaviour
     {
+        [Header("Sync is only used for skid effects,\nset Synchronization Method:\nNone to save bandwidth\nContinuous to sync skids")]
+        [Space(10)]
         public Rigidbody CarRigid;
         public SaccGroundVehicle SGVControl;
         public Transform WheelPoint;
