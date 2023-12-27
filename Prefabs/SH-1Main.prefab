@@ -43414,6 +43414,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8333115239186322126}
+  - {fileID: 3794158492767849092}
   - {fileID: 8333115238806481908}
   - {fileID: 8333115238555617820}
   - {fileID: 8333115238964543377}
@@ -43450,7 +43451,7 @@ MonoBehaviour:
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 8333115238555617820}
   PitchMoment: {fileID: 0}
-  YawMoment: {fileID: 0}
+  YawMoment: {fileID: 3794158492767849092}
   GroundDetector: {fileID: 8333115238806481908}
   GroundDetectorRayDistance: 0.44
   GroundDetectorLayers:
@@ -43477,13 +43478,13 @@ MonoBehaviour:
   AccelerationResponse: 4.5
   EngineSpoolDownSpeedMulti: 0.5
   AirFriction: 0.00059
-  PitchStrength: 3.5
+  PitchStrength: 2.31
   PitchThrustVecMulti: 1
   PitchFriction: 2
   PitchConstantFriction: 1
   PitchResponse: 40
   ReversingPitchStrengthMulti: 2
-  YawStrength: 3.5
+  YawStrength: 0.5
   YawThrustVecMulti: 1
   YawFriction: 14
   YawConstantFriction: 1
@@ -50336,6 +50337,37 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!1 &7393230444037253595
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3794158492767849092}
+  m_Layer: 17
+  m_Name: YawMoment
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3794158492767849092
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7393230444037253595}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.06809354, y: 2.097333, z: -5.916978}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3974340786403165107}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7722288185414737733
 GameObject:
   m_ObjectHideFlags: 0
