@@ -50,22 +50,7 @@ namespace SaccFlightAndVehicles
         public Camera AtGCam;
         public bool SetAtGCamSettings = true;
         public GameObject AtGScreen;
-        [UdonSynced, FieldChangeCallback(nameof(BombFire))] private ushort _BombFire;
-        public ushort BombFire
-        {
-            set
-            {
-                if (value > _BombFire)//if _BombFire is higher locally, it's because a late joiner just took ownership or value was reset, so don't launch
-                {
-                    for (int i = 0; i < NumBomb_PerShot; i++)
-                    {
-                        LaunchBomb();
-                    }
-                }
-                _BombFire = value;
-            }
-            get => _BombFire;
-        }
+        [UdonSynced(UdonSyncMode.None)] private bool BombFireNow = false;
         private float boolToggleTime;
         private bool AnimOn = false;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -153,10 +138,12 @@ namespace SaccFlightAndVehicles
         {
             TriggerLastFrame = true;
             func_active = true;
-            gameObject.SetActive(true);
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
-            if (!OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
+            if (!OthersEnabled)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers));
+            }
             if (AtGScreen) AtGScreen.SetActive(true);
             if (AtGCam)
             {
@@ -171,11 +158,17 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             func_active = false;
-            HoldingTrigger = false;
-            gameObject.SetActive(false);
+            HoldingTrigger_Held = false;
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
-            if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
+            if (OthersEnabled)
+            {
+                if (IsOwner)
+                {
+                    //Will only be false if is a handheld weapon that was just grabbed out of your hands
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers));
+                }
+            }
             if (AtGScreen) { AtGScreen.SetActive(false); }
             if (AtGCam) { AtGCam.gameObject.SetActive(false); }
         }
@@ -205,13 +198,13 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_TakeOwnership() { IsOwner = true; }
         public void SFEXT_O_LoseOwnership() { IsOwner = false; }
-        private bool HoldingTrigger = false;
+        private bool HoldingTrigger_Held = false;
         public void SFEXT_O_OnPickupUseDown()
         {
             if (!func_active) { return; }
             if (HandHeld_MachineGun)
             {
-                HoldingTrigger = true;
+                HoldingTrigger_Held = true;
                 return;
             }
             else if (HandHeld_UseEventToFire)
@@ -219,6 +212,16 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchBombs_Event));
                 return;
             }
+            else
+            {
+                LaunchBomb_Owner();
+            }
+        }
+        private void LaunchBomb_Owner()
+        {
+            FireNextSerialization = true;
+            RequestSerialization();
+            LaunchBombs_Event();
         }
         public void LaunchBombs_Event()
         {
@@ -229,7 +232,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger = false;
+            HoldingTrigger_Held = false;
         }
         public void SFEXT_O_OnPickup()
         {
@@ -238,18 +241,18 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_OnDrop()
         {
             Held = false;
-            HoldingTrigger = false;
+            HoldingTrigger_Held = false;
             DFUNC_Deselected();
         }
         public void UpdateAmmoVisuals()
         {
-            if (BombAnimator) { BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider); }
+            if (BombAnimator && AnimFloatName != string.Empty) { BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider); }
             if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
         }
         public void EnableForOthers()
         {
             if (!Piloting)
-            { gameObject.SetActive(true); BombFire = 0; }
+            { gameObject.SetActive(true); }
             OthersEnabled = true;
         }
         public void DisableForOthers()
@@ -267,7 +270,7 @@ namespace SaccFlightAndVehicles
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if (Trigger > 0.75 || HoldingTrigger || (!Held && (Input.GetKey(KeyCode.Space))))
+                if ((Trigger > 0.75 && !Held) || HoldingTrigger_Held || (!Held && Input.GetKey(KeyCode.Space)))
                 {
                     if (!TriggerLastFrame)
                     {
@@ -278,14 +281,12 @@ namespace SaccFlightAndVehicles
                         }
                         if (NumBomb > 0 && (AllowFiringWhenGrounded || (!SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing"))) && ((Time.time - LastBombDropTime) > BombDelay))
                         {
-                            BombFire++;
-                            RequestSerialization();
+                            LaunchBomb_Owner();
                         }
                     }
                     else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && (AllowFiringWhenGrounded || (!SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing"))))
                     {///launch every BombHoldDelay
-                        BombFire++;
-                        RequestSerialization();
+                        LaunchBomb_Owner();
                     }
                     TriggerLastFrame = true;
                 }
@@ -322,7 +323,8 @@ namespace SaccFlightAndVehicles
                 BombPoint++;
                 if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
             }
-            VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange);
+            if (IsOwner && !Held)
+            { VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange); }
             if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
             UpdateAmmoVisuals();
             if (IsOwner)
@@ -382,6 +384,24 @@ namespace SaccFlightAndVehicles
                 else
                 { EntityControl.RStickSelection = DialPosition; }
             }
+        }
+        private bool FireNextSerialization = false;
+        public override void OnPreSerialization()
+        {
+            if (FireNextSerialization)
+            {
+                FireNextSerialization = false;
+                BombFireNow = true;
+            }
+            else { BombFireNow = false; }
+        }
+        public override void OnPostSerialization(VRC.Udon.Common.SerializationResult result)
+        {
+            BombFireNow = false;
+        }
+        public override void OnDeserialization()
+        {
+            if (BombFireNow) { LaunchBombs_Event(); }
         }
     }
 }
