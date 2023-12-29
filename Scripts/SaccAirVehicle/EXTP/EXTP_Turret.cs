@@ -1,4 +1,5 @@
 ﻿
+using BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -64,7 +65,7 @@ namespace SaccFlightAndVehicles
         public Transform RecoilDirection;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         private Transform VehicleTransform;
-        private float LastFireTime = 0f;
+        private float LastFireTime = -999999f;
         private int FullAmmo;
         private float FullAmmoDivider;
         private float InputXKeyb;
@@ -88,8 +89,8 @@ namespace SaccFlightAndVehicles
         private double StartupTime;
         private Vector2 LastGunRotationSpeed;
         private Vector2 GunRotationSpeed;
-        private Vector2 O_LastGunRotation2;
-        private Vector2 O_LastGunRotation;
+        private Vector2 L_LastGunRotation2;
+        private Vector2 L_LastGunRotation;
         private int O_LastUpdateTime2;
         private float SmoothingTimeDivider;
         private bool ClampHor = false;
@@ -105,10 +106,21 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool IsOwner;//required by the bomb script, not actually related to being the owner of the object
         private Vector3 LastForward_HOR;
         private Vector3 LastForward_VERT;
+        [UdonSynced(UdonSyncMode.None)] private bool GunFireNow = false;
         [UdonSynced(UdonSyncMode.None)] private Vector2 O_GunRotation;
+        private Vector2 L_GunRotation;
         [UdonSynced(UdonSyncMode.None)] private int O_UpdateTime = 0;
+        [Header("Debug, leave empty")]
+        [SerializeField] private Transform HORSYNC;
+        [SerializeField] private Transform VERTSYNC;
         public void SFEXTP_L_EntityStart()
         {
+#if UNITY_EDITOR
+            if (HORSYNC || VERTSYNC)
+            { NetTestMode = true; }
+#endif
+            if (!HORSYNC) { HORSYNC = TurretRotatorHor; }
+            if (!VERTSYNC) { VERTSYNC = TurretRotatorVert; }
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
@@ -139,14 +151,14 @@ namespace SaccFlightAndVehicles
         }
         private GameObject InstantiateWeapon()
         {
-            GameObject NewWeap = Object.Instantiate(Projectile);
+            GameObject NewWeap = Instantiate(Projectile);
             NewWeap.transform.SetParent(transform);
             return NewWeap;
         }
         public void SFEXTP_O_UserEnter()
         {
             TriggerLastFrame = true;
-            LastFireTime = Time.time;
+            FireNextSerialization = false;
             IsOwner = true;
             Manning = true;
             if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
@@ -178,6 +190,12 @@ namespace SaccFlightAndVehicles
         { Manning = false; }//if this is in SFEXTP_O_UserExit rather than here update runs for one frame with it false before it's disabled    
         public void FireGun()
         {
+            LastFireTime = Time.time;
+            if (IsOwner)
+            {
+                FireNextSerialization = true;
+                RequestSerialization();
+            }
             int fp = FirePoints.Length;
             if (Ammo > 0) { Ammo--; }
             for (int x = 0; x < fp; x++)
@@ -238,14 +256,22 @@ namespace SaccFlightAndVehicles
                     {
                         if (Ammo > 0 && ((Time.time - LastFireTime) > FireDelay))
                         {
-                            LastFireTime = Time.time;
-                            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
+#if UNITY_EDITOR
+                            if (NetTestMode) { GunFireNow = true; OnDeserialization(); }
+                            else { FireGun(); }
+#else
+                            FireGun();
+#endif
                         }
                     }
                     else if (Ammo > 0 && ((Time.time - LastFireTime) > FireHoldDelay))
                     {//launch every FireHoldDelay
-                        LastFireTime = Time.time;
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(FireGun));
+#if UNITY_EDITOR
+                        if (NetTestMode) { GunFireNow = true; OnDeserialization(); }
+                        else { FireGun(); }
+#else
+                            FireGun();
+#endif
                     }
                     TriggerLastFrame = true;
                 }
@@ -349,9 +375,15 @@ namespace SaccFlightAndVehicles
                 if (Time.time > nextUpdateTime)
                 {
                     O_UpdateTime = Networking.GetServerTimeInMilliseconds();
-                    O_GunRotation = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.localEulerAngles.y);
+                    if (Stabilize)
+                    { O_GunRotation = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.eulerAngles.y); }
+                    else
+                    { O_GunRotation = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.localEulerAngles.y); }
                     RequestSerialization();
                     nextUpdateTime = Time.time + updateInterval;
+#if UNITY_EDITOR
+                    if (NetTestMode) { OnDeserialization(); }
+#endif
                 }
                 if (RotatingSound)
                 {
@@ -362,107 +394,125 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                float TimeSinceUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_UpdateTime) * .001f);
-                Vector2 prediction = (GunRotationSpeed * (Ping + TimeSinceUpdate));
+                Extrapolation();
+            }
+#if UNITY_EDITOR
+            if (NetTestMode)
+            { Extrapolation(); }
+#endif
+        }
+#if UNITY_EDITOR
+        public bool NetTestMode;
+#endif
+        private void Extrapolation()
+        {
+
+            float TimeSinceUpdate = (float)(Networking.GetServerTimeInMilliseconds() - L_UpdateTime) * .001f;
+            Vector2 prediction = GunRotationSpeed * (Ping + TimeSinceUpdate);
+            //clamp angle in a way that will never cause an overshoot to clip to the other side
+            if (ClampHor)
+            {
+                float maxturn;
+                if (L_GunRotation.y < 180)//looking right
+                {
+                    if (prediction.y > 0)//moving right
+                    {
+                        maxturn = SideAngleMax - L_GunRotation.y;
+                        if (prediction.y > maxturn)
+                        { prediction.y = maxturn; }
+                    }
+                    else//moving left
+                    {
+                        maxturn = L_GunRotation.y + SideAngleMax;
+                        if (-prediction.y > maxturn)
+                        { prediction.y = -maxturn; }
+                    }
+                }
+                else//looking left
+                {
+                    if (prediction.y > 0)//moving right
+                    {
+                        maxturn = 360 - L_GunRotation.y + SideAngleMax;
+                        if (prediction.y > maxturn)
+                        { prediction.y = maxturn; }
+                    }
+                    else//moving left
+                    {
+                        maxturn = SideAngleMax - (360 - L_GunRotation.y);
+                        if (-prediction.y > maxturn)
+                        { prediction.y = -maxturn; }
+                    }
+                }
+            }
+            Vector2 PredictedRotation = L_GunRotation + prediction;
+            PredictedRotation.x = Mathf.Clamp(PredictedRotation.x, -UpAngleMax, DownAngleMax);
+
+            if (TimeSinceUpdate < updateInterval)
+            {
+                float TimeSincePreviousUpdate = (float)(Networking.GetServerTimeInMilliseconds() - L_LastUpdateTime) * .001f;
+                Vector2 oldprediction = LastGunRotationSpeed * (LastPing + TimeSincePreviousUpdate);
                 //clamp angle in a way that will never cause an overshoot to clip to the other side
                 if (ClampHor)
                 {
                     float maxturn;
-                    if (O_GunRotation.y < 180)//looking right
+                    if (L_LastGunRotation2.y < 180)//looking right
                     {
-                        if (prediction.y > 0)//moving right
+                        if (oldprediction.y > 0)//moving right
                         {
-                            maxturn = SideAngleMax - O_GunRotation.y;
-                            if (prediction.y > maxturn)
-                            { prediction.y = maxturn; }
+                            maxturn = SideAngleMax - L_LastGunRotation2.y;
+                            if (oldprediction.y > maxturn)
+                            { oldprediction.y = maxturn; }
                         }
                         else//moving left
                         {
-                            maxturn = O_GunRotation.y + SideAngleMax;
-                            if (-prediction.y > maxturn)
-                            { prediction.y = -maxturn; }
+                            maxturn = L_LastGunRotation2.y + SideAngleMax;
+                            if (-oldprediction.y > maxturn)
+                            { oldprediction.y = -maxturn; }
                         }
                     }
                     else//looking left
                     {
-                        if (prediction.y > 0)//moving right
+                        if (oldprediction.y > 0)//moving right
                         {
-                            maxturn = 360 - O_GunRotation.y + SideAngleMax;
-                            if (prediction.y > maxturn)
-                            { prediction.y = maxturn; }
+                            maxturn = 360 - L_LastGunRotation2.y + SideAngleMax;
+                            if (oldprediction.y > maxturn)
+                            { oldprediction.y = maxturn; }
                         }
                         else//moving left
                         {
-                            maxturn = SideAngleMax - (360 - O_GunRotation.y);
-                            if (-prediction.y > maxturn)
-                            { prediction.y = -maxturn; }
+                            maxturn = SideAngleMax - (360 - L_LastGunRotation2.y);
+                            if (-oldprediction.y > maxturn)
+                            { oldprediction.y = -maxturn; }
                         }
                     }
                 }
-                Vector2 PredictedRotation = O_GunRotation + prediction;
-                PredictedRotation.x = Mathf.Clamp(PredictedRotation.x, -UpAngleMax, DownAngleMax);
-                //previous imperfect clamp
-                /*             if (PredictedRotation.y > SideAngleMax && PredictedRotation.y < 360 - SideAngleMax)
-                            {
-                                if (O_GunRotation.y > 180)
-                                { PredictedRotation.y = 360 - SideAngleMax; }
-                                else
-                                { PredictedRotation.y = SideAngleMax; }
-                            } */
-                Vector3 PredictedRotation_3 = new Vector3(PredictedRotation.x, PredictedRotation.y, 0);
+                Vector2 OldPredictedRotation = L_LastGunRotation2 + oldprediction;
+                OldPredictedRotation.x = Mathf.Clamp(OldPredictedRotation.x, -UpAngleMax, DownAngleMax);
 
-                if (TimeSinceUpdate < updateInterval)
+                Vector3 TargetRot = Vector2.Lerp(OldPredictedRotation, PredictedRotation, TimeSinceUpdate * SmoothingTimeDivider);
+                if (Stabilize)
                 {
-                    float TimeSincePreviousUpdate = ((float)(Networking.GetServerTimeInMilliseconds() - L_LastUpdateTime) * .001f);
-                    Vector2 oldprediction = (LastGunRotationSpeed * (LastPing + TimeSincePreviousUpdate));
-                    //clamp angle in a way that will never cause an overshoot to clip to the other side
-                    if (ClampHor)
-                    {
-                        float maxturn;
-                        if (O_LastGunRotation2.y < 180)//looking right
-                        {
-                            if (oldprediction.y > 0)//moving right
-                            {
-                                maxturn = SideAngleMax - O_LastGunRotation2.y;
-                                if (oldprediction.y > maxturn)
-                                { oldprediction.y = maxturn; }
-                            }
-                            else//moving left
-                            {
-                                maxturn = O_LastGunRotation2.y + SideAngleMax;
-                                if (-oldprediction.y > maxturn)
-                                { oldprediction.y = -maxturn; }
-                            }
-                        }
-                        else//looking left
-                        {
-                            if (oldprediction.y > 0)//moving right
-                            {
-                                maxturn = 360 - O_LastGunRotation2.y + SideAngleMax;
-                                if (oldprediction.y > maxturn)
-                                { oldprediction.y = maxturn; }
-                            }
-                            else//moving left
-                            {
-                                maxturn = SideAngleMax - (360 - O_LastGunRotation2.y);
-                                if (-oldprediction.y > maxturn)
-                                { oldprediction.y = -maxturn; }
-                            }
-                        }
-                    }
-                    Vector2 OldPredictedRotation = O_LastGunRotation2 + oldprediction;
-                    OldPredictedRotation.x = Mathf.Clamp(OldPredictedRotation.x, -UpAngleMax, DownAngleMax);
-                    Vector3 OldPredictedRotation_3 = new Vector3(OldPredictedRotation.x, OldPredictedRotation.y, 0);
-
-                    Vector3 TargetRot = Vector3.Lerp(OldPredictedRotation_3, PredictedRotation_3, TimeSinceUpdate * SmoothingTimeDivider);
-                    TurretRotatorHor.localRotation = Quaternion.Euler(new Vector3(0, TargetRot.y, 0));
-                    TurretRotatorVert.localRotation = Quaternion.Euler(new Vector3(TargetRot.x, 0, 0));
+                    HORSYNC.rotation = Quaternion.Euler(new Vector3(0, TargetRot.y, 0));
+                    HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, HORSYNC.localEulerAngles.y, 0));
                 }
                 else
                 {
-                    TurretRotatorHor.localRotation = Quaternion.Euler(new Vector3(0, PredictedRotation_3.y, 0));
-                    TurretRotatorVert.localRotation = Quaternion.Euler(new Vector3(PredictedRotation_3.x, 0, 0));
+                    HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, TargetRot.y, 0));
                 }
+                VERTSYNC.localRotation = Quaternion.Euler(new Vector3(TargetRot.x, 0, 0));
+            }
+            else
+            {
+                if (Stabilize)
+                {
+                    HORSYNC.rotation = Quaternion.Euler(new Vector3(0, PredictedRotation.y, 0));
+                    HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, HORSYNC.localEulerAngles.y, 0));
+                }
+                else
+                {
+                    HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, PredictedRotation.y, 0));
+                }
+                VERTSYNC.localRotation = Quaternion.Euler(new Vector3(PredictedRotation.x, 0, 0));
             }
         }
         public void SFEXTP_O_PlayerJoined()
@@ -479,37 +529,72 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_NotActive));
             }
         }
+        private bool FireNextSerialization = false;
+        public override void OnPreSerialization()
+        {
+            if (FireNextSerialization)
+            {
+                FireNextSerialization = false;
+                GunFireNow = true;
+            }
+        }
+        public override void OnPostSerialization(VRC.Udon.Common.SerializationResult result)
+        {
+            GunFireNow = false;
+        }
         public override void OnDeserialization()
         {
-            if (O_UpdateTime != O_LastUpdateTime)//only do anything if OnDeserialization was for this script
+            if (GunFireNow)
             {
-                if (O_GunRotation.x > 180) { O_GunRotation.x -= 360; }
-                LastPing = Ping;
-                L_LastUpdateTime = L_UpdateTime;
-                float updatedelta = (O_UpdateTime - O_LastUpdateTime) * .001f;
-                float speednormalizer = 1 / updatedelta;
-
-                L_UpdateTime = Networking.GetServerTimeInMilliseconds();
-                Ping = (L_UpdateTime - O_UpdateTime) * .001f;
-                LastGunRotationSpeed = GunRotationSpeed;
-
-                //check if going from rotation 0->360 and fix values for interpolation
-                if (Mathf.Abs(O_GunRotation.y - O_LastGunRotation.y) > 180)
+                // teleport to fire angle
+                L_GunRotation = O_GunRotation;
+                if (L_GunRotation.x > 180) { L_GunRotation.x -= 360; }
+                L_LastGunRotation2 = L_LastGunRotation = L_GunRotation;
+                LastGunRotationSpeed = GunRotationSpeed = Vector2.zero;
+                Vector2 newRot = L_GunRotation;
+                if (Stabilize)
                 {
-                    if (O_GunRotation.y > O_LastGunRotation.y)
-                    {
-                        O_LastGunRotation.y += 360;
-                    }
-                    else
-                    {
-                        O_LastGunRotation.y -= 360;
-                    }
+                    HORSYNC.rotation = Quaternion.Euler(new Vector3(0, newRot.y, 0));
+                    HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, HORSYNC.localEulerAngles.y, 0));
                 }
-                GunRotationSpeed = (O_GunRotation - O_LastGunRotation) * speednormalizer;
-                O_LastGunRotation2 = O_LastGunRotation;
-                O_LastGunRotation = O_GunRotation;
-                O_LastUpdateTime = O_UpdateTime;
+                else
+                {
+                    HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, newRot.y, 0));
+                }
+                VERTSYNC.localRotation = Quaternion.Euler(new Vector3(newRot.x, 0, 0));
+#if UNITY_EDITOR
+                if (NetTestMode) { GunFireNow = false; }
+#endif
+                FireGun();
+                return;
             }
+            L_GunRotation = O_GunRotation;
+            if (L_GunRotation.x > 180) { L_GunRotation.x -= 360; }
+            LastPing = Ping;
+            L_LastUpdateTime = L_UpdateTime;
+            float updatedelta = (O_UpdateTime - O_LastUpdateTime) * .001f;
+            float speednormalizer = 1 / updatedelta;
+
+            L_UpdateTime = Networking.GetServerTimeInMilliseconds();
+            Ping = (L_UpdateTime - O_UpdateTime) * .001f;
+            LastGunRotationSpeed = GunRotationSpeed;
+
+            //check if going from rotation 0->360 and fix values for interpolation
+            if (Mathf.Abs(L_GunRotation.y - L_LastGunRotation.y) > 180)
+            {
+                if (L_GunRotation.y > L_LastGunRotation.y)
+                {
+                    L_LastGunRotation.y += 360;
+                }
+                else
+                {
+                    L_LastGunRotation.y -= 360;
+                }
+            }
+            GunRotationSpeed = (L_GunRotation - L_LastGunRotation) * speednormalizer;
+            L_LastGunRotation2 = L_LastGunRotation;
+            L_LastGunRotation = L_GunRotation;
+            O_LastUpdateTime = O_UpdateTime;
         }
     }
 }
