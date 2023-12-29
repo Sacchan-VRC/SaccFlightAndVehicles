@@ -68,17 +68,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("If not empty, targeting will be done relative to this transform's forward")]
         public Transform TargetingTransform;
         private float HighAspectPreventLockAngleDot;
-        [UdonSynced, FieldChangeCallback(nameof(AAMFire))] private ushort _AAMFire;
-        public ushort AAMFire
-        {
-            set
-            {
-                if (value > _AAMFire)//if _AAMFire is higher locally, it's because a late joiner just took ownership or value was reset, so don't launch
-                { LaunchAAM(); }
-                _AAMFire = value;
-            }
-            get => _AAMFire;
-        }
+        [UdonSynced] private bool AAMFireNow;
         [UdonSynced, FieldChangeCallback(nameof(sendtargeted))] private bool _SendTargeted;
         public bool sendtargeted
         {
@@ -210,7 +200,7 @@ namespace SaccFlightAndVehicles
             RequestSerialization();
         }
         public void SFEXT_G_PilotEnter()
-        { gameObject.SetActive(true); AAMFire = 0; }
+        { gameObject.SetActive(true); }
         public void SFEXT_G_PilotExit()
         { gameObject.SetActive(false); }
         public void SFEXT_O_PilotExit()
@@ -341,8 +331,7 @@ namespace SaccFlightAndVehicles
                             }
                             if (NumAAM > 0 && AAMLocked && Time.time - AAMLastFiredTime > AAMLaunchDelay)
                             {
-                                AAMFire++;//launch AAM using set
-                                RequestSerialization();
+                                LaunchAAM_Owner();
                                 if (NumAAM == 0 && !AllowNoAmmoLock) { AAMLockTimer = 0; AAMLocked = false; }
                                 EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
                             }
@@ -645,6 +634,29 @@ namespace SaccFlightAndVehicles
                 else
                 { EntityControl.RStickSelection = DialPosition; }
             }
+        }
+        private void LaunchAAM_Owner()
+        {
+            FireNextSerialization = true;
+            RequestSerialization();
+            LaunchAAM();
+        }
+        private bool FireNextSerialization = false;
+        public override void OnPreSerialization()
+        {
+            if (FireNextSerialization)
+            {
+                FireNextSerialization = false;
+                AAMFireNow = true;
+            }
+        }
+        public override void OnPostSerialization(VRC.Udon.Common.SerializationResult result)
+        {
+            AAMFireNow = false;
+        }
+        public override void OnDeserialization()
+        {
+            if (AAMFireNow) { LaunchAAM(); }
         }
     }
 }
