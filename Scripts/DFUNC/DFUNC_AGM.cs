@@ -51,17 +51,7 @@ namespace SaccFlightAndVehicles
         public Transform WorldParent;
         [SerializeField] private bool HandHeldMode = false;
         [SerializeField] private SaccEntity _EntityControl;
-        [UdonSynced, FieldChangeCallback(nameof(AGMFire))] private ushort _AGMFire;
-        public ushort AGMFire
-        {
-            set
-            {
-                if (value > _AGMFire)//if _AGMFire is higher locally, it's because a late joiner just took ownership or value was reset, so don't launch
-                { LaunchAGM(); }
-                _AGMFire = value;
-            }
-            get => _AGMFire;
-        }
+        [UdonSynced] private bool AGMFireNow;
         private float boolToggleTime;
         private bool AnimOn = false;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -261,7 +251,7 @@ namespace SaccFlightAndVehicles
         public void EnableForOthers()
         {
             if (!Piloting)
-            { gameObject.SetActive(true); AGMFire = 0; }
+            { gameObject.SetActive(true); }
             OthersEnabled = true;
         }
         public void DisableForOthers()
@@ -323,8 +313,7 @@ namespace SaccFlightAndVehicles
                                         if (((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
                                         { return; }
                                     }
-                                    AGMFire++;//launch AGM using set
-                                    RequestSerialization();
+                                    LaunchAGM_Owner();
                                     TriggerTapTime += 0.4f;//dont count every tap after first double tap as another double tap
                                     if (IsOwner)
                                     { EntityControl.SendEventToExtensions("SFEXT_O_AGMLaunch"); }
@@ -544,6 +533,30 @@ namespace SaccFlightAndVehicles
         {
             UseTrigger = 1;
             SendCustomEventDelayedFrames(nameof(UseTrigZero), 1, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
+        }
+        private void LaunchAGM_Owner()
+        {
+            FireNextSerialization = true;
+            RequestSerialization();
+            LaunchAGM();
+        }
+        private bool FireNextSerialization = false;
+        public override void OnPreSerialization()
+        {
+            if (FireNextSerialization)
+            {
+                FireNextSerialization = false;
+                AGMFireNow = true;
+            }
+            else { AGMFireNow = false; }
+        }
+        public override void OnPostSerialization(VRC.Udon.Common.SerializationResult result)
+        {
+            AGMFireNow = false;
+        }
+        public override void OnDeserialization()
+        {
+            if (AGMFireNow) { LaunchAGM(); }
         }
     }
 }
