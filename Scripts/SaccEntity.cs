@@ -1,6 +1,10 @@
 
+using System.Configuration;
+using System.Runtime.CompilerServices;
 using UdonSharp;
 using UnityEngine;
+using UnityEngine.UIElements;
+using UnityEngine.UIElements.Experimental;
 using VRC.SDKBase;
 using VRC.Udon;
 
@@ -52,6 +56,25 @@ namespace SaccFlightAndVehicles
         public bool PlaySelectSoundRight = true;
         [Tooltip("You can add seats that are NOT a child of this object, if you want to control the vehicle from outside")]
         public VRCStation[] ExternalSeats;
+        [Tooltip("Enable the Interact functionality on this object?")]
+        [FieldChangeCallback(nameof(EnableInteract))] public bool _EnableInteract = false;
+        public bool EnableInteract
+        {
+            set
+            {
+                _EnableInteract = value;
+                updateDisableInteractive();
+            }
+            get => _EnableInteract;
+        }
+        [Tooltip("Interact runs the custom pickup code in SaccEntity? (allows dual wielding on desktop, and holding without holding down grip)")]
+        public bool Interact_CustomPickup = true;
+        [Tooltip("Same as what VRC_Pickup's AllowSteal does")]
+        public bool CustomPickup_AllowSteal = true;
+        [Tooltip("Match rotation of hand?")]
+        public bool CustomPickup_SetRotation = true;
+        [Tooltip("Grab the object here")]
+        public Transform CustomPickup_GrabPosition;
         [Header("For debugging, auto filled on build")]
         public GameObject[] AAMTargets;
         [System.NonSerializedAttribute] public bool InEditor = true;//false if in clientsim
@@ -198,6 +221,10 @@ namespace SaccFlightAndVehicles
                 CenterOfMass = gameObject.transform;
                 Debug.Log(gameObject.name + ": " + "No Center Of Mass Set");
             }
+
+            if (!CustomPickup_GrabPosition) { CustomPickup_GrabPosition = transform; }
+            updateDisableInteractive();
+
             VehicleStations = GetComponentsInChildren<VRCStation>(true);
             //add EXTRASEATS to VehicleStations list
             if (ExternalSeats.Length > 0)
@@ -527,6 +554,13 @@ namespace SaccFlightAndVehicles
                 { if (EnableWhenOwner[i]) { EnableWhenOwner[i].SetActive(true); } }
                 TakeOwnerShipOfExtensions();
                 SendEventToExtensions("SFEXT_O_TakeOwnership");
+                if (CustomPickup_Synced_isHeld && !CustomPickup_localHeld)
+                {
+                    //if we took ownership and CustomPickup_Synced_isHeld is true, check if we're holding it by checking these tags
+                    //if we are not then we most likely took ownership of it from someone who quit or timed out while holding it
+                    //we send the drop event
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Drop));
+                }
             }
             else
             {
@@ -536,6 +570,12 @@ namespace SaccFlightAndVehicles
                     for (int i = 0; i < EnableWhenOwner.Length; i++)
                     { if (EnableWhenOwner[i]) { EnableWhenOwner[i].SetActive(false); } }
                     SendEventToExtensions("SFEXT_O_LoseOwnership");
+                    if (CustomPickup_localHeld)
+                    {
+                        //someone snatched it out of our hand
+                        snatched = true;
+                        CustomPickup_Drop();
+                    }
                 }
             }
             SendEventToExtensions("SFEXT_L_OwnershipTransfer");
@@ -637,7 +677,111 @@ namespace SaccFlightAndVehicles
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
             if (IsOwner)
-            { SendEventToExtensions("SFEXT_O_OnPlayerJoined"); }
+            {
+                SendEventToExtensions("SFEXT_O_OnPlayerJoined");
+                if (CustomPickup_localHeld)
+                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Pickup)); }
+            }
+        }
+        public KeyCode CustomPickup_DropKey = KeyCode.G;
+        [System.NonSerialized] public int CustomPickup_Hand = 0;
+        [System.NonSerialized] public bool CustomPickup_LeftHand;
+        [System.NonSerialized] public bool CustomPickup_localHeld;
+        public void CustomPickup_Grab()
+        {
+            int.TryParse(localPlayer.GetPlayerTag("SFCP_N"), out int numHolding);
+            if (string.IsNullOrEmpty(localPlayer.GetPlayerTag("SFCP_R")))
+            {
+                CustomPickup_Hand = 1;
+                CustomPickup_LeftHand = false;
+                localPlayer.SetPlayerTag("SFCP_R", "T");
+            }
+            else if (string.IsNullOrEmpty(localPlayer.GetPlayerTag("SFCP_L")))
+            {
+                CustomPickup_Hand = 0;
+                CustomPickup_LeftHand = true;
+                localPlayer.SetPlayerTag("SFCP_L", "T");
+            }
+            else { return; }
+            Networking.SetOwner(localPlayer, gameObject);
+            CustomPickup_localHeld = true;
+            numHolding++;
+            localPlayer.SetPlayerTag("SFCP_N", numHolding.ToString());
+            OnPickup();
+            updateDisableInteractive();
+            SendCustomEventDelayedFrames(nameof(CustomPickup_HoldLoop), 2);//so we don't pick it up and instantly fire (GetMouseButtonDown)
+        }
+        public Vector3 CustomPickup_RotationOffsetVR = new Vector3(0, 60, 90);
+        public Vector3 CustomPickup_RotationOffsetDesktop = new Vector3(0, 35, 90);
+        int numHolding_last;
+        public void CustomPickup_HoldLoop()
+        {
+            Vector3 grabOffset = CustomPickup_GrabPosition.position - transform.position;
+            if (CustomPickup_LeftHand)
+            {
+                transform.position = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position - grabOffset;
+                if (CustomPickup_SetRotation)
+                {
+                    if (InVR)
+                    { transform.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(CustomPickup_RotationOffsetVR); }
+                    else
+                    { transform.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(CustomPickup_RotationOffsetDesktop); }
+                }
+            }
+            else
+            {
+                transform.position = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position - grabOffset;
+                if (CustomPickup_SetRotation)
+                {
+                    if (InVR)
+                    { transform.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(CustomPickup_RotationOffsetVR); }
+                    else
+                    { transform.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(CustomPickup_RotationOffsetDesktop); }
+                }
+            }
+
+            float RStickPosY = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+            if (Input.GetKeyDown(CustomPickup_DropKey) || !IsOwner || RStickPosY < -0.9f)
+            {
+                CustomPickup_Drop();
+                return;
+            }
+            int numHolding = int.Parse(localPlayer.GetPlayerTag("SFCP_N"));
+            if (numHolding > numHolding_last) { OnPickupUseUp(); }
+            numHolding_last = numHolding;
+            if (!CustomPickup_LeftHand && numHolding == 1)
+            {
+                if (Input.GetMouseButtonDown(0))
+                { OnPickupUseDown(); }
+                if (Input.GetMouseButtonUp(0))
+                { OnPickupUseUp(); }
+            }
+            else
+            {
+                if (Input.GetMouseButtonDown(CustomPickup_Hand))
+                { OnPickupUseDown(); }
+                if (Input.GetMouseButtonUp(CustomPickup_Hand))
+                { OnPickupUseUp(); }
+            }
+            SendCustomEventDelayedFrames(nameof(CustomPickup_HoldLoop), 1, VRC.Udon.Common.Enums.EventTiming.Update);
+        }
+        private void CustomPickup_Drop()
+        {
+            if (!CustomPickup_localHeld) { return; }
+            if (CustomPickup_LeftHand)
+            { localPlayer.SetPlayerTag("SFCP_L", string.Empty); }
+            else
+            { localPlayer.SetPlayerTag("SFCP_R", string.Empty); }
+            int.TryParse(localPlayer.GetPlayerTag("SFCP_N"), out int numHolding);
+            numHolding = Mathf.Max(numHolding - 1, 0);
+            localPlayer.SetPlayerTag("SFCP_N", numHolding.ToString());
+            CustomPickup_localHeld = false;
+            updateDisableInteractive();
+            OnDrop();
+        }
+        public void updateDisableInteractive()
+        {
+            DisableInteractive = CustomPickup_localHeld || !EnableInteract || (CustomPickup_Synced_isHeld && !CustomPickup_AllowSteal);
         }
         public override void OnPickup()
         {
@@ -656,6 +800,15 @@ namespace SaccFlightAndVehicles
             SendEventToExtensions("SFEXT_O_OnPickup");
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Pickup));
         }
+        public override void Interact()
+        {
+            SendEventToExtensions("SFEXT_O_Interact");
+            if (Interact_CustomPickup)
+            {
+                CustomPickup_Grab();
+            }
+        }
+        bool snatched;
         public override void OnDrop()
         {
             Holding = false;
@@ -666,14 +819,27 @@ namespace SaccFlightAndVehicles
                 { EnableWhenHolding[i].SetActive(false); }
             }
             SendEventToExtensions("SFEXT_O_OnDrop");
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Drop));
+            if (!snatched)//Don't send drop if it was snatched because the drop event will arrive after the other player's grab event
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Drop)); }
+        }
+        [System.NonSerialized, FieldChangeCallback(nameof(CustomPickup_Synced_isHeld))] private bool _CustomPickup_Synced_isHeld = false;//can be used if the VRCPickup script is not in use
+        public bool CustomPickup_Synced_isHeld
+        {
+            set
+            {
+                _CustomPickup_Synced_isHeld = value;
+                updateDisableInteractive();
+            }
+            get => _CustomPickup_Synced_isHeld;
         }
         public void SendEvent_Pickup()
         {
+            CustomPickup_Synced_isHeld = true;
             SendEventToExtensions("SFEXT_G_OnPickup");
         }
         public void SendEvent_Drop()
         {
+            CustomPickup_Synced_isHeld = false;
             SendEventToExtensions("SFEXT_G_OnDrop");
         }
         public override void OnPickupUseDown()
@@ -784,7 +950,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Quaternion Spawnrotation;
         public void EntityRespawn()//can be used by simple items to respawn
         {
-            if (!Occupied && !_dead && (!EntityPickup || !EntityPickup.IsHeld))
+            if (!Occupied && !_dead && (!EntityPickup || !EntityPickup.IsHeld) && !CustomPickup_Synced_isHeld)
             {
                 Networking.SetOwner(localPlayer, gameObject);
                 IsOwner = true;
@@ -803,6 +969,8 @@ namespace SaccFlightAndVehicles
                 {
                     rb.velocity = Vector3.zero;
                     rb.angularVelocity = Vector3.zero;//editor needs this
+                    rb.position = transform.position;
+                    rb.rotation = transform.rotation;
                 }
             }
         }
