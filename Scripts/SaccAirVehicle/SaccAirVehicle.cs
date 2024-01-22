@@ -1587,6 +1587,8 @@ namespace SaccFlightAndVehicles
             {
                 VehicleTransform.localPosition = Spawnposition;
                 VehicleTransform.localRotation = Spawnrotation;
+                VehicleRigidbody.position = VehicleTransform.position;
+                VehicleRigidbody.rotation = VehicleTransform.rotation;
             }
             else
             {

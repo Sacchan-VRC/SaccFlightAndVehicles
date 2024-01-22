@@ -945,6 +945,8 @@ namespace SaccFlightAndVehicles
             Health = FullHealth;
             VehicleTransform.localPosition = Spawnposition;
             VehicleTransform.localRotation = Spawnrotation;
+            VehicleRigidbody.position = VehicleTransform.position;
+            VehicleRigidbody.rotation = VehicleTransform.rotation;
             EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
         }
         public void NotDead()
