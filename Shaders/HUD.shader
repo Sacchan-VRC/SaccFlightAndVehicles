@@ -1,6 +1,6 @@
 Shader "SF-1/HUDStencil" {
     Properties{
-        _Color ("Color", Color) = (0.5,0.5,0.5,0.0)
+        [HDR] _Color ("Color", Color) = (0.5,0.5,0.5,0.0)
         _Brightness("Brightness", Range(0,1)) = 1
     }
     SubShader{
