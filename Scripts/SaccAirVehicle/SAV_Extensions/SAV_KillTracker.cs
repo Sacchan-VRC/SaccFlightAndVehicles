@@ -66,7 +66,6 @@ namespace SaccFlightAndVehicles
             if (KillFeed)
             {
                 Networking.SetOwner(localPlayer, KillFeed.gameObject);
-                KillFeed.SetProgramVariable("Suicide", false);
                 KillFeed.SendCustomEvent("AddNewKill");
             }
         }
