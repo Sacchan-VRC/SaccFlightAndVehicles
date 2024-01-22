@@ -76,8 +76,6 @@ namespace SaccFlightAndVehicles
         public string HitEventName_Trigger = "_interact";
         [Tooltip("If you'd like to use a rigidbody for movement, put one in here")]
         public Rigidbody HandHeldRBMode_RB;
-        [Tooltip("Handle teleportation and enabling/disabling the hand held mode's rigidbody")]
-        public bool HandHeldRBMode_HandleRB = true;
         [Tooltip("Disable the hand held mode's RB if moving below this speed")]
         public float HandHeldRBMode_DisableSpeed = 1f;
         public UdonSharpBehaviour[] GrappleEventCallbacks;
@@ -103,7 +101,6 @@ namespace SaccFlightAndVehicles
         private bool Overriding_DisallowOwnerShipTransfer = false;
         private Vector3 PredictedHitPointStartScale;
         private Vector3 HoldHeight;
-        private bool HandHeldRBMode_AttachedToRB;
         public override void OnDeserialization()
         {
             if (_HookLaunched != _HookLaunchedPrev)
@@ -182,7 +179,7 @@ namespace SaccFlightAndVehicles
                                     HookedGameObject = hit.collider.gameObject;
                                     HookedTransform = hit.collider.transform;
                                     HookedTransformOffset = HookedTransform.InverseTransformPoint(hit.collider.ClosestPoint(value));
-                                    if (TwoWayForces && (!HookedEntity || !TwoWayForces_DisableIfOccupied || (!HookedEntity.Occupied && !EntityControl.CustomPickup_Synced_isHeld && (!HookedEntity.EntityPickup || !HookedEntity.EntityPickup.IsHeld))))
+                                    if (TwoWayForces && (!HookedEntity || !TwoWayForces_DisableIfOccupied || (!HookedEntity.Occupied && !HookedEntity.CustomPickup_Synced_isHeld && (!HookedEntity.EntityPickup || !HookedEntity.EntityPickup.IsHeld))))
                                     {
                                         HookedRB = HookedCollider.attachedRigidbody;
                                         if (HookedRB)
@@ -338,7 +335,7 @@ namespace SaccFlightAndVehicles
             if (HandHeldRBMode_RB)
             {
                 VehicleRB = HandHeldRBMode_RB;
-                if (HandHeldRBMode_HandleRB) { HandHeldRBMode_RB.gameObject.SetActive(false); }
+                // if (HandHeldRBMode_HandleRB) { HandHeldRBMode_RB.gameObject.SetActive(false); }
             }
             IsOwner = (bool)EntityControl.GetProgramVariable("IsOwner");
             EntityPickup = EntityControl.GetComponent<VRC_Pickup>();
@@ -367,7 +364,7 @@ namespace SaccFlightAndVehicles
             Rope_Line.gameObject.SetActive(true);
             HookLaunchTime = Time.time;
             HookLaunchRot = Hook.rotation;
-            LaunchVec = (HandHeldGunMode || (HandHeldRBMode_RB && !HandHeldRBMode_AttachedToRB) ? localPlayer.GetVelocity() : VehicleRB ? VehicleRB.velocity : Vector3.zero) + (HookLaunchPoint.forward * HookSpeed);
+            LaunchVec = ((HandHeldGunMode && !VehicleRB) || (HandHeldRBMode_RB && !VehicleRB.gameObject.activeSelf) ? localPlayer.GetVelocity() : VehicleRB ? VehicleRB.velocity : Vector3.zero) + (HookLaunchPoint.forward * HookSpeed);
             LaunchSpeed = LaunchVec.magnitude;
             Hook.parent = EntityControl.transform.parent;
             Hook.position = HookLaunchPoint.position;
@@ -537,7 +534,7 @@ namespace SaccFlightAndVehicles
                         }
                         PlayerPosLast = playerpos;
                     }
-                    if (HandHeldRBMode_RB)
+                    if (HandHeldRBMode_RB && HandHeldRBMode_RB.gameObject.activeSelf)
                     {
                         holdpos = VehicleRB.position + HoldHeight;
                         dist = Vector3.Distance(holdpos, _HookAttachPoint);
@@ -567,7 +564,11 @@ namespace SaccFlightAndVehicles
                     float PullReduction = 0f;
 
                     float SwingForce = (dist - HookLength) / _skippedFrames;//this measures the difference between frames so it has 'deltatime' including skipped frames built in, so we need to remove the pre-multiplication
-                    if (firstGrappleFrame) { SwingForce = 0; }
+                    if (firstGrappleFrame)
+                    {
+                        SwingForce = 0;
+                        firstGrappleFrame = false;
+                    }
                     if (SwingForce < 0)
                     {
                         PullReduction = SwingForce;
@@ -577,7 +578,6 @@ namespace SaccFlightAndVehicles
                     HookLength = Mathf.Min(dist, HookRange);
 
                     float WeightRatio = 1;
-
                     if (HookedRB && !HookedRB.isKinematic)
                     {
                         if (HandHeldGunMode && !HandHeldRBMode_RB)
@@ -587,9 +587,13 @@ namespace SaccFlightAndVehicles
                         else
                         {
                             if (!VehicleRB || VehicleRB.isKinematic)
-                            { WeightRatio = 0f; }
+                            {
+                                WeightRatio = 0f;
+                            }
                             else
-                            { WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass); }
+                            {
+                                WeightRatio = HookedRB.mass / (HookedRB.mass + VehicleRB.mass);
+                            }
                         }
                         Vector3 forceDirection_HookedRB = -forceDirection;
                         HookedRB.AddForceAtPosition((forceDirection_HookedRB * HookStrength * PullStrOverDist.Evaluate(dist) * Time.fixedDeltaTime + (forceDirection_HookedRB * SwingForce)) * (1f - WeightRatio), _HookAttachPoint, ForceMode.VelocityChange);
@@ -612,22 +616,6 @@ namespace SaccFlightAndVehicles
                         else
                         {
                             VehicleRB.AddForce((forceDirection * HookStrength * PullStrOverDist.Evaluate(dist) * Time.fixedDeltaTime + (forceDirection * SwingForce) + (forceDirection * PullReduction * PullReductionStrength)) * WeightRatio, ForceMode.VelocityChange);
-                        }
-                    }
-                }
-                if (HandHeldRBMode_RB)
-                {
-                    if (firstGrappleFrame)
-                    {
-                        firstGrappleFrame = false;
-                        if (!HandHeldRBMode_AttachedToRB)
-                        {
-                            if (HandHeldRBMode_HandleRB)
-                            {
-                                HandHeldRBMode_RB.gameObject.SetActive(true);
-                                TeleportRBtoPlayer();
-                            }
-                            HandHeldRBMode_AttachedToRB = true;
                         }
                     }
                 }
@@ -666,33 +654,6 @@ namespace SaccFlightAndVehicles
                     HookedRB.AddForceAtPosition((forceDirection_HookedRB * HookStrength * PullStrOverDist.Evaluate(dist) * Time.deltaTime + (forceDirection_HookedRB * SwingForce) + (forceDirection_HookedRB * PullReduction * PullReductionStrength)) * (1f - WeightRatio), _HookAttachPoint, ForceMode.VelocityChange);
                 }
             }
-        }
-        private void TeleportRBtoPlayer()
-        {
-            VehicleRB.position = localPlayer.GetPosition();
-            VehicleRB.velocity = localPlayer.GetVelocity();
-        }
-        private static void StableTeleportTo(Vector3 destinationPos)
-        {
-            var playerPos = Networking.LocalPlayer.GetPosition();
-            var playerOrigin = Networking.LocalPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Origin);
-            var posToOrigin = playerOrigin.position - playerPos;
-            var destinationOrigin = destinationPos + posToOrigin;
-
-#if UNITY_EDITOR
-            Networking.LocalPlayer.TeleportTo(
-                destinationOrigin,
-                playerOrigin.rotation,
-                VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint
-            );
-#else
-        Networking.LocalPlayer.TeleportTo(
-            destinationOrigin,
-            playerOrigin.rotation,
-            VRC_SceneDescriptor.SpawnOrientation.AlignRoomWithSpawnPoint,
-            true
-        );
-#endif
         }
         public void SFEXT_G_Explode()
         {
@@ -891,7 +852,7 @@ namespace SaccFlightAndVehicles
                 { playervel = HandHeldRBMode_RB.velocity; }
                 else
                 { playervel = localPlayer.GetVelocity(); }
-                Vector3 checkdir = ((HandHeldGunMode || (HandHeldRBMode_RB && !HandHeldRBMode_AttachedToRB) ? playervel : VehicleRB ? VehicleRB.velocity : Vector3.zero) + (HookLaunchPoint.forward * HookSpeed)).normalized;
+                Vector3 checkdir = ((HandHeldGunMode || (HandHeldRBMode_RB && !VehicleRB.gameObject.activeSelf) ? playervel : VehicleRB ? VehicleRB.velocity : Vector3.zero) + (HookLaunchPoint.forward * HookSpeed)).normalized;
                 RaycastHit targetcheck;
                 Vector3 predictedhookflight = checkdir * HookRange + playervel * AprHookFlyTime;
                 float predictedflightdist = predictedhookflight.magnitude;
@@ -972,23 +933,10 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
-            if (HandHeldRBMode_AttachedToRB)
+            if (HandHeldRBMode_RB && !HandHeldRBMode_RB.gameObject.activeSelf)
             {
-                if (HandHeldRBMode_RB && HandHeldRBMode_HandleRB)
-                {
-                    StableTeleportTo(HandHeldRBMode_RB.transform.position);
-                    localPlayer.SetVelocity(VehicleRB.velocity);
-                }
-                if ((HandHeldRBMode_RB.velocity.magnitude < HandHeldRBMode_DisableSpeed && !HookAttached) || !HandHeldRBMode_RB.gameObject.activeSelf)
-                {
-                    if (HookAttached)
-                    { ResetHook(); }
-                    HandHeldRBMode_AttachedToRB = false;
-                    if (HandHeldRBMode_HandleRB)
-                    { HandHeldRBMode_RB.gameObject.SetActive(false); }
-                    if (localPlayer.IsPlayerGrounded())
-                    { localPlayer.SetVelocity(Vector3.zero); }
-                }
+                if (HookAttached)
+                { ResetHook(); }
             }
         }
         private void PredictionOff()
@@ -999,15 +947,14 @@ namespace SaccFlightAndVehicles
         }
         public override void OnPlayerRespawn(VRCPlayerApi player)
         {
-            if (player.isLocal)
+            if (player.isLocal && _HookLaunched)
             {
                 HookLaunched = false;
-                HandHeldRBMode_AttachedToRB = false;
-                if (HandHeldRBMode_HandleRB) { HandHeldRBMode_RB.gameObject.SetActive(false); }
             }
         }
         private void DoEventCallbacks(string EventName)
         {
+            if (!IsOwner) { return; }
             for (int i = 0; i < GrappleEventCallbacks.Length; i++)
             {
                 GrappleEventCallbacks[i].SendCustomEvent(EventName);
