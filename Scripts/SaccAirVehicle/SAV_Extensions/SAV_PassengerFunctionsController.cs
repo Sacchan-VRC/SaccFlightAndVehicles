@@ -176,7 +176,7 @@ namespace SaccFlightAndVehicles
                     { if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
                     else
                     {
-                        if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, LStickFuncDegrees * LStickSelection); }
+                        if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -LStickFuncDegrees * LStickSelection); }
                     }
                 }
                 LStickSelectionLastFrame = LStickSelection;
@@ -215,7 +215,7 @@ namespace SaccFlightAndVehicles
                     { if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
                     else
                     {
-                        if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, RStickFuncDegrees * RStickSelection); }
+                        if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -RStickFuncDegrees * RStickSelection); }
                     }
                 }
                 RStickSelectionLastFrame = RStickSelection;
@@ -373,6 +373,14 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_AfterburnerOn()
         {
             SendEventToExtensions_Gunner("SFEXTP_G_AfterburnerOn");
+        }
+        public void SFEXT_G_EngineOn()
+        {
+            SendEventToExtensions_Gunner("SFEXTP_G_EngineOn");
+        }
+        public void SFEXT_G_EngineOff()
+        {
+            SendEventToExtensions_Gunner("SFEXTP_G_EngineOff");
         }
         public override void OnPlayerJoined(VRCPlayerApi player)
         {
