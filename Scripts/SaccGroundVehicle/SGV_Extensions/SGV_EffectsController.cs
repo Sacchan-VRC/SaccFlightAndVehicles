@@ -53,6 +53,14 @@ namespace SaccFlightAndVehicles
         public AudioSource GearDown;
         [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
         public Transform testcamera;
+        public bool DoCaterpillarTracks;
+        public Transform[] TrackEmptys;
+        private float[] TrackDistance;
+        private Vector3[] TrackLast;
+        public Renderer TracksRenderer;
+        public float TrackSpeedMulti = 1f;
+        public int[] TrackMaterialSlots;
+        private Material[] Tracks;
         private SaccEntity EntityControl;
         private Animator VehicleAnimator;
         private bool InWater;
@@ -160,7 +168,17 @@ namespace SaccFlightAndVehicles
             {
                 BigCrashInsidePos[i] = BigCrashInside[i].transform.localPosition;
             }
-
+            if (DoCaterpillarTracks)
+            {
+                int numtracks = TrackMaterialSlots.Length;
+                Tracks = new Material[numtracks];
+                TrackDistance = new float[numtracks];
+                TrackLast = new Vector3[numtracks];
+                for (int i = 0; i < TrackMaterialSlots.Length; i++)
+                {
+                    Tracks[i] = TracksRenderer.materials[TrackMaterialSlots[i]];
+                }
+            }
 
             DoEffects = 0f;
             Sleeping = false;
@@ -225,6 +243,18 @@ namespace SaccFlightAndVehicles
             if (!InWater && HasFuel)
             {
                 VehicleAnimator.SetFloat(REVS_STRING, (float)SGVControl.GetProgramVariable("Revs") / RevLimiter);
+            }
+            if (DoCaterpillarTracks)
+            {
+                for (int i = 0; i < TrackEmptys.Length; i++)
+                {
+                    Vector3 Dif = TrackEmptys[i].position - TrackLast[i];
+                    Dif.y = 0;
+                    float dist = Dif.magnitude;
+                    TrackLast[i] = TrackEmptys[i].position;
+                    float forward = Vector3.Dot(TrackEmptys[i].forward, Dif) > 0 ? 1 : -1;
+                    Tracks[i].mainTextureOffset += new Vector2(0, TrackSpeedMulti * dist * forward);
+                }
             }
             if (!Occupied)
             {
