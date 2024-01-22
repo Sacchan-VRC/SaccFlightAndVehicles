@@ -106,7 +106,7 @@ namespace SaccFlightAndVehicles
                     thisplayer.SetVoiceGain(VoiceGain);
                 }
             }
-            if (NextVehicle.EntityPickup && NextVehicle.EntityPickup.IsHeld)
+            if ((NextVehicle.EntityPickup && NextVehicle.EntityPickup.IsHeld) || NextVehicle.CustomPickup_Synced_isHeld)
             {
                 VRCPlayerApi thisplayer = Networking.GetOwner(NextVehicle.gameObject);
                 if (thisplayer != null)

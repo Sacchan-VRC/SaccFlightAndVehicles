@@ -89,7 +89,7 @@ namespace SaccFlightAndVehicles
         }
         public void NewChannel()
         {
-            if (EntityControl.Piloting)
+            if (EntityControl.Using)
             {
                 RadioOn = (bool)RadioBase.GetProgramVariable("RadioEnabled");
                 if (RadioOn)
