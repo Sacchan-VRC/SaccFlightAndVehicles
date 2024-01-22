@@ -10,13 +10,9 @@ namespace SaccFlightAndVehicles
     public class SaccFlight : UdonSharpBehaviour
     {
         private VRCPlayerApi localPlayer;
-        public float ThrustStrength = .33f;
+        [SerializeField] private float Thrust_Strength = 29.7f;
         [Tooltip("Strength of extra thrust applied when trying to thrust in direction going against movement")]
-        public float BackThrustStrength = .5f;
-        [System.NonSerializedAttribute] public float _thruststrength;
-        [System.NonSerializedAttribute] public float _backthruststrength;
-        private float controllertriggerR;
-        private float controllertriggerL;
+        [SerializeField] private float Back_Thrust_Strength = 45f;
         private bool InVR = false;
         private void Start()
         {
@@ -24,9 +20,6 @@ namespace SaccFlightAndVehicles
             if (localPlayer == null) { gameObject.SetActive(false); }//fixedupdate runs before this happens and causes a crash in the editor until vrc fix it
             else if (localPlayer.IsUserInVR())
             { InVR = true; }
-            //to match 90fps with deltatime
-            _thruststrength = ThrustStrength * 90;
-            _backthruststrength = BackThrustStrength * 90;
         }
         private void FixedUpdate()
         {
@@ -38,23 +31,20 @@ namespace SaccFlightAndVehicles
 
                 Vector3 PlayerVel = localPlayer.GetVelocity();
 
-                Quaternion newrot;
                 Vector3 NewForwardVec;
                 if (InVR)
                 {
-                    newrot = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0);
-                    NewForwardVec = newrot * Vector3.forward;
+                    NewForwardVec = (localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0)) * Vector3.forward;
                 }
                 else//Desktop
                 {
-                    newrot = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation;
-                    NewForwardVec = newrot * (Vector3.forward);
+                    NewForwardVec = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward;
                 }
                 //get backwards amount
-                float BackThrustAmount = -((Vector3.Dot(PlayerVel, NewForwardVec)) * _backthruststrength * DeltaTime);
-                NewForwardVec = NewForwardVec * _thruststrength * ForwardThrust * DeltaTime * Mathf.Max(1, (BackThrustAmount * ForwardThrust));
+                float BackThrustAmount = -(Vector3.Dot(PlayerVel, NewForwardVec) * Back_Thrust_Strength * DeltaTime);
+                NewForwardVec = NewForwardVec * Thrust_Strength * ForwardThrust * DeltaTime * Mathf.Max(1, BackThrustAmount * ForwardThrust);
 
-                Vector3 NewUpVec = ((Vector3.up * _thruststrength) * UpThrust * DeltaTime);
+                Vector3 NewUpVec = Vector3.up * Thrust_Strength * UpThrust * DeltaTime;
 
 #if UNITY_EDITOR
                 //SetVelocity overrides all other forces in clientsim so we need to add gravity ourselves
