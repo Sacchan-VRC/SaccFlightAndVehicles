@@ -1,5 +1,3 @@
-
-using System.Drawing.Text;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
