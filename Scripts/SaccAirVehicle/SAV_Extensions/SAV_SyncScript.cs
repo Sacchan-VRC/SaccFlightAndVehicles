@@ -352,11 +352,13 @@ namespace SaccFlightAndVehicles
         }
         private void ExtrapolationAndSmoothing()
         {
+#if UNITY_EDITOR
             if (Deserialized)
             {
                 Deserialized = false;
-                DeserializationStuff();
+                OnDeserialization();
             }
+#endif
             float deltatime = Time.deltaTime;
             double time;
             Vector3 Deriv = Vector3.zero;
@@ -409,13 +411,6 @@ namespace SaccFlightAndVehicles
         { IdleUpdateMode = true; }
         private void ExitIdleMode()
         { IdleUpdateMode = false; }
-        public override void OnDeserialization()
-        {
-            if (!IsOwner)//only do anything if OnDeserialization was for this script
-            {
-                DeserializationCheck();
-            }
-        }
 #if UNITY_EDITOR
         public float LagSimDelay;
         private float LagSimTime;
@@ -426,13 +421,11 @@ namespace SaccFlightAndVehicles
             if (TestMode)
             { DeserializationCheck(); }
         }
-#endif
         private bool Deserialized = false;
         private void DeserializationCheck()
         {
             if (O_UpdateTime != O_LastUpdateTime)//only do anything if OnDeserialization was for this script
             {
-#if UNITY_EDITOR
                 if (!LagSimWait)
                 {
                     if (LagSimDelay != 0)
@@ -453,11 +446,11 @@ namespace SaccFlightAndVehicles
                         return;
                     }
                 }
-#endif
                 Deserialized = true;
             }
         }
-        public void DeserializationStuff()
+#endif
+        public override void OnDeserialization()
         {
             LastAcceleration = Acceleration;
             LastCurAngMom = CurAngMom;
