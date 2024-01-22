@@ -13,7 +13,7 @@ namespace SaccFlightAndVehicles
         private SaccGroundVehicle SGVControl;
         [Tooltip("Height added to vehicle when it's reset")]
         public float AddedHeight = 0f;
-        [Tooltip("Vehicle must be moving below this speed to allow reset")]
+        [Tooltip("Vehicle must be moving below this speed to allow reset, meters/sec")]
         public float AllowRespawnSpeed = 9999f;
         [Tooltip("Set vehicle's speed to zero when reset")]
         public bool StopCarOnReset = false;
@@ -24,6 +24,7 @@ namespace SaccFlightAndVehicles
         private bool InVR;
         private bool UseLeftTrigger;
         private bool TriggerLastFrame;
+        private Rigidbody VehicleRigidbody;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
@@ -31,6 +32,7 @@ namespace SaccFlightAndVehicles
             VehicleTransform = EntityControl.transform;
             InVR = EntityControl.InVR;
             SGVControl = (SaccGroundVehicle)EntityControl.GetExtention(GetUdonTypeName<SaccGroundVehicle>());
+            VehicleRigidbody = EntityControl.VehicleRigidbody;
         }
         public void DFUNC_Selected()
         {
@@ -81,7 +83,9 @@ namespace SaccFlightAndVehicles
                 if (rb) { rb.velocity = Vector3.zero; }
             }
             VehicleTransform.rotation = Quaternion.Euler(new Vector3(0f, VehicleTransform.rotation.eulerAngles.y, 0f));
+            VehicleRigidbody.rotation = VehicleTransform.rotation;
             VehicleTransform.position += Vector3.up * AddedHeight;
+            VehicleRigidbody.position = VehicleTransform.position;
             if (SGVControl)
             {
                 SGVControl.YawInput = 0;
