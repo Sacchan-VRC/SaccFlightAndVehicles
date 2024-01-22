@@ -75,12 +75,16 @@ namespace SaccFlightAndVehicles
         public bool CustomPickup_SetRotation = true;
         [Tooltip("Grab the object here")]
         public Transform CustomPickup_GrabPosition;
+        public KeyCode CustomPickup_DropKey = KeyCode.G;
+        public Vector3 CustomPickup_RotationOffsetVR = new Vector3(0, 60, 90);
+        public Vector3 CustomPickup_RotationOffsetDesktop = new Vector3(0, 35, 90);
         [Header("For debugging, auto filled on build")]
         public GameObject[] AAMTargets;
         [System.NonSerializedAttribute] public bool InEditor = true;//false if in clientsim
         private VRCPlayerApi localPlayer;
         [System.NonSerialized] public VRCPlayerApi OwnerAPI;
         [System.NonSerializedAttribute] public VRC_Pickup EntityPickup;
+        [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
         [System.NonSerializedAttribute] public bool Piloting;
         [System.NonSerializedAttribute] public int UsersID;
         [System.NonSerializedAttribute] public string UsersName;
@@ -212,6 +216,7 @@ namespace SaccFlightAndVehicles
             { if (EnableWhenOwner[i]) { EnableWhenOwner[i].SetActive(IsOwner); } }
             Spawnposition = transform.localPosition;
             Spawnrotation = transform.localRotation;
+            VehicleRigidbody = GetComponent<Rigidbody>();
             if (CenterOfMass)
             {
                 SetCoM();
@@ -586,6 +591,8 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             Occupied = true;
+            localPlayer.SetPlayerTag("SF_LocalPiloting", "T");
+            localPlayer.SetPlayerTag("SF_LocalInVehicle", "T");
             if (LStickNumFuncs == 1)
             {
                 Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected");
@@ -618,27 +625,33 @@ namespace SaccFlightAndVehicles
                 UsersName = player.displayName;
                 UsersID = player.playerId;
                 PilotEnterTime = Time.time;
+                localPlayer.SetPlayerTag("SF_InVehicle", "T");
+                player.SetPlayerTag("SF_IsPilot", "T");
                 SendEventToExtensions("SFEXT_G_PilotEnter");
             }
         }
         public void PilotExitVehicle(VRCPlayerApi player)
         {
+            if (player.isLocal)
+            {
+                Using = false;
+                Piloting = false;
+                InVehicle = false;
+                localPlayer.SetPlayerTag("SF_LocalPiloting", "");
+                localPlayer.SetPlayerTag("SF_LocalInVehicle", "");
+                if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
+                for (int i = 0; i < EnableInVehicle.Length; i++)
+                { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(false); }
+                SendEventToExtensions("SFEXT_O_PilotExit");
+            }
+            localPlayer.SetPlayerTag("SF_InVehicle", "");
+            player.SetPlayerTag("SF_IsPilot", "");
             PilotExitTime = Time.time;
             LStickSelection = -1;
             RStickSelection = -1;
             LStickSelectionLastFrame = -1;
             RStickSelectionLastFrame = -1;
             SendEventToExtensions("SFEXT_G_PilotExit");
-            if (player.isLocal)
-            {
-                Using = false;
-                Piloting = false;
-                InVehicle = false;
-                if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
-                for (int i = 0; i < EnableInVehicle.Length; i++)
-                { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(false); }
-                SendEventToExtensions("SFEXT_O_PilotExit");
-            }
             Occupied = false;
             UsersName = string.Empty;
             UsersID = -1;
@@ -647,6 +660,7 @@ namespace SaccFlightAndVehicles
         {
             Passenger = true;
             InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
+            localPlayer.SetPlayerTag("SF_LocalInVehicle", "T");
             if (LStickDisplayHighlighter)
             { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             if (RStickDisplayHighlighter)
@@ -661,6 +675,7 @@ namespace SaccFlightAndVehicles
         {
             Passenger = false;
             InVehicle = false;
+            localPlayer.SetPlayerTag("SF_LocalInVehicle", "");
             if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
             for (int i = 0; i < EnableInVehicle.Length; i++)
             { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(false); }
@@ -668,10 +683,12 @@ namespace SaccFlightAndVehicles
         }
         public void PassengerEnterVehicleGlobal()
         {
+            localPlayer.SetPlayerTag("SF_InVehicle", "T");
             SendEventToExtensions("SFEXT_G_PassengerEnter");
         }
         public void PassengerExitVehicleGlobal()
         {
+            localPlayer.SetPlayerTag("SF_InVehicle", "");
             SendEventToExtensions("SFEXT_G_PassengerExit");
         }
         public override void OnPlayerJoined(VRCPlayerApi player)
@@ -683,7 +700,6 @@ namespace SaccFlightAndVehicles
                 { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Pickup)); }
             }
         }
-        public KeyCode CustomPickup_DropKey = KeyCode.G;
         [System.NonSerialized] public int CustomPickup_Hand = 0;
         [System.NonSerialized] public bool CustomPickup_LeftHand;
         [System.NonSerialized] public bool CustomPickup_localHeld;
@@ -711,8 +727,6 @@ namespace SaccFlightAndVehicles
             updateDisableInteractive();
             SendCustomEventDelayedFrames(nameof(CustomPickup_HoldLoop), 2);//so we don't pick it up and instantly fire (GetMouseButtonDown)
         }
-        public Vector3 CustomPickup_RotationOffsetVR = new Vector3(0, 60, 90);
-        public Vector3 CustomPickup_RotationOffsetDesktop = new Vector3(0, 35, 90);
         int numHolding_last;
         public void CustomPickup_HoldLoop()
         {
@@ -865,10 +879,9 @@ namespace SaccFlightAndVehicles
         public void SetCoM()
         {
             //WARNING: Setting this will reset ITR in SaccAirVehicle etc.
-            Rigidbody rb = GetComponent<Rigidbody>();
-            if (rb)
+            if (VehicleRigidbody)
             {
-                GetComponent<Rigidbody>().centerOfMass = transform.InverseTransformDirection(CenterOfMass.position - transform.position);//correct position if scaled}
+                VehicleRigidbody.centerOfMass = transform.InverseTransformDirection(CenterOfMass.position - transform.position);//correct position if scaled}
             }
             SendEventToExtensions("SFEXT_L_CoMSet");
         }
