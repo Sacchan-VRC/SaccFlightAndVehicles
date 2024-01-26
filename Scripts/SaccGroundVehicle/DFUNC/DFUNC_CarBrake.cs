@@ -150,7 +150,7 @@ namespace SaccFlightAndVehicles
         {
             Selected = false;
             Piloting = false;
-            if (EnableBrakeOnExit)
+            if (EnableBrakeOnExit && !GrappleActive)
             {
                 SetBrakeOne();
             }
@@ -314,6 +314,20 @@ namespace SaccFlightAndVehicles
                 gameObject.SetActive(false);
             }
             IsOwner = false;
+        }
+        //Don't enable the brake if the car is using it's grapple when you exit to make towing easier
+        private bool GrappleActive;
+        private int NumGrapplesActive;
+        public void SFEXT_G_GrappleInactive()
+        {
+            NumGrapplesActive--;
+            if (NumGrapplesActive == 0)
+            { GrappleActive = false; }
+        }
+        public void SFEXT_G_GrappleActive()
+        {
+            NumGrapplesActive++;
+            GrappleActive = true;
         }
     }
 }
