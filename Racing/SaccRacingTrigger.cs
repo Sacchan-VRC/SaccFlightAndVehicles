@@ -170,13 +170,7 @@ namespace SaccFlightAndVehicles
             if (Physics.Raycast(PlaneClosestPos, PlaneRigidbody.GetPointVelocity(PlaneClosestPos), out hit, 50, ThisObjLayer, QueryTriggerInteraction.Collide))
             {
                 PlaneDistanceFromCheckPoint = hit.distance;
-                //Debug.Log("racetrigger hit");
-                //Debug.Log(string.Concat("dist: ", hit.distance));
             }
-            /*             else
-                        {
-                            Debug.Log("racetrigger miss");
-                        } */
             ThisCapsuleCollider.enabled = true;
             if (RaceCountdown)
             {
@@ -474,7 +468,11 @@ namespace SaccFlightAndVehicles
             CurrentCourseSelection = RaceToggler.CurrentCourseSelection;
             if (CurrentCourseSelection != -1)
             {
-                if (Racename_text) { Racename_text.text = RaceToggler.Races[CurrentCourseSelection].RaceName; }
+                if (Racename_text)
+                {
+                    Racename_text.text = RaceToggler.Races[CurrentCourseSelection].RaceName;
+                    if (!TrackForward) { Racename_text.text += " (R)"; }
+                }
                 CurrentCourse = RaceToggler.Races[CurrentCourseSelection].GetComponent<SaccRaceCourseAndScoreboard>();
                 CurrentTrackAllowReverse = CurrentCourse.AllowReverse;
                 if (TrackForward || !CurrentTrackAllowReverse)
