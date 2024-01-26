@@ -850,6 +850,7 @@ namespace SaccFlightAndVehicles
             }
         }
         float Steps_Error;
+        bool frame_even = true;
         private void FixedUpdate()
         {
             if (!IsOwner) { return; }
@@ -882,6 +883,31 @@ namespace SaccFlightAndVehicles
             {
                 Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, Time.fixedDeltaTime * EngineSlowDown)), 0f);
             }
+            // Alternate order of processing of wheels to make the car drive straight.
+            // I don't think there's another way of fixing that without completely changing how wheel works.
+            // would require communication between wheels and removal of substep?
+            if (frame_even)
+            {
+                for (int i = 0; i < DriveWheels.Length; i++)
+                { DriveWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
+                for (int i = 0; i < SteerWheels.Length; i++)
+                { SteerWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
+                for (int i = 0; i < OtherWheels.Length; i++)
+                { OtherWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
+            }
+            else
+            {
+                int numDWheels = DriveWheels.Length - 1;
+                for (int i = 0; i < DriveWheels.Length; i++)
+                { DriveWheels[numDWheels - i].SendCustomEvent("Wheel_FixedUpdate"); }
+                int numSWheels = SteerWheels.Length - 1;
+                for (int i = 0; i < SteerWheels.Length; i++)
+                { SteerWheels[numSWheels - i].SendCustomEvent("Wheel_FixedUpdate"); }
+                int numOWheels = OtherWheels.Length - 1;
+                for (int i = 0; i < OtherWheels.Length; i++)
+                { OtherWheels[numOWheels - i].SendCustomEvent("Wheel_FixedUpdate"); }
+            }
+            frame_even = !frame_even;
 
             VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, 1 - Mathf.Pow(0.5f, Drag * Time.fixedDeltaTime));
         }
@@ -1075,8 +1101,6 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             GDamageToTake = 0f;
             AllGs = 0f;
-            VehicleRigidbody.velocity = CurrentVel;
-            LastFrameVel = CurrentVel;
             InVR = EntityControl.InVR;
             SetCollidersLayer(OnboardVehicleLayer);
             SetWheelDriver();

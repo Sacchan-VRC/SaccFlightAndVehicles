@@ -269,9 +269,9 @@ namespace SaccFlightAndVehicles
             }
         }
         float Steps_Error;
-        public void FixedUpdate()
+        public void Wheel_FixedUpdate()
         {
-            if (!IsOwner || Sleeping) { return; }
+            if (Sleeping) { return; }
             if (Piloting && IsDriveWheel)//only do subframe Stepsations if driving
             {
                 float StepsFloat = ((Time.fixedDeltaTime) * NumStepsSec);
@@ -667,7 +667,7 @@ namespace SaccFlightAndVehicles
             {
                 LastTouchedTransform = SusOut.collider.transform;
                 LastTouchedTransform_Position = LastTouchedTransform.position;
-                LastTouchedTransform_RB = LastTouchedTransform.GetComponent<Rigidbody>();
+                LastTouchedTransform_RB = SusOut.collider.attachedRigidbody;
                 if (LastTouchedTransform_RB && !LastTouchedTransform_RB.isKinematic)
                 {
                     LastTouchedTransform_Speed = LastTouchedTransform_RB.GetPointVelocity(SusOut.point);
