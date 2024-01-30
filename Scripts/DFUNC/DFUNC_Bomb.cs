@@ -66,7 +66,7 @@ namespace SaccFlightAndVehicles
         private float reloadspeed;
         private bool LeftDial = false;
         private bool Piloting = false;
-        private bool OthersEnabled = false;
+        private bool ObjectEnabled = false;
         private bool func_active = false;
         private int DialPosition = -999;
         private int NumChildrenStart;
@@ -118,7 +118,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotExit()
         {
-            if (OthersEnabled) { DisableForOthers(); }
+            if (ObjectEnabled) { DisableForAll(); }
             if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
             { SetBoolOff(); }
         }
@@ -138,12 +138,12 @@ namespace SaccFlightAndVehicles
         {
             TriggerLastFrame = true;
             func_active = true;
+            if (!ObjectEnabled)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForAll));
+            }
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
-            if (!OthersEnabled)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers));
-            }
             if (AtGScreen) AtGScreen.SetActive(true);
             if (AtGCam)
             {
@@ -161,12 +161,12 @@ namespace SaccFlightAndVehicles
             HoldingTrigger_Held = false;
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
-            if (OthersEnabled)
+            if (ObjectEnabled)
             {
                 if (IsOwner)
                 {
                     //Will only be false if is a handheld weapon that was just grabbed out of your hands
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers));
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForAll));
                 }
             }
             if (AtGScreen) { AtGScreen.SetActive(false); }
@@ -249,17 +249,15 @@ namespace SaccFlightAndVehicles
             if (BombAnimator && AnimFloatName != string.Empty) { BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider); }
             if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
         }
-        public void EnableForOthers()
+        public void EnableForAll()
         {
-            if (!Piloting)
-            { gameObject.SetActive(true); }
-            OthersEnabled = true;
+            gameObject.SetActive(true);
+            ObjectEnabled = true;
         }
-        public void DisableForOthers()
+        public void DisableForAll()
         {
-            if (!Piloting)
-            { gameObject.SetActive(false); }
-            OthersEnabled = false;
+            gameObject.SetActive(false);
+            ObjectEnabled = false;
         }
         private void Update()
         {
@@ -270,7 +268,7 @@ namespace SaccFlightAndVehicles
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if ((Trigger > 0.75 && !Held) || HoldingTrigger_Held || (!Held && Input.GetKey(KeyCode.Space)))
+                if ((Trigger > 0.75 || Input.GetKey(KeyCode.Space)) && !Held || HoldingTrigger_Held)
                 {
                     if (!TriggerLastFrame)
                     {
@@ -279,7 +277,7 @@ namespace SaccFlightAndVehicles
                             if (SAVControl && ((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
                             { return; }
                         }
-                        if (NumBomb > 0 && (AllowFiringWhenGrounded || (!SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing"))) && ((Time.time - LastBombDropTime) > BombDelay))
+                        if (NumBomb > 0 && (AllowFiringWhenGrounded || !SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
                         {
                             LaunchBomb_Owner();
                         }
@@ -383,6 +381,13 @@ namespace SaccFlightAndVehicles
                 { EntityControl.RStickSelection = -1; }
                 else
                 { EntityControl.RStickSelection = DialPosition; }
+            }
+        }
+        public void SFEXT_O_OnPlayerJoined()
+        {
+            if (IsOwner && ObjectEnabled)
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForAll));
             }
         }
         private bool FireNextSerialization = false;
