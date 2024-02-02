@@ -286,7 +286,7 @@ namespace SaccFlightAndVehicles
             {
                 float strvalue = SaccFlightStrengthSlider.value;
                 SaccFlightStrengthSliderNumber.text = strvalue.ToString("F2");
-                SaccFlight.SetProgramVariable("_thruststrength", strvalue * 90);
+                SaccFlight.SetProgramVariable("Thrust_Strength", strvalue * 90);
             }
         }
         public void Reset()
