@@ -17,7 +17,7 @@ namespace SaccFlightAndVehicles
         public GameObject Dial_Funcon;
         public float HookSpeed = 300f;
         public float SwingStrength = 20f;
-        [System.NonSerialized] public SaccFlightAndVehicles.SaccEntity EntityControl;
+        [System.NonSerialized] public SaccEntity EntityControl;
         private Rigidbody VehicleRB;
         [Tooltip("Hook launches from here, in this transform's forward direction")]
         public Transform HookLaunchPoint;
@@ -95,7 +95,7 @@ namespace SaccFlightAndVehicles
         private VRC_Pickup EntityPickup;
         private bool InVr;
         private VRCPlayerApi localPlayer;
-        private SaccFlightAndVehicles.SaccEntity HookedEntity;
+        private SaccEntity HookedEntity;
         //these 2 variables are only used if TwoWayForces_LocalForceMode is true
         private bool NonLocalAttached;//if you are in a vehicle that is attached
         private bool PlayReelIn = true;
@@ -371,7 +371,7 @@ namespace SaccFlightAndVehicles
             Rope_Line.gameObject.SetActive(true);
             HookLaunchTime = Time.time;
             HookLaunchRot = Hook.rotation;
-            LaunchVec = ((HandHeldGunMode && !VehicleRB) || (HandHeldRBMode_RB && !VehicleRB.gameObject.activeSelf) ? localPlayer.GetVelocity() : VehicleRB ? VehicleRB.velocity : Vector3.zero) + (HookLaunchPoint.forward * HookSpeed);
+            LaunchVec = ((HandHeldGunMode && (!VehicleRB || VehicleRB.isKinematic)) || (HandHeldRBMode_RB && (!VehicleRB.gameObject.activeSelf || VehicleRB.isKinematic)) ? localPlayer.GetVelocity() : VehicleRB ? VehicleRB.velocity : Vector3.zero) + (HookLaunchPoint.forward * HookSpeed);
             //make grappling more forgiving by grappling the last targeted point if you're going to miss
             if (DoHitPrediction)
             {
@@ -952,7 +952,7 @@ namespace SaccFlightAndVehicles
                     }
                     else { TriggerLastFrame = false; }
                 }
-                else if (CustomPickupMode)
+                else
                 {
                     float Trigger;
                     if (EntityControl.CustomPickup_LeftHand)
