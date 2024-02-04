@@ -21,11 +21,10 @@ namespace SaccFlightAndVehicles
         public float WheelRadius;
         public float SpringForceMulti = .25f;
         public float DampingForceMulti = 0.01111111f;
-        public float DampingForce_BottomOutMulti = 5f;
         [Tooltip("Limit suspension force so that the car doesn't fly up when going up large step instantly")]
         public float MaxSuspensionForce = .2f;
-        //[Tooltip("Limit Damping force so that the car doesn't behave strangely when leaving a ramp")]
-        private float MaxNegativeDamping = 0f;
+        // [Tooltip("Limit Damping when suspension is decomopressing?")]
+        // public float MaxNegDamping = 999999f;
         [Tooltip("Extra height on the raycast origin to prevent the wheel from sticking through the floor")]
         public float ExtraRayCastDistance = .5f;
         public float Grip = 7f;
@@ -321,14 +320,6 @@ namespace SaccFlightAndVehicles
                 Vector3 SpringForce = (SusDirection/* WheelPoint.up */ * compression * SpringForceMulti) * fixedDT;
                 float damping = (compression - compressionLast);
                 compressionLast = compression;
-                if (compression > 1f)//bottomed out
-                {
-                    damping *= DampingForce_BottomOutMulti;
-                }
-                if (damping < -MaxNegativeDamping)
-                {
-                    damping = -MaxNegativeDamping;
-                }
                 //Damping force: The more the difference in compression between updates, the more force
                 Vector3 DampingForce = SusDirection/* WheelPoint.up */ * (damping * DampingForceMulti);
                 //these are added together, but both contain deltatime, potential deltatime problem source?
