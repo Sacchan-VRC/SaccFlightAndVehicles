@@ -46,6 +46,11 @@ namespace SaccFlightAndVehicles
         public bool UseMainFuel = false;
         [Tooltip("If using main fuel, use this much per second")]
         public float MainFuelUsePerSecond = 30f;
+        [Header("Overheat mode:")]
+        [Tooltip("Silly mode where you have infinite boost but your car explodes when it overheats")]
+        public bool BoostOverheatMode;
+        [Tooltip("Boost is recovered at this speed")]
+        public float OverheadMode_replenishSpeed = 0.75f;
         [Header("Debug")]
         [UdonSynced, FieldChangeCallback(nameof(Boosting))] public float _Boosting;
         public float Boosting
@@ -96,9 +101,9 @@ namespace SaccFlightAndVehicles
             else
             {
                 if (_BoostRemainingAnimFloatName != string.Empty)//prevent missing parameter warning
-                { BoostRemaining = BoostInSeconds; }
+                { BoostRemaining = BoostOverheatMode ? 0 : BoostInSeconds; }
                 else
-                { _BoostRemaining = BoostInSeconds; }
+                { _BoostRemaining = BoostOverheatMode ? 0 : BoostInSeconds; }
             }
             Boosting = 0;
         }
@@ -115,9 +120,17 @@ namespace SaccFlightAndVehicles
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                 }
                 float BoostKeyb = Input.GetKey(BoostKey) ? 1f : 0f;
-                float PilotBoosting = Mathf.Max(Trigger, BoostKeyb);
+                float PilotBoosting;
+                if (BoostOverheatMode)
+                {
+                    PilotBoosting = Mathf.Max(Trigger, BoostKeyb) > .75f ? 1 : 0;
+                }
+                else
+                {
+                    PilotBoosting = Mathf.Max(Trigger, BoostKeyb);
+                }
 
-                if (PilotBoosting > 0 && (_BoostRemaining > 0 || UseMainFuel && (float)SGVControl.GetProgramVariable("Fuel") > 0))
+                if (PilotBoosting > 0 && ((_BoostRemaining > 0 || BoostOverheatMode) || UseMainFuel && (float)SGVControl.GetProgramVariable("Fuel") > 0))
                 {
                     if (BoostType_Force)
                     {
@@ -132,7 +145,18 @@ namespace SaccFlightAndVehicles
                         }
                         else
                         {
-                            BoostRemaining -= Time.deltaTime * PilotBoosting * (float)SGVControl.GetProgramVariable("Revs") / RevLimiter;
+                            if (BoostOverheatMode)
+                            {
+                                if (BoostRemaining * BoostRemainingDivider >= 1)
+                                {
+                                    SGVControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                                }
+                                BoostRemaining += Time.deltaTime * PilotBoosting;
+                            }
+                            else
+                            {
+                                BoostRemaining -= Time.deltaTime * PilotBoosting * (float)SGVControl.GetProgramVariable("Revs") / RevLimiter;
+                            }
                         }
                     }
                     boostingLast = true;
@@ -152,6 +176,10 @@ namespace SaccFlightAndVehicles
                     { SGVControl.SetProgramVariable("DriveSpeed", StartDriveSpeed); }
                     RequestSerialization();
                 }
+                else if (BoostOverheatMode)
+                {
+                    BoostRemaining = Mathf.Max(BoostRemaining - (Time.deltaTime * OverheadMode_replenishSpeed), 0);
+                }
             }
         }
         public void SFEXT_G_RespawnButton()
@@ -164,7 +192,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_ReSupply()
         {
-            if (UseMainFuel) { return; }
+            if (UseMainFuel || BoostOverheatMode) { return; }
             if (_BoostRemaining != BoostInSeconds)
             {
                 SGVControl.SetProgramVariable("ReSupplied", (int)SGVControl.GetProgramVariable("ReSupplied") + 1);
@@ -178,7 +206,9 @@ namespace SaccFlightAndVehicles
         private void Reset()
         {
             Boosting = 0;
-            if (!UseMainFuel) { BoostRemaining = BoostInSeconds; }
+            if (BoostOverheatMode) { BoostRemaining = 0; }
+            else
+            { if (!UseMainFuel) { BoostRemaining = BoostInSeconds; } }
             if ((bool)SGVControl.GetProgramVariable("IsOwner"))
             {
                 RequestSerialization();
@@ -215,15 +245,31 @@ namespace SaccFlightAndVehicles
         }
         private void FixedUpdate()
         {
-            if (ApplyBoostForce)
+            if (BoostType_Force)
             {
-                VehicleRigidbody.AddForceAtPosition(Boosting * BoostForce * BoostPoint.forward, BoostPoint.position, ForceMode.Acceleration);
-                if (UseMainFuel)
+                if (ApplyBoostForce)
                 {
-                    SGVControl.SetProgramVariable("Fuel", (float)SGVControl.GetProgramVariable("Fuel") - (MainFuelUsePerSecond * Time.deltaTime * Boosting));
+                    VehicleRigidbody.AddForceAtPosition(Boosting * BoostForce * BoostPoint.forward, BoostPoint.position, ForceMode.Acceleration);
+                    if (UseMainFuel)
+                    {
+                        SGVControl.SetProgramVariable("Fuel", (float)SGVControl.GetProgramVariable("Fuel") - (MainFuelUsePerSecond * Time.deltaTime * Boosting));
+                    }
+                    else
+                    {
+                        if (BoostOverheatMode)
+                        {
+                            if (BoostRemaining * BoostRemainingDivider >= 1)
+                            {
+                                SGVControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                            }
+                        }
+                        BoostRemaining -= Time.fixedDeltaTime * Boosting;
+                    }
                 }
-                else
-                { BoostRemaining -= Time.deltaTime * Boosting; }
+                else if (BoostOverheatMode)
+                {
+                    BoostRemaining = Mathf.Max(BoostRemaining - (Time.deltaTime * OverheadMode_replenishSpeed), 0);
+                }
             }
         }
     }
