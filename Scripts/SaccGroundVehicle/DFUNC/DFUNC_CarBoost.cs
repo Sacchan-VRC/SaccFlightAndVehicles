@@ -1,4 +1,5 @@
 ﻿
+using BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp;
 using UdonSharp;
 using UnityEngine;
 using VRC.SDKBase;
@@ -132,6 +133,8 @@ namespace SaccFlightAndVehicles
 
                 if (PilotBoosting > 0 && ((_BoostRemaining > 0 || BoostOverheatMode) || UseMainFuel && (float)SGVControl.GetProgramVariable("Fuel") > 0))
                 {
+                    boostingLast = true;
+                    Boosting = PilotBoosting;
                     if (BoostType_Force)
                     {
                         ApplyBoostForce = true;
@@ -159,8 +162,6 @@ namespace SaccFlightAndVehicles
                             }
                         }
                     }
-                    boostingLast = true;
-                    Boosting = PilotBoosting;
                     if (Time.time - LastUpdateTime > 0.3f)
                     {
                         RequestSerialization();
@@ -217,6 +218,8 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Selected()
         {
             Selected = true;
+            Boosting = 0;
+            RequestSerialization();
         }
         public void DFUNC_Deselected()
         {
