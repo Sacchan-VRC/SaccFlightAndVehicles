@@ -330,7 +330,9 @@ namespace SaccFlightAndVehicles
                     SusForce *= MaxSuspensionForce * fixedDT / (SusForce).magnitude;
                 }
 
-                CarRigid.AddForceAtPosition(SusForce, WheelPoint.position, ForceMode.VelocityChange);
+                float susdot = Vector3.Dot(transform.up, SusForce);
+                if (susdot > 0)// don't let the suspension force push the car down
+                { CarRigid.AddForceAtPosition(SusForce, WheelPoint.position, ForceMode.VelocityChange); }
 
                 //set wheel's visual position
                 if (SusOut.distance > ExtraRayCastDistance)
