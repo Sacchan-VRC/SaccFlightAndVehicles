@@ -51,8 +51,9 @@ namespace SaccFlightAndVehicles
         public AudioSource GearChange;
         public AudioSource GearUp;
         public AudioSource GearDown;
-        [Tooltip("Add any extra sounds that you want to recieve the doppler effect to this list")]
-        public Transform testcamera;
+        // public Transform testcamera;
+        [Tooltip("Physics scripts that only need to be enabled if you're owner, and the vehicle is awake")]
+        public GameObject[] Wings;
         public bool DoCaterpillarTracks;
         public Transform[] TrackEmptys;
         private float[] TrackDistance;
@@ -122,6 +123,7 @@ namespace SaccFlightAndVehicles
                 EngineSoundsT[i] = EngineSounds[i].transform;
             }
 
+            EnableWings(IsOwner);
 
             FullHealthDivider = 1f / (float)SGVControl.GetProgramVariable("Health");
             FullFuelDivider = 1f / (float)SGVControl.GetProgramVariable("Fuel");
@@ -271,7 +273,6 @@ namespace SaccFlightAndVehicles
             Sleeping = true;
             VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
             VehicleAnimator.SetFloat(REVS_STRING, 0);
-            EntityControl.SendEventToExtensions("SFEXT_L_FallAsleep");
 
             for (int i = 0; i < DriveWheels.Length; i++)
             { DriveWheels[i].SendCustomEvent("FallAsleep"); }
@@ -279,6 +280,10 @@ namespace SaccFlightAndVehicles
             { SteerWheels[i].SendCustomEvent("FallAsleep"); }
             for (int i = 0; i < OtherWheels.Length; i++)
             { OtherWheels[i].SendCustomEvent("FallAsleep"); }
+
+            if (IsOwner) { EnableWings(false); }
+
+            EntityControl.SendEventToExtensions("SFEXT_L_FallAsleep");
         }
         public void SFEXT_G_RespawnButton()
         {
@@ -297,7 +302,8 @@ namespace SaccFlightAndVehicles
             CheckingToDisable = false;
             Sleeping = false;
             DoEffects = 0f;
-            EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
+
+            if (IsOwner) { EnableWings(true); }
 
             for (int i = 0; i < DriveWheels.Length; i++)
             { DriveWheels[i].SendCustomEvent("WakeUp"); }
@@ -305,6 +311,15 @@ namespace SaccFlightAndVehicles
             { SteerWheels[i].SendCustomEvent("WakeUp"); }
             for (int i = 0; i < OtherWheels.Length; i++)
             { OtherWheels[i].SendCustomEvent("WakeUp"); }
+
+            EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
+        }
+        private void EnableWings(bool enable)
+        {
+            for (int i = 0; i < Wings.Length; i++)
+            {
+                Wings[i].SetActive(enable);
+            }
         }
         public void SFEXT_G_EnterWater()
         {
@@ -511,13 +526,14 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_TakeOwnership()
         {
-            WakeUp();
             IsOwner = true;
             DoEffects = 5f;
+            WakeUp();
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
+            EnableWings(false);
         }
         public void SFEXT_L_OwnershipTransfer()
         {
