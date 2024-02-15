@@ -208,8 +208,6 @@ namespace SaccFlightAndVehicles
                                     if (!DisablePhysicsApplication)
                                     {
                                         SAVControl.SetProgramVariable("DisablePhysicsApplication", (int)SAVControl.GetProgramVariable("DisablePhysicsApplication") + 1);
-                                        SAVControl.SetProgramVariable("CFRelativeForceOverride", Vector3.zero);
-                                        SAVControl.SetProgramVariable("CFRelativeTorqueOverride", Vector3.zero);
                                         DisablePhysicsApplication = true;
                                     }
                                     //use dead to make plane invincible for x frames when entering the catapult to prevent taking G damage from stopping instantly

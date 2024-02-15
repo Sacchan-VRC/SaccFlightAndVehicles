@@ -294,28 +294,7 @@ namespace SaccFlightAndVehicles
             }
             get => DisablePhysicsAndInputs;
         }
-        [System.NonSerializedAttribute] public Vector3 CFRelativeForceOverride;
-        [System.NonSerializedAttribute] public Vector3 CFRelativeTorqueOverride;
-
-        [System.NonSerializedAttribute] public bool _OverrideConstantForce;//this is only here for compatability with DFUNCs designed for SaccAirVehicle
-        [System.NonSerializedAttribute, FieldChangeCallback(nameof(OverrideConstantForce_))] public int OverrideConstantForce = 0;
-        public int OverrideConstantForce_
-        {
-            set
-            {
-                if (value > 0 && OverrideConstantForce == 0)
-                {
-                    EntityControl.SendEventToExtensions("SFEXT_O_OverrideConstantForce_Activated");
-                }
-                else if (value == 0 && OverrideConstantForce > 0)
-                {
-                    EntityControl.SendEventToExtensions("SFEXT_O_OverrideConstantForce_Deactivated");
-                }
-                _OverrideConstantForce = value > 0;
-                OverrideConstantForce = value;
-            }
-            get => OverrideConstantForce;
-        }
+        [System.NonSerialized] public int DisablePhysicsApplication;
         [System.NonSerializedAttribute] public bool _DisableTaxiRotation;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableTaxiRotation_))] public int DisableTaxiRotation = 0;
         public int DisableTaxiRotation_

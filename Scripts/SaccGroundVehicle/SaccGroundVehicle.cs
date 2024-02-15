@@ -135,6 +135,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("Range at which vehicle becomes 'distant' for optimization")]
         public float DistantRange = 400f;
         public float RevLimiterDelay = .04f;
+        public bool RepeatingWorld = true;
+        [Tooltip("Distance you can travel away from world origin before being teleported to the other side of the map. Not recommended to increase, floating point innacuracy and game freezing issues may occur if larger than default")]
+        public float RepeatingWorldDistance = 20000;
         [Header("Bike Stuff (WIP/Broken)")]
         [Tooltip("Max roll angle of head for leaning on bike")]
         public float LeanSensitivity_Roll = 25f;
@@ -439,6 +442,7 @@ namespace SaccFlightAndVehicles
                 else { GDamageToTake = 0; }
                 if (!Sleeping)
                 {
+                    DoRepeatingWorld();
                     VehicleSpeed = VehicleVel.magnitude;
                     NumGroundedWheels = 0;
                     NumGroundedSteerWheels = 0;
@@ -982,12 +986,10 @@ namespace SaccFlightAndVehicles
         }
         [System.NonSerializedAttribute] public float FullHealth;
         //unused variables that are just here for compatability with SAV DFuncs.
-        [System.NonSerialized] public int OverrideConstantForce;
-        [System.NonSerialized] public Vector3 CFRelativeForceOverride;
-        [System.NonSerialized] public Vector3 CFRelativeTorqueOverride;
         [System.NonSerialized] public int DisablePhysicsAndInputs = 0;
         [System.NonSerialized] public int DisableTaxiRotation;
         [System.NonSerialized] public int DisableGroundDetection;
+        [System.NonSerialized] public int DisablePhysicsApplication;
         [System.NonSerialized] public int ThrottleOverridden;
         [System.NonSerialized] public int JoystickOverridden;
         [System.NonSerialized] public bool Taxiing = false;
@@ -1462,6 +1464,50 @@ namespace SaccFlightAndVehicles
                     }
                 }
                 WheelGripLastFrameL = false;
+            }
+        }
+        private bool RepeatingWorldCheckAxis;
+        public void DoRepeatingWorld()
+        {
+            if (RepeatingWorld)
+            {
+                if (RepeatingWorldCheckAxis)
+                {
+                    if (Mathf.Abs(CenterOfMass.position.z) > RepeatingWorldDistance)
+                    {
+                        if (CenterOfMass.position.z > 0)
+                        {
+                            Vector3 vehpos = VehicleTransform.position;
+                            vehpos.z -= RepeatingWorldDistance * 2;
+                            VehicleTransform.position = vehpos;
+                        }
+                        else
+                        {
+                            Vector3 vehpos = VehicleTransform.position;
+                            vehpos.z += RepeatingWorldDistance * 2;
+                            VehicleTransform.position = vehpos;
+                        }
+                    }
+                }
+                else
+                {
+                    if (Mathf.Abs(CenterOfMass.position.x) > RepeatingWorldDistance)
+                    {
+                        if (CenterOfMass.position.x > 0)
+                        {
+                            Vector3 vehpos = VehicleTransform.position;
+                            vehpos.x -= RepeatingWorldDistance * 2;
+                            VehicleTransform.position = vehpos;
+                        }
+                        else
+                        {
+                            Vector3 vehpos = VehicleTransform.position;
+                            vehpos.x += RepeatingWorldDistance * 2;
+                            VehicleTransform.position = vehpos;
+                        }
+                    }
+                }
+                RepeatingWorldCheckAxis = !RepeatingWorldCheckAxis;//Check one axis per frame
             }
         }
     }
