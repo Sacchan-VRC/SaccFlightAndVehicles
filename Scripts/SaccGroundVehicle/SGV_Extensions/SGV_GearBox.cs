@@ -40,8 +40,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("If clutch input is bleow this amount, input is clamped to min")]
         public float LowerDeadZone = .05f;
         [Tooltip("Set this to your neutral gear")]
-        [System.NonSerialized]
-        public bool InvertVRGearChangeDirection;
+        [System.NonSerialized] public bool InvertVRGearChangeDirection;
+        [Tooltip("How long for the clutch to return to 0 after changing gear")]
+        public float AutoClutch_Length = 0.5f;
         private SaccEntity EntityControl;
         [UdonSynced, FieldChangeCallback(nameof(CurrentGear))] public int _CurrentGear = 1;
         public int CurrentGear
@@ -66,9 +67,29 @@ namespace SaccFlightAndVehicles
                 else
                 { EntityControl.SendEventToExtensions("SFEXT_G_CarGearDown"); }
                 EntityControl.SendEventToExtensions("SFEXT_G_CarChangeGear");
+                if (!ClutchTransitioning)
+                {
+                    ClutchTransitioning = true;
+                    AutoClutch = 1;
+                    ClutchTransition();
+                }
                 _CurrentGear = value;
             }
             get => _CurrentGear;
+        }
+        private float AutoClutch;
+        private bool ClutchTransitioning = false;
+        private float ClucthDecaySpeed;
+        public void ClutchTransition()
+        {
+            AutoClutch -= ClucthDecaySpeed * Time.deltaTime;
+            if (AutoClutch < 0)
+            {
+                AutoClutch = 0;
+                ClutchTransitioning = false;
+                return;
+            }
+            SendCustomEventDelayedFrames(nameof(ClutchTransition), 1);
         }
         [Header("Debug")]
         [System.NonSerializedAttribute] public bool _ClutchOverrideOne = false;
@@ -127,6 +148,8 @@ namespace SaccFlightAndVehicles
                     break;
                 }
             }
+            if (AutoClutch_Length <= 0) { ClucthDecaySpeed = Mathf.Infinity; }
+            else { ClucthDecaySpeed = 1 / AutoClutch_Length; }
             CurrentGear = NeutralGear;
         }
         private void LateUpdate()
@@ -182,7 +205,6 @@ namespace SaccFlightAndVehicles
                 }
                 if (Automatic)
                 {
-
                     if (Input.GetKeyDown(GearUpKey))
                     {
                         AutomaticReversing = !AutomaticReversing;
@@ -206,7 +228,6 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    float kbclutch = 0;
                     if (!ClutchDisabled)
                     {
                         if (ClutchLeftController)
@@ -217,13 +238,13 @@ namespace SaccFlightAndVehicles
                         {
                             Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryHandTrigger");
                         }
-                        kbclutch = Input.GetKey(ClutchKey) ? 1f : 0f;
                     }
+                    float kbclutch = Input.GetKey(ClutchKey) ? 1f : 0f;
                     if (Trigger > UpperDeadZone)
                     { Trigger = 1f; }
                     if (Trigger < LowerDeadZone)
                     { Trigger = 0f; }
-                    SGVControl.SetProgramVariable("Clutch", Mathf.Max(Trigger, kbclutch, _ClutchOverride));
+                    SGVControl.SetProgramVariable("Clutch", Mathf.Max(Trigger, kbclutch, _ClutchOverride, AutoClutch));
 
                     if (Input.GetKeyDown(GearUpKey))
                     {
@@ -263,11 +284,13 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
+            CurrentGear = NeutralGear;
             RequestSerialization();
         }
         public void SFEXT_O_PilotExit()
         {
             Piloting = false;
+            CurrentGear = NeutralGear;
             AutomaticReversing = false;
         }
         public void SFEXT_G_PilotEnter()
