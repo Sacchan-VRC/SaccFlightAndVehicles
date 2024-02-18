@@ -2488,11 +2488,11 @@ MonoBehaviour:
   VehicleAnimator: {fileID: 1217889975573313658}
   NumStepsSec: 300
   DriveWheels:
-  - {fileID: 5034242082547958647}
-  - {fileID: 5034242082547958640}
+  - {fileID: 7211299479356292543}
+  - {fileID: 4193423723041413652}
   SteerWheels:
-  - {fileID: 5034242082547958644}
-  - {fileID: 5034242082547958641}
+  - {fileID: 6392917590679912788}
+  - {fileID: 8204297190439482269}
   OtherWheels: []
   DriveSpeed: 33000
   EngineSlowDown: 1.2
@@ -13730,6 +13730,7 @@ MonoBehaviour:
   - 0.42
   UpperDeadZone: 0.95
   LowerDeadZone: 0.05
+  AutoClutch_Length: 0.5
   _CurrentGear: 1
 --- !u!114 &7081360298673104733
 MonoBehaviour:
@@ -19286,8 +19287,8 @@ MonoBehaviour:
   SGVControl: {fileID: 1217889975697026386}
   BrakeAnimator: {fileID: 1217889975573313658}
   BrakeWheels_Front:
-  - {fileID: 5034242082547958644}
-  - {fileID: 5034242082547958641}
+  - {fileID: 6392917590679912788}
+  - {fileID: 8204297190439482269}
   Brake_FrontStrengthMulti: 1
   BrakeWheels_Back: []
   Brake_BackStrengthMulti: 0.6
@@ -20498,7 +20499,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7994176259569690008}
+  m_Father: {fileID: 887899305417962517}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &5034242080955129058
 AudioSource:
@@ -20636,7 +20637,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 193890125170155256}
+  m_Father: {fileID: 3731056625559623309}
   m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!198 &5034242081098430808
 ParticleSystem:
@@ -25476,7 +25477,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7334712581917854188}
+  m_Father: {fileID: 7597664762943680424}
   m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!198 &5034242081223864271
 ParticleSystem:
@@ -30316,7 +30317,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7994176259569690008}
+  m_Father: {fileID: 887899305417962517}
   m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!198 &5034242081569295819
 ParticleSystem:
@@ -35155,7 +35156,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7334712581917854188}
+  m_Father: {fileID: 7597664762943680424}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &5034242081574600412
 AudioSource:
@@ -35355,7 +35356,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 193890125170155256}
+  m_Father: {fileID: 3731056625559623309}
   m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!198 &5034242081763461519
 ParticleSystem:
@@ -40194,7 +40195,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 193890125170155256}
+  m_Father: {fileID: 3731056625559623309}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &5034242081775106891
 AudioSource:
@@ -40332,7 +40333,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7364986246367640479}
+  m_Father: {fileID: 5635687635756386850}
   m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!198 &5034242081854379897
 ParticleSystem:
@@ -45338,7 +45339,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7364986246367640479}
+  m_Father: {fileID: 5635687635756386850}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &5034242082049594293
 AudioSource:
@@ -45475,7 +45476,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7364986246367640479}
+  m_Father: {fileID: 5635687635756386850}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &5034242082299753248
 AudioSource:
@@ -45719,7 +45720,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7994176259569690008}
+  m_Father: {fileID: 887899305417962517}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &5034242082459734014
 AudioSource:
@@ -45856,7 +45857,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 193890125170155256}
+  m_Father: {fileID: 3731056625559623309}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &5034242082471989187
 AudioSource:
@@ -46024,7 +46025,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7334712581917854188}
+  m_Father: {fileID: 7597664762943680424}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!82 &5034242082547340373
 AudioSource:
@@ -46162,7 +46163,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7994176259569690008}
+  m_Father: {fileID: 887899305417962517}
   m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!198 &5034242082579995010
 ParticleSystem:
@@ -51169,7 +51170,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7334712581917854188}
+  m_Father: {fileID: 7597664762943680424}
   m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!198 &5034242082883694242
 ParticleSystem:
@@ -56009,7 +56010,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 7364986246367640479}
+  m_Father: {fileID: 5635687635756386850}
   m_LocalEulerAnglesHint: {x: -89.98, y: 0, z: 0}
 --- !u!198 &5034242082915683883
 ParticleSystem:
@@ -62154,8 +62155,8 @@ MonoBehaviour:
   BrakeWheels_Front: []
   Brake_FrontStrengthMulti: 1
   BrakeWheels_Back:
-  - {fileID: 5034242082547958647}
-  - {fileID: 5034242082547958640}
+  - {fileID: 7211299479356292543}
+  - {fileID: 4193423723041413652}
   Brake_BackStrengthMulti: 1
   KeyboardControl: 32
   UpperDeadZone: 0.9
@@ -83529,6 +83530,31 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 17
       objectReference: {fileID: 0}
+    - target: {fileID: 7986333500260251797, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 7986333500260251797, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9990483
+      objectReference: {fileID: 0}
+    - target: {fileID: 7986333500260251797, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7986333500260251797, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.043619405
+      objectReference: {fileID: 0}
+    - target: {fileID: 7986333500260251797, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -5
+      objectReference: {fileID: 0}
     - target: {fileID: 8016466451411788203, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -83584,6 +83610,36 @@ PrefabInstance:
       propertyPath: m_Materials.Array.data[10]
       value: 
       objectReference: {fileID: 2100000, guid: 9ef894bdd96cbb34096b01134772a207, type: 2}
+    - target: {fileID: 8276867964637168854, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 8276867964637168854, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.9990483
+      objectReference: {fileID: 0}
+    - target: {fileID: 8276867964637168854, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8276867964637168854, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.043619405
+      objectReference: {fileID: 0}
+    - target: {fileID: 8276867964637168854, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8276867964637168854, guid: 2c818a5f08de956489dcf2628e3de3fc,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 9053764737798283593, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       propertyPath: m_Name
@@ -83592,67 +83648,67 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: -6635887507701925860, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -8365220203175736927, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242082299753263}
-    - targetCorrespondingSourceObject: {fileID: -6635887507701925860, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -8365220203175736927, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242082049594292}
-    - targetCorrespondingSourceObject: {fileID: -6635887507701925860, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -8365220203175736927, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242081854379911}
-    - targetCorrespondingSourceObject: {fileID: -6635887507701925860, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -8365220203175736927, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242082915683881}
-    - targetCorrespondingSourceObject: {fileID: -4076339807878308485, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -713160027568777970, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242081775106892}
-    - targetCorrespondingSourceObject: {fileID: -4076339807878308485, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -713160027568777970, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242082471989188}
-    - targetCorrespondingSourceObject: {fileID: -4076339807878308485, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -713160027568777970, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242081763461505}
-    - targetCorrespondingSourceObject: {fileID: -4076339807878308485, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -713160027568777970, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242081098430810}
-    - targetCorrespondingSourceObject: {fileID: -6911025712357619089, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -6004024696501523413, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242082547340372}
-    - targetCorrespondingSourceObject: {fileID: -6911025712357619089, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -6004024696501523413, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242081574600411}
-    - targetCorrespondingSourceObject: {fileID: -6911025712357619089, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -6004024696501523413, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242081223864269}
-    - targetCorrespondingSourceObject: {fileID: -6911025712357619089, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -6004024696501523413, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242082883694240}
-    - targetCorrespondingSourceObject: {fileID: -6112444127010675173, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -3922834052358801514, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242080955129057}
-    - targetCorrespondingSourceObject: {fileID: -6112444127010675173, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -3922834052358801514, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242082459734013}
-    - targetCorrespondingSourceObject: {fileID: -6112444127010675173, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -3922834052358801514, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242082579995008}
-    - targetCorrespondingSourceObject: {fileID: -6112444127010675173, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -3922834052358801514, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5034242081569295817}
@@ -83665,108 +83721,52 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5752547058522598087}
-    - targetCorrespondingSourceObject: {fileID: -9149946848031643803, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    - targetCorrespondingSourceObject: {fileID: -7980277013235448302, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5034242082547958643}
-    - targetCorrespondingSourceObject: {fileID: -9149946848031643803, guid: 2c818a5f08de956489dcf2628e3de3fc,
+      addedObject: {fileID: 7211299479356292543}
+    - targetCorrespondingSourceObject: {fileID: -7980277013235448302, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5034242082547958647}
-    - targetCorrespondingSourceObject: {fileID: -7819278198318245664, guid: 2c818a5f08de956489dcf2628e3de3fc,
+      addedObject: {fileID: 9202492799657541760}
+    - targetCorrespondingSourceObject: {fileID: 5028265495950217733, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5034242082547958640}
-    - targetCorrespondingSourceObject: {fileID: -7819278198318245664, guid: 2c818a5f08de956489dcf2628e3de3fc,
+      addedObject: {fileID: 4193423723041413652}
+    - targetCorrespondingSourceObject: {fileID: 5028265495950217733, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5034242082547958646}
-    - targetCorrespondingSourceObject: {fileID: 1145378189432178335, guid: 2c818a5f08de956489dcf2628e3de3fc,
+      addedObject: {fileID: 6729283488457233665}
+    - targetCorrespondingSourceObject: {fileID: -2611754460468678034, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5034242082547958644}
-    - targetCorrespondingSourceObject: {fileID: 1145378189432178335, guid: 2c818a5f08de956489dcf2628e3de3fc,
+      addedObject: {fileID: 6392917590679912788}
+    - targetCorrespondingSourceObject: {fileID: -2611754460468678034, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5034242082547958645}
-    - targetCorrespondingSourceObject: {fileID: -8619971727969430743, guid: 2c818a5f08de956489dcf2628e3de3fc,
+      addedObject: {fileID: 3623161829856892969}
+    - targetCorrespondingSourceObject: {fileID: 3910079471040035556, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5034242082547958641}
-    - targetCorrespondingSourceObject: {fileID: -8619971727969430743, guid: 2c818a5f08de956489dcf2628e3de3fc,
+      addedObject: {fileID: 8204297190439482269}
+    - targetCorrespondingSourceObject: {fileID: 3910079471040035556, guid: 2c818a5f08de956489dcf2628e3de3fc,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5034242082547958642}
+      addedObject: {fileID: 7037072827926750975}
   m_SourcePrefab: {fileID: 100100000, guid: 2c818a5f08de956489dcf2628e3de3fc, type: 3}
---- !u!4 &193890125170155256 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -4076339807878308485, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!137 &1964195338337086324 stripped
-SkinnedMeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -2405201749689800457, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2162537333681921343 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -2603123743937421636, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &2409782968404012759 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 7254309817087028564, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &4780432453592769640 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &4961246404153861350 stripped
+--- !u!1 &7534212335751558 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: -9149946848031643803, guid: 2c818a5f08de956489dcf2628e3de3fc,
+  m_CorrespondingSourceObject: {fileID: 5028265495950217733, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5034242082547958643
+--- !u!114 &4193423723041413652
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4961246404153861350}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactTextPlacement: {fileID: 0}
-  interactText: Use
-  interactTextGO: {fileID: 0}
-  proximity: 2
-  SynchronizePosition: 0
-  AllowCollisionOwnershipTransfer: 0
-  Reliable: 0
-  _syncMethod: 2
-  serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
-    type: 2}
-  programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
-  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
-  publicVariablesUnityEngineObjects: []
-  publicVariablesSerializationDataFormat: 0
---- !u!114 &5034242082547958647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4961246404153861350}
+  m_GameObject: {fileID: 7534212335751558}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7e15e9ef41f96240870486b6a2b985c, type: 3}
@@ -83781,756 +83781,11 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 5034242082547958643}
+  _udonSharpBackingUdonBehaviour: {fileID: 6729283488457233665}
   CarRigid: {fileID: 1217889975573313654}
   SGVControl: {fileID: 1217889975697026386}
-  WheelPoint: {fileID: 7364986246367640479}
-  WheelVisual: {fileID: 8170026611739050717}
-  WheelVisual_Ground: {fileID: 0}
-  SuspensionDistance: 0.1
-  WheelRadius: 0.3326535
-  SpringForceMulti: 8
-  DampingForceMulti: 1.8
-  MaxSuspensionForce: 20
-  ExtraRayCastDistance: 0.5
-  Grip: 375
-  GripCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 2
-      value: 0.5
-      inSlope: -0.04364132
-      outSlope: -0.04364132
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.50872517
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  SeparateLongLatGrip: 1
-  LateralGrip: 0.8
-  GripCurveLateral:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 2
-      value: 0.5
-      inSlope: -0.04364132
-      outSlope: -0.04364132
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.50872517
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  WheelWeight: 0.3
-  BrakeStrength: 500
-  HandBrakeStrength: 70
-  WheelLayers:
-    serializedVersion: 2
-    m_Bits: 133121
-  SurfaceType_Grips:
-  - 1
-  - 0.7
-  - 0.2
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  SurfaceType_Slowdown:
-  - 0.1
-  - 4
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  SurfaceType_SkidSounds:
-  - {fileID: 5034242082299753248}
-  - {fileID: 5034242082049594293}
-  SurfaceType_SkidParticles:
-  - {fileID: 5034242081854379897}
-  - {fileID: 5034242082915683883}
-  SurfaceType_SkidParticles_Amount:
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  ClutchStrength: 500
-  SkidSound_Min: 3
-  SkidSound_VolumeIncrease: 0.2
-  SkidSound_PitchIncrease: 0.013
-  SkidSound_Pitch: 0.85
-  SkidVolInVehicleMulti: 0.3
-  DisableEffects: 0
-  SkidRatioMode: 0
-  EngineInfluence: 225
-  LastTouchedTransform: {fileID: 0}
-  LastTouchedTransform_RB: {fileID: 0}
-  LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
-  LastTouchedTransform_Speed: {x: 0, y: 0, z: 0}
-  CurrentGrip: 7
-  CurrentNumParticles: 0
-  CurrentWheelSlowDown: 0
-  Clutch: 1
-  WheelRotation: 0
-  WheelRotationSpeedRPS: 0
-  WheelRotationSpeedRPM: 0
-  WheelRotationSpeedSurf: 0
-  EngineRevs: 0
-  Grounded: 0
-  Sleeping: 0
-  _GearRatio: 0
-  GearNeutral: 0
-  IsOwner: 0
-  Piloting: 0
-  Debugslip: 0
-  CurrentlyDistant: 1
-  SetVel: 0
-  PrintDebugValues: 0
-  DebugMoveSpeed: {x: 0, y: 0, z: 0}
-  DebugFreezeWheel: 0
-  AccelTestLength: 4
-  DistResultPush: 0
-  DistResultAccel: 0
-  SpeedResultAccel: 0
-  RevUpResult: 0
-  RPMTestTarget: 500
-  ShowWheelForceLines: 0
-  ForceUsedDBG: 0
-  ContactPoint: {x: 0, y: 0, z: 0}
-  ForceVector: {x: 0, y: 0, z: 0}
---- !u!1 &5268175074725543634 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!65 &1814071665317771014
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5268175074725543634}
-  m_Material: {fileID: 13400000, guid: c352042ddf1f7c94cbb288c12d0346f0, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.85, y: 0.72476125, z: 4.399896}
-  m_Center: {x: 0.000000002267976, y: 0.5517098, z: 0.08222234}
---- !u!65 &5752547058522598087
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5268175074725543634}
-  m_Material: {fileID: 13400000, guid: c352042ddf1f7c94cbb288c12d0346f0, type: 2}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.3, y: 0.95342946, z: 1.4628639}
-  m_Center: {x: 0, y: 0.88101447, z: -0.19}
---- !u!1 &5348037637574608156 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1145378189432178335, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5034242082547958644
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5348037637574608156}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7e15e9ef41f96240870486b6a2b985c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 5034242082547958645}
-  CarRigid: {fileID: 1217889975573313654}
-  SGVControl: {fileID: 1217889975697026386}
-  WheelPoint: {fileID: 7334712581917854188}
-  WheelVisual: {fileID: 2409782968404012759}
-  WheelVisual_Ground: {fileID: 0}
-  SuspensionDistance: 0.1
-  WheelRadius: 0.3326535
-  SpringForceMulti: 8
-  DampingForceMulti: 1.8
-  MaxSuspensionForce: 20
-  ExtraRayCastDistance: 0.5
-  Grip: 300
-  GripCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 2
-      value: 0.5
-      inSlope: -0.04364132
-      outSlope: -0.04364132
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.50872517
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  SeparateLongLatGrip: 1
-  LateralGrip: 0.8
-  GripCurveLateral:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 2
-      value: 0.5
-      inSlope: -0.04364132
-      outSlope: -0.04364132
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.50872517
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  WheelWeight: 0.3
-  BrakeStrength: 500
-  HandBrakeStrength: 70
-  WheelLayers:
-    serializedVersion: 2
-    m_Bits: 133121
-  SurfaceType_Grips:
-  - 1
-  - 0.7
-  - 0.2
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  SurfaceType_Slowdown:
-  - 0.1
-  - 4
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  SurfaceType_SkidSounds:
-  - {fileID: 5034242082547340373}
-  - {fileID: 5034242081574600412}
-  SurfaceType_SkidParticles:
-  - {fileID: 5034242081223864271}
-  - {fileID: 5034242082883694242}
-  SurfaceType_SkidParticles_Amount:
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  ClutchStrength: 500
-  SkidSound_Min: 3
-  SkidSound_VolumeIncrease: 0.2
-  SkidSound_PitchIncrease: 0.013
-  SkidSound_Pitch: 0.85
-  SkidVolInVehicleMulti: 0.3
-  DisableEffects: 0
-  SkidRatioMode: 0
-  EngineInfluence: 225
-  LastTouchedTransform: {fileID: 0}
-  LastTouchedTransform_RB: {fileID: 0}
-  LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
-  LastTouchedTransform_Speed: {x: 0, y: 0, z: 0}
-  CurrentGrip: 7
-  CurrentNumParticles: 0
-  CurrentWheelSlowDown: 0
-  Clutch: 1
-  WheelRotation: 0
-  WheelRotationSpeedRPS: 0
-  WheelRotationSpeedRPM: 0
-  WheelRotationSpeedSurf: 0
-  EngineRevs: 0
-  Grounded: 0
-  Sleeping: 0
-  _GearRatio: 0
-  GearNeutral: 0
-  IsOwner: 0
-  Piloting: 0
-  Debugslip: 0
-  CurrentlyDistant: 1
-  SetVel: 0
-  PrintDebugValues: 0
-  DebugMoveSpeed: {x: 0, y: 0, z: 0}
-  DebugFreezeWheel: 0
-  AccelTestLength: 4
-  DistResultPush: 0
-  DistResultAccel: 0
-  SpeedResultAccel: 0
-  RevUpResult: 0
-  RPMTestTarget: 500
-  ShowWheelForceLines: 0
-  ForceUsedDBG: 0
-  ContactPoint: {x: 0, y: 0, z: 0}
-  ForceVector: {x: 0, y: 0, z: 0}
---- !u!114 &5034242082547958645
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5348037637574608156}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactTextPlacement: {fileID: 0}
-  interactText: Use
-  interactTextGO: {fileID: 0}
-  proximity: 2
-  SynchronizePosition: 0
-  AllowCollisionOwnershipTransfer: 0
-  Reliable: 0
-  _syncMethod: 2
-  serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
-    type: 2}
-  programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
-  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
-  publicVariablesUnityEngineObjects: []
-  publicVariablesSerializationDataFormat: 0
---- !u!1 &5585182490498224298 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -8619971727969430743, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5034242082547958641
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5585182490498224298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7e15e9ef41f96240870486b6a2b985c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 5034242082547958642}
-  CarRigid: {fileID: 1217889975573313654}
-  SGVControl: {fileID: 1217889975697026386}
-  WheelPoint: {fileID: 7994176259569690008}
-  WheelVisual: {fileID: 9163595173999141445}
-  WheelVisual_Ground: {fileID: 0}
-  SuspensionDistance: 0.1
-  WheelRadius: 0.3326535
-  SpringForceMulti: 8
-  DampingForceMulti: 1.8
-  MaxSuspensionForce: 20
-  ExtraRayCastDistance: 0.5
-  Grip: 300
-  GripCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 2
-      value: 0.5
-      inSlope: -0.04364132
-      outSlope: -0.04364132
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.50872517
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  SeparateLongLatGrip: 1
-  LateralGrip: 0.8
-  GripCurveLateral:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 2
-      value: 0.5
-      inSlope: -0.04364132
-      outSlope: -0.04364132
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.50872517
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  WheelWeight: 0.3
-  BrakeStrength: 500
-  HandBrakeStrength: 70
-  WheelLayers:
-    serializedVersion: 2
-    m_Bits: 133121
-  SurfaceType_Grips:
-  - 1
-  - 0.7
-  - 0.2
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  - 1
-  SurfaceType_Slowdown:
-  - 0.1
-  - 4
-  - 0.05
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  - 0.1
-  SurfaceType_SkidSounds:
-  - {fileID: 5034242080955129058}
-  - {fileID: 5034242082459734014}
-  SurfaceType_SkidParticles:
-  - {fileID: 5034242082579995010}
-  - {fileID: 5034242081569295819}
-  SurfaceType_SkidParticles_Amount:
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  - 0.3
-  ClutchStrength: 500
-  SkidSound_Min: 3
-  SkidSound_VolumeIncrease: 0.2
-  SkidSound_PitchIncrease: 0.013
-  SkidSound_Pitch: 0.85
-  SkidVolInVehicleMulti: 0.3
-  DisableEffects: 0
-  SkidRatioMode: 0
-  EngineInfluence: 225
-  LastTouchedTransform: {fileID: 0}
-  LastTouchedTransform_RB: {fileID: 0}
-  LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
-  LastTouchedTransform_Speed: {x: 0, y: 0, z: 0}
-  CurrentGrip: 7
-  CurrentNumParticles: 0
-  CurrentWheelSlowDown: 0
-  Clutch: 1
-  WheelRotation: 0
-  WheelRotationSpeedRPS: 0
-  WheelRotationSpeedRPM: 0
-  WheelRotationSpeedSurf: 0
-  EngineRevs: 0
-  Grounded: 0
-  Sleeping: 0
-  _GearRatio: 0
-  GearNeutral: 0
-  IsOwner: 0
-  Piloting: 0
-  Debugslip: 0
-  CurrentlyDistant: 1
-  SetVel: 0
-  PrintDebugValues: 0
-  DebugMoveSpeed: {x: 0, y: 0, z: 0}
-  DebugFreezeWheel: 0
-  AccelTestLength: 4
-  DistResultPush: 0
-  DistResultAccel: 0
-  SpeedResultAccel: 0
-  RevUpResult: 0
-  RPMTestTarget: 500
-  ShowWheelForceLines: 0
-  ForceUsedDBG: 0
-  ContactPoint: {x: 0, y: 0, z: 0}
-  ForceVector: {x: 0, y: 0, z: 0}
---- !u!114 &5034242082547958642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5585182490498224298}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactTextPlacement: {fileID: 0}
-  interactText: Use
-  interactTextGO: {fileID: 0}
-  proximity: 2
-  SynchronizePosition: 0
-  AllowCollisionOwnershipTransfer: 0
-  Reliable: 0
-  _syncMethod: 2
-  serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
-    type: 2}
-  programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
-  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
-  publicVariablesUnityEngineObjects: []
-  publicVariablesSerializationDataFormat: 0
---- !u!1 &6242393052301810531 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: -7819278198318245664, guid: 2c818a5f08de956489dcf2628e3de3fc,
-    type: 3}
-  m_PrefabInstance: {fileID: 5034242082547958659}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &5034242082547958640
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6242393052301810531}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d7e15e9ef41f96240870486b6a2b985c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 5034242082547958646}
-  CarRigid: {fileID: 1217889975573313654}
-  SGVControl: {fileID: 1217889975697026386}
-  WheelPoint: {fileID: 193890125170155256}
-  WheelVisual: {fileID: 2162537333681921343}
+  WheelPoint: {fileID: 3731056625559623309}
+  WheelVisual: {fileID: 126663418511229904}
   WheelVisual_Ground: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.3326535
@@ -84714,13 +83969,13 @@ MonoBehaviour:
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
   ForceVector: {x: 0, y: 0, z: 0}
---- !u!114 &5034242082547958646
+--- !u!114 &6729283488457233665
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6242393052301810531}
+  m_GameObject: {fileID: 7534212335751558}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
@@ -84740,36 +83995,837 @@ MonoBehaviour:
   serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
   publicVariablesUnityEngineObjects: []
   publicVariablesSerializationDataFormat: 0
---- !u!4 &7334712581917854188 stripped
+--- !u!4 &126663418511229904 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -6911025712357619089, guid: 2c818a5f08de956489dcf2628e3de3fc,
+  m_CorrespondingSourceObject: {fileID: 4908016724944486483, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &7364986246367640479 stripped
+--- !u!4 &887899305417962517 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -6635887507701925860, guid: 2c818a5f08de956489dcf2628e3de3fc,
+  m_CorrespondingSourceObject: {fileID: -3922834052358801514, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &7994176259569690008 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -6112444127010675173, guid: 2c818a5f08de956489dcf2628e3de3fc,
+--- !u!137 &1964195338337086324 stripped
+SkinnedMeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -2405201749689800457, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &8170026611739050717 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 3800188621729415518, guid: 2c818a5f08de956489dcf2628e3de3fc,
+--- !u!1 &2169635128737853933 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -2611754460468678034, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &9163595173999141445 stripped
+--- !u!114 &6392917590679912788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2169635128737853933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e15e9ef41f96240870486b6a2b985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _udonSharpBackingUdonBehaviour: {fileID: 3623161829856892969}
+  CarRigid: {fileID: 1217889975573313654}
+  SGVControl: {fileID: 1217889975697026386}
+  WheelPoint: {fileID: 7597664762943680424}
+  WheelVisual: {fileID: 2883316143006554622}
+  WheelVisual_Ground: {fileID: 0}
+  SuspensionDistance: 0.1
+  WheelRadius: 0.3326535
+  SpringForceMulti: 8
+  DampingForceMulti: 1.8
+  MaxSuspensionForce: 20
+  ExtraRayCastDistance: 0.5
+  Grip: 300
+  GripCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SeparateLongLatGrip: 1
+  LateralGrip: 0.8
+  GripCurveLateral:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  WheelWeight: 0.3
+  BrakeStrength: 500
+  HandBrakeStrength: 70
+  WheelLayers:
+    serializedVersion: 2
+    m_Bits: 133121
+  SurfaceType_Grips:
+  - 1
+  - 0.7
+  - 0.2
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 4
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  SurfaceType_SkidSounds:
+  - {fileID: 5034242082547340373}
+  - {fileID: 5034242081574600412}
+  SurfaceType_SkidParticles:
+  - {fileID: 5034242081223864271}
+  - {fileID: 5034242082883694242}
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
+  SkidSound_Min: 3
+  SkidSound_VolumeIncrease: 0.2
+  SkidSound_PitchIncrease: 0.013
+  SkidSound_Pitch: 0.85
+  SkidVolInVehicleMulti: 0.3
+  DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
+  LastTouchedTransform: {fileID: 0}
+  LastTouchedTransform_RB: {fileID: 0}
+  LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
+  LastTouchedTransform_Speed: {x: 0, y: 0, z: 0}
+  CurrentGrip: 7
+  CurrentNumParticles: 0
+  CurrentWheelSlowDown: 0
+  Clutch: 1
+  WheelRotation: 0
+  WheelRotationSpeedRPS: 0
+  WheelRotationSpeedRPM: 0
+  WheelRotationSpeedSurf: 0
+  EngineRevs: 0
+  Grounded: 0
+  Sleeping: 0
+  _GearRatio: 0
+  GearNeutral: 0
+  IsOwner: 0
+  Piloting: 0
+  Debugslip: 0
+  CurrentlyDistant: 1
+  SetVel: 0
+  PrintDebugValues: 0
+  DebugMoveSpeed: {x: 0, y: 0, z: 0}
+  DebugFreezeWheel: 0
+  AccelTestLength: 4
+  DistResultPush: 0
+  DistResultAccel: 0
+  SpeedResultAccel: 0
+  RevUpResult: 0
+  RPMTestTarget: 500
+  ShowWheelForceLines: 0
+  ForceUsedDBG: 0
+  ContactPoint: {x: 0, y: 0, z: 0}
+  ForceVector: {x: 0, y: 0, z: 0}
+--- !u!114 &3623161829856892969
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2169635128737853933}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactTextPlacement: {fileID: 0}
+  interactText: Use
+  interactTextGO: {fileID: 0}
+  proximity: 2
+  SynchronizePosition: 0
+  AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
+  _syncMethod: 2
+  serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
+    type: 2}
+  programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
+  publicVariablesUnityEngineObjects: []
+  publicVariablesSerializationDataFormat: 0
+--- !u!4 &2883316143006554622 stripped
 Transform:
-  m_CorrespondingSourceObject: {fileID: -4974619675986239034, guid: 2c818a5f08de956489dcf2628e3de3fc,
+  m_CorrespondingSourceObject: {fileID: -1306430640646382979, guid: 2c818a5f08de956489dcf2628e3de3fc,
     type: 3}
   m_PrefabInstance: {fileID: 5034242082547958659}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &3731056625559623309 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -713160027568777970, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &4780432453592769640 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &5268175074725543634 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &1814071665317771014
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5268175074725543634}
+  m_Material: {fileID: 13400000, guid: c352042ddf1f7c94cbb288c12d0346f0, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.85, y: 0.72476125, z: 4.399896}
+  m_Center: {x: 0.000000002267976, y: 0.5517098, z: 0.08222234}
+--- !u!65 &5752547058522598087
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5268175074725543634}
+  m_Material: {fileID: 13400000, guid: c352042ddf1f7c94cbb288c12d0346f0, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.3, y: 0.95342946, z: 1.4628639}
+  m_Center: {x: 0, y: 0.88101447, z: -0.19}
+--- !u!4 &5635687635756386850 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -8365220203175736927, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6097140341276329361 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -7980277013235448302, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7211299479356292543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6097140341276329361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e15e9ef41f96240870486b6a2b985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _udonSharpBackingUdonBehaviour: {fileID: 9202492799657541760}
+  CarRigid: {fileID: 1217889975573313654}
+  SGVControl: {fileID: 1217889975697026386}
+  WheelPoint: {fileID: 5635687635756386850}
+  WheelVisual: {fileID: 6297078974878207425}
+  WheelVisual_Ground: {fileID: 0}
+  SuspensionDistance: 0.1
+  WheelRadius: 0.3326535
+  SpringForceMulti: 8
+  DampingForceMulti: 1.8
+  MaxSuspensionForce: 20
+  ExtraRayCastDistance: 0.5
+  Grip: 375
+  GripCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SeparateLongLatGrip: 1
+  LateralGrip: 0.8
+  GripCurveLateral:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  WheelWeight: 0.3
+  BrakeStrength: 500
+  HandBrakeStrength: 70
+  WheelLayers:
+    serializedVersion: 2
+    m_Bits: 133121
+  SurfaceType_Grips:
+  - 1
+  - 0.7
+  - 0.2
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 4
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  SurfaceType_SkidSounds:
+  - {fileID: 5034242082299753248}
+  - {fileID: 5034242082049594293}
+  SurfaceType_SkidParticles:
+  - {fileID: 5034242081854379897}
+  - {fileID: 5034242082915683883}
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
+  SkidSound_Min: 3
+  SkidSound_VolumeIncrease: 0.2
+  SkidSound_PitchIncrease: 0.013
+  SkidSound_Pitch: 0.85
+  SkidVolInVehicleMulti: 0.3
+  DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
+  LastTouchedTransform: {fileID: 0}
+  LastTouchedTransform_RB: {fileID: 0}
+  LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
+  LastTouchedTransform_Speed: {x: 0, y: 0, z: 0}
+  CurrentGrip: 7
+  CurrentNumParticles: 0
+  CurrentWheelSlowDown: 0
+  Clutch: 1
+  WheelRotation: 0
+  WheelRotationSpeedRPS: 0
+  WheelRotationSpeedRPM: 0
+  WheelRotationSpeedSurf: 0
+  EngineRevs: 0
+  Grounded: 0
+  Sleeping: 0
+  _GearRatio: 0
+  GearNeutral: 0
+  IsOwner: 0
+  Piloting: 0
+  Debugslip: 0
+  CurrentlyDistant: 1
+  SetVel: 0
+  PrintDebugValues: 0
+  DebugMoveSpeed: {x: 0, y: 0, z: 0}
+  DebugFreezeWheel: 0
+  AccelTestLength: 4
+  DistResultPush: 0
+  DistResultAccel: 0
+  SpeedResultAccel: 0
+  RevUpResult: 0
+  RPMTestTarget: 500
+  ShowWheelForceLines: 0
+  ForceUsedDBG: 0
+  ContactPoint: {x: 0, y: 0, z: 0}
+  ForceVector: {x: 0, y: 0, z: 0}
+--- !u!114 &9202492799657541760
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6097140341276329361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactTextPlacement: {fileID: 0}
+  interactText: Use
+  interactTextGO: {fileID: 0}
+  proximity: 2
+  SynchronizePosition: 0
+  AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
+  _syncMethod: 2
+  serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
+    type: 2}
+  programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
+  publicVariablesUnityEngineObjects: []
+  publicVariablesSerializationDataFormat: 0
+--- !u!4 &6222540144188693721 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1407339469624942426, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &6297078974878207425 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1350674678442249794, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &7597664762943680424 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6004024696501523413, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8331197582751267175 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3910079471040035556, guid: 2c818a5f08de956489dcf2628e3de3fc,
+    type: 3}
+  m_PrefabInstance: {fileID: 5034242082547958659}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8204297190439482269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8331197582751267175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7e15e9ef41f96240870486b6a2b985c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _udonSharpBackingUdonBehaviour: {fileID: 7037072827926750975}
+  CarRigid: {fileID: 1217889975573313654}
+  SGVControl: {fileID: 1217889975697026386}
+  WheelPoint: {fileID: 887899305417962517}
+  WheelVisual: {fileID: 6222540144188693721}
+  WheelVisual_Ground: {fileID: 0}
+  SuspensionDistance: 0.1
+  WheelRadius: 0.3326535
+  SpringForceMulti: 8
+  DampingForceMulti: 1.8
+  MaxSuspensionForce: 20
+  ExtraRayCastDistance: 0.5
+  Grip: 300
+  GripCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  SeparateLongLatGrip: 1
+  LateralGrip: 0.8
+  GripCurveLateral:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1.0003198
+      outSlope: 1.0003198
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1.3778018
+      value: 0.7553785
+      inSlope: -0.99939287
+      outSlope: -0.99939287
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 2
+      value: 0.5
+      inSlope: -0.04364132
+      outSlope: -0.04364132
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.50872517
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  WheelWeight: 0.3
+  BrakeStrength: 500
+  HandBrakeStrength: 70
+  WheelLayers:
+    serializedVersion: 2
+    m_Bits: 133121
+  SurfaceType_Grips:
+  - 1
+  - 0.7
+  - 0.2
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  - 1
+  SurfaceType_Slowdown:
+  - 0.1
+  - 4
+  - 0.05
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  - 0.1
+  SurfaceType_SkidSounds:
+  - {fileID: 5034242080955129058}
+  - {fileID: 5034242082459734014}
+  SurfaceType_SkidParticles:
+  - {fileID: 5034242082579995010}
+  - {fileID: 5034242081569295819}
+  SurfaceType_SkidParticles_Amount:
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  - 0.3
+  ClutchStrength: 500
+  SkidSound_Min: 3
+  SkidSound_VolumeIncrease: 0.2
+  SkidSound_PitchIncrease: 0.013
+  SkidSound_Pitch: 0.85
+  SkidVolInVehicleMulti: 0.3
+  DisableEffects: 0
+  SkidRatioMode: 0
+  EngineInfluence: 225
+  LastTouchedTransform: {fileID: 0}
+  LastTouchedTransform_RB: {fileID: 0}
+  LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
+  LastTouchedTransform_Speed: {x: 0, y: 0, z: 0}
+  CurrentGrip: 7
+  CurrentNumParticles: 0
+  CurrentWheelSlowDown: 0
+  Clutch: 1
+  WheelRotation: 0
+  WheelRotationSpeedRPS: 0
+  WheelRotationSpeedRPM: 0
+  WheelRotationSpeedSurf: 0
+  EngineRevs: 0
+  Grounded: 0
+  Sleeping: 0
+  _GearRatio: 0
+  GearNeutral: 0
+  IsOwner: 0
+  Piloting: 0
+  Debugslip: 0
+  CurrentlyDistant: 1
+  SetVel: 0
+  PrintDebugValues: 0
+  DebugMoveSpeed: {x: 0, y: 0, z: 0}
+  DebugFreezeWheel: 0
+  AccelTestLength: 4
+  DistResultPush: 0
+  DistResultAccel: 0
+  SpeedResultAccel: 0
+  RevUpResult: 0
+  RPMTestTarget: 500
+  ShowWheelForceLines: 0
+  ForceUsedDBG: 0
+  ContactPoint: {x: 0, y: 0, z: 0}
+  ForceVector: {x: 0, y: 0, z: 0}
+--- !u!114 &7037072827926750975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8331197582751267175}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactTextPlacement: {fileID: 0}
+  interactText: Use
+  interactTextGO: {fileID: 0}
+  proximity: 2
+  SynchronizePosition: 0
+  AllowCollisionOwnershipTransfer: 0
+  Reliable: 0
+  _syncMethod: 2
+  serializedProgramAsset: {fileID: 11400000, guid: a71474697de683244ac1c8fe41834a21,
+    type: 2}
+  programSource: {fileID: 11400000, guid: 54a12ca60e9d8444c8e05c071ee872bf, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
+  publicVariablesUnityEngineObjects: []
+  publicVariablesSerializationDataFormat: 0
 --- !u!1001 &6656130132299047853
 PrefabInstance:
   m_ObjectHideFlags: 0
