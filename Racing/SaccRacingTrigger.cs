@@ -66,6 +66,7 @@ namespace SaccFlightAndVehicles
         private bool Initialized = false;
         private bool RaceCountdown = false;
         private bool FreezeCar = false;
+        private bool AirStart;
         private void Initialize()
         {
             Initialized = true;
@@ -103,14 +104,14 @@ namespace SaccFlightAndVehicles
         {
             if (RaceOn && !RaceCountdown)
             {
-                RaceTime = Time.realtimeSinceStartup - RaceStartTime;
+                RaceTime = Time.time - RaceStartTime;
                 if (Time_text) { Time_text.text = SecsToMinsSec(RaceTime); }
             }
         }
         private int CurrentSplit = 0;
         private void UpdateSplitTime(bool RaceEnded = false)
         {
-            CurrentSplits[CurrentSplit] = (Time.realtimeSinceStartup - RaceStartTime - CalcSubFrameTime());
+            CurrentSplits[CurrentSplit] = (Time.time - RaceStartTime - CalcSubFrameTime());
             float splitdif;
             if (TrackForward)
             {
@@ -179,7 +180,7 @@ namespace SaccFlightAndVehicles
                     MoveCarToStart();
                     return;
                 }
-                RaceStartTime = Time.realtimeSinceStartup;
+                RaceStartTime = Time.time;
                 Vector3 vel = PlaneRigidbody.velocity;
                 vel.x = 0; vel.z = 0;
                 PlaneRigidbody.velocity = vel;
@@ -230,12 +231,20 @@ namespace SaccFlightAndVehicles
         public void SetFreezeCarFalse()
         {
             FreezeCar = false;
-            Vehicle_EntityControl.dead = false;//disable invincibility
+            SendCustomEventDelayedSeconds(nameof(SetDeadFalse), Time.fixedDeltaTime * 2f);
         }
+        public void SetDeadFalse() { Vehicle_EntityControl.dead = false; }
         public void SetRaceCountdownFalse()
         {
             NumCountDowns--;
             NumCountDownDisables++;
+            if (AirStart)
+            {
+                SetFreezeCarFalse();
+            }
+            float launchspd = CurrentCourse.LaunchSpeed;
+            if (launchspd > 0f)
+            { PlaneRigidbody.velocity = PlaneRigidbody.transform.forward * CurrentCourse.LaunchSpeed; }
             SendCustomEventDelayedSeconds(nameof(DisableCountDownAnimation), 3f);
             if (NumCountDowns != 0) { return; }
             RaceCountdown = false;
@@ -257,8 +266,9 @@ namespace SaccFlightAndVehicles
         }
         void ReportTime()
         {
+            Vehicle_EntityControl.SendEventToExtensions("SFEXT_L_FinishRace");
             //Debug.Log("Finish Race!");
-            RaceFinishTime = Time.realtimeSinceStartup;
+            RaceFinishTime = Time.time;
             RaceTime = LastTime = (RaceFinishTime - RaceStartTime - CalcSubFrameTime());
             CurrentCourse.TimeReporter.MyLastRace_Reverse = !TrackForward;
             if (TrackForward || !CurrentTrackAllowReverse)//track was finished forward
@@ -342,7 +352,7 @@ namespace SaccFlightAndVehicles
         void OnTriggerEnter(Collider other)
         {
             if (
-                (Time.realtimeSinceStartup - RaceFinishTime < 2f && !CurrentCourse.LoopRace)
+                (Time.time - RaceFinishTime < 2f && !CurrentCourse.LoopRace)
                 || (CurrentCourseSelection == -1 || (other && other.gameObject != CurrentCourse.RaceCheckpoints[NextCheckpoint]))
                 ) { return; }
             if (NextCheckpoint == FinalCheckpoint)//end of the race
@@ -387,7 +397,8 @@ namespace SaccFlightAndVehicles
                         NumCountDowns++;
                         Vehicle_EntityControl.dead = true;//make invincible for teleport
                         SendCustomEventDelayedSeconds(nameof(SetRaceCountdownFalse), CurrentCourse.CountDownLength);
-                        SendCustomEventDelayedSeconds(nameof(SetFreezeCarFalse), .2f);
+                        if (!AirStart)
+                        { SendCustomEventDelayedSeconds(nameof(SetFreezeCarFalse), .2f); }
                         if (CountDownAnimation)
                         { CountDownAnimation.SetActive(true); }
                         if (!OverridingClutch)
@@ -400,12 +411,13 @@ namespace SaccFlightAndVehicles
                         }
                     }
                 }
+                Vehicle_EntityControl.SendEventToExtensions("SFEXT_L_StartRace");
                 RaceTime = 0;
                 CurrentSplits = new float[CurrentCourse.RaceCheckpoints.Length];
                 CurrentSplit = 0;
 
                 //Debug.Log("Start Race!");
-                RaceStartTime = Time.realtimeSinceStartup - CalcSubFrameTime();
+                RaceStartTime = Time.time - CalcSubFrameTime();
                 RaceOn = true;
                 if (!InProgress)
                 {
@@ -474,6 +486,7 @@ namespace SaccFlightAndVehicles
                     if (!TrackForward) { Racename_text.text += " (R)"; }
                 }
                 CurrentCourse = RaceToggler.Races[CurrentCourseSelection].GetComponent<SaccRaceCourseAndScoreboard>();
+                AirStart = CurrentCourse.AirStart;
                 CurrentTrackAllowReverse = CurrentCourse.AllowReverse;
                 if (TrackForward || !CurrentTrackAllowReverse)
                 {
@@ -520,7 +533,6 @@ namespace SaccFlightAndVehicles
         void OnDisable()
         {
             TurnOffCurrentCheckPoints();
-            RaceOn = false;
             TimerTextCounter++; SetTimerEmpty();
             if (CountDownAnimation)
             { CountDownAnimation.SetActive(false); }
@@ -534,6 +546,11 @@ namespace SaccFlightAndVehicles
             }
             RaceCountdown = false;
             SetFreezeCarFalse();
+            if (RaceOn)
+            {
+                Vehicle_EntityControl.SendEventToExtensions("SFEXT_L_CancelRace");
+            }
+            RaceOn = false;
         }
         public void TurnOffCurrentCheckPoints()
         {

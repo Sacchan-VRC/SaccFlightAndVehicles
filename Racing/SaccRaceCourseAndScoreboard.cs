@@ -30,8 +30,12 @@ namespace SaccFlightAndVehicles
         public float Autotoggler_EnableDist_Reverse = 100;
         [Tooltip("Race starts from a standstill?")]
         public bool StartFromStill = false;
+        [Tooltip("Race starts in the air? (only works if StartFromStill=true)")]
+        public bool AirStart = true;
         [Tooltip("How long til race starts?")]
         public float CountDownLength = 3f;
+        [Tooltip("Launch the vehicle at this speed when the race starts (only works if StartFromStill is true)")]
+        public float LaunchSpeed = 0f;
         [Tooltip("If StartFromStill=true, teleport car here to start")]
         public Transform StartPoint;
         public Transform StartPoint_Reverse;

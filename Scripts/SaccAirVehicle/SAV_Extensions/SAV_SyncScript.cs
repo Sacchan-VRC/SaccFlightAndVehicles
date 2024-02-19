@@ -104,6 +104,7 @@ namespace SaccFlightAndVehicles
         private float ErrorLastFrame;
         private float StartDrag;
         private float StartAngDrag;
+        public GameObject SLEEPCUBE;
         private void Start()
         {
             if (SyncRigid)
@@ -230,7 +231,6 @@ namespace SaccFlightAndVehicles
             IsOwner = false;
             O_LastUpdateTime = L_UpdateTime = lastframetime_extrap = StartupServerTime + (double)(Time.time - StartupLocalTime);
             O_LastUpdateTime -= updateInterval;
-            IsOwner = false;
             Extrapolation_Raw = L_PingAdjustedPosition = O_Position;
             ExtrapDirection_Smooth = O_CurVel;
             RotExtrapolation_Raw = RotationLerper = O_LastRotation = O_Rotation_Q;
@@ -275,6 +275,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (SLEEPCUBE) { SLEEPCUBE.SetActive(IdleUpdateMode); }
             if (IsOwner)//send data
             {
                 double time = (StartupServerTime + (double)(Time.time - StartupLocalTime));
@@ -282,7 +283,7 @@ namespace SaccFlightAndVehicles
                 {
                     ResetSyncTimes();
                     time = Networking.GetServerTimeInSeconds();//because we just ResetSyncTimes()'d
-                    if (_AntiWarp)//let's see if we can fix the movement jerkiness for observers if the FPS is extremely low
+                    if (_AntiWarp && !DisableAntiWarp)//let's see if we can fix the movement jerkiness for observers if the FPS is extremely low
                     {
                         double acctime = time;
                         double accuratedelta = acctime - lastframetime;
@@ -584,6 +585,10 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
         }
+        private bool DisableAntiWarp;
+        public void SFEXT_L_FinishRace() { DisableAntiWarp = false; }
+        public void SFEXT_L_StartRace() { DisableAntiWarp = true; }
+        public void SFEXT_L_CancelRace() { DisableAntiWarp = false; }
         //unity slerp always uses shortest route to orientation rather than slerping to the actual quat. This undoes that
         public Quaternion RealSlerp(Quaternion p, Quaternion q, float t)
         {
