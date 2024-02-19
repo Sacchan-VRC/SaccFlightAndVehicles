@@ -433,7 +433,6 @@ namespace SaccFlightAndVehicles
                 //add both skid axis together to get total 'skid'
                 Vector3 FullSkid = SideSkid + ForwardSkid;
                 float FullSkidMag = FullSkid.magnitude;
-                SkidVectorFX = FullSkid;
                 //find out how much of the skid is on the forward axis 
                 if (FullSkidMag != 0)
                 {
@@ -499,22 +498,22 @@ namespace SaccFlightAndVehicles
                                     Debug.Log(string.Concat("_CRUVEEVAL : ", GripCurve.Evaluate((FullSkidMag) / (_Grip * (SusForce.magnitude / Time.fixedDeltaTime _/ 90f))).ToString()));
                                 } */
                 //ENDOFDEBUG
-            }
 
-            //move wheel rotation speed towards its ground speed along its forward axis based on how much of it's forward skid that it gripped
-            if (Grounded && HandBrake != 1f)
-            {
-                //setting wheelweight very high does allow for proper wheel spins, but the vehicle physics gets ruined
-                WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, ForwardSpeed, (ForceUsed / WheelWeight));
-                WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
-                WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
-                // if (PrintDebugValues)
-                // {
-                //     Debug.Log(string.Concat("(Mathf.Abs(ForwardSlip)): ", ((Mathf.Abs(ForwardSlip))).ToString()));
-                //     Debug.Log(string.Concat("SlipGrip / Time.deltaTime: ", (SlipGrip / Time.deltaTime).ToString()));
-                // }
+                //move wheel rotation speed towards its ground speed along its forward axis based on how much of it's forward skid that it gripped
+                if (HandBrake != 1f)
+                {
+                    //setting wheelweight very high does allow for proper wheel spins, but the vehicle physics gets ruined
+                    WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, ForwardSpeed, (ForceUsed / WheelWeight));
+                    WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
+                    WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
+                    // if (PrintDebugValues)
+                    // {
+                    //     Debug.Log(string.Concat("(Mathf.Abs(ForwardSlip)): ", ((Mathf.Abs(ForwardSlip))).ToString()));
+                    //     Debug.Log(string.Concat("SlipGrip / Time.deltaTime: ", (SlipGrip / Time.deltaTime).ToString()));
+                    // }
+                }
+                SkidVectorFX = SideSkid + (ForwardSkid.normalized * (ForwardSpeed - WheelRotationSpeedSurf));
             }
-
             //move engine speed towards wheel speed
             if (IsDriveWheel && !GearNeutral)
             {
@@ -613,6 +612,7 @@ namespace SaccFlightAndVehicles
             if (SkidSound)
             {
                 SkidSound.gameObject.SetActive(true);
+                SkidSound.time = Random.Range(0, SkidSound.clip.length);
             }
             SkidSoundPlayingLast = true;
         }
