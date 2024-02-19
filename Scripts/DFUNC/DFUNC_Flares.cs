@@ -1,4 +1,5 @@
 ﻿
+using BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp;
 using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
@@ -38,22 +39,7 @@ namespace SaccFlightAndVehicles
         private bool TriggerLastFrame;
         private SaccEntity EntityControl;
         private float FlareLaunchTime;
-        [UdonSynced, FieldChangeCallback(nameof(sendlaunchflare))] private short _SendLaunchFlare = -1;
-        public short sendlaunchflare
-        {
-            set
-            {
-                _SendLaunchFlare = value;
-                if (value > -1)
-                {
-                    for (int i = 0; i < NumFlare_PerShot; i++)
-                    {
-                        Send_LaunchFlare();
-                    }
-                }
-            }
-            get => _SendLaunchFlare;
-        }
+        [UdonSynced] private bool FlareFireNow;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void DFUNC_Selected()
@@ -64,11 +50,8 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             Selected = false;
-            if (SequentialLaunch)
-            {
-                _SendLaunchFlare = (short)-1;
+                FlareFireNow = false;
                 RequestSerialization();
-            }
         }
         public void SFEXT_L_EntityStart()
         {
@@ -91,21 +74,13 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
-            if (SequentialLaunch)
-            {
-                _SendLaunchFlare = (short)-1;
-                RequestSerialization();
-            }
+            FlareFireNow = false;
+            RequestSerialization();
         }
         public void SFEXT_O_PilotExit()
         {
             Piloting = false;
             Selected = false;
-            if (SequentialLaunch)
-            {
-                _SendLaunchFlare = (short)-1;
-                RequestSerialization();
-            }
         }
         public void SFEXT_G_RespawnButton()
         {
@@ -134,21 +109,18 @@ namespace SaccFlightAndVehicles
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
 
-                if (Trigger > 0.75 || (Input.GetKey(LaunchKey)))
+                if (Trigger > 0.75 || Input.GetKey(LaunchKey))
                 {
                     if (!TriggerLastFrame)
                     {
                         if (NumFlares > 0)
                         {
-                            sendlaunchflare++;
-                            RequestSerialization();
+                            LaunchFlare_Owner();
                         }
                     }
                     else if (NumFlares > 0 && ((Time.time - FlareLaunchTime) > FlareHoldDelay))
                     {///launch every FlareHoldDelay
-                        sendlaunchflare++;
-                        RequestSerialization();
-                        EntityControl.SendEventToExtensions("SFEXT_G_LaunchFlare");
+                        LaunchFlare_Owner();
                     }
                     TriggerLastFrame = true;
                 }
@@ -206,20 +178,38 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds("RemoveFlare", FlareActiveTime);
             EntityControl.SendEventToExtensions("SFEXT_G_LaunchFlare");
         }
-        public void Send_LaunchFlare()
-        {
-            LaunchFlare();
-        }
-        public void KeyboardInput()
-        {
-            if (NumFlares > 0)
-            {
-                Send_LaunchFlare();
-            }
-        }
         public void RemoveFlare()
         {
             { SAVControl.SetProgramVariable(CMTypes[FlareType], (int)SAVControl.GetProgramVariable(CMTypes[FlareType]) - 1); }
+        }
+        private void LaunchFlare_Owner()
+        {
+            FireNextSerialization = true;
+            RequestSerialization();
+            LaunchFlare();
+        }
+        private bool FireNextSerialization = false;
+        public override void OnPreSerialization()
+        {
+            if (FireNextSerialization)
+            {
+                FireNextSerialization = false;
+                FlareFireNow = true;
+            }
+        }
+        public override void OnPostSerialization(VRC.Udon.Common.SerializationResult result)
+        {
+            FlareFireNow = false;
+        }
+        public override void OnDeserialization()
+        {
+            if (FlareFireNow)
+            {
+                for (int i = 0; i < NumFlare_PerShot; i++)
+                {
+                    LaunchFlare();
+                }
+            }
         }
     }
 }
