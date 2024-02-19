@@ -42,6 +42,8 @@ namespace SaccFlightAndVehicles
         public float EngineSlowDown = .75f;
         [Tooltip("Throttle % that is applied when not touching the controls")]
         public float MinThrottle = .08f;
+        [Tooltip("How agressively to reach minthrottle value when not touching the controls")]
+        public float MinThrottle_PStrength = 2f;
         [Tooltip("Amount of max DriveSpeed that keyboard users have access to, to stop them spinning out")]
         public float DriveSpeedKeyboardMax = 1f;
         //public float SteerAngle;
@@ -152,7 +154,6 @@ namespace SaccFlightAndVehicles
         [UdonSynced(UdonSyncMode.Linear)] public float Revs;
         public float Clutch;
         [System.NonSerialized] public int OutsideVehicleLayer;
-        private float ThrottleNormalizer;
         public int CurrentGear = 0;
         private bool LimitingRev = false;
         public Vector3 VehicleVel;
@@ -290,9 +291,6 @@ namespace SaccFlightAndVehicles
             if (!ControlsRoot)
             { ControlsRoot = VehicleTransform; }
             CenterOfMass = EntityControl.CenterOfMass;
-
-            ThrottleNormalizer = 1 - MinThrottle;
-            // SetWheelSGV();
             for (int i = 0; i < DriveWheels.Length; i++)
             {
                 DriveWheels[i].SetProgramVariable("IsDriveWheel", true);
@@ -831,7 +829,12 @@ namespace SaccFlightAndVehicles
                             {
                                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetHasFuel));
                             }
-                            FinalThrottle = (MinThrottle + (ThrottleInput * ThrottleNormalizer));
+                            FinalThrottle = ThrottleInput;
+                            if (ThrottleInput < MinThrottle && Revs / RevLimiter < MinThrottle)
+                            {
+                                FinalThrottle = (MinThrottle - FinalThrottle) * MinThrottle_PStrength;
+                                //P Controller for throttle
+                            }
                         }
                         else
                         {
@@ -862,7 +865,7 @@ namespace SaccFlightAndVehicles
 
             Vector3 absVel = VehicleRigidbody.velocity;
             VehicleVel = absVel - LastTouchedTransform_Speed;
-            float gravity = 9.81f * DeltaTime;
+            float gravity = -Physics.gravity.y * DeltaTime;
             LastFrameVel.y -= gravity; //add gravity
             AllGs = Vector3.Distance(LastFrameVel, absVel) / gravity;
             GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
