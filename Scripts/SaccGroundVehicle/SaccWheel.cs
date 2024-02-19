@@ -33,10 +33,12 @@ namespace SaccFlightAndVehicles
         [Tooltip("Multiply forward grip by this value for sideways grip")]
         public float LateralGrip = .8f;
         public AnimationCurve GripCurveLateral = AnimationCurve.Linear(0, 1, 1, 1);
-        [Tooltip("Torque, kindof. How quickly the wheel matches the speed of the ground when in contact with it")]
-        public float WheelWeight = 0.1f;
         public float BrakeStrength = 500f;
         public float HandBrakeStrength = 70f;
+        [Tooltip("How quickly the wheel matches the speed of the ground when in contact with it, high values will make the car skid more")]
+        public float WheelWeight = 0.1f;
+        [Tooltip("Only effects DriveWheels. Behaves like engine torque. How much forces on the wheel from the ground can influence the engine speed, low values will make the car skid more")]
+        public float EngineInfluence = 225f;
         public LayerMask WheelLayers;
         public float[] SurfaceType_Grips = { 1f, 0.7f, 0.2f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
         public float[] SurfaceType_Slowdown = { 0.1f, 4f, 0.05f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f };
@@ -58,9 +60,6 @@ namespace SaccFlightAndVehicles
         public bool DisableEffects = false;
         [Range(0, 2), Tooltip("3 Different ways to calculate amount of engine force used when sliding + accelerating, for testing. 0 = old way, 1 = keeps more energy, 2 = loses more energy")]
         public int SkidRatioMode = 0;
-        [Header("Drive Wheels Only")]
-        [Tooltip("How much the wheel slowing down/speeding up changes the engine speed")]
-        public float EngineInfluence = 225f;
         private int NumStepsSec;
         [Header("Debug")]
         public Transform LastTouchedTransform;
@@ -271,7 +270,7 @@ namespace SaccFlightAndVehicles
         public void Wheel_FixedUpdate()
         {
             if (Sleeping) { return; }
-            if (Piloting && IsDriveWheel)//only do subframe Stepsations if driving
+            if (Piloting && IsDriveWheel)//only do subframe Steps if driving
             {
                 float StepsFloat = ((Time.fixedDeltaTime) * NumStepsSec);
                 int steps = (int)((Time.fixedDeltaTime) * NumStepsSec);
