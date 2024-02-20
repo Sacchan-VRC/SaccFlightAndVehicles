@@ -50,8 +50,8 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             Selected = false;
-                FlareFireNow = false;
-                RequestSerialization();
+            FlareFireNow = false;
+            RequestSerialization();
         }
         public void SFEXT_L_EntityStart()
         {
@@ -68,7 +68,12 @@ namespace SaccFlightAndVehicles
             if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
         }
         public void SFEXT_G_PilotEnter()
-        { gameObject.SetActive(true); }
+        {
+            OnEnableDeserializationBlocker = true;
+            gameObject.SetActive(true);
+            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 1);
+        }
+        public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
         { gameObject.SetActive(false); }
         public void SFEXT_O_PilotEnter()
@@ -201,8 +206,10 @@ namespace SaccFlightAndVehicles
         {
             FlareFireNow = false;
         }
+        bool OnEnableDeserializationBlocker;
         public override void OnDeserialization()
         {
+            if (OnEnableDeserializationBlocker) { return; }
             if (FlareFireNow)
             {
                 for (int i = 0; i < NumFlare_PerShot; i++)

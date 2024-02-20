@@ -50,7 +50,6 @@ namespace SaccFlightAndVehicles
         public LayerMask AGMTargetsLayer = 1 << 26;
         public Transform WorldParent;
         [SerializeField] private bool HandHeldMode = false;
-        [SerializeField] private SaccEntity _EntityControl;
         [UdonSynced] private bool AGMFireNow;
         private float boolToggleTime;
         private bool AnimOn = false;
@@ -111,7 +110,6 @@ namespace SaccFlightAndVehicles
         private float reloadspeed;
         private bool LeftDial = false;
         private int DialPosition = -999;
-        private bool OthersEnabled;
         private bool Piloting;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -124,18 +122,11 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
-            if (HandHeldMode)
-            {
-                EntityControl = _EntityControl;
-                IsOwner = _EntityControl.IsOwner;
-            }
-            else
-            {
-                EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-                IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
-            }
+            IsOwner = EntityControl.IsOwner;
             VehicleTransform = EntityControl.transform;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            EntityColliders = EntityControl.gameObject.GetComponentsInChildren<Collider>();
+            StartEntityLayer = EntityControl.gameObject.layer;
 
             FindSelf();
 
@@ -176,11 +167,43 @@ namespace SaccFlightAndVehicles
         {
             if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
         }
+        private Collider[] EntityColliders;
+        private int StartEntityLayer;
+        public void SFEXT_G_PilotEnter()
+        {
+            OnEnableDeserializationBlocker = true;
+            gameObject.SetActive(true);
+            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 1);
+            if (EntityControl.EntityPickup)
+            {
+                if (EntityControl.Holding)
+                {
+                    EntityControl.gameObject.layer = 9;
+                    foreach (Collider stngcol in EntityColliders)
+                    { stngcol.isTrigger = true; }
+                }
+                else
+                {
+                    foreach (Collider stngcol in EntityColliders)
+                    { stngcol.enabled = false; }
+                }
+            }
+        }
+        public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
         {
-            if (OthersEnabled) { DisableForOthers(); }
+            gameObject.SetActive(false);
             if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
             { SetBoolOff(); }
+            if (EntityControl.EntityPickup)
+            {
+                EntityControl.gameObject.layer = StartEntityLayer;
+                foreach (Collider stngcol in EntityColliders)
+                {
+                    stngcol.isTrigger = false;
+                    stngcol.enabled = true;
+                }
+            }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -190,6 +213,7 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             func_active = false;
             Piloting = false;
+            UseTrigger = 0;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         }
         public void SFEXT_G_RespawnButton()
@@ -229,36 +253,20 @@ namespace SaccFlightAndVehicles
         {
             TriggerLastFrame = true;
             func_active = true;
-            gameObject.SetActive(true);
             AtGScreen.SetActive(true);
             AtGCam.gameObject.SetActive(true);
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
-            if (!OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
         }
         public void DFUNC_Deselected()
         {
             func_active = false;
             AtGScreen.SetActive(false);
             AtGCam.gameObject.SetActive(false);
-            gameObject.SetActive(false);
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
-            if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
             AGMUnlockTimer = 0;
             AGMUnlocking = 0;
-        }
-        public void EnableForOthers()
-        {
-            if (!Piloting)
-            { gameObject.SetActive(true); }
-            OthersEnabled = true;
-        }
-        public void DisableForOthers()
-        {
-            if (!Piloting)
-            { gameObject.SetActive(false); }
-            OthersEnabled = false;
         }
         private void RaycastLock()
         {
@@ -287,8 +295,11 @@ namespace SaccFlightAndVehicles
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                 }
-                else { Trigger = UseTrigger; }
-                if (AGMUnlockTimer > 0.4f && AGMLocked == true)
+                else
+                {
+                    Trigger = UseTrigger;
+                }
+                if (AGMUnlockTimer > 0.4f && AGMLocked)
                 {
                     //disable for others because they no longer need to sync
                     AGMLocked = false;
@@ -527,12 +538,16 @@ namespace SaccFlightAndVehicles
             DFUNC_Deselected();
             SFEXT_O_PilotExit();
         }
+        public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
+        public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
         private float UseTrigger;
-        public void UseTrigZero() { UseTrigger = 0; }
         public void SFEXT_O_OnPickupUseDown()
         {
             UseTrigger = 1;
-            SendCustomEventDelayedFrames(nameof(UseTrigZero), 1, VRC.Udon.Common.Enums.EventTiming.LateUpdate);
+        }
+        public void SFEXT_O_OnPickupUseUp()
+        {
+            UseTrigger = 0;
         }
         private void LaunchAGM_Owner()
         {
@@ -550,12 +565,10 @@ namespace SaccFlightAndVehicles
             }
             else { AGMFireNow = false; }
         }
-        public override void OnPostSerialization(VRC.Udon.Common.SerializationResult result)
-        {
-            AGMFireNow = false;
-        }
+        bool OnEnableDeserializationBlocker;
         public override void OnDeserialization()
         {
+            if (OnEnableDeserializationBlocker) { return; }
             if (AGMFireNow) { LaunchAGM(); }
         }
     }

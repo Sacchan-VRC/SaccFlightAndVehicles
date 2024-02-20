@@ -334,6 +334,7 @@ namespace SaccFlightAndVehicles
                         Vector3 RotationAxis = Vector3.Cross(MissileForward, targetDirection);
                         float deltaAngle = Vector3.Angle(MissileForward, targetDirection);
                         transform.Rotate(RotationAxis, Mathf.Min(RotSpeed * EngineTrack * AspectTrack * DeltaTime, deltaAngle), Space.World);
+                        MissileRigid.rotation = transform.rotation;
                     }
                     else
                     {
