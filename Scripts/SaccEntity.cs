@@ -625,7 +625,7 @@ namespace SaccFlightAndVehicles
                 UsersName = player.displayName;
                 UsersID = player.playerId;
                 PilotEnterTime = Time.time;
-                localPlayer.SetPlayerTag("SF_InVehicle", "T");
+                player.SetPlayerTag("SF_InVehicle", "T");
                 player.SetPlayerTag("SF_IsPilot", "T");
                 SendEventToExtensions("SFEXT_G_PilotEnter");
             }
@@ -644,7 +644,7 @@ namespace SaccFlightAndVehicles
                 { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(false); }
                 SendEventToExtensions("SFEXT_O_PilotExit");
             }
-            localPlayer.SetPlayerTag("SF_InVehicle", "");
+            player.SetPlayerTag("SF_InVehicle", "");
             player.SetPlayerTag("SF_IsPilot", "");
             PilotExitTime = Time.time;
             LStickSelection = -1;
@@ -681,14 +681,14 @@ namespace SaccFlightAndVehicles
             { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(false); }
             SendEventToExtensions("SFEXT_P_PassengerExit");
         }
-        public void PassengerEnterVehicleGlobal()
+        public void PassengerEnterVehicleGlobal(VRCPlayerApi player)
         {
-            localPlayer.SetPlayerTag("SF_InVehicle", "T");
+            player.SetPlayerTag("SF_InVehicle", "T");
             SendEventToExtensions("SFEXT_G_PassengerEnter");
         }
-        public void PassengerExitVehicleGlobal()
+        public void PassengerExitVehicleGlobal(VRCPlayerApi player)
         {
-            localPlayer.SetPlayerTag("SF_InVehicle", "");
+            player.SetPlayerTag("SF_InVehicle", "");
             SendEventToExtensions("SFEXT_G_PassengerExit");
         }
         public override void OnPlayerJoined(VRCPlayerApi player)
@@ -696,7 +696,7 @@ namespace SaccFlightAndVehicles
             if (IsOwner)
             {
                 SendEventToExtensions("SFEXT_O_OnPlayerJoined");
-                if (CustomPickup_localHeld)
+                if (Holding)
                 { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Pickup)); }
             }
         }
@@ -816,15 +816,13 @@ namespace SaccFlightAndVehicles
         }
         public override void Interact()
         {
-            SendEventToExtensions("SFEXT_O_Interact");
-            if (Interact_CustomPickup)
-            {
-                CustomPickup_Grab();
-            }
+            if (Interact_CustomPickup) { CustomPickup_Grab(); }
+            else { SendEventToExtensions("SFEXT_O_Interact"); }
         }
         bool snatched;
         public override void OnDrop()
         {
+            if (!IsOwner) { snatched = true; }
             Holding = false;
             Using = false;
             if (EnableWhenHolding.Length > 0)
@@ -833,7 +831,9 @@ namespace SaccFlightAndVehicles
                 { EnableWhenHolding[i].SetActive(false); }
             }
             SendEventToExtensions("SFEXT_O_OnDrop");
-            if (!snatched)//Don't send drop if it was snatched because the drop event will arrive after the other player's grab event
+            if (snatched)//Don't send drop if it was snatched because the drop event will arrive after the other player's grab event
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Snatched)); snatched = false; }
+            else
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Drop)); }
         }
         [System.NonSerialized, FieldChangeCallback(nameof(CustomPickup_Synced_isHeld))] private bool _CustomPickup_Synced_isHeld = false;//can be used if the VRCPickup script is not in use
@@ -850,6 +850,10 @@ namespace SaccFlightAndVehicles
         {
             CustomPickup_Synced_isHeld = true;
             SendEventToExtensions("SFEXT_G_OnPickup");
+        }
+        public void SendEvent_Snatched()
+        {
+            SendEventToExtensions("SFEXT_G_OnSnatched");
         }
         public void SendEvent_Drop()
         {
@@ -985,8 +989,11 @@ namespace SaccFlightAndVehicles
                     rb.position = transform.position;
                     rb.rotation = transform.rotation;
                 }
+                SendEventToExtensions("SFEXT_O_RespawnButton");
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendRespawn));
             }
         }
+        public void SendRespawn() { SendEventToExtensions("SFEXT_G_RespawnButton"); }
         // ToDo: Use static to better performance on U#1.0
         // public static UdonSharpBehaviour GetExtention(SaccEntity entity, string udonTypeName)
         public UdonSharpBehaviour GetExtention(string udonTypeName)
