@@ -1087,12 +1087,29 @@ namespace SaccFlightAndVehicles
                             Taxiinglerper = 0;
                         }
                         //keyboard control for afterburner
-                        if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner && (VTOLAngleDegrees < EnterVTOLEvent_Angle || VTOLAllowAfterburner))
+                        if (Input.GetKeyDown(AfterBurnerKey))
                         {
-                            if (AfterburnerOn)
-                            { PlayerThrottle = ThrottleAfterburnerPoint; }
-                            else
+                            if (HasAfterburner)
+                            {
+                                if ((VTOLAngleDegrees < EnterVTOLEvent_Angle || VTOLAllowAfterburner))
+                                {
+                                    if (AfterburnerOn)
+                                    { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                    else
+                                    { PlayerThrottle = 1; }
+                                }
+                                else
+                                {
+                                    if (PlayerThrottle == ThrottleAfterburnerPoint)
+                                    { PlayerThrottle = 0; }
+                                    else
+                                    { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                }
+                            }
+                            else if (PlayerThrottle < 1)
                             { PlayerThrottle = 1; }
+                            else
+                            { PlayerThrottle = 0; }
                         }
                         if (_ThrottleOverridden)
                         {
