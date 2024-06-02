@@ -43,8 +43,7 @@ namespace SaccFlightAndVehicles
         {
             if (other && other.gameObject.layer == ResupplyLayer)
             {
-                float tim = Time.time;
-                if (NumTriggers == 0) { LastResupplyTime = Mathf.Min((tim + ResupplyDelay) - ResupplyInitialDelay, tim); }
+                if (NumTriggers == 0) { LastResupplyTime = Time.time - ResupplyDelay + ResupplyInitialDelay; }
                 NumTriggers += 1;
                 InResupplyZone = true;
             }
