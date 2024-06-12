@@ -303,11 +303,21 @@ namespace SaccFlightAndVehicles
             float compression = 0f;
             if (Physics.Raycast(WheelPoint.position + WheelPoint.up * ExtraRayCastDistance, -WheelPoint.up, out SusOut, SuspensionDistance + ExtraRayCastDistance, WheelLayers, QueryTriggerInteraction.Ignore))
             {
-                GetTouchingTransformSpeed();
                 float fixedDT = Time.fixedDeltaTime;
+                Vector3 PointVel = (SusOut.point - GroundPointLast) / fixedDT;
+                GroundPointLast = SusOut.point;
+                GetTouchingTransformSpeed();
+                if (Grounded)
+                {
+                    PointVelocity = PointVel - LastTouchedTransform_Speed;
+                }
+                else
+                {
+                    PointVelocity = CarRigid.GetPointVelocity(SusOut.point) - LastTouchedTransform_Speed;
+                }
                 Grounded = true;
-                //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop
-                if (Vector3.Angle(SusOut.normal, Vector3.up) < 20)
+                //SusDirection is closer to straight up the slower vehicle is moving, so that it can stop on slopes
+                if (Vector3.Angle(SusOut.normal, Vector3.up) < 20 && !SGVControl.Bike_AutoSteer)
                 { SusDirection = Vector3.Lerp(Vector3.up, SusOut.normal, (SGVControl.VehicleSpeed / 1f)); }
                 else
                 { SusDirection = SusOut.normal; }
@@ -348,7 +358,6 @@ namespace SaccFlightAndVehicles
                 //GRIP//
                 //Wheel's velocity vector projected to the normal of the ground
                 WheelGroundUp = Vector3.ProjectOnPlane(SusOut.normal, WheelPoint.right).normalized;
-                PointVelocity = CarRigid.GetPointVelocity(SusOut.point) - LastTouchedTransform_Speed;
 #if UNITY_EDITOR
                 ContactPoint = SusOut.point;
 #endif
@@ -368,6 +377,7 @@ namespace SaccFlightAndVehicles
         RaycastHit SusOut;
         Vector3 SusForce;
         Vector3 WheelGroundUp = Vector3.up;
+        Vector3 GroundPointLast;
         Vector3 PointVelocity;
         private void WheelPhysics(int NumSteps)
         {
