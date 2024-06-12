@@ -14,6 +14,7 @@ namespace SaccFlightAndVehicles
         [Space(10)]
         public Rigidbody CarRigid;
         public SaccGroundVehicle SGVControl;
+        public float SyncInterval = 0.3f;
         public Transform WheelPoint;
         public Transform WheelVisual;
         public Transform WheelVisual_Ground;
@@ -48,6 +49,7 @@ namespace SaccFlightAndVehicles
         public float[] SurfaceType_SkidParticles_Amount = { .3f, .3f, .3f, .3f, .3f, .3f, .3f, .3f, .3f, .3f };
         public float ClutchStrength = .33f;
         [Tooltip("Lower number = less skid required for sound to start")]
+        private float SkidSound_Min_THREEQUARTER, SkidSound_Min_TWOTHRID; // sync a bit before the skid speed so it's more accurate
         public float SkidSound_Min = 3f;
         [Tooltip("How quickly volume increases as skid speed increases")]
         public float SkidSound_VolumeIncrease = 0.5f;
@@ -76,6 +78,11 @@ namespace SaccFlightAndVehicles
         private ParticleSystem SkidParticle;
         private ParticleSystem.EmissionModule SkidParticleEM;
         [UdonSynced(UdonSyncMode.Linear)] private float SkidLength;
+        private float SkidLength_Smoothed;
+        public float SkidLength_SmoothStep = 0.11f;
+        private bool SyncSkid_Running;
+        private bool SkidLength_SkiddingLast;
+        private float lastSync;
         public float Clutch = 1f;
         public float WheelRotation;
         public float WheelRotationSpeedRPS;
@@ -201,6 +208,8 @@ namespace SaccFlightAndVehicles
 #endif
         void Start()
         {
+            SkidSound_Min_THREEQUARTER = SkidSound_Min * .75f;
+            SkidSound_Min_TWOTHRID = SkidSound_Min * .66f;
             NumStepsSec = (int)SGVControl.GetProgramVariable("NumStepsSec");
             WheelRenderer = (Renderer)SGVControl.GetProgramVariable("MainObjectRenderer");
             if (!WheelRenderer)
@@ -538,6 +547,17 @@ namespace SaccFlightAndVehicles
             {
                 if (IsOwner)
                 {
+                    if (Time.time - lastSync > SyncInterval)
+                    {
+                        bool Skidding = SkidLength < SkidSound_Min_THREEQUARTER;
+                        if (!(!Skidding && !SkidLength_SkiddingLast))//if last send was (not skidding) and it's still (not skidding) don't send
+                        {
+                            lastSync = Time.time;
+                            SkidLength_SkiddingLast = Skidding;
+                            RequestSerialization();
+                        }
+                    }
+                    SkidLength_Smoothed = SkidLength;
                     if (WheelRenderer.isVisible)
                     {
                         RotateWheelOwner();
@@ -554,7 +574,7 @@ namespace SaccFlightAndVehicles
                 if (DisableEffects) { return; }
                 if (Grounded && !CurrentlyDistant)
                 {
-                    float skidvol = Mathf.Min((SkidLength - SkidSound_Min) * SkidSound_VolumeIncrease, 1);
+                    float skidvol = Mathf.Min((SkidLength_Smoothed - SkidSound_Min) * SkidSound_VolumeIncrease, 1);
                     if (skidvol > 0)
                     {
                         if (SkidSound)
@@ -564,7 +584,7 @@ namespace SaccFlightAndVehicles
                                 StartSkidSound();
                             }
                             SkidSound.volume = skidvol * SkidVolumeMulti;
-                            SkidSound.pitch = (SkidLength * SkidSound_PitchIncrease) + SkidSound_Pitch;
+                            SkidSound.pitch = (SkidLength_Smoothed * SkidSound_PitchIncrease) + SkidSound_Pitch;
                         }
                         if (SkidParticle)
                         {
@@ -572,7 +592,7 @@ namespace SaccFlightAndVehicles
                             {
                                 StartSkidParticle();
                             }
-                            SkidParticleEM.rateOverTime = SkidLength * CurrentNumParticles;
+                            SkidParticleEM.rateOverTime = SkidLength_Smoothed * CurrentNumParticles;
                         }
                     }
                     else
@@ -651,7 +671,7 @@ namespace SaccFlightAndVehicles
         }
         public void FallAsleep()
         {
-            SkidLength = 0;
+            SkidLength = SkidLength_Smoothed = 0;
             LastTouchedTransform_Speed = Vector3.zero;
             Sleeping = true;
             StopSkidSound();
@@ -760,6 +780,7 @@ namespace SaccFlightAndVehicles
         public void UpdateOwner()
         {
             bool IsOwner_New = (bool)SGVControl.GetProgramVariable("IsOwner");
+            if (TESTISOWNER) TESTISOWNER.SetActive(IsOwner_New);
             /*             if (IsOwner && !IsOwner_New)
                         {
                             //lose ownership
@@ -771,6 +792,34 @@ namespace SaccFlightAndVehicles
                 GroundPointLast = WheelPoint.position; // prevent 1 frame skid from last owned position
             }
             IsOwner = IsOwner_New;
+        }
+        public GameObject TESTISOWNER;
+        public GameObject TESTISSYNCING;
+        public void SyncSkid()
+        {
+            if (TESTISSYNCING) TESTISSYNCING.SetActive(!TESTISSYNCING.activeSelf);
+            if (!SyncSkid_Running) { return; }
+            if (IsOwner)
+            {
+                SyncSkid_Running = false;
+                return;
+            }
+            if (SkidLength < SkidSound_Min_THREEQUARTER && SkidLength_Smoothed < SkidSound_Min_THREEQUARTER)
+            {
+                SkidLength = 0;
+                SyncSkid_Running = false;
+                return;
+            }
+            SkidLength_Smoothed = Mathf.SmoothStep(SkidLength_Smoothed, SkidLength, SkidLength_SmoothStep);
+            SendCustomEventDelayedFrames(nameof(SyncSkid), 1);
+        }
+        public override void OnDeserialization()
+        {
+            if (SkidLength > SkidSound_Min_THREEQUARTER && !SyncSkid_Running)
+            {
+                SyncSkid_Running = true;
+                SyncSkid();
+            }
         }
 #if UNITY_EDITOR
         [Header("Editor Only, use in play mode")]
