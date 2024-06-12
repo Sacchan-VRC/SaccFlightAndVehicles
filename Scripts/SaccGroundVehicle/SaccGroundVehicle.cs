@@ -282,7 +282,7 @@ namespace SaccFlightAndVehicles
             OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
 
             IsOwner = EntityControl.IsOwner;
-            SetWheelIsOwner();
+            UpdateWheelIsOwner();
             InVR = EntityControl.InVR;
             localPlayer = Networking.LocalPlayer;
             if (localPlayer == null)
@@ -727,7 +727,6 @@ namespace SaccFlightAndVehicles
                             }
                             else
                             {
-
                                 if (Drift_AutoSteer)
                                 {
                                     YawInput = Mathf.Lerp(YawInput, AutoSteer, 1 - Mathf.Pow(0.5f, VehicleSpeed * AutoSteerStrength * GroundedwheelsRatio * DeltaTime));
@@ -1056,39 +1055,42 @@ namespace SaccFlightAndVehicles
             GDamageToTake = 0f;
             VehicleRigidbody.velocity = CurrentVel;
             LastFrameVel = CurrentVel;
-            SetWheelIsOwner();
+            UpdateWheelIsOwner();
         }
         public void SFEXT_O_LoseOwnership()
         {
             VehiclePosLastFrame = VehicleTransform.position;
             IsOwner = false;
-            SetWheelIsOwner();
+            UpdateWheelIsOwner();
         }
-        public void SetWheelIsOwner()
+        public void UpdateWheelIsOwner()
         {
-            for (int i = 0; i < DriveWheels.Length; i++)
+            if (IsOwner)
             {
-                DriveWheels[i].SetProgramVariable("IsOwner", IsOwner);
-                if (IsOwner)
+                for (int i = 0; i < DriveWheels.Length; i++)
                 {
                     Networking.SetOwner(Networking.LocalPlayer, DriveWheels[i].gameObject);
                 }
-            }
-            for (int i = 0; i < SteerWheels.Length; i++)
-            {
-                SteerWheels[i].SetProgramVariable("IsOwner", IsOwner);
-                if (IsOwner)
+                for (int i = 0; i < SteerWheels.Length; i++)
                 {
                     Networking.SetOwner(Networking.LocalPlayer, SteerWheels[i].gameObject);
                 }
-            }
-            for (int i = 0; i < OtherWheels.Length; i++)
-            {
-                OtherWheels[i].SetProgramVariable("IsOwner", IsOwner);
-                if (IsOwner)
+                for (int i = 0; i < OtherWheels.Length; i++)
                 {
                     Networking.SetOwner(Networking.LocalPlayer, OtherWheels[i].gameObject);
                 }
+            }
+            for (int i = 0; i < DriveWheels.Length; i++)
+            {
+                DriveWheels[i].SendCustomEvent("UpdateOwner");
+            }
+            for (int i = 0; i < SteerWheels.Length; i++)
+            {
+                SteerWheels[i].SendCustomEvent("UpdateOwner");
+            }
+            for (int i = 0; i < OtherWheels.Length; i++)
+            {
+                OtherWheels[i].SendCustomEvent("UpdateOwner");
             }
         }
         public void SetWheelDriver()

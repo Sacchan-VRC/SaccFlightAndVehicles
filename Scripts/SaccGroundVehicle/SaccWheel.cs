@@ -757,6 +757,21 @@ namespace SaccFlightAndVehicles
             WheelRotationSpeedRPM = 0;
             WheelRotationSpeedSurf = 0;
         }
+        public void UpdateOwner()
+        {
+            bool IsOwner_New = (bool)SGVControl.GetProgramVariable("IsOwner");
+            /*             if (IsOwner && !IsOwner_New)
+                        {
+                            //lose ownership
+                        }
+                        else  */
+            if (!IsOwner && IsOwner_New)
+            {
+                //take ownership
+                GroundPointLast = WheelPoint.position; // prevent 1 frame skid from last owned position
+            }
+            IsOwner = IsOwner_New;
+        }
 #if UNITY_EDITOR
         [Header("Editor Only, use in play mode")]
         public bool ShowWheelForceLines;
