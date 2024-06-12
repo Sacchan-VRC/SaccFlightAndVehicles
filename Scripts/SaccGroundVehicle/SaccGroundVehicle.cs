@@ -40,7 +40,7 @@ namespace SaccFlightAndVehicles
         public float DriveSpeed;
         [Tooltip("How many revs are taken away all the time")]
         public float EngineSlowDown = .75f;
-        [Tooltip("Throttle % that is applied when not touching the controls")]
+        [Tooltip("Throttle that is applied when not touching the controls")]
         public float MinThrottle = .08f;
         [Tooltip("How agressively to reach minthrottle value when not touching the controls")]
         public float MinThrottle_PStrength = 2f;
@@ -99,6 +99,9 @@ namespace SaccFlightAndVehicles
             get => HandBrakeOn;
         }
         private Vector3 VehiclePosLastFrame;
+        public bool Bike_AutoSteer;
+        public float Bike_AutoSteer_CounterStrength = .01f;
+        public float Bike_AutoSteer_Strength = .01f;
         public bool Drift_AutoSteer;
         [Header("AutoSteer (Drift Mode)")]
         [Tooltip("Put in the max degrees the wheels can turn to in order to make autosteer work properly")]
@@ -222,6 +225,7 @@ namespace SaccFlightAndVehicles
         public int NumWheels = 4;
         public float CurrentDistance;
         public bool CurrentlyDistant = true;
+        float angleLast;
         int HandsOnWheel;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(HasFuel_))] public bool HasFuel = true;
         public bool HasFuel_
@@ -723,6 +727,7 @@ namespace SaccFlightAndVehicles
                             }
                             else
                             {
+
                                 if (Drift_AutoSteer)
                                 {
                                     YawInput = Mathf.Lerp(YawInput, AutoSteer, 1 - Mathf.Pow(0.5f, VehicleSpeed * AutoSteerStrength * GroundedwheelsRatio * DeltaTime));
@@ -791,6 +796,20 @@ namespace SaccFlightAndVehicles
                             {
                                 if (Drift_AutoSteer)
                                 { YawInput = Mathf.Lerp(YawInput, AutoSteer, 1 - Mathf.Pow(0.5f, VehicleSpeed * AutoSteerStrength * DeltaTime * GroundedwheelsRatio)); }
+                                else if (Bike_AutoSteer)
+                                {
+                                    float angle = Vector3.SignedAngle(VehicleTransform.up, Vector3.up, VehicleTransform.forward);
+                                    if (angle != angleLast)
+                                    {
+                                        // if ((angle > 0 && YawInput < 0) || (angle < 0 && YawInput > 0))
+                                        // {
+                                        //     YawInput = 0;
+                                        // }
+                                        YawInput += angle * Bike_AutoSteer_Strength * Time.deltaTime;
+                                        YawInput *= (angle - angleLast) * Bike_AutoSteer_CounterStrength * Time.deltaTime;
+                                        angleLast = angle;
+                                    }
+                                }
                                 else
                                 { YawInput = Mathf.MoveTowards(YawInput, 0f, (1f / SteeringReturnSpeedDT) * DeltaTime); }
                             }
