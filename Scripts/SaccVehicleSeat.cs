@@ -154,7 +154,7 @@ namespace SaccFlightAndVehicles
                 if (!player.IsUserInVR() && !Fake && !Disable180Rotation) { ThreeSixtySeat(); }
                 if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
                 else
-                { EntityControl.PassengerEnterVehicleGlobal(); }
+                { EntityControl.PassengerEnterVehicleGlobal(player); }
             }
         }
         public override void OnStationExited(VRCPlayerApi player)
@@ -186,7 +186,7 @@ namespace SaccFlightAndVehicles
                 SeatOccupied = false;
                 DoVoiceVolumeChange = EntityControl.DoVoiceVolumeChange;
                 if (IsPilotSeat) { EntityControl.PilotExitVehicle(player); }
-                else { EntityControl.PassengerExitVehicleGlobal(); }
+                else { EntityControl.PassengerExitVehicleGlobal(player); }
                 if (DoVoiceVolumeChange)
                 {
                     SetVoiceOutside(player);
