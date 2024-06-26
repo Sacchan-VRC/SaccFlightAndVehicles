@@ -13,6 +13,12 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     public SaccFlightAndVehicles.SaccAirVehicle SAVControl;
     public Animator ThrustAnimator;
     public Transform ThrustArrow;
+    [SerializeField] KeyCode ThrustForwardKey = KeyCode.I;
+    [SerializeField] KeyCode ThrustBackKey = KeyCode.K;
+    [SerializeField] KeyCode ThrustRightKey = KeyCode.L;
+    [SerializeField] KeyCode ThrustLeftKey = KeyCode.J;
+    [SerializeField] KeyCode ThrustUpKey = KeyCode.O;
+    [SerializeField] KeyCode ThrustDownKey = KeyCode.U;
     public Vector2 ThreeDThrottleStrengthX = new Vector2(20f, 20f);
     public Vector2 ThreeDThrottleStrengthY = new Vector2(20f, 20f);
     public Vector2 ThreeDThrottleStrengthZ = new Vector2(20f, 20f);
@@ -210,12 +216,12 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
                     ThrottleStuff(ThreeDGrab);
                 }
             }
-            int Ii = Input.GetKey(KeyCode.I) ? 1 : 0;
-            int Ki = Input.GetKey(KeyCode.K) ? -1 : 0;
-            int Ji = Input.GetKey(KeyCode.J) ? -1 : 0;
-            int Li = Input.GetKey(KeyCode.L) ? 1 : 0;
-            int Ui = Input.GetKey(KeyCode.U) ? -1 : 0;
-            int Oi = Input.GetKey(KeyCode.O) ? 1 : 0;
+            int Ii = Input.GetKey(ThrustForwardKey) ? 1 : 0;
+            int Ki = Input.GetKey(ThrustBackKey) ? -1 : 0;
+            int Ji = Input.GetKey(ThrustLeftKey) ? -1 : 0;
+            int Li = Input.GetKey(ThrustRightKey) ? 1 : 0;
+            int Ui = Input.GetKey(ThrustDownKey) ? -1 : 0;
+            int Oi = Input.GetKey(ThrustUpKey) ? 1 : 0;
             ThreeDKeybThrottle.x = Ji + Li;
             ThreeDKeybThrottle.y = Ui + Oi;
             ThreeDKeybThrottle.z = Ii + Ki;

@@ -11,6 +11,8 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour SAVControl;
         public float SyncUpdateRate = .25f;
+        [SerializeField] KeyCode VtolUpKey = KeyCode.PageUp;
+        [SerializeField] KeyCode VtolDownKey = KeyCode.PageDown;
         private bool UseLeftTrigger = false;
         [System.NonSerializedAttribute, UdonSynced] public float VTOLAngle;
         private float VTOLAngleLast;
@@ -79,8 +81,8 @@ namespace SaccFlightAndVehicles
                 if (!InVR || Selected)
                 {
                     VTOLAngle = (float)SAVControl.GetProgramVariable("VTOLAngle");
-                    float pgup = Input.GetKey(KeyCode.PageUp) ? 1 : 0;
-                    float pgdn = Input.GetKey(KeyCode.PageDown) ? 1 : 0;
+                    float pgup = Input.GetKey(VtolUpKey) ? 1 : 0;
+                    float pgdn = Input.GetKey(VtolDownKey) ? 1 : 0;
                     if (pgup + pgdn != 0)
                     {
                         UpdatingKeyb = true;
