@@ -489,7 +489,8 @@ namespace SaccFlightAndVehicles
                 }
                 if ((Piloting || Passenger) && EngineStarted)
                 {
-                    float engineout = IsHelicopter ? ((float)SAVControl.GetProgramVariable("EngineOutput") * .5f) + .5f : (float)SAVControl.GetProgramVariable("EngineOutput");
+                    float engineout = Mathf.Abs((float)SAVControl.GetProgramVariable("EngineOutput"));
+                    engineout = IsHelicopter ? (engineout * .5f) + .5f : engineout;
                     if (PlaneInside)
                     {
                         PlaneInside.pitch = Mathf.Lerp(PlaneInside.pitch, (engineout * .4f) + .8f, PlaneInsidePitchLerpValueOn * DeltaTime);
@@ -510,7 +511,7 @@ namespace SaccFlightAndVehicles
             else if (EngineStarted)//someone else is piloting
             {
                 PlaneIdleVolume = Mathf.Lerp(PlaneIdleVolume, PlaneIdleTargetVolume, PlaneIdleVolLerpValueOn * DeltaTime);
-                float engineout = (float)SAVControl.GetProgramVariable("EngineOutput");
+                float engineout = Mathf.Abs((float)SAVControl.GetProgramVariable("EngineOutput"));
                 PlaneIdlePitch = Mathf.Lerp(PlaneIdlePitch, (engineout - 0.3f) + 1.3f, PlaneIdlePitchLerpValueOn * DeltaTime);
                 if (IsHelicopter) { engineout = (engineout * .5f) + .5f; }
                 if (Doppler > 50)

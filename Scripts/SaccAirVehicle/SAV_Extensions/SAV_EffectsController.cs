@@ -81,6 +81,7 @@ namespace SaccFlightAndVehicles
             }
             else { InEditor = false; }
             IsOwner = EntityControl.IsOwner;
+            VehicleAnimator.SetBool("owner", IsOwner);
 
             if (PrintAnimHashNamesOnStart)
             { PrintStringHashes(); }
@@ -310,10 +311,12 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
+            VehicleAnimator.SetBool("owner", true);
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
+            VehicleAnimator.SetBool("owner", false);
             if (DoWheelPose)
             {
                 for (int i = 0; i < WheelColliders.Length; i++)

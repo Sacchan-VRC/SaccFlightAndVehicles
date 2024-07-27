@@ -277,6 +277,7 @@ namespace SaccFlightAndVehicles
         public bool EngineOnOnEnter = true;
         [Tooltip("Set Engine Off when entering the vehicle?")]
         public bool EngineOffOnExit = true;
+        public bool DroneMode = false;
         [FieldChangeCallback(nameof(EngineOn))] public bool _EngineOn = false;
         public bool EngineOn
         {
@@ -601,6 +602,26 @@ namespace SaccFlightAndVehicles
                 PreventEngineToggle = value;
             }
             get => PreventEngineToggle;
+        }
+        [System.NonSerialized] public float InverThrustMultiplier = -1;
+        [System.NonSerializedAttribute] public bool _InvertThrust;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(InvertThrust_))] public int InvertThrust = 0;
+        public int InvertThrust_
+        {
+            set
+            {
+                if (value > 0 && InvertThrust == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_InvertThrust_Activated");
+                }
+                else if (value == 0 && InvertThrust > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_InvertThrust_Deactivated");
+                }
+                _InvertThrust = value > 0;
+                InvertThrust = value;
+            }
+            get => InvertThrust;
         }
         [System.NonSerializedAttribute] public bool _DisablePhysicsApplication;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisablePhysicsApplication_))] public int DisablePhysicsApplication = 0;
@@ -1284,7 +1305,6 @@ namespace SaccFlightAndVehicles
                         PitchDown = downspeed < 0;//air is hitting plane from above?
                         SpeedLiftFactor = AirSpeed * AirSpeed;
                         SpeedLiftFactor_Lift = Mathf.Min(SpeedLiftFactor * Lift, MaxLift);
-                        SpeedLiftFactor_pd = Mathf.Min(AirSpeed * AirSpeed * Lift, PitchDown ? MaxLift * PitchDownLiftMulti : MaxLift);
 
                         rotlift = Mathf.Min(AirSpeed / RotMultiMaxSpeed, 1);//using a simple linear curve for increasing control as you move faster
 
@@ -1312,20 +1332,32 @@ namespace SaccFlightAndVehicles
 
                     if ((!Asleep))
                     {
-                        //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
-                        //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
-                        Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor_Lift * AoALiftYaw,// X Sideways
-                                ((PitchDown ? downspeed * PitchDownLiftMulti : downspeed) * ExtraLift * SpeedLiftFactor_pd * AoALiftPitch),// Y Up
-                                0);//Z Forward
 
                         float GroundEffectAndVelLift = 0;
 
-                        Vector2 Outputs = UnpackThrottles(EngineOutput);
+                        Vector2 Outputs = UnpackThrottles(Mathf.Abs(EngineOutput));//collective value
+
+                        if (_InvertThrust)
+                        {
+                            if (DroneMode)
+                            {
+                                PitchDown = !PitchDown;
+                            }
+                            Outputs *= InverThrustMultiplier;
+                        }
+
                         float Thrust = (Mathf.Min(Outputs.x)//Throttle
                         * ThrottleStrength
                         + Mathf.Max(Outputs.y, 0)//Afterburner throttle
                         * ThrottleStrengthAB);
 
+                        SpeedLiftFactor_pd = Mathf.Min(AirSpeed * AirSpeed * Lift, PitchDown ? MaxLift * PitchDownLiftMulti : MaxLift);
+
+                        //Create a Vector3 Containing the thrust, and rotate and adjust strength based on VTOL value
+                        //engine output is multiplied so that max throttle without afterburner is max strength (unrelated to vtol)
+                        Vector3 FinalInputAcc = new Vector3(-sidespeed * SidewaysLift * SpeedLiftFactor_Lift * AoALiftYaw,// X Sideways
+                                ((PitchDown ? downspeed * PitchDownLiftMulti : downspeed) * ExtraLift * SpeedLiftFactor_pd * AoALiftPitch),// Y Up
+                                0);//Z Forward
 
                         if (VTOLenabled)
                         {
@@ -1414,6 +1446,11 @@ namespace SaccFlightAndVehicles
                                 , 0);
                         }
 
+                        if (DroneMode)
+                        {
+                            FinalInputAcc.y *= _EngineOn ? ThrottleInput : 0;
+                        }
+
                         VehicleForce = FinalInputAcc;
                         if (HasWheelColliders && WheelSuspension)
                         {
@@ -1474,7 +1511,7 @@ namespace SaccFlightAndVehicles
                     { VehicleRigidbody.AddRelativeTorque(-Yawing, ForceMode.Force); }
                 }
                 //calc Gs
-                float gravity = -Physics.gravity.y * DeltaTime;
+                float gravity = 9.80665f * DeltaTime;
                 LastFrameVel.y -= gravity; //add gravity
 
                 Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);
@@ -1486,7 +1523,11 @@ namespace SaccFlightAndVehicles
                 LastFrameVel = VehicleVel;
             }
         }
-        public void Explode()//all the things players see happen when the vehicle explodes
+        public void NetworkExplode()
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+        }
+        public void Explode()
         {
             if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
             FallAsleep();
@@ -2441,6 +2482,7 @@ namespace SaccFlightAndVehicles
         }
         public Vector2 UnpackThrottles(float Throttle)
         {
+            Throttle = Mathf.Abs(Throttle);
             //x = throttle amount (0-1), y = afterburner amount (0-1)
             return new Vector2(Mathf.Min(Throttle, ThrottleAfterburnerPoint) * ThrottleNormalizer,
             Mathf.Max((Mathf.Max(Throttle, ThrottleAfterburnerPoint) - ThrottleAfterburnerPoint) * ABNormalizer, 0));
