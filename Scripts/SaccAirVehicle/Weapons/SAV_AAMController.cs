@@ -26,9 +26,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("See above")]
         public float HighAspectRotSpeedMulti = .5f;
         [Tooltip("Send the target plane's animator an integer +1 whilst this missile is flying towards it")]
-        public bool SendAnimInt = true;
+        public bool SendMissileIncoming = true;
         [Tooltip("Name of animator integer to +1 on the target plane while chasing it")]
-        public string AnimINTName = "missilesincoming";
+        public string MissileIncomingName = "missilesincoming";
         [Tooltip("Play a random one of these explosion sounds")]
         public AudioSource[] ExplosionSounds;
         [Tooltip("Play a random one of these explosion sounds when hitting water")]
@@ -179,14 +179,14 @@ namespace SaccFlightAndVehicles
                     if (TargetSAVControl)
                     {
                         OutsideVehicleLayer = (int)TargetSAVControl.GetProgramVariable("OutsideVehicleLayer");
-                        if (SendAnimInt && ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger")))
+                        if (SendMissileIncoming && ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger")))
                         {
                             TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) + 1);
                             MissileIncoming = true;
                         }
                         TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
                         TargetAnimator = (Animator)TargetSAVControl.GetProgramVariable("VehicleAnimator");
-                        TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
+                        TargetAnimator.SetInteger(MissileIncomingName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
                         TargetABPoint = (float)TargetSAVControl.GetProgramVariable("ThrottleAfterburnerPoint");
                         TargetThrottleNormalizer = 1 / TargetABPoint;
                     }
@@ -356,7 +356,7 @@ namespace SaccFlightAndVehicles
                         if ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger"))
                         {
                             TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) - 1);
-                            TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
+                            TargetAnimator.SetInteger(MissileIncomingName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
                         }
                         MissileIncoming = false;
                     }
@@ -456,7 +456,7 @@ namespace SaccFlightAndVehicles
                 {
                     TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) - 1);
                 }
-                TargetAnimator.SetInteger(AnimINTName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
+                TargetAnimator.SetInteger(MissileIncomingName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
                 MissileIncoming = false;
             }
 
