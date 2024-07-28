@@ -67,10 +67,10 @@ namespace SaccFlightAndVehicles
                 else
                 { EntityControl.SendEventToExtensions("SFEXT_G_CarGearDown"); }
                 EntityControl.SendEventToExtensions("SFEXT_G_CarChangeGear");
+                AutoClutch = 1;
                 if (!ClutchTransitioning)
                 {
                     ClutchTransitioning = true;
-                    AutoClutch = 1;
                     ClutchTransition();
                 }
                 _CurrentGear = value;
