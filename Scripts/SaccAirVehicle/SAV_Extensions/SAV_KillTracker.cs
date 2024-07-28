@@ -27,7 +27,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_Explode()
         {
             float time = Time.time;
-            if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || (time - (float)SAVControl.GetProgramVariable("LastHitTime") < 2 && ((time - EntityControl.PilotExitTime) < 5))))
+            if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && time - (float)SAVControl.GetProgramVariable("LastHitTime") < 2 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || ((time - EntityControl.PilotExitTime) < 5)))
             {
                 if (EntityControl.LastAttacker != EntityControl)
                 {
