@@ -22,6 +22,8 @@ namespace SaccFlightAndVehicles
         public AudioSource[] WaterExplosionSounds;
         [Tooltip("Spawn bomb at a random angle up to this number of degrees")]
         public float AngleRandomization = 0;
+        [Tooltip("Bomb flies forward with this much extra speed, can be used to make guns/shells")]
+        public float LaunchSpeed = 0;
         private Animator RocketAnimator;
         private Rigidbody RocketRigid;
         private SaccEntity EntityControl;
@@ -41,6 +43,10 @@ namespace SaccFlightAndVehicles
             RocketRigid = GetComponent<Rigidbody>();
             RocketAnimator = GetComponent<Animator>();
         }
+        public void AddLaunchSpeed()
+        {
+            RocketRigid.velocity += transform.forward * LaunchSpeed;
+        }
         private void OnEnable()
         {
             if (!initialized) { Initialize(); }
@@ -50,6 +56,7 @@ namespace SaccFlightAndVehicles
             { IsOwner = (bool)LauncherControl.GetProgramVariable("IsOwner"); }
             SendCustomEventDelayedSeconds(nameof(EnableCollider), ColliderEnableDelay);
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
+            SendCustomEventDelayedFrames(nameof(AddLaunchSpeed), 1);//doesn't work if done this frame
             LifeTimeExplodesSent++;
         }
         public void EnableCollider()
