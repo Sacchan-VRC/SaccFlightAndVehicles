@@ -34,7 +34,9 @@ namespace SaccFlightAndVehicles
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             if (localPlayer != null)
             {
-                if (!localPlayer.isMaster)
+                if (localPlayer.isMaster)
+                { OnEnable(); }
+                else
                 { gameObject.SetActive(false); }
             }
         }
@@ -102,7 +104,7 @@ namespace SaccFlightAndVehicles
         //collider enabled and disabled so that it does ontriggerenter on enable
         private void OnEnable()
         {
-            if (!Initilized) { SFEXT_L_EntityStart(); }//for test mode where onenable runs before ECStart
+            if (!Initilized) { return; }//for test mode when onenable runs before ECStart
             ThisCollider.enabled = true;
         }
         private void OnDisable()
