@@ -63,5 +63,54 @@ namespace SaccFlightAndVehicles
             if (Event_Name != string.Empty)
             { EntityControl.SendCustomEvent(Event_Name); }
         }
+
+        // can now be used as a DFUNC
+        private bool UseLeftTrigger;
+        private bool TriggerLastFrame;
+        bool controlsActive = false;
+        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
+        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        public void ControlInputs()
+        {
+            if (!controlsActive) { return; }
+            float Trigger;
+            if (UseLeftTrigger)
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+            else
+            { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+
+            if (Trigger > 0.75)
+            {
+                if (!TriggerLastFrame)
+                {
+                    Interact();
+                }
+                TriggerLastFrame = true;
+            }
+            else { TriggerLastFrame = false; }
+            SendCustomEventDelayedFrames(nameof(ControlInputs), 1);
+        }
+        public void KeyboardInput()
+        {
+            Interact();
+        }
+        public void DFUNC_Deselected()
+        {
+            controlsActive = false;
+        }
+        public void DFUNC_Selected()
+        {
+            TriggerLastFrame = true;
+            if (!controlsActive)
+            {
+                controlsActive = true;
+                ControlInputs();
+            }
+        }
+        public void SFEXT_O_PilotExit()
+        {
+            gameObject.SetActive(false);
+            controlsActive = false;
+        }
     }
 }
