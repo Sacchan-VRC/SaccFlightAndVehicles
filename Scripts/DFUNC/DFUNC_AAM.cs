@@ -447,7 +447,12 @@ namespace SaccFlightAndVehicles
                         RaycastHit hitnext;
                         //raycast to check if it's behind something
                         bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
-
+#if UNITY_EDITOR
+                        if (hitnext.collider)
+                            Debug.DrawLine(HudControlPosition, hitnext.point, Color.red);
+                        else
+                            Debug.DrawRay(HudControlPosition, AAMNextTargetDirection, Color.yellow);
+#endif
                         /*                         Debug.Log(string.Concat("LoS_next ", LineOfSightNext));
                                                 if (hitnext.collider)
                                                 {
@@ -499,6 +504,12 @@ namespace SaccFlightAndVehicles
                 //raycast to check if it's behind something
                 RaycastHit hitcurrent;
                 bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
+#if UNITY_EDITOR
+                if (hitcurrent.collider)
+                    Debug.DrawLine(HudControlPosition, hitcurrent.point, Color.green);
+                else
+                    Debug.DrawRay(HudControlPosition, AAMNextTargetDirection, Color.blue);
+#endif
                 //used to make lock remain for .25 seconds after target is obscured
                 if (!LineOfSightCur || (hitcurrent.collider && hitcurrent.collider.gameObject.layer != OutsideVehicleLayer))
                 { AAMTargetObscuredDelay += DeltaTime; }
