@@ -18,8 +18,8 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
         }
 
-        private int MyPilotID;//if this pilot enters, enter 2nd seat
-        private int MyPilotCheck;//if this pilot enters, enter 2nd seat
+        private int MyPilotID;
+        private int MyPilotCheck;
         private VRCPlayerApi[] players_choosepilot;
         public TextMeshProUGUI PilotName;
         public void NextPilot()
