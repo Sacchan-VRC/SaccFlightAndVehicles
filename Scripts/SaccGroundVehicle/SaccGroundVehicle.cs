@@ -880,10 +880,9 @@ namespace SaccFlightAndVehicles
         {
             if (!IsOwner) { return; }
             float DeltaTime = Time.fixedDeltaTime;
-
             Vector3 absVel = VehicleRigidbody.velocity;
             VehicleVel = absVel - LastTouchedTransform_Speed;
-            float gravity = -Physics.gravity.y * DeltaTime;
+            float gravity = 9.80665f * DeltaTime;
             LastFrameVel.y -= gravity; //add gravity
             AllGs = Vector3.Distance(LastFrameVel, absVel) / gravity;
             GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
@@ -1140,6 +1139,9 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i < DriveWheels.Length; i++)
             {
                 DriveWheels[i].SetProgramVariable("EngineRevs", 0f);
+            }
+            for (int i = 0; i < SteerWheels.Length; i++)
+            {
                 SteerWheels[i].SetProgramVariable("EngineRevs", 0f);//for TankMode
             }
             SetCollidersLayer(OutsideVehicleLayer);
