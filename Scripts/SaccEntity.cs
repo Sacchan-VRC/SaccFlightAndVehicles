@@ -46,7 +46,7 @@ namespace SaccFlightAndVehicles
         public bool DoVoiceVolumeChange = true;
         [Tooltip("Double tap the exit vehicle button to exit the vehicle?")]
         public bool DoubleTapToExit = false;
-        [Tooltip("Double tap the exit vehicle button to exit the vehicle?")]
+        [Tooltip("Ignore particles hitting the object?")]
         public bool DisableBulletHitEvent = false;
         [Header("Selection Sound")]
 
@@ -705,7 +705,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public bool CustomPickup_localHeld;
         public void CustomPickup_Grab()
         {
-            int.TryParse(localPlayer.GetPlayerTag("SFCP_N"), out int numHolding);
             if (string.IsNullOrEmpty(localPlayer.GetPlayerTag("SFCP_R")))
             {
                 CustomPickup_Hand = 1;
@@ -719,6 +718,7 @@ namespace SaccFlightAndVehicles
                 localPlayer.SetPlayerTag("SFCP_L", "T");
             }
             else { return; }
+            int.TryParse(localPlayer.GetPlayerTag("SFCP_N"), out int numHolding);
             Networking.SetOwner(localPlayer, gameObject);
             CustomPickup_localHeld = true;
             numHolding++;
