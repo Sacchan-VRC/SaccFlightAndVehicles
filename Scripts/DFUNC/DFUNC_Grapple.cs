@@ -81,8 +81,8 @@ namespace SaccFlightAndVehicles
         public string HitEventName_Trigger = "_interact";
         [Tooltip("If you'd like to use a rigidbody for movement, put one in here")]
         public Rigidbody HandHeldRBMode_RB;
-        [SerializeField] private float AutoTargetTimeTest = 0.2f;
-        [SerializeField] private float AutoTargetAngleTest = 25f;
+        [SerializeField] private float AutoTargetTime = 0.2f;
+        [SerializeField] private float AutoTargetAngle = 25f;
         public UdonSharpBehaviour[] GrappleEventCallbacks;
         private float AprHookFlyTime;
         private bool DoHitPrediction;
@@ -375,10 +375,10 @@ namespace SaccFlightAndVehicles
             //make grappling more forgiving by grappling the last targeted point if you're going to miss
             if (DoHitPrediction)
             {
-                if (!HitPredicted && Time.time - LastPredictedHitTime < AutoTargetTimeTest)
+                if (!HitPredicted && Time.time - LastPredictedHitTime < AutoTargetTime)
                 {
                     Vector3 newLaunchVec = (LastPredictedHitPoint - HookLaunchPoint.position).normalized;
-                    if (Vector3.Angle(LaunchVec, newLaunchVec) < AutoTargetAngleTest)
+                    if (Vector3.Angle(LaunchVec, newLaunchVec) < AutoTargetAngle)
                     {
                         LaunchVec = newLaunchVec * LaunchVec.magnitude;
                     }
@@ -702,6 +702,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
+            _HookLaunchedPrev = _HookLaunched;
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -888,15 +889,20 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    Vector3 newTargetVec = (LastPredictedHitPoint - HookLaunchPoint.position).normalized;
                     bool ObjectMoved = false;
+                    Vector3 newTargetVec = (LastPredictedHitPoint - HookLaunchPoint.position).normalized;
+
                     RaycastHit targetcheck2;
                     if (Physics.Raycast(HookLaunchPoint.position, newTargetVec, out targetcheck2, predictedflightdist, HookLayers, QueryTriggerInteraction.Ignore))
-                    { LastPredictedHitPoint = targetcheck2.point; }
+                    {
+                        if (Vector3.Distance(targetcheck2.point, LastPredictedHitPoint) > 0.01f)
+                        { ObjectMoved = true; }
+                    }
                     else
                     { ObjectMoved = true; }
-                    if (Time.time - LastPredictedHitTime > AutoTargetTimeTest
-                    || Vector3.Angle(HookLaunchPoint.forward, newTargetVec) > AutoTargetAngleTest
+
+                    if (Time.time - LastPredictedHitTime > AutoTargetTime
+                    || Vector3.Angle(HookLaunchPoint.forward, newTargetVec) > AutoTargetAngle
                     || ObjectMoved)
                     { PredictionOff(true); }
                     else
@@ -933,6 +939,7 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
+            if (!IsOwner) { return; }
             if (Selected)
             {
                 if (!HandHeldGunMode)//handheld mode is done with OnPickupUseDown
