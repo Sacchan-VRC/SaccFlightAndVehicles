@@ -1001,7 +1001,7 @@ namespace SaccFlightAndVehicles
         }
         public override void OnPlayerRespawn(VRCPlayerApi player)
         {
-            if (player.isLocal && _HookLaunched)
+            if (player.isLocal && _HookLaunched && HandHeldGunMode)
             {
                 HookLaunched = false;
             }
