@@ -120,10 +120,7 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
         Piloting = true;
         InVR = SAVControl.InVR;
         SwitchHandsJoyThrottle = SAVControl.SwitchHandsJoyThrottle;
-        if (!InVR)
-        { if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); } }
-        else
-        { if (ThrustArrow) { ThrustArrow.gameObject.SetActive(true); } }
+        if (ThrustArrow) { ThrustArrow.gameObject.SetActive(InVR); }
     }
     public void SFEXT_O_PilotExit()
     {
@@ -395,13 +392,10 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     public void SFEXT_G_EngineOn()
     {
         EngineOn = true;
-
-        if (InVR) { if (ThrustArrow) { ThrustArrow.gameObject.SetActive(true); } }
     }
     public void SFEXT_G_EngineOff()
     {
         EngineOn = false;
-        if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); }
     }
     private void FixedUpdate()
     {
