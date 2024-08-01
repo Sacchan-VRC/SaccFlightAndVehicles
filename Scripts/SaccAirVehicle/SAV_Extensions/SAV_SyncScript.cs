@@ -72,8 +72,6 @@ namespace SaccFlightAndVehicles
         private bool IsOwner = true;
         private Vector3 ExtrapolationDirection;
         private Quaternion RotationExtrapolationDirection;
-        private Vector3 L_PingAdjustedPosition = Vector3.zero;
-        private Quaternion L_PingAdjustedRotation = Quaternion.identity;
         private Vector3 lerpedCurVel;
         private Vector3 Acceleration = Vector3.zero;
         private Vector3 LastAcceleration;
@@ -104,7 +102,6 @@ namespace SaccFlightAndVehicles
         private float ErrorLastFrame;
         private float StartDrag;
         private float StartAngDrag;
-        public GameObject SLEEPCUBE;
         private void Start()
         {
             if (SyncRigid)
@@ -192,7 +189,7 @@ namespace SaccFlightAndVehicles
         private void InitSyncValues()
         {
             ResetSyncTimes();
-            Extrapolation_Raw = L_PingAdjustedPosition = O_Position = VehicleTransform.position;
+            Extrapolation_Raw = O_Position = VehicleTransform.position;
             O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime + Random.Range(0f, updateInterval));
             O_LastUpdateTime = L_UpdateTime = lastframetime = lastframetime_extrap = Networking.GetServerTimeInMilliseconds();
@@ -231,7 +228,7 @@ namespace SaccFlightAndVehicles
             IsOwner = false;
             O_LastUpdateTime = L_UpdateTime = lastframetime_extrap = StartupServerTime + (double)(Time.time - StartupLocalTime);
             O_LastUpdateTime -= updateInterval;
-            Extrapolation_Raw = L_PingAdjustedPosition = O_Position;
+            Extrapolation_Raw = O_Position;
             ExtrapDirection_Smooth = O_CurVel;
             RotExtrapolation_Raw = RotationLerper = O_LastRotation = O_Rotation_Q;
             LastCurAngMom = CurAngMom = Quaternion.identity;
@@ -266,7 +263,7 @@ namespace SaccFlightAndVehicles
             UpdatesSentWhileStill = 0;
             //make it teleport instead of interpolating
             ExtrapolationDirection = Vector3.zero;
-            Extrapolation_Raw = VehicleTransform.position = L_PingAdjustedPosition = O_LastPosition = O_Position;
+            Extrapolation_Raw = VehicleTransform.position = O_LastPosition = O_Position;
             RotationLerper = VehicleTransform.rotation = O_LastRotation = O_Rotation_Q;
             ExtrapDirection_Smooth = Vector3.zero;
             RotExtrapDirection_Smooth = Quaternion.identity;
@@ -275,7 +272,6 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (SLEEPCUBE) { SLEEPCUBE.SetActive(IdleUpdateMode); }
             if (IsOwner)//send data
             {
                 double time = (StartupServerTime + (double)(Time.time - StartupLocalTime));
@@ -391,7 +387,7 @@ namespace SaccFlightAndVehicles
             RotExtrapDirection_Smooth = RealSlerp(RotExtrapDirection_Smooth, AngMomEstimate, RotationSpeedLerpTime * deltatime);
 
             //apply positional update
-            Extrapolation_Raw += ExtrapolationDirection * deltatime;
+            Extrapolation_Raw = O_Position + (ExtrapolationDirection * (float)(time - O_UpdateTime));
             SyncTransform.position += ExtrapDirection_Smooth * deltatime;
             //apply rotational update
             Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime);
@@ -425,7 +421,7 @@ namespace SaccFlightAndVehicles
         private bool Deserialized = false;
         private void DeserializationCheck()
         {
-            if (O_UpdateTime != O_LastUpdateTime)//only do anything if OnDeserialization was for this script
+            if (O_UpdateTime != O_LastUpdateTime)
             {
                 if (!LagSimWait)
                 {
@@ -498,17 +494,12 @@ namespace SaccFlightAndVehicles
             { Acceleration = Vector3.zero; CurAngMomAcceleration = Quaternion.identity; }
 
             RotationExtrapolationDirection = CurAngMomAcceleration * CurAngMom;
-            Quaternion PingRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, Ping);
-            L_PingAdjustedRotation = PingRotExtrap * O_Rotation_Q;
-            Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, -Time.deltaTime);
-            RotExtrapolation_Raw = FrameRotExtrap * L_PingAdjustedRotation;//undo 1 frame worth of movement because its done again in update()
 
             //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
             if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", L_CurVel); }
             ExtrapolationDirection = L_CurVel + Acceleration;
-            L_PingAdjustedPosition = O_Position + (ExtrapolationDirection * Ping);
 
-            Extrapolation_Raw = L_PingAdjustedPosition - (ExtrapolationDirection * Time.deltaTime);//undo 1 frame worth of movement because its done again in update()
+            // Extrapolation_Raw = L_PingAdjustedPosition - (ExtrapolationDirection * Time.deltaTime);//undo 1 frame worth of movement because its done again in update()
 
             //if we're going one way but moved the other, we must have teleported.
             //set values to the same thing for Current and Last to make teleportation instead of interpolation
