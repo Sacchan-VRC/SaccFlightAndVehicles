@@ -375,19 +375,20 @@ namespace SaccFlightAndVehicles
             }
             ErrorLastFrame = Error;
             lastframetime_extrap = Networking.GetServerTimeInSeconds();
-            float TimeSinceUpdate = (float)(time - L_UpdateTime)
-                    / updateInterval;
+            float TimeSinceUpdate = (float)(time - L_UpdateTime);
+            float TimeSinceUpdate_UI = TimeSinceUpdate / updateInterval;
+
             //extrapolated position based on time passed since update
-            Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
+            Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate_UI);
             ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
 
             //rotate using similar method to movement (no deriv, correction is done with a simple slerp after)
-            Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngMomAcceleration, TimeSinceUpdate);
+            Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngMomAcceleration, TimeSinceUpdate_UI);
             Quaternion AngMomEstimate = FrameRotAccel * CurAngMom;
             RotExtrapDirection_Smooth = RealSlerp(RotExtrapDirection_Smooth, AngMomEstimate, RotationSpeedLerpTime * deltatime);
 
             //apply positional update
-            Extrapolation_Raw = O_Position + (ExtrapolationDirection * (float)(time - O_UpdateTime));
+            Extrapolation_Raw = O_Position + (ExtrapolationDirection * TimeSinceUpdate);
             SyncTransform.position += ExtrapDirection_Smooth * deltatime;
             //apply rotational update
             Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime);
@@ -409,6 +410,7 @@ namespace SaccFlightAndVehicles
         private void ExitIdleMode()
         { IdleUpdateMode = false; }
 #if UNITY_EDITOR
+        [Tooltip("Doesn't work properly, can't wait beyond update interval.")]
         public float LagSimDelay;
         private float LagSimTime;
         private bool LagSimWait;
@@ -474,10 +476,10 @@ namespace SaccFlightAndVehicles
             else
             { L_CurVel = O_CurVel; }
             O_CurVelLast = O_CurVel;
-            Acceleration = (L_CurVel - L_CurVelLast);//acceleration is difference in velocity
+            Acceleration = L_CurVel - L_CurVelLast;//acceleration is difference in velocity
 
             float smv = short.MaxValue;
-            O_Rotation_Q = (new Quaternion(O_RotationX / smv, O_RotationY / smv, O_RotationZ / smv, O_RotationW / smv));
+            O_Rotation_Q = new Quaternion(O_RotationX / smv, O_RotationY / smv, O_RotationZ / smv, O_RotationW / smv);
 
             //rotate Acceleration by the difference in rotation of vehicle between last and this update to make it match the angle for the next update better
             Quaternion PlaneRotDif = O_Rotation_Q * Quaternion.Inverse(O_LastRotation);
@@ -490,7 +492,7 @@ namespace SaccFlightAndVehicles
 
             //if direction of acceleration changed by more than 90 degrees, just set zero to prevent bounce effect, the vehicle likely just crashed into a wall.
             //+ if idlemode, disable acceleration because it brakes
-            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero || O_CurVel.magnitude < IdleMovementRange)
+            if (Vector3.Dot(Acceleration, LastAcceleration) < 0 || SetVelZero || L_CurVel.magnitude < IdleMovementRange)
             { Acceleration = Vector3.zero; CurAngMomAcceleration = Quaternion.identity; }
 
             RotationExtrapolationDirection = CurAngMomAcceleration * CurAngMom;
