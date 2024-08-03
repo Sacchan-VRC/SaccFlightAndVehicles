@@ -135,7 +135,7 @@ namespace SaccFlightAndVehicles
 
                 float spheresize = SphereCastAccuracy;
                 int hitlen = 0;
-                RaycastHit[] hits = new RaycastHit[0];
+                RaycastHit[] hits;
                 bool hitSelf = false;
 
                 HookedTransform = null;
@@ -852,7 +852,6 @@ namespace SaccFlightAndVehicles
         public void FireHook()
         {
             HookLaunched = !HookLaunched;
-            HookAttachPoint = -Vector3.zero;
             RequestSerialization();
         }
         private void FindSelf()
