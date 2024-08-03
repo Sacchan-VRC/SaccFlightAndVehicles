@@ -1,10 +1,7 @@
 
 using UdonSharp;
 using UnityEngine;
-using UnityEngine.UI;
-using VRC.SDK3.StringLoading;
 using VRC.SDKBase;
-using VRC.Udon;
 
 namespace SaccFlightAndVehicles
 {
@@ -1024,7 +1021,6 @@ namespace SaccFlightAndVehicles
             VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
             bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && VehicleSpeed > .2f;
             if (Occupied || EntityControl._dead || BlockedCheck) { return; }
-            Networking.SetOwner(localPlayer, EntityControl.gameObject);
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
             IsOwner = true;
             Fuel = FullFuel;
@@ -1040,6 +1036,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigidbody.velocity = Vector3.zero;
             }
             VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
+            Networking.SetOwner(localPlayer, EntityControl.gameObject);
         }
         public void ResetStatus()//called globally when using respawn button
         {

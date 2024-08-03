@@ -780,24 +780,20 @@ namespace SaccFlightAndVehicles
         public void UpdateOwner()
         {
             bool IsOwner_New = (bool)SGVControl.GetProgramVariable("IsOwner");
-            if (TESTISOWNER) TESTISOWNER.SetActive(IsOwner_New);
             /*             if (IsOwner && !IsOwner_New)
                         {
                             //lose ownership
                         }
                         else  */
-            if (!IsOwner && IsOwner_New)
-            {
-                //take ownership
-                GroundPointLast = WheelPoint.position; // prevent 1 frame skid from last owned position
-            }
+            // if (!IsOwner && IsOwner_New)
+            // {
+            //take ownership
+            GroundPointLast = WheelPoint.position; // prevent 1 frame skid from last owned position
+            // }
             IsOwner = IsOwner_New;
         }
-        public GameObject TESTISOWNER;
-        public GameObject TESTISSYNCING;
         public void SyncSkid()
         {
-            if (TESTISSYNCING) TESTISSYNCING.SetActive(!TESTISSYNCING.activeSelf);
             if (!SyncSkid_Running) { return; }
             if (IsOwner)
             {
