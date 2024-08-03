@@ -16,6 +16,7 @@ namespace SaccFlightAndVehicles
         public float PlaySplashSpeed = 7;
         public Transform[] FlatWaterEffects;
         public UdonSharpBehaviour FloatScript;
+        [System.NonSerialized] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
         [System.NonSerializedAttribute] public float DoEffects = 999f;//don't do effects before initialized
         private float brake;
@@ -26,6 +27,7 @@ namespace SaccFlightAndVehicles
         private int FlatWaterEffectsLength;
         private float FullFuelDivider;
         private bool Occupied;
+        private bool IsOwner;
         private bool InVR;
         private bool InEditor = true;
         private int YAWINPUT_STRING = Animator.StringToHash("yawinput");
@@ -49,6 +51,8 @@ namespace SaccFlightAndVehicles
                 VehicleAnimator.SetBool("occupied", true);
             }
             else { InEditor = false; }
+            IsOwner = EntityControl.IsOwner;
+            VehicleAnimator.SetBool("owner", IsOwner);
 
             if (PrintAnimHashNamesOnStart)
             { PrintStringHashes(); }
@@ -197,6 +201,16 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);
             if (!InEditor) { VehicleAnimator.SetBool("occupied", false); }
             DoEffects = 0f;//keep awake
+        }
+        public void SFEXT_O_TakeOwnership()
+        {
+            IsOwner = true;
+            VehicleAnimator.SetBool("owner", true);
+        }
+        public void SFEXT_O_LoseOwnership()
+        {
+            IsOwner = false;
+            VehicleAnimator.SetBool("owner", false);
         }
         private void PrintStringHashes()
         {

@@ -72,6 +72,7 @@ MonoBehaviour:
   SyncRigid: {fileID: 0}
   SyncTransform: {fileID: 0}
   SyncTransform_Raw: {fileID: 0}
+  SLEEPCUBE: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &630903748
@@ -6158,8 +6159,8 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1128268329442277853}
   Lfunc1: {fileID: 0}
   Lfunc1key: 0
-  Lfunc2: {fileID: 2449688609888896633}
-  Lfunc2key: 120
+  Lfunc2: {fileID: 0}
+  Lfunc2key: 0
   Lfunc3: {fileID: 3907015542933838434}
   Lfunc3key: 103
   Lfunc4: {fileID: 4075196158679939147}
@@ -43477,7 +43478,7 @@ MonoBehaviour:
   AfterburnerThrustMulti: 1.5
   AccelerationResponse: 4.5
   EngineSpoolDownSpeedMulti: 0.5
-  AirFriction: 0.00059
+  AirFriction: 0.000944
   PitchStrength: 2.31
   PitchThrustVecMulti: 1
   PitchFriction: 2
@@ -71219,7 +71220,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238213158040}
   SAVControl: {fileID: 5695413857654158265}
-  LaunchKey: 0
+  LaunchKey: 120
   NumFlares: 60
   FlareType: 1
   FlareParticles:
@@ -116219,7 +116220,6 @@ GameObject:
   - component: {fileID: 8333115239819171338}
   - component: {fileID: 8333115239819171383}
   - component: {fileID: 8333115239819171382}
-  - component: {fileID: 8333115239819171337}
   - component: {fileID: 1439720729650657754}
   - component: {fileID: 8333115239819171336}
   m_Layer: 17
@@ -116309,18 +116309,6 @@ Rigidbody:
   m_Interpolate: 2
   m_Constraints: 14
   m_CollisionDetection: 2
---- !u!75 &8333115239819171337
-ConstantForce:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8333115239819171341}
-  m_Enabled: 1
-  m_Force: {x: 0, y: 0, z: 0}
-  m_RelativeForce: {x: 0, y: 0, z: 0}
-  m_Torque: {x: 0, y: 0, z: 0}
-  m_RelativeTorque: {x: 0, y: 0, z: 0}
 --- !u!114 &1439720729650657754
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -116386,6 +116374,14 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  _EnableInteract: 0
+  Interact_CustomPickup: 1
+  CustomPickup_AllowSteal: 1
+  CustomPickup_SetRotation: 1
+  CustomPickup_GrabPosition: {fileID: 0}
+  CustomPickup_DropKey: 103
+  CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
+  CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   AAMTargets: []
 --- !u!114 &8333115239819171336
 MonoBehaviour:

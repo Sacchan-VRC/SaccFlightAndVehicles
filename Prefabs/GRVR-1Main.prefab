@@ -31382,7 +31382,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1564986658997062103}
   SAVControl: {fileID: 2961384493794590454}
-  LaunchKey: 0
+  LaunchKey: 120
   NumFlares: 60
   FlareType: 1
   FlareParticles:
@@ -54836,6 +54836,14 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  _EnableInteract: 0
+  Interact_CustomPickup: 1
+  CustomPickup_AllowSteal: 1
+  CustomPickup_SetRotation: 1
+  CustomPickup_GrabPosition: {fileID: 0}
+  CustomPickup_DropKey: 103
+  CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
+  CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   AAMTargets: []
 --- !u!114 &1564986660552776519
 MonoBehaviour:
@@ -59960,17 +59968,24 @@ MonoBehaviour:
   HookReelIn: {fileID: 975571885411303469}
   EnableOnSelect: []
   HandHeldGunMode: 0
+  CustomPickupMode: 0
   DisablePulling: 0
   MoveGunToSelfOnAirDrop: 1
   PlayerMass: 150
   DisableOnPickup: []
+  EnableOnPickup: []
   TargetingLaser: {fileID: 0}
   PredictedHitPoint: {fileID: 0}
+  OnlyFireIfTargetPredicted: 0
   KeyboardSelectMode: 0
   RunEventOnTargets: 0
   RunEventOnTargets_Triggers: 0
   HitEventName: _interact
   HitEventName_Trigger: _interact
+  HandHeldRBMode_RB: {fileID: 0}
+  AutoTargetTimeTest: 0.2
+  AutoTargetAngleTest: 25
+  GrappleEventCallbacks: []
 --- !u!114 &5347653333253470325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90414,7 +90429,7 @@ MonoBehaviour:
   AfterburnerThrustMulti: 1.5
   AccelerationResponse: 4.5
   EngineSpoolDownSpeedMulti: 0.5
-  AirFriction: 0.0007
+  AirFriction: 0.00112
   PitchStrength: 6.24
   PitchThrustVecMulti: 1
   PitchFriction: 2
@@ -97548,6 +97563,7 @@ MonoBehaviour:
   SyncRigid: {fileID: 0}
   SyncTransform: {fileID: 0}
   SyncTransform_Raw: {fileID: 0}
+  SLEEPCUBE: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &7355186588968754827
@@ -103621,8 +103637,8 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 7618600915034125458}
   Lfunc1: {fileID: 837961135888876603}
   Lfunc1key: 102
-  Lfunc2: {fileID: 5183033991650233142}
-  Lfunc2key: 120
+  Lfunc2: {fileID: 0}
+  Lfunc2key: 0
   Lfunc3: {fileID: 8418306373073733336}
   Lfunc3key: 103
   Lfunc4: {fileID: 3463623673416620690}

@@ -37,6 +37,7 @@ namespace SaccFlightAndVehicles
         private bool HasTrails;
         private bool vapor;
         private float Gs_trail = 1000;//ensures trails wont emit at first frame
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
         [System.NonSerializedAttribute] public float DoEffects = 999f;//don't do effects before initialized
         private float brake;
@@ -69,7 +70,6 @@ namespace SaccFlightAndVehicles
             FullHealthDivider = 1f / (float)SAVControl.GetProgramVariable("Health");
             HasTrails = Trails.Length > 0;
 
-            SaccEntity EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             localPlayer = Networking.LocalPlayer;
             float fuel = (float)SAVControl.GetProgramVariable("Fuel");

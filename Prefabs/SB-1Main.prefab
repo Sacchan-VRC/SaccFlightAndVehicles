@@ -346,6 +346,7 @@ MonoBehaviour:
   SyncRigid: {fileID: 0}
   SyncTransform: {fileID: 0}
   SyncTransform_Raw: {fileID: 0}
+  SLEEPCUBE: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &1538257256
@@ -52514,8 +52515,8 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 2934804654579370602}
   Lfunc1: {fileID: -3803746560051625630}
   Lfunc1key: 8
-  Lfunc2: {fileID: 505760011925659829}
-  Lfunc2key: 120
+  Lfunc2: {fileID: 0}
+  Lfunc2key: 0
   Lfunc3: {fileID: 0}
   Lfunc3key: 0
   Lfunc4: {fileID: 664581946243506453}
@@ -52810,7 +52811,7 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2934804654602662228}
   SAVControl: {fileID: 2926696625540112212}
-  LaunchKey: 0
+  LaunchKey: 120
   NumFlares: 60
   FlareType: 1
   FlareParticles:
@@ -100817,7 +100818,6 @@ GameObject:
   - component: {fileID: 2934804655656756588}
   - component: {fileID: 2934804655656756586}
   - component: {fileID: 2934804655656756587}
-  - component: {fileID: 2934804655656756584}
   - component: {fileID: -5424269735798070188}
   - component: {fileID: 2934804655656756585}
   m_Layer: 17
@@ -100902,18 +100902,6 @@ Rigidbody:
   m_Interpolate: 2
   m_Constraints: 14
   m_CollisionDetection: 2
---- !u!75 &2934804655656756584
-ConstantForce:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2934804655656756582}
-  m_Enabled: 1
-  m_Force: {x: 0, y: 0, z: 0}
-  m_RelativeForce: {x: 0, y: 0, z: 0}
-  m_Torque: {x: 0, y: 0, z: 0}
-  m_RelativeTorque: {x: 0, y: 0, z: 0}
 --- !u!114 &-5424269735798070188
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100973,6 +100961,14 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   ExternalSeats: []
+  _EnableInteract: 0
+  Interact_CustomPickup: 1
+  CustomPickup_AllowSteal: 1
+  CustomPickup_SetRotation: 1
+  CustomPickup_GrabPosition: {fileID: 0}
+  CustomPickup_DropKey: 103
+  CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
+  CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
   AAMTargets: []
 --- !u!114 &2934804655656756585
 MonoBehaviour:
@@ -101728,7 +101724,7 @@ MonoBehaviour:
   AfterburnerThrustMulti: 5
   AccelerationResponse: 2
   EngineSpoolDownSpeedMulti: 0.5
-  AirFriction: 0.001
+  AirFriction: 0.0016
   PitchStrength: 5
   PitchThrustVecMulti: 1
   PitchFriction: 0

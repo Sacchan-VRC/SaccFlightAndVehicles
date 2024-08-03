@@ -117,6 +117,7 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             IsOwner = EntityControl.IsOwner;
+            VehicleAnimator.SetBool("owner", IsOwner);
             EngineSoundsT = new Transform[EngineSounds.Length];
             for (int i = 0; i < EngineSounds.Length; i++)
             {
@@ -527,12 +528,14 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
+            VehicleAnimator.SetBool("owner", true);
             DoEffects = 5f;
             WakeUp();
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
+            VehicleAnimator.SetBool("owner", false);
             EnableWings(false);
         }
         public void SFEXT_L_OwnershipTransfer()
@@ -550,6 +553,8 @@ namespace SaccFlightAndVehicles
                 BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
                 BulletHit[rand].PlayOneShot(BulletHit[rand].clip);
             }
+            WakeUp();
+            VehicleAnimator.SetTrigger("bullethit");
         }
         public void SFEXT_G_ReAppear()
         {
