@@ -375,20 +375,18 @@ namespace SaccFlightAndVehicles
             }
             ErrorLastFrame = Error;
             lastframetime_extrap = Networking.GetServerTimeInSeconds();
-            float TimeSinceUpdate = (float)(time - L_UpdateTime);
-            float TimeSinceUpdate_UI = TimeSinceUpdate / updateInterval;
-
+            float TimeSinceUpdate = (float)((time - L_UpdateTime) / updateInterval);
             //extrapolated position based on time passed since update
-            Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate_UI);
+            Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
             ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
 
             //rotate using similar method to movement (no deriv, correction is done with a simple slerp after)
-            Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngMomAcceleration, TimeSinceUpdate_UI);
+            Quaternion FrameRotAccel = RealSlerp(Quaternion.identity, CurAngMomAcceleration, TimeSinceUpdate);
             Quaternion AngMomEstimate = FrameRotAccel * CurAngMom;
             RotExtrapDirection_Smooth = RealSlerp(RotExtrapDirection_Smooth, AngMomEstimate, RotationSpeedLerpTime * deltatime);
 
             //apply positional update
-            Extrapolation_Raw = O_Position + (ExtrapolationDirection * TimeSinceUpdate);
+            Extrapolation_Raw = O_Position + (ExtrapolationDirection * (float)(time - O_UpdateTime));
             SyncTransform.position += ExtrapDirection_Smooth * deltatime;
             //apply rotational update
             Quaternion FrameRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, deltatime);
@@ -496,6 +494,9 @@ namespace SaccFlightAndVehicles
             { Acceleration = Vector3.zero; CurAngMomAcceleration = Quaternion.identity; }
 
             RotationExtrapolationDirection = CurAngMomAcceleration * CurAngMom;
+            Quaternion PingRotExtrap = RealSlerp(Quaternion.identity, RotationExtrapolationDirection, Ping);
+            Quaternion L_PingAdjustedRotation = PingRotExtrap * O_Rotation_Q;
+            RotExtrapolation_Raw = L_PingAdjustedRotation;
 
             //tell the SaccAirVehicle the velocity value because it doesn't sync it itself
             if (!ObjectMode) { SAVControl.SetProgramVariable("CurrentVel", L_CurVel); }
