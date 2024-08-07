@@ -263,8 +263,13 @@ namespace SaccFlightAndVehicles
             UpdatesSentWhileStill = 0;
             //make it teleport instead of interpolating
             ExtrapolationDirection = Vector3.zero;
-            Extrapolation_Raw = VehicleTransform.position = O_LastPosition = O_Position;
-            RotationLerper = VehicleTransform.rotation = O_LastRotation = O_Rotation_Q;
+            Extrapolation_Raw = O_LastPosition = O_Position;
+            RotationLerper = O_LastRotation = O_Rotation_Q;
+            if (!IsOwner)
+            {
+                VehicleTransform.position = O_Position;
+                VehicleTransform.rotation = O_Rotation_Q;
+            }
             ExtrapDirection_Smooth = Vector3.zero;
             RotExtrapDirection_Smooth = Quaternion.identity;
             L_CurVelLast = Vector3.zero;

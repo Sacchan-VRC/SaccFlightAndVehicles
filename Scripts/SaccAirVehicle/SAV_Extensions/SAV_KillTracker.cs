@@ -24,7 +24,7 @@ namespace SaccFlightAndVehicles
             if (localPlayer == null)
             { InEditor = true; }
         }
-        public void SFEXT_G_Explode()
+        public void SFEXT_G_Wrecked()
         {
             float time = Time.time;
             if (EntityControl.LastAttacker && EntityControl.LastAttacker.Using && time - (float)SAVControl.GetProgramVariable("LastHitTime") < 2 && !(bool)SAVControl.GetProgramVariable("Taxiing") && ((bool)SAVControl.GetProgramVariable("Occupied") || ((time - EntityControl.PilotExitTime) < 5)))

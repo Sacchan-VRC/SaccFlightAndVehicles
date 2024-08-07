@@ -570,7 +570,6 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetFloat(REVS_STRING, 0f);
 
             VehicleAnimator.SetTrigger("explode");
-            VehicleAnimator.SetBool("dead", true);
             VehicleAnimator.SetInteger("missilesincoming", 0);
             if (!InEditor) { VehicleAnimator.SetBool("occupied", false); }
             if (InWater && !Explosion_WaterNull)
@@ -589,6 +588,14 @@ namespace SaccFlightAndVehicles
                     Explosion[rand].Play();
                 }
             }
+        }
+        public void SFEXT_G_Dead()
+        {
+            VehicleAnimator.SetBool("dead", true);
+        }
+        public void SFEXT_G_NotDead()
+        {
+            VehicleAnimator.SetBool("dead", false);
         }
         public void SFEXT_O_Grounded()
         {

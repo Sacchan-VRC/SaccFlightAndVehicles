@@ -43,6 +43,8 @@ namespace SaccFlightAndVehicles
         public AudioSource[] SonicBoom;
         [Tooltip("Sounds that can be played when vehicle explodes")]
         public AudioSource[] Explosion;
+        [Tooltip("Sounds that can be played when vehicle is 'wrecked'")]
+        public AudioSource[] Wrecked;
         [Tooltip("Sounds that can be played when vehicle explodes while underwater")]
         public AudioSource[] Explosion_Water;
         [Tooltip("Sounds that can be played when vehicle gets hit by something")]
@@ -164,6 +166,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool TouchDownWaterNull = true;
         [System.NonSerializedAttribute] public bool SonicBoomNull = true;
         [System.NonSerializedAttribute] public bool ExplosionNull = true;
+        [System.NonSerializedAttribute] public bool WreckedNull = true;
         [System.NonSerializedAttribute] public bool Explosion_WaterNull = true;
         [System.NonSerializedAttribute] public bool BulletHitNull = true;
         [System.NonSerializedAttribute] public bool MissileHitNULL = true;
@@ -245,6 +248,7 @@ namespace SaccFlightAndVehicles
             TouchDownWaterNull = TouchDownWater.Length == 0;
             SonicBoomNull = SonicBoom.Length == 0;
             ExplosionNull = Explosion.Length == 0;
+            WreckedNull = Wrecked.Length == 0;
             Explosion_WaterNull = Explosion_Water.Length == 0;
             BulletHitNull = BulletHit.Length == 0;
             SmallCrashNULL = SmallCrash.Length == 0;
@@ -689,6 +693,18 @@ namespace SaccFlightAndVehicles
                 }
             }
             ResetSounds();
+        }
+        public void SFEXT_G_Wrecked()
+        {
+            if (!Piloting) return;
+            if (!WreckedNull)
+            {
+                int rand = Random.Range(0, Wrecked.Length);
+                if (Wrecked[rand])
+                {
+                    Wrecked[rand].Play();
+                }
+            }
         }
         public void SFEXT_G_PilotEnter()
         { Occupied = true; }

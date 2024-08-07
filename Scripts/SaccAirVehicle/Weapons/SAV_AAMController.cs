@@ -417,7 +417,6 @@ namespace SaccFlightAndVehicles
                     {
                         DirectHit = true;
                         TargetEntity.LastAttacker = EntityControl;
-                        TargetSAVControl.SetProgramVariable("LastHitTime", Time.time);
                         TargetEntity.SendEventToExtensions("SFEXT_L_MissileHit100");
                         //Debug.Log("DIRECTHIT");
                     }
@@ -465,7 +464,6 @@ namespace SaccFlightAndVehicles
             if (TargetEntityControl && (DirectHit || SplashHit))
             {
                 TargetEntityControl.LastAttacker = EntityControl;
-                TargetSAVControl.SetProgramVariable("LastHitTime", Time.time);
                 DamageDist = Vector3.Distance(transform.position, ((Transform)TargetSAVControl.GetProgramVariable("CenterOfMass")).position) / ProximityExplodeDistance;
                 if (IsOwner)
                 {

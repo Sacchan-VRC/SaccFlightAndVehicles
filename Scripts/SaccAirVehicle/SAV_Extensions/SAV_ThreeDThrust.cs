@@ -377,7 +377,15 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
             ThrustAnimator.SetFloat("thrustz", ThreeDThrottleInput.z * .5f + .5f);
         }
     }
+    public void SFEXT_G_Wrecked()
+    {
+        if (ThrustArrow) { ThrustArrow.gameObject.SetActive(false); }
+        ThreeDThrottle = ThreeDThrottleInput = Vector3.zero;
+        setAnimatorDefault();
+    }
     public void SFEXT_G_Explode()
+    { setAnimatorDefault(); }
+    private void setAnimatorDefault()
     {
         ThrustAnimator.SetFloat("thrustx", .5f);
         ThrustAnimator.SetFloat("thrusty", .5f);

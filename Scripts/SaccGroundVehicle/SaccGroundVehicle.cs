@@ -950,6 +950,7 @@ namespace SaccFlightAndVehicles
         public void Explode()
         {
             if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
+            EntityControl.wrecked = true;//compatability
             EntityControl.dead = true;
             Health = FullHealth;
             HasFuel_ = true;
@@ -974,6 +975,7 @@ namespace SaccFlightAndVehicles
         public void ReAppear()
         {
             EntityControl.SendEventToExtensions("SFEXT_G_ReAppear");
+            EntityControl.wrecked = false;//compatability
             if (IsOwner)
             {
                 if (!UsingManualSync)

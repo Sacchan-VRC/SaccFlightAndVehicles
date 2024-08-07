@@ -148,7 +148,6 @@ namespace SaccFlightAndVehicles
         {
             DoEffects = 6f; //wake up if was asleep
             VehicleAnimator.SetTrigger("reappear");
-            VehicleAnimator.SetBool("dead", false);
         }
         public void SFEXT_G_AfterburnerOn()
         {
@@ -195,12 +194,19 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_Explode()//old EffectsExplode()
         {
             VehicleAnimator.SetTrigger("explode");
-            VehicleAnimator.SetBool("dead", true);
             VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);
             VehicleAnimator.SetFloat(THROTTLE_STRING, 0);
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);
             if (!InEditor) { VehicleAnimator.SetBool("occupied", false); }
             DoEffects = 0f;//keep awake
+        }
+        public void SFEXT_G_Dead()
+        {
+            VehicleAnimator.SetBool("dead", true);
+        }
+        public void SFEXT_G_NotDead()
+        {
+            VehicleAnimator.SetBool("dead", false);
         }
         public void SFEXT_O_TakeOwnership()
         {

@@ -1,10 +1,5 @@
-
-using System.Configuration;
-using System.Runtime.CompilerServices;
 using UdonSharp;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.UIElements.Experimental;
 using VRC.SDKBase;
 using VRC.Udon;
 
@@ -162,6 +157,19 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int LStickSelection = -1;
         [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
         [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
+        [System.NonSerializedAttribute] public bool _wrecked = false;
+        public bool wrecked
+        {
+            set
+            {
+                if (value)
+                { SendEventToExtensions("SFEXT_G_Wrecked"); }
+                else
+                { SendEventToExtensions("SFEXT_G_NotWrecked"); }
+                _wrecked = value;
+            }
+            get => _wrecked;
+        }
         [System.NonSerializedAttribute] public bool _dead = false;
         public bool dead
         {
@@ -965,10 +973,13 @@ namespace SaccFlightAndVehicles
         }
         [System.NonSerializedAttribute] public Vector3 Spawnposition;
         [System.NonSerializedAttribute] public Quaternion Spawnrotation;
+        private float lastRespawnTime;
         public void EntityRespawn()//can be used by simple items to respawn
         {
+            if (Time.time - lastRespawnTime < 3) { return; }
             if (!Occupied && !_dead && (!EntityPickup || !EntityPickup.IsHeld) && !CustomPickup_Synced_isHeld)
             {
+                lastRespawnTime = Time.time;
                 Networking.SetOwner(localPlayer, gameObject);
                 IsOwner = true;
                 VRC.SDK3.Components.VRCObjectSync ObjectSync = (VRC.SDK3.Components.VRCObjectSync)gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
@@ -1281,6 +1292,14 @@ namespace SaccFlightAndVehicles
         {
             LastHitBulletDamageMulti = 8192;
             SendEventToExtensions("SFEXT_G_BulletHit");
+        }
+        public void SetWrecked()
+        {
+            wrecked = true;
+        }
+        public void SetWreckedFalse()
+        {
+            wrecked = false;
         }
     }
 }

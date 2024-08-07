@@ -15,6 +15,8 @@ namespace SaccFlightAndVehicles
         public TrailRenderer[] Trails;
         [Tooltip("How many Gs do you have to pull before the trails appear?")]
         public float TrailGs = 4;
+        [Tooltip("Particle system that plays when vehicle is wrecked (shot down, 0 health)")]
+        public ParticleSystem[] WreckedParticles;
         [Tooltip("Particle system that plays when vehicle enters water")]
         public ParticleSystem SplashParticle;
         [Tooltip("Only play the splash particle if vehicle is faster than this. Meters/s")]
@@ -36,6 +38,8 @@ namespace SaccFlightAndVehicles
         private bool TrailsOn;
         private bool HasTrails;
         private bool vapor;
+        private bool dead;
+        private bool wrecked;
         private float Gs_trail = 1000;//ensures trails wont emit at first frame
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
@@ -263,7 +267,6 @@ namespace SaccFlightAndVehicles
         {
             DoEffects = 6f; //wake up if was asleep
             VehicleAnimator.SetTrigger("reappear");
-            VehicleAnimator.SetBool("dead", false);
         }
         public void SFEXT_G_AfterburnerOn()
         {
@@ -332,7 +335,6 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_Explode()//old EffectsExplode()
         {
             VehicleAnimator.SetTrigger("explode");
-            VehicleAnimator.SetBool("dead", true);
             VehicleAnimator.SetInteger("missilesincoming", 0);
             VehicleAnimator.SetFloat(PITCHINPUT_STRING, .5f);
             VehicleAnimator.SetFloat(YAWINPUT_STRING, .5f);
@@ -341,6 +343,30 @@ namespace SaccFlightAndVehicles
             VehicleAnimator.SetFloat(ENGINEOUTPUT_STRING, 0);
             if (!InEditor) { VehicleAnimator.SetBool("occupied", false); }
             DoEffects = 0f;//keep awake
+        }
+        public void SFEXT_G_Dead()
+        {
+            dead = true;
+            VehicleAnimator.SetBool("dead", true);
+        }
+        public void SFEXT_G_NotDead()
+        {
+            dead = false;
+            VehicleAnimator.SetBool("dead", false);
+        }
+        public void SFEXT_G_Wrecked()
+        {
+            wrecked = true;
+            VehicleAnimator.SetBool("wrecked", true);
+            for (int i = 0; i < WreckedParticles.Length; i++)
+            {
+                WreckedParticles[i].Play();
+            }
+        }
+        public void SFEXT_G_NotWrecked()
+        {
+            wrecked = false;
+            VehicleAnimator.SetBool("wrecked", false);
         }
         public void SFEXT_L_AAMTargeted()//sent locally by the person who's locking onto this plane
         {
