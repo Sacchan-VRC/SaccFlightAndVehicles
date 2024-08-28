@@ -5,14 +5,16 @@ Shader "SF-1/MFD" {
     }
     SubShader{
         Tags { "RenderType" = "Opaque" }
-        
+        Tags { "DisableBatching" = "True" }
         Pass
         {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
-
+			#pragma DisableBatching 
             #include "UnityCG.cginc"
+
+			#define UNITY_SHADER_NO_UPGRADE 1 
 
             struct appdata
             {
@@ -27,7 +29,7 @@ Shader "SF-1/MFD" {
             v2f vert (appdata v)
             {
                 v2f o;
-                o.vertex = UnityObjectToClipPos(v.vertex);
+				o.vertex = mul(UNITY_MATRIX_MVP, float4(v.vertex.xyz, 1.0));
                 return o;
             }
 
@@ -36,7 +38,7 @@ Shader "SF-1/MFD" {
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return _Color * _Brightness;
+				return _Color * _Brightness;
             }
             ENDCG
         }
