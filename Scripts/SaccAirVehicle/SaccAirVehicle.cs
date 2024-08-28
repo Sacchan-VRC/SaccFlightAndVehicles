@@ -1520,7 +1520,7 @@ namespace SaccFlightAndVehicles
                     {
                         float negHealthPc = -Health / -ExplodeHealth;
                         VehicleRigidbody.AddRelativeTorque(wreckedSpinForce * negHealthPc * /* StillWintMulti requires EngineOn + Grounded, so: */ Mathf.Min(AirSpeed * .1f, 1), ForceMode.Acceleration);
-                        VehicleRigidbody.AddRelativeForce(VehicleForce * negHealthPc, ForceMode.Force);
+                        VehicleRigidbody.AddRelativeForce(VehicleForce * (1 - negHealthPc), ForceMode.Force);
                     }
                     else
                     { VehicleRigidbody.AddRelativeForce(VehicleForce, ForceMode.Force); }
