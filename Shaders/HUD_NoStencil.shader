@@ -1,4 +1,4 @@
-Shader "SF-1/HUD_NoStencil" {
+Shader "SaccFlight/HUD_NoStencil" {
     Properties{
         _Color ("Color", Color) = (0.5,0.5,0.5,0.0)
         _Brightness("Brightness", Range(0,1)) = 1

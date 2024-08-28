@@ -1,4 +1,4 @@
-Shader "SF-1/AGMScreen" 
+Shader "SaccFlight/AGMScreen" 
 {
     Properties
     {

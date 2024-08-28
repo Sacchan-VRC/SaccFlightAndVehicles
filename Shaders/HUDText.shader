@@ -1,4 +1,4 @@
-Shader "SF-1/HUDText"
+Shader "SaccFlight/HUDText"
 {
 	Properties
 	{
