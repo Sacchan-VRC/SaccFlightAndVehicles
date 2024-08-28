@@ -29,8 +29,10 @@ namespace SaccFlightAndVehicles
         public LayerMask AAMTargetsLayer = 1 << 25;//layer 25
         [Tooltip("Object that is enabled when entering vehicle in any seat. Will be removed"), Header("Removing InVehicleOnly next version.")]
         public GameObject InVehicleOnly;
-        [Tooltip("Objects that is enabled when entering vehicle in any seat")]
+        [Tooltip("Objects that are enabled when entering vehicle in any seat")]
         public GameObject[] EnableInVehicle;
+        [Tooltip("Objects that are disabled when entering vehicle in any seat")]
+        public GameObject[] DisableInVehicle;
         [Tooltip("Objects that is enabled when holding this object")]
         public GameObject[] EnableWhenHolding;
         [Tooltip("Objects that are enabled when owner of this object")]
@@ -411,11 +413,6 @@ namespace SaccFlightAndVehicles
             SendDamageEvent(dmg, More);
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
-        private void SendDefaultDamage()
-        {
-            LastHitBulletDamageMulti = 1;
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
-        }
         public void InVehicleControls()
         {
             if (!InVehicle) { return; }
@@ -593,6 +590,26 @@ namespace SaccFlightAndVehicles
             }
             SendEventToExtensions("SFEXT_L_OwnershipTransfer");
         }
+        private void EnableInVehicle_Enable()
+        {
+            for (int i = 0; i < EnableInVehicle.Length; i++)
+            { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(true); }
+        }
+        private void EnableInVehicle_Disable()
+        {
+            for (int i = 0; i < EnableInVehicle.Length; i++)
+            { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(false); }
+        }
+        private void DisableInVehicle_Enable()
+        {
+            for (int i = 0; i < DisableInVehicle.Length; i++)
+            { if (DisableInVehicle[i]) DisableInVehicle[i].SetActive(true); }
+        }
+        private void DisableInVehicle_Disable()
+        {
+            for (int i = 0; i < DisableInVehicle.Length; i++)
+            { if (DisableInVehicle[i]) DisableInVehicle[i].SetActive(false); }
+        }
         public void PilotEnterVehicleLocal()//called from PilotSeat
         {
             Using = true;
@@ -616,8 +633,8 @@ namespace SaccFlightAndVehicles
 
             if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }
             if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
-            for (int i = 0; i < EnableInVehicle.Length; i++)
-            { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(true); }
+            EnableInVehicle_Enable();
+            DisableInVehicle_Disable();
             if (!_DisallowOwnerShipTransfer)
             {
                 Networking.SetOwner(localPlayer, gameObject);
@@ -648,8 +665,8 @@ namespace SaccFlightAndVehicles
                 localPlayer.SetPlayerTag("SF_LocalPiloting", "");
                 localPlayer.SetPlayerTag("SF_LocalInVehicle", "");
                 if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
-                for (int i = 0; i < EnableInVehicle.Length; i++)
-                { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(false); }
+                EnableInVehicle_Disable();
+                DisableInVehicle_Enable();
                 SendEventToExtensions("SFEXT_O_PilotExit");
             }
             player.SetPlayerTag("SF_InVehicle", "");
@@ -675,8 +692,8 @@ namespace SaccFlightAndVehicles
             { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
             if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
-            for (int i = 0; i < EnableInVehicle.Length; i++)
-            { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(true); }
+            EnableInVehicle_Enable();
+            DisableInVehicle_Disable();
             SendEventToExtensions("SFEXT_P_PassengerEnter");
         }
         public void PassengerExitVehicleLocal()
@@ -685,8 +702,8 @@ namespace SaccFlightAndVehicles
             InVehicle = false;
             localPlayer.SetPlayerTag("SF_LocalInVehicle", "");
             if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
-            for (int i = 0; i < EnableInVehicle.Length; i++)
-            { if (EnableInVehicle[i]) EnableInVehicle[i].SetActive(false); }
+            EnableInVehicle_Disable();
+            DisableInVehicle_Enable();
             SendEventToExtensions("SFEXT_P_PassengerExit");
         }
         public void PassengerEnterVehicleGlobal(VRCPlayerApi player)
