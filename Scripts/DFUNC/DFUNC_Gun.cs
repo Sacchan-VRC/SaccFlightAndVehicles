@@ -428,6 +428,9 @@ namespace SaccFlightAndVehicles
         //hud stuff
         public Transform TargetIndicator;
         public Transform GUNLeadIndicator;
+        [Range(0.01f, 1)]
+        [Tooltip("1 = max accuracy, 0.01 = smooth but innacurate")]
+        [SerializeField] private float GunLeadResponsiveness = 1f;
         private float GUN_TargetSpeedLerper;
         private Vector3 RelativeTargetVelLastFrame;
         private Vector3 RelativeTargetVel;
@@ -452,47 +455,31 @@ namespace SaccFlightAndVehicles
                 if (GUNLeadIndicator)
                 {
                     //GUN Lead Indicator
+                    float deltaTime = Time.deltaTime;
                     Vector3 HudControlPosition = HUDControl.transform.position;
                     GUNLeadIndicator.gameObject.SetActive(true);
-                    Vector3 TargetDir;
+                    Vector3 TargetPos;
                     if (!AAMCurrentTargetSAVControl)//target is a dummy target
-                    { TargetDir = AAMTargets[AAMTarget].transform.position - HudControlPosition; }
+                    { TargetPos = AAMTargets[AAMTarget].transform.position; }
                     else
-                    { TargetDir = AAMCurrentTargetSAVControl.CenterOfMass.position - HudControlPosition; }
-                    GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
+                    { TargetPos = AAMCurrentTargetSAVControl.CenterOfMass.position; }
+                    Vector3 TargetDir = TargetPos - HudControlPosition;
 
                     Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-                    float BulletPlusPlaneSpeed = ((Vector3)SAVControl.GetProgramVariable("CurrentVel") + (VehicleTransform.forward * BulletSpeed) - (RelativeTargetVel * .25f)).magnitude;
-                    Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
-                    //GUN_TargetDirOld is around 4 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
-                    //multiplying the result by .25(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
-                    GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .25f) / SmoothDeltaTime, 15 * SmoothDeltaTime);
-                    float BulletHitTime = TargetDir.magnitude / BulletPlusPlaneSpeed;
-                    //normalize lerped relative target velocity vector and multiply by lerped speed
-                    Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
-                    Vector3 PredictedPos = TargetDir
-                        + (((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
-                            //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
-                            + (TargetAccel * .125f * BulletHitTime))//Acceleration
-                                    * BulletHitTime);
 
-                    //refine the position of the prediction to account for if it's closer or further away from you than the target, (because bullet travel time will change)
-                    Vector3 PredictionPosGlobal = transform.position + PredictedPos;
-                    Vector3 TargetPos = AAMTargets[AAMTarget].transform.position;
-                    float DistFromPrediction = Vector3.Distance(PredictionPosGlobal, transform.position);
-                    float DistFromTarg = Vector3.Distance(TargetPos, transform.position);
-                    float DistDiv = DistFromPrediction / DistFromTarg;
-                    //convert the vector used to be the vector between the prediction and the target vehicle
-                    PredictedPos = PredictionPosGlobal - TargetPos;
-                    //multiply it by the ratio of the distance to the predicition and the distance to the target
-                    PredictedPos *= DistDiv;
+                    GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, GunLeadResponsiveness);
+                    GUN_TargetSpeedLerper = RelativeTargetVel.magnitude * GunLeadResponsiveness / deltaTime;
 
-                    //use the distance to the new predicted position to add the bullet drop prediction
-                    BulletHitTime = Vector3.Distance(transform.position, TargetPos + PredictedPos) / BulletSpeed;
-                    Vector3 gravity = new Vector3(0, -Physics.gravity.y * .5f * BulletHitTime * BulletHitTime, 0);//Bulletdrop
-                    PredictedPos += gravity;
+                    float interceptTime = vintercept(HudControlPosition, BulletSpeed, TargetPos, RelativeTargetVel.normalized * GUN_TargetSpeedLerper);
+                    Vector3 PredictedPos = (TargetPos + (RelativeTargetVel.normalized * GUN_TargetSpeedLerper) * interceptTime);
 
-                    GUNLeadIndicator.position = TargetPos + PredictedPos;
+                    //Bulletdrop, technically incorrect implementation because it should be integrated into vintercept() but that'd be very difficult
+                    Vector3 gravity = new Vector3(0, -Physics.gravity.y * .5f * interceptTime * interceptTime, 0);
+                    // Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
+                    // Vector3 accel = ((TargetAccel / Time.deltaTime) * 0.5f * interceptTime * interceptTime); // accel causes jitter
+                    PredictedPos += gravity /* + accel */;
+
+                    GUNLeadIndicator.position = PredictedPos;
                     //move lead indicator to match the distance of the rest of the hud
                     GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
                     GUNLeadIndicator.rotation = Quaternion.LookRotation(GUNLeadIndicator.position - HUDControl.transform.position, VehicleTransform.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
@@ -508,6 +495,43 @@ namespace SaccFlightAndVehicles
                 { GUNLeadIndicator.gameObject.SetActive(false); }
             }
             /////////////////
+        }
+
+        //not mine
+        float vintercept(Vector3 fireorg, float missilespeed, Vector3 tgtorg, Vector3 tgtvel)
+        {
+            if (missilespeed <= 0)
+                return (tgtorg - fireorg).magnitude / missilespeed;
+
+            float tgtspd = tgtvel.magnitude;
+            Vector3 dir = fireorg - tgtorg;
+            float d = dir.magnitude;
+            float a = missilespeed * missilespeed - tgtspd * tgtspd;
+            float b = 2 * Vector3.Dot(dir, tgtvel);
+            float c = -d * d;
+
+            float t = 0;
+            if (a == 0)
+            {
+                if (b == 0)
+                    return 0f;
+                else
+                    t = -c / b;
+            }
+            else
+            {
+                float s0 = b * b - 4 * a * c;
+                if (s0 <= 0)
+                    return 0f;
+                float s = Mathf.Sqrt(s0);
+                float div = 1.0f / (2f * a);
+                float t1 = -(s + b) * div;
+                float t2 = (s - b) * div;
+                if (t1 <= 0 && t2 <= 0)
+                    return 0f;
+                t = (t1 > 0 && t2 > 0) ? Mathf.Min(t1, t2) : Mathf.Max(t1, t2);
+            }
+            return t;
         }
         private void FindSelf()
         {
