@@ -15805,8 +15805,8 @@ MonoBehaviour:
   MissileType: 1
   RotatingSound: {fileID: 5639847567931604606}
   RotatingSoundMulti: 0.02
-  AAMLocking: {fileID: 464908274}
-  AAMLockedOn: {fileID: 244561739}
+  AAMTargeting: {fileID: 464908274}
+  AAMTargetLock: {fileID: 244561739}
   DamageFeedBack: {fileID: 6014378832009447336}
   JoyStick: {fileID: 6124371903860333399}
   MaxJoyAngles: {x: 45, y: 45, z: 45}
@@ -15835,7 +15835,9 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  SendAAMWarning: 1
+  AllowNoAmmoLock: 0
+  LoseLockWhenFired: 0
+  SendLockWarning: 1
   DisableTargeting: 0
   BulletDamageTaken: 10
   AI_GUN: 0

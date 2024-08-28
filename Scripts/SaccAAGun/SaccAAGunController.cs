@@ -22,9 +22,9 @@ namespace SaccFlightAndVehicles
         public AudioSource RotatingSound;
         public float RotatingSoundMulti = .02f;
         [Tooltip("Sound that plays when targeting an enemy")]
-        public AudioSource AAMLocking;
+        public AudioSource AAMTargeting;
         [Tooltip("Sound that plays when locked onto a target")]
-        public AudioSource AAMLockedOn;
+        public AudioSource AAMTargetLock;
         [Tooltip("Sound that plays when a target is hit")]
         public AudioSource DamageFeedBack;
         [Tooltip("Joystick object that moves around in to show rotation inputs")]
@@ -313,20 +313,20 @@ namespace SaccFlightAndVehicles
                     HPReplenishment();
 
                     //Sounds
-                    if (AAMLockTimer > 0 && !AAMLocked && NumAAM > 0)
+                    if (!AAMLocked && AAMLockTimer > 0)
                     {
-                        AAMLocking.gameObject.SetActive(true);
-                        AAMLockedOn.gameObject.SetActive(false);
+                        if (AAMTargeting && (NumAAM > 0 || AllowNoAmmoLock)) { AAMTargeting.gameObject.SetActive(true); }
+                        if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
                     }
                     else if (AAMLocked)
                     {
-                        AAMLocking.gameObject.SetActive(false);
-                        AAMLockedOn.gameObject.SetActive(true);
+                        if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
+                        if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(true); }
                     }
                     else
                     {
-                        AAMLocking.gameObject.SetActive(false);
-                        AAMLockedOn.gameObject.SetActive(false);
+                        if (AAMTargeting) { AAMTargeting.gameObject.SetActive(false); }
+                        if (AAMTargetLock) { AAMTargetLock.gameObject.SetActive(false); }
                     }
                     if (RotatingSound)
                     {
@@ -521,7 +521,7 @@ namespace SaccFlightAndVehicles
         {
             if (DoAAMTargeting && (Manning || (IsOwner && AI_GUN_RUNNINGLOCAL)))
             {
-                AAMTargeting(AAMLockAngle);
+                AAMFindTargets(AAMLockAngle);
             }
         }
         public void NetworkExplode()
@@ -623,7 +623,7 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        private void AAMTargeting(float Lock_Angle)
+        private void AAMFindTargets(float Lock_Angle)
         {
             float DeltaTime = Time.deltaTime;
             var AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
@@ -722,7 +722,6 @@ namespace SaccFlightAndVehicles
                     if (AAMCurrentTargetAngle < AAMLockAngle && (NumAAM > 0 || AllowNoAmmoLock))
                     {
                         AAMLockTimer += DeltaTime;
-                        //dont give enemy radar lock if you're out of missiles (planes do do this though)
                         if (AAMCurrentTargetSAVControl)
                         {
                             //target is a plane, send the 'targeted' event every second to make the target plane play a warning sound in the cockpit.
@@ -736,7 +735,7 @@ namespace SaccFlightAndVehicles
                     }
                     else
                     {
-                        AAMTargetedTime = 2f;
+                        AAMTargetedTime = 0f;
                         AAMLockTimer = 0;
                     }
                 }
@@ -759,7 +758,7 @@ namespace SaccFlightAndVehicles
         }
         private void noLock()
         {
-            AAMTargetedTime = 2f;//so it plays straight away next time it's targeted
+            AAMTargetedTime = 0f;//so it plays straight away next time it's targeted
             AAMLockTimer = 0;
             if (AAMHasTarget)
             {
@@ -906,8 +905,8 @@ namespace SaccFlightAndVehicles
             Manning = false;
             AAMLockTimer = 0;
             AAMHasTarget = false;
-            AAMLocking.gameObject.SetActive(false);
-            AAMLockedOn.gameObject.SetActive(false);
+            AAMTargeting.gameObject.SetActive(false);
+            AAMTargetLock.gameObject.SetActive(false);
             AAGunAnimator.SetBool("inside", false);
             if (RotatingSound) { RotatingSound.Stop(); }
             if (AI_GUN) { AI_GUN_Enter(); }
