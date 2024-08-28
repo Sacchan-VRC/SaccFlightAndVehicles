@@ -717,7 +717,7 @@ namespace SaccFlightAndVehicles
                     {
                         AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
                     }
-                    if (AAMCurrentTargetSAVControl != null)
+                    if (AAMCurrentTargetSAVControl != null && AAMCurrentTargetSAVControl.EntityControl.InVehicle)
                     { AAMCurrentTargetSAVControl.EntityControl.SendEventToExtensions("SFEXT_L_AAMTargeted"); }
                 }
             }
