@@ -173,7 +173,7 @@ namespace SaccFlightAndVehicles
         {
             OnEnableDeserializationBlocker = true;
             gameObject.SetActive(true);
-            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 1);
+            SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), .1f);
             if (EntityControl.EntityPickup)
             {
                 if (EntityControl.Holding)
@@ -568,7 +568,7 @@ namespace SaccFlightAndVehicles
         bool OnEnableDeserializationBlocker;
         public override void OnDeserialization()
         {
-            if (OnEnableDeserializationBlocker) { return; }
+            if (OnEnableDeserializationBlocker) { OnEnableDeserializationBlocker = false; return; }
             if (AGMFireNow) { LaunchAGM(); }
         }
     }

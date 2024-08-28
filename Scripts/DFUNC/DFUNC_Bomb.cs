@@ -19,6 +19,8 @@ namespace SaccFlightAndVehicles
         public int NumBomb_PerShot = 1;
         [Tooltip("Delay between bomb drops when holding the trigger")]
         public float BombHoldDelay = 0.5f;
+        [Tooltip("How many bombs to create at StarT() so they don't have to be created later")]
+        public int NumPreInstatiated = 5;
         [Tooltip("Minimum delay between bomb drops")]
         public float BombDelay = 0f;
         [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
@@ -99,8 +101,7 @@ namespace SaccFlightAndVehicles
             NumChildrenStart = transform.childCount;
             if (Bomb)
             {
-                int NumToInstantiate = Mathf.Min(FullBombs, 30);
-                for (int i = 0; i < NumToInstantiate; i++)
+                for (int i = 0; i < NumPreInstatiated; i++)
                 {
                     InstantiateWeapon();
                 }
@@ -123,7 +124,7 @@ namespace SaccFlightAndVehicles
         {
             OnEnableDeserializationBlocker = true;
             gameObject.SetActive(true);
-            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 1);
+            SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), .1f);
             if (EntityControl.EntityPickup)
             {
                 if (EntityControl.Holding)
@@ -400,10 +401,8 @@ namespace SaccFlightAndVehicles
             }
         }
         private bool FireNextSerialization = false;
-        bool OnEnableDeserializationBlocker;
         public override void OnPreSerialization()
         {
-            if (OnEnableDeserializationBlocker) { return; }
             if (FireNextSerialization)
             {
                 FireNextSerialization = false;
@@ -411,8 +410,10 @@ namespace SaccFlightAndVehicles
             }
             else { BombFireNow = false; }
         }
+        bool OnEnableDeserializationBlocker;
         public override void OnDeserialization()
         {
+            if (OnEnableDeserializationBlocker) { OnEnableDeserializationBlocker = false; return; }
             if (BombFireNow) { LaunchBombs_Event(); }
         }
     }
