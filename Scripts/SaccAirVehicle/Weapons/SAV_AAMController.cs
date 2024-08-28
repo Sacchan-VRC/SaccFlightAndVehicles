@@ -338,7 +338,7 @@ namespace SaccFlightAndVehicles
                     }
                     else
                     {
-                        if (TargetDistance < ProximityExplodeDistance)//missile flew past the target, but is within proximity explode range?
+                        if (TargetDistance < ProximityExplodeDistance && Target && Target.gameObject.activeInHierarchy)//missile flew past the target, but is within proximity explode range?
                         {
                             SplashHit = true;
                             hitwater = false;
