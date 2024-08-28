@@ -17,29 +17,39 @@ namespace SaccFlightAndVehicles
         public Transform HeadingIndicator;
         public Transform AAMTargetIndicator;
         public Transform GUNLeadIndicator;
+        [Range(0.01f, 1)]
+        [Tooltip("1 = max accuracy, 0.01 = smooth but innacurate")]
+        [SerializeField] private float GunLeadResponsiveness = 1f;
         public Transform AAMReloadBar;
         public Transform MGAmmoBar;
         public Text HUDText_AAM_ammo;
         [Tooltip("Local distance projected forward for objects that move dynamically, only adjust if the hud is moved forward in order to make it appear smaller")]
         public float distance_from_head = 1.333f;
-        [System.NonSerializedAttribute] public Vector3 GUN_TargetDirOld;
-        [System.NonSerializedAttribute] public float GUN_TargetSpeedLerper;
-        [System.NonSerializedAttribute] public Vector3 RelativeTargetVel;
-        [System.NonSerializedAttribute] public Vector3 RelativeTargetVelLastFrame;
+        [System.NonSerialized] public Vector3 GUN_TargetDirOld;
+        [System.NonSerialized] public float GUN_TargetSpeedLerper;
+        [System.NonSerialized] public Vector3 RelativeTargetVel;
+        [System.NonSerialized] public Vector3 RelativeTargetVelLastFrame;
+        private SaccEntity EntityControl;
         public float BulletSpeed = 1050;
         private float BulletSpeedDivider;
         private float AAMReloadBarDivider;
         private float MGReloadBarDivider;
         private Transform Rotator;
         private Quaternion backfacing = Quaternion.Euler(new Vector3(0, 180, 0));
+        bool Initialized = false;
+        public void RemoteInit() { Start(); }
         private void Start()
         {
+            if (Initialized) return;
+            Initialized = true;
             BulletSpeedDivider = 1f / BulletSpeed;
             AAMReloadBarDivider = 1f / AAGunControl.MissileReloadTime;
             MGReloadBarDivider = 1f / AAGunControl.MGAmmoSeconds;
             if (PilotSeatAdjusterTarget) { transform.position = PilotSeatAdjusterTarget.position; }
 
             Rotator = AAGunControl.Rotator.transform;
+
+            EntityControl = AAGunControl.EntityControl;
         }
         private void Update()
         {
@@ -78,56 +88,7 @@ namespace SaccFlightAndVehicles
             /////////////////
 
             //GUN Lead Indicator
-            if (GUNLeadIndicator)
-            {
-                if (AAGunControl.AAMHasTarget)
-                {
-                    GUNLeadIndicator.gameObject.SetActive(true);
-                    Vector3 TargetDir;
-                    if (!AAGunControl.AAMCurrentTargetSAVControl)//target is a dummy target
-                    { TargetDir = AAGunControl.AAMTargets[AAGunControl.AAMTarget].transform.position - transform.position; }
-                    else
-                    { TargetDir = AAGunControl.AAMCurrentTargetSAVControl.CenterOfMass.position - transform.position; }
-                    GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, .2f);
-
-                    Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
-                    Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
-                    //GUN_TargetDirOld is around 4 frames worth of distance behind a moving target (lerped by .2) in order to smooth out the calculation for unsmooth netcode
-                    //multiplying the result by .25(to get back to 1 frames worth) seems to actually give an accurate enough result to use in prediction
-                    GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * .25f) / SmoothDeltaTime, 15 * SmoothDeltaTime);
-                    float BulletHitTime = TargetDir.magnitude / BulletSpeed;
-                    //normalize lerped relative target velocity vector and multiply by lerped speed
-                    Vector3 RelTargVelNormalized = RelativeTargetVel.normalized;
-                    Vector3 PredictedPos = TargetDir
-                        + (((RelTargVelNormalized * GUN_TargetSpeedLerper)/* Linear */
-                            //the .125 in the next line is combined .25 for undoing the lerp, and .5 for the acceleration formula
-                            + (TargetAccel * .125f * BulletHitTime))//Acceleration
-                                    * BulletHitTime);
-
-                    //refine the position of the prediction to account for if it's closer or further away from you than the target, (because bullet travel time will change)
-                    Vector3 PredictionPosGlobal = transform.position + PredictedPos;
-                    Vector3 TargetPos = AAGunControl.AAMTargets[AAGunControl.AAMTarget].transform.position;
-                    float DistFromPrediction = Vector3.Distance(PredictionPosGlobal, transform.position);
-                    float DistFromTarg = Vector3.Distance(TargetPos, transform.position);
-                    float DistDiv = DistFromPrediction / DistFromTarg;
-                    //convert the vector used to be the vector between the prediction and the target vehicle
-                    PredictedPos = PredictionPosGlobal - TargetPos;
-                    //multiply it by the ratio of the distance to the predicition and the distance to the target
-                    PredictedPos *= DistDiv;
-
-                    //use the distance to the new predicted position to add the bullet drop prediction
-                    BulletHitTime = Vector3.Distance(transform.position, TargetPos + PredictedPos) / BulletSpeed;
-                    Vector3 gravity = new Vector3(0, 9.81f * .5f * BulletHitTime * BulletHitTime, 0);//Bulletdrop
-                    PredictedPos += gravity;
-
-                    GUNLeadIndicator.position = TargetPos + PredictedPos;
-                    //move lead indicator to match the distance of the rest of the hud
-                    GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
-
-                    RelativeTargetVelLastFrame = RelativeTargetVel;
-                }
-                else GUNLeadIndicator.gameObject.SetActive(false);
-            }
+            // GUNLead();
             /////////////////
 
             //Heading indicator
@@ -142,6 +103,81 @@ namespace SaccFlightAndVehicles
             if (ElevationIndicator)
             { ElevationIndicator.rotation = Quaternion.Euler(newrot); }
             /////////////////
+        }
+        public void GUNLead()
+        {
+            if (GUNLeadIndicator)
+            {
+                //GUN Lead Indicator
+                float deltaTime = Time.deltaTime;
+                Vector3 HudControlPosition = transform.position;
+                GUNLeadIndicator.gameObject.SetActive(true);
+                Vector3 TargetPos;
+                if (!AAGunControl.AAMCurrentTargetSAVControl)//target is a dummy target
+                { TargetPos = AAGunControl.AAMTargets[AAGunControl.AAMTarget].transform.position; }
+                else
+                { TargetPos = AAGunControl.AAMCurrentTargetSAVControl.CenterOfMass.position; }
+                Vector3 TargetDir = TargetPos - HudControlPosition;
+
+                Vector3 RelativeTargetVel = TargetDir - GUN_TargetDirOld;
+
+                GUN_TargetDirOld = Vector3.Lerp(GUN_TargetDirOld, TargetDir, GunLeadResponsiveness);
+                // GUN_TargetSpeedLerper = Mathf.Lerp(GUN_TargetSpeedLerper, (RelativeTargetVel.magnitude * GunLeadResponsiveness) / deltaTime, 15 * deltaTime);
+                GUN_TargetSpeedLerper = RelativeTargetVel.magnitude * GunLeadResponsiveness / deltaTime;
+
+                float interceptTime = vintercept(HudControlPosition, BulletSpeed, TargetPos, RelativeTargetVel.normalized * GUN_TargetSpeedLerper);
+                Vector3 PredictedPos = (TargetPos + (RelativeTargetVel.normalized * GUN_TargetSpeedLerper) * interceptTime);
+
+                //Bulletdrop, technically incorrect implementation because it should be integrated into vintercept() but that'd be very difficult
+                Vector3 gravity = new Vector3(0, -Physics.gravity.y * .5f * interceptTime * interceptTime, 0);//Bulletdrop
+                // Vector3 TargetAccel = RelativeTargetVel - RelativeTargetVelLastFrame;
+                // Vector3 accel = ((TargetAccel / deltaTime) * 0.5f * interceptTime * interceptTime); // accel causes jitter
+                PredictedPos += gravity /* + accel */;
+
+                GUNLeadIndicator.position = PredictedPos;
+                //move lead indicator to match the distance of the rest of the hud
+                GUNLeadIndicator.localPosition = GUNLeadIndicator.localPosition.normalized * distance_from_head;
+                GUNLeadIndicator.rotation = Quaternion.LookRotation(GUNLeadIndicator.position - HudControlPosition, Rotator.transform.up);//This makes it not stretch when off to the side by fixing the rotation.
+
+                RelativeTargetVelLastFrame = RelativeTargetVel;
+            }
+        }
+
+        //not mine
+        float vintercept(Vector3 fireorg, float missilespeed, Vector3 tgtorg, Vector3 tgtvel)
+        {
+            if (missilespeed <= 0)
+                return (tgtorg - fireorg).magnitude / missilespeed;
+
+            float tgtspd = tgtvel.magnitude;
+            Vector3 dir = fireorg - tgtorg;
+            float d = dir.magnitude;
+            float a = missilespeed * missilespeed - tgtspd * tgtspd;
+            float b = 2 * Vector3.Dot(dir, tgtvel);
+            float c = -d * d;
+
+            float t = 0;
+            if (a == 0)
+            {
+                if (b == 0)
+                    return 0f;
+                else
+                    t = -c / b;
+            }
+            else
+            {
+                float s0 = b * b - 4 * a * c;
+                if (s0 <= 0)
+                    return 0f;
+                float s = Mathf.Sqrt(s0);
+                float div = 1.0f / (2f * a);
+                float t1 = -(s + b) * div;
+                float t2 = (s - b) * div;
+                if (t1 <= 0 && t2 <= 0)
+                    return 0f;
+                t = (t1 > 0 && t2 > 0) ? Mathf.Min(t1, t2) : Mathf.Max(t1, t2);
+            }
+            return t;
         }
     }
 }
