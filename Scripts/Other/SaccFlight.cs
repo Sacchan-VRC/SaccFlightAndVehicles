@@ -12,7 +12,7 @@ namespace SaccFlightAndVehicles
         private VRCPlayerApi localPlayer;
         [SerializeField] private float Thrust_Strength = 29.7f;
         [Tooltip("Strength of extra thrust applied when trying to thrust in direction going against movement")]
-        [SerializeField] private float Back_Thrust_Strength = 45f;
+        [SerializeField] private float Back_Thrust_Strength = 0.45f;
         private bool InVR = false;
         private void Start()
         {
@@ -41,7 +41,7 @@ namespace SaccFlightAndVehicles
                     NewForwardVec = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward;
                 }
                 //get backwards amount
-                float BackThrustAmount = -(Vector3.Dot(PlayerVel, NewForwardVec) * Back_Thrust_Strength * DeltaTime);
+                float BackThrustAmount = -(Vector3.Dot(PlayerVel, NewForwardVec) * Back_Thrust_Strength);
                 NewForwardVec = NewForwardVec * Thrust_Strength * ForwardThrust * DeltaTime * Mathf.Max(1, BackThrustAmount * ForwardThrust);
 
                 Vector3 NewUpVec = Vector3.up * Thrust_Strength * UpThrust * DeltaTime;
@@ -50,7 +50,7 @@ namespace SaccFlightAndVehicles
                 //SetVelocity overrides all other forces in clientsim so we need to add gravity ourselves
                 if (ForwardThrust + UpThrust == 0) { return; }
                 else
-                { NewForwardVec += -Vector3.up * 9.81f * Time.deltaTime; }
+                { NewForwardVec += Physics.gravity * DeltaTime; }
 #endif
 
                 localPlayer.SetVelocity(PlayerVel + NewForwardVec + NewUpVec);
