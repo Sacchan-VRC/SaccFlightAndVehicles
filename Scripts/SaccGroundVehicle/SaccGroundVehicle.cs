@@ -30,6 +30,7 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour[] SteerWheels;
         [Tooltip("All of the rest of the wheels")]
         public UdonSharpBehaviour[] OtherWheels;
+        private UdonSharpBehaviour[] AllWheels;
         //public Transform[] DriveWheelsTrans;
         //public sustest[] SteeringWheels;
         //public Transform[] SteeringWheelsTrans;
@@ -311,6 +312,44 @@ namespace SaccFlightAndVehicles
                     SteerWheels[i].SetProgramVariable("IsDriveWheel", true);
                 }
             }
+            // Create AllWheels array, making sure that any wheel that is in drivewheels and steerwheels isn't there twice
+            // We assume that no one is stupid enough to put a drive or steer wheel in otherwheels at the same time as it's pointless.
+            int uniqueDriveWheels = DriveWheels.Length;
+            bool[] wheelisDup = new bool[DriveWheels.Length];
+            for (int i = 0; i < DriveWheels.Length; i++)
+            {
+                for (int o = 0; o < SteerWheels.Length; o++)
+                {
+                    if (DriveWheels[i] == SteerWheels[o])
+                    {
+                        wheelisDup[i] = true;
+                        uniqueDriveWheels--;
+                    }
+                }
+            }
+            AllWheels = new SaccWheel[uniqueDriveWheels + SteerWheels.Length + OtherWheels.Length];
+            int sub = 0;
+            for (int i = 0; i < DriveWheels.Length; i++)
+            {
+                if (wheelisDup[i])
+                {
+                    sub++;
+                }
+                else
+                {
+                    AllWheels[i - sub] = DriveWheels[i];
+                }
+            }
+            int insertIndex = uniqueDriveWheels;
+            for (int i = 0; i < SteerWheels.Length; i++)
+            {
+                AllWheels[insertIndex++] = SteerWheels[i];
+            }
+            for (int i = 0; i < OtherWheels.Length; i++)
+            {
+                AllWheels[insertIndex++] = OtherWheels[i];
+            }
+
             CurrentlyDistant = true;
             SendCustomEventDelayedSeconds(nameof(CheckDistance), Random.Range(5f, 7f));//dont do all vehicles on same frame
         }
@@ -706,7 +745,7 @@ namespace SaccFlightAndVehicles
 
                         { AutoSteer = Mathf.Clamp(AutoSteer / SteeringDegrees, -1, 1); }
 
-                        float GroundedwheelsRatio = NumGroundedWheels / SteerWheels.Length;
+                        float GroundedwheelsRatio = NumGroundedSteerWheels / SteerWheels.Length;
                         if (InVR && !UseStickSteering)
                         {
                             AutoSteerLerper = Mathf.Lerp(AutoSteerLerper, AutoSteer, 1 - Mathf.Pow(0.5f, VehicleSpeed * AutoSteerStrength * GroundedwheelsRatio * DeltaTime));
@@ -909,24 +948,14 @@ namespace SaccFlightAndVehicles
             // would require communication between wheels and removal of substep?
             if (frame_even)
             {
-                for (int i = 0; i < DriveWheels.Length; i++)
-                { DriveWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
-                for (int i = 0; i < SteerWheels.Length; i++)
-                { SteerWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
-                for (int i = 0; i < OtherWheels.Length; i++)
-                { OtherWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
+                for (int i = 0; i < AllWheels.Length; i++)
+                { AllWheels[i].SendCustomEvent("Wheel_FixedUpdate"); }
             }
             else
             {
-                int numDWheels = DriveWheels.Length - 1;
-                for (int i = 0; i < DriveWheels.Length; i++)
-                { DriveWheels[numDWheels - i].SendCustomEvent("Wheel_FixedUpdate"); }
-                int numSWheels = SteerWheels.Length - 1;
-                for (int i = 0; i < SteerWheels.Length; i++)
-                { SteerWheels[numSWheels - i].SendCustomEvent("Wheel_FixedUpdate"); }
-                int numOWheels = OtherWheels.Length - 1;
-                for (int i = 0; i < OtherWheels.Length; i++)
-                { OtherWheels[numOWheels - i].SendCustomEvent("Wheel_FixedUpdate"); }
+                int numDWheels = AllWheels.Length - 1;
+                for (int i = 0; i < AllWheels.Length; i++)
+                { AllWheels[numDWheels - i].SendCustomEvent("Wheel_FixedUpdate"); }
             }
             frame_even = !frame_even;
 
