@@ -81,6 +81,8 @@ namespace SaccFlightAndVehicles
         public bool SendLockWarning = true;
         [Tooltip("Tick this to disable target tracking, prediction, and missiles (WW2 flak?)")]
         public bool DisableTargeting;
+        [Tooltip("Ignore targets that don't have a SaccAirVehicle script?")]
+        public bool OnlyTargetVehicles;
         [Tooltip("Multiplies how much damage is taken from bullets")]
         public float BulletDamageTaken = 10f;
         public bool AI_GUN;
@@ -662,12 +664,12 @@ namespace SaccFlightAndVehicles
                     Debug.Log(string.Concat("BelowMaxDist ", NextTargetDistance < AAMMaxTargetDistance));
                     Debug.Log(string.Concat("LowerAngle ", NextTargetAngle < AAMCurrentTargetAngle));
                     Debug.Log(string.Concat("CurrentTargTaxiing ", !AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)); */
-                    if ((LineOfSightNext
+                    if ((!OnlyTargetVehicles || NextTargetSAVControl) && ((LineOfSightNext
                         && hitnext.collider && (hitnext.collider.gameObject.layer == 17 || hitnext.collider.gameObject.layer == 31)
                             && NextTargetAngle < Lock_Angle
                                 && NextTargetDistance < AAMMaxTargetDistance
                                     && NextTargetAngle < AAMCurrentTargetAngle)
-                                        || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing) || !AAMTargets[AAMTarget].activeInHierarchy)) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                                        || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing) || !AAMTargets[AAMTarget].activeInHierarchy))) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
                     {
                         //found new target
                         AAMCurrentTargetAngle = NextTargetAngle;
