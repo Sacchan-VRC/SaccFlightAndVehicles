@@ -33,8 +33,10 @@ namespace SaccFlightAndVehicles
         public GameObject[] EnableInVehicle;
         [Tooltip("Objects that are disabled when entering vehicle in any seat")]
         public GameObject[] DisableInVehicle;
-        [Tooltip("Objects that is enabled when holding this object")]
+        [Tooltip("Objects that are enabled when holding this object")]
         public GameObject[] EnableWhenHolding;
+        [Tooltip("Objects that are disabled when holding this object")]
+        public GameObject[] DisableWhenHolding;
         [Tooltip("Objects that are enabled when owner of this object")]
         public GameObject[] EnableWhenOwner;
         [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
@@ -610,6 +612,26 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i < DisableInVehicle.Length; i++)
             { if (DisableInVehicle[i]) DisableInVehicle[i].SetActive(false); }
         }
+        private void EnableWhenHolding_Enable()
+        {
+            for (int i = 0; i < EnableWhenHolding.Length; i++)
+            { if (EnableWhenHolding[i]) EnableWhenHolding[i].SetActive(true); }
+        }
+        private void EnableWhenHolding_Disable()
+        {
+            for (int i = 0; i < EnableWhenHolding.Length; i++)
+            { if (EnableWhenHolding[i]) EnableWhenHolding[i].SetActive(false); }
+        }
+        private void DisableWhenHolding_Enable()
+        {
+            for (int i = 0; i < DisableWhenHolding.Length; i++)
+            { if (DisableWhenHolding[i]) DisableWhenHolding[i].SetActive(true); }
+        }
+        private void DisableWhenHolding_Disable()
+        {
+            for (int i = 0; i < DisableWhenHolding.Length; i++)
+            { if (DisableWhenHolding[i]) DisableWhenHolding[i].SetActive(false); }
+        }
         public void PilotEnterVehicleLocal()//called from PilotSeat
         {
             Using = true;
@@ -826,11 +848,8 @@ namespace SaccFlightAndVehicles
         {
             Holding = true;
             Using = true;
-            if (EnableWhenHolding.Length > 0)
-            {
-                for (int i = 0; i < EnableWhenHolding.Length; i++)
-                { EnableWhenHolding[i].SetActive(true); }
-            }
+            EnableWhenHolding_Enable();
+            DisableWhenHolding_Disable();
             if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
             if (LStickNumFuncs == 1)
             { Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected"); }
@@ -850,11 +869,8 @@ namespace SaccFlightAndVehicles
             if (!IsOwner) { snatched = true; }
             Holding = false;
             Using = false;
-            if (EnableWhenHolding.Length > 0)
-            {
-                for (int i = 0; i < EnableWhenHolding.Length; i++)
-                { EnableWhenHolding[i].SetActive(false); }
-            }
+            EnableWhenHolding_Disable();
+            DisableWhenHolding_Enable();
             SendEventToExtensions("SFEXT_O_OnDrop");
             if (snatched)//Don't send drop if it was snatched because the drop event will arrive after the other player's grab event
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Snatched)); snatched = false; }
