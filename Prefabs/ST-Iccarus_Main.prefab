@@ -63925,7 +63925,6 @@ MonoBehaviour:
   SyncRigid: {fileID: 0}
   SyncTransform: {fileID: 0}
   SyncTransform_Raw: {fileID: 0}
-  SLEEPCUBE: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &3243243056881722325
@@ -64376,7 +64375,9 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 7099842138338204315}
+  DisableInVehicle: []
   EnableWhenHolding: []
+  DisableWhenHolding: []
   EnableWhenOwner: []
   CenterOfMass: {fileID: 8924013770782945331}
   DoVoiceVolumeChange: 1
@@ -88994,8 +88995,6 @@ MonoBehaviour:
   SpeedResultAccel: 0
   RevUpResult: 0
   RPMTestTarget: 500
-  TESTISOWNER: {fileID: 0}
-  TESTISSYNCING: {fileID: 0}
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -89271,8 +89270,6 @@ MonoBehaviour:
   SpeedResultAccel: 0
   RevUpResult: 0
   RPMTestTarget: 500
-  TESTISOWNER: {fileID: 0}
-  TESTISSYNCING: {fileID: 0}
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -89586,8 +89583,6 @@ MonoBehaviour:
   SpeedResultAccel: 0
   RevUpResult: 0
   RPMTestTarget: 500
-  TESTISOWNER: {fileID: 0}
-  TESTISSYNCING: {fileID: 0}
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -89831,8 +89826,6 @@ MonoBehaviour:
   SpeedResultAccel: 0
   RevUpResult: 0
   RPMTestTarget: 500
-  TESTISOWNER: {fileID: 0}
-  TESTISSYNCING: {fileID: 0}
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -90047,6 +90040,61 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RacingTrigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427669004923879692, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.4845
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.1816
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.0506
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7996739
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.42173645
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.37803614
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.19937074
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -55.613
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: -50.604
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3672388411083110915, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
         type: 3}

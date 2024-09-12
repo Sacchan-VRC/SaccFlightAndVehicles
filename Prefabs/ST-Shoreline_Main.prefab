@@ -2065,7 +2065,6 @@ MonoBehaviour:
   SyncRigid: {fileID: 0}
   SyncTransform: {fileID: 0}
   SyncTransform_Raw: {fileID: 0}
-  SLEEPCUBE: {fileID: 0}
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &1217889975477297945
@@ -2221,7 +2220,9 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 6873395543557872215}
+  DisableInVehicle: []
   EnableWhenHolding: []
+  DisableWhenHolding: []
   EnableWhenOwner: []
   CenterOfMass: {fileID: 5061191818139185407}
   DoVoiceVolumeChange: 1
@@ -84001,8 +84002,6 @@ MonoBehaviour:
   SpeedResultAccel: 0
   RevUpResult: 0
   RPMTestTarget: 500
-  TESTISOWNER: {fileID: 0}
-  TESTISSYNCING: {fileID: 0}
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -84264,8 +84263,6 @@ MonoBehaviour:
   SpeedResultAccel: 0
   RevUpResult: 0
   RPMTestTarget: 500
-  TESTISOWNER: {fileID: 0}
-  TESTISSYNCING: {fileID: 0}
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -84581,8 +84578,6 @@ MonoBehaviour:
   SpeedResultAccel: 0
   RevUpResult: 0
   RPMTestTarget: 500
-  TESTISOWNER: {fileID: 0}
-  TESTISSYNCING: {fileID: 0}
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -84844,8 +84839,6 @@ MonoBehaviour:
   SpeedResultAccel: 0
   RevUpResult: 0
   RPMTestTarget: 500
-  TESTISOWNER: {fileID: 0}
-  TESTISSYNCING: {fileID: 0}
   ShowWheelForceLines: 0
   ForceUsedDBG: 0
   ContactPoint: {x: 0, y: 0, z: 0}
@@ -85112,6 +85105,66 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RacingTrigger
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427669004923879692, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.6981117
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6981117
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.6981117
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0199
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.3369
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.6305
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.86602545
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.50000006
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -1.1612712e-12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -60
       objectReference: {fileID: 0}
     - target: {fileID: 3672388411083110915, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
         type: 3}

@@ -42350,6 +42350,7 @@ MonoBehaviour:
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 1564986658540807043}
   GUNLeadIndicator: {fileID: 1564986658926027213}
+  GunLeadResponsiveness: 1
   BulletSpeed: 1050
 --- !u!114 &1564986659352901454
 MonoBehaviour:
@@ -42938,6 +42939,7 @@ MonoBehaviour:
   NumBomb: 36
   NumBomb_PerShot: 1
   BombHoldDelay: 0.25
+  NumPreInstatiated: 5
   BombDelay: 0
   BombLaunchPoints:
   - {fileID: 6866471498013573617}
@@ -54852,7 +54854,9 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 1564986659621963122}
+  DisableInVehicle: []
   EnableWhenHolding: []
+  DisableWhenHolding: []
   EnableWhenOwner: []
   CenterOfMass: {fileID: 1564986659969277825}
   DoVoiceVolumeChange: 1
@@ -114406,6 +114410,56 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RacingTrigger_GRVR
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427669004923879692, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.3205
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.3088
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.8595
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.6751619
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.6751619
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.21013421
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0.21013422
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: -34.576
       objectReference: {fileID: 0}
     - target: {fileID: 3672388411083110915, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
         type: 3}

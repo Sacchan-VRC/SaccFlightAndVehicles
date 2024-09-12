@@ -175,12 +175,12 @@ namespace SaccFlightAndVehicles
             ThisCapsuleCollider.enabled = true;
             if (RaceCountdown)
             {
+                RaceStartTime = Time.time;
                 if (FreezeCar)
                 {
                     MoveCarToStart();
                     return;
                 }
-                RaceStartTime = Time.time;
                 Vector3 vel = PlaneRigidbody.velocity;
                 vel.x = 0; vel.z = 0;
                 PlaneRigidbody.velocity = vel;

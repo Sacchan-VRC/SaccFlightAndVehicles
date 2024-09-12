@@ -30865,6 +30865,7 @@ MonoBehaviour:
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 8101121279009016025}
   GUNLeadIndicator: {fileID: 8101121279821621872}
+  GunLeadResponsiveness: 1
   BulletSpeed: 1050
 --- !u!114 &2934804653972449689
 MonoBehaviour:
@@ -100994,7 +100995,9 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 2934804654959112473}
+  DisableInVehicle: []
   EnableWhenHolding: []
+  DisableWhenHolding: []
   EnableWhenOwner: []
   CenterOfMass: {fileID: 2934804654583356880}
   DoVoiceVolumeChange: 1
@@ -118599,6 +118602,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RacingTrigger_SB-1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427669004923879692, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.4808
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.2846
       objectReference: {fileID: 0}
     - target: {fileID: 3672388411083110915, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
         type: 3}

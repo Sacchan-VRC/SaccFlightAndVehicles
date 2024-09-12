@@ -48625,7 +48625,9 @@ MonoBehaviour:
   InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 4371473019321031449}
+  DisableInVehicle: []
   EnableWhenHolding: []
+  DisableWhenHolding: []
   EnableWhenOwner: []
   CenterOfMass: {fileID: 4371473018504201464}
   DoVoiceVolumeChange: 1
@@ -54448,6 +54450,7 @@ MonoBehaviour:
   MaxTargetDistance: 6000
   TargetIndicator: {fileID: 4371473019558103429}
   GUNLeadIndicator: {fileID: 4371473018167786412}
+  GunLeadResponsiveness: 1
   BulletSpeed: 1050
 --- !u!114 &4371473019080752959
 MonoBehaviour:
@@ -71938,6 +71941,7 @@ MonoBehaviour:
   NumBomb: 4
   NumBomb_PerShot: 1
   BombHoldDelay: 0.5
+  NumPreInstatiated: 5
   BombDelay: 0
   BombLaunchPoints:
   - {fileID: 4371473018565603552}
@@ -116541,6 +116545,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RacingTrigger_SF1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2427669004923879692, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.6044
+      objectReference: {fileID: 0}
+    - target: {fileID: 2890488430609175412, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.3984
       objectReference: {fileID: 0}
     - target: {fileID: 3672388411083110915, guid: 7c488d0d50ee72b4aa05ceb6fc6e296d,
         type: 3}
