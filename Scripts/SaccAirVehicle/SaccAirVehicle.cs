@@ -1841,12 +1841,14 @@ namespace SaccFlightAndVehicles
                             Vector3 vehpos = VehicleTransform.position;
                             vehpos.z -= RepeatingWorldDistance * 2;
                             VehicleTransform.position = vehpos;
+                            VehicleRigidbody.position = VehicleTransform.position;
                         }
                         else
                         {
                             Vector3 vehpos = VehicleTransform.position;
                             vehpos.z += RepeatingWorldDistance * 2;
                             VehicleTransform.position = vehpos;
+                            VehicleRigidbody.position = VehicleTransform.position;
                         }
                     }
                 }
@@ -1859,12 +1861,14 @@ namespace SaccFlightAndVehicles
                             Vector3 vehpos = VehicleTransform.position;
                             vehpos.x -= RepeatingWorldDistance * 2;
                             VehicleTransform.position = vehpos;
+                            VehicleRigidbody.position = VehicleTransform.position;
                         }
                         else
                         {
                             Vector3 vehpos = VehicleTransform.position;
                             vehpos.x += RepeatingWorldDistance * 2;
                             VehicleTransform.position = vehpos;
+                            VehicleRigidbody.position = VehicleTransform.position;
                         }
                     }
                 }
