@@ -71,7 +71,7 @@ namespace SaccFlightAndVehicles
         {
             OnEnableDeserializationBlocker = true;
             gameObject.SetActive(true);
-            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 1);
+            SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), 0.1f);
         }
         public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
