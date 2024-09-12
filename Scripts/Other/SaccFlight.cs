@@ -10,20 +10,19 @@ namespace SaccFlightAndVehicles
     public class SaccFlight : UdonSharpBehaviour
     {
         private VRCPlayerApi localPlayer;
-        [SerializeField] private float Thrust_Strength = 29.7f;
+        [SerializeField] private float Thrust = 30f;
         [Tooltip("Strength of extra thrust applied when trying to thrust in direction going against movement")]
-        [SerializeField] private float Back_Thrust_Strength = 0.45f;
+        [SerializeField] private float Back_Thrust = 0.45f;
         private bool InVR = false;
         private void Start()
         {
             localPlayer = Networking.LocalPlayer;
-            if (localPlayer == null) { gameObject.SetActive(false); }//fixedupdate runs before this happens and causes a crash in the editor until vrc fix it
-            else if (localPlayer.IsUserInVR())
+            if (localPlayer.IsUserInVR())
             { InVR = true; }
         }
         private void FixedUpdate()
         {
-            if (!localPlayer.IsPlayerGrounded())//only does anything if in the air.
+            if (!localPlayer.IsPlayerGrounded())
             {
                 float DeltaTime = Time.fixedDeltaTime;
                 float ForwardThrust = Mathf.Max(Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"), Input.GetKey(KeyCode.F) ? 1 : 0);
@@ -41,10 +40,10 @@ namespace SaccFlightAndVehicles
                     NewForwardVec = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.Head).rotation * Vector3.forward;
                 }
                 //get backwards amount
-                float BackThrustAmount = -(Vector3.Dot(PlayerVel, NewForwardVec) * Back_Thrust_Strength);
-                NewForwardVec = NewForwardVec * Thrust_Strength * ForwardThrust * DeltaTime * Mathf.Max(1, BackThrustAmount * ForwardThrust);
+                float BackThrustAmount = -(Vector3.Dot(PlayerVel, NewForwardVec) * Back_Thrust);
+                NewForwardVec = NewForwardVec * Thrust * ForwardThrust * DeltaTime * Mathf.Max(1, BackThrustAmount * ForwardThrust);
 
-                Vector3 NewUpVec = Vector3.up * Thrust_Strength * UpThrust * DeltaTime;
+                Vector3 NewUpVec = Vector3.up * Thrust * UpThrust * DeltaTime;
 
 #if UNITY_EDITOR
                 //SetVelocity overrides all other forces in clientsim so we need to add gravity ourselves
