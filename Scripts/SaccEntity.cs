@@ -99,6 +99,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int RStickNumFuncs;
         [System.NonSerializedAttribute] public bool DoDialLeft;
         [System.NonSerializedAttribute] public bool DoDialRight;
+        string HierarchyName;
         //specially used by limits function
         //this stuff can be used by DFUNCs
         //if these == 0 then they are not disabled. Being an int allows more than one extension to disable it at a time
@@ -336,6 +337,14 @@ namespace SaccFlightAndVehicles
                 if (EXT) EXT.SetProgramVariable("EntityControl", this);
             }
             OwnerAPI = Networking.GetOwner(gameObject);
+
+            HierarchyName = gameObject.name;
+            Transform VehicleNameTemp = gameObject.transform;
+            while (VehicleNameTemp.parent)
+            {
+                VehicleNameTemp = VehicleNameTemp.parent;
+                HierarchyName = VehicleNameTemp.gameObject.name + "/" + HierarchyName;
+            }
 
             SendEventToExtensions("SFEXT_L_EntityStart");
 
@@ -674,6 +683,7 @@ namespace SaccFlightAndVehicles
                 PilotEnterTime = Time.time;
                 player.SetPlayerTag("SF_InVehicle", "T");
                 player.SetPlayerTag("SF_IsPilot", "T");
+                player.SetPlayerTag("SF_VehicleName", HierarchyName);
                 SendEventToExtensions("SFEXT_G_PilotEnter");
             }
         }
@@ -684,15 +694,16 @@ namespace SaccFlightAndVehicles
                 Using = false;
                 Piloting = false;
                 InVehicle = false;
-                localPlayer.SetPlayerTag("SF_LocalPiloting", "");
-                localPlayer.SetPlayerTag("SF_LocalInVehicle", "");
+                localPlayer.SetPlayerTag("SF_LocalPiloting", string.Empty);
+                localPlayer.SetPlayerTag("SF_LocalInVehicle", string.Empty);
                 if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
                 EnableInVehicle_Disable();
                 DisableInVehicle_Enable();
                 SendEventToExtensions("SFEXT_O_PilotExit");
             }
-            player.SetPlayerTag("SF_InVehicle", "");
-            player.SetPlayerTag("SF_IsPilot", "");
+            player.SetPlayerTag("SF_InVehicle", string.Empty);
+            player.SetPlayerTag("SF_IsPilot", string.Empty);
+            player.SetPlayerTag("SF_VehicleName", string.Empty);
             PilotExitTime = Time.time;
             LStickSelection = -1;
             RStickSelection = -1;
@@ -722,7 +733,7 @@ namespace SaccFlightAndVehicles
         {
             Passenger = false;
             InVehicle = false;
-            localPlayer.SetPlayerTag("SF_LocalInVehicle", "");
+            localPlayer.SetPlayerTag("SF_LocalInVehicle", string.Empty);
             if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
             EnableInVehicle_Disable();
             DisableInVehicle_Enable();
@@ -731,11 +742,13 @@ namespace SaccFlightAndVehicles
         public void PassengerEnterVehicleGlobal(VRCPlayerApi player)
         {
             player.SetPlayerTag("SF_InVehicle", "T");
+            player.SetPlayerTag("SF_VehicleName", HierarchyName);
             SendEventToExtensions("SFEXT_G_PassengerEnter");
         }
         public void PassengerExitVehicleGlobal(VRCPlayerApi player)
         {
-            player.SetPlayerTag("SF_InVehicle", "");
+            player.SetPlayerTag("SF_InVehicle", string.Empty);
+            player.SetPlayerTag("SF_VehicleName", string.Empty);
             SendEventToExtensions("SFEXT_G_PassengerExit");
         }
         public override void OnPlayerJoined(VRCPlayerApi player)
