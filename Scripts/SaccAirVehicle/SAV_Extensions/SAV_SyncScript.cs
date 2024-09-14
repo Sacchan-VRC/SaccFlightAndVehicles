@@ -95,7 +95,6 @@ namespace SaccFlightAndVehicles
         private double StartupLocalTime;
         private Vector3 ExtrapDirection_Smooth;
         private Quaternion RotExtrapDirection_Smooth;
-        // private Quaternion RotExtrapDirection_Smooth_Correction;
 #if UNITY_EDITOR
         private bool TestMode;
 #endif
@@ -275,10 +274,21 @@ namespace SaccFlightAndVehicles
             L_CurVelLast = Vector3.zero;
             LastAcceleration = Acceleration = Vector3.zero;
         }
+        float lastFrameTime_hitchtest;
         private void Update()
         {
             if (IsOwner)//send data
             {
+                //uncomment to test hitching
+                // int i = 0;
+                // if (Input.GetKeyDown(KeyCode.V))
+                // {
+                //     while (Time.realtimeSinceStartup - lastFrameTime_hitchtest < 1f)
+                //     {
+                //         i++;
+                //     }
+                // }
+                // lastFrameTime_hitchtest = Time.realtimeSinceStartup;
                 double time = (StartupServerTime + (double)(Time.time - StartupLocalTime));
                 if (Time.deltaTime > .099f)
                 {
@@ -286,6 +296,7 @@ namespace SaccFlightAndVehicles
                     time = Networking.GetServerTimeInSeconds();//because we just ResetSyncTimes()'d
                     if (_AntiWarp && !DisableAntiWarp)//let's see if we can fix the movement jerkiness for observers if the FPS is extremely low
                     {
+                        // ANTIWARP DOES NOT WORK IN CLIENTSIM, TEST IN-GAME
                         double acctime = time;
                         double accuratedelta = acctime - lastframetime;
                         Vector3 RigidMovedAmount = VehicleRigid.velocity * Time.deltaTime;
@@ -293,14 +304,18 @@ namespace SaccFlightAndVehicles
 
                         if (DistanceTravelled < (VehicleRigid.velocity * (float)accuratedelta).magnitude)
                         {
-                            //smooth, but the extrapolation gets added each time (i think) causing vehicle to be faster (10%~)
-                            //VehicleTransform.position += (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
-                            //it's more correct to use RB position, but then you're removing the RB extrapolation and things get jerky.
-                            //When setting rigidbody position, although it looks more jerky when flying side-by-side, it's more accurate speed-wise
-                            //and hopefully doesn't cause rapid speed-up-slow-down if you keep on transitioning in and out of the parent if statement.
-                            //Setting transform position to rigidbody position+, so that position is correct if data is sent this frame (the result should be the jerky, speed-accurate one)
-                            VehicleTransform.position = VehicleRigid.position + (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
-                            //is there a best of both worlds solution?
+                            if (!Physics.Raycast(VehicleRigid.position, VehicleRigid.velocity, ((VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount).magnitude, 133121 /* Default, Environment, and Walkthrough */, QueryTriggerInteraction.Ignore))
+                            {
+                                //smooth, but the extrapolation gets added each time (i think) causing vehicle to be faster (10%~)
+                                //VehicleTransform.position += (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
+                                //it's more correct to use RB position, but then you're removing the RB extrapolation and things get jerky.
+                                //When setting rigidbody position, although it looks more jerky when flying side-by-side, it's more accurate speed-wise
+                                //and hopefully doesn't cause rapid speed-up-slow-down if you keep on transitioning in and out of the parent if statement.
+                                //Setting transform position to rigidbody position+, so that position is correct if data is sent this frame (the result should be the jerky, speed-accurate one)
+                                VehicleTransform.position = VehicleRigid.position + (VehicleRigid.velocity * (float)accuratedelta) - RigidMovedAmount;
+                                VehicleRigid.position = VehicleTransform.position;
+                                //is there a best of both worlds solution?
+                            }
                         }
                     }
                 }
