@@ -9,7 +9,8 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class SaccEntitySendEvent : UdonSharpBehaviour
     {
-        public SaccEntity EntityControl;
+        public UdonSharpBehaviour EntityControl;
+        private SaccEntity EntityControl_;
         [Tooltip("Name of entity event to send to the SaccEntity (send to all extensions)")]
         public string EntityEvent_Name = "SFEXT_O_RespawnButton";
         [Tooltip("Name of event to send to the SaccEntity (just sent to entity)")]
@@ -17,11 +18,17 @@ namespace SaccFlightAndVehicles
         public string Event_Name;
         public bool EventGlobal = false;
         private bool BothGlobal;
+        bool isSaccEntity;
         void Start()
         {
             if (EntityEvent_Name == string.Empty) { EntityEventGlobal = false; }
             if (Event_Name == string.Empty) { EventGlobal = false; }
             if (EntityEventGlobal && EventGlobal) { BothGlobal = true; }
+            if (EntityControl.GetUdonTypeName() == "SaccFlightAndVehicles.SaccEntity")
+            {
+                isSaccEntity = true;
+                EntityControl_ = (SaccEntity)EntityControl;
+            }
         }
         public override void Interact()
         {
@@ -48,20 +55,28 @@ namespace SaccFlightAndVehicles
         }
         public void Event_both()
         {
-            if (EntityEvent_Name != string.Empty)
-            { EntityControl.SendEventToExtensions(EntityEvent_Name); }
+            if (EntityEvent_Name != string.Empty && isSaccEntity)
+            {
+                EntityControl_.SendEventToExtensions(EntityEvent_Name);
+            }
             if (Event_Name != string.Empty)
-            { EntityControl.SendCustomEvent(Event_Name); }
+            {
+                EntityControl.SendCustomEvent(Event_Name);
+            }
         }
         public void EntityEvent()
         {
-            if (EntityEvent_Name != string.Empty)
-            { EntityControl.SendEventToExtensions(EntityEvent_Name); }
+            if (EntityEvent_Name != string.Empty && isSaccEntity)
+            {
+                EntityControl_.SendEventToExtensions(EntityEvent_Name);
+            }
         }
         public void NormalEvent()
         {
             if (Event_Name != string.Empty)
-            { EntityControl.SendCustomEvent(Event_Name); }
+            {
+                EntityControl.SendCustomEvent(Event_Name);
+            }
         }
 
         // can now be used as a DFUNC
