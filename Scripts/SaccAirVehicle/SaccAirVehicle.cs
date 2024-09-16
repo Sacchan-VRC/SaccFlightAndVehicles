@@ -2234,8 +2234,6 @@ namespace SaccFlightAndVehicles
             GDamageToTake = 0f;
             VertGs = 0f;
             AllGs = 0f;
-            VehicleRigidbody.velocity = CurrentVel;
-            LastFrameVel = CurrentVel;
             if (_EngineOn)
             {
                 //the Occupied check is to check if the player just left the instance while in a vehicle

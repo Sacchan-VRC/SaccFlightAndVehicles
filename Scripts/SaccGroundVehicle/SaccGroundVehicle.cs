@@ -1080,8 +1080,6 @@ namespace SaccFlightAndVehicles
             IsOwner = true;
             AllGs = 0;
             GDamageToTake = 0f;
-            VehicleRigidbody.velocity = CurrentVel;
-            LastFrameVel = CurrentVel;
             UpdateWheelIsOwner();
         }
         public void SFEXT_O_LoseOwnership()

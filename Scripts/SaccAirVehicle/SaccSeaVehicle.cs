@@ -1498,7 +1498,6 @@ namespace SaccFlightAndVehicles
         {
             IsOwner = true;
             if (Asleep) { WakeUp(); }
-            VehicleRigidbody.velocity = CurrentVel;
             if (_EngineOn)
             {
                 //the Occupied check is to check if the player just left the instance while in a vehicle
