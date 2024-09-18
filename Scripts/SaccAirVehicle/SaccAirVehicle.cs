@@ -1154,7 +1154,7 @@ namespace SaccFlightAndVehicles
                         }
                         if (_ThrottleOverridden)
                         {
-                            ThrottleInput = PlayerThrottle = ThrottleOverride;
+                            //handled in FixedUpdate()
                         }
                         else//if cruise control disabled, use inputs
                         {
@@ -1175,9 +1175,9 @@ namespace SaccFlightAndVehicles
                         }
                         FuelEvents();
 
-                        if (_JoystickOverridden)//joystick override enabled, and player not holding joystick
+                        if (_JoystickOverridden)
                         {
-                            RotationInputs = JoystickOverride;
+                            //handled in FixedUpdate()
                         }
                         else//joystick override disabled, player has control
                         {
@@ -1223,14 +1223,13 @@ namespace SaccFlightAndVehicles
                             RotationInputs.y = Mathf.Clamp(Qi + Ei + VRJoystickPos.y, -1, 1) * Limits;
                             //roll isn't subject to flight limits
                             RotationInputs.z = Mathf.Clamp(((VRJoystickPos.z + Ai + Di + lefti + righti) * -1), -1, 1);
+                            SetRotInputs();
                         }
 
                         //ability to adjust input to be more precise at low amounts. 'exponant'
                         /* RotationInputs.x = RotationInputs.x > 0 ? Mathf.Pow(RotationInputs.x, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.x), StickInputPower);
                         RotationInputs.y = RotationInputs.y > 0 ? Mathf.Pow(RotationInputs.y, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.y), StickInputPower);
                         RotationInputs.z = RotationInputs.z > 0 ? Mathf.Pow(RotationInputs.z, StickInputPower) : -Mathf.Pow(Mathf.Abs(RotationInputs.z), StickInputPower); */
-
-                        SetRotInputs();
 
                         if (VTOLenabled)
                         {
@@ -1286,11 +1285,6 @@ namespace SaccFlightAndVehicles
                         { ThrottleInput = PlayerThrottle = ThrottleOverride; }
                         FuelEvents();
                     }
-                    if (_JoystickOverridden)
-                    {
-                        RotationInputs = JoystickOverride;
-                        SetRotInputs();
-                    }
                     DoRepeatingWorld();
                 }
                 SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
@@ -1317,6 +1311,15 @@ namespace SaccFlightAndVehicles
 
                 if (!_DisablePhysicsAndInputs)
                 {
+                    if (_ThrottleOverridden)
+                    {
+                        ThrottleInput = PlayerThrottle = ThrottleOverride;
+                    }
+                    if (_JoystickOverridden)
+                    {
+                        RotationInputs = JoystickOverride;
+                        SetRotInputs();
+                    }
                     //Lerp the inputs for 'engine response', throttle decrease response is slower than increase (EngineSpoolDownSpeedMulti)
                     if (_EngineOn)
                     {

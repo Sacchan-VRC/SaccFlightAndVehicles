@@ -47,6 +47,7 @@ namespace SaccFlightAndVehicles
         private bool CruiseThrottleOverridden;
         private Transform ControlsRoot;
         [System.NonSerializedAttribute] public float SetSpeed;
+        private Rigidbody VehicleRigidbody;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
@@ -56,7 +57,7 @@ namespace SaccFlightAndVehicles
             { InVR = localPlayer.IsUserInVR(); }
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
-            VehicleTransform = EntityControl.transform;
+            VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
         }
         public void DFUNC_Selected()
@@ -199,7 +200,7 @@ namespace SaccFlightAndVehicles
                 float DeltaTime = Time.deltaTime;
                 float equals = Input.GetKey(KeyCode.Equals) ? DeltaTime * 10 : 0;
                 float minus = Input.GetKey(KeyCode.Minus) ? DeltaTime * 10 : 0;
-                float shiftF = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ? 3f : 0f;
+                float shiftF = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ? 3f : 1f;
                 SetSpeed = Mathf.Max(SetSpeed + ((equals - minus) * shiftF), 0);
             }
             if (Cruise)
@@ -213,7 +214,7 @@ namespace SaccFlightAndVehicles
             if (func_active)
             {
                 float dt = Time.fixedDeltaTime;
-                float error = SetSpeed - (float)SAVControl.GetProgramVariable("AirSpeed");
+                float error = SetSpeed - VehicleRigidbody.velocity.magnitude;
 
                 CruiseIntegrator += error * dt;
                 CruiseIntegrator = Mathf.Clamp(CruiseIntegrator, CruiseIntegrator_Min, CruiseIntegrator_Max);

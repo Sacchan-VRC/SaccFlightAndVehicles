@@ -53,7 +53,6 @@ namespace SaccFlightAndVehicles
         private bool TriggerLastFrame;
         [System.NonSerializedAttribute] public bool AltHold;
         private Rigidbody VehicleRigidbody;
-        private Transform VehicleTransform;
         private Vector3 RotationInputs;
         private bool EngineOn;
         private bool IsOwner;
@@ -71,7 +70,6 @@ namespace SaccFlightAndVehicles
             { InVR = localPlayer.IsUserInVR(); }
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
-            VehicleTransform = EntityControl.transform;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
         }
@@ -227,7 +225,7 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    error = ((Vector3)SAVControl.GetProgramVariable("CurrentVel")).normalized.y - (localAngularVelocity.x * upsidedown * 2.5f);
+                    error = VehicleRigidbody.velocity.normalized.y - (localAngularVelocity.x * upsidedown * 2.5f);
                 }
 
                 AltHoldPitchIntegrator += error * DeltaTime;
@@ -243,20 +241,23 @@ namespace SaccFlightAndVehicles
                 float errorRoll = VehicleRigidbody.rotation.eulerAngles.z;
                 if (errorRoll > 180) { errorRoll -= 360; }
 
-                //lock upside down if rotated more than 90
-                if (errorRoll > 90)
-                {
-                    errorRoll -= 180;
-                    RotationInputs.x *= -1;
-                }
-                else if (errorRoll < -90)
-                {
-                    errorRoll += 180;
-                    RotationInputs.x *= -1;
-                }
                 if (HelicopterMode)
                 {
                     errorRoll -= Mathf.Clamp(Mathf.Clamp(localVelocity.x, -AutoHoverMaxAngleSpeedRoll, AutoHoverMaxAngleSpeedRoll) * AutoHoverStrengthRoll, -AutoHoverMaxRoll, AutoHoverMaxRoll);
+                }
+                else
+                {
+                    //lock upside down if rotated more than 90
+                    if (errorRoll > 90)
+                    {
+                        errorRoll -= 180;
+                        RotationInputs.x *= -1;
+                    }
+                    else if (errorRoll < -90)
+                    {
+                        errorRoll += 180;
+                        RotationInputs.x *= -1;
+                    }
                 }
                 errorRoll = -errorRoll;
                 float AltHoldRollDerivator = (errorRoll - AltHoldRolllastframeerror) / DeltaTime;
@@ -309,7 +310,7 @@ namespace SaccFlightAndVehicles
                         }
                         SetSpeed = 0;
 
-                        float errorCruise = SetSpeed - ((Vector3)SAVControl.GetProgramVariable("CurrentVel")).y;
+                        float errorCruise = SetSpeed - VehicleRigidbody.velocity.y;
 
                         CruiseIntegrator += errorCruise * DeltaTime;
                         CruiseIntegrator = Mathf.Clamp(CruiseIntegrator, CruiseIntegratorMin, CruiseIntegratorMax);
