@@ -901,6 +901,7 @@ namespace SaccFlightAndVehicles
                         Fuel -= Mathf.Max(FuelConsumption * Time.deltaTime * (Revs / RevLimiter), 0);
                     }
                 }
+                CurrentVel = VehicleRigidbody.velocity;//CurrentVel is set by SAV_SyncScript for non owners
             }
             else //TODO: Move this to an effects script / Have a timer to not do it while empty for more than 10s
             {
