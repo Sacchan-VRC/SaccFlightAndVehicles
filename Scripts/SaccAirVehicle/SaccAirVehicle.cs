@@ -1293,6 +1293,27 @@ namespace SaccFlightAndVehicles
                     }
                     DoRepeatingWorld();
                 }
+                SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
+            }
+            else//non-owners need to know these values
+            {
+                Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
+                                                        //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
+                                                        //AirSpeed = AirVel.magnitude;
+            }
+        }
+        private void FixedUpdate()
+        {
+
+#if UNITY_EDITOR
+            if (SetVel)
+            {
+                VehicleRigidbody.velocity = VelToSet;
+            }
+#endif
+            if (IsOwner)
+            {
+                float DeltaTime = Time.fixedDeltaTime;
 
                 if (!_DisablePhysicsAndInputs)
                 {
@@ -1315,7 +1336,7 @@ namespace SaccFlightAndVehicles
                     float SpeedLiftFactor_pd = 0;
                     float rotlift = 0;
 
-                    if (!Asleep)//optimization
+                    if (!Asleep)
                     {
                         //used to create air resistance for updown and sideways if your movement direction is in those directions
                         //to add physics to plane's yaw and pitch, accel angvel towards velocity, and add force to the plane
@@ -1344,18 +1365,11 @@ namespace SaccFlightAndVehicles
                         LerpedRoll = Mathf.Lerp(LerpedRoll, roll, 1 - Mathf.Pow(0.5f, RollResponse * DeltaTime));
                         LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, 1 - Mathf.Pow(0.5f, PitchResponse * DeltaTime));
                         LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, 1 - Mathf.Pow(0.5f, YawResponse * DeltaTime));
-                    }
-                    else
-                    {
-                        VelLift = pitch = yaw = roll = 0;
-                    }
 
-                    if ((!Asleep))
-                    {
 
                         float GroundEffectAndVelLift = 0;
 
-                        Vector2 Outputs = UnpackThrottles(Mathf.Abs(EngineOutput));//collective value
+                        Vector2 Outputs = UnpackThrottles(Mathf.Abs(EngineOutput));
 
                         if (_InvertThrust)
                         {
@@ -1488,28 +1502,13 @@ namespace SaccFlightAndVehicles
 
                         VehicleTorque = FinalInputRot;
                     }
+                    else
+                    {
+                        VelLift = pitch = yaw = roll = 0;
+                    }
                 }
 
-                SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
-            }
-            else//non-owners need to know these values
-            {
-                Speed = AirSpeed = CurrentVel.magnitude;//wind speed is local anyway, so just use ground speed for non-owners
-                                                        //AirVel = VehicleRigidbody.velocity - Wind;//wind isn't synced so this will be wrong
-                                                        //AirSpeed = AirVel.magnitude;
-            }
-        }
-        private void FixedUpdate()
-        {
-#if UNITY_EDITOR
-            if (SetVel)
-            {
-                VehicleRigidbody.velocity = VelToSet;
-            }
-#endif
-            if (IsOwner && !Asleep)
-            {
-                float DeltaTime = Time.fixedDeltaTime;
+                if (Asleep) { return; }
                 //lerp velocity toward 0 to simulate air friction
                 Vector3 VehicleVel = VehicleRigidbody.velocity;
                 if (!_DisablePhysicsApplication)

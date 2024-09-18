@@ -15,6 +15,18 @@ namespace SaccFlightAndVehicles
         public GameObject Dial_Funcon;
         public bool AllowCruiseGrounded;
         public Text HUDText_knotstarget;
+        [Tooltip("Conversion from meters/s")]
+        [SerializeField] private float speedMultiplier = 1.9438445f;
+        [Header("PID Controller:")]
+        public float CruiseProportional = .13f;
+        public float CruiseIntegral = .1f;
+        public float CruiseIntegrator_Max = 10;
+        public float CruiseIntegrator_Min = -10;
+        public float Derivative = 0.1f;
+        public float DerivMax = 0f;
+        public float DerivMin = -1000f;
+        [Header("Debug:")]
+        public float CruiseIntegrator;
         private SaccEntity EntityControl;
         private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
@@ -24,11 +36,6 @@ namespace SaccFlightAndVehicles
         private float SpeedZeroPoint;
         private float TriggerTapTime = 0;
         [System.NonSerializedAttribute] public bool Cruise;
-        private float CruiseProportional = .1f;
-        private float CruiseIntegral = .1f;
-        private float CruiseIntegrator;
-        private float CruiseIntegratorMax = 5;
-        private float CruiseIntegratorMin = -5;
         private float Cruiselastframeerror;
         private bool func_active;
         private bool Selected;
@@ -136,7 +143,10 @@ namespace SaccFlightAndVehicles
                         if (Trigger > 0.75)
                         {
                             //for setting speed in VR
-                            Vector3 handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position;
+                            Vector3 handpos = ControlsRoot.position -
+                            (UseLeftTrigger
+                            ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position
+                            : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
                             handpos = ControlsRoot.InverseTransformDirection(handpos);
 
                             //enable and disable
@@ -156,7 +166,7 @@ namespace SaccFlightAndVehicles
                                 TriggerTapTime = Time.time;
                             }
                             float SpeedDifference = (SpeedZeroPoint - handpos.z) * 250;
-                            SetSpeed = Mathf.Clamp(CruiseTemp + SpeedDifference, 0, 2000);
+                            SetSpeed = Mathf.Max(CruiseTemp + SpeedDifference, 0);
 
                             TriggerLastFrame = true;
                         }
@@ -189,26 +199,29 @@ namespace SaccFlightAndVehicles
                 float DeltaTime = Time.deltaTime;
                 float equals = Input.GetKey(KeyCode.Equals) ? DeltaTime * 10 : 0;
                 float minus = Input.GetKey(KeyCode.Minus) ? DeltaTime * 10 : 0;
-                SetSpeed = Mathf.Max(SetSpeed + (equals - minus), 0);
-
-                if (func_active)
-                {
-                    float error = (SetSpeed - (float)SAVControl.GetProgramVariable("AirSpeed"));
-
-                    CruiseIntegrator += error * DeltaTime;
-                    CruiseIntegrator = Mathf.Clamp(CruiseIntegrator, CruiseIntegratorMin, CruiseIntegratorMax);
-
-                    //float Derivator = Mathf.Clamp(((error - lastframeerror) / DeltaTime),DerivMin, DerivMax);
-
-                    SAVControl.SetProgramVariable("ThrottleOverride", Mathf.Clamp((CruiseProportional * error) + (CruiseIntegral * CruiseIntegrator), 0, 1));
-                    //ThrottleInput += Derivative * Derivator; //works but spazzes out real bad
-                }
+                float shiftF = (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) ? 3f : 0f;
+                SetSpeed = Mathf.Max(SetSpeed + ((equals - minus) * shiftF), 0);
             }
-
-            //Cruise Control target knots
             if (Cruise)
             {
-                if (HUDText_knotstarget) { HUDText_knotstarget.text = ((SetSpeed) * 1.9438445f).ToString("F0"); }
+                if (HUDText_knotstarget) { HUDText_knotstarget.text = (SetSpeed * speedMultiplier).ToString("F0"); }
+            }
+        }
+        float lastframeerror;
+        void FixedUpdate()
+        {
+            if (func_active)
+            {
+                float dt = Time.fixedDeltaTime;
+                float error = SetSpeed - (float)SAVControl.GetProgramVariable("AirSpeed");
+
+                CruiseIntegrator += error * dt;
+                CruiseIntegrator = Mathf.Clamp(CruiseIntegrator, CruiseIntegrator_Min, CruiseIntegrator_Max);
+
+                float Derivator = Mathf.Clamp((error - lastframeerror) / dt, DerivMin, DerivMax);
+                lastframeerror = error;
+
+                SAVControl.SetProgramVariable("ThrottleOverride", Mathf.Clamp((CruiseProportional * error) + (CruiseIntegral * CruiseIntegrator) + (Derivative * Derivator), 0, 1));
             }
         }
         public void KeyboardInput()
@@ -226,6 +239,7 @@ namespace SaccFlightAndVehicles
         public void SetCruiseOn()
         {
             if (Cruise) { return; }
+            CruiseIntegrator = 0f;
             if (Piloting)
             {
                 func_active = true;
