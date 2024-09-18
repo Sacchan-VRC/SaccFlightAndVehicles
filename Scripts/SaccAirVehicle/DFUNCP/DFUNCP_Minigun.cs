@@ -16,7 +16,7 @@ namespace SaccFlightAndVehicles
         public Transform MinigunPitch;
         [Tooltip("There is a separate particle system for doing damage that is only enabled for the user of the gun. This object is the parent of that particle system, is enabled when entering the seat, and disabled when exiting")]
         public Transform GunDamageParticle_Parent;
-        [SerializeField] [UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
+        [SerializeField][UdonSynced(UdonSyncMode.None)] private float GunAmmoInSeconds = 12;
         [Tooltip("How long it takes to fully reload from empty in seconds")]
         public float FullReloadTimeSec = 20;
         public string AnimatorFiringStringName;
@@ -56,6 +56,16 @@ namespace SaccFlightAndVehicles
         private float LastFireTime;
         private bool TriggerLastFrame;
         [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
+        [System.NonSerializedAttribute, UdonSynced, FieldChangeCallback(nameof(Firing))] public bool _firing;
+        public bool Firing
+        {
+            set
+            {
+                GunAnimator.SetBool(AnimatorFiringStringName, value);
+                _firing = value;
+            }
+            get => _firing;
+        }
         [System.NonSerialized] SaccEntity EntityControl;
         [System.NonSerialized] bool IsOwner;
         private bool InVR;
@@ -67,7 +77,6 @@ namespace SaccFlightAndVehicles
         private float reloadspeed;
         private float FullGunAmmoInSeconds;
         private float TimeSinceSerialization;
-        private bool firing;
         private Vector3 AmmoBarScaleStart;
         private Quaternion NonOwnerGunAngleSlerper;
         private bool Grounded;
@@ -117,14 +126,20 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Selected()
         {
             Selected = true;
+            if (Firing)
+            {
+                Firing = false;
+                RequestSerialization();
+            }
             gameObject.SetActive(true);
         }
         public void DFUNC_Deselected()
         {
             Selected = false;
-            if (firing)
+            if (Firing)
             {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
+                Firing = false;
+                RequestSerialization();
             }
         }
         public void SFEXTP_O_UserEnter()
@@ -143,10 +158,10 @@ namespace SaccFlightAndVehicles
             Selected = false;
             if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(false); }
             AmmoBar.gameObject.SetActive(false);
-            if (firing)
+            if (Firing)
             {
-                firing = false;
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
+                Firing = false;
+                RequestSerialization();
             }
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Deactivate));
             NonOwnerGunAngleSlerper = Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0));
@@ -157,7 +172,7 @@ namespace SaccFlightAndVehicles
             ProjectileAmmo = ProjectileAmmoFULL;
             Minigun.localRotation = Quaternion.identity;
             GunRotation = Vector2.zero;
-            GunStopFiring();
+            Firing = false;
             Selected = false;
             if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(false); }
             gameObject.SetActive(false);
@@ -231,29 +246,29 @@ namespace SaccFlightAndVehicles
                     {
                         if (((Trigger > 0.75 || (Input.GetKey(MinigunFireKey))) && GunAmmoInSeconds > 0) && (AllowGroundedFiring || !Grounded))
                         {
-                            if (!firing)
+                            if (!Firing)
                             {
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStartFiring));
-                                firing = true;
+                                Firing = true;
+                                RequestSerialization();
                             }
                             GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
                         }
                         else
                         {
-                            if (firing)
+                            if (Firing)
                             {
-                                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
-                                firing = false;
+                                Firing = false;
+                                RequestSerialization();
                             }
                         }
                     }
                 }
                 else
                 {
-                    if (firing)
+                    if (Firing)
                     {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
-                        firing = false;
+                        Firing = false;
+                        RequestSerialization();
                     }
                 }
                 if (InVR && !Aim_HeadDirectionVR)
@@ -409,24 +424,11 @@ namespace SaccFlightAndVehicles
         {
             if (func_active)
             {
-                if (firing)
+                if (Firing)
                 {
-                    SendCustomEventDelayedFrames(nameof(Disable_Stopfiring), 1);//because lateupdate runs for one more frame after this for some reason
+                    Firing = false;
                 }
             }
-        }
-        public void Disable_Stopfiring()
-        {
-            firing = false;
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(GunStopFiring));
-        }
-        public void GunStartFiring()
-        {
-            GunAnimator.SetBool(AnimatorFiringStringName, true);
-        }
-        public void GunStopFiring()
-        {
-            GunAnimator.SetBool(AnimatorFiringStringName, false);
         }
         public void SFEXTP_G_TouchDown()
         {
