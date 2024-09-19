@@ -208,8 +208,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float AllGs;
         [System.NonSerializedAttribute] public Vector3 LastFrameVel = Vector3.zero;
         private float FinalThrottle;
-        private Vector3 Spawnposition;
-        private Quaternion Spawnrotation;
         private float AutoSteerLerper;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float YawInput;
         [System.NonSerializedAttribute][UdonSynced(UdonSyncMode.Linear)] public float ThrottleInput;
@@ -271,6 +269,10 @@ namespace SaccFlightAndVehicles
                 Debug.LogWarning("NumStepsSec lower than FixedUpdate rate, setting it to FixedUpdate rate. Physics will be unfair in VR.");
                 NumStepsSec = (int)(Mathf.Round(1f / Time.fixedDeltaTime));
             }
+            if (EntityControl.EntityObjectSync)
+            {
+                UsingManualSync = false;
+            }
 
             NumWheels = DriveWheels.Length + SteerWheels.Length + OtherWheels.Length;
 
@@ -288,8 +290,8 @@ namespace SaccFlightAndVehicles
                 InEditor = true;
             }
             else { InEditor = false; }
-            Spawnposition = VehicleTransform.localPosition;
-            Spawnrotation = VehicleTransform.localRotation;
+            EntityControl.Spawnposition = VehicleTransform.localPosition;
+            EntityControl.Spawnrotation = VehicleTransform.localRotation;
             if (!ControlsRoot)
             { ControlsRoot = VehicleTransform; }
             CenterOfMass = EntityControl.CenterOfMass;
@@ -1022,11 +1024,33 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody.velocity = Vector3.zero;
             //these could get set after death by lag, probably
             Health = FullHealth;
-            VehicleTransform.localPosition = Spawnposition;
-            VehicleTransform.localRotation = Spawnrotation;
-            VehicleRigidbody.position = VehicleTransform.position;
-            VehicleRigidbody.rotation = VehicleTransform.rotation;
+            SetRespawnPos();
             EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
+        }
+        public void SetRespawnPos()
+        {
+            VehicleRigidbody.drag = 0;
+            VehicleRigidbody.angularDrag = 0;
+            VehicleRigidbody.angularVelocity = Vector3.zero;
+            VehicleRigidbody.velocity = Vector3.zero;
+            if (InEditor || UsingManualSync)
+            {
+                VehicleTransform.localPosition = EntityControl.Spawnposition;
+                VehicleTransform.localRotation = EntityControl.Spawnrotation;
+                VehicleRigidbody.position = VehicleTransform.position;
+                VehicleRigidbody.rotation = VehicleTransform.rotation;
+            }
+            else
+            {
+                if (EntityControl.EntityObjectSync) { EntityControl.EntityObjectSync.Respawn(); }
+            }
+            if (EntityControl.RespawnPoint)
+            {
+                VehicleTransform.position = EntityControl.RespawnPoint.position;
+                VehicleTransform.rotation = EntityControl.RespawnPoint.rotation;
+                VehicleRigidbody.position = VehicleTransform.position;
+                VehicleRigidbody.rotation = VehicleTransform.rotation;
+            }
         }
         public void NotDead()
         {
@@ -1059,15 +1083,7 @@ namespace SaccFlightAndVehicles
             Health = FullHealth;
             YawInput = 0;
             AutoSteerLerper = 0;
-            if (InEditor || UsingManualSync)
-            {
-                VehicleTransform.localPosition = Spawnposition;
-                VehicleTransform.localRotation = Spawnrotation;
-                VehicleRigidbody.position = VehicleTransform.position;
-                VehicleRigidbody.rotation = VehicleTransform.rotation;
-                VehicleRigidbody.velocity = Vector3.zero;
-            }
-            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
+            SetRespawnPos();
             Networking.SetOwner(localPlayer, EntityControl.gameObject);
         }
         public void ResetStatus()//called globally when using respawn button

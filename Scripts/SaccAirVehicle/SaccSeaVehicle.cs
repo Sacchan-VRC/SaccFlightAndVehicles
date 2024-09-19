@@ -193,7 +193,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
         [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
         [System.NonSerializedAttribute] public Transform VehicleTransform;
-        private VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
         private GameObject VehicleGameObj;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         private float LerpedYaw;
@@ -234,8 +233,6 @@ namespace SaccFlightAndVehicles
         private float LowFuelDivider;
         private float LastResupplyTime = 0;
         [System.NonSerializedAttribute] public float FullGunAmmo;
-        [System.NonSerializedAttribute] public Vector3 Spawnposition;
-        [System.NonSerializedAttribute] public Quaternion Spawnrotation;
         [System.NonSerializedAttribute] public int OutsideVehicleLayer;
         [System.NonSerializedAttribute] public bool DoAAMTargeting;
         [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
@@ -402,10 +399,9 @@ namespace SaccFlightAndVehicles
             VehicleGameObj = EntityControl.gameObject;
             VehicleTransform = EntityControl.transform;
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
-            VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)EntityControl.gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
-            if (VehicleObjectSync == null)
+            if (EntityControl.EntityObjectSync)
             {
-                UsingManualSync = true;
+                UsingManualSync = false;
             }
 
 
@@ -1069,6 +1065,33 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void SetRespawnPos()
+        {
+            VehicleRigidbody.drag = 0;
+            VehicleRigidbody.angularDrag = 0;
+            Thrust = Vector3.zero;
+            Yawing = Vector3.zero;
+            VehicleRigidbody.angularVelocity = Vector3.zero;
+            VehicleRigidbody.velocity = Vector3.zero;
+            if (InEditor || UsingManualSync)
+            {
+                VehicleTransform.localPosition = EntityControl.Spawnposition;
+                VehicleTransform.localRotation = EntityControl.Spawnrotation;
+                VehicleRigidbody.position = VehicleTransform.position;
+                VehicleRigidbody.rotation = VehicleTransform.rotation;
+            }
+            else
+            {
+                if (EntityControl.EntityObjectSync) { EntityControl.EntityObjectSync.Respawn(); }
+            }
+            if (EntityControl.RespawnPoint)
+            {
+                VehicleTransform.position = EntityControl.RespawnPoint.position;
+                VehicleTransform.rotation = EntityControl.RespawnPoint.rotation;
+                VehicleRigidbody.position = VehicleTransform.position;
+                VehicleRigidbody.rotation = VehicleTransform.rotation;
+            }
+        }
         public void NotDead()
         {
             Health = FullHealth;
@@ -1081,17 +1104,7 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody.angularVelocity = Vector3.zero;
             VehicleRigidbody.velocity = Vector3.zero;
             Health = FullHealth;
-            if (InEditor || UsingManualSync)
-            {
-                VehicleTransform.localPosition = Spawnposition;
-                VehicleTransform.localRotation = Spawnrotation;
-                VehicleRigidbody.position = VehicleTransform.position;
-                VehicleRigidbody.rotation = VehicleTransform.rotation;
-            }
-            else
-            {
-                VehicleObjectSync.Respawn();
-            }
+            SetRespawnPos();
             EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
         }
         private void WakeUp()
@@ -1134,8 +1147,8 @@ namespace SaccFlightAndVehicles
             }
             VehicleTransform.position += CoMOffset;
             SendCustomEventDelayedSeconds(nameof(SetCoM), Time.fixedDeltaTime);//this has to be delayed because ?
-            Spawnposition = VehicleTransform.localPosition;
-            Spawnrotation = VehicleTransform.localRotation;
+            EntityControl.Spawnposition = VehicleTransform.localPosition;
+            EntityControl.Spawnrotation = VehicleTransform.localRotation;
         }
         public void SetCoM()
         {
@@ -1348,18 +1361,7 @@ namespace SaccFlightAndVehicles
             //synced variables
             Health = FullHealth;
             Fuel = FullFuel;
-            if (InEditor || UsingManualSync)
-            {
-                VehicleTransform.localPosition = Spawnposition;
-                VehicleTransform.localRotation = Spawnrotation;
-                VehicleRigidbody.position = VehicleTransform.position;
-                VehicleRigidbody.rotation = VehicleTransform.rotation;
-                VehicleRigidbody.velocity = Vector3.zero;
-            }
-            else
-            {
-                VehicleObjectSync.Respawn();
-            }
+            SetRespawnPos();
             VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
         }
         public void ResetStatus()//called globally when using respawn button

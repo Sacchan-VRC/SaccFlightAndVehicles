@@ -363,7 +363,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float VTOLAngleForwardDot;
         [System.NonSerializedAttribute] public bool VTOLAngleForward = true;
         [System.NonSerializedAttribute] public Vector3 Gs3;
-        private VRC.SDK3.Components.VRCObjectSync VehicleObjectSync;
         private GameObject VehicleGameObj;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         private float LerpedRoll;
@@ -431,8 +430,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int MissilesIncomingHeat = 0;
         [System.NonSerializedAttribute] public int MissilesIncomingRadar = 0;
         [System.NonSerializedAttribute] public int MissilesIncomingOther = 0;
-        [System.NonSerializedAttribute] public Vector3 Spawnposition;
-        [System.NonSerializedAttribute] public Quaternion Spawnrotation;
         [System.NonSerializedAttribute] public int OutsideVehicleLayer;
         [System.NonSerializedAttribute] public bool DoAAMTargeting;
         [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
@@ -655,10 +652,9 @@ namespace SaccFlightAndVehicles
             VehicleGameObj = EntityControl.gameObject;
             VehicleTransform = EntityControl.transform;
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
-            VehicleObjectSync = (VRC.SDK3.Components.VRCObjectSync)VehicleGameObj.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
-            if (VehicleObjectSync == null)
+            if (EntityControl.EntityObjectSync)
             {
-                UsingManualSync = true;
+                UsingManualSync = false;
             }
 
             localPlayer = Networking.LocalPlayer;
@@ -1663,10 +1659,22 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody.velocity = Vector3.zero;
             if (InEditor || UsingManualSync)
             {
-                VehicleTransform.localPosition = Spawnposition;
-                VehicleTransform.localRotation = Spawnrotation;
+                VehicleTransform.localPosition = EntityControl.Spawnposition;
+                VehicleTransform.localRotation = EntityControl.Spawnrotation;
+                VehicleRigidbody.position = VehicleTransform.position;
+                VehicleRigidbody.rotation = VehicleTransform.rotation;
             }
-            else { VehicleObjectSync.Respawn(); }
+            else
+            {
+                if (EntityControl.EntityObjectSync) { EntityControl.EntityObjectSync.Respawn(); }
+            }
+            if (EntityControl.RespawnPoint)
+            {
+                VehicleTransform.position = EntityControl.RespawnPoint.position;
+                VehicleTransform.rotation = EntityControl.RespawnPoint.rotation;
+                VehicleRigidbody.position = VehicleTransform.position;
+                VehicleRigidbody.rotation = VehicleTransform.rotation;
+            }
         }
         public void NotDead()
         {
@@ -1677,24 +1685,12 @@ namespace SaccFlightAndVehicles
         {
             PlayerThrottle = 0;//for editor test mode
             EngineOutput = 0;//^
-            VehicleRigidbody.angularVelocity = Vector3.zero;
-            VehicleRigidbody.velocity = Vector3.zero;
             //these could get set after death by lag, probably
             MissilesIncomingHeat = 0;
             MissilesIncomingRadar = 0;
             MissilesIncomingOther = 0;
             Health = FullHealth;
-            if (InEditor || UsingManualSync)
-            {
-                VehicleTransform.localPosition = Spawnposition;
-                VehicleTransform.localRotation = Spawnrotation;
-                VehicleRigidbody.position = VehicleTransform.position;
-                VehicleRigidbody.rotation = VehicleTransform.rotation;
-            }
-            else
-            {
-                VehicleObjectSync.Respawn();
-            }
+            SetRespawnPos();
             EntityControl.SendEventToExtensions("SFEXT_O_MoveToSpawn");
         }
         private void WakeUp()
@@ -1741,8 +1737,8 @@ namespace SaccFlightAndVehicles
             VehicleTransform.position += CoMOffset;
             VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
             SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
-            Spawnposition = VehicleTransform.localPosition;
-            Spawnrotation = VehicleTransform.localRotation;
+            EntityControl.Spawnposition = VehicleTransform.localPosition;
+            EntityControl.Spawnrotation = VehicleTransform.localRotation;
         }
         public void SetCoM_ITR()
         {
@@ -1989,19 +1985,7 @@ namespace SaccFlightAndVehicles
             VTOLAngle = VTOLDefaultValue;
             VTOLAngleInput = VTOLDefaultValue;
             VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
-            if (InEditor || UsingManualSync)
-            {
-                VehicleTransform.localPosition = Spawnposition;
-                VehicleTransform.localRotation = Spawnrotation;
-                VehicleRigidbody.velocity = Vector3.zero;
-                VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
-                VehicleRigidbody.rotation = VehicleTransform.rotation;//Unity 2022.3.6f1 bug workaround
-            }
-            else
-            {
-                VehicleObjectSync.Respawn();
-            }
-            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
+            SetRespawnPos();
         }
         public void ResetStatus()//called globally when using respawn button
         {

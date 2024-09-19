@@ -39,6 +39,8 @@ namespace SaccFlightAndVehicles
         public GameObject[] DisableWhenHolding;
         [Tooltip("Objects that are enabled when owner of this object")]
         public GameObject[] EnableWhenOwner;
+        [Tooltip("Optional: Use a transform as respawn point")]
+        public Transform RespawnPoint;
         [Tooltip("To tell child scripts/rigidbodys where the center of the vehicle is")]
         public Transform CenterOfMass;
         [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
@@ -83,6 +85,7 @@ namespace SaccFlightAndVehicles
         private VRCPlayerApi localPlayer;
         [System.NonSerialized] public VRCPlayerApi OwnerAPI;
         [System.NonSerializedAttribute] public VRC_Pickup EntityPickup;
+        [System.NonSerializedAttribute] public VRC.SDK3.Components.VRCObjectSync EntityObjectSync;
         [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
         [System.NonSerializedAttribute] public bool Piloting;
         [System.NonSerializedAttribute] public int UsersID;
@@ -264,6 +267,7 @@ namespace SaccFlightAndVehicles
                 if (VehicleSeats[i]) { VehicleSeats[i].InitializeSeat(); }
             }
             EntityPickup = (VRC_Pickup)gameObject.GetComponent<VRC_Pickup>();
+            EntityObjectSync = (VRC.SDK3.Components.VRCObjectSync)gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
 
             //Dial Stuff
             LStickNumFuncs = Dial_Functions_L.Length;
@@ -1028,10 +1032,9 @@ namespace SaccFlightAndVehicles
                 lastRespawnTime = Time.time;
                 Networking.SetOwner(localPlayer, gameObject);
                 IsOwner = true;
-                VRC.SDK3.Components.VRCObjectSync ObjectSync = (VRC.SDK3.Components.VRCObjectSync)gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
-                if (ObjectSync)
+                if (EntityObjectSync)
                 {
-                    ObjectSync.Respawn();
+                    EntityObjectSync.Respawn();
                 }
                 else
                 {
