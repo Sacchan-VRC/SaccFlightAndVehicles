@@ -798,17 +798,29 @@ namespace SaccFlightAndVehicles
                 _rolling.Play();
                 _rolling.volume = 0;
             }
-            foreach (AudioSource thrust in Thrust)
+            if (!ThrustNull && !Thrust[0].isPlaying)
             {
-                if (!thrust.isPlaying)
-                { thrust.Play(); }
+                int numSounds = Thrust.Length;
+                int numSounds_pos = numSounds + 1;
+                for (int i = 0; i < numSounds; i++)
+                {
+                    Thrust[i].Play();
+                    float time = (float)i / numSounds_pos;
+                    Thrust[i].time = Thrust[i].clip.length * time;
+                }
             }
             if (!InVehicle_Sounds || !AllDoorsClosed)
             {
                 if (!PlaneIdleNull && !PlaneIdle[0].isPlaying)
                 {
-                    foreach (AudioSource idle in PlaneIdle)
-                    { idle.Play(); }
+                    int numSounds = PlaneIdle.Length;
+                    int numSounds_pos = numSounds + 1;
+                    for (int i = 0; i < numSounds; i++)
+                    {
+                        PlaneIdle[i].Play();
+                        float time = (float)i / numSounds_pos;
+                        PlaneIdle[i].time = PlaneIdle[i].clip.length * time;
+                    }
                 }
                 if (PlaneDistant && !PlaneDistant.isPlaying)
                 {
