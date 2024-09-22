@@ -19,7 +19,7 @@ namespace SaccFlightAndVehicles
         // public float VoiceLowPass;
         [Tooltip("Make this text object darker when radio is disabled. Not required.")]
         public TextMeshProUGUI RadioEnabledTxt;
-        public bool RadioEnabled = true;
+        public bool RadioEnabled_ = true;
         private byte CurrentChannel = 1;
         public byte MyChannel = 1;
         [Header("All Planes and RadioZones are filled automatically on build.")]
@@ -87,7 +87,7 @@ namespace SaccFlightAndVehicles
         public void SetRadioVoiceVolumes()
         {
             SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes), 5);
-            if ((!MyVehicle || !RadioEnabled) && !MyZone) { return; }
+            if ((!MyVehicle || !RadioEnabled_) && !MyZone) { return; }
             if (DoZones)
             { SendCustomEventDelayedFrames(nameof(SetRadioVoiceVolumes_Zones), 2); }//separate in frames for optimization
             NextPlane++;
@@ -119,7 +119,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetRadioVoiceVolumes_Zones()
         {
-            if ((!MyVehicle || !RadioEnabled) && !MyZone) { return; }
+            if ((!MyVehicle || !RadioEnabled_) && !MyZone) { return; }
             NextZone++;
             if (NextZone >= NumZones) { NextZone = 0; }
             SaccRadioZone NextRZ = RadioZones[NextZone];
@@ -170,41 +170,33 @@ namespace SaccFlightAndVehicles
             player.SetVoiceDistanceFar(25);
             player.SetVoiceGain(15);
         }
-        public void ToggleRadio()
-        {
-            RadioEnabled = !RadioEnabled;
-            if (RadioEnabledTxt) RadioEnabledTxt.color = RadioEnabled ? Color.white : Color.gray;
-            UpdateRadioScripts();
-        }
         public void IncreaseChannel()
         {
-            if (MyChannel + 1 > 16) { MyChannel = 1; }
+            if (MyChannel + 1 > 16) { MyChannel = 0; }
             else
             {
                 MyChannel++;
             }
-            if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
+            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
             CurrentChannel = MyChannel;
             UpdateRadioScripts();
         }
         public void DecreaseChannel()
         {
-            if (MyChannel - 1 < 1) { MyChannel = 16; }
+            if (MyChannel - 1 < 0) { MyChannel = 16; }
             else
             {
                 MyChannel--;
             }
-            if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
+            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
             CurrentChannel = MyChannel;
             UpdateRadioScripts();
         }
         public void SetChannel(int inChannel)
         {
-            inChannel--;
-            inChannel = mod(inChannel, 16);
-            inChannel++;
+            inChannel = mod(inChannel, 17);
             CurrentChannel = MyChannel = (byte)(inChannel);
-            if (ChannelText) { ChannelText.text = MyChannel.ToString(); }
+            if (ChannelText) { ChannelText.text = MyChannel == 0 ? "OFF" : MyChannel.ToString(); }
             UpdateRadioScripts();
         }
         int mod(int x, int m)

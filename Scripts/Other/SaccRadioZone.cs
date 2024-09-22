@@ -152,15 +152,21 @@ namespace SaccFlightAndVehicles
         public void IncreaseChannel()
         {
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
-            if (Channel + 1 > 16) { return; }
-            Channel++;
+            if (Channel + 1 > 16) { Channel = 1; }
+            else
+            {
+                Channel++;
+            }
             RequestSerialization();
         }
         public void DecreaseChannel()
         {
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
-            if (Channel - 1 < 1) { return; }
-            Channel--;
+            if (Channel - 1 < 1) { Channel = 16; }
+            else
+            {
+                Channel--;
+            }
             RequestSerialization();
         }
     }
