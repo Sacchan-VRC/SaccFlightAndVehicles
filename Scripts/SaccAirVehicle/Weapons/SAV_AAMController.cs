@@ -71,7 +71,6 @@ namespace SaccFlightAndVehicles
         public bool ThrowSpaceVehicle = true;
         private string[] MissileTypes = { "MissilesIncomingRadar", "MissilesIncomingHeat", "MissilesIncomingOther" };//names of variables in SaccAirVehicle
         private string[] CMTypes = { "NumActiveChaff", "NumActiveFlares", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
-        [SerializeField] private bool TrackThroughWalls = true;
         private SaccEntity EntityControl;
         private int MissileType = 1;
         private UdonSharpBehaviour TargetSAVControl;
@@ -160,7 +159,6 @@ namespace SaccFlightAndVehicles
             SplashHit = false;
             LockHack = true;
             TargetLost = false;
-            TargetLineOfSight = true;
             MissileIncoming = false;
             PitBull = false;
             UnlockTimer = 0;
@@ -204,26 +202,6 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime);
             LifeTimeExplodesSent++;
         }
-        private bool TargetLineOfSight;
-        void Update()
-        {
-            if (!Initialized || TrackThroughWalls) { return; }
-            Vector3 MissileToTargetVector;
-            if (TargetSAVControl)
-            { MissileToTargetVector = (TargetEntityControl.transform.position - transform.position); }
-            else
-            { MissileToTargetVector = (Target.position - transform.position); }
-            RaycastHit rayHit;
-            if (Physics.Raycast(transform.position, MissileToTargetVector, out rayHit, AAMMaxTargetDistance, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
-            {
-                if (rayHit.collider && rayHit.collider.gameObject.layer == OutsideVehicleLayer)
-                { TargetLineOfSight = true; }
-                else
-                { TargetLineOfSight = false; }
-            }
-            else
-            { TargetLineOfSight = false; }
-        }
         void FixedUpdate()
         {
             float sidespeed = Vector3.Dot(MissileRigid.velocity, transform.right);
@@ -255,6 +233,7 @@ namespace SaccFlightAndVehicles
                             if (PitBullIndicator)
                             {
                                 PitBullIndicator.SetActive(true);
+                                pitbullsSent++;
                                 SendCustomEventDelayedSeconds(nameof(DisablePitBullIndicator), 1);
                             }
                         }
@@ -277,16 +256,19 @@ namespace SaccFlightAndVehicles
                 {
                     Targetmovedir = (Vector3)TargetSAVControl.GetProgramVariable("CurrentVel");
                     //other player's vehicles only move on Update() (low framerate fix)
-                    if (TargetEntityControl.transform.position != LastRealPos)
+                    if (TargetEntityControl.CenterOfMass.position != LastRealPos)
                     {
-                        LastRealPos = TargetEntityControl.transform.position;
+                        LastRealPos = TargetEntityControl.CenterOfMass.position;
                         PredictedPos = LastRealPos;
                     }
                     else
                     {
                         PredictedPos += Targetmovedir * Time.fixedDeltaTime;
                     }
-                    MissileToTargetVector = (PredictedPos - transform.position).normalized;
+                    MissileToTargetVector = (PredictedPos - Position).normalized;
+                    bool TargetLineOfSight = CheckTargetLOS();
+                    bool MotherLoS = true;
+                    if (RequireParentLock && !PitBull) { MotherLoS = CheckMotherLOS(); }
                     Dumb = //Missile just flies straight if it's confused by flares or notched
                            //flare effect
                         Random.Range(0, 100) < (int)TargetSAVControl.GetProgramVariable(CMTypes[MissileType]) * FlareEffect//if there are flares active, there's a chance it will not track per frame.
@@ -297,21 +279,24 @@ namespace SaccFlightAndVehicles
                         && Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, MissileToTargetVector)) < NotchLimitDot)
                         ||
                         //FOX-1
-                        ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")] || !AAMLauncherControl.gameObject.activeSelf))
+                        ((RequireParentLock && !PitBull && !MotherLoS) || ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")])) || (!PitBull && !(bool)AAMLauncherControl.GetProgramVariable("_AAMLocked")))
                         ||
-                        !TargetLineOfSight
+                        (!TargetLineOfSight && (!RequireParentLock || PitBull))
                         ;
                     AspectTrack = Vector3.Dot(MissileToTargetVector, -TargetEntityControl.transform.forward) > HighAspectTrack ? HighAspectRotSpeedMulti : 1;
                     EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle
                 }
                 else
                 {
+                    bool MotherLoS = true;
+                    if (RequireParentLock && !PitBull) { MotherLoS = CheckMotherLOS(); }
                     MissileToTargetVector = (TargetPos - Position).normalized;
+                    CheckTargetLOS();
                     Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
                     EngineTrack = 1;
                     AspectTrack = 1;
                     Dumb = //FOX-1
-                        ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")] || !AAMLauncherControl.gameObject.activeSelf));
+                         ((RequireParentLock && !PitBull && !MotherLoS) || ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")])) || (!PitBull && !(bool)AAMLauncherControl.GetProgramVariable("_AAMLocked")));
                 }
                 if (EngineTrack > 1) { EngineTrack = AfterBurnerTrackMulti; }//if AB on, faster rotation
                 if (Target.gameObject.activeInHierarchy && UnlockTimer < UnlockTime)
@@ -364,10 +349,48 @@ namespace SaccFlightAndVehicles
                 TargDistlastframe = TargetDistance;
             }
         }
+        bool CheckMotherLOS()
+        {
+            RaycastHit rayHit;
+            if (MissileType == 0 && !PitBull) // Fox-1 requires LoS to mother vehicle instead of target to recieve target data
+            {
+                Vector3 dir = EntityControl.CenterOfMass.position - transform.position;
+                if (Physics.Raycast(transform.position, dir, out rayHit, dir.magnitude, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
+                {
+                    if (rayHit.collider.attachedRigidbody == EntityControl.VehicleRigidbody) return true;
+                    else return false;
+                }
+                else return true;
+            }
+            return false;
+        }
+        bool CheckTargetLOS()
+        {
+            RaycastHit rayHit;
+            Vector3 targdir;
+            if (TargetSAVControl)
+                targdir = TargetEntityControl.CenterOfMass.position - transform.position;
+            else
+                targdir = Target.position - transform.position;
+            if (Physics.Raycast(transform.position, targdir, out rayHit, AAMMaxTargetDistance, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
+            {
+                if (rayHit.collider && rayHit.collider.gameObject.layer == OutsideVehicleLayer)
+                { return true; }
+                else
+                { return false; }
+            }
+            else
+            { return false; }
+        }
         public void DisableLockHack()
         { LockHack = false; }
+        uint pitbullsSent;
         public void DisablePitBullIndicator()
-        { if (PitBullIndicator) { PitBullIndicator.SetActive(false); } }
+        {
+            pitbullsSent--;
+            if (pitbullsSent != 0) return;
+            if (PitBullIndicator) { PitBullIndicator.SetActive(false); }
+        }
         public void LifeTimeExplode()
         {
             //prevent the delayed event from a previous life causing explosion

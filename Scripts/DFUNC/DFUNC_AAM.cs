@@ -12,7 +12,7 @@ namespace SaccFlightAndVehicles
         [SerializeField] public UdonSharpBehaviour SAVControl;
         public Animator AAMAnimator;
         [Range(0, 2)]
-        [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingHeat NumActiveFlares, MissilesIncomingRadar NumActiveChaff, MissilesIncomingOther NumActiveOtherCM)")]
+        [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingRadar NumActiveChaff, MissilesIncomingHeat NumActiveFlares, MissilesIncomingOther NumActiveOtherCM)")]
         public int MissileType = 1;
         public int NumAAM = 6;
         [Tooltip("If target is within this angle of the direction the gun is aiming, it is lockable")]
@@ -70,8 +70,6 @@ namespace SaccFlightAndVehicles
         public Transform WorldParent;
         [Tooltip("If not empty, targeting will be done relative to this transform's forward")]
         public Transform TargetingTransform;
-        [Tooltip("Tick this to use as a passenger DFUNC")]
-        public bool DFUNCP_MODE;
         private float HighAspectPreventLockAngleDot;
         [UdonSynced] private bool AAMFireNow;
         [UdonSynced] private bool SendTargeted;
@@ -86,7 +84,7 @@ namespace SaccFlightAndVehicles
         private int NumAAMTargets;
         private float AAMLockTimer = 0;
         private bool AAMHasTarget = false;
-        [System.NonSerializedAttribute] public bool _AAMLocked = false;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(AAMLocked)), UdonSynced] public bool _AAMLocked = false;
         public bool AAMLocked
         {
             set
@@ -198,15 +196,12 @@ namespace SaccFlightAndVehicles
             {
                 AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
             }
-            RequestSerialization();
         }
         private Collider[] EntityColliders;
         private int StartEntityLayer;
         public void G_UserEnter()
         {
-            OnEnableDeserializationBlocker = true;
-            gameObject.SetActive(true);
-            SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), 0.1f);
+            SFEXT_G_PilotEnter();
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -237,6 +232,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_PilotExit()
         {
             gameObject.SetActive(false);
+            AAMLocked = false;
             if (EntityControl.EntityPickup)
             {
                 EntityControl.gameObject.layer = StartEntityLayer;
@@ -363,6 +359,7 @@ namespace SaccFlightAndVehicles
             AAMLockTimer = 0;
             AAMHasTarget = false;
             AAMLocked = false;
+            RequestSerialization();
             if (AAMTargetIndicator)
             {
                 AAMTargetIndicator.localRotation = Quaternion.identity;
@@ -384,6 +381,7 @@ namespace SaccFlightAndVehicles
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
 
+                bool lockedLast = AAMLocked;
                 if (NumAAMTargets != 0)
                 {
                     if (MissileType == 1)//heatseekers check engine output of target
@@ -403,6 +401,7 @@ namespace SaccFlightAndVehicles
                         if (AAMLockTimer > AAMLockTime && AAMHasTarget) { AAMLocked = true; }
                         else { AAMLocked = false; }
                     }
+                    if (lockedLast != AAMLocked) { RequestSerialization(); }
 
                     //firing AAM
                     if (Trigger > 0.75 || (!Holding && (Input.GetKey(KeyCode.Space))))
@@ -518,7 +517,7 @@ namespace SaccFlightAndVehicles
                                             && (!HighAspectPreventLock || !NextTargetSAVControl || Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot)
                                             || (AAMCurrentTargetSAVControl &&//null check
                                                                         (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
-                                                                        (MissileType == 0 && !AAMCurrentTargetSAVControl._EngineOn)))//switch target if heatseeker and current target's engine is off
+                                                                        (MissileType == 1 && !AAMCurrentTargetSAVControl._EngineOn)))//switch target if heatseeker and current target's engine is off
                                                 || !AAMTargets[AAMTarget].activeInHierarchy//switch target if current target is destroyed
                                                 )
                         {
@@ -570,7 +569,7 @@ namespace SaccFlightAndVehicles
                             && AAMTargets[AAMTarget].activeInHierarchy
                                 && (!AAMCurrentTargetSAVControl ||
                                     (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl._dead &&
-                                        (MissileType != 0 || AAMCurrentTargetSAVControl._EngineOn)))//heatseekers cant lock if engine off
+                                        (MissileType != 1 || AAMCurrentTargetSAVControl._EngineOn)))//heatseekers cant lock if engine off
                                     &&
                                         (!HighAspectPreventLock || !AAMCurrentTargetSAVControl || Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot)
                                         )
@@ -733,7 +732,7 @@ namespace SaccFlightAndVehicles
                 FireNextSerialization = true;
                 RequestSerialization();
                 LaunchAAM();
-                if (LoseLockWhenFired || (NumAAM == 0 && !AllowNoAmmoLock)) { AAMLockTimer = 0; AAMLocked = false; }
+                if (LoseLockWhenFired || (NumAAM == 0 && !AllowNoAmmoLock)) { AAMLockTimer = 0; AAMLocked = false; RequestSerialization(); }
                 EntityControl.SendEventToExtensions("SFEXT_O_AAMLaunch");
             }
         }
