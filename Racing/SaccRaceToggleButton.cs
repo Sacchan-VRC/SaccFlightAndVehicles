@@ -14,13 +14,13 @@ namespace SaccFlightAndVehicles
         [HideInInspector] public SaccRaceCourseAndScoreboard[] Races;
         [Tooltip("Can be used to set a default course -1 = none")]
         public int CurrentCourseSelection = -1;
-        [System.NonSerialized] public int LastCourseSelection = -1;
         private bool Reverse = false;
         public bool _AutomaticRaceSelection = true;
         public bool AutomaticRaceSelection
         {
             set
             {
+                SetRace(-1);
                 for (int i = 0; i < Races.Length; i++)
                 {
                     for (int u = 0; u < Races[i].StartPointFX.Length; u++)
@@ -36,12 +36,7 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    if (CurrentCourseSelection != -1)
-                    {
-                        LastCourseSelection = CurrentCourseSelection;
-                        CurrentCourseSelection = -1;
-                        SetRace();
-                    }
+                    SetRace(-1);
                     AutoEnableRace_NextRace = 0;
                     ClosestRaceDist = 99999f;
                 }
@@ -90,7 +85,7 @@ namespace SaccFlightAndVehicles
             if (AutomaticRaceSelection)
             { RaceSelectionLoop(); }
             else
-            { SetRace(); }
+            { SetRace(CurrentCourseSelection); }
         }
         public override void Interact()
         {
@@ -98,39 +93,44 @@ namespace SaccFlightAndVehicles
         }
         public void NextRace()
         {
-            LastCourseSelection = CurrentCourseSelection;
+            int nextCourse;
             if (CurrentCourseSelection == Races.Length - 1)
-            { CurrentCourseSelection = -1; }
-            else { CurrentCourseSelection++; }
+            { nextCourse = -1; }
+            else { nextCourse = CurrentCourseSelection + 1; }
 
-            SetRace();
+            SetRace(nextCourse);
         }
         public void PreviousRace()
         {
-            LastCourseSelection = CurrentCourseSelection;
+            int prevCourse;
             if (CurrentCourseSelection == -1)
-            { CurrentCourseSelection = Races.Length - 1; }
-            else { CurrentCourseSelection--; }
+            { prevCourse = Races.Length - 1; }
+            else { prevCourse = CurrentCourseSelection - 1; }
 
-            SetRace();
+            SetRace(prevCourse);
         }
-        public void SetRace()
+        public void SetRace(int newCourse)
         {
-            if (LastCourseSelection != -1)
+            if (newCourse != CurrentCourseSelection)
             {
-                SaccRaceCourseAndScoreboard lastrace = Races[LastCourseSelection];
-                lastrace.RaceInProgress = false;
-                for (int i = 0; i < lastrace.RaceCheckpoints.Length; i++)
-                { lastrace.RaceCheckpoints[i].GetComponent<Animator>().WriteDefaultValues(); }
-                lastrace.RaceObjects.SetActive(false);
-                if (AutomaticRaceSelection)
+                int LastCourseSelection = CurrentCourseSelection;
+                if (LastCourseSelection != -1)
                 {
-                    for (int i = 0; i < lastrace.StartPointFX.Length; i++)
-                    { lastrace.StartPointFX[i].SetActive(true); }
-                    for (int i = 0; i < lastrace.EndPointFX.Length; i++)
-                    { lastrace.EndPointFX[i].SetActive(true); }
+                    SaccRaceCourseAndScoreboard lastrace = Races[LastCourseSelection];
+                    lastrace.RaceInProgress = false;
+                    for (int i = 0; i < lastrace.RaceCheckpoints.Length; i++)
+                    { lastrace.RaceCheckpoints[i].GetComponent<Animator>().WriteDefaultValues(); }
+                    lastrace.RaceObjects.SetActive(false);
+                    if (AutomaticRaceSelection)
+                    {
+                        for (int i = 0; i < lastrace.StartPointFX.Length; i++)
+                        { lastrace.StartPointFX[i].SetActive(true); }
+                        for (int i = 0; i < lastrace.EndPointFX.Length; i++)
+                        { lastrace.EndPointFX[i].SetActive(true); }
+                    }
                 }
             }
+            CurrentCourseSelection = newCourse;
             if (CurrentCourseSelection != -1)//-1 = all races disabled
             {
                 if (EnableWhenNoneSelected) { EnableWhenNoneSelected.SetActive(false); }
@@ -166,7 +166,7 @@ namespace SaccFlightAndVehicles
             { SetTrack_Reverse(); }
             else
             { SetTrack_Forward(); }
-            SetRace();
+            SetRace(CurrentCourseSelection);
         }
         public void SetTrack_Reverse()
         {
@@ -256,14 +256,9 @@ namespace SaccFlightAndVehicles
                     }
                 }
                 bool coursechanged = CurrentCourseSelection != ClosestRace;
-                if (coursechanged)
-                {
-                    LastCourseSelection = CurrentCourseSelection;
-                    CurrentCourseSelection = ClosestRace;
-                }
                 if (coursechanged || DirectionCheck)
                 {
-                    SetRace();
+                    SetRace(ClosestRace);
                 }
                 AutoEnableRace_NextRace = 0;
                 ClosestRaceDist = 99999f;
