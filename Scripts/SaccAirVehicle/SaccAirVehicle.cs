@@ -652,10 +652,8 @@ namespace SaccFlightAndVehicles
             VehicleGameObj = EntityControl.gameObject;
             VehicleTransform = EntityControl.transform;
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
-            if (EntityControl.EntityObjectSync)
-            {
-                UsingManualSync = false;
-            }
+
+            UsingManualSync = !EntityControl.EntityObjectSync;
 
             localPlayer = Networking.LocalPlayer;
             if (localPlayer == null)

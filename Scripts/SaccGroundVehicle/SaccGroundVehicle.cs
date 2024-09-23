@@ -269,10 +269,7 @@ namespace SaccFlightAndVehicles
                 Debug.LogWarning("NumStepsSec lower than FixedUpdate rate, setting it to FixedUpdate rate. Physics will be unfair in VR.");
                 NumStepsSec = (int)(Mathf.Round(1f / Time.fixedDeltaTime));
             }
-            if (EntityControl.EntityObjectSync)
-            {
-                UsingManualSync = false;
-            }
+            UsingManualSync = !EntityControl.EntityObjectSync;
 
             NumWheels = DriveWheels.Length + SteerWheels.Length + OtherWheels.Length;
 
@@ -1071,7 +1068,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public bool Occupied;
         [System.NonSerialized] public int NumPassengers;
         [System.NonSerializedAttribute] public bool IsOwner;
-        [System.NonSerializedAttribute] public bool UsingManualSync = true;
+        [System.NonSerializedAttribute] public bool UsingManualSync;
         public void SFEXT_O_RespawnButton()//called when using respawn button
         {
             VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
