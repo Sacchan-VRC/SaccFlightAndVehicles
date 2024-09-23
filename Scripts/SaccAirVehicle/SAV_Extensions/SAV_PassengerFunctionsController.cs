@@ -48,6 +48,7 @@ namespace SaccFlightAndVehicles
         private bool RightDialEmpty;
         private bool LStickDoDial;
         private bool RStickDoDial;
+        [NonSerialized] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public bool _DisableLeftDial;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableLeftDial_))] public int DisableLeftDial = 0;
         public int DisableLeftDial_
@@ -129,20 +130,27 @@ namespace SaccFlightAndVehicles
                     RStickCheckAngle.y = RAngle.z;
                 }
             }
-
-
             TellDFUNCsLR();
+            foreach (UdonSharpBehaviour EXT in PassengerExtensions)
+            {
+                if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
+            }
+            foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
+            {
+                if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
+            }
+            foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+            {
+                if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
+            }
+
             SendEventToExtensions_Gunner("SFEXTP_L_EntityStart");
         }
         private void Update()
         {
 
-            Vector2 RStickPos = new Vector2(0, 0);
-            Vector2 LStickPos = new Vector2(0, 0);
-            LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
-            LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
-            RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
-            RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+            Vector2 LStickPos = new Vector2(Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal"), Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical"));
+            Vector2 RStickPos = new Vector2(Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal"), Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical"));
             if (LStickDoDial && !_DisableLeftDial)
             {
                 //LStick Selection wheel

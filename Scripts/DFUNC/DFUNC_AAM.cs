@@ -1,6 +1,4 @@
-﻿
-using System.Diagnostics.Contracts;
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
@@ -72,6 +70,8 @@ namespace SaccFlightAndVehicles
         public Transform WorldParent;
         [Tooltip("If not empty, targeting will be done relative to this transform's forward")]
         public Transform TargetingTransform;
+        [Tooltip("Tick this to use as a passenger DFUNC")]
+        public bool DFUNCP_MODE;
         private float HighAspectPreventLockAngleDot;
         [UdonSynced] private bool AAMFireNow;
         [UdonSynced] private bool SendTargeted;
@@ -115,6 +115,10 @@ namespace SaccFlightAndVehicles
         private VRCPlayerApi localPlayer;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        public void SFEXTP_L_EntityStart()
+        {
+            SFEXT_L_EntityStart();
+        }
         public void SFEXT_L_EntityStart()
         {
             FullAAMs = NumAAM;
@@ -178,6 +182,12 @@ namespace SaccFlightAndVehicles
             NewWeap.transform.SetParent(transform);
             return NewWeap;
         }
+        public void SFEXTP_O_UserEnter()
+        {
+            IsOwner = true;
+            SFEXT_O_PilotEnter();
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(G_UserEnter));
+        }
         public void SFEXT_O_PilotEnter()
         {
             Pilot = true;
@@ -192,6 +202,12 @@ namespace SaccFlightAndVehicles
         }
         private Collider[] EntityColliders;
         private int StartEntityLayer;
+        public void G_UserEnter()
+        {
+            OnEnableDeserializationBlocker = true;
+            gameObject.SetActive(true);
+            SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), 0.1f);
+        }
         public void SFEXT_G_PilotEnter()
         {
             OnEnableDeserializationBlocker = true;
@@ -213,6 +229,11 @@ namespace SaccFlightAndVehicles
             }
         }
         public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
+        public void G_UserExit()
+        {
+            gameObject.SetActive(false);
+            IsOwner = false;
+        }
         public void SFEXT_G_PilotExit()
         {
             gameObject.SetActive(false);
@@ -225,6 +246,11 @@ namespace SaccFlightAndVehicles
                     stngcol.enabled = true;
                 }
             }
+        }
+        public void SFEXTP_O_UserExit()
+        {
+            SFEXT_O_PilotExit();
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(G_UserExit));
         }
         public void SFEXT_O_PilotExit()
         {
@@ -242,9 +268,18 @@ namespace SaccFlightAndVehicles
                 AAMTargetIndicator.localRotation = Quaternion.identity;
             }
         }
+
+        public void SFEXTP_P_PassengerEnter()
+        {
+            SFEXT_P_PassengerEnter();
+        }
         public void SFEXT_P_PassengerEnter()
         {
             if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
+        }
+        public void SFEXTP_G_Explode()
+        {
+            SFEXT_G_Explode();
         }
         public void SFEXT_G_Explode()
         {
@@ -256,6 +291,10 @@ namespace SaccFlightAndVehicles
             }
             if (DoAnimBool && AnimOn)
             { SetBoolOff(); }
+        }
+        public void SFEXTP_G_ReSupply()
+        {
+            SFEXT_G_ReSupply();
         }
         public void SFEXT_G_ReSupply()
         {
@@ -269,12 +308,20 @@ namespace SaccFlightAndVehicles
             if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
             if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
         }
+        public void SFEXTP_G_RespawnButton()
+        {
+            SFEXT_G_RespawnButton();
+        }
         public void SFEXT_G_RespawnButton()
         {
             NumAAM = FullAAMs;
             UpdateAmmoVisuals();
             if (DoAnimBool && AnimOn)
             { SetBoolOff(); }
+        }
+        public void SFEXTP_G_TouchDown()
+        {
+            SFEXT_G_TouchDown();
         }
         public void SFEXT_G_TouchDown()
         {
