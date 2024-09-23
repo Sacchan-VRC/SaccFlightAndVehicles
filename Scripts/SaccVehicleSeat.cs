@@ -17,6 +17,8 @@ namespace SaccFlightAndVehicles
         public GameObject ThisSeatOnly;
         [Tooltip("Objects that are enabled only when sitting in this seat")]
         public GameObject[] EnableInSeat;
+        [Tooltip("Objects that are disabled only when sitting in this seat")]
+        public GameObject[] DisableInSeat;
         public bool AdjustSeatPosition = true;
         // public bool AdjustSeatRotation = true; //YAWCALIBRATION
         public Transform TargetEyePosition;
@@ -77,6 +79,8 @@ namespace SaccFlightAndVehicles
                 if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
                 for (int i = 0; i < EnableInSeat.Length; i++)
                 { if (EnableInSeat[i]) EnableInSeat[i].SetActive(true); }
+                for (int i = 0; i < DisableInSeat.Length; i++)
+                { if (DisableInSeat[i]) DisableInSeat[i].SetActive(false); }
             }
             DT180SeatCalcCounter = Random.Range(0, 10);
             for (int i = 0; i < EntityControl.ExternalSeats.Length; i++)
@@ -118,6 +122,8 @@ namespace SaccFlightAndVehicles
                     if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
                     for (int i = 0; i < EnableInSeat.Length; i++)
                     { if (EnableInSeat[i]) EnableInSeat[i].SetActive(true); }
+                    for (int i = 0; i < DisableInSeat.Length; i++)
+                    { if (DisableInSeat[i]) DisableInSeat[i].SetActive(false); }
 
                     if (!Fake && AdjustSeatPosition && TargetEyePosition)
                     {
@@ -212,6 +218,8 @@ namespace SaccFlightAndVehicles
                     if (ThisSeatOnly) { ThisSeatOnly.SetActive(false); }
                     for (int i = 0; i < EnableInSeat.Length; i++)
                     { if (EnableInSeat[i]) EnableInSeat[i].SetActive(false); }
+                    for (int i = 0; i < DisableInSeat.Length; i++)
+                    { if (DisableInSeat[i]) DisableInSeat[i].SetActive(true); }
                 }
             }
         }
