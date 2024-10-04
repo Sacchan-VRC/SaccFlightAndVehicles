@@ -279,7 +279,9 @@ namespace SaccFlightAndVehicles
                         && Mathf.Abs(Vector3.Dot(Targetmovedir.normalized, MissileToTargetVector)) < NotchLimitDot)
                         ||
                         //FOX-1
-                        ((RequireParentLock && !PitBull && !MotherLoS) || ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")])) || (!PitBull && !(bool)AAMLauncherControl.GetProgramVariable("_AAMLocked")))
+                        (RequireParentLock && !PitBull &&
+                            (!MotherLoS || Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")] || !(bool)AAMLauncherControl.GetProgramVariable("_AAMLocked"))
+                        )
                         ||
                         (!TargetLineOfSight && (!RequireParentLock || PitBull))
                         ;
@@ -296,7 +298,9 @@ namespace SaccFlightAndVehicles
                     EngineTrack = 1;
                     AspectTrack = 1;
                     Dumb = //FOX-1
-                         ((RequireParentLock && !PitBull && !MotherLoS) || ((RequireParentLock && !PitBull) && (Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")])) || (!PitBull && !(bool)AAMLauncherControl.GetProgramVariable("_AAMLocked")));
+                        (RequireParentLock && !PitBull &&
+                            (!MotherLoS || Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")] || !(bool)AAMLauncherControl.GetProgramVariable("_AAMLocked"))
+                        );
                 }
                 if (EngineTrack > 1) { EngineTrack = AfterBurnerTrackMulti; }//if AB on, faster rotation
                 if (Target.gameObject.activeInHierarchy && UnlockTimer < UnlockTime)
