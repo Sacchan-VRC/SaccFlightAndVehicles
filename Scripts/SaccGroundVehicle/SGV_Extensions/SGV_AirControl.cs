@@ -87,12 +87,12 @@ namespace SaccFlightAndVehicles
                         if (SwitchHandsJoyThrottle)
                         {
                             JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation;
-                            localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35);
+                            localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35);
                         }//rotation of the controller relative to the plane when it was pressed
                         else
                         {
                             JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation;
-                            localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35);
+                            localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35);
                         }
                     }
                     JoystickGripLastFrame = true;
@@ -120,9 +120,9 @@ namespace SaccFlightAndVehicles
                     {
                         JoystickDropped();
                         if (SwitchHandsJoyThrottle)
-                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .07f, 35); }
+                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                         else
-                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .07f, 35); }
+                        { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }
                     }
                     JoystickGripLastFrame = false;
                 }
