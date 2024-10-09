@@ -9,26 +9,20 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class SaccEntitySendEvent : UdonSharpBehaviour
     {
-        public UdonSharpBehaviour EntityControl;
-        private SaccEntity EntityControl_;
+        public SaccEntity EntityControl;
         [Tooltip("Name of entity event to send to the SaccEntity (send to all extensions)")]
         public string EntityEvent_Name = "SFEXT_O_RespawnButton";
         [Tooltip("Name of event to send to the SaccEntity (just sent to entity)")]
         public bool EntityEventGlobal = false;
-        public string Event_Name;
-        public bool EventGlobal = false;
+        public UdonSharpBehaviour[] OtherScripts;
+        public string OtherScripts_Event_Name;
+        public bool OtherScript_EventGlobal = false;
         private bool BothGlobal;
-        bool isSaccEntity;
         void Start()
         {
             if (EntityEvent_Name == string.Empty) { EntityEventGlobal = false; }
-            if (Event_Name == string.Empty) { EventGlobal = false; }
-            if (EntityEventGlobal && EventGlobal) { BothGlobal = true; }
-            if (EntityControl.GetUdonTypeName() == "SaccFlightAndVehicles.SaccEntity")
-            {
-                isSaccEntity = true;
-                EntityControl_ = (SaccEntity)EntityControl;
-            }
+            if (OtherScripts_Event_Name == string.Empty) { OtherScript_EventGlobal = false; }
+            if (EntityEventGlobal && OtherScript_EventGlobal) { BothGlobal = true; }
         }
         public override void Interact()
         {
@@ -45,7 +39,7 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 { EntityEvent(); }
-                if (EventGlobal)
+                if (OtherScript_EventGlobal)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(NormalEvent));
                 }
@@ -55,27 +49,33 @@ namespace SaccFlightAndVehicles
         }
         public void Event_both()
         {
-            if (EntityEvent_Name != string.Empty && isSaccEntity)
+            if (EntityEvent_Name != string.Empty)
             {
-                EntityControl_.SendEventToExtensions(EntityEvent_Name);
+                EntityControl.SendEventToExtensions(EntityEvent_Name);
             }
-            if (Event_Name != string.Empty)
+            if (OtherScripts_Event_Name != string.Empty)
             {
-                EntityControl.SendCustomEvent(Event_Name);
+                for (int i = 0; i < OtherScripts.Length; i++)
+                {
+                    OtherScripts[i].SendCustomEvent(OtherScripts_Event_Name);
+                }
             }
         }
         public void EntityEvent()
         {
-            if (EntityEvent_Name != string.Empty && isSaccEntity)
+            if (EntityEvent_Name != string.Empty)
             {
-                EntityControl_.SendEventToExtensions(EntityEvent_Name);
+                EntityControl.SendEventToExtensions(EntityEvent_Name);
             }
         }
         public void NormalEvent()
         {
-            if (Event_Name != string.Empty)
+            if (OtherScripts_Event_Name != string.Empty)
             {
-                EntityControl.SendCustomEvent(Event_Name);
+                for (int i = 0; i < OtherScripts.Length; i++)
+                {
+                    OtherScripts[i].SendCustomEvent(OtherScripts_Event_Name);
+                }
             }
         }
 
@@ -83,6 +83,7 @@ namespace SaccFlightAndVehicles
         private bool UseLeftTrigger;
         private bool TriggerLastFrame;
         bool controlsActive = false;
+        public void SFEXT_L_EntityStart() { Start(); }
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void ControlInputs()
