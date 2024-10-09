@@ -11,7 +11,7 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour SAVControl;
         public float ReversingThrottleMultiplier = -.5f;
-        public GameObject Dial_funcon;
+        public GameObject Dial_Funcon;
         private SaccEntity EntityControl;
         private float StartThrottleStrength;
         private float StartABStrength;
@@ -29,7 +29,7 @@ namespace SaccFlightAndVehicles
             StartABStrength = (float)SAVControl.GetProgramVariable("ThrottleStrengthAB");
             ReversingThrottleStrength = StartThrottleStrength * ReversingThrottleMultiplier;
             ReversingABStrength = StartABStrength * ReversingThrottleMultiplier;
-            if (Dial_funcon) { Dial_funcon.SetActive(false); }
+            if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         }
         public void DFUNC_Selected()
         {
@@ -72,7 +72,7 @@ namespace SaccFlightAndVehicles
             Reversing = true;
             SAVControl.SetProgramVariable("ThrottleStrength", ReversingThrottleStrength);
             SAVControl.SetProgramVariable("ThrottleStrengthAB", ReversingABStrength);
-            if (Dial_funcon) { Dial_funcon.SetActive(true); }
+            if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
             EntityControl.SendEventToExtensions("SFEXT_O_StartReversing");
         }
         private void SetNotReversing()
@@ -80,7 +80,7 @@ namespace SaccFlightAndVehicles
             Reversing = false;
             SAVControl.SetProgramVariable("ThrottleStrength", StartThrottleStrength);
             SAVControl.SetProgramVariable("ThrottleStrengthAB", StartABStrength);
-            if (Dial_funcon) { Dial_funcon.SetActive(false); }
+            if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             EntityControl.SendEventToExtensions("SFEXT_O_StopReversing");
         }
         public void KeyboardInput()
