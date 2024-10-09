@@ -282,14 +282,14 @@ public class DFUNCP_Laser : UdonSharpBehaviour
         if (LaserFireSound) { LaserFireSound.PlayOneShot(LaserFireSound.clip); }
         if (TriggerFireDelay == 0)
         {
-            FireLaser();
+            FireLaser_Owner();
         }
         else
         {
-            SendCustomEventDelayedSeconds(nameof(FireLaser), TriggerFireDelay);
+            SendCustomEventDelayedSeconds(nameof(FireLaser_Owner), TriggerFireDelay);
         }
     }
-    private void FireLaser_Owner()
+    public void FireLaser_Owner()
     {
         FireNextSerialization = true;
         RequestSerialization();
