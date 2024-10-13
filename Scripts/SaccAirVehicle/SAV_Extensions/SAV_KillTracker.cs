@@ -80,11 +80,11 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_GunKill()
         {
-            KillFeed.SetProgramVariable("WeaponType", (short)0);
+            if (KillFeed) { KillFeed.SetProgramVariable("WeaponType", (short)0); }
         }
         public void SFEXT_O_MissileKill()
         {
-            KillFeed.SetProgramVariable("WeaponType", (short)1);
+            if (KillFeed) { KillFeed.SetProgramVariable("WeaponType", (short)1); }
         }
     }
 }
