@@ -12,9 +12,12 @@ namespace SaccFlightAndVehicles
     {
         public UdonSharpBehaviour SAVControl;
         [Tooltip("Wing trails, emit when pulling Gs")]
-        public TrailRenderer[] Trails;
+        public ParticleSystem[] WingTrails;
+        private ParticleSystem.EmissionModule[] WingTrails_EM;
         [Tooltip("How many Gs do you have to pull before the trails appear?")]
         public float TrailGs = 4;
+        [Tooltip("Lower number = Trails linger for longer after Gs are no longer being pulled")]
+        public float TrailGs_OffSpeed = 2.7f;
         [Tooltip("Particle system that plays when vehicle is wrecked (shot down, 0 health)")]
         public ParticleSystem[] WreckedParticles;
         [Tooltip("Particle system that plays when vehicle enters water")]
@@ -72,7 +75,12 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             FullHealthDivider = 1f / (float)SAVControl.GetProgramVariable("Health");
-            HasTrails = Trails.Length > 0;
+            HasTrails = WingTrails.Length > 0;
+            WingTrails_EM = new ParticleSystem.EmissionModule[WingTrails.Length];
+            for (int i = 0; i < WingTrails.Length; i++)
+            {
+                WingTrails_EM[i] = WingTrails[i].emission;
+            }
 
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             localPlayer = Networking.LocalPlayer;
@@ -189,22 +197,32 @@ namespace SaccFlightAndVehicles
                 float vertgs = Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs"));
                 if (vertgs > Gs_trail) //Gs are increasing
                 {
-                    Gs_trail = Mathf.Lerp(Gs_trail, vertgs, 30f * DeltaTime);//apear fast when pulling Gs
+                    Gs_trail = vertgs;//apear fast when pulling Gs
                     if (!TrailsOn && Gs_trail > TrailGs)
                     {
                         TrailsOn = true;
-                        for (int x = 0; x < Trails.Length; x++)
-                        { Trails[x].emitting = true; }
+                        ParticleSystem.EmitParams invisibleParticle = new ParticleSystem.EmitParams();
+                        invisibleParticle.startColor = Color.clear;
+                        for (int x = 0; x < WingTrails_EM.Length; x++)
+                        {
+                            WingTrails[x].Emit(invisibleParticle, 1);
+                            WingTrails_EM[x].enabled = true;
+                        }
                     }
                 }
                 else //Gs are decreasing
                 {
-                    Gs_trail = Mathf.Lerp(Gs_trail, vertgs, 2.7f * DeltaTime);//linger for a bit before cutting off
+                    Gs_trail = Mathf.Lerp(Gs_trail, vertgs, TrailGs_OffSpeed * DeltaTime);//linger for a bit before cutting off
                     if (TrailsOn && Gs_trail < TrailGs)
                     {
                         TrailsOn = false;
-                        for (int x = 0; x < Trails.Length; x++)
-                        { Trails[x].emitting = false; }
+                        ParticleSystem.EmitParams invisibleParticle = new ParticleSystem.EmitParams();
+                        invisibleParticle.startColor = Color.clear;
+                        for (int x = 0; x < WingTrails_EM.Length; x++)
+                        {
+                            WingTrails[x].Emit(invisibleParticle, 1);
+                            WingTrails_EM[x].enabled = false;
+                        }
                     }
                 }
             }
