@@ -16,7 +16,7 @@ namespace SaccFlightAndVehicles
         public KeyCode LaunchKey = KeyCode.None;
         public int NumFlares = 60;
         [Range(0, 2)]
-        [Tooltip("1 = Flare(Heat), 1 = Chaff(Radar), 2 = Other. Controls what variable is added to in SaccAirVehicle to count active countermeasures, (NumActiveFlares MissilesIncomingHeat, NumActiveChaff MissilesIncomingRadar, NumActiveOtherCM MissilesIncomingOther)")]
+        [Tooltip("0 = Chaff(Radar), 1 = Flare(Heat), 2 = Other. Controls what variable is added to in SaccAirVehicle to count active countermeasures, (NumActiveFlares MissilesIncomingHeat, NumActiveChaff MissilesIncomingRadar, NumActiveOtherCM MissilesIncomingOther)")]
         public int FlareType = 1;
         public ParticleSystem[] FlareParticles;
         [Tooltip("How long a flare has an effect for")]
@@ -27,7 +27,6 @@ namespace SaccFlightAndVehicles
         public Text HUDText_flare_ammo;
         [Tooltip("Launch one particle system per click, cycling through, instead of all at once")]
         public bool SequentialLaunch = false;
-        public bool Hol = false;
         public int NumFlare_PerShot = 1;
         [Tooltip("Delay between flares drops when holding the trigger")]
         public float FlareHoldDelay = 0.3f;
