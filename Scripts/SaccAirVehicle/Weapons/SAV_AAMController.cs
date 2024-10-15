@@ -364,7 +364,7 @@ namespace SaccFlightAndVehicles
                     if (rayHit.collider.attachedRigidbody == EntityControl.VehicleRigidbody) return true;
                     else return false;
                 }
-                else return true;
+                else return true; // the ray terminated at our center of mass so it reached us, it's just not checking the onboardvehiclelayer
             }
             return false;
         }
@@ -376,15 +376,14 @@ namespace SaccFlightAndVehicles
                 targdir = TargetEntityControl.CenterOfMass.position - transform.position;
             else
                 targdir = Target.position - transform.position;
-            if (Physics.Raycast(transform.position, targdir, out rayHit, AAMMaxTargetDistance, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
+            if (Physics.Raycast(transform.position, targdir, out rayHit, targdir.magnitude, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
             {
-                if (rayHit.collider && rayHit.collider.gameObject.layer == OutsideVehicleLayer)
+                if (rayHit.collider && (rayHit.collider.gameObject.layer == OutsideVehicleLayer || rayHit.collider.gameObject.layer == EntityControl.OnboardVehicleLayer))
                 { return true; }
                 else
                 { return false; }
             }
-            else
-            { return false; }
+            else return true; // the ray terminated at our center of mass so it reached us, it's just not checking the onboardvehiclelayer
         }
         public void DisableLockHack()
         { LockHack = false; }

@@ -14,8 +14,6 @@ namespace SaccFlightAndVehicles
         public SaccEntity EntityControl;
         [Tooltip("The object containing all non-trigger colliders for the vehicle, their layers are changed when entering and exiting")]
         public Transform VehicleMesh;
-        [Tooltip("Layer to set the VehicleMesh and it's children to when entering vehicle")]
-        public int OnboardVehicleLayer = 31;
         [Tooltip("Change all children of VehicleMesh, or just the objects with colliders?")]
         public bool OnlyChangeColliders = false;
         [Tooltip("Position used to raycast from in order to calculate ground effect")]
@@ -2192,7 +2190,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerEnter()
         {
             Passenger = true;
-            SetCollidersLayer(OnboardVehicleLayer);
+            SetCollidersLayer(EntityControl.OnboardVehicleLayer);
         }
         public void SFEXT_P_PassengerExit()
         {
@@ -2277,7 +2275,7 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOn));
             }
 
-            SetCollidersLayer(OnboardVehicleLayer);
+            SetCollidersLayer(EntityControl.OnboardVehicleLayer);
         }
         public void SFEXT_G_PilotEnter()
         {

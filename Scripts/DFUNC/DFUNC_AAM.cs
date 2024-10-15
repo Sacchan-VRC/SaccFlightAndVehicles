@@ -492,7 +492,7 @@ namespace SaccFlightAndVehicles
                     {
                         RaycastHit hitnext;
                         //raycast to check if it's behind something
-                        bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, 99999999, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
+                        bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, Mathf.Infinity, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
 #if UNITY_EDITOR
                         if (hitnext.collider)
                             Debug.DrawLine(HudControlPosition, hitnext.point, Color.red);
@@ -549,7 +549,7 @@ namespace SaccFlightAndVehicles
                 //check if target is active, and if it's SaccAirVehicle is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
                 //raycast to check if it's behind something
                 RaycastHit hitcurrent;
-                bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, 99999999, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
+                bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide);
 #if UNITY_EDITOR
                 if (hitcurrent.collider)
                     Debug.DrawLine(HudControlPosition, hitcurrent.point, Color.green);

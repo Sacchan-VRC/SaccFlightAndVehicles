@@ -71,8 +71,6 @@ namespace SaccFlightAndVehicles
         public float AAMLaunchDelay = 0f;
         [Tooltip("Point missile is launched from, flips on local X each time fired")]
         public Transform AAMLaunchPoint;
-        [Tooltip("Layer to spherecast to find all triggers on to use as AAM targets")]
-        public LayerMask AAMTargetsLayer;
         [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
         public bool AllowNoAmmoLock = false;
         [Tooltip("Require re-lock after firing?")]
@@ -654,8 +652,8 @@ namespace SaccFlightAndVehicles
                 {
                     RaycastHit hitnext;
                     //raycast to check if it's behind something
-                    int layermask_Next = 133121;
-                    if (AI_GUN_RUNNINGLOCAL) layermask_Next += 1 << 31; // add OnBoardVehicleLayer so it can hit you if you're owner of this and in another vehicle
+                    int layermask_Next = 133137;/* Default, Water, Environment, and Walkthrough */
+                    if (AI_GUN_RUNNINGLOCAL) layermask_Next += 1 << EntityControl.OnboardVehicleLayer; // add OnBoardVehicleLayer so it can hit you if you're owner of this and in another vehicle
                     bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, Mathf.Infinity, layermask_Next, QueryTriggerInteraction.Ignore);
 
                     /* Debug.Log(string.Concat("LoS ", LineOfSightNext));
@@ -702,8 +700,8 @@ namespace SaccFlightAndVehicles
             //check if target is active, and if it's SaccairVehicle is null(dummy target), or if it's not null(plane) make sure it's not taxiing or dead.
             //raycast to check if it's behind something
             RaycastHit hitcurrent;
-            int layermask_Current = 133121;
-            if (AI_GUN_RUNNINGLOCAL) layermask_Current += 1 << 31;
+            int layermask_Current = 133137;
+            if (AI_GUN_RUNNINGLOCAL) layermask_Current += 1 << EntityControl.OnboardVehicleLayer;
             bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, layermask_Current, QueryTriggerInteraction.Ignore);
             //used to make lock remain for .25 seconds after target is obscured
             if (!LineOfSightCur || (hitcurrent.collider && hitcurrent.collider.gameObject.layer != 17 && hitcurrent.collider.gameObject.layer != 31))

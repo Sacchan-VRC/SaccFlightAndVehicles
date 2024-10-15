@@ -16,8 +16,6 @@ namespace SaccFlightAndVehicles
         public Renderer MainObjectRenderer;
         [Tooltip("Change all children of VehicleMesh, or just the objects with colliders?")]
         public bool OnlyChangeColliders = false;
-        [Tooltip("Layer to set the VehicleMesh and it's children to when entering vehicle")]
-        public int OnboardVehicleLayer = 31;
         [UdonSynced] public float Health = 73f;
         public Animator VehicleAnimator;
         [System.NonSerialized] public Transform VehicleTransform;
@@ -1167,7 +1165,7 @@ namespace SaccFlightAndVehicles
             GDamageToTake = 0f;
             AllGs = 0f;
             InVR = EntityControl.InVR;
-            SetCollidersLayer(OnboardVehicleLayer);
+            SetCollidersLayer(EntityControl.OnboardVehicleLayer);
             SetWheelDriver();
         }
         public void SFEXT_O_PilotExit()
@@ -1191,7 +1189,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_P_PassengerEnter()
         {
             Passenger = true;
-            SetCollidersLayer(OnboardVehicleLayer);
+            SetCollidersLayer(EntityControl.OnboardVehicleLayer);
         }
         public void SFEXT_P_PassengerExit()
         {
