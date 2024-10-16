@@ -145,7 +145,7 @@ namespace SaccFlightAndVehicles
                 CatapultObjects = CatapultObjects.transform.parent.gameObject;
                 CatapultAnimator = CatapultObjects.GetComponent<Animator>();
             }
-            return (CatapultAnimator != null);
+            return CatapultAnimator != null;
         }
         private void OnTriggerEnter(Collider other)
         {
@@ -303,7 +303,25 @@ namespace SaccFlightAndVehicles
                     DisableOverrides();
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff));
                     SAVControl.SetProgramVariable("Taxiinglerper", 0f);
-                    VehicleRigidbody.velocity = (CatapultTransform.position - CatapultPosLastFrame) / DeltaTime;
+                    // allow world creators to set an exact launch speed in case they want to make a fair race or something
+                    Vector3 launchVel = (CatapultTransform.position - CatapultPosLastFrame) / DeltaTime;
+                    if (CatapultAnimator)
+                    {
+                        string catName = CatapultAnimator.gameObject.name;
+                        if (catName.Contains("speed="))
+                        {
+                            string[] splitCat = catName.Split("=");
+                            if (splitCat.Length > 1)
+                            {
+                                float launchSpeed;
+                                if (float.TryParse(splitCat[1], out launchSpeed))
+                                {
+                                    launchVel = launchVel.normalized * launchSpeed;
+                                }
+                            }
+                        }
+                    }
+                    VehicleRigidbody.velocity = launchVel;
                     Vector3 CatapultRotDifEULER = CatapultRotDif.eulerAngles;
                     //.eulerangles is dumb (convert 0 - 360 to -180 - 180)
                     if (CatapultRotDifEULER.x > 180) { CatapultRotDifEULER.x -= 360; }
