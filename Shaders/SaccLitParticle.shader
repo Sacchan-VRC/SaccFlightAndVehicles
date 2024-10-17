@@ -3,7 +3,8 @@
 
 Shader "SaccFlight/SaccLitParticle" {
     Properties {
-        _Color ("Color", Color) = (1,1,1,1)
+        _Color_Ambient ("Ambient Color", Color) = (1,1,1,1)
+        _Color_Lights ("Lights Color", Color) = (1,1,1,1)
         _MainTex ("Main Tex", 2D) = "white" {}
     }
     SubShader {
@@ -26,7 +27,7 @@ Shader "SaccFlight/SaccLitParticle" {
             #pragma multi_compile_fwdbase
             #pragma multi_compile_fog
             #pragma target 3.0
-            uniform float4 _LightColor0, _Color;
+            uniform float4 _LightColor0, _Color_Ambient, _Color_Lights;
             uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
             struct VertexInput {
                 float4 vertex : POSITION;
@@ -57,13 +58,13 @@ Shader "SaccFlight/SaccLitParticle" {
                 float3 attenColor = attenuation * _LightColor0.xyz;
 /////// Diffuse:
                 float3 directDiffuse = attenColor;
-                float3 indirectDiffuse = UNITY_LIGHTMODEL_AMBIENT.rgb;
+                float3 indirectDiffuse = (unity_AmbientSky + unity_AmbientEquator + unity_AmbientGround) / 3;
                 float4 _MainTex_var = tex2D(_MainTex,TRANSFORM_TEX(i.uv0, _MainTex));
                 float3 diffuseColor = _MainTex_var.rgb;
-                float3 diffuse = (directDiffuse + indirectDiffuse) * diffuseColor;
+                float3 diffuse = (directDiffuse * _Color_Lights + indirectDiffuse * _Color_Ambient) * diffuseColor;
 /// Final Color:
                 float3 finalColor = diffuse;
-                fixed4 finalRGBA = fixed4(finalColor * i.color.rgb * _Color, _MainTex_var.a * i.color.a);
+                fixed4 finalRGBA = fixed4(finalColor * i.color.rgb, _MainTex_var.a * i.color.a);
                 UNITY_APPLY_FOG(i.fogCoord, finalRGBA );
                 return finalRGBA;
             }
@@ -87,7 +88,7 @@ Shader "SaccFlight/SaccLitParticle" {
             #pragma multi_compile_fwdadd
             #pragma multi_compile_fog
             #pragma target 3.0
-            uniform float4 _LightColor0, _Color;
+            uniform float4 _LightColor0, _Color_Ambient, _Color_Lights;
             uniform sampler2D _MainTex; uniform float4 _MainTex_ST;
             struct VertexInput {
                 float4 vertex : POSITION;
@@ -123,7 +124,7 @@ Shader "SaccFlight/SaccLitParticle" {
                 float3 diffuse = directDiffuse * diffuseColor * _MainTex_var.a * i.color.a;
 /// Final Color:
                 float3 finalColor = diffuse;
-                fixed4 finalRGBA = fixed4(finalColor * i.color.rgb * _Color, 0);
+                fixed4 finalRGBA = fixed4(finalColor * i.color.rgb * _Color_Lights, 0);
                 UNITY_APPLY_FOG(i.fogCoord, finalRGBA);
                 return finalRGBA;
             }
