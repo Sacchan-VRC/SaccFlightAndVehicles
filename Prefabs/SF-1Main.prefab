@@ -16389,6 +16389,143 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &2507424253256594622
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4923962155233452163}
+  - component: {fileID: 3309865269425289962}
+  m_Layer: 17
+  m_Name: GearDown
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4923962155233452163
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2507424253256594622}
+  serializedVersion: 2
+  m_LocalRotation: {x: -4.973798e-14, y: 1.8521933e-20, z: 2.2737362e-13, w: 1}
+  m_LocalPosition: {x: 0, y: -0.7, z: 0.78}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4371473018086113416}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &3309865269425289962
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2507424253256594622}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 26a736f74a71a9f4da80a4d7b05ebc56, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 0
+  MinDistance: 1
+  MaxDistance: 100
+  Pan2D: 0
+  rolloffMode: 1
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: -6.1029396
+      outSlope: -6.1029396
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.14748996
+    - serializedVersion: 3
+      time: 0.18304119
+      value: 0.37816268
+      inSlope: -1.5239788
+      outSlope: -1.5239788
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: -0.105121635
+      outSlope: -0.105121635
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.17248464
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.3611111
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &3017557331205386670
 GameObject:
   m_ObjectHideFlags: 0
@@ -17067,6 +17204,7 @@ Transform:
   - {fileID: 7829098040414507031}
   - {fileID: 8771412242969346326}
   - {fileID: 877570518}
+  - {fileID: 4923962155233452163}
   m_Father: {fileID: 4371473019549114404}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4371473018127897538
@@ -33322,7 +33460,6 @@ MonoBehaviour:
   FlareLaunch: {fileID: 7829098040145606130}
   HUDText_flare_ammo: {fileID: 2341975302880250122}
   SequentialLaunch: 0
-  Hol: 0
   NumFlare_PerShot: 1
   FlareHoldDelay: 0.3
 --- !u!114 &4371473018491397882
@@ -33612,6 +33749,8 @@ MonoBehaviour:
   AllowToggleGrounded: 1
   GearCheckDistance: 2
   AllowToggleDuringTransition: 1
+  LandingGearSound_Up: {fileID: 3309865269425289962}
+  LandingGearSound_Down: {fileID: 3309865269425289962}
   TransitionLength: 5
 --- !u!114 &4371473018557886276
 MonoBehaviour:
@@ -88501,6 +88640,7 @@ MonoBehaviour:
   - {fileID: 739086580361900874}
   - {fileID: 8097297477268948898}
   TrailGs: 4
+  TrailGs_OffSpeed: 2.7
   WreckedParticles:
   - {fileID: 4087840839749029517}
   SplashParticle: {fileID: 8771412243284011448}
@@ -94275,7 +94415,6 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 5511535095792669435}
   EntityControl: {fileID: -2692614534935363141}
   VehicleMesh: {fileID: 7510463846146837827}
-  OnboardVehicleLayer: 31
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 4371473018256058482}
   PitchMoment: {fileID: 4371473019930906791}

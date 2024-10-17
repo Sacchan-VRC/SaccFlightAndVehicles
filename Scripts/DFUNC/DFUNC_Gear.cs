@@ -20,6 +20,9 @@ namespace SaccFlightAndVehicles
         public float GearCheckDistance = 2f;
         [Tooltip("If ticked, gear can only be toggled every TransitionLength")]
         public bool AllowToggleDuringTransition = true;
+        [Tooltip("Sound that plays if you're in the plane when the landing gear is toggled")]
+        public AudioSource LandingGearSound_Up;
+        public AudioSource LandingGearSound_Down;
         public float TransitionLength = 5f;
         private float TransitionTime;
         private SaccEntity EntityControl;
@@ -85,6 +88,8 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_Explode()
         {
+            if (LandingGearSound_Up && LandingGearSound_Up.isPlaying) { LandingGearSound_Up.Stop(); }
+            if (LandingGearSound_Down && LandingGearSound_Down.isPlaying) { LandingGearSound_Down.Stop(); }
             SetGearDown();
         }
         public void SFEXT_G_RespawnButton()
@@ -140,6 +145,7 @@ namespace SaccFlightAndVehicles
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - LandingGearDragMulti);
                 DragApplied = false;
             }
+            if ((EntityControl.InVehicle || (Vector3.Distance(Networking.LocalPlayer.GetPosition(), LandingGearSound_Up.transform.position) < 20)) && !EntityControl.dead && LandingGearSound_Up) { LandingGearSound_Up.PlayOneShot(LandingGearSound_Up.clip); }
 
             EntityControl.SendEventToExtensions("SFEXT_G_GearUp");
             TransitionTime = Time.time;
@@ -160,6 +166,7 @@ namespace SaccFlightAndVehicles
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + LandingGearDragMulti);
                 DragApplied = true;
             }
+            if ((EntityControl.InVehicle || (Vector3.Distance(Networking.LocalPlayer.GetPosition(), LandingGearSound_Down.transform.position) < 20)) && !EntityControl.dead && LandingGearSound_Down) { LandingGearSound_Down.PlayOneShot(LandingGearSound_Down.clip); }
 
             EntityControl.SendEventToExtensions("SFEXT_G_GearDown");
             TransitionTime = Time.time;
