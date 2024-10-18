@@ -470,7 +470,7 @@ namespace SaccFlightAndVehicles
                     }
                     if (Health <= 0f)//vehicle is ded
                     {
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                        NetworkExplode();
                         return;
                     }
                 }
@@ -974,6 +974,10 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        public void NetworkExplode()
+        {
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+        }
         public void Explode()
         {
             if (EntityControl._dead) { return; }//can happen with prediction enabled if two people kill something at the same time
@@ -1234,7 +1238,7 @@ namespace SaccFlightAndVehicles
                     if (PredictedHealth <= 0)
                     {
                         EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                        NetworkExplode();
                     }
                 }
                 else
@@ -1244,7 +1248,7 @@ namespace SaccFlightAndVehicles
                     if (PredictedHealth <= 0)
                     {
                         EntityControl.SendEventToExtensions("SFEXT_O_GunKill");
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                        NetworkExplode();
                     }
                 }
             }
@@ -1272,7 +1276,7 @@ namespace SaccFlightAndVehicles
                 //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
                 if (Health == 0.0911f)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                    NetworkExplode();
                 }
             }
         }
