@@ -134,17 +134,19 @@ namespace SaccFlightAndVehicles
                 if (PilotBoosting > 0 && ((_BoostRemaining > 0 || BoostOverheatMode) || UseMainFuel && (float)SGVControl.GetProgramVariable("Fuel") > 0))
                 {
                     boostingLast = true;
-                    Boosting = PilotBoosting;
                     if (BoostType_Force)
                     {
+                        Boosting = PilotBoosting;
                         ApplyBoostForce = true;
                     }
                     else
                     {
+                        float engineSpeed = (float)SGVControl.GetProgramVariable("Revs") / RevLimiter;
+                        Boosting = PilotBoosting * engineSpeed;
                         SGVControl.SetProgramVariable("DriveSpeed", StartDriveSpeed + (PilotBoosting * BoostAmount));
                         if (UseMainFuel)
                         {
-                            SGVControl.SetProgramVariable("Fuel", (float)SGVControl.GetProgramVariable("Fuel") - (MainFuelUsePerSecond * Time.deltaTime * PilotBoosting * ((float)SGVControl.GetProgramVariable("Revs") / RevLimiter)));
+                            SGVControl.SetProgramVariable("Fuel", (float)SGVControl.GetProgramVariable("Fuel") - (MainFuelUsePerSecond * Time.deltaTime * PilotBoosting * engineSpeed));
                         }
                         else
                         {
@@ -158,7 +160,7 @@ namespace SaccFlightAndVehicles
                             }
                             else
                             {
-                                BoostRemaining -= Time.deltaTime * PilotBoosting * (float)SGVControl.GetProgramVariable("Revs") / RevLimiter;
+                                BoostRemaining -= Time.deltaTime * PilotBoosting * engineSpeed;
                             }
                         }
                     }
