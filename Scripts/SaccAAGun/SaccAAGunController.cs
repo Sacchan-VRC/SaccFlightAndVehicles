@@ -619,7 +619,7 @@ namespace SaccFlightAndVehicles
                 //Check if we still have the amount of health set to not send explode when killed, and if we do send explode
                 if (Health == 0.0911f)
                 {
-                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
+                    NetworkExplode();
                 }
             }
         }
