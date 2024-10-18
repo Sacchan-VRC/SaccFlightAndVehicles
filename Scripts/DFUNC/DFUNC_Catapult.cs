@@ -48,6 +48,7 @@ namespace SaccFlightAndVehicles
         private Quaternion CatapultRotLastFrame;
         private Vector3 CatapultPosLastFrame;
         private Animator CatapultAnimator;
+        BoxCollider thisCollider;
         //these bools exist to make sure this script only ever adds/removes 1 from the value in enginecontroller
         private bool DisableTaxiRotation = false;
         private bool DisableGearToggle = false;
@@ -66,7 +67,26 @@ namespace SaccFlightAndVehicles
             VehicleTransform = EntityControl.transform;
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
             VehicleAnimator = EntityControl.GetComponent<Animator>();
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            thisCollider = GetComponent<BoxCollider>();
+            {
+                IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+                colliderOwner();
+            }
+        }
+        // non-owners have a bigger collider so that they can find catapults if the position isn't synced perfectly
+        void colliderNotOwner()
+        {
+            Vector3 colSize = thisCollider.size;
+            colSize.x = 8;
+            colSize.z = 40;
+            thisCollider.size = colSize;
+        }
+        void colliderOwner()
+        {
+            Vector3 colSize = thisCollider.size;
+            colSize.x = 0;
+            colSize.z = 0;
+            thisCollider.size = colSize;
         }
         public void DFUNC_Selected()
         {
@@ -80,6 +100,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             gameObject.SetActive(true);
+            enabledToFindAnimator = false;
             Piloting = true;
             DisableOverrides();
         }
@@ -101,11 +122,13 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
+            colliderOwner();
             if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
+            colliderNotOwner();
             Launching = false;
             OnCatapult = false;
             Piloting = false;
@@ -121,22 +144,27 @@ namespace SaccFlightAndVehicles
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         }
-        private void EnableOneFrameToFindAnimator()
+        bool enabledToFindAnimator;
+        private void EnableToFindAnimator()
         {
             if (!IsOwner)
             {
+                enabledToFindAnimator = true;
                 gameObject.SetActive(true);
-                SendCustomEventDelayedFrames(nameof(DisableThisObjNonOnwer), 1);
+                SendCustomEventDelayedSeconds(nameof(FindAnimator_Disable), 3f);
             }
         }
-        private void DisableThisObjNonOnwer()
+        public void FindAnimator_Disable()
         {
-            if (!IsOwner)
-            { gameObject.SetActive(false); }
+            if (enabledToFindAnimator)
+            {
+                enabledToFindAnimator = false;
+                gameObject.SetActive(false);
+            }
         }
         private bool FindCatapultAnimator(GameObject other)
         {
-            if (OnCatapult) { return false; }//Why is this needed?
+            // if (OnCatapult) { return false; }//Why is this needed?
             GameObject CatapultObjects = other.gameObject;
             CatapultAnimator = null;
             CatapultAnimator = other.GetComponent<Animator>();
@@ -225,7 +253,10 @@ namespace SaccFlightAndVehicles
             {
                 if (other)
                 {
-                    FindCatapultAnimator(other.gameObject);
+                    if (FindCatapultAnimator(other.gameObject))
+                    {
+                        FindAnimator_Disable();
+                    }
                 }
             }
         }
@@ -371,25 +402,22 @@ namespace SaccFlightAndVehicles
             if (IsOwner && OnCatapult && !Launching)
             {
                 Launching = true;
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PreLaunchCatapult));
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchCatapult));
                 EntityControl.SendEventToExtensions("SFEXT_O_LaunchFromCatapult");
             }
         }
-        public void PreLaunchCatapult()
-        {
-            if (!IsOwner) { EnableOneFrameToFindAnimator(); }
-            SendCustomEventDelayedFrames(nameof(LaunchCatapult), 3);
-            if (VehicleAnimator) { VehicleAnimator.SetTrigger(AnimTriggerLaunchName); }
-        }
         public void LaunchCatapult()
         {
+            if (VehicleAnimator) { VehicleAnimator.SetTrigger(AnimTriggerLaunchName); }
             if (Utilities.IsValid(CatapultAnimator))
             { CatapultAnimator.SetTrigger("launch"); }
+            CatapultAnimator = null;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             EntityControl.SendEventToExtensions("SFEXT_G_LaunchFromCatapult");
         }
         public void CatapultLockIn()
         {
+            if (!IsOwner) { EnableToFindAnimator(); }
             OnCatapult = true;
             if (VehicleAnimator) { VehicleAnimator.SetBool("oncatapult", true); }
             if (CatapultLock) { CatapultLock.Play(); }
