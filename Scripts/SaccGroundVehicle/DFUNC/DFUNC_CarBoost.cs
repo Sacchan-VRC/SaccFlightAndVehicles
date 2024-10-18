@@ -152,7 +152,7 @@ namespace SaccFlightAndVehicles
                             {
                                 if (BoostRemaining * BoostRemainingDivider >= 1)
                                 {
-                                    SGVControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                                    SGVControl.SendCustomEvent("NetworkExplode");
                                 }
                                 BoostRemaining += Time.deltaTime * PilotBoosting;
                             }
@@ -169,19 +169,23 @@ namespace SaccFlightAndVehicles
                 }
                 else if (boostingLast)
                 {
-                    boostingLast = false;
-                    Boosting = 0;
-                    if (ApplyBoostForce)
-                    { ApplyBoostForce = false; }
-                    else
-                    { SGVControl.SetProgramVariable("DriveSpeed", StartDriveSpeed); }
-                    RequestSerialization();
+                    cancelBoosting();
                 }
                 else if (BoostOverheatMode)
                 {
                     BoostRemaining = Mathf.Max(BoostRemaining - (Time.deltaTime * OverheadMode_replenishSpeed), 0);
                 }
             }
+        }
+        void cancelBoosting()
+        {
+            boostingLast = false;
+            Boosting = 0;
+            if (ApplyBoostForce)
+            { ApplyBoostForce = false; }
+            else
+            { SGVControl.SetProgramVariable("DriveSpeed", StartDriveSpeed); }
+            RequestSerialization();
         }
         public void SFEXT_G_RespawnButton()
         {
@@ -237,12 +241,14 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_PilotExit()
         {
             gameObject.SetActive(false);
-            boostingLast = false;
             Boosting = 0;
-            ApplyBoostForce = false;
         }
         public void SFEXT_O_PilotExit()
         {
+            if (boostingLast)
+            {
+                cancelBoosting();
+            }
             Piloting = false;
             Selected = false;
         }
@@ -263,7 +269,7 @@ namespace SaccFlightAndVehicles
                         {
                             if (BoostRemaining * BoostRemainingDivider >= 1)
                             {
-                                SGVControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "Explode");
+                                SGVControl.SendCustomEvent("NetworkExplode");
                             }
                         }
                         BoostRemaining -= Time.fixedDeltaTime * Boosting;
