@@ -12,7 +12,7 @@ namespace SaccFlightAndVehicles
     public class DFUNCP_TakeControl : UdonSharpBehaviour
     {
         public SaccEntity EntityControl;
-        [NonSerialized] public SAV_PassengerFunctionsController PassengerFunctionsController;
+        [NonSerialized] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private SaccVehicleSeat[] VehicleSeats;
         public SaccVehicleSeat ThisSVSeat;
         [Tooltip("Require the user to hold down the button to take control?")]
@@ -28,6 +28,8 @@ namespace SaccFlightAndVehicles
         private bool Swapped;
         private GameObject PilotThisSeatOnly;
         private GameObject ThisThisSeatOnly;
+        private SAV_PassengerFunctionsController PilotPassengerFunctions;
+        private SAV_PassengerFunctionsController ThisPassengerFunctions;
         private GameObject[] PilotEnableInSeat;
         private GameObject[] ThisEnableInSeat;
         private VRCPlayerApi SeatAPI;
@@ -37,7 +39,7 @@ namespace SaccFlightAndVehicles
         private Quaternion[] MoveTransformsRot_Orig;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
-        public void SFEXTP_L_EntityStart()
+        public void SFEXT_L_EntityStart()
         {
             VehicleSeats = EntityControl.VehicleSeats;
             PilotSVSeat = EntityControl.VehicleStations[EntityControl.PilotSeat].GetComponent<SaccVehicleSeat>();
@@ -45,6 +47,8 @@ namespace SaccFlightAndVehicles
             ThisThisSeatOnly = ThisSVSeat.ThisSeatOnly;
             PilotEnableInSeat = PilotSVSeat.EnableInSeat;
             ThisEnableInSeat = ThisSVSeat.EnableInSeat;
+            PilotPassengerFunctions = PilotSVSeat.PassengerFunctions;
+            ThisPassengerFunctions = ThisSVSeat.PassengerFunctions;
             SAVControl = (SaccAirVehicle)EntityControl.GetExtention(GetUdonTypeName<SaccAirVehicle>());
             int mtlen = MoveTransforms.Length;
             MoveTransformsPos_Orig = new Vector3[mtlen];
@@ -92,6 +96,8 @@ namespace SaccFlightAndVehicles
             ThisSVSeat.ThisSeatOnly = PilotThisSeatOnly;
             PilotSVSeat.EnableInSeat = ThisEnableInSeat;
             ThisSVSeat.EnableInSeat = PilotEnableInSeat;
+            PilotSVSeat.PassengerFunctions = ThisPassengerFunctions;
+            ThisSVSeat.PassengerFunctions = PilotPassengerFunctions;
             PilotSVSeat.IsPilotSeat = false;
             ThisSVSeat.IsPilotSeat = true;
 
@@ -138,6 +144,8 @@ namespace SaccFlightAndVehicles
             ThisSVSeat.ThisSeatOnly = ThisThisSeatOnly;
             PilotSVSeat.EnableInSeat = PilotEnableInSeat;
             ThisSVSeat.EnableInSeat = ThisEnableInSeat;
+            PilotSVSeat.PassengerFunctions = PilotPassengerFunctions;
+            ThisSVSeat.PassengerFunctions = ThisPassengerFunctions;
             PilotSVSeat.IsPilotSeat = true;
             ThisSVSeat.IsPilotSeat = false;
 
@@ -167,22 +175,23 @@ namespace SaccFlightAndVehicles
                 UnSwap_Event();
             }
         }
-        public void SFEXTP_G_ReAppear()
+        public void SFEXT_G_ReAppear()
         {
             ResetSwap();
         }
-        public void SFEXTP_G_RespawnButton()
+        public void SFEXT_G_RespawnButton()
         {
             ResetSwap();
         }
-        public void SFEXTP_O_UserEnter()
+        public void SFEXT_O_PilotEnter()
         {
             IsUser = true;
             TriggerPressTime = Time.time + 1000f;// prevent activation if you hold the trigger when getting in
         }
-        public void SFEXTP_O_UserExit()
+        public void SFEXT_O_PilotExit()
         {
             IsUser = false;
+            gameObject.SetActive(false);
         }
         public void DFUNC_Selected()
         {
@@ -226,7 +235,7 @@ namespace SaccFlightAndVehicles
                 Swapped = true;
             }
         }
-        public void SFEXTP_O_PlayerJoined()
+        public void SFEXT_O_PlayerJoined()
         {
             if (Networking.LocalPlayer.IsOwner(gameObject) && Swapped)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LateJoinerSwap)); }
@@ -234,10 +243,10 @@ namespace SaccFlightAndVehicles
 
         public void KeyboardInput()
         {
-            if (PassengerFunctionsController)
+            if (PassengerFunctionsControl)
             {
-                if (UseLeftTrigger) PassengerFunctionsController.ToggleStickSelectionLeft(this);
-                else PassengerFunctionsController.ToggleStickSelectionRight(this);
+                if (UseLeftTrigger) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
+                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
             }
             else
             {

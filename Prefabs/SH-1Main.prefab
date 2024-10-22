@@ -7248,10 +7248,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1651320210846012064}
-  - component: {fileID: -4968335017175674862}
-  - component: {fileID: 1651320210846012067}
+  - component: {fileID: 6597450062522420819}
+  - component: {fileID: 2452078378740462998}
   m_Layer: 17
-  m_Name: DFUNCP_SideDoor
+  m_Name: DFUNC_SideDoor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7272,7 +7272,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2653143540209350435}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-4968335017175674862
+--- !u!114 &6597450062522420819
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7281,7 +7281,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1651320210846012065}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2e8bdd544d5d46479017c0059c209f9, type: 3}
+  m_Script: {fileID: 11500000, guid: fe33337a821edcf488ee3eb8a8dbb507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
@@ -7293,21 +7293,23 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 1651320210846012067}
+  _udonSharpBackingUdonBehaviour: {fileID: 2452078378740462998}
   MasterToggle: {fileID: 0}
   BoolAnimator: {fileID: 8333115239819171383}
-  AnimBoolName: sidedoor
   Dial_Funcon:
   - {fileID: 8922977315312981250}
   - {fileID: 7604477877241135387}
   InvertFuncon: 0
+  DoAnimBool: 1
+  AnimBoolName: sidedoor
   OnDefault: 0
-  UserExitTurnOff: 0
-  UserExitTurnOn: 0
-  UserEnterTurnOff: 0
-  UserEnterTurnOn: 0
-  ToggleMinDelay: 0
+  PilotExitTurnOff: 0
+  PilotExitTurnOn: 0
+  PilotEnterTurnOff: 0
+  PilotEnterTurnOn: 0
+  ToggleMinDelay: 2
   ToggleObjects: []
+  ToggleObjects_Off: []
   ToggleEmission: []
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
@@ -7316,9 +7318,9 @@ MonoBehaviour:
   AllowToggleEngineOff: 1
   AllowToggleEngineOn: 1
   OpensDoor: 1
-  SoundControl: {fileID: 8333115239632277907}
+  SoundControl: {fileID: -333974543967690982}
   DoorCloseTime: 2
---- !u!114 &1651320210846012067
+--- !u!114 &2452078378740462998
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7337,11 +7339,11 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 2
-  serializedProgramAsset: {fileID: 11400000, guid: dd833670878fe534cb6edbd040e3df2b,
+  _syncMethod: 0
+  serializedProgramAsset: {fileID: 11400000, guid: c7a4ad08cad8a4748a187cedceeea645,
     type: 2}
-  programSource: {fileID: 11400000, guid: d8262517692e74c4692552a2aeefd8e3, type: 2}
-  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgIAAAAAAAAAAi8CAAAAAUsAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgACAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAErAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIASABhAHMARABvAG4AZQBTAGMAZQBuAGUAVQBwAGcAcgBhAGQAZQBfAF8AXwAnAQQAAAB0AHkAcABlAAEYAAAAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAKwEFAAAAVgBhAGwAdQBlAAEHBQIvAwAAAAFJAAAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQBgADEAWwBbAFMAeQBzAHQAZQBtAC4ASQBuAHQAMwAyACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgADAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAEfAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIAVgBlAHIAcwBpAG8AbgBfAF8AXwAnAQQAAAB0AHkAcABlAAEWAAAAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgAXAQUAAABWAGEAbAB1AGUAAgAAAAcFBwUHBQ==
+  programSource: {fileID: 11400000, guid: 13b3afa1cb7686c4187808dfb673655a, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
   publicVariablesUnityEngineObjects: []
   publicVariablesSerializationDataFormat: 0
 --- !u!1 &1651320211060793693
@@ -7418,10 +7420,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1651320211658043413}
-  - component: {fileID: 3264179667693875775}
-  - component: {fileID: 1651320211658043412}
+  - component: {fileID: 5064265753511855764}
+  - component: {fileID: 438315858759981833}
   m_Layer: 17
-  m_Name: DFUNCP_Searchlight
+  m_Name: DFUNC_Searchlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7442,7 +7444,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2653143540353186884}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3264179667693875775
+--- !u!114 &5064265753511855764
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7451,7 +7453,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1651320211658043402}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d2e8bdd544d5d46479017c0059c209f9, type: 3}
+  m_Script: {fileID: 11500000, guid: fe33337a821edcf488ee3eb8a8dbb507, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   serializationData:
@@ -7463,21 +7465,23 @@ MonoBehaviour:
     PrefabModificationsReferencedUnityObjects: []
     PrefabModifications: []
     SerializationNodes: []
-  _udonSharpBackingUdonBehaviour: {fileID: 1651320211658043412}
+  _udonSharpBackingUdonBehaviour: {fileID: 438315858759981833}
   MasterToggle: {fileID: 0}
   BoolAnimator: {fileID: 8333115239819171383}
-  AnimBoolName: 
   Dial_Funcon:
   - {fileID: 4525370790198140218}
   InvertFuncon: 0
+  DoAnimBool: 0
+  AnimBoolName: AnimBool
   OnDefault: 0
-  UserExitTurnOff: 1
-  UserExitTurnOn: 0
-  UserEnterTurnOff: 0
-  UserEnterTurnOn: 0
-  ToggleMinDelay: 0
+  PilotExitTurnOff: 1
+  PilotExitTurnOn: 0
+  PilotEnterTurnOff: 0
+  PilotEnterTurnOn: 0
+  ToggleMinDelay: 2
   ToggleObjects:
   - {fileID: 1651320212675512075}
+  ToggleObjects_Off: []
   ToggleEmission: []
   AllowToggleFlying: 1
   AllowToggleGrounded: 1
@@ -7488,7 +7492,7 @@ MonoBehaviour:
   OpensDoor: 0
   SoundControl: {fileID: 0}
   DoorCloseTime: 2
---- !u!114 &1651320211658043412
+--- !u!114 &438315858759981833
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -7507,11 +7511,11 @@ MonoBehaviour:
   SynchronizePosition: 0
   AllowCollisionOwnershipTransfer: 0
   Reliable: 0
-  _syncMethod: 2
-  serializedProgramAsset: {fileID: 11400000, guid: dd833670878fe534cb6edbd040e3df2b,
+  _syncMethod: 0
+  serializedProgramAsset: {fileID: 11400000, guid: c7a4ad08cad8a4748a187cedceeea645,
     type: 2}
-  programSource: {fileID: 11400000, guid: d8262517692e74c4692552a2aeefd8e3, type: 2}
-  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgIAAAAAAAAAAi8CAAAAAUsAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgACAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAErAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIASABhAHMARABvAG4AZQBTAGMAZQBuAGUAVQBwAGcAcgBhAGQAZQBfAF8AXwAnAQQAAAB0AHkAcABlAAEYAAAAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAKwEFAAAAVgBhAGwAdQBlAAEHBQIvAwAAAAFJAAAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQBgADEAWwBbAFMAeQBzAHQAZQBtAC4ASQBuAHQAMwAyACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgADAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAEfAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIAVgBlAHIAcwBpAG8AbgBfAF8AXwAnAQQAAAB0AHkAcABlAAEWAAAAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgAXAQUAAABWAGEAbAB1AGUAAgAAAAcFBwUHBQ==
+  programSource: {fileID: 11400000, guid: 13b3afa1cb7686c4187808dfb673655a, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgEAAAAAAAAAAi8CAAAAAUkAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgBdAF0ALAAgAFYAUgBDAC4AVQBkAG8AbgAuAEMAbwBtAG0AbwBuAAIAAAAGAgAAAAAAAAAnAQQAAAB0AHkAcABlAAEXAAAAUwB5AHMAdABlAG0ALgBTAHQAcgBpAG4AZwAsACAAbQBzAGMAbwByAGwAaQBiACcBCgAAAFMAeQBtAGIAbwBsAE4AYQBtAGUAAR8AAABfAF8AXwBVAGQAbwBuAFMAaABhAHIAcABCAGUAaABhAHYAaQBvAHUAcgBWAGUAcgBzAGkAbwBuAF8AXwBfACcBBAAAAHQAeQBwAGUAARYAAABTAHkAcwB0AGUAbQAuAEkAbgB0ADMAMgAsACAAbQBzAGMAbwByAGwAaQBiABcBBQAAAFYAYQBsAHUAZQACAAAABwUHBQcF
   publicVariablesUnityEngineObjects: []
   publicVariablesSerializationDataFormat: 0
 --- !u!1 &1651320212126833623
@@ -7840,6 +7844,10 @@ MonoBehaviour:
   LStickDisplayHighlighter: {fileID: 5700159570525580115}
   RStickDisplayHighlighter: {fileID: 4352778826878119693}
   SwitchFunctionSound: {fileID: 8333115238311187226}
+  PlaySelectSoundLeft: 1
+  PlaySelectSoundRight: 1
+  DialSensitivity: 0.7
+  DialFuncPos: 0
 --- !u!114 &3672560189053500627
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -33167,9 +33175,9 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2653143540577959711}
-  Lfunc1: {fileID: -4968335017175674862}
+  Lfunc1: {fileID: 6597450062522420819}
   Lfunc1key: 122
-  Lfunc2: {fileID: 3264179667693875775}
+  Lfunc2: {fileID: 5064265753511855764}
   Lfunc2key: 102
   Lfunc3: {fileID: 0}
   Lfunc3key: 0
@@ -38188,7 +38196,7 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 2653143540773659217}
-  MasterToggle: {fileID: -4968335017175674862}
+  MasterToggle: {fileID: 6597450062522420819}
   BoolAnimator: {fileID: 0}
   Dial_Funcon: []
   InvertFuncon: 0
@@ -43887,7 +43895,7 @@ GameObject:
   - component: {fileID: 4232558894052799057}
   - component: {fileID: 3622057683052247031}
   m_Layer: 17
-  m_Name: DFUNCP_Minigun
+  m_Name: DFUNC_Minigun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43997,7 +44005,7 @@ GameObject:
   - component: {fileID: -2335611487116778559}
   - component: {fileID: 3622057684111839449}
   m_Layer: 17
-  m_Name: DFUNCP_Rockets
+  m_Name: DFUNC_Rockets
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -44176,7 +44184,6 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 3974340786403165104}
   EntityControl: {fileID: 1439720729650657754}
   VehicleMesh: {fileID: 7978705244105965653}
-  OnboardVehicleLayer: 31
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 8333115238555617820}
   PitchMoment: {fileID: 0}
@@ -44359,6 +44366,8 @@ MonoBehaviour:
   _EngineOn: 0
   VehicleForce: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
+  Pitching: {x: 0, y: 0, z: 0}
+  Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
 --- !u!114 &3974340786403165104
@@ -76907,6 +76916,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238084813638}
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
+  PassengerFunctions: {fileID: 0}
   ThisSeatOnly: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
@@ -77328,8 +77338,9 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238184276952}
   SAVControl: {fileID: 5695413857654158265}
-  Trails: []
+  WingTrails: []
   TrailGs: 4
+  TrailGs_OffSpeed: 2.7
   WreckedParticles:
   - {fileID: 6565606178478183152}
   SplashParticle: {fileID: 1881236568729097790}
@@ -77465,7 +77476,6 @@ MonoBehaviour:
   FlareLaunch: {fileID: 1620758739213353236}
   HUDText_flare_ammo: {fileID: 2653143541375218998}
   SequentialLaunch: 0
-  Hol: 0
   NumFlare_PerShot: 1
   FlareHoldDelay: 0.3
 --- !u!114 &8333115238213158040
@@ -78017,6 +78027,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238229734847}
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 1
+  PassengerFunctions: {fileID: 0}
   ThisSeatOnly: {fileID: 8333115238474179255}
   EnableInSeat: []
   DisableInSeat: []
@@ -93900,15 +93911,19 @@ MonoBehaviour:
   PassengerExtensions: []
   Dial_Functions_L:
   - {fileID: -2335611487116778559}
-  - {fileID: -4968335017175674862}
+  - {fileID: 6597450062522420819}
   Dial_Functions_R:
   - {fileID: 4232558894052799057}
-  - {fileID: 3264179667693875775}
+  - {fileID: 5064265753511855764}
   LeftDialDivideStraightUp: 0
   RightDialDivideStraightUp: 0
   LStickDisplayHighlighter: {fileID: 5700159570525580115}
   RStickDisplayHighlighter: {fileID: 4352778826878119693}
   SwitchFunctionSound: {fileID: 8333115238311187226}
+  PlaySelectSoundLeft: 1
+  PlaySelectSoundRight: 1
+  DialSensitivity: 0.7
+  DialFuncPos: 0
 --- !u!114 &8333115238588098056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95023,6 +95038,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238828317008}
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
+  PassengerFunctions: {fileID: 0}
   ThisSeatOnly: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
@@ -95376,6 +95392,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238922619061}
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
+  PassengerFunctions: {fileID: 2168759596302437}
   ThisSeatOnly: {fileID: 0}
   EnableInSeat:
   - {fileID: 5176589018563589172}
@@ -111255,6 +111272,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 8333115238474179252}
+  - {fileID: 7875730194422673740}
   - {fileID: 8333115238768783586}
   - {fileID: 8333115239949523036}
   - {fileID: 8333115239849592804}
@@ -111263,7 +111281,6 @@ Transform:
   - {fileID: 8333115239082984690}
   - {fileID: 2056879797267907620}
   - {fileID: 8333115238037884871}
-  - {fileID: 7875730194422673740}
   m_Father: {fileID: 8333115239819171338}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8333115239445770356
@@ -122092,7 +122109,6 @@ Transform:
   - {fileID: 8333115239632277906}
   - {fileID: 388422482235497838}
   - {fileID: 8333115239408584762}
-  - {fileID: 8333115238065731970}
   - {fileID: 8333115238229734846}
   - {fileID: 8333115238922619060}
   - {fileID: 8333115238828317011}
@@ -122101,6 +122117,7 @@ Transform:
   - {fileID: 8333115240067380490}
   - {fileID: 630903747}
   - {fileID: 3845323076079566393}
+  - {fileID: 8333115238065731970}
   - {fileID: 6168894563566601047}
   m_Father: {fileID: 8333115238204019076}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -122179,9 +122196,7 @@ MonoBehaviour:
   - {fileID: 7804369315149185901}
   - {fileID: -333974543967690982}
   - {fileID: -350790305699909250}
-  - {fileID: -7666395092794540532}
   - {fileID: 6283363742186465719}
-  - {fileID: 2168759596302437}
   Dial_Functions_L:
   - {fileID: 3500674108781184150}
   - {fileID: 2449688609888896633}
@@ -122228,7 +122243,10 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  PassengerFunctionControllers: []
   AAMTargets: []
+  DialFuncPos: 0
+  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &8333115239819171336
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -132748,6 +132766,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115240067380491}
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
+  PassengerFunctions: {fileID: -7666395092794540532}
   ThisSeatOnly: {fileID: 8333115238768783589}
   EnableInSeat: []
   DisableInSeat: []
@@ -133022,6 +133041,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115240080910066}
   EntityControl: {fileID: 1439720729650657754}
   IsPilotSeat: 0
+  PassengerFunctions: {fileID: 0}
   ThisSeatOnly: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
@@ -148268,7 +148288,7 @@ GameObject:
   - component: {fileID: 7384226108303104416}
   - component: {fileID: 5977842168220115740}
   m_Layer: 17
-  m_Name: DFUNCP_TakeControl
+  m_Name: DFUNC_TakeControl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

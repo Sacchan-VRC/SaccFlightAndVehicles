@@ -9,7 +9,7 @@ namespace SaccFlightAndVehicles
     [DefaultExecutionOrder(-10)]
     public class SaccEntity : UdonSharpBehaviour
     {
-        [Tooltip("Put all scripts used by this vehicle that use the event system into this list (excluding DFUNCs)")]
+        [Tooltip("Put all scripts used by this vehicle that use the event system into this list (excluding DFUNCs and PassengerFunctionsControllers)")]
         public UdonSharpBehaviour[] ExtensionUdonBehaviours;
         [Tooltip("Function dial scripts that you wish to be on the left dial")]
         public UdonSharpBehaviour[] Dial_Functions_L;
@@ -82,6 +82,8 @@ namespace SaccFlightAndVehicles
         public Vector3 CustomPickup_RotationOffsetVR = new Vector3(0, 60, 90);
         public Vector3 CustomPickup_RotationOffsetDesktop = new Vector3(0, 35, 90);
         [Header("For debugging, auto filled on build")]
+        [Tooltip("These are automatically collected from the vehicle's seat scripts")]
+        public SAV_PassengerFunctionsController[] PassengerFunctionControllers;
         public GameObject[] AAMTargets;
         [System.NonSerializedAttribute] public bool InEditor = true;//false if in clientsim
         private VRCPlayerApi localPlayer;
@@ -96,6 +98,7 @@ namespace SaccFlightAndVehicles
         private Vector2 LStickCheckAngle;
         [System.NonSerializedAttribute] public bool MySeatIsExternal;
         [System.NonSerializedAttribute] public GameObject LastHitParticle;
+        bool hasPassengerFunctions;
         [System.NonSerializedAttribute] public float LStickFuncDegrees;
         [System.NonSerializedAttribute] public float RStickFuncDegrees;
         [System.NonSerializedAttribute] public float LStickFuncDegreesDivider;
@@ -263,10 +266,27 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i != SeatedPlayers.Length; i++)
             { SeatedPlayers[i] = -1; }
             VehicleSeats = new SaccVehicleSeat[VehicleStations.Length];
+            int numPassengerFunctions = 0;
+            int[] passengerFuncsIndexs = new int[100];//xD
             for (int i = 0; i < VehicleSeats.Length; i++)
             {
                 VehicleSeats[i] = (SaccVehicleSeat)VehicleStations[i].GetComponent<SaccVehicleSeat>();
-                if (VehicleSeats[i]) { VehicleSeats[i].InitializeSeat(); }
+                if (VehicleSeats[i])
+                {
+                    VehicleSeats[i].InitializeSeat();
+                    //store which seats have passengerfunctions
+                    if (VehicleSeats[i].PassengerFunctions)
+                    {
+                        passengerFuncsIndexs[numPassengerFunctions] = i;
+                        numPassengerFunctions++;
+                    }
+                }
+            }
+            //get passenger function controllers from the seats
+            PassengerFunctionControllers = new SAV_PassengerFunctionsController[numPassengerFunctions];
+            for (int i = 0; i < numPassengerFunctions; i++)
+            {
+                PassengerFunctionControllers[i] = VehicleSeats[passengerFuncsIndexs[i]].PassengerFunctions;
             }
             EntityPickup = (VRC_Pickup)gameObject.GetComponent<VRC_Pickup>();
             EntityObjectSync = (VRC.SDK3.Components.VRCObjectSync)gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
@@ -328,8 +348,6 @@ namespace SaccFlightAndVehicles
                 }
             }
 
-            TellDFUNCsLR();
-
             foreach (UdonSharpBehaviour EXT in ExtensionUdonBehaviours)
             {
                 if (EXT) EXT.SetProgramVariable("EntityControl", this);
@@ -342,6 +360,12 @@ namespace SaccFlightAndVehicles
             {
                 if (EXT) EXT.SetProgramVariable("EntityControl", this);
             }
+            foreach (UdonSharpBehaviour EXT in PassengerFunctionControllers)
+            {
+                if (EXT) EXT.SetProgramVariable("EntityControl", this);
+            }
+            hasPassengerFunctions = PassengerFunctionControllers.Length > 0;
+            TellDFUNCsLR();
             OwnerAPI = Networking.GetOwner(gameObject);
 
             HierarchyName = gameObject.name;
@@ -973,17 +997,19 @@ namespace SaccFlightAndVehicles
             LastTriggerExit = Trig;
             SendEventToExtensions("SFEXT_L_OnTriggerExit");
         }
+
+        public int DialFuncPos;
         public void TellDFUNCsLR()
         {
-            foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
+            for (DialFuncPos = 0; DialFuncPos < Dial_Functions_L.Length; DialFuncPos++)
             {
-                if (EXT)
-                { EXT.SendCustomEvent("DFUNC_LeftDial"); }
+                if (Dial_Functions_L[DialFuncPos])
+                { Dial_Functions_L[DialFuncPos].SendCustomEvent("DFUNC_LeftDial"); }
             }
-            foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+            for (DialFuncPos = 0; DialFuncPos < Dial_Functions_R.Length; DialFuncPos++)
             {
-                if (EXT)
-                { EXT.SendCustomEvent("DFUNC_RightDial"); }
+                if (Dial_Functions_R[DialFuncPos])
+                { Dial_Functions_R[DialFuncPos].SendCustomEvent("DFUNC_RightDial"); }
             }
         }
         public void TakeOwnerShipOfExtensions()
@@ -998,6 +1024,7 @@ namespace SaccFlightAndVehicles
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             }
         }
+        public bool passengerFuncIgnorePassengerFlag;
         [RecursiveMethod]
         public void SendEventToExtensions(string eventname)
         {
@@ -1016,6 +1043,41 @@ namespace SaccFlightAndVehicles
             {
                 if (EXT)
                 { EXT.SendCustomEvent(eventname); }
+            }
+            if (hasPassengerFunctions)
+            {
+                if (passengerFuncIgnorePassengerFlag)
+                {
+                    passengerFuncIgnorePassengerFlag = false;
+                    if (eventname.Contains("_Passenger"))
+                    {
+                        // Don't send PassengerEnter etc to PassengerFunctionsController when the passenger controlling the functions enters
+                        // For those functions to work this passenger is sent as 'pilot' from SaccVehicleSeat.PassengerFunctions
+                        // SFEXT_P_PassengerEnter
+                        // SFEXT_P_PassengerExit
+                        // SFEXT_G_PassengerEnter
+                        // SFEXT_G_PassengerExit
+                        return;
+                    }
+                }
+                foreach (SAV_PassengerFunctionsController EXT in PassengerFunctionControllers)
+                {
+                    if (EXT)
+                    {
+                        EXT.SendCustomEvent(eventname);
+                        if (eventname == "SFEXT_L_EntityStart") continue;
+                        //Pilot from SaccEntity is the Pilot of the vehicle
+                        //DFUNCs assume that the pilot of the vehicle should control the DFUNC
+                        //but since this controls passenger functions we turn the pilot events into passenger events
+                        string passengerEventName = eventname;
+                        passengerEventName = passengerEventName.Replace("G_PilotEnter", "G_PassengerEnter");
+                        passengerEventName = passengerEventName.Replace("G_PilotExit", "G_PassengerExit");
+                        passengerEventName = passengerEventName.Replace("O_PilotEnter", "P_PassengerEnter");
+                        passengerEventName = passengerEventName.Replace("O_PilotExit", "P_PassengerExit");
+
+                        EXT.SendEventToExtensions_Gunner(passengerEventName);
+                    }
+                }
             }
         }
         public void ExitStation()

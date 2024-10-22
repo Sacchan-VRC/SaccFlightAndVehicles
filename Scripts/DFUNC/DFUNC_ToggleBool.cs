@@ -54,12 +54,12 @@ namespace SaccFlightAndVehicles
         public float DoorCloseTime = 2;
         [System.NonSerializedAttribute] public bool AnimOn = false;
         [System.NonSerializedAttribute] public float ToggleTime;
+        [System.NonSerialized] public SaccEntity EntityControl;
         private ParticleSystem.EmissionModule[] ToggleEmission_em;
         private int ParticleLength;
         private bool ToggleAllowed = true;
         private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
-        private bool sound_DoorOpen;
         private bool IsSecondary = false;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
@@ -104,35 +104,35 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(false);
         }
-        public void SFEXT_O_PilotEnter()
+        public void SFEXT_G_PilotEnter()
         {
             if (!IsSecondary)
             {
                 if (PilotEnterTurnOff)
                 {
                     if (AnimOn)
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+                    { SetBoolOff(); }
                 }
                 if (PilotEnterTurnOn)
                 {
                     if (!AnimOn)
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
+                    { SetBoolOn(); }
                 }
             }
         }
-        public void SFEXT_O_PilotExit()
+        public void SFEXT_G_PilotExit()
         {
             if (!IsSecondary)
             {
                 if (PilotExitTurnOn)
                 {
                     if (!AnimOn)
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
+                    { SetBoolOn(); }
                 }
                 if (PilotExitTurnOff)
                 {
                     if (AnimOn)
-                    { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+                    { SetBoolOff(); }
                 }
             }
             gameObject.SetActive(false);
@@ -205,8 +205,8 @@ namespace SaccFlightAndVehicles
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, true); }
             foreach (GameObject funcon in Dial_Funcon)
             { funcon.SetActive(InvertFuncon ? !true : true); }
-            /*             if (OpensDoor)
-                        { SoundControl.SendCustomEvent("DoorOpen"); } */
+            if (OpensDoor)
+            { SoundControl.SendCustomEvent("DoorOpen"); }
             foreach (GameObject obj in ToggleObjects)
             { obj.SetActive(true); }
             foreach (GameObject obj in ToggleObjects_Off)
@@ -222,8 +222,8 @@ namespace SaccFlightAndVehicles
             if (DoAnimBool && BoolAnimator) { BoolAnimator.SetBool(AnimBoolName, false); }
             foreach (GameObject funcon in Dial_Funcon)
             { funcon.SetActive(InvertFuncon ? !false : false); }
-            /*             if (OpensDoor)
-                        { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); } */
+            if (OpensDoor)
+            { SoundControl.SendCustomEventDelayedSeconds("DoorClose", DoorCloseTime); }
             foreach (GameObject obj in ToggleObjects)
             { obj.SetActive(false); }
             foreach (GameObject obj in ToggleObjects_Off)
@@ -236,9 +236,9 @@ namespace SaccFlightAndVehicles
             if (!IsSecondary)
             {
                 if (!OnDefault && AnimOn)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
+                { SetBoolOff(); }
                 else if (OnDefault && !AnimOn)
-                { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
+                { SetBoolOn(); }
             }
         }
         private bool InAir;
@@ -303,11 +303,11 @@ namespace SaccFlightAndVehicles
             EngineOn = false;
             CheckToggleAllowed();
         }
-        public override void OnOwnershipTransferred(VRCPlayerApi player)
+        public void SFEXT_O_TakeOwnership()
         {//disable if owner leaves while piloting
             if (!IsSecondary)
             {
-                if (player.isLocal)
+                if (!(EntityControl.Piloting || EntityControl.Holding))
                 {
                     if (PilotExitTurnOff)
                     {

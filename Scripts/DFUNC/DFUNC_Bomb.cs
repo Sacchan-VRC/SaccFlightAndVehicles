@@ -56,6 +56,7 @@ namespace SaccFlightAndVehicles
         private float boolToggleTime;
         private bool AnimOn = false;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool UseLeftTrigger = false;
         private float Trigger;
         private bool TriggerLastFrame;
@@ -75,8 +76,20 @@ namespace SaccFlightAndVehicles
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         [System.NonSerializedAttribute] public bool IsOwner;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        public void DFUNC_LeftDial()
+        {
+            LeftDial = true;
+            UseLeftTrigger = true;
+            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
+            else { DialPosition = EntityControl.DialFuncPos; }
+        }
+        public void DFUNC_RightDial()
+        {
+            LeftDial = false;
+            UseLeftTrigger = false;
+            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
+            else { DialPosition = EntityControl.DialFuncPos; }
+        }
         public void SFEXT_L_EntityStart()
         {
             FullBombs = NumBomb;
@@ -93,8 +106,6 @@ namespace SaccFlightAndVehicles
             if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
             EntityColliders = EntityControl.gameObject.GetComponentsInChildren<Collider>();
             StartEntityLayer = EntityControl.gameObject.layer;
-
-            FindSelf();
 
             UpdateAmmoVisuals();
 
@@ -345,32 +356,6 @@ namespace SaccFlightAndVehicles
             if (IsOwner)
             { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
         }
-        private void FindSelf()
-        {
-            int x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_R)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            LeftDial = true;
-            x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_L)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            DialPosition = -999;
-            Debug.LogWarning("DFUNC_Bomb: Can't find self in dial functions");
-        }
         public void SetBoolOn()
         {
             boolToggleTime = Time.time;
@@ -385,19 +370,39 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (LeftDial)
+            if (PassengerFunctionsControl)
             {
-                if (EntityControl.LStickSelection == DialPosition)
-                { EntityControl.LStickSelection = -1; }
+                if (LeftDial)
+                {
+                    if (PassengerFunctionsControl.LStickSelection == DialPosition)
+                    { PassengerFunctionsControl.LStickSelection = -1; }
+                    else
+                    { PassengerFunctionsControl.LStickSelection = DialPosition; }
+                }
                 else
-                { EntityControl.LStickSelection = DialPosition; }
+                {
+                    if (PassengerFunctionsControl.RStickSelection == DialPosition)
+                    { PassengerFunctionsControl.RStickSelection = -1; }
+                    else
+                    { PassengerFunctionsControl.RStickSelection = DialPosition; }
+                }
             }
             else
             {
-                if (EntityControl.RStickSelection == DialPosition)
-                { EntityControl.RStickSelection = -1; }
+                if (LeftDial)
+                {
+                    if (EntityControl.LStickSelection == DialPosition)
+                    { EntityControl.LStickSelection = -1; }
+                    else
+                    { EntityControl.LStickSelection = DialPosition; }
+                }
                 else
-                { EntityControl.RStickSelection = DialPosition; }
+                {
+                    if (EntityControl.RStickSelection == DialPosition)
+                    { EntityControl.RStickSelection = -1; }
+                    else
+                    { EntityControl.RStickSelection = DialPosition; }
+                }
             }
         }
         private bool FireNextSerialization = false;

@@ -45,7 +45,7 @@ public class DFUNCP_Laser : UdonSharpBehaviour
     public float ATGScrDist = .5f;
     private float boolToggleTime;
     [System.NonSerialized] public SaccFlightAndVehicles.SaccEntity EntityControl;
-    public SaccFlightAndVehicles.SAV_PassengerFunctionsController PassengerFunctionsController;
+    [System.NonSerialized] public SaccFlightAndVehicles.SAV_PassengerFunctionsController PassengerFunctionsControl;
     private bool UseLeftTrigger = false;
     [UdonSynced(UdonSyncMode.None)] private Vector2 GunRotation;
     [System.NonSerializedAttribute] public bool IsOwner;
@@ -66,15 +66,23 @@ public class DFUNCP_Laser : UdonSharpBehaviour
     private int NumChildrenStart;
     private Quaternion AtGscreenStartRot;
     private Vector3 AtGscreenStartPos;
-    private bool OthersEnabled;
     [System.NonSerialized] public bool Using;
-    public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-    public void DFUNC_RightDial() { UseLeftTrigger = false; }
-    public void SFEXTP_L_EntityStart()
+    public void DFUNC_LeftDial()
+    {
+        LeftDial = true;
+        UseLeftTrigger = true;
+        DialPosition = PassengerFunctionsControl.DialFuncPos;
+    }
+    public void DFUNC_RightDial()
+    {
+        LeftDial = false;
+        UseLeftTrigger = false;
+        DialPosition = PassengerFunctionsControl.DialFuncPos;
+    }
+    public void SFEXT_L_EntityStart()
     {
         localPlayer = Networking.LocalPlayer;
         InEditor = localPlayer == null;
-        EntityControl = (SaccFlightAndVehicles.SaccEntity)SAVControl.GetProgramVariable("EntityControl");
         VehicleTransform = EntityControl.transform;
         if (Dial_Funcon) Dial_Funcon.SetActive(false);
         NumChildrenStart = transform.childCount;
@@ -88,8 +96,6 @@ public class DFUNCP_Laser : UdonSharpBehaviour
             }
         }
 
-        FindSelf();
-
         AtGscreenStartRot = AtGScreen.transform.localRotation;
         AtGscreenStartPos = AtGScreen.transform.localPosition;
     }
@@ -99,29 +105,37 @@ public class DFUNCP_Laser : UdonSharpBehaviour
         NewWeap.transform.SetParent(transform);
         return NewWeap;
     }
-    public void SFEXTP_O_UserEnter()
+    public void SFEXT_O_PilotEnter()
     {
         TriggerLastFrame = true;
         IsOwner = Using = true;
         if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
-        if (!OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(EnableForOthers)); }
         if (DialPosition == -999) { DFUNC_Selected(); }
         if (Gunparticle_Gunner) { Gunparticle_Gunner.SetActive(true); }
     }
-    public void SFEXTP_O_UserExit()
+    public void SFEXT_G_PilotEnter()
+    {
+        OnEnableDeserializationBlocker = true;
+        gameObject.SetActive(true);
+        SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), .1f);
+    }
+    public void SFEXT_O_PilotExit()
     {
         AtGScreen.SetActive(false);
         AtGCam.gameObject.SetActive(false);
         gameObject.SetActive(false);
         func_active = false;
         IsOwner = Using = false;
-        if (OthersEnabled) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(DisableForOthers)); }
         if (DialPosition == -999) { DFUNC_Deselected(); }
         if (Gunparticle_Gunner) { Gunparticle_Gunner.SetActive(false); }
         AtGScreen.transform.localRotation = AtGscreenStartRot;
         AtGScreen.transform.localPosition = AtGscreenStartPos;
     }
-    public void SFEXTP_G_Explode()
+    public void SFEXT_G_PilotExit()
+    {
+        gameObject.SetActive(false);
+    }
+    public void SFEXT_G_Explode()
     {
         GunRotation = Vector2.zero;
         if (DoAnimBool && AnimOn)
@@ -153,23 +167,7 @@ public class DFUNCP_Laser : UdonSharpBehaviour
         if (DoAnimBool && AnimOn)
         { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
     }
-    public void EnableForOthers()
-    {
-        if (!Using)
-        {
-            OnEnableDeserializationBlocker = true;
-            gameObject.SetActive(true);
-            SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), .1f);
-        }
-        OthersEnabled = true;
-    }
-    public void DisableForOthers()
-    {
-        if (!Using)
-        { gameObject.SetActive(false); }
-        OthersEnabled = false;
-    }
-    public void SFEXTP_G_RespawnButton()
+    public void SFEXT_G_RespawnButton()
     {
         LaserBarrel.localRotation = Quaternion.identity;
         GunRotation = Vector2.zero;
@@ -316,33 +314,6 @@ public class DFUNCP_Laser : UdonSharpBehaviour
             }
         }
     }
-    private void FindSelf()
-    {
-        if (!PassengerFunctionsController) { return; }
-        int x = 0;
-        foreach (UdonSharpBehaviour usb in PassengerFunctionsController.Dial_Functions_R)
-        {
-            if (this == usb)
-            {
-                DialPosition = x;
-                return;
-            }
-            x++;
-        }
-        LeftDial = true;
-        x = 0;
-        foreach (UdonSharpBehaviour usb in PassengerFunctionsController.Dial_Functions_L)
-        {
-            if (this == usb)
-            {
-                DialPosition = x;
-                return;
-            }
-            x++;
-        }
-        DialPosition = -999;
-        Debug.Log("DFUNCP_Laser: Can't find self in dial functions");
-    }
     public void SetBoolOn()
     {
         boolToggleTime = Time.time;
@@ -360,17 +331,17 @@ public class DFUNCP_Laser : UdonSharpBehaviour
         if (DialPosition == -999) return;
         if (LeftDial)
         {
-            if (PassengerFunctionsController.LStickSelection == DialPosition)
-            { PassengerFunctionsController.LStickSelection = -1; }
+            if (PassengerFunctionsControl.LStickSelection == DialPosition)
+            { PassengerFunctionsControl.LStickSelection = -1; }
             else
-            { PassengerFunctionsController.LStickSelection = DialPosition; }
+            { PassengerFunctionsControl.LStickSelection = DialPosition; }
         }
         else
         {
-            if (PassengerFunctionsController.RStickSelection == DialPosition)
-            { PassengerFunctionsController.RStickSelection = -1; }
+            if (PassengerFunctionsControl.RStickSelection == DialPosition)
+            { PassengerFunctionsControl.RStickSelection = -1; }
             else
-            { PassengerFunctionsController.RStickSelection = DialPosition; }
+            { PassengerFunctionsControl.RStickSelection = DialPosition; }
         }
     }
     private bool FireNextSerialization = false;

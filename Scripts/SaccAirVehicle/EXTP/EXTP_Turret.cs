@@ -113,7 +113,7 @@ namespace SaccFlightAndVehicles
         [Header("Debug, leave empty")]
         [SerializeField] private Transform HORSYNC;
         [SerializeField] private Transform VERTSYNC;
-        public void SFEXTP_L_EntityStart()
+        public void SFEXT_L_EntityStart()
         {
 #if UNITY_EDITOR
             if (HORSYNC || VERTSYNC)
@@ -155,24 +155,27 @@ namespace SaccFlightAndVehicles
             NewWeap.transform.SetParent(transform);
             return NewWeap;
         }
-        public void SFEXTP_O_UserEnter()
+        public void SFEXT_O_PilotEnter()
         {
             TriggerLastFrame = true;
             FireNextSerialization = false;
             IsOwner = true;
             Manning = true;
             if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active));
             if (AmmoBar) { AmmoBar.gameObject.SetActive(true); }
             if (ViewCamera) { ViewCamera.gameObject.SetActive(true); }
             if (ViewCameraScreen) { ViewCameraScreen.gameObject.SetActive(true); }
             if (RotatingSound) { RotatingSound.Play(); }
         }
-        public void SFEXTP_O_UserExit()
+        public void SFEXT_G_PilotEnter()
+        {
+            gameObject.SetActive(true);
+            if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+        }
+        public void SFEXT_O_PilotExit()
         {
             IsOwner = false;
             SendCustomEventDelayedFrames(nameof(ManningFalse), 1);
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_NotActive));
             if (AmmoBar) { AmmoBar.gameObject.SetActive(false); }
             if (ViewCamera) { ViewCamera.gameObject.SetActive(false); }
             if (ViewCameraScreen) { ViewCameraScreen.gameObject.SetActive(false); }
@@ -180,14 +183,12 @@ namespace SaccFlightAndVehicles
             RotationSpeedY = 0;
             if (RotatingSound) { RotatingSound.Stop(); }
         }
-        public void Set_Active()
+        public void SFEXT_G_PilotExit()
         {
-            gameObject.SetActive(true);
-            if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
+            gameObject.SetActive(false);
         }
-        public void Set_NotActive() { gameObject.SetActive(false); }
         public void ManningFalse()
-        { Manning = false; }//if this is in SFEXTP_O_UserExit rather than here update runs for one frame with it false before it's disabled    
+        { Manning = false; }//if this is in SFEXT_O_UserExit rather than here update runs for one frame with it false before it's disabled    
         public void FireGun()
         {
             LastFireTime = Time.time;
@@ -224,20 +225,20 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange);
             }
         }
-        public void SFEXTP_G_ReSupply()
+        public void SFEXT_G_ReSupply()
         {
             if (Ammo != FullAmmo) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
             Ammo = (int)Mathf.Min(Ammo + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullAmmo);
             if (AmmoBar) { AmmoBar.localScale = new Vector3((Ammo * FullAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
         }
-        public void SFEXTP_G_RespawnButton()
+        public void SFEXT_G_RespawnButton()
         {
             Ammo = FullAmmo;
             if (AmmoBar) { AmmoBar.localScale = AmmoBarScaleStart; }
             TurretRotatorHor.localRotation = Quaternion.identity;
             TurretRotatorVert.localRotation = Quaternion.identity;
         }
-        public void SFEXTP_G_Explode()
+        public void SFEXT_G_Explode()
         {
             Ammo = FullAmmo;
             if (AmmoBar) { AmmoBar.localScale = AmmoBarScaleStart; }
@@ -513,20 +514,6 @@ namespace SaccFlightAndVehicles
                     HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, PredictedRotation.y, 0));
                 }
                 VERTSYNC.localRotation = Quaternion.Euler(new Vector3(PredictedRotation.x, 0, 0));
-            }
-        }
-        public void SFEXTP_O_PlayerJoined()
-        {
-            if (localPlayer.IsOwner(gameObject) && Manning)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Active));
-            }
-        }
-        public override void OnOwnershipTransferred(VRCPlayerApi player)
-        {//when we take ownership because someone timed out, we don't want it left active
-            if (player.isLocal && gameObject.activeSelf && !Manning)
-            {
-                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_NotActive));
             }
         }
         private bool FireNextSerialization = false;

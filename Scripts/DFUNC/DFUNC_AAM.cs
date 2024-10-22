@@ -79,6 +79,7 @@ namespace SaccFlightAndVehicles
         private float boolToggleTime;
         private bool AnimOn = false;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool UseLeftTrigger = false;
         [System.NonSerializedAttribute] public int FullAAMs;
         private int NumAAMTargets;
@@ -111,11 +112,19 @@ namespace SaccFlightAndVehicles
         private bool LeftDial = false;
         private int DialPosition = -999;
         private VRCPlayerApi localPlayer;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
-        public void SFEXTP_L_EntityStart()
+        public void DFUNC_LeftDial()
         {
-            SFEXT_L_EntityStart();
+            LeftDial = true;
+            UseLeftTrigger = true;
+            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
+            else { DialPosition = EntityControl.DialFuncPos; }
+        }
+        public void DFUNC_RightDial()
+        {
+            LeftDial = false;
+            UseLeftTrigger = false;
+            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
+            else { DialPosition = EntityControl.DialFuncPos; }
         }
         public void SFEXT_L_EntityStart()
         {
@@ -150,8 +159,6 @@ namespace SaccFlightAndVehicles
             else
             { distance_from_head = 1.333f; }
 
-            FindSelf();
-
             if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
 
             NumChildrenStart = transform.childCount;
@@ -180,12 +187,6 @@ namespace SaccFlightAndVehicles
             NewWeap.transform.SetParent(transform);
             return NewWeap;
         }
-        public void SFEXTP_O_UserEnter()
-        {
-            IsOwner = true;
-            SFEXT_O_PilotEnter();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(G_UserEnter));
-        }
         public void SFEXT_O_PilotEnter()
         {
             Pilot = true;
@@ -199,10 +200,6 @@ namespace SaccFlightAndVehicles
         }
         private Collider[] EntityColliders;
         private int StartEntityLayer;
-        public void G_UserEnter()
-        {
-            SFEXT_G_PilotEnter();
-        }
         public void SFEXT_G_PilotEnter()
         {
             OnEnableDeserializationBlocker = true;
@@ -224,11 +221,6 @@ namespace SaccFlightAndVehicles
             }
         }
         public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
-        public void G_UserExit()
-        {
-            gameObject.SetActive(false);
-            IsOwner = false;
-        }
         public void SFEXT_G_PilotExit()
         {
             gameObject.SetActive(false);
@@ -242,11 +234,6 @@ namespace SaccFlightAndVehicles
                     stngcol.enabled = true;
                 }
             }
-        }
-        public void SFEXTP_O_UserExit()
-        {
-            SFEXT_O_PilotExit();
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(G_UserExit));
         }
         public void SFEXT_O_PilotExit()
         {
@@ -265,17 +252,9 @@ namespace SaccFlightAndVehicles
             }
         }
 
-        public void SFEXTP_P_PassengerEnter()
-        {
-            SFEXT_P_PassengerEnter();
-        }
         public void SFEXT_P_PassengerEnter()
         {
             if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
-        }
-        public void SFEXTP_G_Explode()
-        {
-            SFEXT_G_Explode();
         }
         public void SFEXT_G_Explode()
         {
@@ -287,10 +266,6 @@ namespace SaccFlightAndVehicles
             }
             if (DoAnimBool && AnimOn)
             { SetBoolOff(); }
-        }
-        public void SFEXTP_G_ReSupply()
-        {
-            SFEXT_G_ReSupply();
         }
         public void SFEXT_G_ReSupply()
         {
@@ -304,20 +279,12 @@ namespace SaccFlightAndVehicles
             if (AAMAnimator) { AAMAnimator.SetFloat(AnimFloatName, (float)NumAAM * FullAAMsDivider); }
             if (HUDText_AAM_ammo) { HUDText_AAM_ammo.text = NumAAM.ToString("F0"); }
         }
-        public void SFEXTP_G_RespawnButton()
-        {
-            SFEXT_G_RespawnButton();
-        }
         public void SFEXT_G_RespawnButton()
         {
             NumAAM = FullAAMs;
             UpdateAmmoVisuals();
             if (DoAnimBool && AnimOn)
             { SetBoolOff(); }
-        }
-        public void SFEXTP_G_TouchDown()
-        {
-            SFEXT_G_TouchDown();
         }
         public void SFEXT_G_TouchDown()
         {
@@ -514,7 +481,9 @@ namespace SaccFlightAndVehicles
                                 && NextTargetAngle < AAMLockAngle
                                     && NextTargetAngle < AAMCurrentTargetAngle
                                         && NextTargetDistance < AAMMaxTargetDistance
-                                            && (!HighAspectPreventLock || !NextTargetSAVControl || Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot)
+                                            && (!NextTargetSAVControl ||//null check
+                                                ((!HighAspectPreventLock || Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot)
+                                                && (MissileType != 1 || NextTargetSAVControl._EngineOn)))
                                             || (AAMCurrentTargetSAVControl &&//null check
                                                                         (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
                                                                         (MissileType == 1 && !AAMCurrentTargetSAVControl._EngineOn)))//switch target if heatseeker and current target's engine is off
@@ -670,32 +639,6 @@ namespace SaccFlightAndVehicles
             }
             UpdateAmmoVisuals();
         }
-        private void FindSelf()
-        {
-            int x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_R)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            LeftDial = true;
-            x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_L)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            DialPosition = -999;
-            Debug.LogWarning("DFUNC_AAM: Can't find self in dial functions");
-        }
         public void SetBoolOn()
         {
             boolToggleTime = Time.time;
@@ -710,19 +653,39 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (LeftDial)
+            if (PassengerFunctionsControl)
             {
-                if (EntityControl.LStickSelection == DialPosition)
-                { EntityControl.LStickSelection = -1; }
+                if (LeftDial)
+                {
+                    if (PassengerFunctionsControl.LStickSelection == DialPosition)
+                    { PassengerFunctionsControl.LStickSelection = -1; }
+                    else
+                    { PassengerFunctionsControl.LStickSelection = DialPosition; }
+                }
                 else
-                { EntityControl.LStickSelection = DialPosition; }
+                {
+                    if (PassengerFunctionsControl.RStickSelection == DialPosition)
+                    { PassengerFunctionsControl.RStickSelection = -1; }
+                    else
+                    { PassengerFunctionsControl.RStickSelection = DialPosition; }
+                }
             }
             else
             {
-                if (EntityControl.RStickSelection == DialPosition)
-                { EntityControl.RStickSelection = -1; }
+                if (LeftDial)
+                {
+                    if (EntityControl.LStickSelection == DialPosition)
+                    { EntityControl.LStickSelection = -1; }
+                    else
+                    { EntityControl.LStickSelection = DialPosition; }
+                }
                 else
-                { EntityControl.RStickSelection = DialPosition; }
+                {
+                    if (EntityControl.RStickSelection == DialPosition)
+                    { EntityControl.RStickSelection = -1; }
+                    else
+                    { EntityControl.RStickSelection = DialPosition; }
+                }
             }
         }
         private void LaunchAAM_Owner()

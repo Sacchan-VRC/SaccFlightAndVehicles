@@ -24,12 +24,19 @@ namespace SaccFlightAndVehicles
         public Transform LStickDisplayHighlighter;
         [Tooltip("Object that points toward the currently selected function on the right stick")]
         public Transform RStickDisplayHighlighter;
+        [Header("Selection Sound")]
+
         [Tooltip("Oneshot sound played when switching functions")]
         public AudioSource SwitchFunctionSound;
+        public bool PlaySelectSoundLeft = true;
+        public bool PlaySelectSoundRight = true;
+        public float DialSensitivity = 0.7f;
         private int LStickNumFuncs;
         private int RStickNumFuncs;
         private float LStickFuncDegrees;
         private float RStickFuncDegrees;
+        [System.NonSerializedAttribute] public float LStickFuncDegreesDivider;
+        [System.NonSerializedAttribute] public float RStickFuncDegreesDivider;
         private bool[] LStickNULL;
         private bool[] RStickNULL;
         private Vector2 LStickCheckAngle;
@@ -46,8 +53,8 @@ namespace SaccFlightAndVehicles
         private bool RightDialOnlyOne;
         private bool LeftDialEmpty;
         private bool RightDialEmpty;
-        private bool LStickDoDial;
-        private bool RStickDoDial;
+        private bool DoDialLeft;
+        private bool DoDialRight;
         [NonSerialized] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public bool _DisableLeftDial;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(DisableLeftDial_))] public int DisableLeftDial = 0;
@@ -76,28 +83,48 @@ namespace SaccFlightAndVehicles
             RStickNumFuncs = Dial_Functions_R.Length;
             LStickFuncDegrees = 360 / (float)LStickNumFuncs;
             RStickFuncDegrees = 360 / (float)RStickNumFuncs;
+            LStickFuncDegreesDivider = 1 / LStickFuncDegrees;
+            RStickFuncDegreesDivider = 1 / RStickFuncDegrees;
             LStickNULL = new bool[LStickNumFuncs];
             RStickNULL = new bool[RStickNumFuncs];
             int u = 0;
+            foreach (UdonSharpBehaviour usb in PassengerExtensions)
+            {
+                if (usb)
+                {
+                    usb.SetProgramVariable("PassengerFunctionsControl", this);
+                    usb.SetProgramVariable("EntityControl", EntityControl);
+                }
+                u++;
+            }
+            u = 0;
             foreach (UdonSharpBehaviour usb in Dial_Functions_L)
             {
-                if (usb == null) { LStickNULL[u] = true; }
-                else usb.SetProgramVariable("PassengerFunctionsController", this);
+                if (!usb) { LStickNULL[u] = true; }
+                else
+                {
+                    usb.SetProgramVariable("PassengerFunctionsControl", this);
+                    usb.SetProgramVariable("EntityControl", EntityControl);
+                }
                 u++;
             }
             u = 0;
             foreach (UdonSharpBehaviour usb in Dial_Functions_R)
             {
-                if (usb == null) { RStickNULL[u] = true; }
-                else usb.SetProgramVariable("PassengerFunctionsController", this);
+                if (!usb) { RStickNULL[u] = true; }
+                else
+                {
+                    usb.SetProgramVariable("PassengerFunctionsControl", this);
+                    usb.SetProgramVariable("EntityControl", EntityControl);
+                }
                 u++;
             }
             if (LStickNumFuncs == 1) { LeftDialOnlyOne = true; }
             if (RStickNumFuncs == 1) { RightDialOnlyOne = true; }
             if (LStickNumFuncs == 0) { LeftDialEmpty = true; }
             if (RStickNumFuncs == 0) { RightDialEmpty = true; }
-            if (LeftDialEmpty || LeftDialOnlyOne) { LStickDoDial = false; } else { LStickDoDial = true; }
-            if (RightDialEmpty || RightDialOnlyOne) { RStickDoDial = false; } else { RStickDoDial = true; }
+            if (LeftDialEmpty || LeftDialOnlyOne) { DoDialLeft = false; } else { DoDialLeft = true; }
+            if (RightDialEmpty || RightDialOnlyOne) { DoDialRight = false; } else { DoDialRight = true; }
             DisableLeftDial_ = 0;
             DisableRightDial_ = 0;
             //work out angle to check against for function selection because straight up is the middle of a function (if *DialDivideStraightUp isn't true)
@@ -130,75 +157,79 @@ namespace SaccFlightAndVehicles
                     RStickCheckAngle.y = RAngle.z;
                 }
             }
+
             TellDFUNCsLR();
-            foreach (UdonSharpBehaviour EXT in PassengerExtensions)
-            {
-                if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
-            }
-            foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
-            {
-                if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
-            }
-            foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
-            {
-                if (EXT) EXT.SetProgramVariable("EntityControl", EntityControl);
-            }
 
-            SendEventToExtensions_Gunner("SFEXTP_L_EntityStart");
+            SendEventToExtensions_Gunner("SFEXT_L_EntityStart");
         }
-        private void Update()
+        public void InVehicleControls()
         {
-
-            Vector2 LStickPos = new Vector2(Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal"), Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical"));
-            Vector2 RStickPos = new Vector2(Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal"), Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical"));
-            if (LStickDoDial && !_DisableLeftDial)
+            if (!FunctionsActive) { return; }
+            SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
+            Vector2 LStickPos = Vector2.zero;
+            Vector2 RStickPos = Vector2.zero;
+            float LTrigger = 0;
+            float RTrigger = 0;
+            if (!InEditor)
             {
-                //LStick Selection wheel
-                if (InVR && LStickPos.magnitude > .7f)
+                LStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal");
+                LStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical");
+                RStickPos.x = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal");
+                RStickPos.y = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical");
+                LTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger");
+                RTrigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger");
+            }
+
+            //LStick Selection wheel
+            if (DoDialLeft && !_DisableLeftDial)
+            {
+                if (InVR && LStickPos.magnitude > DialSensitivity)
                 {
                     float stickdir = Vector2.SignedAngle(LStickCheckAngle, LStickPos);
 
-                    stickdir = (stickdir - 180) * -1;
-                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / LStickFuncDegrees, LStickNumFuncs - 1));
+                    stickdir = -(stickdir - 180);
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * LStickFuncDegreesDivider, LStickNumFuncs - 1));
                     if (!LStickNULL[newselection])
                     { LStickSelection = newselection; }
                 }
                 if (LStickSelection != LStickSelectionLastFrame)
                 {
                     //new function selected, send deselected to old one
-                    if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame])
+                    if (LStickSelectionLastFrame != -1 && Dial_Functions_L[LStickSelectionLastFrame] != null)
                     {
                         Dial_Functions_L[LStickSelectionLastFrame].SendCustomEvent("DFUNC_Deselected");
                     }
                     //get udonbehaviour for newly selected function and then send selected
                     if (LStickSelection > -1)
                     {
-                        if (Dial_Functions_L[LStickSelection])
+                        if (Dial_Functions_L[LStickSelection] != null)
                         {
                             Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
-
-                    if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
-                    if (LStickSelection < 0)
-                    { if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
-                    else
+                    if (PlaySelectSoundLeft && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (LStickDisplayHighlighter)
                     {
-                        if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -LStickFuncDegrees * LStickSelection); }
+                        if (LStickSelection < 0)
+                        { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+                        else
+                        {
+                            LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -LStickFuncDegrees * LStickSelection);
+                        }
                     }
+                    LStickSelectionLastFrame = LStickSelection;
                 }
-                LStickSelectionLastFrame = LStickSelection;
             }
 
-            if (RStickDoDial && !_DisableRightDial)
+            //RStick Selection wheel
+            if (DoDialRight && !_DisableRightDial)
             {
-                //RStick Selection wheel
-                if (InVR && RStickPos.magnitude > .7f)
+                if (InVR && RStickPos.magnitude > DialSensitivity)
                 {
                     float stickdir = Vector2.SignedAngle(RStickCheckAngle, RStickPos);
 
-                    stickdir = (stickdir - 180) * -1;
-                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir / RStickFuncDegrees, RStickNumFuncs - 1));
+                    stickdir = -(stickdir - 180);
+                    int newselection = Mathf.FloorToInt(Mathf.Min(stickdir * RStickFuncDegreesDivider, RStickNumFuncs - 1));
                     if (!RStickNULL[newselection])
                     { RStickSelection = newselection; }
                 }
@@ -217,46 +248,54 @@ namespace SaccFlightAndVehicles
                             Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
                         }
                     }
-
-                    if (SwitchFunctionSound) { SwitchFunctionSound.Play(); }
-                    if (RStickSelection < 0)
-                    { if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); } }
-                    else
+                    if (PlaySelectSoundRight && SwitchFunctionSound) { SwitchFunctionSound.Play(); }
+                    if (RStickDisplayHighlighter)
                     {
-                        if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -RStickFuncDegrees * RStickSelection); }
+                        if (RStickSelection < 0)
+                        { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+                        else
+                        {
+                            RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 0, -RStickFuncDegrees * RStickSelection);
+                        }
                     }
+                    RStickSelectionLastFrame = RStickSelection;
                 }
-                RStickSelectionLastFrame = RStickSelection;
             }
         }
 
+        public int DialFuncPos;
         public void TellDFUNCsLR()
         {
-            foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
+            for (DialFuncPos = 0; DialFuncPos < Dial_Functions_L.Length; DialFuncPos++)
             {
-                if (EXT)
-                { EXT.SendCustomEvent("DFUNC_LeftDial"); }
+                if (Dial_Functions_L[DialFuncPos])
+                { Dial_Functions_L[DialFuncPos].SendCustomEvent("DFUNC_LeftDial"); }
             }
-            foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
+            for (DialFuncPos = 0; DialFuncPos < Dial_Functions_R.Length; DialFuncPos++)
             {
-                if (EXT)
-                { EXT.SendCustomEvent("DFUNC_RightDial"); }
+                if (Dial_Functions_R[DialFuncPos])
+                { Dial_Functions_R[DialFuncPos].SendCustomEvent("DFUNC_RightDial"); }
             }
         }
         public void TakeOwnerShipOfExtensions()
         {
             if (!InEditor)
             {
+                foreach (UdonSharpBehaviour EXT in PassengerExtensions)
+                { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
                 foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
                 foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
-                { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
-                foreach (UdonSharpBehaviour EXT in PassengerExtensions)
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
             }
         }
         public void SendEventToExtensions_Gunner(string eventname)
         {
+            foreach (UdonSharpBehaviour EXT in PassengerExtensions)
+            {
+                if (EXT)
+                { EXT.SendCustomEvent(eventname); }
+            }
             foreach (UdonSharpBehaviour EXT in Dial_Functions_L)
             {
                 if (EXT)
@@ -267,13 +306,8 @@ namespace SaccFlightAndVehicles
                 if (EXT)
                 { EXT.SendCustomEvent(eventname); }
             }
-            foreach (UdonSharpBehaviour EXT in PassengerExtensions)
-            {
-                if (EXT)
-                { EXT.SendCustomEvent(eventname); }
-            }
         }
-        private void OnEnable()
+        public void UserEnterVehicleLocal()
         {
             LStickSelectionLastFrame = -1;
             RStickSelectionLastFrame = -1;
@@ -291,109 +325,23 @@ namespace SaccFlightAndVehicles
             if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             TakeOwnerShipOfExtensions();
             FunctionsActive = true;
+            SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
+            SendEventToExtensions_Gunner("SFEXT_O_PilotEnter");
         }
-        private void OnDisable()
+        public void UserEnterVehicleGlobal()
         {
-            if (LeftDialOnlyOne)
-            {
-                LStickSelection = 0;
-                Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Deselected");
-            }
-            if (RightDialOnlyOne)
-            {
-                RStickSelection = 0;
-                Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Deselected");
-            }
+            SendEventToExtensions_Gunner("SFEXT_G_PilotEnter");
+        }
+        public void UserExitVehicleLocal()
+        {
+            FunctionsActive = false;
             LStickSelection = -1;
             RStickSelection = -1;
+            SendEventToExtensions_Gunner("SFEXT_O_PilotExit");
         }
-        public void SFEXT_P_PassengerEnter()
+        public void UserExitVehicleGlobal()
         {
-            SendCustomEventDelayedFrames(nameof(PassengerEnter_2), 2);
-        }
-        public void PassengerEnter_2()//this shouldn't be needed but it is. OnEnable seems to run late
-        {
-            if (FunctionsActive)//only do this for the one in the seat that has activated it
-            {
-                SendEventToExtensions_Gunner("SFEXTP_O_UserEnter");
-            }
-            else
-            {
-                SendEventToExtensions_Gunner("SFEXTP_P_PassengerEnter");
-            }
-        }
-        public void SFEXT_P_PassengerExit()
-        {
-            if (FunctionsActive)
-            {
-                FunctionsActive = false;
-                SendEventToExtensions_Gunner("SFEXTP_O_UserExit");
-            }
-        }
-        public void SFEXT_G_ReSupply()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_ReSupply");
-        }
-        public void SFEXT_G_Explode()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_Explode");
-        }
-        public void SFEXT_G_ReAppear()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_ReAppear");
-        }
-        public void SFEXT_G_RespawnButton()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_RespawnButton");
-        }
-        public void SFEXT_G_TouchDown()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_TouchDown");
-        }
-        public void SFEXT_G_TouchDownWater()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_TouchDownWater");
-        }
-        public void SFEXT_G_TakeOff()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_TakeOff");
-        }
-        public void SFEXT_G_PassengerEnter()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_PassengerEnter");
-        }
-        public void SFEXT_G_PilotEnter()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_PilotEnter");
-        }
-        public void SFEXT_G_PilotExit()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_PilotExit");
-        }
-        public void SFEXT_G_PassengerExit()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_PassengerExit");
-        }
-        public void SFEXT_G_AfterburnerOff()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_AfterburnerOff");
-        }
-        public void SFEXT_G_AfterburnerOn()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_AfterburnerOn");
-        }
-        public void SFEXT_G_EngineOn()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_EngineOn");
-        }
-        public void SFEXT_G_EngineOff()
-        {
-            SendEventToExtensions_Gunner("SFEXTP_G_EngineOff");
-        }
-        public override void OnPlayerJoined(VRCPlayerApi player)
-        {
-            if (FunctionsActive)
-            { SendEventToExtensions_Gunner("SFEXTP_O_PlayerJoined"); }
+            SendEventToExtensions_Gunner("SFEXT_G_PilotExit");
         }
 
         public void ToggleStickSelectionLeft(UdonSharpBehaviour dfunc)

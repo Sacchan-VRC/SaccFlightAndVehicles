@@ -47,8 +47,18 @@ namespace SaccFlightAndVehicles
         private bool LeftDial;
         private float LastSerialization;
         private Transform ControlsRoot;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        public void DFUNC_LeftDial()
+        {
+            LeftDial = true;
+            UseLeftTrigger = true;
+            DialPosition = EntityControl.DialFuncPos;
+        }
+        public void DFUNC_RightDial()
+        {
+            LeftDial = false;
+            UseLeftTrigger = false;
+            DialPosition = EntityControl.DialFuncPos;
+        }
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
@@ -61,7 +71,6 @@ namespace SaccFlightAndVehicles
 
             for (int x = 0; x < DisplaySmokeem.Length; x++)
             { DisplaySmokeem[x] = DisplaySmoke[x].emission; }
-            FindSelf();
         }
         public void DFUNC_Selected()
         {
@@ -227,41 +236,15 @@ namespace SaccFlightAndVehicles
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotActive));
             }
         }
-        public override void OnPlayerJoined(VRCPlayerApi player)
+        public void SFEXT_O_OnPlayerJoined()
         {
-            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+            if (EntityControl.IsOwner)
             {
                 if (localSmoking)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetActive));
                 }
             }
-        }
-        private void FindSelf()
-        {
-            int x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_R)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            LeftDial = true;
-            x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_L)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            DialPosition = -999;
-            Debug.LogWarning("DFUNC_AAM: Can't find self in dial functions");
         }
     }
 }

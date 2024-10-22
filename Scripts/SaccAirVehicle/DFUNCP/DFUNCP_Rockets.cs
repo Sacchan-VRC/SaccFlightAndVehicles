@@ -41,7 +41,7 @@ namespace SaccFlightAndVehicles
         private bool IsOwner;
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
-        public void SFEXTP_L_EntityStart()
+        public void SFEXT_L_EntityStart()
         {
             FullRockets = NumRocket;
             reloadspeed = FullRockets / FullReloadTimeSec;
@@ -82,7 +82,7 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(false);
         }
-        public void SFEXTP_O_UserEnter()
+        public void SFEXT_O_PilotEnter()
         {
             if (AmmoBar) { AmmoBar.gameObject.SetActive(true); }
             if (!InVR)
@@ -90,24 +90,24 @@ namespace SaccFlightAndVehicles
                 DFUNC_Selected();
             }
         }
-        public void SFEXTP_O_UserExit()
+        public void SFEXT_O_PilotExit()
         {
             if (AmmoBar) { AmmoBar.gameObject.SetActive(false); }
             DFUNC_Deselected();
         }
-        public void SFEXTP_G_Explode()
+        public void SFEXT_G_Explode()
         {
             RocketPoint = 0;
             NumRocket = FullRockets;
             UpdateAmmoVisuals();
         }
-        public void SFEXTP_G_RespawnButton()
+        public void SFEXT_G_RespawnButton()
         {
             NumRocket = FullRockets;
             RocketPoint = 0;
             UpdateAmmoVisuals();
         }
-        public void SFEXTP_G_ReSupply()
+        public void SFEXT_G_ReSupply()
         {
             if (NumRocket != FullRockets) { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
             NumRocket = (int)Mathf.Min(NumRocket + Mathf.Max(Mathf.Floor(reloadspeed), 1), FullRockets);

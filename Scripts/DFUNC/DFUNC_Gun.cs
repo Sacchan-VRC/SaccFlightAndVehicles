@@ -42,6 +42,7 @@ namespace SaccFlightAndVehicles
         public GameObject[] EnableOnSelected;
         private bool Grounded;
         private SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool AnimOn;
         private int AnimBool_STRING;
         private bool UseLeftTrigger = false;
@@ -66,8 +67,20 @@ namespace SaccFlightAndVehicles
         private int DialPosition = -999;
         private Vector3 AmmoBarScaleStart;
         private Vector3[] AmmoBarScaleStarts;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        public void DFUNC_LeftDial()
+        {
+            LeftDial = true;
+            UseLeftTrigger = true;
+            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
+            else { DialPosition = EntityControl.DialFuncPos; }
+        }
+        public void DFUNC_RightDial()
+        {
+            LeftDial = false;
+            UseLeftTrigger = false;
+            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
+            else { DialPosition = EntityControl.DialFuncPos; }
+        }
         public void SFEXT_L_EntityStart()
         {
             FullGunAmmoInSeconds = GunAmmoInSeconds;
@@ -82,6 +95,7 @@ namespace SaccFlightAndVehicles
 
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
+            IsOwner = EntityControl.IsOwner;
             FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
             AAMTargets = EntityControl.AAMTargets;
             NumAAMTargets = AAMTargets.Length;
@@ -90,8 +104,6 @@ namespace SaccFlightAndVehicles
             OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
             GunRecoil *= VehicleRigidbody.mass;
             if (GunDamageParticle) GunDamageParticle.gameObject.SetActive(false);
-
-            FindSelf();
 
             //HUD
             if (HUDControl)
@@ -171,7 +183,6 @@ namespace SaccFlightAndVehicles
                 AmmoBars[i].localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStarts[i].x, AmmoBarScaleStarts[i].y, AmmoBarScaleStarts[i].z);
             }
         }
-
         public void SFEXT_G_RespawnButton()
         {
             GunAmmoInSeconds = FullGunAmmoInSeconds;
@@ -207,8 +218,10 @@ namespace SaccFlightAndVehicles
             Firing = false;
             gameObject.SetActive(false);
         }
+        bool IsOwner;
         public void SFEXT_O_TakeOwnership()
         {
+            IsOwner = true;
             if (gameObject.activeSelf)//if someone times out, tell weapon to stop firing if you take ownership.
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Inactive)); }
             if (Selected_HUD)
@@ -243,7 +256,7 @@ namespace SaccFlightAndVehicles
                         {
                             Firing = true;
                             RequestSerialization();
-                            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                            if (IsOwner)
                             { EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
                         }
                         GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
@@ -262,7 +275,7 @@ namespace SaccFlightAndVehicles
                         {
                             Firing = false;
                             RequestSerialization();
-                            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                            if (IsOwner)
                             { EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
                         }
                     }
@@ -533,32 +546,6 @@ namespace SaccFlightAndVehicles
             }
             return t;
         }
-        private void FindSelf()
-        {
-            int x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_R)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            LeftDial = true;
-            x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_L)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            DialPosition = -999;
-            Debug.LogWarning("DFUNC_Gun: Can't find self in dial functions");
-        }
         public void SetBoolOn()
         {
             AnimOn = true;
@@ -571,19 +558,39 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (LeftDial)
+            if (PassengerFunctionsControl)
             {
-                if (EntityControl.LStickSelection == DialPosition)
-                { EntityControl.LStickSelection = -1; }
+                if (LeftDial)
+                {
+                    if (PassengerFunctionsControl.LStickSelection == DialPosition)
+                    { PassengerFunctionsControl.LStickSelection = -1; }
+                    else
+                    { PassengerFunctionsControl.LStickSelection = DialPosition; }
+                }
                 else
-                { EntityControl.LStickSelection = DialPosition; }
+                {
+                    if (PassengerFunctionsControl.RStickSelection == DialPosition)
+                    { PassengerFunctionsControl.RStickSelection = -1; }
+                    else
+                    { PassengerFunctionsControl.RStickSelection = DialPosition; }
+                }
             }
             else
             {
-                if (EntityControl.RStickSelection == DialPosition)
-                { EntityControl.RStickSelection = -1; }
+                if (LeftDial)
+                {
+                    if (EntityControl.LStickSelection == DialPosition)
+                    { EntityControl.LStickSelection = -1; }
+                    else
+                    { EntityControl.LStickSelection = DialPosition; }
+                }
                 else
-                { EntityControl.RStickSelection = DialPosition; }
+                {
+                    if (EntityControl.RStickSelection == DialPosition)
+                    { EntityControl.RStickSelection = -1; }
+                    else
+                    { EntityControl.RStickSelection = DialPosition; }
+                }
             }
         }
     }

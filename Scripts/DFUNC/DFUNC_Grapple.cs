@@ -373,7 +373,6 @@ namespace SaccFlightAndVehicles
             InVr = localPlayer.IsUserInVR();
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
             foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
-            FindSelf();
             gameObject.SetActive(true);
             SendCustomEventDelayedSeconds(nameof(DisableThis), 10f);
             InitializeChangeableValues();
@@ -854,34 +853,18 @@ namespace SaccFlightAndVehicles
             HookLaunched = !HookLaunched;
             RequestSerialization();
         }
-        private void FindSelf()
+        public void DFUNC_LeftDial()
         {
-            int x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_R)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
             LeftDial = true;
-            x = 0;
-            foreach (UdonSharpBehaviour usb in EntityControl.Dial_Functions_L)
-            {
-                if (this == usb)
-                {
-                    DialPosition = x;
-                    return;
-                }
-                x++;
-            }
-            DialPosition = -999;
-            Debug.LogWarning("DFUNC_AAM: Can't find self in dial functions");
+            UseLeftTrigger = true;
+            DialPosition = EntityControl.DialFuncPos;
         }
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        public void DFUNC_RightDial()
+        {
+            LeftDial = false;
+            UseLeftTrigger = false;
+            DialPosition = EntityControl.DialFuncPos;
+        }
         private bool TriggerLastFrame;
         private bool Selected;
         private bool UseLeftTrigger;

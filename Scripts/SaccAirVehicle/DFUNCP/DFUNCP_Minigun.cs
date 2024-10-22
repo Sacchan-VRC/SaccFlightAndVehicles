@@ -83,7 +83,7 @@ namespace SaccFlightAndVehicles
 
         public void DFUNC_LeftDial() { UseLeftTrigger = true; }
         public void DFUNC_RightDial() { UseLeftTrigger = false; }
-        public void SFEXTP_L_EntityStart()
+        public void SFEXT_L_EntityStart()
         {
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             if (UseProjectileMode)
@@ -121,8 +121,6 @@ namespace SaccFlightAndVehicles
             NewWeap.transform.SetParent(transform);
             return NewWeap;
         }
-        public void Activate() { gameObject.SetActive(true); }
-        public void Deactivate() { gameObject.SetActive(false); }
         public void DFUNC_Selected()
         {
             Selected = true;
@@ -142,17 +140,16 @@ namespace SaccFlightAndVehicles
                 RequestSerialization();
             }
         }
-        public void SFEXTP_O_UserEnter()
+        public void SFEXT_O_PilotEnter()
         {
             func_active = true;
             TriggerLastFrame = true;
             if (!InVR) { DFUNC_Selected(); }
             if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(true); }
             AmmoBar.gameObject.SetActive(true);
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Activate));
             UpdateAmmoVisuals();
         }
-        public void SFEXTP_O_UserExit()
+        public void SFEXT_O_PilotExit()
         {
             func_active = false;
             Selected = false;
@@ -163,10 +160,11 @@ namespace SaccFlightAndVehicles
                 Firing = false;
                 RequestSerialization();
             }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Deactivate));
             NonOwnerGunAngleSlerper = Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0));
         }
-        public void SFEXTP_G_Explode()
+        public void SFEXT_G_PilotEnter() { gameObject.SetActive(true); }
+        public void SFEXT_G_PilotExit() { gameObject.SetActive(false); }
+        public void SFEXT_G_Explode()
         {
             GunAmmoInSeconds = FullGunAmmoInSeconds;
             ProjectileAmmo = ProjectileAmmoFULL;
@@ -177,14 +175,14 @@ namespace SaccFlightAndVehicles
             if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(false); }
             gameObject.SetActive(false);
         }
-        public void SFEXTP_G_RespawnButton()
+        public void SFEXT_G_RespawnButton()
         {
             ProjectileAmmo = ProjectileAmmoFULL;
             GunAmmoInSeconds = FullGunAmmoInSeconds;
             Minigun.localRotation = Quaternion.identity;
             GunRotation = Vector2.zero;
         }
-        public void SFEXTP_G_ReSupply()
+        public void SFEXT_G_ReSupply()
         {
             if (UseProjectileMode)
             {
@@ -430,15 +428,15 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
-        public void SFEXTP_G_TouchDown()
+        public void SFEXT_G_TouchDown()
         {
             Grounded = true;
         }
-        public void SFEXTP_G_TouchDownWater()
+        public void SFEXT_G_TouchDownWater()
         {
             Grounded = true;
         }
-        public void SFEXTP_G_TakeOff()
+        public void SFEXT_G_TakeOff()
         {
             Grounded = false;
         }

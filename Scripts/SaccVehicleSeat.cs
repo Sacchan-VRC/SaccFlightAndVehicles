@@ -12,6 +12,8 @@ namespace SaccFlightAndVehicles
         public SaccEntity EntityControl;
         [Tooltip("Gameobject with script that runs when you enter the seat to edjust your view position")]
         public bool IsPilotSeat = false;
+        [Tooltip("Optional: Use to set up passenger seat with its own function dials")]
+        public SAV_PassengerFunctionsController PassengerFunctions;
         [Header("Removing ThisSeatOnly next version. EnableInSeat replaces it.")]
         [Tooltip("Object that is enabled only when sitting in this seat")]
         public GameObject ThisSeatOnly;
@@ -115,10 +117,16 @@ namespace SaccFlightAndVehicles
                     if (!localPlayer.IsOwner(gameObject))
                     { Networking.SetOwner(localPlayer, gameObject); }
                     EntityControl.MySeat = ThisStationID;
+                    if (PassengerFunctions)
+                    { PassengerFunctions.UserEnterVehicleLocal(); }
                     if (IsPilotSeat)
                     { EntityControl.PilotEnterVehicleLocal(); }
                     else
-                    { EntityControl.PassengerEnterVehicleLocal(); }
+                    {
+                        if (PassengerFunctions)
+                        { EntityControl.passengerFuncIgnorePassengerFlag = true; }
+                        EntityControl.PassengerEnterVehicleLocal();
+                    }
                     if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
                     for (int i = 0; i < EnableInSeat.Length; i++)
                     { if (EnableInSeat[i]) EnableInSeat[i].SetActive(true); }
@@ -158,9 +166,15 @@ namespace SaccFlightAndVehicles
                     }
                 }
                 if (!player.IsUserInVR() && !Fake && !Disable180Rotation) { ThreeSixtySeat(); }
+                if (PassengerFunctions)
+                { PassengerFunctions.UserEnterVehicleGlobal(); }
                 if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
                 else
-                { EntityControl.PassengerEnterVehicleGlobal(player); }
+                {
+                    if (PassengerFunctions)
+                    { EntityControl.passengerFuncIgnorePassengerFlag = true; }
+                    EntityControl.PassengerEnterVehicleGlobal(player);
+                }
             }
         }
         public override void OnStationExited(VRCPlayerApi player)
@@ -191,8 +205,6 @@ namespace SaccFlightAndVehicles
             {
                 SeatOccupied = false;
                 DoVoiceVolumeChange = EntityControl.DoVoiceVolumeChange;
-                if (IsPilotSeat) { EntityControl.PilotExitVehicle(player); }
-                else { EntityControl.PassengerExitVehicleGlobal(player); }
                 if (DoVoiceVolumeChange)
                 {
                     SetVoiceOutside(player);
@@ -201,8 +213,14 @@ namespace SaccFlightAndVehicles
                 {
                     InSeat = false;
                     EntityControl.MySeat = -1;
+                    if (PassengerFunctions)
+                    { PassengerFunctions.UserExitVehicleLocal(); }
                     if (!IsPilotSeat)
-                    { EntityControl.PassengerExitVehicleLocal(); }
+                    {
+                        if (PassengerFunctions)
+                        { EntityControl.passengerFuncIgnorePassengerFlag = true; }
+                        EntityControl.PassengerExitVehicleLocal();
+                    }
                     if (DoVoiceVolumeChange)
                     {
                         //undo voice distances of all players inside the vehicle
@@ -221,6 +239,15 @@ namespace SaccFlightAndVehicles
                     for (int i = 0; i < DisableInSeat.Length; i++)
                     { if (DisableInSeat[i]) DisableInSeat[i].SetActive(true); }
                 }
+                if (IsPilotSeat) { EntityControl.PilotExitVehicle(player); }
+                else
+                {
+                    if (PassengerFunctions)
+                    { EntityControl.passengerFuncIgnorePassengerFlag = true; }
+                    EntityControl.PassengerExitVehicleGlobal(player);
+                }
+                if (PassengerFunctions)
+                { PassengerFunctions.UserExitVehicleGlobal(); }
             }
         }
         private void SetVoiceInside(VRCPlayerApi Player)
