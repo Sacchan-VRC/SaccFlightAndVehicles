@@ -353,8 +353,18 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float VTOLAngle;
 
         [System.NonSerializedAttribute] public Animator VehicleAnimator;
+
+#if UNITY_EDITOR // for debugging
         public Vector3 VehicleForce;
         public Vector3 VehicleTorque;
+        public Vector3 Pitching;
+        public Vector3 Yawing;
+# else
+        private Vector3 VehicleForce;
+        private Vector3 VehicleTorque;
+        private Vector3 Pitching;
+        private Vector3 Yawing;
+#endif
         [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
         [System.NonSerializedAttribute] public Transform VehicleTransform;
         [System.NonSerializedAttribute] public float VTOLAngleForward90;//dot converted to angle, 0=0 90=1 max 1, for adjusting values that change with engine angle
@@ -394,8 +404,6 @@ namespace SaccFlightAndVehicles
         private float AoALiftYaw;
         private float AoALiftPitch;
         private float AoALift_Min;
-        private Vector3 Pitching;
-        private Vector3 Yawing;
         [System.NonSerializedAttribute] public float Taxiinglerper;
         [System.NonSerializedAttribute] public float ExtraDrag = 1;
         [System.NonSerializedAttribute] public float ExtraLift = 1;
@@ -891,7 +899,6 @@ namespace SaccFlightAndVehicles
                 Speed = CurrentVel.magnitude;
                 if (Piloting)
                 {
-                    WindAndAoA();
                     DoRepeatingWorld();
 
                     if (!_DisablePhysicsAndInputs)
@@ -1256,14 +1263,6 @@ namespace SaccFlightAndVehicles
                 }
                 else
                 {
-                    if (Speed > .01f)
-                    {
-                        WindAndAoA();
-                    }
-                    else if (!Asleep && GroundedLastFrame && !KeepAwake)
-                    {
-                        FallAsleep();
-                    }
                     if (Taxiing)
                     {
                         StillWindMulti = Mathf.Min(Speed * .1f, 1);
@@ -1300,7 +1299,18 @@ namespace SaccFlightAndVehicles
             if (IsOwner)
             {
                 float DeltaTime = Time.fixedDeltaTime;
-
+                if (Piloting)
+                {
+                    WindAndAoA();
+                }
+                else if (Speed > .01f)
+                {
+                    WindAndAoA();
+                }
+                else if (!Asleep && GroundedLastFrame && !KeepAwake)
+                {
+                    FallAsleep();
+                }
                 if (!_DisablePhysicsAndInputs)
                 {
                     if (_ThrottleOverridden)
@@ -1347,20 +1357,20 @@ namespace SaccFlightAndVehicles
                         //thrust vectoring airplanes have a minimum rotation control
                         //AoALiftPitch is used here before being modified in the next block of code on purpose
                         float minlifttemp = rotlift * Mathf.Min(AoALiftPitch, AoALiftYaw);
-                        pitch *= Mathf.Max(PitchThrustVecMulti * ThrustVecGrounded, minlifttemp);
-                        yaw *= Mathf.Max(YawThrustVecMulti * ThrustVecGrounded, minlifttemp);
-                        roll *= Mathf.Max(RollThrustVecMulti * ThrustVecGrounded, minlifttemp);
+
+                        float pitchnew = pitch * Mathf.Max(PitchThrustVecMulti * ThrustVecGrounded, minlifttemp);
+                        float yawnew = yaw * Mathf.Max(YawThrustVecMulti * ThrustVecGrounded, minlifttemp);
+                        float rollnew = roll * Mathf.Max(RollThrustVecMulti * ThrustVecGrounded, minlifttemp);
+
+                        //Lerp the inputs for 'rotation response'   
+                        LerpedRoll = Mathf.Lerp(LerpedRoll, rollnew, 1 - Mathf.Pow(0.5f, RollResponse * DeltaTime));
+                        LerpedPitch = Mathf.Lerp(LerpedPitch, pitchnew, 1 - Mathf.Pow(0.5f, PitchResponse * DeltaTime));
+                        LerpedYaw = Mathf.Lerp(LerpedYaw, yawnew, 1 - Mathf.Pow(0.5f, YawResponse * DeltaTime));
 
                         //rotation inputs are done, now we can set the minimum lift/drag when at high aoa, this should be higher than 0 because if it's 0 you will have 0 drag when at 90 degree AoA.
                         AoALiftPitch = Mathf.Clamp(AoALiftPitch, HighPitchAoaMinLift, 1);
                         AoALiftYaw = Mathf.Clamp(AoALiftYaw, HighYawAoaMinLift, 1);
                         AoALift_Min = Mathf.Min(AoALiftYaw, AoALiftPitch);
-
-                        //Lerp the inputs for 'rotation response'
-                        LerpedRoll = Mathf.Lerp(LerpedRoll, roll, 1 - Mathf.Pow(0.5f, RollResponse * DeltaTime));
-                        LerpedPitch = Mathf.Lerp(LerpedPitch, pitch, 1 - Mathf.Pow(0.5f, PitchResponse * DeltaTime));
-                        LerpedYaw = Mathf.Lerp(LerpedYaw, yaw, 1 - Mathf.Pow(0.5f, YawResponse * DeltaTime));
-
 
                         float GroundEffectAndVelLift = 0;
 
