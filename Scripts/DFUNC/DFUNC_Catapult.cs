@@ -70,18 +70,18 @@ namespace SaccFlightAndVehicles
             thisCollider = GetComponent<BoxCollider>();
             {
                 IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
-                colliderOwner();
             }
+            colliderSmall();
         }
         // non-owners have a bigger collider so that they can find catapults if the position isn't synced perfectly
-        void colliderNotOwner()
+        void colliderLarge()
         {
             Vector3 colSize = thisCollider.size;
             colSize.x = 8;
             colSize.z = 40;
             thisCollider.size = colSize;
         }
-        void colliderOwner()
+        void colliderSmall()
         {
             Vector3 colSize = thisCollider.size;
             colSize.x = 0;
@@ -122,13 +122,12 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_TakeOwnership()
         {
             IsOwner = true;
-            colliderOwner();
+            colliderSmall();
             if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
         }
         public void SFEXT_O_LoseOwnership()
         {
             IsOwner = false;
-            colliderNotOwner();
             Launching = false;
             OnCatapult = false;
             Piloting = false;
@@ -150,6 +149,7 @@ namespace SaccFlightAndVehicles
             if (!IsOwner)
             {
                 enabledToFindAnimator = true;
+                colliderLarge();
                 gameObject.SetActive(true);
                 SendCustomEventDelayedSeconds(nameof(FindAnimator_Disable), 3f);
             }
@@ -158,6 +158,7 @@ namespace SaccFlightAndVehicles
         {
             if (enabledToFindAnimator)
             {
+                colliderSmall();
                 enabledToFindAnimator = false;
                 gameObject.SetActive(false);
             }
