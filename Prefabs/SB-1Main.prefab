@@ -37723,6 +37723,7 @@ MonoBehaviour:
   - {fileID: 322990329264741880}
   - {fileID: 1063273098425160542}
   TrailGs: 4
+  TrailGs_OffSpeed: 2.7
   WreckedParticles:
   - {fileID: 6605969676225271487}
   SplashParticle: {fileID: 6071313651886054200}
@@ -53180,6 +53181,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 2934804654584033638}
   EntityControl: {fileID: -5424269735798070188}
   IsPilotSeat: 1
+  PassengerFunctions: {fileID: 0}
   ThisSeatOnly: {fileID: 2934804655512785824}
   EnableInSeat: []
   DisableInSeat: []
@@ -53284,7 +53286,6 @@ MonoBehaviour:
   FlareLaunch: {fileID: 8101121278866543259}
   HUDText_flare_ammo: {fileID: 6026305700492271228}
   SequentialLaunch: 0
-  Hol: 0
   NumFlare_PerShot: 1
   FlareHoldDelay: 0.3
 --- !u!114 &2934804654602662228
@@ -100326,6 +100327,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 2934804655606403472}
   EntityControl: {fileID: -5424269735798070188}
   IsPilotSeat: 0
+  PassengerFunctions: {fileID: 0}
   ThisSeatOnly: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
@@ -100664,7 +100666,10 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  PassengerFunctionControllers: []
   AAMTargets: []
+  DialFuncPos: 0
+  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &2934804655656756585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -106453,7 +106458,6 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 5934194373947756573}
   EntityControl: {fileID: -5424269735798070188}
   VehicleMesh: {fileID: 2934804655585822818}
-  OnboardVehicleLayer: 31
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 0}
   PitchMoment: {fileID: 0}
@@ -106636,6 +106640,8 @@ MonoBehaviour:
   _EngineOn: 0
   VehicleForce: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
+  Pitching: {x: 0, y: 0, z: 0}
+  Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
 --- !u!114 &5934194373947756573
@@ -106679,7 +106685,7 @@ GameObject:
   - component: {fileID: 8365868764447161897}
   - component: {fileID: 501912362114580255}
   m_Layer: 31
-  m_Name: DFUNC_Flaps
+  m_Name: DFUNC_Wings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -106732,7 +106738,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: FLAPS
+  m_text: WINGS
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 76f1914f4f82852458d2250d86c7f472, type: 2}
   m_sharedMaterial: {fileID: -3398402084506154318, guid: 76f1914f4f82852458d2250d86c7f472,
