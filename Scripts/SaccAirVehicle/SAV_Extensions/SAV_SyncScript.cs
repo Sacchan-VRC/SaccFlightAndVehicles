@@ -210,9 +210,6 @@ namespace SaccFlightAndVehicles
             IsOwner = true;
             VehicleRigid.isKinematic = false;
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
-            Vector3 cvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
-            VehicleRigid.velocity = cvel;
-            SAVControl.SetProgramVariable("LastFrameVel", cvel);
             if (ObjectMode)
             {
                 VehicleRigid.drag = StartDrag;
@@ -220,6 +217,9 @@ namespace SaccFlightAndVehicles
             }
             else
             {
+                Vector3 cvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+                VehicleRigid.velocity = cvel;
+                SAVControl.SetProgramVariable("LastFrameVel", cvel);
                 VehicleRigid.drag = 0;
                 VehicleRigid.angularDrag = 0;
             }
