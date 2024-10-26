@@ -362,7 +362,7 @@ namespace SaccFlightAndVehicles
                     Vector3 CatapultRotDifrad = (CatapultRotDifEULER * Mathf.Deg2Rad) / DeltaTime;
                     VehicleRigidbody.angularVelocity = CatapultRotDifrad;
                     EntityControl.dead = true;
-                    SendCustomEventDelayedFrames(nameof(deadfalse), 5);
+                    SendCustomEventDelayedSeconds(nameof(deadfalse), Time.fixedDeltaTime * 3);
                 }
                 CatapultRotLastFrame = CatapultTransform.rotation;
                 CatapultPosLastFrame = CatapultTransform.position;
