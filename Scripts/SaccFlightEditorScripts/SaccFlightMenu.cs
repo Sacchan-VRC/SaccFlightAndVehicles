@@ -147,7 +147,6 @@ namespace SaccFlightAndVehicles
             var SEs = GetAllSaccEntitys().ToArray();
             foreach (var se in SEs)
             {
-                if (se.InVehicleOnly && se.InVehicleOnly.activeInHierarchy) { se.InVehicleOnly.SetActive(false); }
                 for (int i = 0; i < se.EnableInVehicle.Length; i++)
                 { if (se.EnableInVehicle[i]) se.EnableInVehicle[i].SetActive(false); }
                 PrefabUtility.RecordPrefabInstancePropertyModifications(se);

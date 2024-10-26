@@ -43,8 +43,6 @@ namespace SaccFlightAndVehicles
         {
             VehicleSeats = EntityControl.VehicleSeats;
             PilotSVSeat = EntityControl.VehicleStations[EntityControl.PilotSeat].GetComponent<SaccVehicleSeat>();
-            PilotThisSeatOnly = PilotSVSeat.ThisSeatOnly;
-            ThisThisSeatOnly = ThisSVSeat.ThisSeatOnly;
             PilotEnableInSeat = PilotSVSeat.EnableInSeat;
             ThisEnableInSeat = ThisSVSeat.EnableInSeat;
             PilotPassengerFunctions = PilotSVSeat.PassengerFunctions;
@@ -92,8 +90,6 @@ namespace SaccFlightAndVehicles
             ThisSVSeat.OnStationExited(SeatAPI);
             PilotSVSeat.OnStationExited(PilotSeatAPI);
 
-            PilotSVSeat.ThisSeatOnly = ThisThisSeatOnly;
-            ThisSVSeat.ThisSeatOnly = PilotThisSeatOnly;
             PilotSVSeat.EnableInSeat = ThisEnableInSeat;
             ThisSVSeat.EnableInSeat = PilotEnableInSeat;
             PilotSVSeat.PassengerFunctions = ThisPassengerFunctions;
@@ -140,8 +136,6 @@ namespace SaccFlightAndVehicles
             ThisSVSeat.OnStationExited(SeatAPI);
             PilotSVSeat.OnStationExited(PilotSeatAPI);
 
-            PilotSVSeat.ThisSeatOnly = PilotThisSeatOnly;
-            ThisSVSeat.ThisSeatOnly = ThisThisSeatOnly;
             PilotSVSeat.EnableInSeat = PilotEnableInSeat;
             ThisSVSeat.EnableInSeat = ThisEnableInSeat;
             PilotSVSeat.PassengerFunctions = PilotPassengerFunctions;

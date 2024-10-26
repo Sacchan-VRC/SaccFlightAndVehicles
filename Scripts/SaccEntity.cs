@@ -27,8 +27,6 @@ namespace SaccFlightAndVehicles
         public bool RightDialDivideStraightUp = false;
         [Tooltip("Layer to find all objects on to use as AAM targets")]
         public LayerMask AAMTargetsLayer = 1 << 25;//layer 25
-        [Tooltip("Object that is enabled when entering vehicle in any seat. Will be removed"), Header("Removing InVehicleOnly next version.")]
-        public GameObject InVehicleOnly;
         [Tooltip("Objects that are enabled when entering vehicle in any seat")]
         public GameObject[] EnableInVehicle;
         [Tooltip("Objects that are disabled when entering vehicle in any seat")]
@@ -693,7 +691,6 @@ namespace SaccFlightAndVehicles
             { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
 
             if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }
-            if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
             EnableInVehicle_Enable();
             DisableInVehicle_Disable();
             if (!_DisallowOwnerShipTransfer)
@@ -726,7 +723,6 @@ namespace SaccFlightAndVehicles
                 InVehicle = false;
                 localPlayer.SetPlayerTag("SF_LocalPiloting", string.Empty);
                 localPlayer.SetPlayerTag("SF_LocalInVehicle", string.Empty);
-                if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
                 EnableInVehicle_Disable();
                 DisableInVehicle_Enable();
                 SendEventToExtensions("SFEXT_O_PilotExit");
@@ -754,7 +750,6 @@ namespace SaccFlightAndVehicles
             if (RStickDisplayHighlighter)
             { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }//move me to start when they fix the bug
-            if (InVehicleOnly) { InVehicleOnly.SetActive(true); }
             EnableInVehicle_Enable();
             DisableInVehicle_Disable();
             SendEventToExtensions("SFEXT_P_PassengerEnter");
@@ -764,7 +759,6 @@ namespace SaccFlightAndVehicles
             Passenger = false;
             InVehicle = false;
             localPlayer.SetPlayerTag("SF_LocalInVehicle", string.Empty);
-            if (InVehicleOnly) { InVehicleOnly.SetActive(false); }
             EnableInVehicle_Disable();
             DisableInVehicle_Enable();
             SendEventToExtensions("SFEXT_P_PassengerExit");

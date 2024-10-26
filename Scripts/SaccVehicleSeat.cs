@@ -14,9 +14,6 @@ namespace SaccFlightAndVehicles
         public bool IsPilotSeat = false;
         [Tooltip("Optional: Use to set up passenger seat with its own function dials")]
         public SAV_PassengerFunctionsController PassengerFunctions;
-        [Header("Removing ThisSeatOnly next version. EnableInSeat replaces it.")]
-        [Tooltip("Object that is enabled only when sitting in this seat")]
-        public GameObject ThisSeatOnly;
         [Tooltip("Objects that are enabled only when sitting in this seat")]
         public GameObject[] EnableInSeat;
         [Tooltip("Objects that are disabled only when sitting in this seat")]
@@ -78,7 +75,6 @@ namespace SaccFlightAndVehicles
             SeatAdjustedPos = SeatStartPos = Seat.localPosition;
             if (InEditor)
             {
-                if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
                 for (int i = 0; i < EnableInSeat.Length; i++)
                 { if (EnableInSeat[i]) EnableInSeat[i].SetActive(true); }
                 for (int i = 0; i < DisableInSeat.Length; i++)
@@ -127,7 +123,6 @@ namespace SaccFlightAndVehicles
                         { EntityControl.passengerFuncIgnorePassengerFlag = true; }
                         EntityControl.PassengerEnterVehicleLocal();
                     }
-                    if (ThisSeatOnly) { ThisSeatOnly.SetActive(true); }
                     for (int i = 0; i < EnableInSeat.Length; i++)
                     { if (EnableInSeat[i]) EnableInSeat[i].SetActive(true); }
                     for (int i = 0; i < DisableInSeat.Length; i++)
@@ -233,7 +228,6 @@ namespace SaccFlightAndVehicles
                             }
                         }
                     }
-                    if (ThisSeatOnly) { ThisSeatOnly.SetActive(false); }
                     for (int i = 0; i < EnableInSeat.Length; i++)
                     { if (EnableInSeat[i]) EnableInSeat[i].SetActive(false); }
                     for (int i = 0; i < DisableInSeat.Length; i++)
