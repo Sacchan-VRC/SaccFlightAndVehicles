@@ -7,7 +7,7 @@ using VRC.Udon;
 namespace SaccFlightAndVehicles
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
-    public class DFUNCP_Rockets : UdonSharpBehaviour
+    public class DFUNC_Rockets : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
         public GameObject Rocket;

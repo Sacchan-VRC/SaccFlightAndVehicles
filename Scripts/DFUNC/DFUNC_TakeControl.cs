@@ -9,7 +9,7 @@ using VRC.Udon;
 namespace SaccFlightAndVehicles
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
-    public class DFUNCP_TakeControl : UdonSharpBehaviour
+    public class DFUNC_TakeControl : UdonSharpBehaviour
     {
         public SaccEntity EntityControl;
         [NonSerialized] public SAV_PassengerFunctionsController PassengerFunctionsControl;

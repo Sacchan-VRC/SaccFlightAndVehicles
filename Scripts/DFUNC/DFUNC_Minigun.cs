@@ -6,7 +6,7 @@ using VRC.Udon;
 namespace SaccFlightAndVehicles
 {
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-    public class DFUNCP_Minigun : UdonSharpBehaviour
+    public class DFUNC_Minigun : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
         public Transform VehicleTransform;

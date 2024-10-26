@@ -5,7 +5,7 @@ using VRC.SDKBase;
 using VRC.Udon;
 
 [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
-public class DFUNCP_Laser : UdonSharpBehaviour
+public class DFUNC_Laser : UdonSharpBehaviour
 {
     [SerializeField] public UdonSharpBehaviour SAVControl;
     public Animator LaserAnimator;
