@@ -105,9 +105,12 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     {
         Occupied = false;
         gameObject.SetActive(false);
-        ThrustAnimator.SetFloat("thrustx", .5f);
-        ThrustAnimator.SetFloat("thrusty", .5f);
-        ThrustAnimator.SetFloat("thrustz", .5f);
+        if (ThrustAnimator)
+        {
+            ThrustAnimator.SetFloat("thrustx", .5f);
+            ThrustAnimator.SetFloat("thrusty", .5f);
+            ThrustAnimator.SetFloat("thrustz", .5f);
+        }
     }
     public void SFEXT_G_PilotEnter()
     {
@@ -372,9 +375,12 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
         }
         if (Occupied)
         {
-            ThrustAnimator.SetFloat("thrustx", ThreeDThrottleInput.x * .5f + .5f);
-            ThrustAnimator.SetFloat("thrusty", ThreeDThrottleInput.y * .5f + .5f);
-            ThrustAnimator.SetFloat("thrustz", ThreeDThrottleInput.z * .5f + .5f);
+            if (ThrustAnimator)
+            {
+                ThrustAnimator.SetFloat("thrustx", ThreeDThrottleInput.x * .5f + .5f);
+                ThrustAnimator.SetFloat("thrusty", ThreeDThrottleInput.y * .5f + .5f);
+                ThrustAnimator.SetFloat("thrustz", ThreeDThrottleInput.z * .5f + .5f);
+            }
         }
     }
     public void SFEXT_G_Wrecked()
@@ -387,9 +393,12 @@ public class SAV_ThreeDThrust : UdonSharpBehaviour
     { setAnimatorDefault(); }
     private void setAnimatorDefault()
     {
-        ThrustAnimator.SetFloat("thrustx", .5f);
-        ThrustAnimator.SetFloat("thrusty", .5f);
-        ThrustAnimator.SetFloat("thrustz", .5f);
+        if (ThrustAnimator)
+        {
+            ThrustAnimator.SetFloat("thrustx", .5f);
+            ThrustAnimator.SetFloat("thrusty", .5f);
+            ThrustAnimator.SetFloat("thrustz", .5f);
+        }
     }
     private bool InWater;
     public void SFEXT_G_EnterWater()
