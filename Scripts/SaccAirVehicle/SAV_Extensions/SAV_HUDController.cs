@@ -13,7 +13,6 @@ namespace SaccFlightAndVehicles
         [Tooltip("Transform of the pilot seat's target eye position, HUDController is automatically moved to this position in Start() to ensure perfect alignment. Not required")]
         public Transform PilotSeatAdjusterTarget;
         public UdonSharpBehaviour SAVControl;
-        public Animator HUDAnimator;
         public Text HUDText_G;
         public Text HUDText_mach;
         public Text HUDText_altitude;
@@ -39,17 +38,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("Local distance projected forward for objects that move dynamically, only adjust if the hud is moved forward in order to make it appear smaller")]
         public float distance_from_head = 1.333f;
         private float maxGs = 0f;
-        private Vector3 startingpos;
         private float check = 0;
-        private int showvel;
-        private Vector3 TargetDir = Vector3.zero;
-        private Vector3 TargetSpeed;
-        private float FullGunAmmoDivider;
-        private Transform VehicleTransform;
-        private SAV_EffectsController EffectsControl;
         private float SeaLevel;
         private Transform CenterOfMass;
-        VRCPlayerApi localPlayer;
         private Vector3 Vel_Lerper;
         private float Vel_UpdateInterval;
         private float Vel_UpdateTime;
@@ -58,17 +49,12 @@ namespace SaccFlightAndVehicles
         private Vector3 Vel_NormalizedExtrapDir;
         private void Start()
         {
-
             EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
-            HUDAnimator = EntityControl.GetComponent<Animator>();
-            VehicleTransform = EntityControl.transform;
 
             if (PilotSeatAdjusterTarget) { transform.position = PilotSeatAdjusterTarget.position; }
 
             SeaLevel = (float)SAVControl.GetProgramVariable("SeaLevel");
             CenterOfMass = EntityControl.CenterOfMass;
-
-            localPlayer = Networking.LocalPlayer;
         }
         private void OnEnable()
         {
