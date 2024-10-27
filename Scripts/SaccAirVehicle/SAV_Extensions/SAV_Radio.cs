@@ -173,11 +173,9 @@ namespace SaccFlightAndVehicles
         [SerializeField] private KeyCode ChannelDownKey = KeyCode.LeftBracket;
         [SerializeField] private TextMeshProUGUI ChannelNumber;
         [SerializeField] private Transform ControlsRoot;
-        private bool Selected, UseLeftTrigger;
+        private bool Selected;
         [Tooltip("Objects enabled when function is active (used on MFD)")]
         public GameObject[] Dial_Funcon;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         private bool TriggerLastFrame;
         private Quaternion VehicleRotLastFrame, JoystickZeroPoint;
         private float JoyStickValue;
@@ -185,6 +183,9 @@ namespace SaccFlightAndVehicles
         private int ChannelOnGrab, CurChannel;
         bool inVR;
         bool controlsRunning;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         public void Controls()
         {
             if (!controlsRunning) return;
@@ -205,7 +206,7 @@ namespace SaccFlightAndVehicles
             else if (Selected)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -219,7 +220,7 @@ namespace SaccFlightAndVehicles
                     {
                         TriggerLastFrame = true;
                         VehicleRotDif = Quaternion.identity;
-                        if (UseLeftTrigger)
+                        if (LeftDial)
                         { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation; }//rotation of the controller relative to the vehicle when it was pressed
                         else
                         { JoystickZeroPoint = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation; }
@@ -230,7 +231,7 @@ namespace SaccFlightAndVehicles
                     //difference between the vehicle and the hand's rotation, and then the difference between that and the JoystickZeroPoint
                     Quaternion JoystickDifference;
                     JoystickDifference = Quaternion.Inverse(ControlsRoot.rotation) *
-                        (UseLeftTrigger ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation
+                        (LeftDial ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation
                                                 : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation)
                     * Quaternion.Inverse(JoystickZeroPoint)
                      * ControlsRoot.rotation;
@@ -243,7 +244,7 @@ namespace SaccFlightAndVehicles
                     int NewChannel = ChannelOnGrab + channelIncreaseAmount;
                     if (CurChannel != NewChannel)
                     {
-                        if (UseLeftTrigger)
+                        if (LeftDial)
                         { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Left, .05f, .222f, 35); }
                         else
                         { localPlayer.PlayHapticEventInHand(VRC_Pickup.PickupHand.Right, .05f, .222f, 35); }

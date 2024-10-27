@@ -13,7 +13,6 @@ namespace SaccFlightAndVehicles
         public float SyncUpdateRate = .25f;
         [SerializeField] KeyCode VtolUpKey = KeyCode.PageUp;
         [SerializeField] KeyCode VtolDownKey = KeyCode.PageDown;
-        private bool UseLeftTrigger = false;
         [System.NonSerializedAttribute, UdonSynced] public float VTOLAngle;
         private float VTOLAngleLast;
         private float VTOLDefault;
@@ -34,8 +33,10 @@ namespace SaccFlightAndVehicles
         private float VTOLZeroPoint;
         private float VTOLAngleDivider;
         private float ThrottleSensitivity;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         public void SFEXT_L_EntityStart()
         {
             VTOLDefault = (float)SAVControl.GetProgramVariable("VTOLDefaultValue");
@@ -90,7 +91,7 @@ namespace SaccFlightAndVehicles
                         SAVControl.SetProgramVariable("VTOLAngleInput", NewVTOL);
                     }
                     float Trigger;
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -98,7 +99,7 @@ namespace SaccFlightAndVehicles
                     {
                         UpdatingVR = true;
                         Vector3 handpos;
-                        if (UseLeftTrigger)
+                        if (LeftDial)
                         { handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position; }
                         else
                         { handpos = ControlsRoot.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position; }

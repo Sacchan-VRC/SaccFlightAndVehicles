@@ -11,8 +11,6 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_TakeControl : UdonSharpBehaviour
     {
-        public SaccEntity EntityControl;
-        [NonSerialized] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private SaccVehicleSeat[] VehicleSeats;
         public SaccVehicleSeat ThisSVSeat;
         [Tooltip("Require the user to hold down the button to take control?")]
@@ -21,9 +19,12 @@ namespace SaccFlightAndVehicles
         public Transform[] MoveTransforms;
         public Transform[] MoveTransforms_CoPosition;
         public KeyCode TakeControlKey = KeyCode.Space;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private SaccVehicleSeat PilotSVSeat;
         private bool TriggerLastFrame;
-        private bool UseLeftTrigger;
         private bool IsUser;
         private bool Swapped;
         private GameObject PilotThisSeatOnly;
@@ -37,8 +38,6 @@ namespace SaccFlightAndVehicles
         private SaccAirVehicle SAVControl;
         private Vector3[] MoveTransformsPos_Orig;
         private Quaternion[] MoveTransformsRot_Orig;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             VehicleSeats = EntityControl.VehicleSeats;
@@ -200,7 +199,7 @@ namespace SaccFlightAndVehicles
         private void Update()
         {
             float Trigger;
-            if (UseLeftTrigger)
+            if (LeftDial)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -234,17 +233,16 @@ namespace SaccFlightAndVehicles
             if (Networking.LocalPlayer.IsOwner(gameObject) && Swapped)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LateJoinerSwap)); }
         }
-
         public void KeyboardInput()
         {
             if (PassengerFunctionsControl)
             {
-                if (UseLeftTrigger) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
+                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
                 else PassengerFunctionsControl.ToggleStickSelectionRight(this);
             }
             else
             {
-                if (UseLeftTrigger) EntityControl.ToggleStickSelectionLeft(this);
+                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
                 else EntityControl.ToggleStickSelectionRight(this);
             }
         }

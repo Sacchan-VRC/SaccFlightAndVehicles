@@ -28,8 +28,10 @@ namespace SaccFlightAndVehicles
         public float AoALimiter = 14f;
         public bool DisableGLimiter = false;
         public bool DisableAoALimiter = false;
-        private SaccEntity EntityControl;
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private bool InVR;
         private bool Piloting;
@@ -39,14 +41,11 @@ namespace SaccFlightAndVehicles
         private float GLimiterRange_Neg;
         private float AoALimiterRange;
         [System.NonSerializedAttribute] public bool FlightLimitsEnabled = true;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             if (localPlayer != null)
             { InVR = localPlayer.IsUserInVR(); }
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             if (!DefaultLimitsOn) { SetLimitsOff(); }
             GLimiterRange_Pos = GLimiter_Pos - GLimiter_Begin_Pos;
             if (GLimiter_Neg < 0 || GLimiter_Begin_Neg < 0)
@@ -133,7 +132,7 @@ namespace SaccFlightAndVehicles
             if (Selected)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

@@ -182,7 +182,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Vector3[] MediumCrashInsidePos;
         [System.NonSerializedAttribute] public Vector3[] BigCrashPos;
         [System.NonSerializedAttribute] public Vector3[] BigCrashInsidePos;
-        private SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
         //public Transform testcamera;
         private AudioSource _rolling;
         private float _rollingVolCurve;
@@ -296,7 +296,6 @@ namespace SaccFlightAndVehicles
             localPlayer = Networking.LocalPlayer;
             if (localPlayer != null)
             { InEditor = false; }
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             CenterOfMass = EntityControl.CenterOfMass;
             if (PlaneInside)
             {

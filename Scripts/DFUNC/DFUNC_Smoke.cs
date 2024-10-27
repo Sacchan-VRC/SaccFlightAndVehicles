@@ -28,8 +28,10 @@ namespace SaccFlightAndVehicles
             }
             get => _smokeon;
         }
-        private SaccEntity EntityControl;
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private VRCPlayerApi localPlayer;
         private bool TriggerLastFrame;
         private float SmokeHoldTime;
@@ -43,27 +45,13 @@ namespace SaccFlightAndVehicles
         private Vector3 TempSmokeCol = Vector3.zero;
         private bool Pilot;
         private bool Selected;
-        private bool InEditor; private int DialPosition;
-        private bool LeftDial;
+        private bool InEditor;
         private float LastSerialization;
         private Transform ControlsRoot;
-        public void DFUNC_LeftDial()
-        {
-            LeftDial = true;
-            UseLeftTrigger = true;
-            DialPosition = EntityControl.DialFuncPos;
-        }
-        public void DFUNC_RightDial()
-        {
-            LeftDial = false;
-            UseLeftTrigger = false;
-            DialPosition = EntityControl.DialFuncPos;
-        }
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
             int NumSmokes = DisplaySmoke.Length;
@@ -131,7 +119,7 @@ namespace SaccFlightAndVehicles
                 if (Selected)
                 {
                     float Trigger;
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -199,19 +187,15 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (LeftDial)
+            if (PassengerFunctionsControl)
             {
-                if (EntityControl.LStickSelection == DialPosition)
-                { EntityControl.LStickSelection = -1; }
-                else
-                { EntityControl.LStickSelection = DialPosition; }
+                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
+                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
             }
             else
             {
-                if (EntityControl.RStickSelection == DialPosition)
-                { EntityControl.RStickSelection = -1; }
-                else
-                { EntityControl.RStickSelection = DialPosition; }
+                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
+                else EntityControl.ToggleStickSelectionRight(this);
             }
         }
         public void SetSmoking(bool smoking)

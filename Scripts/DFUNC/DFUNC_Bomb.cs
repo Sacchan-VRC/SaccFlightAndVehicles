@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
 using VRC.Udon;
+using TMPro;
 
 namespace SaccFlightAndVehicles
 {
@@ -15,6 +16,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
         public float FullReloadTimeSec = 8;
         public Text HUDText_Bomb_ammo;
+        public TextMeshPro HUDText_Bomb_ammo_TMP;
+        public TextMeshProUGUI HUDText_Bomb_ammo_TMPUGUI;
         public int NumBomb = 4;
         public int NumBomb_PerShot = 1;
         [Tooltip("Delay between bomb drops when holding the trigger")]
@@ -44,6 +47,8 @@ namespace SaccFlightAndVehicles
         public string AnimFiredTriggerName = string.Empty;
         [Tooltip("Should the boolean stay true if the pilot exits with it selected?")]
         public bool AnimBoolStayTrueOnExit;
+        [Tooltip("KeyboardInput function fires instantly instead of selecting the DFUNC")]
+        public bool KeyboardInput_InstantFire = false;
         public bool HandHeld_MachineGun = false;
         public bool HandHeld_UseEventToFire = false;
         private bool Held = false;
@@ -55,9 +60,10 @@ namespace SaccFlightAndVehicles
         [UdonSynced(UdonSyncMode.None)] private bool BombFireNow = false;
         private float boolToggleTime;
         private bool AnimOn = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
-        private bool UseLeftTrigger = false;
         private float Trigger;
         private bool TriggerLastFrame;
         private int BombPoint = 0;
@@ -67,29 +73,13 @@ namespace SaccFlightAndVehicles
         private Transform VehicleTransform;
         private Rigidbody VehicleRigid;
         private float reloadspeed;
-        private bool LeftDial = false;
         private bool Piloting = false;
         private bool func_active = false;
-        private int DialPosition = -999;
         private int NumChildrenStart;
         private bool DoAnimFiredTrigger = false;
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         [System.NonSerializedAttribute] public bool IsOwner;
-        public void DFUNC_LeftDial()
-        {
-            LeftDial = true;
-            UseLeftTrigger = true;
-            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
-            else { DialPosition = EntityControl.DialFuncPos; }
-        }
-        public void DFUNC_RightDial()
-        {
-            LeftDial = false;
-            UseLeftTrigger = false;
-            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
-            else { DialPosition = EntityControl.DialFuncPos; }
-        }
         public void SFEXT_L_EntityStart()
         {
             FullBombs = NumBomb;
@@ -127,7 +117,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
-            if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
+            UpdateAmmoVisuals();
         }
         private Collider[] EntityColliders;
         private int StartEntityLayer;
@@ -178,12 +168,12 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_P_PassengerEnter()
         {
-            if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
+            UpdateAmmoVisuals();
         }
         public void DFUNC_Selected()
         {
             TriggerLastFrame = true;
-            func_active = true;
+            func_active = EntityControl.InVR || !KeyboardInput_InstantFire;
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
             if (AtGScreen) AtGScreen.SetActive(true);
@@ -248,6 +238,13 @@ namespace SaccFlightAndVehicles
             }
             else
             {
+                TryToFire();
+            }
+        }
+        void TryToFire()
+        {
+            if (NumBomb > 0 && (AllowFiringWhenGrounded || !SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
+            {
                 LaunchBomb_Owner();
             }
         }
@@ -282,6 +279,8 @@ namespace SaccFlightAndVehicles
         {
             if (BombAnimator && AnimFloatName != string.Empty) { BombAnimator.SetFloat(AnimFloatName, (float)NumBomb * FullBombsDivider); }
             if (HUDText_Bomb_ammo) { HUDText_Bomb_ammo.text = NumBomb.ToString("F0"); }
+            if (HUDText_Bomb_ammo_TMP) { HUDText_Bomb_ammo_TMP.text = NumBomb.ToString("F0"); }
+            if (HUDText_Bomb_ammo_TMPUGUI) { HUDText_Bomb_ammo_TMPUGUI.text = NumBomb.ToString("F0"); }
         }
         public void DisableThisObject()
         {
@@ -292,7 +291,7 @@ namespace SaccFlightAndVehicles
             if (func_active)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -307,7 +306,7 @@ namespace SaccFlightAndVehicles
                         }
                         if (NumBomb > 0 && (AllowFiringWhenGrounded || !SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
                         {
-                            LaunchBomb_Owner();
+                            TryToFire();
                         }
                     }
                     else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && (AllowFiringWhenGrounded || (!SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing"))))
@@ -370,38 +369,21 @@ namespace SaccFlightAndVehicles
         }
         public void KeyboardInput()
         {
-            if (PassengerFunctionsControl)
+            if (KeyboardInput_InstantFire)
             {
-                if (LeftDial)
-                {
-                    if (PassengerFunctionsControl.LStickSelection == DialPosition)
-                    { PassengerFunctionsControl.LStickSelection = -1; }
-                    else
-                    { PassengerFunctionsControl.LStickSelection = DialPosition; }
-                }
-                else
-                {
-                    if (PassengerFunctionsControl.RStickSelection == DialPosition)
-                    { PassengerFunctionsControl.RStickSelection = -1; }
-                    else
-                    { PassengerFunctionsControl.RStickSelection = DialPosition; }
-                }
+                TryToFire();
             }
             else
             {
-                if (LeftDial)
+                if (PassengerFunctionsControl)
                 {
-                    if (EntityControl.LStickSelection == DialPosition)
-                    { EntityControl.LStickSelection = -1; }
-                    else
-                    { EntityControl.LStickSelection = DialPosition; }
+                    if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
+                    else PassengerFunctionsControl.ToggleStickSelectionRight(this);
                 }
                 else
                 {
-                    if (EntityControl.RStickSelection == DialPosition)
-                    { EntityControl.RStickSelection = -1; }
-                    else
-                    { EntityControl.RStickSelection = DialPosition; }
+                    if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
+                    else EntityControl.ToggleStickSelectionRight(this);
                 }
             }
         }

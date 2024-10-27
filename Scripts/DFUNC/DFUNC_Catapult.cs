@@ -30,8 +30,10 @@ namespace SaccFlightAndVehicles
         public string AnimTriggerLaunchName = "catapultlaunch";
         [Tooltip("Align vehicle to catapult when attaching to it?")]
         [SerializeField] private bool AlignToCatapult = true;
-        [System.NonSerialized] public SaccEntity EntityControl;
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private bool Selected;
         [System.NonSerializedAttribute] public bool OnCatapult;
@@ -58,8 +60,6 @@ namespace SaccFlightAndVehicles
         private float AttachTime;
         private float FullThrottleTime;
         private bool Launching_AB;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             InEditor = Networking.LocalPlayer == null;
@@ -69,7 +69,7 @@ namespace SaccFlightAndVehicles
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             thisCollider = GetComponent<BoxCollider>();
             {
-                IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+                IsOwner = EntityControl.IsOwner;
             }
             colliderSmall();
         }
@@ -165,7 +165,6 @@ namespace SaccFlightAndVehicles
         }
         private bool FindCatapultAnimator(GameObject other)
         {
-            // if (OnCatapult) { return false; }//Why is this needed?
             GameObject CatapultObjects = other.gameObject;
             CatapultAnimator = null;
             CatapultAnimator = other.GetComponent<Animator>();
@@ -299,7 +298,7 @@ namespace SaccFlightAndVehicles
                     if (!Launching && Selected)
                     {
                         float Trigger;
-                        if (UseLeftTrigger)
+                        if (LeftDial)
                         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                         else
                         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

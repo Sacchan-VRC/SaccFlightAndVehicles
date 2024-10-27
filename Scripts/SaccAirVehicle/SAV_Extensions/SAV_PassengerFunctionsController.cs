@@ -49,10 +49,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
         [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
         private bool FunctionsActive = false;
-        private bool LeftDialOnlyOne;
-        private bool RightDialOnlyOne;
-        private bool LeftDialEmpty;
-        private bool RightDialEmpty;
         private bool DoDialLeft;
         private bool DoDialRight;
         [NonSerialized] public SaccEntity EntityControl;
@@ -79,10 +75,15 @@ namespace SaccFlightAndVehicles
                 InVR = localPlayer.IsUserInVR();
             }
 
+            //Dial Stuff
             LStickNumFuncs = Dial_Functions_L.Length;
             RStickNumFuncs = Dial_Functions_R.Length;
-            LStickFuncDegrees = 360 / (float)LStickNumFuncs;
-            RStickFuncDegrees = 360 / (float)RStickNumFuncs;
+            DoDialLeft = LStickNumFuncs > 1;
+            DoDialRight = RStickNumFuncs > 1;
+            DisableLeftDial_ = 0;
+            DisableRightDial_ = 0;
+            LStickFuncDegrees = 360 / Mathf.Max((float)LStickNumFuncs, 1);
+            RStickFuncDegrees = 360 / Mathf.Max((float)RStickNumFuncs, 1);
             LStickFuncDegreesDivider = 1 / LStickFuncDegrees;
             RStickFuncDegreesDivider = 1 / RStickFuncDegrees;
             LStickNULL = new bool[LStickNumFuncs];
@@ -119,12 +120,6 @@ namespace SaccFlightAndVehicles
                 }
                 u++;
             }
-            if (LStickNumFuncs == 1) { LeftDialOnlyOne = true; }
-            if (RStickNumFuncs == 1) { RightDialOnlyOne = true; }
-            if (LStickNumFuncs == 0) { LeftDialEmpty = true; }
-            if (RStickNumFuncs == 0) { RightDialEmpty = true; }
-            if (LeftDialEmpty || LeftDialOnlyOne) { DoDialLeft = false; } else { DoDialLeft = true; }
-            if (RightDialEmpty || RightDialOnlyOne) { DoDialRight = false; } else { DoDialRight = true; }
             DisableLeftDial_ = 0;
             DisableRightDial_ = 0;
             //work out angle to check against for function selection because straight up is the middle of a function (if *DialDivideStraightUp isn't true)
@@ -269,12 +264,18 @@ namespace SaccFlightAndVehicles
             for (DialFuncPos = 0; DialFuncPos < Dial_Functions_L.Length; DialFuncPos++)
             {
                 if (Dial_Functions_L[DialFuncPos])
-                { Dial_Functions_L[DialFuncPos].SendCustomEvent("DFUNC_LeftDial"); }
+                {
+                    Dial_Functions_L[DialFuncPos].SetProgramVariable("LeftDial", true);
+                    Dial_Functions_L[DialFuncPos].SetProgramVariable("DialPosition", DialFuncPos);
+                }
             }
             for (DialFuncPos = 0; DialFuncPos < Dial_Functions_R.Length; DialFuncPos++)
             {
                 if (Dial_Functions_R[DialFuncPos])
-                { Dial_Functions_R[DialFuncPos].SendCustomEvent("DFUNC_RightDial"); }
+                {
+                    Dial_Functions_R[DialFuncPos].SetProgramVariable("LeftDial", false);
+                    Dial_Functions_R[DialFuncPos].SetProgramVariable("DialPosition", DialFuncPos);
+                }
             }
         }
         public void TakeOwnerShipOfExtensions()
@@ -311,15 +312,15 @@ namespace SaccFlightAndVehicles
         {
             LStickSelectionLastFrame = -1;
             RStickSelectionLastFrame = -1;
-            if (LeftDialOnlyOne)
+            if (LStickNumFuncs == 1)
             {
                 LStickSelection = 0;
                 Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
             }
-            if (RightDialOnlyOne)
+            if (RStickNumFuncs == 1)
             {
-                RStickSelection = 0;
-                Dial_Functions_R[RStickSelection].SendCustomEvent("DFUNC_Selected");
+                LStickSelection = 0;
+                Dial_Functions_R[LStickSelection].SendCustomEvent("DFUNC_Selected");
             }
             if (RStickDisplayHighlighter) { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }

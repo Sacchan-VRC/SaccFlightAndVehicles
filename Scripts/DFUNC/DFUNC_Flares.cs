@@ -1,6 +1,4 @@
-﻿
-using BestHTTP.SecureProtocol.Org.BouncyCastle.Ocsp;
-using UdonSharp;
+﻿using UdonSharp;
 using UnityEngine;
 using UnityEngine.UI;
 using VRC.SDKBase;
@@ -31,16 +29,16 @@ namespace SaccFlightAndVehicles
         [Tooltip("Delay between flares drops when holding the trigger")]
         public float FlareHoldDelay = 0.3f;
         private string[] CMTypes = { "NumActiveChaff", "NumActiveFlares", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
-        private bool UseLeftTrigger = false;
         [System.NonSerialized] public int FullFlares;
         private float reloadspeed;
         private bool Piloting, InVR, Selected;
         private bool TriggerLastFrame;
-        private SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private float FlareLaunchTime;
         [UdonSynced] private bool FlareFireNow;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void DFUNC_Selected()
         {
             Selected = true;
@@ -57,7 +55,6 @@ namespace SaccFlightAndVehicles
             FullFlares = NumFlares;
             reloadspeed = FullFlares / FullReloadTimeSec;
             if (HUDText_flare_ammo) { HUDText_flare_ammo.text = NumFlares.ToString("F0"); }
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             InVR = EntityControl.InVR;
         }
         public void ReInitNumFlares()//set FullFlares then run this to change vehicles max flares
@@ -108,7 +105,7 @@ namespace SaccFlightAndVehicles
             if ((Piloting && !InVR) || Selected)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

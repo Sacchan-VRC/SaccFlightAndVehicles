@@ -30,8 +30,10 @@ namespace SaccFlightAndVehicles
         [Tooltip("Name of animator boolean that is true when canopy is broken")]
         public string AnimCanopyBroken = "canopybroken";
         public bool DoCanopyOpenDrag = true;
-        private SaccEntity EntityControl;
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private Transform VehicleTransform;
         private VRCPlayerApi localPlayer;
@@ -44,13 +46,10 @@ namespace SaccFlightAndVehicles
         private bool DragApplied;
         private bool CanopyTransitioning = false;
         private bool InEditor = true;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleTransform = EntityControl.transform;
             CanopyDragMulti -= 1;
             //crashes if not sent delayed because the order of events sent by SendCustomEvent are not maintained, (SaccEntity.SendEventToExtensions())
@@ -124,7 +123,7 @@ namespace SaccFlightAndVehicles
             if (Selected)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

@@ -78,9 +78,10 @@ namespace SaccFlightAndVehicles
         private float AAMTargetedTime = 2;
         private float boolToggleTime;
         private bool AnimOn = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
-        private bool UseLeftTrigger = false;
         [System.NonSerializedAttribute] public int FullAAMs;
         private int NumAAMTargets;
         private float AAMLockTimer = 0;
@@ -109,23 +110,7 @@ namespace SaccFlightAndVehicles
         private float reloadspeed;
         private bool DoAnimFiredTrigger;
         private int NumChildrenStart;
-        private bool LeftDial = false;
-        private int DialPosition = -999;
         private VRCPlayerApi localPlayer;
-        public void DFUNC_LeftDial()
-        {
-            LeftDial = true;
-            UseLeftTrigger = true;
-            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
-            else { DialPosition = EntityControl.DialFuncPos; }
-        }
-        public void DFUNC_RightDial()
-        {
-            LeftDial = false;
-            UseLeftTrigger = false;
-            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
-            else { DialPosition = EntityControl.DialFuncPos; }
-        }
         public void SFEXT_L_EntityStart()
         {
             FullAAMs = NumAAM;
@@ -343,7 +328,7 @@ namespace SaccFlightAndVehicles
             if (func_active)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -655,37 +640,13 @@ namespace SaccFlightAndVehicles
         {
             if (PassengerFunctionsControl)
             {
-                if (LeftDial)
-                {
-                    if (PassengerFunctionsControl.LStickSelection == DialPosition)
-                    { PassengerFunctionsControl.LStickSelection = -1; }
-                    else
-                    { PassengerFunctionsControl.LStickSelection = DialPosition; }
-                }
-                else
-                {
-                    if (PassengerFunctionsControl.RStickSelection == DialPosition)
-                    { PassengerFunctionsControl.RStickSelection = -1; }
-                    else
-                    { PassengerFunctionsControl.RStickSelection = DialPosition; }
-                }
+                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
+                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
             }
             else
             {
-                if (LeftDial)
-                {
-                    if (EntityControl.LStickSelection == DialPosition)
-                    { EntityControl.LStickSelection = -1; }
-                    else
-                    { EntityControl.LStickSelection = DialPosition; }
-                }
-                else
-                {
-                    if (EntityControl.RStickSelection == DialPosition)
-                    { EntityControl.RStickSelection = -1; }
-                    else
-                    { EntityControl.RStickSelection = DialPosition; }
-                }
+                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
+                else EntityControl.ToggleStickSelectionRight(this);
             }
         }
         private void LaunchAAM_Owner()

@@ -48,8 +48,10 @@ namespace SaccFlightAndVehicles
         public float AutoHoverMaxAngleSpeedRoll = 20f;
         [Header("Debug:")]
         public float CruiseIntegrator;
-        private SaccEntity EntityControl;
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         [System.NonSerializedAttribute] public bool AltHold;
         private Rigidbody VehicleRigidbody;
@@ -61,14 +63,11 @@ namespace SaccFlightAndVehicles
         private bool JoyStickOveridden;
         private bool StickHeld;
         private bool Piloting;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             if (localPlayer != null)
             { InVR = localPlayer.IsUserInVR(); }
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
@@ -190,7 +189,7 @@ namespace SaccFlightAndVehicles
                 if (InVR)
                 {
                     float Trigger;
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

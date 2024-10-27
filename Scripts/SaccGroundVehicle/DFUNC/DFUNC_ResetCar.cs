@@ -9,24 +9,24 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class DFUNC_ResetCar : UdonSharpBehaviour
     {
-        public SaccEntity EntityControl;
         private SaccGroundVehicle SGVControl;
         [Tooltip("Height added to vehicle when it's reset")]
         public float AddedHeight = 0f;
         [Tooltip("Vehicle must be moving below this speed to allow reset, meters/sec")]
-        public float AllowRespawnSpeed = 9999f;
+        public float AllowRespawnSpeed = 9999999f;
         [Tooltip("Set vehicle's speed to zero when reset")]
         public bool StopCarOnReset = false;
         [SerializeField] private float ResetMinDelay = 0;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private float RespawnTime;
         private Transform VehicleTransform;
         private bool Selected;
         private bool InVR;
-        private bool UseLeftTrigger;
         private bool TriggerLastFrame;
         private Rigidbody VehicleRigidbody;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             VehicleTransform = EntityControl.transform;
@@ -55,7 +55,7 @@ namespace SaccFlightAndVehicles
             if (Selected)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

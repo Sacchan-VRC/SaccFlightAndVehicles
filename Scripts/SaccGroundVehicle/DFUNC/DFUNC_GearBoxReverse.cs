@@ -13,21 +13,22 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour GearBox;
         public GameObject Dial_funcon;
         private bool Reversing;
-        private bool UseLeftTrigger;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         public void SFEXT_L_EntityStart()
         {
             gameObject.SetActive(false);
             if (Dial_funcon) { Dial_funcon.SetActive(Reversing); }
         }
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void DFUNC_Selected() { gameObject.SetActive(true); }
         public void DFUNC_Deselected() { gameObject.SetActive(false); }
         private void Update()
         {
             float Trigger;
-            if (UseLeftTrigger)
+            if (LeftDial)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

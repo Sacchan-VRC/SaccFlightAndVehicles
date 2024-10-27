@@ -30,15 +30,15 @@ namespace SaccFlightAndVehicles
         private UdonSharpBehaviour[] DriveWheels;
         private UdonSharpBehaviour[] SteerWheels;
         private UdonSharpBehaviour[] OtherWheels;
-        private SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private Transform CoM;
         private Vector3 CoMOriginalPos;
-        private bool UseLeftTrigger;
         private bool Toggled;
         private bool Selected;
         private bool TriggerLastFrame;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
@@ -83,7 +83,7 @@ namespace SaccFlightAndVehicles
             if (Selected)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

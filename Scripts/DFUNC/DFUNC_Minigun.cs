@@ -51,6 +51,10 @@ namespace SaccFlightAndVehicles
         public AudioSource FireSound;
         public bool SendAnimTrigger;
         public string AnimTriggerName;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private int ProjectileAmmoFULL;
         private int NumChildrenStart;
         private float LastFireTime;
@@ -66,11 +70,9 @@ namespace SaccFlightAndVehicles
             }
             get => _firing;
         }
-        [System.NonSerialized] SaccEntity EntityControl;
         [System.NonSerialized] bool IsOwner;
         private bool InVR;
         private VRCPlayerApi localPlayer;
-        private bool UseLeftTrigger;
         private bool func_active;
         private bool Selected;
         private int NumBulletParticles;
@@ -80,12 +82,8 @@ namespace SaccFlightAndVehicles
         private Vector3 AmmoBarScaleStart;
         private Quaternion NonOwnerGunAngleSlerper;
         private bool Grounded;
-
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             if (UseProjectileMode)
             {
                 ProjectileAmmoFULL = ProjectileAmmo;
@@ -215,7 +213,7 @@ namespace SaccFlightAndVehicles
                 if (Selected)
                 {
                     float Trigger;
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -273,7 +271,7 @@ namespace SaccFlightAndVehicles
                 {
                     if (Aim_HandDirection)
                     {
-                        if (UseLeftTrigger)
+                        if (LeftDial)
                         { Minigun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
                         else
                         { Minigun.rotation = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
@@ -281,7 +279,7 @@ namespace SaccFlightAndVehicles
                     else
                     {
                         Vector3 lookpoint;
-                        if (UseLeftTrigger)
+                        if (LeftDial)
                         {
                             lookpoint = ((Minigun.position - localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position) * 500) + Minigun.position;
                         }
@@ -439,6 +437,19 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_TakeOff()
         {
             Grounded = false;
+        }
+        public void KeyboardInput()
+        {
+            if (PassengerFunctionsControl)
+            {
+                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
+                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
+            }
+            else
+            {
+                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
+                else EntityControl.ToggleStickSelectionRight(this);
+            }
         }
     }
 }

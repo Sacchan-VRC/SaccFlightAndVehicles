@@ -679,11 +679,13 @@ namespace SaccFlightAndVehicles
             localPlayer.SetPlayerTag("SF_LocalInVehicle", "T");
             if (LStickNumFuncs == 1)
             {
-                Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected");
+                LStickSelection = 0;
+                Dial_Functions_L[LStickSelection].SendCustomEvent("DFUNC_Selected");
             }
             if (RStickNumFuncs == 1)
             {
-                Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected");
+                LStickSelection = 0;
+                Dial_Functions_R[LStickSelection].SendCustomEvent("DFUNC_Selected");
             }
             if (LStickDisplayHighlighter)
             { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
@@ -998,12 +1000,18 @@ namespace SaccFlightAndVehicles
             for (DialFuncPos = 0; DialFuncPos < Dial_Functions_L.Length; DialFuncPos++)
             {
                 if (Dial_Functions_L[DialFuncPos])
-                { Dial_Functions_L[DialFuncPos].SendCustomEvent("DFUNC_LeftDial"); }
+                {
+                    Dial_Functions_L[DialFuncPos].SetProgramVariable("LeftDial", true);
+                    Dial_Functions_L[DialFuncPos].SetProgramVariable("DialPosition", DialFuncPos);
+                }
             }
             for (DialFuncPos = 0; DialFuncPos < Dial_Functions_R.Length; DialFuncPos++)
             {
                 if (Dial_Functions_R[DialFuncPos])
-                { Dial_Functions_R[DialFuncPos].SendCustomEvent("DFUNC_RightDial"); }
+                {
+                    Dial_Functions_R[DialFuncPos].SetProgramVariable("LeftDial", false);
+                    Dial_Functions_R[DialFuncPos].SetProgramVariable("DialPosition", DialFuncPos);
+                }
             }
         }
         public void TakeOwnerShipOfExtensions()

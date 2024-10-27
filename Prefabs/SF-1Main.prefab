@@ -49342,7 +49342,6 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 4371473019321031449}
   DisableInVehicle: []
@@ -49366,7 +49365,10 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  PassengerFunctionControllers: []
   AAMTargets: []
+  DialFuncPos: 0
+  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &4371473018401239850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -55533,7 +55535,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 4371473019235475175}
   EntityControl: {fileID: -2692614534935363141}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -82599,8 +82601,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 4371473019733388728}
   EntityControl: {fileID: -2692614534935363141}
   IsPilotSeat: 1
-  ThisSeatOnly: {fileID: 4371473018583758445}
-  EnableInSeat: []
+  PassengerFunctions: {fileID: 0}
+  EnableInSeat:
+  - {fileID: 4371473018583758445}
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 543805048618571905}
@@ -94669,6 +94672,8 @@ MonoBehaviour:
   _EngineOn: 0
   VehicleForce: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
+  Pitching: {x: 0, y: 0, z: 0}
+  Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
 --- !u!114 &5511535095792669435

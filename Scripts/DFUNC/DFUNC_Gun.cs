@@ -41,11 +41,12 @@ namespace SaccFlightAndVehicles
         [Tooltip("Enable these objects when GUN selected")]
         public GameObject[] EnableOnSelected;
         private bool Grounded;
-        private SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool AnimOn;
         private int AnimBool_STRING;
-        private bool UseLeftTrigger = false;
         [System.NonSerializedAttribute] public float FullGunAmmoInSeconds;
         private Rigidbody VehicleRigidbody;
         [System.NonSerializedAttribute, UdonSynced, FieldChangeCallback(nameof(Firing))] public bool _firing;
@@ -62,25 +63,9 @@ namespace SaccFlightAndVehicles
         private bool Selected = false;
         private bool Selected_HUD = false;
         private float reloadspeed;
-        private bool LeftDial = false;
         private bool InVehicle = false;
-        private int DialPosition = -999;
         private Vector3 AmmoBarScaleStart;
         private Vector3[] AmmoBarScaleStarts;
-        public void DFUNC_LeftDial()
-        {
-            LeftDial = true;
-            UseLeftTrigger = true;
-            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
-            else { DialPosition = EntityControl.DialFuncPos; }
-        }
-        public void DFUNC_RightDial()
-        {
-            LeftDial = false;
-            UseLeftTrigger = false;
-            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
-            else { DialPosition = EntityControl.DialFuncPos; }
-        }
         public void SFEXT_L_EntityStart()
         {
             FullGunAmmoInSeconds = GunAmmoInSeconds;
@@ -93,7 +78,6 @@ namespace SaccFlightAndVehicles
                 AmmoBarScaleStarts[i] = AmmoBars[i].localScale;
             }
 
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
             IsOwner = EntityControl.IsOwner;
             FullGunAmmoDivider = 1f / (FullGunAmmoInSeconds > 0 ? FullGunAmmoInSeconds : 10000000);
@@ -241,7 +225,7 @@ namespace SaccFlightAndVehicles
                 {
                     float DeltaTime = Time.deltaTime;
                     float Trigger;
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -560,37 +544,13 @@ namespace SaccFlightAndVehicles
         {
             if (PassengerFunctionsControl)
             {
-                if (LeftDial)
-                {
-                    if (PassengerFunctionsControl.LStickSelection == DialPosition)
-                    { PassengerFunctionsControl.LStickSelection = -1; }
-                    else
-                    { PassengerFunctionsControl.LStickSelection = DialPosition; }
-                }
-                else
-                {
-                    if (PassengerFunctionsControl.RStickSelection == DialPosition)
-                    { PassengerFunctionsControl.RStickSelection = -1; }
-                    else
-                    { PassengerFunctionsControl.RStickSelection = DialPosition; }
-                }
+                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
+                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
             }
             else
             {
-                if (LeftDial)
-                {
-                    if (EntityControl.LStickSelection == DialPosition)
-                    { EntityControl.LStickSelection = -1; }
-                    else
-                    { EntityControl.LStickSelection = DialPosition; }
-                }
-                else
-                {
-                    if (EntityControl.RStickSelection == DialPosition)
-                    { EntityControl.RStickSelection = -1; }
-                    else
-                    { EntityControl.RStickSelection = DialPosition; }
-                }
+                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
+                else EntityControl.ToggleStickSelectionRight(this);
             }
         }
     }

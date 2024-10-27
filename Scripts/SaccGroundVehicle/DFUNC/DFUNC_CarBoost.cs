@@ -82,13 +82,14 @@ namespace SaccFlightAndVehicles
         private bool Piloting = false;
         private bool DoBoostRemainingAnim = false;
         private bool boostingLast = false;
-        private bool UseLeftTrigger = false;
         private bool ApplyBoostForce = false;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         public void SFEXT_L_EntityStart()
         {
-            VehicleRigidbody = (Rigidbody)SGVControl.GetProgramVariable("VehicleRigidbody");
+            VehicleRigidbody = EntityControl.VehicleRigidbody;
             if (!BoostType_Force)
             {
                 StartDriveSpeed = (float)SGVControl.GetProgramVariable("DriveSpeed");
@@ -115,7 +116,7 @@ namespace SaccFlightAndVehicles
                 float Trigger = 0;
                 if (Selected)
                 {
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

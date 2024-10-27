@@ -63,7 +63,10 @@ namespace SaccFlightAndVehicles
         public float Recoil = 0f;
         [Tooltip("Backwards vector of this transform is the direction along which the recoil force is applied (backwards so it can default to VehicleTransform)")]
         public Transform RecoilDirection;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private Transform VehicleTransform;
         private float LastFireTime = -999999f;
         private int FullAmmo;
@@ -123,7 +126,6 @@ namespace SaccFlightAndVehicles
             if (!VERTSYNC) { VERTSYNC = TurretRotatorVert; }
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleTransform = EntityControl.transform;
             VehicleRigid = EntityControl.GetComponent<Rigidbody>();
             if (!ControlsRoot) { ControlsRoot = TurretRotatorHor; }

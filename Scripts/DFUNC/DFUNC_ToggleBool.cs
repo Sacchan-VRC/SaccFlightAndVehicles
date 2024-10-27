@@ -54,15 +54,15 @@ namespace SaccFlightAndVehicles
         public float DoorCloseTime = 2;
         [System.NonSerializedAttribute] public bool AnimOn = false;
         [System.NonSerializedAttribute] public float ToggleTime;
-        [System.NonSerialized] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private ParticleSystem.EmissionModule[] ToggleEmission_em;
         private int ParticleLength;
         private bool ToggleAllowed = true;
-        private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
         private bool IsSecondary = false;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             if (MasterToggle)//this object is slave
@@ -155,7 +155,7 @@ namespace SaccFlightAndVehicles
         private void Update()
         {
             float Trigger;
-            if (UseLeftTrigger)
+            if (LeftDial)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

@@ -27,8 +27,10 @@ namespace SaccFlightAndVehicles
         public float FlapsStraightenMulti = 1;
         private float StraightenStartValue_Pitch;
         private float StraightenStartValue_Yaw;
-        private SaccEntity EntityControl;
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         [System.NonSerializedAttribute] public bool Flaps = false;
         private bool TriggerLastFrame;
         private bool DragApplied;
@@ -41,8 +43,6 @@ namespace SaccFlightAndVehicles
         private bool Asleep;
         private bool InEditor = true;
         private VRCPlayerApi localPlayer;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void DFUNC_Selected()
         {
             TriggerLastFrame = true;
@@ -58,7 +58,6 @@ namespace SaccFlightAndVehicles
         {
             localPlayer = Networking.LocalPlayer;
             if (localPlayer != null) { InEditor = false; }
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             //to match how the old values worked
             FlapsDragMulti -= 1f;
             FlapsLiftMulti -= 1f;
@@ -117,7 +116,7 @@ namespace SaccFlightAndVehicles
                 if (Selected)
                 {
                     float Trigger;
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

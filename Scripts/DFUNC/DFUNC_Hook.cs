@@ -20,8 +20,10 @@ namespace SaccFlightAndVehicles
         public float HookedCableSnapDistance = 120f;
         [Tooltip("If this vehicle has a brake function, need a reference to it to disable it when this function is braking the vehicle")]
         public UdonSharpBehaviour BrakeFunction;
-        private SaccEntity EntityControl;
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         public LayerMask HookCableLayer;
         private bool TriggerLastFrame;
         [System.NonSerializedAttribute] public bool Hooked = false;
@@ -33,12 +35,9 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool HookDown = false;
         private bool DisableGroundBrake;
         private bool func_active;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             VehicleTransform = EntityControl.transform;
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
@@ -98,7 +97,7 @@ namespace SaccFlightAndVehicles
             if (func_active)
             {
                 float Trigger;
-                if (UseLeftTrigger)
+                if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

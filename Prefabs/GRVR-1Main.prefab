@@ -30895,8 +30895,9 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1564986658967232151}
   SAVControl: {fileID: 2961384493794590454}
-  Trails: []
+  WingTrails: []
   TrailGs: 4
+  TrailGs_OffSpeed: 2.7
   WreckedParticles:
   - {fileID: 5431718319124809549}
   SplashParticle: {fileID: 8937852552661916529}
@@ -31172,8 +31173,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1564986658979985648}
   EntityControl: {fileID: 8496099365134152853}
   IsPilotSeat: 1
-  ThisSeatOnly: {fileID: 1564986658666590200}
-  EnableInSeat: []
+  PassengerFunctions: {fileID: 0}
+  EnableInSeat:
+  - {fileID: 1564986658666590200}
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 7165555808720475924}
@@ -31410,7 +31412,6 @@ MonoBehaviour:
   FlareLaunch: {fileID: 8101070040839081051}
   HUDText_flare_ammo: {fileID: 4810694074881505401}
   SequentialLaunch: 0
-  Hol: 0
   NumFlare_PerShot: 1
   FlareHoldDelay: 0.3
 --- !u!114 &1564986658997062103
@@ -32108,7 +32109,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1564986659165521402}
   EntityControl: {fileID: 8496099365134152853}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -42768,10 +42769,12 @@ MonoBehaviour:
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 1564986659538012441}
   SAVControl: {fileID: 2961384493794590454}
-  BombAnimator: {fileID: 1564986660552776568}
+  BombAnimator: {fileID: 0}
   Bomb: {fileID: 5141064103186665271}
   FullReloadTimeSec: 8
   HUDText_Bomb_ammo: {fileID: 1564986659006246960}
+  HUDText_Bomb_ammo_TMP: {fileID: 0}
+  HUDText_Bomb_ammo_TMPUGUI: {fileID: 0}
   NumBomb: 36
   NumBomb_PerShot: 1
   BombHoldDelay: 0.25
@@ -42791,6 +42794,7 @@ MonoBehaviour:
   AnimFloatName: bombs
   AnimFiredTriggerName: bomblaunched
   AnimBoolStayTrueOnExit: 0
+  KeyboardInput_InstantFire: 0
   HandHeld_MachineGun: 0
   HandHeld_UseEventToFire: 0
   WorldParent: {fileID: 0}
@@ -54518,7 +54522,6 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 1564986659621963122}
   DisableInVehicle: []
@@ -54542,7 +54545,10 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  PassengerFunctionControllers: []
   AAMTargets: []
+  DialFuncPos: 0
+  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &1564986660552776519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90696,7 +90702,6 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 5851705168927756031}
   EntityControl: {fileID: 8496099365134152853}
   VehicleMesh: {fileID: 7032483272631630433}
-  OnboardVehicleLayer: 31
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 1564986659322808147}
   PitchMoment: {fileID: 0}
@@ -90879,6 +90884,8 @@ MonoBehaviour:
   _EngineOn: 0
   VehicleForce: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
+  Pitching: {x: 0, y: 0, z: 0}
+  Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
 --- !u!114 &5851705168927756031
@@ -96172,6 +96179,8 @@ MonoBehaviour:
   AllowToggleGrounded: 1
   GearCheckDistance: 2
   AllowToggleDuringTransition: 1
+  LandingGearSound_Up: {fileID: 0}
+  LandingGearSound_Down: {fileID: 0}
   TransitionLength: 5
 --- !u!114 &1695668829043343048
 MonoBehaviour:
@@ -98950,7 +98959,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: HOOK
+  m_text: GRAPPLE
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 76f1914f4f82852458d2250d86c7f472, type: 2}
   m_sharedMaterial: {fileID: -3398402084506154318, guid: 76f1914f4f82852458d2250d86c7f472,
@@ -114725,6 +114734,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8723609688775321150, guid: 96f9956a8643b6146b5974c824f2194c,
+        type: 3}
+      propertyPath: BombLauncherControl
+      value: 
+      objectReference: {fileID: 1257127239916548155}
+    - target: {fileID: 8723609688775321150, guid: 96f9956a8643b6146b5974c824f2194c,
+        type: 3}
+      propertyPath: ColliderActiveDistance
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8723609688775321150, guid: 96f9956a8643b6146b5974c824f2194c,
+        type: 3}
+      propertyPath: serializationData.Prefab
+      value: 
+      objectReference: {fileID: 8723609688775321150, guid: 96f9956a8643b6146b5974c824f2194c,
+        type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -19,17 +19,17 @@ namespace SaccFlightAndVehicles
         [Header("Only required if above is ticked")]
         public Animator EngineAnimator;
         public string AnimEngineStartupAnimBool = "EngineStarting";
-        [System.NonSerialized] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool NoFuel;
         private bool wrecked;
         private int EngineStartCount;
         private int EngineStartCancelCount;
-        private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
         private float ToggleTime;
         private float TriggerTapTime;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             wrecked = EntityControl.wrecked;
@@ -38,7 +38,7 @@ namespace SaccFlightAndVehicles
         private void Update()
         {
             float Trigger;
-            if (UseLeftTrigger)
+            if (LeftDial)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

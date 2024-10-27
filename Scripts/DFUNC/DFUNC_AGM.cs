@@ -53,9 +53,10 @@ namespace SaccFlightAndVehicles
         [UdonSynced] private bool AGMFireNow;
         private float boolToggleTime;
         private bool AnimOn = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
-        private bool UseLeftTrigger = false;
         [System.NonSerializedAttribute] public bool AGMLocked;
         [System.NonSerializedAttribute] public bool IsOwner;
         [System.NonSerializedAttribute] public Transform TrackedTransform;
@@ -109,23 +110,7 @@ namespace SaccFlightAndVehicles
         private bool func_active;
         private bool DoAnimFiredTrigger = false;
         private float reloadspeed;
-        private bool LeftDial = false;
-        private int DialPosition = -999;
         private bool Piloting;
-        public void DFUNC_LeftDial()
-        {
-            LeftDial = true;
-            UseLeftTrigger = true;
-            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
-            else { DialPosition = EntityControl.DialFuncPos; }
-        }
-        public void DFUNC_RightDial()
-        {
-            LeftDial = false;
-            UseLeftTrigger = false;
-            if (PassengerFunctionsControl) { DialPosition = PassengerFunctionsControl.DialFuncPos; }
-            else { DialPosition = EntityControl.DialFuncPos; }
-        }
         public void SFEXT_L_EntityStart()
         {
             TrackedTransform = transform;//avoid null
@@ -301,7 +286,7 @@ namespace SaccFlightAndVehicles
                 float Trigger;
                 if (!HandHeldMode)
                 {
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -404,7 +389,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (InVR)
                         {
-                            if (UseLeftTrigger)
+                            if (LeftDial)
                             { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).rotation * Quaternion.Euler(0, 60, 0); }
                             else
                             { newangle = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation * Quaternion.Euler(0, 60, 0); }
@@ -505,37 +490,13 @@ namespace SaccFlightAndVehicles
         {
             if (PassengerFunctionsControl)
             {
-                if (LeftDial)
-                {
-                    if (PassengerFunctionsControl.LStickSelection == DialPosition)
-                    { PassengerFunctionsControl.LStickSelection = -1; }
-                    else
-                    { PassengerFunctionsControl.LStickSelection = DialPosition; }
-                }
-                else
-                {
-                    if (PassengerFunctionsControl.RStickSelection == DialPosition)
-                    { PassengerFunctionsControl.RStickSelection = -1; }
-                    else
-                    { PassengerFunctionsControl.RStickSelection = DialPosition; }
-                }
+                if (LeftDial) PassengerFunctionsControl.ToggleStickSelectionLeft(this);
+                else PassengerFunctionsControl.ToggleStickSelectionRight(this);
             }
             else
             {
-                if (LeftDial)
-                {
-                    if (EntityControl.LStickSelection == DialPosition)
-                    { EntityControl.LStickSelection = -1; }
-                    else
-                    { EntityControl.LStickSelection = DialPosition; }
-                }
-                else
-                {
-                    if (EntityControl.RStickSelection == DialPosition)
-                    { EntityControl.RStickSelection = -1; }
-                    else
-                    { EntityControl.RStickSelection = DialPosition; }
-                }
+                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
+                else EntityControl.ToggleStickSelectionRight(this);
             }
         }
         public void SFEXT_O_OnDrop()

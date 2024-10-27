@@ -41,7 +41,10 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour GearBox;
         private bool ClutchOverrideLast = false;
         private string Brake_VariableName = "Brake";
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool InVR = false;
         private bool DoFrontWheelBrakes = false;
         private bool DoBackWheelBrakes = false;
@@ -75,13 +78,11 @@ namespace SaccFlightAndVehicles
             }
             get => _BrakeInput;
         }
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             AnimFloatName = _AnimFloatName;
             DeadZoneSize = (1 - UpperDeadZone) + LowerDeadZone;
-            InVR = (bool)SGVControl.GetProgramVariable("InVR");
+            InVR = EntityControl.InVR;
             IsOwner = (bool)SGVControl.GetProgramVariable("IsOwner");
             if (IsHandBrake) { Brake_VariableName = "HandBrake"; }
             else { Brake_VariableName = "Brake"; }
@@ -202,7 +203,7 @@ namespace SaccFlightAndVehicles
                 if (!InVR || Selected)
                 {
                     float Trigger;
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

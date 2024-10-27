@@ -17,7 +17,6 @@ namespace SaccFlightAndVehicles
         public GameObject Dial_Funcon;
         public float HookSpeed = 300f;
         public float SwingStrength = 20f;
-        [System.NonSerialized] public SaccEntity EntityControl;
         private Rigidbody VehicleRB;
         [Tooltip("Hook launches from here, in this transform's forward direction")]
         public Transform HookLaunchPoint;
@@ -84,6 +83,10 @@ namespace SaccFlightAndVehicles
         [SerializeField] private float AutoTargetTime = 0.2f;
         [SerializeField] private float AutoTargetAngle = 25f;
         public UdonSharpBehaviour[] GrappleEventCallbacks;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private float AprHookFlyTime;
         private bool DoHitPrediction;
         private Vector3 HookStartPos;
@@ -100,8 +103,6 @@ namespace SaccFlightAndVehicles
         private bool NonLocalAttached;//if you are in a vehicle that is attached
         private bool PlayReelIn = true;
         private bool Occupied = false;
-        private bool LeftDial = false;
-        private int DialPosition = -999;
         private bool KeepingHEAwake = false;
         private bool Overriding_DisallowOwnerShipTransfer = false;
         private Vector3 PredictedHitPointStartScale;
@@ -760,20 +761,8 @@ namespace SaccFlightAndVehicles
         {
             if (KeyboardSelectMode)
             {
-                if (LeftDial)
-                {
-                    if (EntityControl.LStickSelection == DialPosition)
-                    { EntityControl.LStickSelection = -1; }
-                    else
-                    { EntityControl.LStickSelection = DialPosition; }
-                }
-                else
-                {
-                    if (EntityControl.RStickSelection == DialPosition)
-                    { EntityControl.RStickSelection = -1; }
-                    else
-                    { EntityControl.RStickSelection = DialPosition; }
-                }
+                if (LeftDial) EntityControl.ToggleStickSelectionLeft(this);
+                else EntityControl.ToggleStickSelectionRight(this);
             }
             else
             {
@@ -853,21 +842,8 @@ namespace SaccFlightAndVehicles
             HookLaunched = !HookLaunched;
             RequestSerialization();
         }
-        public void DFUNC_LeftDial()
-        {
-            LeftDial = true;
-            UseLeftTrigger = true;
-            DialPosition = EntityControl.DialFuncPos;
-        }
-        public void DFUNC_RightDial()
-        {
-            LeftDial = false;
-            UseLeftTrigger = false;
-            DialPosition = EntityControl.DialFuncPos;
-        }
         private bool TriggerLastFrame;
         private bool Selected;
-        private bool UseLeftTrigger;
         public void DFUNC_Selected()
         {
             Selected = true;
@@ -961,7 +937,7 @@ namespace SaccFlightAndVehicles
                 if (!HandHeldGunMode)//handheld mode is done with OnPickupUseDown
                 {
                     float Trigger;
-                    if (UseLeftTrigger)
+                    if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

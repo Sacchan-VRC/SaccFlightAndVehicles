@@ -27,8 +27,10 @@ namespace SaccFlightAndVehicles
         public float DerivMin = -1000f;
         [Header("Debug:")]
         public float CruiseIntegrator;
-        private SaccEntity EntityControl;
-        private bool UseLeftTrigger = false;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         private Transform VehicleTransform;
         private VRCPlayerApi localPlayer;
@@ -48,14 +50,11 @@ namespace SaccFlightAndVehicles
         private Transform ControlsRoot;
         [System.NonSerializedAttribute] public float SetSpeed;
         private Rigidbody VehicleRigidbody;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
             if (localPlayer != null)
             { InVR = localPlayer.IsUserInVR(); }
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
             VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
@@ -136,7 +135,7 @@ namespace SaccFlightAndVehicles
                     if (Selected)
                     {
                         float Trigger;
-                        if (UseLeftTrigger)
+                        if (LeftDial)
                         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                         else
                         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
@@ -145,7 +144,7 @@ namespace SaccFlightAndVehicles
                         {
                             //for setting speed in VR
                             Vector3 handpos = ControlsRoot.position -
-                            (UseLeftTrigger
+                            (LeftDial
                             ? localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position
                             : localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).position);
                             handpos = ControlsRoot.InverseTransformDirection(handpos);

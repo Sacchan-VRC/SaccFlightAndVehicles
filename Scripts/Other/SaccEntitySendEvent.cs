@@ -18,8 +18,12 @@ namespace SaccFlightAndVehicles
         public string OtherScripts_Event_Name;
         public bool OtherScript_EventGlobal = false;
         private bool BothGlobal;
-        void Start()
+        bool initialized;
+        void Start() { Initialize(); }
+        void Initialize()
         {
+            if (initialized) return;
+            initialized = true;
             if (EntityEvent_Name == string.Empty) { EntityEventGlobal = false; }
             if (OtherScripts_Event_Name == string.Empty) { OtherScript_EventGlobal = false; }
             if (EntityEventGlobal && OtherScript_EventGlobal) { BothGlobal = true; }
@@ -80,17 +84,17 @@ namespace SaccFlightAndVehicles
         }
 
         // can now be used as a DFUNC
-        private bool UseLeftTrigger;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private bool TriggerLastFrame;
         bool controlsActive = false;
-        public void SFEXT_L_EntityStart() { Start(); }
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
+        public void SFEXT_L_EntityStart() { Initialize(); }
         public void ControlInputs()
         {
             if (!controlsActive) { return; }
             float Trigger;
-            if (UseLeftTrigger)
+            if (LeftDial)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }

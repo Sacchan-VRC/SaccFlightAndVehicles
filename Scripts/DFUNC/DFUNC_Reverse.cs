@@ -12,19 +12,18 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SAVControl;
         public float ReversingThrottleMultiplier = -.5f;
         public GameObject Dial_Funcon;
-        private SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public bool LeftDial = false;
+        [System.NonSerializedAttribute] public int DialPosition = -999;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
+        [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         private float StartThrottleStrength;
         private float StartABStrength;
         private float ReversingThrottleStrength;
         private float ReversingABStrength;
-        private bool UseLeftTrigger = false;
         private bool TriggerLastFrame;
         [System.NonSerializedAttribute] public bool Reversing;
-        public void DFUNC_LeftDial() { UseLeftTrigger = true; }
-        public void DFUNC_RightDial() { UseLeftTrigger = false; }
         public void SFEXT_L_EntityStart()
         {
-            EntityControl = (SaccEntity)SAVControl.GetProgramVariable("EntityControl");
             StartThrottleStrength = (float)SAVControl.GetProgramVariable("ThrottleStrength");
             StartABStrength = (float)SAVControl.GetProgramVariable("ThrottleStrengthAB");
             ReversingThrottleStrength = StartThrottleStrength * ReversingThrottleMultiplier;
@@ -49,7 +48,7 @@ namespace SaccFlightAndVehicles
         private void Update()
         {
             float Trigger;
-            if (UseLeftTrigger)
+            if (LeftDial)
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
             else
             { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
