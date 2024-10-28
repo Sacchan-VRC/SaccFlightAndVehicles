@@ -6,12 +6,18 @@ using VRC.Udon;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
+    //Set to Continuous because going from None->NoVariableSync just leaves it on None internally until they fix it ¯\_(ツ)_/¯
+    [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
     public class DFUNC_Reverse : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
         public float ReversingThrottleMultiplier = -.5f;
         public GameObject Dial_Funcon;
+        [SerializeField] bool ResetOnExit = false;
+        [Tooltip("Would you like to set an animator bool to true while reversing?")]
+        [SerializeField] Animator ReverseAnimator;
+        [Tooltip("Name of the animator bool to set?")]
+        [SerializeField] string AnimBoolName = "reversing";
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -41,9 +47,12 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotExit()
         {
-            if (Reversing)
-            { SetNotReversing(); }
             gameObject.SetActive(false);
+        }
+        public void SFEXT_G_PilotExit()
+        {
+            if (ResetOnExit && Reversing)
+            { SetNotReversing(); }
         }
         private void Update()
         {
@@ -59,32 +68,51 @@ namespace SaccFlightAndVehicles
             }
             else { TriggerLastFrame = false; }
         }
-        private void ToggleReverse()
+        public void ToggleReverse()
         {
+            Debug.Log("ToggleReverse");
             if (!Reversing)
-            { SetReversing(); }
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetReversing));
+            }
             else
-            { SetNotReversing(); }
+            {
+                SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotReversing));
+            }
         }
-        private void SetReversing()
+        public void SetReversing()
         {
+            Debug.Log("SetReversing");
+            if (Reversing) { return; }
+            Debug.Log("SetReversing2");
             Reversing = true;
+            if (ReverseAnimator) { ReverseAnimator.SetBool(AnimBoolName, true); }
             SAVControl.SetProgramVariable("ThrottleStrength", ReversingThrottleStrength);
             SAVControl.SetProgramVariable("ThrottleStrengthAB", ReversingABStrength);
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
-            EntityControl.SendEventToExtensions("SFEXT_O_StartReversing");
+            if (EntityControl.IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_StartReversing"); }
         }
-        private void SetNotReversing()
+        public void SetNotReversing()
         {
+            Debug.Log("SetNotReversing");
+            if (!Reversing) { return; }
+            Debug.Log("SetNotReversing2");
             Reversing = false;
+            if (ReverseAnimator) { ReverseAnimator.SetBool(AnimBoolName, false); }
             SAVControl.SetProgramVariable("ThrottleStrength", StartThrottleStrength);
             SAVControl.SetProgramVariable("ThrottleStrengthAB", StartABStrength);
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-            EntityControl.SendEventToExtensions("SFEXT_O_StopReversing");
+            if (EntityControl.IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_StopReversing"); }
         }
         public void KeyboardInput()
         {
+            Debug.Log("KeyboardInput");
             ToggleReverse();
+        }
+        public void SFEXT_O_OnPlayerJoined()
+        {
+            if (Reversing)
+            { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetReversing)); }
         }
     }
 }
