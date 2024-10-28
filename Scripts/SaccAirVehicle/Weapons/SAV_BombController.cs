@@ -9,27 +9,40 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SAV_BombController : UdonSharpBehaviour
     {
-        public UdonSharpBehaviour BombLauncherControl;
+        [SerializeField] private UdonSharpBehaviour BombLauncherControl;
         [Tooltip("Bomb will explode after this time")]
-        public float MaxLifetime = 40;
+        [SerializeField] private float MaxLifetime = 40;
         [Tooltip("Maximum liftime of bomb is randomized by +- this many seconds on appearance")]
-        public float MaxLifetimeRadnomization = 2f;
+        [SerializeField] private float MaxLifetimeRadnomization = 2f;
         [Tooltip("How long to wait to destroy the gameobject after it has exploded, (explosion sound/animation must finish playing)")]
-        public float ExplosionLifeTime = 10;
+        [SerializeField] private float ExplosionLifeTime = 10;
         [Tooltip("Play a random one of these explosion sounds")]
-        public AudioSource[] ExplosionSounds;
+        [SerializeField] private AudioSource[] ExplosionSounds;
         [Tooltip("Play a random one of these explosion sounds when hitting water")]
-        public AudioSource[] WaterExplosionSounds;
+        [SerializeField] private AudioSource[] WaterExplosionSounds;
         [Tooltip("Bomb flies forward with this much extra speed, can be used to make guns/shells")]
-        public float LaunchSpeed = 0;
+        [SerializeField] private float LaunchSpeed = 0;
         [Tooltip("Spawn bomb at a random angle up to this number")]
-        public float AngleRandomization = 1;
+        [SerializeField] private float AngleRandomization = 1;
         [Tooltip("Distance from plane to enable the missile's collider, to prevent bomb from colliding with own plane")]
-        public float ColliderActiveDistance = 30;
+        [SerializeField] private float ColliderActiveDistance = 30;
         [Tooltip("How much the bomb's nose is pushed towards direction of movement")]
-        public float StraightenFactor = .1f;
+        [SerializeField] private float StraightenFactor = .1f;
         [Tooltip("Amount of drag bomb has when moving horizontally/vertically")]
-        public float AirPhysicsStrength = .1f;
+        [SerializeField] private float AirPhysicsStrength = .1f;
+        [Header("Torpedo mode settings")]
+        [SerializeField] private bool IsTorpedo;
+        [SerializeField] private float TorpedoSpeed = 60;
+        [SerializeField] private ParticleSystem WakeParticle;
+        private ParticleSystem.EmissionModule WakeParticle_EM;
+        [SerializeField] private float TorpedoDepth = -.25f;
+        [SerializeField] private ParticleSystem[] DisableInWater_ParticleEmission;
+        private ParticleSystem.EmissionModule[] DisableInWater_ParticleEmission_EM;
+        [SerializeField] private TrailRenderer[] DisableInWater_TrailEmission;
+        [SerializeField] private GameObject[] DisableInWater;
+        private Transform WakeParticle_Trans;
+        private float TorpedoHeight;
+        private Quaternion TorpedoRot;
         private Animator BombAnimator;
         private SaccEntity EntityControl;
         private Rigidbody VehicleRigid;
@@ -38,11 +51,13 @@ namespace SaccFlightAndVehicles
         private bool ColliderActive = false;
         private CapsuleCollider BombCollider;
         private Transform VehicleCenterOfMass;
+        private bool UnderWater;
         private bool hitwater;
         private bool IsOwner;
         private bool initialized;
         private int LifeTimeExplodesSent;
         private bool ColliderAlwaysActive;
+        private float DragStart;
         private void Initialize()
         {
             initialized = true;
@@ -54,6 +69,17 @@ namespace SaccFlightAndVehicles
             transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
             BombAnimator = GetComponent<Animator>();
             ColliderAlwaysActive = ColliderActiveDistance == 0;
+            DragStart = BombRigid.drag;
+            if (WakeParticle)
+            {
+                WakeParticle_Trans = WakeParticle.transform;
+                WakeParticle_EM = WakeParticle.emission;
+            }
+            DisableInWater_ParticleEmission_EM = new ParticleSystem.EmissionModule[DisableInWater_ParticleEmission.Length];
+            for (int i = 0; i < DisableInWater_ParticleEmission.Length; i++)
+            {
+                DisableInWater_ParticleEmission_EM[i] = DisableInWater_ParticleEmission[i].emission;
+            }
         }
         public void AddLaunchSpeed()
         {
@@ -111,6 +137,11 @@ namespace SaccFlightAndVehicles
             BombRigid.angularVelocity = Vector3.zero;
             transform.localPosition = Vector3.zero;
             Exploding = false;
+            UnderWater = false;
+            BombRigid.drag = DragStart;
+            for (int i = 0; i < DisableInWater.Length; i++) { DisableInWater[i].SetActive(true); }
+            for (int i = 0; i < DisableInWater_ParticleEmission_EM.Length; i++) { DisableInWater_ParticleEmission_EM[i].enabled = true; }
+            for (int i = 0; i < DisableInWater_TrailEmission.Length; i++) { DisableInWater_TrailEmission[i].emitting = true; }
         }
         private void OnCollisionEnter(Collision other)
         { if (!Exploding) { hitwater = false; Explode(); } }
@@ -118,10 +149,55 @@ namespace SaccFlightAndVehicles
         {
             if (other && other.gameObject.layer == 4 /* water */)
             {
-                if (!Exploding)
+                if (hitwater) { return; }
+                if (!IsTorpedo)
                 {
-                    hitwater = true;
-                    Explode();
+                    if (!Exploding)
+                    {
+                        hitwater = true;
+                        Explode();
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < DisableInWater.Length; i++) { DisableInWater[i].SetActive(false); }
+                    for (int i = 0; i < DisableInWater_ParticleEmission_EM.Length; i++) { DisableInWater_ParticleEmission_EM[i].enabled = false; }
+                    for (int i = 0; i < DisableInWater_TrailEmission.Length; i++) { DisableInWater_TrailEmission[i].emitting = false; }
+                    // When a torpedo hits the water it freezes it's height and rotation
+                    // removes all drag and just sets its speed once and goes straight.
+                    UnderWater = true;
+                    BombRigid.angularVelocity = Vector3.zero;
+                    BombRigid.constraints = (RigidbodyConstraints)116; // Freeze all rotation and Y position
+
+                    Vector3 bvel = BombRigid.velocity;
+                    bvel.y = 0;
+
+                    Vector3 brot = transform.eulerAngles;
+                    brot.x = 0;
+                    brot.z = 0;
+                    if (brot.y > 180) { brot.y -= 360; }
+                    Quaternion newrot = Quaternion.Euler(brot);
+                    TorpedoRot = newrot;
+                    transform.rotation = newrot;
+                    BombRigid.rotation = newrot;
+
+                    //Find the water height
+                    RaycastHit WH;
+                    if (Physics.Raycast(transform.position + (Vector3.up * 100), -Vector3.up, out WH, 150, 16/* Water */, QueryTriggerInteraction.Collide))
+                    { TorpedoHeight = WH.point.y + TorpedoDepth; }
+                    else
+                    { TorpedoHeight = transform.position.y; }
+
+                    if (WakeParticle)
+                    {
+                        WakeParticle_EM.enabled = true;
+                        WakeParticle.transform.position = WH.point + Vector3.up * 0.1f;
+                    }
+                    Vector3 bpos = transform.position;
+                    bpos.y = TorpedoHeight;
+                    transform.position = bpos;
+                    BombRigid.velocity = transform.forward * TorpedoSpeed;
+                    BombRigid.drag = 0;
                 }
             }
         }
@@ -133,7 +209,7 @@ namespace SaccFlightAndVehicles
                 BombRigid.velocity = Vector3.zero;
             }
             Exploding = true;
-            if (hitwater && WaterExplosionSounds.Length > 0)
+            if ((hitwater || UnderWater) && WaterExplosionSounds.Length > 0)
             {
                 int rand = Random.Range(0, WaterExplosionSounds.Length);
                 WaterExplosionSounds[rand].pitch = Random.Range(.94f, 1.2f);
@@ -149,10 +225,11 @@ namespace SaccFlightAndVehicles
                 }
             }
             BombCollider.enabled = false;
+            if (WakeParticle) WakeParticle_EM.enabled = false;
             if (IsOwner)
             { BombAnimator.SetTrigger("explodeowner"); }
             else { BombAnimator.SetTrigger("explode"); }
-            BombAnimator.SetBool("hitwater", hitwater);
+            BombAnimator.SetBool("hitwater", hitwater || UnderWater);
             SendCustomEventDelayedSeconds(nameof(MoveBackToPool), ExplosionLifeTime);
         }
     }
