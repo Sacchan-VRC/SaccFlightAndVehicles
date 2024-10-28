@@ -5404,7 +5404,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -26004,7 +26004,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -42840,7 +42840,6 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 2934804654343294579}
   PilotSeatAdjusterTarget: {fileID: 374746152193602298}
   SAVControl: {fileID: 2926696625540112212}
-  HUDAnimator: {fileID: 2934804655656756586}
   HUDText_G: {fileID: 2934804654107176138}
   HUDText_mach: {fileID: 2934804654974030030}
   HUDText_altitude: {fileID: 2934804655576267558}
@@ -53182,8 +53181,8 @@ MonoBehaviour:
   EntityControl: {fileID: -5424269735798070188}
   IsPilotSeat: 1
   PassengerFunctions: {fileID: 0}
-  ThisSeatOnly: {fileID: 2934804655512785824}
-  EnableInSeat: []
+  EnableInSeat:
+  - {fileID: 2934804655512785824}
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 374746152193602298}
@@ -100328,7 +100327,6 @@ MonoBehaviour:
   EntityControl: {fileID: -5424269735798070188}
   IsPilotSeat: 0
   PassengerFunctions: {fileID: 0}
-  ThisSeatOnly: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -100642,7 +100640,6 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 2934804654959112473}
   DisableInVehicle: []

@@ -58051,7 +58051,6 @@ MonoBehaviour:
   VehicleMesh: {fileID: 5958633425667591128}
   MainObjectRenderer: {fileID: 2064891003211753749}
   OnlyChangeColliders: 0
-  OnboardVehicleLayer: 31
   Health: 160
   VehicleAnimator: {fileID: 6141758680382097274}
   NumStepsSec: 300
@@ -58289,7 +58288,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 6141758680061051261}
   EntityControl: {fileID: 6141758680382097273}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -58457,8 +58456,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 6141758680273700199}
   EntityControl: {fileID: 6141758680382097273}
   IsPilotSeat: 1
-  ThisSeatOnly: {fileID: 6169200270901643276}
-  EnableInSeat: []
+  PassengerFunctions: {fileID: 0}
+  EnableInSeat:
+  - {fileID: 6169200270901643276}
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 6141758679963414950}
@@ -58711,7 +58711,6 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 1926991246271948119}
   DisableInVehicle: []
@@ -58736,7 +58735,10 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  PassengerFunctionControllers: []
   AAMTargets: []
+  DialFuncPos: 0
+  passengerFuncIgnorePassengerFlag: 0
 --- !u!95 &6141758680382097274
 Animator:
   serializedVersion: 5
@@ -59055,7 +59057,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 6141758680559467796}
   EntityControl: {fileID: 6141758680382097273}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -59225,7 +59227,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 6141758681580453100}
   EntityControl: {fileID: 6141758680382097273}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1

@@ -49768,7 +49768,6 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 4371473018907901587}
   PilotSeatAdjusterTarget: {fileID: 543805048618571905}
   SAVControl: {fileID: 4327496282912357153}
-  HUDAnimator: {fileID: 4371473018849597658}
   HUDText_G: {fileID: 4371473018216741849}
   HUDText_mach: {fileID: 4371473020080243149}
   HUDText_altitude: {fileID: 4371473019350629710}
@@ -50053,7 +50052,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -71920,6 +71919,8 @@ MonoBehaviour:
   Bomb: {fileID: 3196698694733883011}
   FullReloadTimeSec: 8
   HUDText_Bomb_ammo: {fileID: 1490522283600781605}
+  HUDText_Bomb_ammo_TMP: {fileID: 0}
+  HUDText_Bomb_ammo_TMPUGUI: {fileID: 0}
   NumBomb: 4
   NumBomb_PerShot: 1
   BombHoldDelay: 0.5
@@ -71938,6 +71939,7 @@ MonoBehaviour:
   AnimFloatName: bombs
   AnimFiredTriggerName: bomblaunched
   AnimBoolStayTrueOnExit: 0
+  KeyboardInput_InstantFire: 0
   HandHeld_MachineGun: 0
   HandHeld_UseEventToFire: 0
   WorldParent: {fileID: 0}

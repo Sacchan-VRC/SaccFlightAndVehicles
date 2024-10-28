@@ -824,7 +824,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -5970,6 +5970,7 @@ MonoBehaviour:
   - {fileID: 724218824127891564}
   - {fileID: 4763190522954354963}
   TrailGs: 4
+  TrailGs_OffSpeed: 2.7
   WreckedParticles:
   - {fileID: 4219322778270998863}
   SplashParticle: {fileID: 9050472816110490642}
@@ -26564,7 +26565,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 914079681445392395}
   EntityControl: {fileID: 8560298986138584170}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -32007,7 +32008,6 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 914079682251412346}
   DisableInVehicle: []
@@ -32031,7 +32031,10 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  PassengerFunctionControllers: []
   AAMTargets: []
+  DialFuncPos: 0
+  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &914079681580794773
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -37271,7 +37274,6 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 914079681652928850}
   PilotSeatAdjusterTarget: {fileID: 719214354298189907}
   SAVControl: {fileID: -1791885612027421787}
-  HUDAnimator: {fileID: 914079681580794731}
   HUDText_G: {fileID: 914079682275436223}
   HUDText_mach: {fileID: 914079682352648334}
   HUDText_altitude: {fileID: 914079681600778027}
@@ -59198,7 +59200,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 914079682345404375}
   EntityControl: {fileID: 8560298986138584170}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -80227,8 +80229,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 914079682730908513}
   EntityControl: {fileID: 8560298986138584170}
   IsPilotSeat: 1
-  ThisSeatOnly: {fileID: 914079681340633185}
-  EnableInSeat: []
+  PassengerFunctions: {fileID: 0}
+  EnableInSeat:
+  - {fileID: 914079681340633185}
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 719214354298189907}
@@ -85268,7 +85271,6 @@ MonoBehaviour:
   FlareLaunch: {fileID: 5465751470569300993}
   HUDText_flare_ammo: {fileID: 6168439344526766729}
   SequentialLaunch: 0
-  Hol: 0
   NumFlare_PerShot: 1
   FlareHoldDelay: 0.3
 --- !u!114 &914079682884834665
@@ -85486,7 +85488,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 914079682918043358}
   EntityControl: {fileID: 8560298986138584170}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -85625,7 +85627,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 914079682919084881}
   EntityControl: {fileID: 8560298986138584170}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -96627,7 +96629,6 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1251122204420011798}
   EntityControl: {fileID: 8560298986138584170}
   VehicleMesh: {fileID: 914079681568277751}
-  OnboardVehicleLayer: 31
   OnlyChangeColliders: 0
   GroundEffectEmpty: {fileID: 914079682690085334}
   PitchMoment: {fileID: 914079681517051714}
@@ -96882,6 +96883,8 @@ MonoBehaviour:
   _EngineOn: 0
   VehicleForce: {x: 0, y: 0, z: 0}
   VehicleTorque: {x: 0, y: 0, z: 0}
+  Pitching: {x: 0, y: 0, z: 0}
+  Yawing: {x: 0, y: 0, z: 0}
   SetVel: 0
   VelToSet: {x: 0, y: 0, z: 0}
 --- !u!114 &1251122204420011798
@@ -137925,7 +137928,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0

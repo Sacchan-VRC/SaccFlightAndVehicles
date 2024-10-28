@@ -22789,7 +22789,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 1803049917701134627}
   EntityControl: {fileID: 3243243057054021813}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -64015,7 +64015,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 3243243056561536689}
   EntityControl: {fileID: 3243243057054021813}
   IsPilotSeat: 0
-  ThisSeatOnly: {fileID: 0}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
   DisableInSeat: []
   AdjustSeatPosition: 1
@@ -64108,7 +64108,6 @@ MonoBehaviour:
   VehicleMesh: {fileID: 2201980004449573614}
   MainObjectRenderer: {fileID: 493540686795614193}
   OnlyChangeColliders: 0
-  OnboardVehicleLayer: 31
   Health: 200
   VehicleAnimator: {fileID: 3243243057054021814}
   NumStepsSec: 300
@@ -64446,8 +64445,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 3243243056892148395}
   EntityControl: {fileID: 3243243057054021813}
   IsPilotSeat: 1
-  ThisSeatOnly: {fileID: 3288998196763310016}
-  EnableInSeat: []
+  PassengerFunctions: {fileID: 0}
+  EnableInSeat:
+  - {fileID: 3288998196763310016}
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 3243243056396766826}
@@ -64763,7 +64763,6 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 7099842138338204315}
   DisableInVehicle: []
@@ -64787,7 +64786,10 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  PassengerFunctionControllers: []
   AAMTargets: []
+  DialFuncPos: 0
+  passengerFuncIgnorePassengerFlag: 0
 --- !u!65 &3243243057054021816
 BoxCollider:
   m_ObjectHideFlags: 0

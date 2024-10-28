@@ -1760,6 +1760,9 @@ MonoBehaviour:
   SAVControl: {fileID: -2400341428957135530}
   ReversingThrottleMultiplier: -0.6
   Dial_Funcon: {fileID: 6292834261707576828}
+  ResetOnExit: 0
+  ReverseAnimator: {fileID: 0}
+  AnimBoolName: reversing
 --- !u!114 &1713418801
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28703,7 +28706,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
