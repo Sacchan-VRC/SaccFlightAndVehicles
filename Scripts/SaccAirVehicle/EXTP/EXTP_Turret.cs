@@ -125,6 +125,7 @@ namespace SaccFlightAndVehicles
             if (!HORSYNC) { HORSYNC = TurretRotatorHor; }
             if (!VERTSYNC) { VERTSYNC = TurretRotatorVert; }
             localPlayer = Networking.LocalPlayer;
+            InVR = EntityControl.InVR;
             InEditor = localPlayer == null;
             VehicleTransform = EntityControl.transform;
             VehicleRigid = EntityControl.GetComponent<Rigidbody>();
@@ -163,7 +164,7 @@ namespace SaccFlightAndVehicles
             FireNextSerialization = false;
             IsOwner = true;
             Manning = true;
-            if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
             if (AmmoBar) { AmmoBar.gameObject.SetActive(true); }
             if (ViewCamera) { ViewCamera.gameObject.SetActive(true); }
             if (ViewCameraScreen) { ViewCameraScreen.gameObject.SetActive(true); }

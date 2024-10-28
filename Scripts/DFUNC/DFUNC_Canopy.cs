@@ -68,7 +68,7 @@ namespace SaccFlightAndVehicles
         {
             gameObject.SetActive(true);
             if (Dial_Funcon) { Dial_Funcon.SetActive(CanopyOpen); }
-            if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
         }
         public void SFEXT_O_PilotExit()
         {

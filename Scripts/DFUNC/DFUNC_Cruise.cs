@@ -53,8 +53,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
-            if (localPlayer != null)
-            { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
             ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
             VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
@@ -75,6 +74,7 @@ namespace SaccFlightAndVehicles
             if (Dial_Funcon) Dial_Funcon.SetActive(Cruise);
             Piloting = true;
             if (HUDText_knotstarget) { HUDText_knotstarget.text = string.Empty; }
+            InVR = EntityControl.InVR;
         }
         public void SFEXT_P_PassengerEnter()
         {

@@ -89,6 +89,7 @@ namespace SaccFlightAndVehicles
             ControlsRoot = SAVControl.ControlsRoot;
             ThrottleSensitivity = SAVControl.ThrottleSensitivity;
             IsOwner = SAVControl.IsOwner;
+            InVR = EntityControl.InVR;
             if (DefaultEnabled)
             {
                 ThreeDThrustActive = true;

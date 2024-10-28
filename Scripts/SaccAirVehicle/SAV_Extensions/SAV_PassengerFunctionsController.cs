@@ -72,7 +72,7 @@ namespace SaccFlightAndVehicles
             if (localPlayer != null)
             {
                 InEditor = false;
-                InVR = localPlayer.IsUserInVR();
+                InVR = EntityControl.InVR;
             }
 
             //Dial Stuff
@@ -156,6 +156,10 @@ namespace SaccFlightAndVehicles
             TellDFUNCsLR();
 
             SendEventToExtensions_Gunner("SFEXT_L_EntityStart");
+        }
+        public void SFEXT_O_PilotEnter()
+        {
+            InVR = EntityControl.InVR;
         }
         public void InVehicleControls()
         {
@@ -374,6 +378,5 @@ namespace SaccFlightAndVehicles
                 dfunc.SendCustomEvent("DFUNC_Selected");
             }
         }
-
     }
 }

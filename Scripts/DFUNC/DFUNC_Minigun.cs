@@ -100,10 +100,7 @@ namespace SaccFlightAndVehicles
             if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; AmmoBar.gameObject.SetActive(false); }
 
             localPlayer = Networking.LocalPlayer;
-            if (localPlayer != null)
-            {
-                InVR = localPlayer.IsUserInVR();
-            }
+            InVR = EntityControl.InVR;
             if (Projectile)
             {
                 int NumToInstantiate = Mathf.Min(ProjectileAmmoFULL, 10);
@@ -141,6 +138,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             func_active = true;
+            InVR = EntityControl.InVR;
             TriggerLastFrame = true;
             if (!InVR) { DFUNC_Selected(); }
             if (GunDamageParticle_Parent) { GunDamageParticle_Parent.gameObject.SetActive(true); }

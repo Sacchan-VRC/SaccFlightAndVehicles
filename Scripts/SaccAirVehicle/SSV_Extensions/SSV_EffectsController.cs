@@ -46,6 +46,7 @@ namespace SaccFlightAndVehicles
 
             VehicleAnimator = ((SaccEntity)SSVControl.GetProgramVariable("EntityControl")).GetComponent<Animator>();
             localPlayer = Networking.LocalPlayer;
+            InVR = EntityControl.InVR;
             if (localPlayer == null)
             {
                 VehicleAnimator.SetBool("occupied", true);
@@ -129,7 +130,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
-            if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
             VehicleAnimator.SetBool("localpilot", true);
         }
         public void SFEXT_O_PilotExit()

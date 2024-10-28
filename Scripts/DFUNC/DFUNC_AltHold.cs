@@ -66,8 +66,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
-            if (localPlayer != null)
-            { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
             VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
@@ -86,6 +85,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
+            InVR = EntityControl.InVR;
             if (!AltHold) { gameObject.SetActive(false); }
             if (Dial_Funcon) Dial_Funcon.SetActive(AltHold);
         }

@@ -96,7 +96,7 @@ namespace SaccFlightAndVehicles
         private GameObject HookedGameObject;
         private Rigidbody HookedRB;
         private VRC_Pickup EntityPickup;
-        private bool InVr;
+        private bool InVR;
         private VRCPlayerApi localPlayer;
         private SaccEntity HookedEntity;
         //these 2 variables are only used if TwoWayForces_LocalForceMode is true
@@ -371,7 +371,7 @@ namespace SaccFlightAndVehicles
             HookStartRot = Hook.localRotation;
             if (PredictedHitPoint) { PredictedHitPointStartScale = PredictedHitPoint.localScale; }
             localPlayer = Networking.LocalPlayer;
-            InVr = localPlayer.IsUserInVR();
+            InVR = EntityControl.InVR;
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
             foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); }
             gameObject.SetActive(true);
@@ -715,7 +715,7 @@ namespace SaccFlightAndVehicles
                 if (_HookLaunched)
                 { ResetHook(); }
             }
-            if (!InVr && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); } }
+            if (!InVR && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(false); } }
         }
         public void SFEXT_O_TakeOwnership()
         {
@@ -730,7 +730,8 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
-            if (!InVr && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(true); } }
+            InVR = EntityControl.InVR;
+            if (!InVR && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(true); } }
         }
         public void SFEXT_G_PilotEnter()
         {

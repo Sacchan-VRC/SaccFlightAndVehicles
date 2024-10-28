@@ -417,7 +417,7 @@ namespace SaccFlightAndVehicles
             else
             {
                 InEditor = false;
-                InVR = localPlayer.IsUserInVR();
+                InVR = EntityControl.InVR;
                 if (localPlayer.isMaster)
                 {
                     IsOwner = true;
@@ -1531,10 +1531,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             if (Asleep) { WakeUp(); }
-            if (!InEditor)
-            {
-                InVR = localPlayer.IsUserInVR();
-            }
+            InVR = EntityControl.InVR;
             GDHitRigidbody = null;
             if (_EngineOn)
             { PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput; }

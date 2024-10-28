@@ -45,6 +45,10 @@ namespace SaccFlightAndVehicles
             Selected = false;
             gameObject.SetActive(false);
         }
+        public void SFEXT_O_PilotEnter()
+        {
+            InVR = EntityControl.InVR;
+        }
         public void SFEXT_O_PilotExit()
         {
             Selected = false;

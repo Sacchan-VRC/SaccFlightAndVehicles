@@ -673,6 +673,7 @@ namespace SaccFlightAndVehicles
         {
             Using = true;
             Piloting = true;
+            if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
             InVehicle = true; SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             Occupied = true;
             localPlayer.SetPlayerTag("SF_LocalPiloting", "T");
@@ -692,7 +693,6 @@ namespace SaccFlightAndVehicles
             if (RStickDisplayHighlighter)
             { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
 
-            if (!InEditor && localPlayer.IsUserInVR()) { InVR = true; }
             EnableInVehicle_Enable();
             DisableInVehicle_Disable();
             if (!_DisallowOwnerShipTransfer)

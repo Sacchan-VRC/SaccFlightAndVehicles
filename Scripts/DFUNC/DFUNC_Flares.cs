@@ -77,6 +77,7 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             FlareFireNow = false;
             RequestSerialization();
+            InVR = EntityControl.InVR;
         }
         public void SFEXT_O_PilotExit()
         {

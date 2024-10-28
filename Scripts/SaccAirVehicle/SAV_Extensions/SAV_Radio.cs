@@ -49,7 +49,7 @@ namespace SaccFlightAndVehicles
             {
                 ControlsRoot = EntityControl.transform;
             }
-            inVR = localPlayer.IsUserInVR();
+            InVR = localPlayer.IsUserInVR();
             gameObject.SetActive(true);
             bool RadioOn = _Channel != 0;
             for (int i = 0; i < Dial_Funcon.Length; i++)
@@ -64,6 +64,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
+            InVR = EntityControl.InVR;
             EnterVehicle();
         }
         public void SFEXT_G_PilotEnter()
@@ -181,7 +182,7 @@ namespace SaccFlightAndVehicles
         private float JoyStickValue;
         private Vector3 CompareAngleLastFrame;
         private int ChannelOnGrab, CurChannel;
-        bool inVR;
+        bool InVR;
         bool controlsRunning;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
@@ -190,7 +191,7 @@ namespace SaccFlightAndVehicles
         {
             if (!controlsRunning) return;
             SendCustomEventDelayedFrames(nameof(Controls), 1);
-            if (!inVR)
+            if (!InVR)
             {
                 if (Input.GetKeyDown(ChannelUpKey))
                 {

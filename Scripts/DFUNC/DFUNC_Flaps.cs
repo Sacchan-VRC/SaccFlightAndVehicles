@@ -62,6 +62,7 @@ namespace SaccFlightAndVehicles
             FlapsDragMulti -= 1f;
             FlapsLiftMulti -= 1f;
             FlapsVelLiftMulti -= 1f;
+            InVR = EntityControl.InVR;
 
             StraightenStartValue_Pitch = (float)SAVControl.GetProgramVariable("VelStraightenStrPitch");
             StraightenStartValue_Yaw = (float)SAVControl.GetProgramVariable("VelStraightenStrYaw");
@@ -75,8 +76,8 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
+            InVR = EntityControl.InVR;
             if (Flaps) { gameObject.SetActive(true); }
-            if (!InEditor) { InVR = Networking.LocalPlayer.IsUserInVR(); }//move to start when they fix the bug
             if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
         }
         public void SFEXT_O_PilotExit()

@@ -321,8 +321,8 @@ namespace SaccFlightAndVehicles
 
                 VehicleTransform.rotation = PlaneCatapultRotDif * CatapultTransform.rotation;
                 VehicleTransform.position = CatapultTransform.position + PlaneCatapultOffset;
-                VehicleRigidbody.position = VehicleTransform.position;
-                VehicleRigidbody.rotation = VehicleTransform.rotation;
+                VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
+                VehicleRigidbody.rotation = VehicleTransform.rotation;//Unity 2022.3.6f1 bug workaround
                 VehicleRigidbody.velocity = Vector3.zero;
                 VehicleRigidbody.angularVelocity = Vector3.zero;
                 Quaternion CatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(CatapultRotLastFrame);

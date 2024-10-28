@@ -283,6 +283,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
+            InVR = EntityControl.InVR;
             Piloting = true;
             CurrentGear = NeutralGear;
             RequestSerialization();

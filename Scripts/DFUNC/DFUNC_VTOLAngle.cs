@@ -43,7 +43,7 @@ namespace SaccFlightAndVehicles
             ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
             localPlayer = Networking.LocalPlayer;
             ThrottleSensitivity = (float)SAVControl.GetProgramVariable("ThrottleSensitivity");
-            InVR = (bool)SAVControl.GetProgramVariable("InVR");
+            InVR = EntityControl.InVR;
             SAVControl.SetProgramVariable("VTOLenabled", true);
             VTOL360 = (bool)SAVControl.GetProgramVariable("VTOL360");
             IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
@@ -54,6 +54,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             TriggerLastFrame = false;
+            InVR = EntityControl.InVR;
             gameObject.SetActive(true);
             VTOLMover = VTOLAngleLast = NewVTOLAngle = VTOLAngle;
             RequestSerialization();

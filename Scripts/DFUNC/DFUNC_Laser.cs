@@ -72,6 +72,7 @@ namespace SaccFlightAndVehicles
         {
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
+            InVR = EntityControl.InVR;
             VehicleTransform = EntityControl.transform;
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
             NumChildrenStart = transform.childCount;
@@ -98,7 +99,7 @@ namespace SaccFlightAndVehicles
         {
             TriggerLastFrame = true;
             IsOwner = Using = true;
-            if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
             if (Gunparticle_Gunner) { Gunparticle_Gunner.SetActive(true); }
         }
         public void SFEXT_G_PilotEnter()

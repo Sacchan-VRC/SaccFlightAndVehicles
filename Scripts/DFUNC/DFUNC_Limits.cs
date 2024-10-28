@@ -44,8 +44,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
-            if (localPlayer != null)
-            { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
             if (!DefaultLimitsOn) { SetLimitsOff(); }
             GLimiterRange_Pos = GLimiter_Pos - GLimiter_Begin_Pos;
             if (GLimiter_Neg < 0 || GLimiter_Begin_Neg < 0)
@@ -71,6 +70,7 @@ namespace SaccFlightAndVehicles
         {
             if (FlightLimitsEnabled) { gameObject.SetActive(true); }
             Piloting = true;
+            InVR = EntityControl.InVR;
             if (Dial_Funcon) Dial_Funcon.SetActive(FlightLimitsEnabled);
         }
         public void SFEXT_O_PilotExit()

@@ -143,6 +143,7 @@ namespace SaccFlightAndVehicles
         {
             SetBrakeZero();
             Piloting = true;
+            InVR = EntityControl.InVR;
             LastUpdateTime = Time.time;
             BrakeLast = BrakeInput;
             RequestSerialization();

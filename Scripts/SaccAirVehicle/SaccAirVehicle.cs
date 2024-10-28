@@ -662,6 +662,7 @@ namespace SaccFlightAndVehicles
             UsingManualSync = !EntityControl.EntityObjectSync;
 
             localPlayer = Networking.LocalPlayer;
+            InVR = EntityControl.InVR;
             if (localPlayer == null)
             {
                 Piloting = true;
@@ -674,7 +675,6 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                InVR = localPlayer.IsUserInVR();
                 if (localPlayer.isMaster)
                 {
                     if (!UsingManualSync)
@@ -1115,7 +1115,7 @@ namespace SaccFlightAndVehicles
                             { TaxiingStillMulti = Mathf.Min(Speed * TaxiFullTurningSpeedDivider, 1); }
                             Taxiinglerper = Mathf.Lerp(Taxiinglerper, RotationInputs.y * TaxiRotationSpeed * Time.smoothDeltaTime * TaxiingStillMulti, 1 - Mathf.Pow(0.5f, TaxiRotationResponse * DeltaTime));
                             VehicleTransform.Rotate(VehicleTransform.up, Taxiinglerper);
-                            VehicleRigidbody.rotation = VehicleTransform.rotation;
+                            VehicleRigidbody.rotation = VehicleTransform.rotation;//Unity 2022.3.6f1 bug workaround
 
                             StillWindMulti = Mathf.Min(Speed * .1f, 1);
                             ThrustVecGrounded = 0;
@@ -1741,7 +1741,7 @@ namespace SaccFlightAndVehicles
                 VehicleTransform.GetChild(i).position -= CoMOffset;
             }
             VehicleTransform.position += CoMOffset;
-            VehicleRigidbody.position = VehicleTransform.position;
+            VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
             SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
             EntityControl.Spawnposition = VehicleTransform.localPosition;
             EntityControl.Spawnrotation = VehicleTransform.localRotation;
@@ -2259,10 +2259,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             if (Asleep) { WakeUp(); }
-            if (!InEditor)
-            {
-                InVR = localPlayer.IsUserInVR();
-            }
+            InVR = EntityControl.InVR;
             VTOLAngleInput = VTOLAngle;
             VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
             GDHitRigidbody = null;

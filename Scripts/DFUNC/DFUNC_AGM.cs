@@ -125,6 +125,7 @@ namespace SaccFlightAndVehicles
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
             EntityColliders = EntityControl.gameObject.GetComponentsInChildren<Collider>();
             StartEntityLayer = EntityControl.gameObject.layer;
+            InVR = EntityControl.InVR;
 
             UpdateAmmoVisuals();
 
@@ -156,7 +157,7 @@ namespace SaccFlightAndVehicles
             TriggerLastFrame = true;
             AGMLocked = false;
             Piloting = true;
-            if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
             if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
         }
         public void SFEXT_P_PassengerEnter()

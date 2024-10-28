@@ -85,6 +85,7 @@ namespace SaccFlightAndVehicles
             VehicleAnimator = EntityControl.GetComponent<Animator>();
             localPlayer = Networking.LocalPlayer;
             float fuel = (float)SAVControl.GetProgramVariable("Fuel");
+            InVR = EntityControl.InVR;
             FullFuelDivider = 1f / (fuel > 0 ? fuel : 10000000);
             if (localPlayer == null)
             {
@@ -265,7 +266,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
-            if (!InEditor) { InVR = localPlayer.IsUserInVR(); }
+            InVR = EntityControl.InVR;
             VehicleAnimator.SetBool("localpilot", true);
         }
         public void SFEXT_O_PilotExit()
