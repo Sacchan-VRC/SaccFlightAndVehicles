@@ -1133,7 +1133,7 @@ namespace SaccFlightAndVehicles
                             {
                                 if ((VTOLAngleDegrees < EnterVTOLEvent_Angle || VTOLAllowAfterburner))
                                 {
-                                    if (AfterburnerOn)
+                                    if (PlayerThrottle == 1)
                                     { PlayerThrottle = ThrottleAfterburnerPoint; }
                                     else
                                     { PlayerThrottle = 1; }

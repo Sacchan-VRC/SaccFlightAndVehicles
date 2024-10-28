@@ -785,13 +785,20 @@ namespace SaccFlightAndVehicles
                                 }
                             }
                         }
-                        //keyboard control for afterburner
-                        if (Input.GetKeyDown(AfterBurnerKey) && HasAfterburner)
+                        //keyboard control for afterburner                        //keyboard control for afterburner
+                        if (Input.GetKeyDown(AfterBurnerKey))
                         {
-                            if (AfterburnerOn)
-                                PlayerThrottle = ThrottleAfterburnerPoint;
+                            if (HasAfterburner)
+                            {
+                                if (PlayerThrottle == 1)
+                                { PlayerThrottle = ThrottleAfterburnerPoint; }
+                                else
+                                { PlayerThrottle = 1; }
+                            }
+                            else if (PlayerThrottle < 1)
+                            { PlayerThrottle = 1; }
                             else
-                                PlayerThrottle = 1;
+                            { PlayerThrottle = 0; }
                         }
                         if (ThrottleOverridden_ > 0 && !ThrottleGripLastFrame)
                         {
