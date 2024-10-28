@@ -85,6 +85,7 @@ namespace SaccFlightAndVehicles
         private CapsuleCollider AAMCollider;
         private bool MissileIncoming = false;
         private Rigidbody MissileRigid;
+        private Rigidbody VehicleRigid;
         private float TargDistlastframe = 999999999;
         private bool TargetLost = false;
         private float UnlockTimer;
@@ -103,7 +104,6 @@ namespace SaccFlightAndVehicles
         private float NotchHorizonDot;
         private float NotchLimitDot;
         private bool hitwater;
-        private ConstantForce MissileConstant;
         private bool initialized;
         private int LifeTimeExplodesSent;
         private GameObject PitBullIndicator;
@@ -120,8 +120,8 @@ namespace SaccFlightAndVehicles
             InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
             VehicleCenterOfMass = EntityControl.CenterOfMass;
             MissileAnimator = GetComponent<Animator>();
-            MissileConstant = GetComponent<ConstantForce>();
             MissileRigid = GetComponent<Rigidbody>();
+            VehicleRigid = EntityControl.VehicleRigidbody;
             AAMCollider = GetComponent<CapsuleCollider>();
             MissileType = (int)AAMLauncherControl.GetProgramVariable("MissileType");
             PitBullIndicator = (GameObject)AAMLauncherControl.GetProgramVariable("PitBullIndicator");
@@ -153,8 +153,6 @@ namespace SaccFlightAndVehicles
 
             //FixedUpdate runs one time after MoveBackToPool so these must be here
             ColliderActive = false;
-            MissileConstant.relativeTorque = Vector3.zero;
-            MissileConstant.relativeForce = Vector3.zero;
             DirectHit = false;
             SplashHit = false;
             LockHack = true;
@@ -206,13 +204,11 @@ namespace SaccFlightAndVehicles
         {
             float sidespeed = Vector3.Dot(MissileRigid.velocity, transform.right);
             float downspeed = Vector3.Dot(MissileRigid.velocity, transform.up);
-            float ConstantRelativeForce = MissileConstant.relativeForce.z;
-            Vector3 NewConstantRelativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, ConstantRelativeForce);
-            MissileConstant.relativeForce = NewConstantRelativeForce;
+            MissileRigid.AddRelativeForce(new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0), ForceMode.Acceleration);
             float DeltaTime = Time.fixedDeltaTime;
             if (!ColliderActive && Initialized)
             {
-                if (Vector3.Distance(transform.position, VehicleCenterOfMass.position) > ColliderActiveDistance)
+                if (Vector3.Distance(MissileRigid.position, VehicleRigid.position) > ColliderActiveDistance)
                 {
                     AAMCollider.enabled = true;
                     ColliderActive = true;
@@ -422,8 +418,6 @@ namespace SaccFlightAndVehicles
             transform.SetParent(AAMLauncherControl.transform);
             AAMCollider.enabled = false;
             ColliderActive = false;
-            MissileConstant.relativeTorque = Vector3.zero;
-            MissileConstant.relativeForce = Vector3.zero;
             MissileRigid.constraints = RigidbodyConstraints.None;
             MissileRigid.angularVelocity = Vector3.zero;
             transform.localPosition = Vector3.zero;

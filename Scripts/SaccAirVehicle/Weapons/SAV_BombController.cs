@@ -32,7 +32,7 @@ namespace SaccFlightAndVehicles
         public float AirPhysicsStrength = .1f;
         private Animator BombAnimator;
         private SaccEntity EntityControl;
-        private ConstantForce BombConstant;
+        private Rigidbody VehicleRigid;
         private Rigidbody BombRigid;
         [System.NonSerializedAttribute] public bool Exploding = false;
         private bool ColliderActive = false;
@@ -50,7 +50,7 @@ namespace SaccFlightAndVehicles
             if (EntityControl) { VehicleCenterOfMass = EntityControl.CenterOfMass; }
             BombCollider = GetComponent<CapsuleCollider>();
             BombRigid = GetComponent<Rigidbody>();
-            BombConstant = GetComponent<ConstantForce>();
+            VehicleRigid = EntityControl.VehicleRigidbody;
             transform.rotation = Quaternion.Euler(new Vector3(transform.rotation.eulerAngles.x + (Random.Range(0, AngleRandomization)), transform.rotation.eulerAngles.y + (Random.Range(-(AngleRandomization / 2), (AngleRandomization / 2))), transform.rotation.eulerAngles.z));
             BombAnimator = GetComponent<Animator>();
             ColliderAlwaysActive = ColliderActiveDistance == 0;
@@ -70,23 +70,25 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(LifeTimeExplode), MaxLifetime + Random.Range(-MaxLifetimeRadnomization, MaxLifetimeRadnomization));
             LifeTimeExplodesSent++;
             SendCustomEventDelayedFrames(nameof(AddLaunchSpeed), 1);//doesn't work if done this frame
-            BombConstant.relativeTorque = Vector3.zero;
-            BombConstant.relativeForce = Vector3.zero;
         }
         void LateUpdate()
         {
             if (!ColliderActive)
             {
-                if (Vector3.Distance(transform.position, VehicleCenterOfMass.position) > ColliderActiveDistance)
+                if (Vector3.Distance(BombRigid.position, VehicleRigid.position) > ColliderActiveDistance)
                 {
                     BombCollider.enabled = true;
                     ColliderActive = true;
                 }
             }
+            if (Exploding) return;
+        }
+        void FixedUpdate()
+        {
             float sidespeed = Vector3.Dot(BombRigid.velocity, transform.right);
             float downspeed = Vector3.Dot(BombRigid.velocity, transform.up);
-            BombConstant.relativeTorque = new Vector3(-downspeed, sidespeed, 0) * StraightenFactor;
-            BombConstant.relativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0);
+            BombRigid.AddRelativeTorque(new Vector3(-downspeed, sidespeed, 0) * StraightenFactor, ForceMode.Acceleration);
+            BombRigid.AddRelativeForce(new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0), ForceMode.Acceleration);
         }
         public void LifeTimeExplode()
         {
@@ -105,8 +107,6 @@ namespace SaccFlightAndVehicles
             transform.SetParent(BombLauncherControl.transform);
             BombCollider.enabled = false;
             if (VehicleCenterOfMass) { ColliderActive = false; }
-            BombConstant.relativeTorque = Vector3.zero;
-            BombConstant.relativeForce = Vector3.zero;
             BombRigid.constraints = RigidbodyConstraints.None;
             BombRigid.angularVelocity = Vector3.zero;
             transform.localPosition = Vector3.zero;

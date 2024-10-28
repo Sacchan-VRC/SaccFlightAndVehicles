@@ -46,7 +46,7 @@ namespace SaccFlightAndVehicles
         private bool IsOwner = false;
         private CapsuleCollider AGMCollider;
         private Rigidbody AGMRigid;
-        private ConstantForce MissileConstant;
+        private Rigidbody VehicleRigid;
         private bool hitwater;
         private bool initialized;
         private int LifeTimeExplodesSent;
@@ -57,7 +57,7 @@ namespace SaccFlightAndVehicles
             VehicleCenterOfMass = EntityControl.CenterOfMass;
             AGMCollider = gameObject.GetComponent<CapsuleCollider>();
             AGMRigid = gameObject.GetComponent<Rigidbody>();
-            MissileConstant = GetComponent<ConstantForce>();
+            VehicleRigid = EntityControl.VehicleRigidbody;
             MissileAnimator = gameObject.GetComponent<Animator>();
         }
         public void ThrowMissile()
@@ -79,21 +79,14 @@ namespace SaccFlightAndVehicles
 
             //LateUpdate runs one time after MoveBackToPool so these must be here
             ColliderActive = false;
-            MissileConstant.relativeTorque = Vector3.zero;
-            MissileConstant.relativeForce = Vector3.zero;
         }
         void LateUpdate()
         {
-            float sidespeed = Vector3.Dot(AGMRigid.velocity, transform.right);
-            float downspeed = Vector3.Dot(AGMRigid.velocity, transform.up);
-            float ConstantRelativeForce = MissileConstant.relativeForce.z;
-            Vector3 NewConstantRelativeForce = new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, ConstantRelativeForce);
-            MissileConstant.relativeForce = NewConstantRelativeForce;
             Vector3 missileToTargetVector = TargetTransform.TransformPoint(TargetOffset) - transform.position;
             float DeltaTime = Time.deltaTime;
             if (!ColliderActive)
             {
-                if (Vector3.Distance(transform.position, VehicleCenterOfMass.position) > ColliderActiveDistance)
+                if (Vector3.Distance(AGMRigid.position, VehicleRigid.position) > ColliderActiveDistance)
                 {
                     AGMCollider.enabled = true;
                     ColliderActive = true;
@@ -110,6 +103,12 @@ namespace SaccFlightAndVehicles
                 transform.Rotate(RotationAxis, Mathf.Min(RotSpeed * DeltaTime, deltaAngle), Space.World);
                 AGMRigid.rotation = transform.rotation;
             }
+        }
+        void FixedUpdate()
+        {
+            float sidespeed = Vector3.Dot(AGMRigid.velocity, transform.right);
+            float downspeed = Vector3.Dot(AGMRigid.velocity, transform.up);
+            AGMRigid.AddRelativeForce(new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0), ForceMode.Acceleration);
         }
         public void StartTracking()
         { StartTrack = true; }
