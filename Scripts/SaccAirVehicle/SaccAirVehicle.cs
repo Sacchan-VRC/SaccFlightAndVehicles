@@ -896,7 +896,6 @@ namespace SaccFlightAndVehicles
 
                 //synced variables because rigidbody values aren't accessable by non-owner players
                 CurrentVel = VehicleRigidbody.velocity;//CurrentVel is set by SAV_SyncScript for non owners
-                Speed = CurrentVel.magnitude;
                 if (Piloting)
                 {
                     DoRepeatingWorld();
@@ -1299,6 +1298,7 @@ namespace SaccFlightAndVehicles
             if (IsOwner)
             {
                 float DeltaTime = Time.fixedDeltaTime;
+                Speed = VehicleRigidbody.velocity.magnitude;
                 if (Piloting)
                 {
                     WindAndAoA();
