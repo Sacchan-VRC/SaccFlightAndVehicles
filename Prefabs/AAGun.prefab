@@ -184,8 +184,9 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 204394095}
   EntityControl: {fileID: -6981790852263073105}
   IsPilotSeat: 1
-  ThisSeatOnly: {fileID: 784884802}
+  PassengerFunctions: {fileID: 0}
   EnableInSeat: []
+  DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 2041867257}
   SeatOutSideVehicle: 0
@@ -15832,13 +15833,11 @@ MonoBehaviour:
   AAMLockTime: 1.5
   AAMLaunchDelay: 0
   AAMLaunchPoint: {fileID: 980607809}
-  AAMTargetsLayer:
-    serializedVersion: 2
-    m_Bits: 33554432
   AllowNoAmmoLock: 0
   LoseLockWhenFired: 0
   SendLockWarning: 1
   DisableTargeting: 0
+  OnlyTargetVehicles: 0
   BulletDamageTaken: 10
   AI_GUN: 0
   AI_GUN_TurnStrength: 1
@@ -16326,7 +16325,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 0
+  moveWithTransform: 1
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -37933,12 +37932,13 @@ MonoBehaviour:
   AAMTargetsLayer:
     serializedVersion: 2
     m_Bits: 33554432
-  InVehicleOnly: {fileID: 0}
   EnableInVehicle:
   - {fileID: 784884802}
   DisableInVehicle: []
   EnableWhenHolding: []
+  DisableWhenHolding: []
   EnableWhenOwner: []
+  RespawnPoint: {fileID: 0}
   CenterOfMass: {fileID: 1947454891}
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
@@ -37955,7 +37955,10 @@ MonoBehaviour:
   CustomPickup_DropKey: 103
   CustomPickup_RotationOffsetVR: {x: 0, y: 60, z: 90}
   CustomPickup_RotationOffsetDesktop: {x: 0, y: 35, z: 90}
+  PassengerFunctionControllers: []
   AAMTargets: []
+  DialFuncPos: 0
+  passengerFuncIgnorePassengerFlag: 0
 --- !u!114 &1831767551
 MonoBehaviour:
   m_ObjectHideFlags: 0

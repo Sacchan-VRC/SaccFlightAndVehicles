@@ -13,6 +13,9 @@ namespace SaccFlightAndVehicles
         [SerializeField] public UdonSharpBehaviour SAVControl;
         public Animator BombAnimator;
         public GameObject Bomb;
+        public KeyCode FireNowKey = KeyCode.None;
+        [Tooltip("How many bombs to create at Start() so they don't have to be created later")]
+        public int NumPreInstatiated = 5;
         [Tooltip("How long it takes to fully reload from empty in seconds. Can be inaccurate because it can only reload by integers per resupply")]
         public float FullReloadTimeSec = 8;
         public Text HUDText_Bomb_ammo;
@@ -22,8 +25,6 @@ namespace SaccFlightAndVehicles
         public int NumBomb_PerShot = 1;
         [Tooltip("Delay between bomb drops when holding the trigger")]
         public float BombHoldDelay = 0.5f;
-        [Tooltip("How many bombs to create at StarT() so they don't have to be created later")]
-        public int NumPreInstatiated = 5;
         [Tooltip("Minimum delay between bomb drops")]
         public float BombDelay = 0f;
         [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
@@ -56,7 +57,7 @@ namespace SaccFlightAndVehicles
         public Transform WorldParent;
         public Camera AtGCam;
         public bool SetAtGCamSettings = true;
-        public GameObject AtGScreen;
+        public GameObject[] EnableOnSelected;
         [UdonSynced(UdonSyncMode.None)] private bool BombFireNow = false;
         private float boolToggleTime;
         private bool AnimOn = false;
@@ -74,7 +75,7 @@ namespace SaccFlightAndVehicles
         private Rigidbody VehicleRigid;
         private float reloadspeed;
         private bool Piloting = false;
-        private bool func_active = false;
+        private bool Selected = false;
         private int NumChildrenStart;
         private bool DoAnimFiredTrigger = false;
         private VRCPlayerApi localPlayer;
@@ -98,6 +99,7 @@ namespace SaccFlightAndVehicles
             StartEntityLayer = EntityControl.gameObject.layer;
 
             UpdateAmmoVisuals();
+            for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
 
             NumChildrenStart = transform.childCount;
             if (Bomb)
@@ -161,9 +163,9 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
         public void SFEXT_O_PilotExit()
         {
-            func_active = false;
+            Selected = false;
             Piloting = false;
-            if (AtGScreen) { AtGScreen.SetActive(false); }
+            for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
             if (AtGCam) { AtGCam.gameObject.SetActive(false); }
         }
         public void SFEXT_P_PassengerEnter()
@@ -173,10 +175,10 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Selected()
         {
             TriggerLastFrame = true;
-            func_active = EntityControl.InVR || !KeyboardInput_InstantFire;
+            Selected = EntityControl.InVR || !KeyboardInput_InstantFire;
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
-            if (AtGScreen) AtGScreen.SetActive(true);
+            for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(true); }
             if (AtGCam)
             {
                 AtGCam.gameObject.SetActive(true);
@@ -189,11 +191,11 @@ namespace SaccFlightAndVehicles
         }
         public void DFUNC_Deselected()
         {
-            func_active = false;
+            Selected = false;
             HoldingTrigger_Held = false;
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
-            if (AtGScreen) { AtGScreen.SetActive(false); }
+            for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
             if (AtGCam) { AtGCam.gameObject.SetActive(false); }
         }
         public void SFEXT_G_Explode()
@@ -225,7 +227,7 @@ namespace SaccFlightAndVehicles
         private bool HoldingTrigger_Held = false;
         public void SFEXT_O_OnPickupUseDown()
         {
-            if (!func_active) { return; }
+            if (!Selected) { return; }
             if (HandHeld_MachineGun)
             {
                 HoldingTrigger_Held = true;
@@ -288,14 +290,14 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (func_active)
+            if (Selected || Input.GetKey(FireNowKey))
             {
                 float Trigger;
                 if (LeftDial)
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if ((Trigger > 0.75 || Input.GetKey(KeyCode.Space)) && !Held || HoldingTrigger_Held)
+                if ((Trigger > 0.75 || Input.GetKey(KeyCode.Space) || Input.GetKey(FireNowKey)) && !Held || HoldingTrigger_Held)
                 {
                     if (!TriggerLastFrame)
                     {

@@ -42334,8 +42334,9 @@ MonoBehaviour:
   SAVControl: {fileID: 2961384493794590454}
   GunAnimator: {fileID: 1564986660552776568}
   GunFiringBoolName: gunfiring
-  AmmoBar: {fileID: 1564986660355104341}
-  AmmoBars: []
+  FireNowKey: 0
+  AmmoBars:
+  - {fileID: 1564986660355104341}
   GunRecoilEmpty: {fileID: 1564986659346940533}
   GunDamageParticle: {fileID: 953016045453162550}
   HudCrosshairGun: {fileID: 1564986659715920758}
@@ -42770,6 +42771,8 @@ MonoBehaviour:
   SAVControl: {fileID: 2961384493794590454}
   BombAnimator: {fileID: 0}
   Bomb: {fileID: 5141064103186665271}
+  FireNowKey: 0
+  NumPreInstatiated: 5
   FullReloadTimeSec: 8
   HUDText_Bomb_ammo: {fileID: 1564986659006246960}
   HUDText_Bomb_ammo_TMP: {fileID: 0}
@@ -42777,7 +42780,6 @@ MonoBehaviour:
   NumBomb: 36
   NumBomb_PerShot: 1
   BombHoldDelay: 0.25
-  NumPreInstatiated: 5
   BombDelay: 0
   BombLaunchPoints:
   - {fileID: 6866471498013573617}
@@ -42799,7 +42801,7 @@ MonoBehaviour:
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 0}
   SetAtGCamSettings: 1
-  AtGScreen: {fileID: 0}
+  EnableOnSelected: []
 --- !u!114 &1564986659538012441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114741,7 +114743,7 @@ PrefabInstance:
     - target: {fileID: 8723609688775321150, guid: 96f9956a8643b6146b5974c824f2194c,
         type: 3}
       propertyPath: ColliderActiveDistance
-      value: 10
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 8723609688775321150, guid: 96f9956a8643b6146b5974c824f2194c,
         type: 3}

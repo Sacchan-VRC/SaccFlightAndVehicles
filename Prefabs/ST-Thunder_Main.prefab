@@ -87,11 +87,12 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 8005464590886231918}
-  PassengerExtensions: []
+  PassengerExtensions:
+  - {fileID: 2223587385309144781}
   Dial_Functions_L:
   - {fileID: 7433692123803235161}
   Dial_Functions_R:
-  - {fileID: 2223587385309144781}
+  - {fileID: 1055114395135687598}
   LeftDialDivideStraightUp: 0
   RightDialDivideStraightUp: 0
   LStickDisplayHighlighter: {fileID: 0}
@@ -17033,7 +17034,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1204486790021234097}
+  - {fileID: 4357751112629626707}
   m_Father: {fileID: 6209926809663681244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1608060673411961624
@@ -29331,7 +29332,6 @@ MonoBehaviour:
   - {fileID: 8095472886494851222}
   - {fileID: 2935594654065772027}
   - {fileID: 2415333971997971365}
-  - {fileID: 2760801949162191546}
   Dial_Functions_L:
   - {fileID: 8087574855777888572}
   - {fileID: 1320961205973880017}
@@ -29994,6 +29994,7 @@ MonoBehaviour:
   PassengerFunctions: {fileID: 2760801949162191546}
   EnableInSeat:
   - {fileID: 1821296935755917208}
+  - {fileID: 7643922150233032759}
   DisableInSeat: []
   AdjustSeatPosition: 1
   TargetEyePosition: {fileID: 8898729298587184617}
@@ -46426,6 +46427,112 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1 &4797566613073816900
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4357751112629626707}
+  - component: {fileID: 1055114395135687598}
+  - component: {fileID: 5566975238347917375}
+  m_Layer: 17
+  m_Name: DFUNC_Gun
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 0
+--- !u!4 &4357751112629626707
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4797566613073816900}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 35.82489, y: 0, z: 81.50024}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6687756426664581133}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1055114395135687598
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4797566613073816900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46465b5ad64ae66409655c2a81ee4b56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects: []
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes: []
+  _udonSharpBackingUdonBehaviour: {fileID: 5566975238347917375}
+  SAVControl: {fileID: 2935594653847325617}
+  GunAnimator: {fileID: 2935594654239514265}
+  GunFiringBoolName: gunfire
+  FireNowKey: 32
+  AmmoBars:
+  - {fileID: 7643922150233396247}
+  GunRecoilEmpty: {fileID: 0}
+  GunDamageParticle: {fileID: 533464335176836633}
+  HudCrosshairGun: {fileID: 0}
+  HudCrosshair: {fileID: 0}
+  FullReloadTimeSec: 20
+  GunAmmoInSeconds: 60
+  GunRecoil: 0
+  DoAnimBool: 0
+  AnimBoolName: 
+  AnimBoolStayTrueOnExit: 0
+  AllowFiringGrounded: 1
+  DisallowFireIfWind: 0
+  EnableOnSelected: []
+  HUDControl: {fileID: 0}
+  MaxTargetDistance: 6000
+  TargetIndicator: {fileID: 0}
+  GUNLeadIndicator: {fileID: 0}
+  GunLeadResponsiveness: 1
+  BulletSpeed: 1050
+--- !u!114 &5566975238347917375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4797566613073816900}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45115577ef41a5b4ca741ed302693907, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  interactTextPlacement: {fileID: 0}
+  interactText: Use
+  interactTextGO: {fileID: 0}
+  proximity: 2
+  SynchronizePosition: 0
+  AllowCollisionOwnershipTransfer: 0
+  Reliable: 1
+  _syncMethod: 3
+  serializedProgramAsset: {fileID: 11400000, guid: 84d88f7b0e9c11c419565cf7b2853a2c,
+    type: 2}
+  programSource: {fileID: 11400000, guid: 4dd94576051e2a7429583286bc1ea93d, type: 2}
+  serializedPublicVariablesBytesString: Ai8AAAAAATIAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAFQAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AAAAAAAYBAAAAAAAAACcBBAAAAHQAeQBwAGUAAWgAAABTAHkAcwB0AGUAbQAuAEMAbwBsAGwAZQBjAHQAaQBvAG4AcwAuAEcAZQBuAGUAcgBpAGMALgBMAGkAcwB0AGAAMQBbAFsAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBJAG4AdABlAHIAZgBhAGMAZQBzAC4ASQBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQAsACAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4AXQBdACwAIABtAHMAYwBvAHIAbABpAGIAAQEJAAAAVgBhAHIAaQBhAGIAbABlAHMALwEAAAABaAAAAFMAeQBzAHQAZQBtAC4AQwBvAGwAbABlAGMAdABpAG8AbgBzAC4ARwBlAG4AZQByAGkAYwAuAEwAaQBzAHQAYAAxAFsAWwBWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAEkAbgB0AGUAcgBmAGEAYwBlAHMALgBJAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgBdAF0ALAAgAG0AcwBjAG8AcgBsAGkAYgABAAAABgIAAAAAAAAAAi8CAAAAAUsAAABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgAuAFUAZABvAG4AVgBhAHIAaQBhAGIAbABlAGAAMQBbAFsAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgACAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAErAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIASABhAHMARABvAG4AZQBTAGMAZQBuAGUAVQBwAGcAcgBhAGQAZQBfAF8AXwAnAQQAAAB0AHkAcABlAAEYAAAAUwB5AHMAdABlAG0ALgBCAG8AbwBsAGUAYQBuACwAIABtAHMAYwBvAHIAbABpAGIAKwEFAAAAVgBhAGwAdQBlAAEHBQIvAwAAAAFJAAAAVgBSAEMALgBVAGQAbwBuAC4AQwBvAG0AbQBvAG4ALgBVAGQAbwBuAFYAYQByAGkAYQBiAGwAZQBgADEAWwBbAFMAeQBzAHQAZQBtAC4ASQBuAHQAMwAyACwAIABtAHMAYwBvAHIAbABpAGIAXQBdACwAIABWAFIAQwAuAFUAZABvAG4ALgBDAG8AbQBtAG8AbgADAAAABgIAAAAAAAAAJwEEAAAAdAB5AHAAZQABFwAAAFMAeQBzAHQAZQBtAC4AUwB0AHIAaQBuAGcALAAgAG0AcwBjAG8AcgBsAGkAYgAnAQoAAABTAHkAbQBiAG8AbABOAGEAbQBlAAEfAAAAXwBfAF8AVQBkAG8AbgBTAGgAYQByAHAAQgBlAGgAYQB2AGkAbwB1AHIAVgBlAHIAcwBpAG8AbgBfAF8AXwAnAQQAAAB0AHkAcABlAAEWAAAAUwB5AHMAdABlAG0ALgBJAG4AdAAzADIALAAgAG0AcwBjAG8AcgBsAGkAYgAXAQUAAABWAGEAbAB1AGUAAgAAAAcFBwUHBQ==
+  publicVariablesUnityEngineObjects: []
+  publicVariablesSerializationDataFormat: 0
 --- !u!1 &5044468900849151715
 GameObject:
   m_ObjectHideFlags: 0
@@ -67432,6 +67539,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1204486790021234097}
   - {fileID: 8216622710033393948}
   - {fileID: 6687756426664581133}
   m_Father: {fileID: 2935594654239514260}
@@ -73054,7 +73162,7 @@ GameObject:
   - component: {fileID: 2223587385309144781}
   - component: {fileID: 966274979679363536}
   m_Layer: 17
-  m_Name: DFUNCP_Minigun
+  m_Name: EXTT_HandTurret
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -73073,7 +73181,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6687756426664581133}
+  m_Father: {fileID: 6209926809663681244}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2223587385309144781
 MonoBehaviour:
@@ -73097,17 +73205,9 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 966274979679363536}
-  SAVControl: {fileID: 2935594653847325617}
-  VehicleTransform: {fileID: 2935594654239514260}
-  Minigun: {fileID: 6096119339172870666}
-  MinigunPitch: {fileID: 0}
-  GunDamageParticle_Parent: {fileID: 533464335176836633}
-  GunAmmoInSeconds: 60
-  FullReloadTimeSec: 20
-  AnimatorFiringStringName: gunfire
-  GunAnimator: {fileID: 2935594654239514265}
-  AmmoBar: {fileID: 7643922150233396247}
-  MinigunFireKey: 32
+  TurretTransform: {fileID: 2935594654239514260}
+  Gun: {fileID: 6096119339172870666}
+  GunPitch: {fileID: 0}
   Aim_HandDirection: 0
   Aim_HeadDirectionVR: 0
   LimitTurnAngle: 0
@@ -73115,17 +73215,6 @@ MonoBehaviour:
   AngleLimitRight: 0
   AngleLimitUp: 0
   AngleLimitDown: 0
-  AllowGroundedFiring: 1
-  UseProjectileMode: 0
-  Projectile: {fileID: 0}
-  ProjectileAmmo: 30
-  FireDelay: 1
-  FireHoldDelay: 1
-  FirePoints: []
-  WorldParent: {fileID: 0}
-  FireSound: {fileID: 0}
-  SendAnimTrigger: 0
-  AnimTriggerName: 
 --- !u!114 &966274979679363536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99521,6 +99610,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 643c58071ac02de46bcca329c0fcae3e, type: 3}
+--- !u!1 &7643922150233032759 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 100000, guid: 643c58071ac02de46bcca329c0fcae3e,
+    type: 3}
+  m_PrefabInstance: {fileID: 7643922150233001623}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7643922150233396247 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400000, guid: 643c58071ac02de46bcca329c0fcae3e,

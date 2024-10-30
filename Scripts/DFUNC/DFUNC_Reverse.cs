@@ -32,8 +32,7 @@ namespace SaccFlightAndVehicles
         {
             StartThrottleStrength = (float)SAVControl.GetProgramVariable("ThrottleStrength");
             StartABStrength = (float)SAVControl.GetProgramVariable("ThrottleStrengthAB");
-            ReversingThrottleStrength = StartThrottleStrength * ReversingThrottleMultiplier;
-            ReversingABStrength = StartABStrength * ReversingThrottleMultiplier;
+            SAVControl.SetProgramVariable("InverThrustMultiplier", ReversingThrottleMultiplier);
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         }
         public void DFUNC_Selected()
@@ -70,43 +69,35 @@ namespace SaccFlightAndVehicles
         }
         public void ToggleReverse()
         {
-            Debug.Log("ToggleReverse");
             if (!Reversing)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetReversing));
+                EntityControl.SendEventToExtensions("SFEXT_O_StartReversing");
             }
             else
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetNotReversing));
+                EntityControl.SendEventToExtensions("SFEXT_O_StopReversing");
             }
         }
         public void SetReversing()
         {
-            Debug.Log("SetReversing");
             if (Reversing) { return; }
-            Debug.Log("SetReversing2");
             Reversing = true;
             if (ReverseAnimator) { ReverseAnimator.SetBool(AnimBoolName, true); }
-            SAVControl.SetProgramVariable("ThrottleStrength", ReversingThrottleStrength);
-            SAVControl.SetProgramVariable("ThrottleStrengthAB", ReversingABStrength);
+            SAVControl.SetProgramVariable("InvertThrust", (int)SAVControl.GetProgramVariable("InvertThrust") + 1);
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
-            if (EntityControl.IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_StartReversing"); }
         }
         public void SetNotReversing()
         {
-            Debug.Log("SetNotReversing");
             if (!Reversing) { return; }
-            Debug.Log("SetNotReversing2");
             Reversing = false;
             if (ReverseAnimator) { ReverseAnimator.SetBool(AnimBoolName, false); }
-            SAVControl.SetProgramVariable("ThrottleStrength", StartThrottleStrength);
-            SAVControl.SetProgramVariable("ThrottleStrengthAB", StartABStrength);
+            SAVControl.SetProgramVariable("InvertThrust", (int)SAVControl.GetProgramVariable("InvertThrust") - 1);
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-            if (EntityControl.IsOwner) { EntityControl.SendEventToExtensions("SFEXT_O_StopReversing"); }
         }
         public void KeyboardInput()
         {
-            Debug.Log("KeyboardInput");
             ToggleReverse();
         }
         public void SFEXT_O_OnPlayerJoined()

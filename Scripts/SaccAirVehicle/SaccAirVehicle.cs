@@ -214,6 +214,7 @@ namespace SaccFlightAndVehicles
         [Header("Other:")]
         [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders suspension values")]
         public bool AutoAdjustValuesToMass = true;
+        public bool ReverseThrustAllowAfterburner = false;
         [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
         public Transform ControlsRoot;
         [Tooltip("Wind speed on each axis")]
@@ -1076,10 +1077,10 @@ namespace SaccFlightAndVehicles
                             }
                             float ThrottleDifference = ThrottleZeroPoint - HandThrottleAxis;
                             ThrottleDifference *= ThrottleSensitivity;
-                            bool VTOLandAB_Disallowed = (!VTOLAllowAfterburner && VTOLAngle != 0);/*don't allow VTOL AB disabled vehicles, false if attemping to*/
-
+                            // check if VTOLING and VTOL+AB is not allowed OR if reversing and reverse+AB is not allowed 
+                            bool AB_Disallowed = (!VTOLAllowAfterburner && VTOLAngleDegrees > EnterVTOLEvent_Angle) || (!ReverseThrustAllowAfterburner && _InvertThrust);
                             //Detent function to prevent you going into afterburner by accident (bit of extra force required to turn on AB (actually hand speed))
-                            if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !VTOLandAB_Disallowed && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/&& !VTOLandAB_Disallowed) || !HasAfterburner))
+                            if (((HandDistanceZLastFrame - HandThrottleAxis) * ThrottleSensitivity > .05f)/*detent overcome*/ && !AB_Disallowed && Fuel > LowFuel || ((PlayerThrottle > ThrottleAfterburnerPoint/*already in afterburner*/&& !AB_Disallowed) || !HasAfterburner))
                             {
                                 PlayerThrottle = Mathf.Clamp(TempThrottle + ThrottleDifference, 0, 1);
                             }
@@ -1130,7 +1131,7 @@ namespace SaccFlightAndVehicles
                         {
                             if (HasAfterburner)
                             {
-                                if ((VTOLAngleDegrees < EnterVTOLEvent_Angle || VTOLAllowAfterburner))
+                                if ((VTOLAngleDegrees < EnterVTOLEvent_Angle || VTOLAllowAfterburner) && (ReverseThrustAllowAfterburner || !_InvertThrust))
                                 {
                                     if (PlayerThrottle == 1)
                                     { PlayerThrottle = ThrottleAfterburnerPoint; }

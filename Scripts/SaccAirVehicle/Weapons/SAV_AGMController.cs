@@ -38,27 +38,28 @@ namespace SaccFlightAndVehicles
         private Animator MissileAnimator;
         private SaccEntity EntityControl;
         private bool StartTrack = false;
-        private Transform VehicleCenterOfMass;
         private Transform TargetTransform;
         private Vector3 TargetOffset;
         private bool ColliderActive = false;
         [System.NonSerializedAttribute] public bool Exploding = false;
         private bool IsOwner = false;
-        private CapsuleCollider AGMCollider;
+        private Collider AGMCollider;
         private Rigidbody AGMRigid;
         private Rigidbody VehicleRigid;
         private bool hitwater;
         private bool initialized;
         private int LifeTimeExplodesSent;
+        private bool ColliderAlwaysActive;
+        Vector3 LocalLaunchPoint;
         private void Initialize()
         {
             initialized = true;
             EntityControl = (SaccEntity)AGMLauncherControl.GetProgramVariable("EntityControl");
-            VehicleCenterOfMass = EntityControl.CenterOfMass;
-            AGMCollider = gameObject.GetComponent<CapsuleCollider>();
+            AGMCollider = gameObject.GetComponent<Collider>();
             AGMRigid = gameObject.GetComponent<Rigidbody>();
             VehicleRigid = EntityControl.VehicleRigidbody;
             MissileAnimator = gameObject.GetComponent<Animator>();
+            ColliderAlwaysActive = ColliderActiveDistance == 0;
         }
         public void ThrowMissile()
         {
@@ -67,6 +68,9 @@ namespace SaccFlightAndVehicles
         private void OnEnable()
         {
             if (!initialized) { Initialize(); }
+            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            if (ColliderAlwaysActive) { AGMCollider.enabled = true; ColliderActive = true; }
+            else { AGMCollider.enabled = false; ColliderActive = false; }
             TargetTransform = (Transform)AGMLauncherControl.GetProgramVariable("TrackedTransform");
             TargetOffset = (Vector3)AGMLauncherControl.GetProgramVariable("TrackedObjectOffset");
             if (EntityControl.InEditor) { IsOwner = true; }
@@ -76,17 +80,16 @@ namespace SaccFlightAndVehicles
             LifeTimeExplodesSent++;
             SendCustomEventDelayedSeconds(nameof(StartTracking), FlyStraightTime);
             SendCustomEventDelayedFrames(nameof(ThrowMissile), 1);//doesn't work if done this frame
-
-            //LateUpdate runs one time after MoveBackToPool so these must be here
-            ColliderActive = false;
         }
         void LateUpdate()
         {
+            if (Exploding) return;
             Vector3 missileToTargetVector = TargetTransform.TransformPoint(TargetOffset) - transform.position;
             float DeltaTime = Time.deltaTime;
             if (!ColliderActive)
             {
-                if (Vector3.Distance(AGMRigid.position, VehicleRigid.position) > ColliderActiveDistance)
+                Vector3 LaunchPoint = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                if (Vector3.Distance(AGMRigid.position, LaunchPoint) > ColliderActiveDistance)
                 {
                     AGMCollider.enabled = true;
                     ColliderActive = true;
@@ -130,7 +133,9 @@ namespace SaccFlightAndVehicles
             AGMCollider.enabled = false;
             AGMRigid.constraints = RigidbodyConstraints.None;
             AGMRigid.angularVelocity = Vector3.zero;
-            transform.localPosition = Vector3.zero;
+            Vector3 LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
+            transform.position = LaunchPoint;
+            AGMRigid.position = LaunchPoint;
             StartTrack = false;
             Exploding = false;
         }

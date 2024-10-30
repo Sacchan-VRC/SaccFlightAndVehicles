@@ -82,9 +82,9 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public Transform Target;
         private bool ColliderActive = false;
         [System.NonSerializedAttribute] public bool Exploding = false;
-        private CapsuleCollider AAMCollider;
+        private Collider AAMCollider;
         private bool MissileIncoming = false;
-        private Rigidbody MissileRigid;
+        private Rigidbody AAMRigid;
         private Rigidbody VehicleRigid;
         private float TargDistlastframe = 999999999;
         private bool TargetLost = false;
@@ -93,7 +93,6 @@ namespace SaccFlightAndVehicles
         private float TargetThrottleNormalizer;
         Vector3 TargetPosLastFrame;
 
-        private Transform VehicleCenterOfMass;
         private bool IsOwner;
         private bool InEditor;
         private bool Initialized = false;
@@ -113,16 +112,17 @@ namespace SaccFlightAndVehicles
         private Vector3 PredictedPos;
         private float AAMMaxTargetDistance;
         private int OutsideVehicleLayer;
+        Vector3 LocalLaunchPoint;
+        private bool ColliderAlwaysActive;
         void Initialize()
         {
             EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
             //whatever script is launching the missiles must contain all of these variables
             InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
-            VehicleCenterOfMass = EntityControl.CenterOfMass;
             MissileAnimator = GetComponent<Animator>();
-            MissileRigid = GetComponent<Rigidbody>();
+            AAMRigid = GetComponent<Rigidbody>();
             VehicleRigid = EntityControl.VehicleRigidbody;
-            AAMCollider = GetComponent<CapsuleCollider>();
+            AAMCollider = GetComponent<Collider>();
             MissileType = (int)AAMLauncherControl.GetProgramVariable("MissileType");
             PitBullIndicator = (GameObject)AAMLauncherControl.GetProgramVariable("PitBullIndicator");
             AAMMaxTargetDistance = (float)AAMLauncherControl.GetProgramVariable("AAMMaxTargetDistance");
@@ -131,6 +131,7 @@ namespace SaccFlightAndVehicles
             NotchHorizonDot = 1 - Mathf.Cos(NotchHorizon * Mathf.Deg2Rad);//angle as dot product
             NotchLimitDot = 1 - Mathf.Cos(NotchAngle * Mathf.Deg2Rad);
             HighAspectTrack = Mathf.Cos(HighAspectTrackAngle * Mathf.Deg2Rad);
+            ColliderAlwaysActive = ColliderActiveDistance == 0;
         }
         public void StartTracking()
         {
@@ -138,11 +139,14 @@ namespace SaccFlightAndVehicles
         }
         public void ThrowMissile()
         {
-            MissileRigid.velocity = MissileRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
+            AAMRigid.velocity = AAMRigid.velocity + (ThrowSpaceVehicle ? EntityControl.transform.TransformDirection(ThrowVelocity) : transform.TransformDirection(ThrowVelocity));
         }
         private void OnEnable()
         {
             if (!initialized) { Initialize(); }
+            LocalLaunchPoint = EntityControl.transform.InverseTransformDirection(transform.position - EntityControl.transform.position);
+            if (ColliderAlwaysActive) { AAMCollider.enabled = true; ColliderActive = true; }
+            else { AAMCollider.enabled = false; ColliderActive = false; }
             if (EntityControl.InEditor) { IsOwner = true; }
             else
             { IsOwner = (bool)AAMLauncherControl.GetProgramVariable("IsOwner"); }
@@ -202,13 +206,15 @@ namespace SaccFlightAndVehicles
         }
         void FixedUpdate()
         {
-            float sidespeed = Vector3.Dot(MissileRigid.velocity, transform.right);
-            float downspeed = Vector3.Dot(MissileRigid.velocity, transform.up);
-            MissileRigid.AddRelativeForce(new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0), ForceMode.Acceleration);
+            if (Exploding) return;
+            float sidespeed = Vector3.Dot(AAMRigid.velocity, transform.right);
+            float downspeed = Vector3.Dot(AAMRigid.velocity, transform.up);
+            AAMRigid.AddRelativeForce(new Vector3(-sidespeed * AirPhysicsStrength, -downspeed * AirPhysicsStrength, 0), ForceMode.Acceleration);
             float DeltaTime = Time.fixedDeltaTime;
             if (!ColliderActive && Initialized)
             {
-                if (Vector3.Distance(MissileRigid.position, VehicleRigid.position) > ColliderActiveDistance)
+                Vector3 LaunchPoint = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                if (Vector3.Distance(AAMRigid.position, LaunchPoint) > ColliderActiveDistance)
                 {
                     AAMCollider.enabled = true;
                     ColliderActive = true;
@@ -301,7 +307,7 @@ namespace SaccFlightAndVehicles
                 if (EngineTrack > 1) { EngineTrack = AfterBurnerTrackMulti; }//if AB on, faster rotation
                 if (Target.gameObject.activeInHierarchy && UnlockTimer < UnlockTime)
                 {
-                    if (!Dumb && Vector3.Dot(MissileToTargetVector, MissileRigid.velocity) > 0 || LockHack)
+                    if (!Dumb && Vector3.Dot(MissileToTargetVector, AAMRigid.velocity) > 0 || LockHack)
                     {
                         if (PredictiveChase)
                         {
@@ -313,13 +319,13 @@ namespace SaccFlightAndVehicles
                         UnlockTimer = 0;
                         //turn towards the target
                         Vector3 TargetDirNormalized = MissileToTargetVector.normalized * TargetVectorExtension;
-                        Vector3 MissileVelNormalized = MissileRigid.velocity.normalized;
+                        Vector3 MissileVelNormalized = AAMRigid.velocity.normalized;
                         Vector3 MissileForward = transform.forward;
                         Vector3 targetDirection = TargetDirNormalized - MissileVelNormalized;
                         Vector3 RotationAxis = Vector3.Cross(MissileForward, targetDirection);
                         float deltaAngle = Vector3.Angle(MissileForward, targetDirection);
                         transform.Rotate(RotationAxis, Mathf.Min(RotSpeed * EngineTrack * AspectTrack * DeltaTime, deltaAngle), Space.World);
-                        MissileRigid.rotation = transform.rotation;
+                        AAMRigid.rotation = transform.rotation;
                     }
                     else
                     {
@@ -417,10 +423,11 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             transform.SetParent(AAMLauncherControl.transform);
             AAMCollider.enabled = false;
-            ColliderActive = false;
-            MissileRigid.constraints = RigidbodyConstraints.None;
-            MissileRigid.angularVelocity = Vector3.zero;
-            transform.localPosition = Vector3.zero;
+            AAMRigid.constraints = RigidbodyConstraints.None;
+            AAMRigid.angularVelocity = Vector3.zero;
+            Vector3 LaunchPoint = EntityControl.transform.position + EntityControl.transform.TransformDirection(LocalLaunchPoint);
+            transform.position = LaunchPoint;
+            AAMRigid.position = LaunchPoint;
             TargetSAVControl = null;
             TargetEntityControl = null;
             StartTrack = false;
@@ -447,10 +454,10 @@ namespace SaccFlightAndVehicles
         }
         private void Explode()
         {
-            if (MissileRigid)
+            if (AAMRigid)
             {
-                MissileRigid.constraints = RigidbodyConstraints.FreezePosition;
-                MissileRigid.velocity = Vector3.zero;
+                AAMRigid.constraints = RigidbodyConstraints.FreezePosition;
+                AAMRigid.velocity = Vector3.zero;
             }
             Exploding = true;
             TargetLost = true;

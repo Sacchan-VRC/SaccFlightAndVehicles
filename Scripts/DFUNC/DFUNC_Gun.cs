@@ -13,8 +13,8 @@ namespace SaccFlightAndVehicles
         public Animator GunAnimator;
         [Tooltip("Animator bool that is true when the gun is firing")]
         public string GunFiringBoolName = "gunfiring";
+        public KeyCode FireNowKey = KeyCode.None;
         [Tooltip("Transform of which its X scale scales with ammo")]
-        public Transform AmmoBar;
         public Transform[] AmmoBars;
         [Tooltip("Position at which recoil forces are added, not required for recoil to work. Only use this if you want the vehicle to rotate when shooting")]
         public Transform GunRecoilEmpty;
@@ -63,7 +63,7 @@ namespace SaccFlightAndVehicles
         private bool Selected = false;
         private bool Selected_HUD = false;
         private float reloadspeed;
-        private bool InVehicle = false;
+        private bool Piloting = false;
         private Vector3 AmmoBarScaleStart;
         private Vector3[] AmmoBarScaleStarts;
         public void SFEXT_L_EntityStart()
@@ -71,7 +71,6 @@ namespace SaccFlightAndVehicles
             FullGunAmmoInSeconds = GunAmmoInSeconds;
             reloadspeed = FullGunAmmoInSeconds / FullReloadTimeSec;
 
-            if (AmmoBar) { AmmoBarScaleStart = AmmoBar.localScale; }
             AmmoBarScaleStarts = new Vector3[AmmoBars.Length];
             for (int i = 0; i < AmmoBars.Length; i++)
             {
@@ -124,7 +123,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
-            InVehicle = true;
+            Piloting = true;
             if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(true); }
             gameObject.SetActive(true);
             RequestSerialization();
@@ -142,15 +141,11 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotExit()
         {
-            InVehicle = false;
+            Piloting = false;
             if (Selected) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected)); }//unselect 
             Selected = false;
             if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(false); }
         }
-        public void SFEXT_P_PassengerEnter()
-        { InVehicle = true; }
-        public void SFEXT_P_PassengerExit()
-        { InVehicle = false; }
         public void SFEXT_G_ReSupply()
         {
             if (GunAmmoInSeconds != FullGunAmmoInSeconds)
@@ -161,7 +156,6 @@ namespace SaccFlightAndVehicles
 
         public void UpdateAmmoVisuals()
         {
-            if (AmmoBar) { AmmoBar.localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStart.x, AmmoBarScaleStart.y, AmmoBarScaleStart.z); }
             for (int i = 0; i < AmmoBars.Length; i++)
             {
                 AmmoBars[i].localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStarts[i].x, AmmoBarScaleStarts[i].y, AmmoBarScaleStarts[i].z);
@@ -219,9 +213,9 @@ namespace SaccFlightAndVehicles
         }
         public void LateUpdate()
         {
-            if (InVehicle)
+            if (Piloting)
             {
-                if (Selected)
+                if (Selected || Input.GetKey(FireNowKey))
                 {
                     float DeltaTime = Time.deltaTime;
                     float Trigger;
@@ -229,7 +223,7 @@ namespace SaccFlightAndVehicles
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space))) && GunAmmoInSeconds > 0))
+                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space) || Input.GetKey(FireNowKey))) && GunAmmoInSeconds > 0))
                     {
                         if (DisallowFireIfWind)
                         {
@@ -259,14 +253,19 @@ namespace SaccFlightAndVehicles
                         {
                             Firing = false;
                             RequestSerialization();
-                            if (IsOwner)
-                            { EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring"); }
+                            EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                         }
                     }
                     if (HUDControl)
                     { Hud(); }
+                    UpdateAmmoVisuals();
                 }
-                UpdateAmmoVisuals();
+                else if (_firing)
+                {
+                    Firing = false;
+                    RequestSerialization();
+                    EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
+                }
             }
         }
         private GameObject[] AAMTargets;

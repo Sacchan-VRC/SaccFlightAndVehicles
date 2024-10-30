@@ -86,6 +86,10 @@ namespace SaccFlightAndVehicles
                 if (Station == EntityControl.ExternalSeats[i])
                 { ThisSeatExternal = true; break; }
             }
+            for (int i = 0; i < EnableInSeat.Length; i++)
+            { if (EnableInSeat[i]) EnableInSeat[i].SetActive(false); }
+            for (int i = 0; i < DisableInSeat.Length; i++)
+            { if (DisableInSeat[i]) DisableInSeat[i].SetActive(true); }
         }
         public override void Interact()//entering the vehicle
         {

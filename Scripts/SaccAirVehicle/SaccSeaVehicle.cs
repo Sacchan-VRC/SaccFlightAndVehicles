@@ -386,6 +386,26 @@ namespace SaccFlightAndVehicles
             }
             get => PreventEngineToggle;
         }
+        [System.NonSerialized] public float InverThrustMultiplier = -1;
+        [System.NonSerializedAttribute] public bool _InvertThrust;
+        [System.NonSerializedAttribute, FieldChangeCallback(nameof(InvertThrust_))] public int InvertThrust = 0;
+        public int InvertThrust_
+        {
+            set
+            {
+                if (value > 0 && InvertThrust == 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_InvertThrust_Activated");
+                }
+                else if (value == 0 && InvertThrust > 0)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_O_InvertThrust_Deactivated");
+                }
+                _InvertThrust = value > 0;
+                InvertThrust = value;
+            }
+            get => InvertThrust;
+        }
         [System.NonSerializedAttribute] public Vector3 JoystickOverride;
         private float JoystickGrabValue;
         private float JoystickValueLastFrame;
@@ -951,6 +971,10 @@ namespace SaccFlightAndVehicles
                     {
                         Yawing = (VehicleTransform.right * LerpedYaw);
                         Vector2 Outputs = UnpackThrottles(EngineOutput);
+                        if (_InvertThrust)
+                        {
+                            Outputs *= InverThrustMultiplier;
+                        }
                         Thrust = ThrustPoint.forward * (Mathf.Min(Outputs.x)//Throttle
                         * ThrottleStrength
                         + Mathf.Max(Outputs.y, 0)//Afterburner throttle

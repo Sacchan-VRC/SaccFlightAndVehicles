@@ -104,13 +104,17 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             DisableOverrides();
         }
+        public void SFEXT_G_PilotExit()
+        {
+            if (OnCatapult)
+                CatapultLockOff();
+        }
         public void SFEXT_O_PilotExit()
         {
             if (!Launching)
             {
                 gameObject.SetActive(false);
                 Piloting = false;
-                if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
             }
             Selected = false;
             DisableOverrides();
@@ -123,7 +127,6 @@ namespace SaccFlightAndVehicles
         {
             IsOwner = true;
             colliderSmall();
-            if (OnCatapult) { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockOff)); }
         }
         public void SFEXT_O_LoseOwnership()
         {

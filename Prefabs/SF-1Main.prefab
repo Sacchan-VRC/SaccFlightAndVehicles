@@ -54904,8 +54904,9 @@ MonoBehaviour:
   SAVControl: {fileID: 4327496282912357153}
   GunAnimator: {fileID: 4371473018849597658}
   GunFiringBoolName: gunfiring
-  AmmoBar: {fileID: 4371473018091957378}
-  AmmoBars: []
+  FireNowKey: 0
+  AmmoBars:
+  - {fileID: 4371473018091957378}
   GunRecoilEmpty: {fileID: 0}
   GunDamageParticle: {fileID: 4371473018365209735}
   HudCrosshairGun: {fileID: 4371473018103174117}
@@ -71917,6 +71918,8 @@ MonoBehaviour:
   SAVControl: {fileID: 4327496282912357153}
   BombAnimator: {fileID: 4371473018849597658}
   Bomb: {fileID: 3196698694733883011}
+  FireNowKey: 0
+  NumPreInstatiated: 5
   FullReloadTimeSec: 8
   HUDText_Bomb_ammo: {fileID: 1490522283600781605}
   HUDText_Bomb_ammo_TMP: {fileID: 0}
@@ -71924,7 +71927,6 @@ MonoBehaviour:
   NumBomb: 4
   NumBomb_PerShot: 1
   BombHoldDelay: 0.5
-  NumPreInstatiated: 5
   BombDelay: 0
   BombLaunchPoints:
   - {fileID: 4371473018565603552}
@@ -71945,7 +71947,8 @@ MonoBehaviour:
   WorldParent: {fileID: 0}
   AtGCam: {fileID: 4371473019587610573}
   SetAtGCamSettings: 1
-  AtGScreen: {fileID: 4371473018734145325}
+  EnableOnSelected:
+  - {fileID: 4371473018734145325}
 --- !u!114 &4371473019597497249
 MonoBehaviour:
   m_ObjectHideFlags: 0
