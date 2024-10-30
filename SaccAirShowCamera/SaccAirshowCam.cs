@@ -26,7 +26,7 @@ namespace SaccFlightAndVehicles
         [SerializeField] Transform[] OtherTargets;
         [SerializeField] TextMeshProUGUI UITXT;
         [SerializeField] GameObject DisableIfVR;
-        SaccEntity[] TargetVehicles;
+        SaccEntity[] TargetVehicles = new SaccEntity[0];
         SaccAirVehicle TargetVehicle_SAV;
         Transform currentTarget;
         bool lockedIn;
