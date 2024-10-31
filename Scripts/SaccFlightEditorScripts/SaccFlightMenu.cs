@@ -656,14 +656,13 @@ namespace SaccFlightAndVehicles
                 canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
                 ui_canvas.transform.parent = parentOfSelected;
                 ui_canvas.transform.position = Vehicle.position;
-                ui_canvas.transform.rotation = Quaternion.AngleAxis(Vehicle.eulerAngles.y, Vector3.up) * ui_canvas.transform.rotation;
+                ui_canvas.transform.rotation = Vehicle.rotation * ui_canvas.transform.rotation;
             }
             Undo.RegisterCreatedObjectUndo(ui_canvas, "Create Stick Displays");
             // Add a CanvasScaler to the world space canvas
             string ObjectName = "StickDisplay" + (isR ? "R" : "L");
             GameObject StickDisplay = new GameObject(ObjectName);
             StickDisplay.layer = 31;
-            StickDisplay.transform.SetParent(ui_canvas.transform);
             GameObject DisplayHighlighter = new GameObject((isR ? "R" : "L") + "StickDisplayHighlighter");
             DisplayHighlighter.layer = 31;
             GameObject DisplayFuncon = new GameObject("StickFuncon");
@@ -699,16 +698,16 @@ namespace SaccFlightAndVehicles
                         TextMeshProUGUI tmpText = TextObj.AddComponent<TextMeshProUGUI>();
                         string funcName = Funcs[i].GetUdonTypeName();
                         string[] funcNameSplit = funcName.Split("_");
-                        string funcName_Dial = string.Empty;
+                        string funcName_Clean = string.Empty;
                         if (funcNameSplit.Length > 1)
                         {
                             for (int o = 1; o < funcNameSplit.Length; o++)
                             {
-                                funcName_Dial += funcNameSplit[o];
+                                funcName_Clean += funcNameSplit[o];
                             }
                         }
-                        else { funcName_Dial = funcName; }
-                        funcName_Dial = funcName_Dial.ToUpper();
+                        else { funcName_Clean = funcName; }
+                        string funcName_Dial = funcName_Clean.ToUpper();
                         tmpText.rectTransform.sizeDelta = new Vector2(.18f, .14f);
                         tmpText.text = funcName_Dial;
                         tmpText.fontSize = .022f;
@@ -722,17 +721,17 @@ namespace SaccFlightAndVehicles
                         Vector3 pos = tmpText.rectTransform.localPosition;
                         pos.y = 0.14f; ;
                         float rot = (360f / Funcs.Length) * i;
-                        pos = Quaternion.AngleAxis(rot, -ui_canvas.transform.forward) * pos;
+                        pos = Quaternion.AngleAxis(rot, -StickDisplay.transform.forward) * pos;
 
                         tmpText.rectTransform.localPosition = pos;
                         tmpText.rectTransform.rotation = Quaternion.identity;
-                        tmpText.gameObject.name = funcName;
+                        TextObj.name = "MFD_" + funcName_Clean;
 
                         // save whether or not we need to add a Funcon for later
                         if (Funcs[i].GetType().GetField("Dial_Funcon", BindingFlags.Public | BindingFlags.Instance) != null)
                         {
                             HasFuncon.Add(i);
-                            HasFuncon_name.Add(funcName);
+                            HasFuncon_name.Add("MFD_" + funcName_Clean);
                             HasFuncon_isSmoke.Add(funcName == "DFUNC_Smoke");
                         }
                     }
@@ -764,9 +763,10 @@ namespace SaccFlightAndVehicles
             }
 
             DestroyImmediate(DisplayFuncon);
-            StickDisplay.transform.position = ui_canvas.transform.position;
-            StickDisplay.transform.rotation = ui_canvas.transform.rotation;
-            StickDisplay.transform.position += Vehicle.right * (isR ? 0.5f : -0.5f);
+            StickDisplay.transform.position += Vector3.right * (isR ? 0.5f : -0.5f);
+            StickDisplay.transform.SetParent(ui_canvas.transform);
+            StickDisplay.transform.localPosition = StickDisplay.transform.position;
+            StickDisplay.transform.localRotation = StickDisplay.transform.rotation;
             return ui_canvas;
         }
     }
