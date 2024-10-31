@@ -125,6 +125,7 @@ namespace SaccFlightAndVehicles
         {
             Piloting = true;
             if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(true); }
+            if (_firing) { Firing = false; }
             gameObject.SetActive(true);
             RequestSerialization();
         }
