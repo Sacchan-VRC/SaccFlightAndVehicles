@@ -188,7 +188,10 @@ namespace SaccFlightAndVehicles
         {
             FireNextSerialization = true;
             RequestSerialization();
-            LaunchFlare();
+            for (int i = 0; i < NumFlare_PerShot; i++)
+            {
+                LaunchFlare();
+            }
         }
         private bool FireNextSerialization = false;
         public override void OnPreSerialization()
