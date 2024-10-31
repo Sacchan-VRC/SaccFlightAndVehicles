@@ -46,7 +46,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             SAVControl.SetProgramVariable("VTOLenabled", true);
             VTOL360 = (bool)SAVControl.GetProgramVariable("VTOL360");
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            IsOwner = EntityControl.IsOwner;
             float vtolangledif = (float)SAVControl.GetProgramVariable("VTOLMaxAngle") - (float)SAVControl.GetProgramVariable("VTOLMinAngle");
             VTOLAngleDivider = (float)SAVControl.GetProgramVariable("VTOLAngleTurnRate") / vtolangledif;
             VTOLMover = VTOLAngleLast = NewVTOLAngle = VTOLAngle = (float)SAVControl.GetProgramVariable("VTOLAngle");

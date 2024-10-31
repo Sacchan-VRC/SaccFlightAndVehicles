@@ -196,7 +196,7 @@ namespace SaccFlightAndVehicles
                 MaxLiftApplied = false;
             }
 
-            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+            if (EntityControl.IsOwner)
             {
                 if (!InVR) { gameObject.SetActive(false); }//for desktop Users
                 EntityControl.SendEventToExtensions("SFEXT_O_FlapsOff");
@@ -235,7 +235,7 @@ namespace SaccFlightAndVehicles
                 MaxLiftApplied = true;
             }
 
-            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+            if (EntityControl.IsOwner)
             {
                 gameObject.SetActive(true);//for desktop Users
                 EntityControl.SendEventToExtensions("SFEXT_O_FlapsOn");

@@ -74,6 +74,7 @@ namespace SaccFlightAndVehicles
         private bool InEditor = false;
         private float FloatDiameter;
         private int FPLength;
+        [System.NonSerializedAttribute] public SaccEntity EntityControl;
         void Start()
         {
             if (!SAVControl)
@@ -134,7 +135,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_EngineOff()
         {
-            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+            if (EntityControl.IsOwner)
             {
                 if (HoverBike) { gameObject.SetActive(false); }
             }

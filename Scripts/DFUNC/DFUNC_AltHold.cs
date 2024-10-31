@@ -69,7 +69,7 @@ namespace SaccFlightAndVehicles
             InVR = EntityControl.InVR;
             VehicleRigidbody = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            IsOwner = EntityControl.IsOwner;
         }
         public void DFUNC_Selected()
         {

@@ -205,7 +205,7 @@ namespace SaccFlightAndVehicles
             for (int x = 0; x < DisplaySmokeem.Length; x++)
             { DisplaySmokeem[x].enabled = smoking; }
             if (Dial_Funcon) Dial_Funcon.SetActive(smoking);
-            if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+            if (EntityControl.IsOwner)
             {
                 if (smoking)
                 { EntityControl.SendEventToExtensions("SFEXT_G_SmokeOn"); }

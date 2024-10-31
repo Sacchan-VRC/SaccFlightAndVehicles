@@ -53,7 +53,7 @@ namespace SaccFlightAndVehicles
             SetGearDown();
             if (Dial_Funcon) { Dial_Funcon.SetActive(!GearUp); }
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            IsOwner = EntityControl.IsOwner;
 
         }
         public void DFUNC_Selected()

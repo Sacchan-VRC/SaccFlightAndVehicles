@@ -70,7 +70,7 @@ namespace SaccFlightAndVehicles
                 Vector3 currentvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
                 if (currentvel.magnitude < 2)
                 { currentvel = -Vector3.up * 2; }//straight down instead of spazzing out when moving very slow
-                if ((bool)SAVControl.GetProgramVariable("IsOwner"))
+                if (EntityControl.IsOwner)
                 {
                     VelocityIndicator.position = transform.position + currentvel;
                 }

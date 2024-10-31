@@ -62,7 +62,7 @@ namespace SaccFlightAndVehicles
             VehicleRigidbody = EntityControl.GetComponent<Rigidbody>();
             HasAirBrake = AirbrakeStrength != 0;
             RotMultiMaxSpeedDivider = 1 / (float)SAVControl.GetProgramVariable("RotMultiMaxSpeed");
-            IsOwner = (bool)SAVControl.GetProgramVariable("IsOwner");
+            IsOwner = EntityControl.IsOwner;
             VRCPlayerApi localPlayer = Networking.LocalPlayer;
             if (localPlayer != null && !localPlayer.isMaster)
             { gameObject.SetActive(false); }
