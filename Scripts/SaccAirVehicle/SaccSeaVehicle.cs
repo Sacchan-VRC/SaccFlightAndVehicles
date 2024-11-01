@@ -998,7 +998,7 @@ namespace SaccFlightAndVehicles
                                                                                                             //apply yawing using yaw moment
                 VehicleRigidbody.AddForceAtPosition(Yawing * RBMass, YawMoment.position, ForceMode.Force);
                 //calc Gs
-                float gravity = 9.80665f * DeltaTime;
+                float gravity = 9.81f * DeltaTime;
                 LastFrameVel.y -= gravity; //add gravity
                 AllGs = Vector3.Distance(LastFrameVel, VehicleVel) / gravity;
                 GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);

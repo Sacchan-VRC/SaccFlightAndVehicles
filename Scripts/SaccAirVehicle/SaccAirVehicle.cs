@@ -1438,8 +1438,6 @@ namespace SaccFlightAndVehicles
                             (((-localAngularVelocity.y * YawFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVYaw) - (localAngularVelocity.y * YawConstantFriction)) * Atmosphere,// Y Yaw
                                 ((LerpedRoll + yawaoarollforce + (-localAngularVelocity.z * RollFriction * rotlift * AoALiftPitch * AoALiftYaw) + ADVRoll) - (localAngularVelocity.z * RollConstantFriction)) * Atmosphere);// Z Roll
 
-                        //create values for use in fixedupdate (control input and straightening forces)
-
                         if (PitchMoment)
                         { Pitching = ((((VehicleTransform.up * LerpedPitch) + (VehicleTransform.up * downspeed * VelStraightenStrPitch * AoALiftPitch * rotlift)) * Atmosphere)); }
                         else
@@ -1520,7 +1518,7 @@ namespace SaccFlightAndVehicles
                     { VehicleRigidbody.AddRelativeTorque(-Yawing * RBMass, ForceMode.Force); }
                 }
                 //calc Gs
-                float gravity = 9.80665f * DeltaTime;
+                float gravity = 9.81f * DeltaTime;
                 LastFrameVel.y -= gravity; //add gravity
 
                 Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);

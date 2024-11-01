@@ -916,7 +916,7 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.fixedDeltaTime;
             Vector3 absVel = VehicleRigidbody.velocity;
             VehicleVel = absVel - LastTouchedTransform_Speed;
-            float gravity = 9.80665f * DeltaTime;
+            float gravity = 9.81f * DeltaTime;
             LastFrameVel.y -= gravity; //add gravity
             AllGs = Vector3.Distance(LastFrameVel, absVel) / gravity;
             GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
