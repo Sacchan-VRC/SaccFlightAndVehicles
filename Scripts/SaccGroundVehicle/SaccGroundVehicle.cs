@@ -83,6 +83,11 @@ namespace SaccFlightAndVehicles
         public bool SteeringHand_Left = true;
         [Tooltip("Use the right hand grip to grab the steering wheel??")]
         public bool SteeringHand_Right = true;
+        [Header("ITR:")]
+        [Tooltip("Adjust the rotation of Unity's inbuilt Inertia Tensor Rotation, which is a function of rigidbodies. If set to 0, the plane will be very stable and feel boring to fly.")]
+        public float InertiaTensorRotationMulti = 1;
+        [Tooltip("Inverts Z axis of the Inertia Tensor Rotation, causing the direction of the yawing experienced after rolling to invert")]
+        public bool InvertITRYaw = false;
         [System.NonSerializedAttribute] public bool _HandBrakeOn;
         [System.NonSerializedAttribute, FieldChangeCallback(nameof(HandBrakeOn_))] public int HandBrakeOn = 0;
         public int HandBrakeOn_
@@ -262,9 +267,11 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             if (!Initialized) { Init(); }
+            CenterOfMass = EntityControl.CenterOfMass;
+            SetCoMMeshOffset();
             if (NumStepsSec < 1f / Time.fixedDeltaTime)
             {
-                Debug.LogWarning("NumStepsSec lower than FixedUpdate rate, setting it to FixedUpdate rate. Physics will be unfair in VR.");
+                Debug.LogWarning("NumStepsSec lower than FixedUpdate rate, setting it to FixedUpdate rate. Physics will be unfair.");
                 NumStepsSec = (int)(Mathf.Round(1f / Time.fixedDeltaTime));
             }
             UsingManualSync = !EntityControl.EntityObjectSync;
@@ -289,7 +296,6 @@ namespace SaccFlightAndVehicles
             EntityControl.Spawnrotation = VehicleTransform.localRotation;
             if (!ControlsRoot)
             { ControlsRoot = VehicleTransform; }
-            CenterOfMass = EntityControl.CenterOfMass;
             for (int i = 0; i < DriveWheels.Length; i++)
             {
                 DriveWheels[i].SetProgramVariable("IsDriveWheel", true);
@@ -360,6 +366,35 @@ namespace SaccFlightAndVehicles
         private void Start()// awake function when
         {
             if (!Initialized) { Init(); }
+        }
+        public void SetCoMMeshOffset()
+        {
+            //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
+            Vector3 CoMOffset = CenterOfMass.position - VehicleTransform.position;
+            int c = VehicleTransform.childCount;
+            Transform[] MainObjChildren = new Transform[c];
+            for (int i = 0; i < c; i++)
+            {
+                VehicleTransform.GetChild(i).position -= CoMOffset;
+            }
+            VehicleTransform.position += CoMOffset;
+            VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
+            SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
+            EntityControl.Spawnposition = VehicleTransform.localPosition;
+            EntityControl.Spawnrotation = VehicleTransform.localRotation;
+        }
+        public void SetCoM_ITR()
+        {
+            VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
+            EntityControl.CoMSet = true;
+            VehicleRigidbody.ResetInertiaTensor();
+            VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
+            if (InvertITRYaw)
+            {
+                Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
+                ITR.x *= -1;
+                VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
+            }
         }
         public void ReEnableRevs()
         {
@@ -924,8 +959,8 @@ namespace SaccFlightAndVehicles
 
             if (Piloting)
             {
-                float StepsFloat = ((Time.fixedDeltaTime) * NumStepsSec);
-                int steps = (int)((Time.fixedDeltaTime) * NumStepsSec);
+                float StepsFloat = ((DeltaTime) * NumStepsSec);
+                int steps = (int)((DeltaTime) * NumStepsSec);
                 Steps_Error += StepsFloat - steps;
                 if (Steps_Error > 1)
                 {
@@ -939,7 +974,7 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, Time.fixedDeltaTime * EngineSlowDown)), 0f);
+                Revs = Mathf.Max(Mathf.Lerp(Revs, 0f, 1 - Mathf.Pow(0.5f, DeltaTime * EngineSlowDown)), 0f);
             }
             // Alternate order of processing of wheels to make the car drive straight.
             // I don't think there's another way of fixing that without completely changing how wheel works.
@@ -957,7 +992,7 @@ namespace SaccFlightAndVehicles
             }
             frame_even = !frame_even;
 
-            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, 1 - Mathf.Pow(0.5f, Drag * Time.fixedDeltaTime));
+            VehicleRigidbody.velocity = Vector3.Lerp(VehicleRigidbody.velocity, Vector3.zero, 1 - Mathf.Pow(0.5f, Drag * DeltaTime));
         }
         private void RevUp(int NumSteps)
         {

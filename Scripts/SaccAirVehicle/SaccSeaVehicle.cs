@@ -73,6 +73,8 @@ namespace SaccFlightAndVehicles
         public float YawResponse = 20f;
         [Tooltip("Adjust the rotation of Unity's inbuilt Inertia Tensor Rotation, which is a function of rigidbodies. If set to 0, the vehicle will be very stable and feel boring to fly.")]
         public float InertiaTensorRotationMulti = 1;
+        [Tooltip("Inverts Z axis of the Inertia Tensor Rotation, causing the direction of the yawing experienced after rolling to invert")]
+        public bool InvertITRYaw = false;
         [Tooltip("Rotational inputs are multiplied by current speed to make flying at low speeds feel heavier. Above the speed input here, all inputs will be at 100%. Linear. (Meters/second)")]
         public float RotMultiMaxSpeed = 10;
         [Tooltip("How much the the vehicle's nose is pulled toward the direction of movement on the yaw axis")]
@@ -1167,14 +1169,22 @@ namespace SaccFlightAndVehicles
                 VehicleTransform.GetChild(i).position -= CoMOffset;
             }
             VehicleTransform.position += CoMOffset;
-            SendCustomEventDelayedSeconds(nameof(SetCoM), Time.fixedDeltaTime);//this has to be delayed because ?
+            SendCustomEventDelayedSeconds(nameof(SetCoM_ITR), Time.fixedDeltaTime);//this has to be delayed because ?
             EntityControl.Spawnposition = VehicleTransform.localPosition;
             EntityControl.Spawnrotation = VehicleTransform.localRotation;
         }
-        public void SetCoM()
+        public void SetCoM_ITR()
         {
             VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
+            EntityControl.CoMSet = true;
+            VehicleRigidbody.ResetInertiaTensor();
             VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
+            if (InvertITRYaw)
+            {
+                Vector3 ITR = VehicleRigidbody.inertiaTensorRotation.eulerAngles;
+                ITR.x *= -1;
+                VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
+            }
         }
         public void FuelEvents()
         {

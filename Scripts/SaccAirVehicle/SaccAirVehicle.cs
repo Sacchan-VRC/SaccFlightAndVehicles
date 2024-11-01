@@ -1696,16 +1696,6 @@ namespace SaccFlightAndVehicles
             LastFrameVel = Vector3.zero;
             EnableLiftSurfaces(false);
         }
-        public void SFEXT_L_CoMSet()
-        {
-            if (Initialized)
-            { SetCoMMeshOffset(); }
-        }
-        private void OnEnable()
-        {
-            if (Initialized)
-            { SetCoMMeshOffset(); }
-        }
         public void SetCoMMeshOffset()
         {
             //move objects to so that the vehicle's main pivot is at the CoM so that syncscript's rotation is smoother
@@ -1725,6 +1715,8 @@ namespace SaccFlightAndVehicles
         public void SetCoM_ITR()
         {
             VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
+            EntityControl.CoMSet = true;
+            VehicleRigidbody.ResetInertiaTensor();
             VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
             if (InvertITRYaw)
             {
@@ -1732,7 +1724,6 @@ namespace SaccFlightAndVehicles
                 ITR.x *= -1;
                 VehicleRigidbody.inertiaTensorRotation = Quaternion.Euler(ITR);
             }
-            VehicleRigidbody.ResetInertiaTensor();
         }
         public void FuelEvents()
         {
