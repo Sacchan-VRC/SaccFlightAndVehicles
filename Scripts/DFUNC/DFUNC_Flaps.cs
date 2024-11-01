@@ -67,9 +67,6 @@ namespace SaccFlightAndVehicles
             StraightenStartValue_Pitch = (float)SAVControl.GetProgramVariable("VelStraightenStrPitch");
             StraightenStartValue_Yaw = (float)SAVControl.GetProgramVariable("VelStraightenStrYaw");
 
-            if ((bool)SAVControl.GetProgramVariable("AutoAdjustValuesToMass"))
-            { FlapsExtraMaxLift *= ((Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody")).mass; }
-
             if (Dial_Funcon) Dial_Funcon.SetActive(Flaps);
             if (DefaultFlapsOff) { SetFlapsOff(); }
             else { SetFlapsOn(); }

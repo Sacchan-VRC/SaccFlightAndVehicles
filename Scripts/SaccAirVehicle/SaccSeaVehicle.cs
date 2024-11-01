@@ -92,8 +92,6 @@ namespace SaccFlightAndVehicles
         [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
         public float GDamage = 10f;
         [Header("Other:")]
-        [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders suspension values")]
-        public bool AutoAdjustValuesToMass = true;
         [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
         public Transform ControlsRoot;
         [Tooltip("Wind speed on each axis")]
@@ -460,23 +458,14 @@ namespace SaccFlightAndVehicles
             WheelCollider[] wc = VehicleMesh.GetComponentsInChildren<WheelCollider>(true);
             if (wc.Length != 0) { HasWheelColliders = true; }
 
-            if (AutoAdjustValuesToMass)
+            //Adjust wheel values so you don't have to readjust them every time you change rigidbody mass
+            float RBMass = VehicleRigidbody.mass;
+            foreach (WheelCollider wheel in wc)
             {
-                //values that should feel the same no matter the weight of the aircraft
-                float RBMass = VehicleRigidbody.mass;
-                ThrottleStrength *= RBMass;
-                YawStrength *= RBMass;
-                YawFriction *= RBMass;
-                YawConstantFriction *= RBMass;
-                VelStraightenStrYaw *= RBMass;
-                VelLiftMax *= RBMass;
-                foreach (WheelCollider wheel in wc)
-                {
-                    JointSpring SusiSpring = wheel.suspensionSpring;
-                    SusiSpring.spring *= RBMass;
-                    SusiSpring.damper *= RBMass;
-                    wheel.suspensionSpring = SusiSpring;
-                }
+                JointSpring SusiSpring = wheel.suspensionSpring;
+                SusiSpring.spring *= RBMass;
+                SusiSpring.damper *= RBMass;
+                wheel.suspensionSpring = SusiSpring;
             }
             VehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
             OutsideVehicleLayer = VehicleMesh.gameObject.layer;
@@ -1000,13 +989,14 @@ namespace SaccFlightAndVehicles
             if (IsOwner && !Asleep)
             {
                 float DeltaTime = Time.fixedDeltaTime;
+                float RBMass = VehicleRigidbody.mass;
                 //lerp velocity toward 0 to simulate air friction
                 Vector3 VehicleVel = VehicleRigidbody.velocity;
                 VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti, ((((AirFriction) * ExtraDrag)) * 90) * DeltaTime);
                 //apply thrust
-                VehicleRigidbody.AddForceAtPosition(Thrust, ThrustPoint.position, ForceMode.Force);//deltatime is built into ForceMode.Force
-                                                                                                   //apply yawing using yaw moment
-                VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force);
+                VehicleRigidbody.AddForceAtPosition(Thrust * RBMass, ThrustPoint.position, ForceMode.Force);//deltatime is built into ForceMode.Force
+                                                                                                            //apply yawing using yaw moment
+                VehicleRigidbody.AddForceAtPosition(Yawing * RBMass, YawMoment.position, ForceMode.Force);
                 //calc Gs
                 float gravity = 9.80665f * DeltaTime;
                 LastFrameVel.y -= gravity; //add gravity

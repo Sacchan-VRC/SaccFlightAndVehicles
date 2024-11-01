@@ -47,6 +47,7 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour[] LiftSurfaces;
         private bool LiftSurfacesEnabled = true;
         [Header("Response:")]
+        [Header("Some values require re-entering playmode to take full effect (ThrustVec..)")]
         [Tooltip("Vehicle thrust at max throttle without afterburner")]
         public float ThrottleStrength = 20f;
         [Tooltip("Make VR Throttle motion controls use the Y axis instead of the Z axis for adjustment (Helicopter collective)")]
@@ -73,7 +74,7 @@ namespace SaccFlightAndVehicles
         public float AirFriction = 0.0004f;
         [Tooltip("Pitch force multiplier, (gets stronger with airspeed)")]
         public float PitchStrength = 5f;
-        [Tooltip("Pitch rotation force (as multiple of PitchStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
+        [Tooltip("Pitch rotation force (as multiple of PitchStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a nonzero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
         [Range(0.0f, 1f)]
         public float PitchThrustVecMulti = 0f;
         [Tooltip("Force that stops vehicle from pitching, (gets stronger with airspeed)")]
@@ -86,7 +87,7 @@ namespace SaccFlightAndVehicles
         public float ReversingPitchStrengthMulti = 2;
         [Tooltip("Yaw force multiplier, (gets stronger with airspeed)")]
         public float YawStrength = 3f;
-        [Tooltip("Yaw rotation force (as multiple of YawStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
+        [Tooltip("Yaw rotation force (as multiple of YawStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a nonzero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
         [Range(0.0f, 1f)]
         public float YawThrustVecMulti = 0f;
         [Tooltip("Force that stops vehicle from yawing, (gets stronger with airspeed)")]
@@ -99,7 +100,7 @@ namespace SaccFlightAndVehicles
         public float ReversingYawStrengthMulti = 2.4f;
         [Tooltip("Roll force multiplier, (gets stronger with airspeed)")]
         public float RollStrength = 450f;
-        [Tooltip("Roll rotation force (as multiple of RollStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a non - zero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
+        [Tooltip("Roll rotation force (as multiple of RollStrength) (doesn't get stronger with airspeed, useful for helicopters and ridiculous jets). Setting this to a nonzero value disables inversion of joystick pitch controls when vehicle is travelling backwards")]
         [Range(0.0f, 1f)]
         public float RollThrustVecMulti = 0f;
         [Tooltip("Force that stops vehicle from rolling, (gets stronger with airspeed)")]
@@ -212,8 +213,6 @@ namespace SaccFlightAndVehicles
         [Tooltip("Real angle offset from (0 == thrusting backwards) that the SFEXT_O_Enter/ExitVTOL is called. The event used for disabling cruise and flight limits")]
         public float EnterVTOLEvent_Angle = 20;
         [Header("Other:")]
-        [Tooltip("Adjusts all values that would need to be adjusted if you changed the mass automatically on Start(). Including all wheel colliders suspension values")]
-        public bool AutoAdjustValuesToMass = true;
         public bool ReverseThrustAllowAfterburner = false;
         [Tooltip("Transform to base the pilot's throttle and joystick controls from. Used to make vertical throttle for helicopters, or if the cockpit of your vehicle can move, on transforming vehicle")]
         public Transform ControlsRoot;
@@ -714,41 +713,16 @@ namespace SaccFlightAndVehicles
                 }
             }
 
-
-            if (AutoAdjustValuesToMass)
+            float RBMass = VehicleRigidbody.mass;
+            foreach (WheelCollider wheel in VehicleWheelColliders)
             {
-                //values that should feel the same no matter the weight of the aircraft
-                float RBMass = VehicleRigidbody.mass;
-                ThrottleStrength *= RBMass;
-                PitchStrength *= RBMass;
-                PitchFriction *= RBMass;
-                PitchConstantFriction *= RBMass;
-                YawStrength *= RBMass;
-                YawFriction *= RBMass;
-                YawConstantFriction *= RBMass;
-                RollStrength *= RBMass;
-                RollFriction *= RBMass;
-                RollConstantFriction *= RBMass;
-                VelStraightenStrPitch *= RBMass;
-                VelStraightenStrYaw *= RBMass;
-                YawAoaRollForceMulti *= RBMass;
-                PitchAoaPitchForceMulti *= RBMass;
-                Lift *= RBMass;
-                MaxLift *= RBMass;
-                VelLift *= RBMass;
-                VelLiftMax *= RBMass;
-                AdverseRoll *= RBMass;
-                AdverseYaw *= RBMass;
-                GroundEffectLiftMax *= RBMass;
-                foreach (WheelCollider wheel in VehicleWheelColliders)
-                {
-                    wheel.mass *= RBMass;
-                    JointSpring SusiSpring = wheel.suspensionSpring;
-                    SusiSpring.spring *= RBMass;
-                    SusiSpring.damper *= RBMass;
-                    wheel.suspensionSpring = SusiSpring;
-                }
+                wheel.mass *= RBMass;
+                JointSpring SusiSpring = wheel.suspensionSpring;
+                SusiSpring.spring *= RBMass;
+                SusiSpring.damper *= RBMass;
+                wheel.suspensionSpring = SusiSpring;
             }
+
             OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
             VehicleAnimator = EntityControl.GetComponent<Animator>();
 
@@ -1428,7 +1402,7 @@ namespace SaccFlightAndVehicles
                             VTOLInputAcc *= GroundEffectAndVelLift;
 
                             //Add Airplane Ground Effect
-                            GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
+                            GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength / VehicleRigidbody.mass, SpeedLiftFactor);
                             //add lift and thrust
 
                             FinalInputAcc += VTOLInputAcc;
@@ -1437,7 +1411,7 @@ namespace SaccFlightAndVehicles
                         }
                         else//Simpler version for non-VTOL craft
                         {
-                            GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength, SpeedLiftFactor);
+                            GroundEffectAndVelLift = AoALift_Min * GroundEffect(false, GroundEffectEmpty.position, -VehicleTransform.up, GroundEffectStrength / VehicleRigidbody.mass, SpeedLiftFactor);
 
                             FinalInputAcc.y += GroundEffectAndVelLift;
                             FinalInputAcc.z += Thrust;
@@ -1515,32 +1489,35 @@ namespace SaccFlightAndVehicles
                 }
 
                 if (Asleep) { return; }
-                //lerp velocity toward 0 to simulate air friction
+
                 Vector3 VehicleVel = VehicleRigidbody.velocity;
                 if (!_DisablePhysicsApplication)
                 {
+                    // I tried changing ForceMode to Acceleration but for some reason the results are different,
+                    // so until I work out why, just multiply forces by mass
+                    float RBMass = VehicleRigidbody.mass;
+                    // lerp velocity toward zero/windspeed for 'air friction'
                     VehicleRigidbody.velocity = Vector3.Lerp(VehicleVel, FinalWind * StillWindMulti * Atmosphere, 1 - Mathf.Pow(0.5f, (AirFriction + SoundBarrier) * ExtraDrag * 90 * DeltaTime));
-                    //Apply forces calculated in update()
                     if (wrecked)
                     {
                         float negHealthPc = -Health / -ExplodeHealth;
                         VehicleRigidbody.AddRelativeTorque(wreckedSpinForce * negHealthPc * /* StillWintMulti requires EngineOn + Grounded, so: */ Mathf.Min(AirSpeed * .1f, 1), ForceMode.Acceleration);
-                        VehicleRigidbody.AddRelativeForce(VehicleForce * (1 - negHealthPc), ForceMode.Force);
+                        VehicleRigidbody.AddRelativeForce(VehicleForce * (1 - negHealthPc) * RBMass, ForceMode.Force);
                     }
                     else
-                    { VehicleRigidbody.AddRelativeForce(VehicleForce, ForceMode.Force); }
-                    VehicleRigidbody.AddRelativeTorque(VehicleTorque, ForceMode.Force);
+                    { VehicleRigidbody.AddRelativeForce(VehicleForce * RBMass, ForceMode.Force); }
+                    VehicleRigidbody.AddRelativeTorque(VehicleTorque * RBMass, ForceMode.Force);
                     //apply pitching using pitch moment
                     if (PitchMoment)
-                    { VehicleRigidbody.AddForceAtPosition(Pitching, PitchMoment.position, ForceMode.Force); }
+                    { VehicleRigidbody.AddForceAtPosition(Pitching * RBMass, PitchMoment.position, ForceMode.Force); }
                     else
-                    { VehicleRigidbody.AddRelativeTorque(Pitching, ForceMode.Force); }
+                    { VehicleRigidbody.AddRelativeTorque(Pitching * RBMass, ForceMode.Force); }
                     //deltatime is built into ForceMode.Force
                     //apply yawing using yaw moment
                     if (YawMoment)
-                    { VehicleRigidbody.AddForceAtPosition(Yawing, YawMoment.position, ForceMode.Force); }
+                    { VehicleRigidbody.AddForceAtPosition(Yawing * RBMass, YawMoment.position, ForceMode.Force); }
                     else
-                    { VehicleRigidbody.AddRelativeTorque(-Yawing, ForceMode.Force); }
+                    { VehicleRigidbody.AddRelativeTorque(-Yawing * RBMass, ForceMode.Force); }
                 }
                 //calc Gs
                 float gravity = 9.80665f * DeltaTime;
