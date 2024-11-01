@@ -49,7 +49,7 @@ namespace SaccFlightAndVehicles
                     newcam.SetActive(false);
                     var cam = newcam.AddComponent<Camera>();
                     cam.nearClipPlane = .3f;
-                    cam.farClipPlane = 100000f;
+                    cam.farClipPlane = 50000f;
                     newcam.transform.parent = d.transform;
                     d.ReferenceCamera = newcam;
                     PrefabUtility.RecordPrefabInstancePropertyModifications(d);
