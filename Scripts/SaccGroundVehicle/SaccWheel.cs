@@ -7,10 +7,10 @@ using VRC.Udon;
 namespace SaccFlightAndVehicles
 {
     [DefaultExecutionOrder(1500)]
-    // [UdonBehaviourSyncMode(BehaviourSyncMode.Continuous)]
+    // [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class SaccWheel : UdonSharpBehaviour
     {
-        [Header("Sync is only used for skid effects,\nset Synchronization Method:\nNone to save bandwidth\nContinuous to sync skids")]
+        [Header("Sync is only used for skid effects,\nset Synchronization Method:\nNone to save bandwidth\nManual to sync skid sounds/effects")]
         [Space(10)]
         public Rigidbody CarRigid;
         public SaccGroundVehicle SGVControl;
