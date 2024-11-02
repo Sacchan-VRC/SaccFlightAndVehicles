@@ -37,8 +37,12 @@ namespace SaccFlightAndVehicles
         private SaccEntity EntityControl;
         [Tooltip("Local distance projected forward for objects that move dynamically, only adjust if the hud is moved forward in order to make it appear smaller")]
         public float distance_from_head = 1.333f;
+        public float updateInterval_vectors = 0f;
+        public float updateInterval_text = 0.3f;
+        public bool OnlyUpdateTextOnVectorUpdateFrame = true;
         private float maxGs = 0f;
-        private float check = 0;
+        private float check_vectors = 0;
+        private float check_text = 0;
         private float SeaLevel;
         private Transform CenterOfMass;
         private Vector3 Vel_Lerper;
@@ -63,53 +67,57 @@ namespace SaccFlightAndVehicles
         private void LateUpdate()
         {
             float SmoothDeltaTime = Time.smoothDeltaTime;
-
-            //Velocity indicator
-            if (VelocityIndicator)
+            bool updatedVectors = false;
+            if (check_vectors > updateInterval_vectors)
             {
-                Vector3 currentvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
-                if (currentvel.magnitude < 2)
-                { currentvel = -Vector3.up * 2; }//straight down instead of spazzing out when moving very slow
-                if (EntityControl.IsOwner)
+                updatedVectors = true;
+                //Velocity indicator
+                if (VelocityIndicator)
                 {
-                    VelocityIndicator.position = transform.position + currentvel;
-                }
-                else
-                {
-                    //extrapolate CurrentVel and lerp towards it to smooth out the velocity indicator of non-owners
-                    if (currentvel != Vel_LastCurVel)
+                    Vector3 currentvel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
+                    if (currentvel.magnitude < 2)
+                    { currentvel = -Vector3.up * 2; }//straight down instead of spazzing out when moving very slow
+                    if (EntityControl.IsOwner)
                     {
-                        float tim = Time.time;
-                        Vel_UpdateInterval = tim - Vel_UpdateTime;
-                        Vel_NormalizedExtrapDir = (currentvel - Vel_LastCurVel) * (1 / Vel_UpdateInterval);
-                        Vel_LastCurVel = currentvel;
-                        Vel_UpdateTime = tim;
+                        VelocityIndicator.position = transform.position + currentvel;
                     }
-                    Vel_PredictedCurVel = currentvel + (Vel_NormalizedExtrapDir * (Time.time - Vel_UpdateTime));
-                    Vel_Lerper = Vector3.Lerp(Vel_Lerper, Vel_PredictedCurVel, 9f * Time.smoothDeltaTime);
-                    VelocityIndicator.position = transform.position + Vel_Lerper;
+                    else
+                    {
+                        //extrapolate CurrentVel and lerp towards it to smooth out the velocity indicator of non-owners
+                        if (currentvel != Vel_LastCurVel)
+                        {
+                            float tim = Time.time;
+                            Vel_UpdateInterval = tim - Vel_UpdateTime;
+                            Vel_NormalizedExtrapDir = (currentvel - Vel_LastCurVel) * (1 / Vel_UpdateInterval);
+                            Vel_LastCurVel = currentvel;
+                            Vel_UpdateTime = tim;
+                        }
+                        Vel_PredictedCurVel = currentvel + (Vel_NormalizedExtrapDir * (Time.time - Vel_UpdateTime));
+                        Vel_Lerper = Vector3.Lerp(Vel_Lerper, Vel_PredictedCurVel, 9f * Time.smoothDeltaTime);
+                        VelocityIndicator.position = transform.position + Vel_Lerper;
+                    }
+                    VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
+                    VelocityIndicator.rotation = Quaternion.LookRotation(VelocityIndicator.position - gameObject.transform.position, gameObject.transform.up);//This makes it face the pilot.
                 }
-                VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
-                VelocityIndicator.rotation = Quaternion.LookRotation(VelocityIndicator.position - gameObject.transform.position, gameObject.transform.up);//This makes it face the pilot.
+                /////////////////
+
+
+                //Heading indicator
+                Vector3 VehicleEuler = EntityControl.transform.rotation.eulerAngles;
+                if (HeadingIndicator) { HeadingIndicator.localRotation = Quaternion.Euler(new Vector3(0, -VehicleEuler.y, 0)); }
+                /////////////////
+
+                //Elevation indicator
+                if (ElevationIndicator) { ElevationIndicator.rotation = Quaternion.Euler(new Vector3(0, VehicleEuler.y, 0)); }
+                /////////////////
+
+                //Down indicator
+                if (DownIndicator) { DownIndicator.localRotation = Quaternion.Euler(new Vector3(0, 0, -VehicleEuler.z)); }
+                /////////////////
+                check_vectors = 0;
             }
-            /////////////////
 
-
-            //Heading indicator
-            Vector3 VehicleEuler = EntityControl.transform.rotation.eulerAngles;
-            if (HeadingIndicator) { HeadingIndicator.localRotation = Quaternion.Euler(new Vector3(0, -VehicleEuler.y, 0)); }
-            /////////////////
-
-            //Elevation indicator
-            if (ElevationIndicator) { ElevationIndicator.rotation = Quaternion.Euler(new Vector3(0, VehicleEuler.y, 0)); }
-            /////////////////
-
-            //Down indicator
-            if (DownIndicator) { DownIndicator.localRotation = Quaternion.Euler(new Vector3(0, 0, -VehicleEuler.z)); }
-            /////////////////
-
-            //updating numbers 3~ times a second
-            if (check > .3)//update text
+            if (check_text > updateInterval_text && (!OnlyUpdateTextOnVectorUpdateFrame || updatedVectors))//update text
             {
                 float speed = (float)SAVControl.GetProgramVariable("Speed");
                 float vertGs = (float)SAVControl.GetProgramVariable("VertGs");
@@ -154,9 +162,10 @@ namespace SaccFlightAndVehicles
                         }
                     }
                 }
-                check = 0;
+                check_text = 0;
             }
-            check += SmoothDeltaTime;
+            check_text += SmoothDeltaTime;
+            check_vectors += SmoothDeltaTime;
         }
     }
 }
