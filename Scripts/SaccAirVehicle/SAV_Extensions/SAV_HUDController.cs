@@ -111,17 +111,20 @@ namespace SaccFlightAndVehicles
             //updating numbers 3~ times a second
             if (check > .3)//update text
             {
+                float speed = (float)SAVControl.GetProgramVariable("Speed");
+                float vertGs = (float)SAVControl.GetProgramVariable("VertGs");
+                Vector3 CurrentVel = (Vector3)SAVControl.GetProgramVariable("CurrentVel");
                 if (HUDText_G)
                 {
-                    if (Mathf.Abs(maxGs) < Mathf.Abs((float)SAVControl.GetProgramVariable("VertGs")))
-                    { maxGs = (float)SAVControl.GetProgramVariable("VertGs"); }
-                    HUDText_G.text = string.Concat(((float)SAVControl.GetProgramVariable("VertGs")).ToString("F1"), "\n", maxGs.ToString("F1"));
+                    if (Mathf.Abs(maxGs) < Mathf.Abs(vertGs))
+                    { maxGs = vertGs; }
+                    HUDText_G.text = vertGs.ToString("F1") + "\n" + maxGs.ToString("F1");
                 }
-                if (HUDText_mach) { HUDText_mach.text = (((float)SAVControl.GetProgramVariable("Speed")) / 343f).ToString("F2"); }
+                if (HUDText_mach) { HUDText_mach.text = (speed / 343f).ToString("F2"); }
                 if (HUDText_altitude)
                 {
-                    HUDText_altitude.text = string.Concat((((Vector3)SAVControl.GetProgramVariable("CurrentVel")).y * 60 * AltitudeConversion).ToString("F0"),
-                    "\n", ((CenterOfMass.position.y - SeaLevel) * AltitudeConversion).ToString("F0"));
+                    HUDText_altitude.text = (CurrentVel.y * 60 * AltitudeConversion).ToString("F0") +
+                    "\n" + ((CenterOfMass.position.y - SeaLevel) * AltitudeConversion).ToString("F0");
                 }
                 if (HUDText_radaraltitude)
                 {
@@ -131,15 +134,25 @@ namespace SaccFlightAndVehicles
                     else
                     { HUDText_radaraltitude.text = string.Empty; }
                 }
-                if (HUDText_knots) { HUDText_knots.text = (((float)SAVControl.GetProgramVariable("Speed")) * SpeedConversion).ToString("F0"); }
+                if (HUDText_knots) { HUDText_knots.text = (speed * SpeedConversion).ToString("F0"); }
                 if (HUDText_knotsairspeed) { HUDText_knotsairspeed.text = (((float)SAVControl.GetProgramVariable("AirSpeed")) * SpeedConversion).ToString("F0"); }
 
                 if (HUDText_angleofattack)
                 {
-                    if ((float)SAVControl.GetProgramVariable("Speed") < 2)
+                    if (speed < 2)
                     { HUDText_angleofattack.text = System.String.Empty; }
                     else
-                    { HUDText_angleofattack.text = ((float)SAVControl.GetProgramVariable("AngleOfAttack")).ToString("F0"); }
+                    {
+                        if (EntityControl.IsOwner)
+                            HUDText_angleofattack.text = ((float)SAVControl.GetProgramVariable("AngleOfAttackPitch")).ToString("F0");
+                        else
+                        {
+                            // recalculate because it's not synced
+                            float _ZeroLiftAoA = (float)SAVControl.GetProgramVariable("ZeroLiftAoA");
+                            float _AngleOfAttackPitch = Vector3.SignedAngle(EntityControl.transform.forward, Vector3.ProjectOnPlane(CurrentVel, EntityControl.transform.right), EntityControl.transform.right) - _ZeroLiftAoA;
+                            HUDText_angleofattack.text = _AngleOfAttackPitch.ToString("F0");
+                        }
+                    }
                 }
                 check = 0;
             }

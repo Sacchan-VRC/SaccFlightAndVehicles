@@ -1252,7 +1252,7 @@ namespace SaccFlightAndVehicles
                     }
                     DoRepeatingWorld();
                 }
-                SoundBarrier = (-Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1) + 1) * SoundBarrierStrength;
+                SoundBarrier = (1 - Mathf.Clamp(Mathf.Abs(Speed - 343) / SoundBarrierWidth, 0, 1)) * SoundBarrierStrength;
             }
             else//non-owners need to know these values
             {
@@ -2334,24 +2334,31 @@ namespace SaccFlightAndVehicles
             //angle of attack stuff, pitch and yaw are calculated seperately
             //pitch and yaw each have a curve for when they are within the 'MaxAngleOfAttack' and a linear version up to 90 degrees, which are Max'd (using Mathf.Clamp) for the final result.
             //the linear version is used for high aoa, and is 0 when at 90 degrees, and 1(multiplied by HighAoaMinControl) at 0. When at more than 90 degrees, the control comes back with the same curve but the inputs are inverted. (unless thrust vectoring is enabled) The invert code is elsewhere.
-            AoALiftPitch = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) / MaxAngleOfAttackPitch, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) / MaxAngleOfAttackPitch);//angle of attack as 0-1 float, for backwards and forwards
-            AoALiftPitch = -AoALiftPitch + 1;
-            AoALiftPitch = -Mathf.Pow((1 - AoALiftPitch), AoaCurveStrength) + 1;//give it a curve
 
-            float AoALiftPitchMin = Mathf.Min(Mathf.Abs(AngleOfAttackPitch) * 0.0111111111f/* same as divide by 90 */, Mathf.Abs(Mathf.Abs(AngleOfAttackPitch) - 180) * 0.0111111111f/* same as divide by 90 */);//linear version to 90 for high aoa
-            AoALiftPitchMin = Mathf.Clamp((-AoALiftPitchMin + 1) * HighPitchAoaMinControl, 0, 1);
+            float absPitch = Mathf.Abs(AngleOfAttackPitch);
+            float absYaw = Mathf.Abs(AngleOfAttackYaw);
+            //AngleOfAttack = Vector3.Angle(VecForward, AirVel);
+            //^ the reason I'm not doing this is because it would give a circular result instead of square, when the physics is square
+            // which would change a bunch of stuff that uses the value, (Limits, Effects/Sounds)
+            // Limits in particular is important because it effects the controls, based on the physics.
+            AngleOfAttack = Mathf.Max(absPitch, absYaw);
+
+            //for this part AoA maxes out at 90 and reduces again as move towards facing backwards
+            if (absPitch > 90) absPitch = 180 - absPitch;//flying backwards
+            AoALiftPitch = absPitch / MaxAngleOfAttackPitch;//angle of attack as 0-1 float, for backwards and forwards
+            AoALiftPitch = 1 - Mathf.Pow(AoALiftPitch, AoaCurveStrength);//give it a curve
+
+            float AoALiftPitchMin = absPitch * 0.0111111111f/* same as divide by 90 */;//linear version to 90 for high aoa
+            AoALiftPitchMin = Mathf.Clamp01((1 - AoALiftPitchMin) * HighPitchAoaMinControl);
             AoALiftPitch = Mathf.Clamp(AoALiftPitch, AoALiftPitchMin, 1);
 
-            AoALiftYaw = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) / MaxAngleOfAttackYaw, Mathf.Abs((Mathf.Abs(AngleOfAttackYaw) - 180)) / MaxAngleOfAttackYaw);
+            if (absYaw > 90) absYaw = 180 - absYaw;//flying backwards
+            AoALiftYaw = absYaw / MaxAngleOfAttackYaw;
+            AoALiftYaw = 1 - Mathf.Pow(AoALiftYaw, AoaCurveStrength);//give it a curve
 
-            AoALiftYaw = -AoALiftYaw + 1;
-            AoALiftYaw = -Mathf.Pow((1 - AoALiftYaw), AoaCurveStrength) + 1;//give it a curve
-
-            float AoALiftYawMin = Mathf.Min(Mathf.Abs(AngleOfAttackYaw) * 0.0111111111f/* same as divide by 90 */, Mathf.Abs(Mathf.Abs(AngleOfAttackYaw) - 180) * 0.0111111111f/* same as divide by 90 */);//linear version to 90 for high aoa
-            AoALiftYawMin = Mathf.Clamp((-AoALiftYawMin + 1) * HighYawAoaMinControl, 0, 1);
+            float AoALiftYawMin = absYaw * 0.0111111111f/* same as divide by 90 */;//linear version to 90 for high aoa
+            AoALiftYawMin = Mathf.Clamp01((1 - AoALiftYawMin) * HighYawAoaMinControl);
             AoALiftYaw = Mathf.Clamp(AoALiftYaw, AoALiftYawMin, 1);
-
-            AngleOfAttack = Mathf.Max(Mathf.Abs(AngleOfAttackPitch), Mathf.Abs(AngleOfAttackYaw));
         }
         private float GroundEffect(bool VTOL, Vector3 Position, Vector3 Direction, float GEStrength, float speedliftfac)
         {
@@ -2428,7 +2435,7 @@ namespace SaccFlightAndVehicles
                 {
                     if (_EngineOn)
                     {
-                        float SpeedForVTOL_Inverse_xVTOL = ((SpeedForVTOL * -1) + 1) * VTOLAngleForward90;
+                        float SpeedForVTOL_Inverse_xVTOL = (1 - SpeedForVTOL) * VTOLAngleForward90;
                         //the thrust vec values are linearly scaled up the slower you go while in VTOL, from 0 at VTOLLoseControlSpeed
                         PitchThrustVecMulti = Mathf.Lerp(PitchThrustVecMultiStart, VTOLPitchThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
                         YawThrustVecMulti = Mathf.Lerp(YawThrustVecMultiStart, VTOLYawThrustVecMulti, SpeedForVTOL_Inverse_xVTOL);
