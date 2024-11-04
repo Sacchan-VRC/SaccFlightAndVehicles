@@ -16,7 +16,7 @@ namespace SaccFlightAndVehicles
         public float ExplosionLifeTime = 10;
         [Tooltip("Strength of the effect of countermeasures on the missile (ignore 'Flare', it's the effect of whatever countermeasure type this missile is effected by")]
         public float FlareEffect = 10;
-        [Tooltip("For simulating FOX-1/3 missiles")]
+        [Tooltip("For simulating FOX-1/3 missiles, (Requires rigidbody on vehicle, may not work for AAGun)")]
         public bool RequireParentLock = false;
         [Tooltip("For simulating FOX-3. Missile will not require parent vehicle lock after it is closer to target than this distance. Unlike a real FOX-3, it will only chase it's original target in pitbull mode. Meters. Set to 0 for FOX-1")]
         public float PitBullDistance = 0;
@@ -72,6 +72,7 @@ namespace SaccFlightAndVehicles
         private string[] MissileTypes = { "MissilesIncomingRadar", "MissilesIncomingHeat", "MissilesIncomingOther" };//names of variables in SaccAirVehicle
         private string[] CMTypes = { "NumActiveChaff", "NumActiveFlares", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
         private SaccEntity EntityControl;
+        Transform VehicleTransform;
         private int MissileType = 1;
         private UdonSharpBehaviour TargetSAVControl;
         private Animator TargetAnimator;
@@ -117,6 +118,7 @@ namespace SaccFlightAndVehicles
         void Initialize()
         {
             EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
+            VehicleTransform = EntityControl.transform;
             //whatever script is launching the missiles must contain all of these variables
             InEditor = (bool)AAMLauncherControl.GetProgramVariable("InEditor");
             MissileAnimator = GetComponent<Animator>();
@@ -181,8 +183,11 @@ namespace SaccFlightAndVehicles
                         OutsideVehicleLayer = (int)TargetSAVControl.GetProgramVariable("OutsideVehicleLayer");
                         if (SendMissileIncoming && ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger")))
                         {
-                            TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) + 1);
-                            MissileIncoming = true;
+                            if (!MissileIncoming)
+                            {
+                                TargetSAVControl.SetProgramVariable(MissileTypes[MissileType], (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]) + 1);
+                                MissileIncoming = true;
+                            }
                         }
                         TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
                         TargetAnimator = (Animator)TargetSAVControl.GetProgramVariable("VehicleAnimator");
@@ -213,7 +218,10 @@ namespace SaccFlightAndVehicles
             float DeltaTime = Time.fixedDeltaTime;
             if (!ColliderActive && Initialized)
             {
-                Vector3 LaunchPoint = (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position;
+                Vector3 LaunchPoint = VehicleRigid ?
+                    (VehicleRigid.rotation * LocalLaunchPoint) + VehicleRigid.position :
+                    (VehicleTransform.rotation * LocalLaunchPoint) + VehicleTransform.position
+                ;
                 if (Vector3.Distance(AAMRigid.position, LaunchPoint) > ColliderActiveDistance)
                 {
                     AAMCollider.enabled = true;
@@ -357,14 +365,18 @@ namespace SaccFlightAndVehicles
         }
         bool CheckMotherLOS()
         {
+            //This function requires the mothership to have a rigidbody. (AAGuns will not work)
             RaycastHit rayHit;
             if (MissileType == 0 && !PitBull) // Fox-1 requires LoS to mother vehicle instead of target to recieve target data
             {
                 Vector3 dir = EntityControl.CenterOfMass.position - transform.position;
                 if (Physics.Raycast(transform.position, dir, out rayHit, dir.magnitude, 133137 /* Default, Water, Environment, and Walkthrough */, QueryTriggerInteraction.Collide))
                 {
-                    if (rayHit.collider.attachedRigidbody == EntityControl.VehicleRigidbody) return true;
-                    else return false;
+                    if (rayHit.collider.attachedRigidbody && VehicleRigid)
+                    {
+                        if (rayHit.collider.attachedRigidbody == VehicleRigid) return true;
+                        else return false;
+                    }
                 }
                 else return true; // the ray terminated at our center of mass so it reached us, it's just not checking the onboardvehiclelayer
             }
