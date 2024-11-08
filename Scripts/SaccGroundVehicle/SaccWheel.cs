@@ -28,12 +28,15 @@ namespace SaccFlightAndVehicles
         // public float MaxNegDamping = 999999f;
         [Tooltip("Extra height on the raycast origin to prevent the wheel from sticking through the floor")]
         public float ExtraRayCastDistance = .5f;
-        public float Grip = 7f;
+        public float Grip = 350f;
         public AnimationCurve GripCurve = AnimationCurve.Linear(0, 1, 1, 1);
-        public bool SeparateLongLatGrip = false;
         [Tooltip("Multiply forward grip by this value for sideways grip")]
-        public float LateralGrip = .8f;
+        public float LateralGrip = 1f;
         public AnimationCurve GripCurveLateral = AnimationCurve.Linear(0, 1, 1, 1);
+        [Tooltip("!!THE LATERAL GRIP VARS ARE STILL USED WHEN THIS IS FALSE, JUST DIFFERENTLY!!\nCompletely separate wheel's sideways and forward grip calculations (More arcadey)")]
+        public bool SeparateLongLatGrip = false;
+        [Range(0, 2), Tooltip("3 Different ways to calculate amount of engine force used when sliding + accelerating, for testing. 0 = old way, 1 = keeps more energy, 2 = loses more energy")]
+        public int SkidRatioMode = 0;
         public float BrakeStrength = 500f;
         public float HandBrakeStrength = 70f;
         [Tooltip("How quickly the wheel matches the speed of the ground when in contact with it, high values will make the car skid more")]
@@ -41,15 +44,17 @@ namespace SaccFlightAndVehicles
         [Tooltip("Only effects DriveWheels. Behaves like engine torque. How much forces on the wheel from the ground can influence the engine speed, low values will make the car skid more")]
         public float EngineInfluence = 225f;
         public LayerMask WheelLayers;
+        public float ClutchStrength = 100f;
+        [Tooltip("Skip sound and skid effects completely")]
+        public bool DisableEffects = false;
         public float[] SurfaceType_Grips = { 1f, 0.7f, 0.2f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
         public float[] SurfaceType_Slowdown = { 0.1f, 4f, 0.05f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f, 0.1f };
         public AudioSource[] SurfaceType_SkidSounds;
         public ParticleSystem[] SurfaceType_SkidParticles;
         public ParticleSystem.EmissionModule[] SurfaceType_SkidParticlesEM;
         public float[] SurfaceType_SkidParticles_Amount = { .3f, .3f, .3f, .3f, .3f, .3f, .3f, .3f, .3f, .3f };
-        public float ClutchStrength = .33f;
-        [Tooltip("Lower number = less skid required for sound to start")]
         private float SkidSound_Min_THREEQUARTER, SkidSound_Min_TWOTHRID; // sync a bit before the skid speed so it's more accurate
+        [Tooltip("Lower number = less skid required for sound to start")]
         public float SkidSound_Min = 3f;
         [Tooltip("How quickly volume increases as skid speed increases")]
         public float SkidSound_VolumeIncrease = 0.5f;
@@ -58,11 +63,6 @@ namespace SaccFlightAndVehicles
         public float SkidSound_Pitch = 1f;
         [Tooltip("Reduce volume of skid swhilst in the car")]
         public float SkidVolInVehicleMulti = .4f;
-        [Tooltip("Skip sound and skid effects completely")]
-        public bool DisableEffects = false;
-        [Range(0, 2), Tooltip("3 Different ways to calculate amount of engine force used when sliding + accelerating, for testing. 0 = old way, 1 = keeps more energy, 2 = loses more energy")]
-        public int SkidRatioMode = 0;
-        private int NumStepsSec;
         [Header("Debug")]
         public Transform LastTouchedTransform;
         public Rigidbody LastTouchedTransform_RB;
@@ -93,6 +93,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerialized] public float HandBrake;
         [System.NonSerialized] public float Brake;
         public bool Sleeping;
+        private int NumStepsSec;
         private int SurfaceType = -1;
         private float SkidVolumeMulti = 1;
         private bool SkidSoundPlayingLast;
@@ -430,6 +431,7 @@ namespace SaccFlightAndVehicles
                 }
             }
 #endif
+            // float gripUsed = 0;
             if (Grounded)
             {
                 //GRIP//
@@ -478,14 +480,36 @@ namespace SaccFlightAndVehicles
                 Vector3 GripForce3;
                 //SusForce has deltatime built in
                 float SusForceMag = SusForce.magnitude / NumSteps;
-                Vector3 GripForceForward = -FullSkid.normalized * GripCurve.Evaluate((FullSkidMag) / (CurrentGrip * (SusForceMag / WheelPhysicsDelta / 90f))) * CurrentGrip * SusForceMag;
+                float MaxGrip = (SusForceMag * CurrentGrip) / WheelPhysicsDelta;
+                float MaxGripLat = MaxGrip * LateralGrip;
+                Vector3 GripForceForward;
+                Vector3 GripForcLat;
+
                 if (SeparateLongLatGrip)
                 {
-                    Vector3 GripForceSide = -FullSkid.normalized * GripCurveLateral.Evaluate((FullSkidMag) / (CurrentGrip * LateralGrip * (SusForceMag / WheelPhysicsDelta / 90f))) * CurrentGrip * LateralGrip * SusForceMag;
-                    GripForce3 = Vector3.Lerp(GripForceSide, GripForceForward, ForwardSideRatio);
+                    float evalskid = ForwardSkid.magnitude / MaxGrip;
+                    float gripPc = GripCurve.Evaluate(evalskid);
+                    GripForceForward = -ForwardSkid.normalized * gripPc * MaxGrip;
+                    // gripUsed = (gripPc / (evalskid > 0 ? evalskid : 1)) * ForwardSideRatio;
+
+                    float evalskidLat = SideSkid.magnitude / MaxGripLat;
+                    float gripPcLat = GripCurveLateral.Evaluate(evalskidLat);
+                    GripForcLat = -SideSkid.normalized * gripPcLat * MaxGripLat;
+                    GripForce3 = (GripForceForward + GripForcLat) * WheelPhysicsDelta;
                 }
                 else
-                { GripForce3 = GripForceForward; }
+                {
+                    float evalskid = FullSkid.magnitude / MaxGrip;
+                    float gripPc = GripCurve.Evaluate(evalskid);
+                    GripForceForward = -FullSkid.normalized * gripPc * MaxGrip;
+                    // gripUsed = (gripPc / (evalskid > 0 ? evalskid : 1)) * ForwardSideRatio;
+
+                    float evalskidLat = FullSkid.magnitude / MaxGripLat;
+                    float gripPcLat = GripCurveLateral.Evaluate(evalskidLat);
+                    GripForcLat = -FullSkid.normalized * gripPcLat * MaxGripLat;
+                    GripForce3 = Vector3.Lerp(GripForcLat, GripForceForward, ForwardSideRatio) * WheelPhysicsDelta;
+                }
+
                 // two way forces for wheel grip on rigidbodies, many problems
                 /* float WeightRatio = 1;
                 if (LastTouchedTransform_RB && !LastTouchedTransform_RB.isKinematic)
@@ -496,10 +520,12 @@ namespace SaccFlightAndVehicles
                     GripForce3 *= 1 - WeightRatio;
                 } */
                 //Add the Grip forces to the rigidbody
-                //Why /90? Who knows! Maybe offsetting something to do with delta time, no idea why it's needed.
-                CarRigid.AddForceAtPosition(GripForce3 / 90f, SusOut.point, ForceMode.VelocityChange);
-                ForceUsed = (GripForce3.magnitude * ForwardSideRatio);
+                CarRigid.AddForceAtPosition(GripForce3, SusOut.point, ForceMode.VelocityChange);
+                ForceUsed = GripForce3.magnitude * ForwardSideRatio * 100;
 #if UNITY_EDITOR
+                // draws the gripcurve at world origin
+                // Debug.DrawLine(new Vector3(ForwardSkid.magnitude, 0, 0), new Vector3(ForwardSkid.magnitude, GripForceForward.magnitude, 0), Color.green, 5f);
+                // Debug.DrawLine(new Vector3(ForwardSkid.magnitude, 0, 0), new Vector3(ForwardSkid.magnitude, -SusForceMag * 10, 0), Color.red, 5f);
                 ForceVector = GripForce3;
                 ForceUsedDBG = ForceUsed;
 #endif
@@ -521,7 +547,9 @@ namespace SaccFlightAndVehicles
                 //move wheel rotation speed towards its ground speed along its forward axis based on how much of it's forward skid that it gripped
                 if (HandBrake != 1f)
                 {
-                    //setting wheelweight very high does allow for proper wheel spins, but the vehicle physics gets ruined
+                    // ForwardSpeed is this frame's speed, really we should be using next frames speed
+                    // (after the added force is calculated, but we can't do that with substeps anyway)
+                    // I think it's better to use a lerp and the commented out 'gripUsed' as T but it doesn't seem to make much difference in practice
                     WheelRotationSpeedSurf = Mathf.MoveTowards(WheelRotationSpeedSurf, ForwardSpeed, (ForceUsed / WheelWeight));
                     WheelRotationSpeedRPS = WheelRotationSpeedSurf / WheelCircumference;
                     WheelRotationSpeedRPM = WheelRotationSpeedRPS * 60f;
@@ -531,7 +559,7 @@ namespace SaccFlightAndVehicles
                     //     Debug.Log(string.Concat("SlipGrip / Time.deltaTime: ", (SlipGrip / Time.deltaTime).ToString()));
                     // }
                 }
-                SkidVectorFX = SideSkid + (ForwardSkid.normalized * (ForwardSpeed - WheelRotationSpeedSurf));
+                SkidVectorFX = FullSkid;
             }
             //move engine speed towards wheel speed
             if (IsDriveWheel && !GearNeutral)

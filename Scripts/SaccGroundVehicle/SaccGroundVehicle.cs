@@ -100,11 +100,8 @@ namespace SaccFlightAndVehicles
             get => HandBrakeOn;
         }
         private Vector3 VehiclePosLastFrame;
-        public bool Bike_AutoSteer;
-        public float Bike_AutoSteer_CounterStrength = .01f;
-        public float Bike_AutoSteer_Strength = .01f;
-        public bool Drift_AutoSteer;
         [Header("AutoSteer (Drift Mode)")]
+        public bool Drift_AutoSteer;
         [Tooltip("Put in the max degrees the wheels can turn to in order to make autosteer work properly")]
         public float SteeringDegrees = 60;
         public float AutoSteerStrength = 5f;
@@ -150,6 +147,10 @@ namespace SaccFlightAndVehicles
         [Tooltip("How far head has to move to lean forward/back, high number = less movement required")]
         public float LeanSensitivity_Pitch = 2.5f;
         public bool EnableLeaning = false;
+        public bool Bike_AutoSteer;
+        public float Bike_AutoSteer_CounterStrength = .01f;
+        public float Bike_AutoSteer_Strength = .01f;
+        [Space(10)]
         [Tooltip("Completely change how the vehicle operates to behave like a tank, enables two throttle sliders, and turns DriveWheels/SteerWheels into Left/Right tracks")]
         public bool TankMode;
         [Tooltip("Multiply how much the VR throttle moves from hand movement, TankMode only")]

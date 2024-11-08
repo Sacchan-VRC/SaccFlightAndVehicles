@@ -27360,13 +27360,13 @@ MonoBehaviour:
   ClutchDisabled: 1
   FinalDrive: 1
   GearRatios:
-  - -0.04
+  - -0.03
   - 0
-  - 0.06
-  - 0.12
-  - 0.18
+  - 0.048
+  - 0.096
+  - 0.144
+  - 0.192
   - 0.24
-  - 0.3
   UpperDeadZone: 0.95
   LowerDeadZone: 0.05
   AutoClutch_Length: 0.5
@@ -28618,7 +28618,7 @@ Transform:
   m_GameObject: {fileID: 2935594653319740706}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.24000001, z: 0.07999992}
+  m_LocalPosition: {x: 0, y: 0.32, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -28701,10 +28701,10 @@ MonoBehaviour:
   DriveSpeedKeyboardMax: 1
   GripSensitivity: 0.75
   SteeringWheelDegrees: 450
-  SteeringKeyboardSecsToMax: 0.33333
-  SteeringMaxSpeedDT: 50
+  SteeringKeyboardSecsToMax: 0.7
+  SteeringMaxSpeedDT: 45
   SteeringMaxSpeedDTDisabled: 0
-  DesktopMinSteering: 0.06
+  DesktopMinSteering: 0.1
   ThrottleReturnTimeDT: 0.0001
   Drag: 0.02
   ControlsRoot: {fileID: 0}
@@ -28714,12 +28714,12 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0.2
-      inSlope: 0
-      outSlope: 0
+      inSlope: 1.6000005
+      outSlope: 1.6000005
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 1
     - serializedVersion: 3
       time: 0.5
       value: 1
@@ -28732,11 +28732,11 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 0.6
-      inSlope: 0
-      outSlope: 0
+      inSlope: -0.8014983
+      outSlope: -0.8014983
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.99593496
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -28746,15 +28746,17 @@ MonoBehaviour:
   SwitchHandsJoyThrottle: 0
   SteeringHand_Left: 1
   SteeringHand_Right: 1
-  Bike_AutoSteer: 0
-  Bike_AutoSteer_CounterStrength: 0.01
-  Bike_AutoSteer_Strength: 0.01
+  InertiaTensorRotationMulti: 1
+  InvertITRYaw: 0
   Drift_AutoSteer: 0
   SteeringDegrees: 60
   AutoSteerStrength: 0.3
-  SteeringReturnSpeedDT: 0.3
+  SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
+  Bike_AutoSteer: 0
+  Bike_AutoSteer_CounterStrength: 0.01
+  Bike_AutoSteer_Strength: 0.01
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 5
@@ -29340,7 +29342,7 @@ MonoBehaviour:
   - {fileID: 1923975961407355158}
   - {fileID: 4923275279788868207}
   Dial_Functions_R: []
-  LStickDisplayHighlighter: {fileID: 4032119635117446070}
+  LStickDisplayHighlighter: {fileID: 850427505002523452}
   RStickDisplayHighlighter: {fileID: 0}
   DialSensitivity: 0.7
   LeftDialDivideStraightUp: 0
@@ -100292,43 +100294,52 @@ MonoBehaviour:
   WheelVisual_Ground: {fileID: 0}
   SuspensionDistance: 0.4
   WheelRadius: 0.4747345
-  SpringForceMulti: 6.5
+  SpringForceMulti: 8.5
   DampingForceMulti: 1.1
   MaxSuspensionForce: 22
   ExtraRayCastDistance: 1
-  Grip: 287.5
+  Grip: 2.3
   GripCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
+      inSlope: 0.99488544
+      outSlope: 0.99488544
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0.28404364
     - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
+      time: 1.2705913
+      value: 0.92290354
+      inSlope: 0.68075407
+      outSlope: 0.68075407
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7470707
+    - serializedVersion: 3
+      time: 1.6911621
+      value: 0.9507002
+      inSlope: -0.50303125
+      outSlope: -0.50303125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39069265
+      outWeight: 0.29335552
+    - serializedVersion: 3
+      time: 2.0474575
+      value: 0.6884881
+      inSlope: -0.57000786
+      outSlope: -0.57000786
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2
+      time: 2.670108
       value: 0.5
       inSlope: -0.04364132
       outSlope: -0.04364132
@@ -100339,40 +100350,48 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  SeparateLongLatGrip: 1
-  LateralGrip: 0.8
+  LateralGrip: 1
   GripCurveLateral:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
+      inSlope: 0.99488544
+      outSlope: 0.99488544
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0.28404364
     - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
+      time: 1.0700861
+      value: 0.92290354
+      inSlope: 0.68075407
+      outSlope: 0.68075407
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7470707
+    - serializedVersion: 3
+      time: 1.490657
+      value: 0.9507002
+      inSlope: -0.50303125
+      outSlope: -0.50303125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39069265
+      outWeight: 0.29335552
+    - serializedVersion: 3
+      time: 1.8469522
+      value: 0.6884881
+      inSlope: -0.57000786
+      outSlope: -0.57000786
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2
+      time: 2.4696028
       value: 0.5
       inSlope: -0.04364132
       outSlope: -0.04364132
@@ -100383,6 +100402,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  SeparateLongLatGrip: 0
   BrakeStrength: 250
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -100392,7 +100412,7 @@ MonoBehaviour:
     m_Bits: 133121
   SurfaceType_Grips:
   - 1
-  - 0.7
+  - 0.85
   - 0.2
   - 1
   - 1
@@ -100636,43 +100656,52 @@ MonoBehaviour:
   WheelVisual_Ground: {fileID: 0}
   SuspensionDistance: 0.4
   WheelRadius: 0.4747345
-  SpringForceMulti: 6.5
+  SpringForceMulti: 8.5
   DampingForceMulti: 1.1
   MaxSuspensionForce: 22
   ExtraRayCastDistance: 1
-  Grip: 312.5
+  Grip: 1.8
   GripCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
+      inSlope: 0.99488544
+      outSlope: 0.99488544
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0.28404364
     - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
+      time: 1.2705913
+      value: 0.92290354
+      inSlope: 0.68075407
+      outSlope: 0.68075407
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7470707
+    - serializedVersion: 3
+      time: 1.6911621
+      value: 0.9507002
+      inSlope: -0.50303125
+      outSlope: -0.50303125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39069265
+      outWeight: 0.29335552
+    - serializedVersion: 3
+      time: 2.0474575
+      value: 0.6884881
+      inSlope: -0.57000786
+      outSlope: -0.57000786
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2
+      time: 2.670108
       value: 0.5
       inSlope: -0.04364132
       outSlope: -0.04364132
@@ -100683,40 +100712,48 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  SeparateLongLatGrip: 1
-  LateralGrip: 0.8
+  LateralGrip: 1
   GripCurveLateral:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
+      inSlope: 0.99488544
+      outSlope: 0.99488544
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0.28404364
     - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
+      time: 1.0700861
+      value: 0.92290354
+      inSlope: 0.68075407
+      outSlope: 0.68075407
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7470707
+    - serializedVersion: 3
+      time: 1.490657
+      value: 0.9507002
+      inSlope: -0.50303125
+      outSlope: -0.50303125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39069265
+      outWeight: 0.29335552
+    - serializedVersion: 3
+      time: 1.8469522
+      value: 0.6884881
+      inSlope: -0.57000786
+      outSlope: -0.57000786
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2
+      time: 2.4696028
       value: 0.5
       inSlope: -0.04364132
       outSlope: -0.04364132
@@ -100727,6 +100764,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  SeparateLongLatGrip: 0
   BrakeStrength: 250
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -100736,7 +100774,7 @@ MonoBehaviour:
     m_Bits: 133121
   SurfaceType_Grips:
   - 1
-  - 0.7
+  - 0.85
   - 0.2
   - 1
   - 1
@@ -100853,43 +100891,52 @@ MonoBehaviour:
   WheelVisual_Ground: {fileID: 0}
   SuspensionDistance: 0.4
   WheelRadius: 0.4747345
-  SpringForceMulti: 6.5
+  SpringForceMulti: 8.5
   DampingForceMulti: 1.1
   MaxSuspensionForce: 22
   ExtraRayCastDistance: 1
-  Grip: 312.5
+  Grip: 1.8
   GripCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
+      inSlope: 0.99488544
+      outSlope: 0.99488544
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0.28404364
     - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
+      time: 1.2705913
+      value: 0.92290354
+      inSlope: 0.68075407
+      outSlope: 0.68075407
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7470707
+    - serializedVersion: 3
+      time: 1.6911621
+      value: 0.9507002
+      inSlope: -0.50303125
+      outSlope: -0.50303125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39069265
+      outWeight: 0.29335552
+    - serializedVersion: 3
+      time: 2.0474575
+      value: 0.6884881
+      inSlope: -0.57000786
+      outSlope: -0.57000786
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2
+      time: 2.670108
       value: 0.5
       inSlope: -0.04364132
       outSlope: -0.04364132
@@ -100900,40 +100947,48 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  SeparateLongLatGrip: 1
-  LateralGrip: 0.8
+  LateralGrip: 1
   GripCurveLateral:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
+      inSlope: 0.99488544
+      outSlope: 0.99488544
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0.28404364
     - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
+      time: 1.0700861
+      value: 0.92290354
+      inSlope: 0.68075407
+      outSlope: 0.68075407
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7470707
+    - serializedVersion: 3
+      time: 1.490657
+      value: 0.9507002
+      inSlope: -0.50303125
+      outSlope: -0.50303125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39069265
+      outWeight: 0.29335552
+    - serializedVersion: 3
+      time: 1.8469522
+      value: 0.6884881
+      inSlope: -0.57000786
+      outSlope: -0.57000786
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2
+      time: 2.4696028
       value: 0.5
       inSlope: -0.04364132
       outSlope: -0.04364132
@@ -100944,6 +100999,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  SeparateLongLatGrip: 0
   BrakeStrength: 250
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -100953,7 +101009,7 @@ MonoBehaviour:
     m_Bits: 133121
   SurfaceType_Grips:
   - 1
-  - 0.7
+  - 0.85
   - 0.2
   - 1
   - 1
@@ -101140,43 +101196,52 @@ MonoBehaviour:
   WheelVisual_Ground: {fileID: 0}
   SuspensionDistance: 0.4
   WheelRadius: 0.4747345
-  SpringForceMulti: 6.5
+  SpringForceMulti: 8.5
   DampingForceMulti: 1.1
   MaxSuspensionForce: 22
   ExtraRayCastDistance: 1
-  Grip: 287.5
+  Grip: 2.3
   GripCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
+      inSlope: 0.99488544
+      outSlope: 0.99488544
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0.28404364
     - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
+      time: 1.2705913
+      value: 0.92290354
+      inSlope: 0.68075407
+      outSlope: 0.68075407
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7470707
+    - serializedVersion: 3
+      time: 1.6911621
+      value: 0.9507002
+      inSlope: -0.50303125
+      outSlope: -0.50303125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39069265
+      outWeight: 0.29335552
+    - serializedVersion: 3
+      time: 2.0474575
+      value: 0.6884881
+      inSlope: -0.57000786
+      outSlope: -0.57000786
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2
+      time: 2.670108
       value: 0.5
       inSlope: -0.04364132
       outSlope: -0.04364132
@@ -101187,40 +101252,48 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  SeparateLongLatGrip: 1
-  LateralGrip: 0.8
+  LateralGrip: 1
   GripCurveLateral:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1.0003198
-      outSlope: 1.0003198
+      inSlope: 0.99488544
+      outSlope: 0.99488544
       tangentMode: 0
       weightedMode: 0
-      inWeight: 1
-      outWeight: 0.33333334
+      inWeight: 0
+      outWeight: 0.28404364
     - serializedVersion: 3
-      time: 1.3778018
-      value: 0.7553785
-      inSlope: -0.99939287
-      outSlope: -0.99939287
+      time: 1.0700861
+      value: 0.92290354
+      inSlope: 0.68075407
+      outSlope: 0.68075407
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.7470707
+    - serializedVersion: 3
+      time: 1.490657
+      value: 0.9507002
+      inSlope: -0.50303125
+      outSlope: -0.50303125
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.39069265
+      outWeight: 0.29335552
+    - serializedVersion: 3
+      time: 1.8469522
+      value: 0.6884881
+      inSlope: -0.57000786
+      outSlope: -0.57000786
       tangentMode: 0
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2
+      time: 2.4696028
       value: 0.5
       inSlope: -0.04364132
       outSlope: -0.04364132
@@ -101231,6 +101304,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+  SeparateLongLatGrip: 0
   BrakeStrength: 250
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -101240,7 +101314,7 @@ MonoBehaviour:
     m_Bits: 133121
   SurfaceType_Grips:
   - 1
-  - 0.7
+  - 0.85
   - 0.2
   - 1
   - 1
