@@ -183,7 +183,7 @@ namespace SaccFlightAndVehicles
                 }
             }
 
-            DoEffects = 0f;
+            DoEffects = 9f;//must be longer than syncscript activation time
             Sleeping = false;
         }
         private bool KeepAwake = false;

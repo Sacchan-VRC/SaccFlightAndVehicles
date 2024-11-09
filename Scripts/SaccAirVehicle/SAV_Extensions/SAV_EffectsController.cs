@@ -98,7 +98,7 @@ namespace SaccFlightAndVehicles
 
             if (PrintAnimHashNamesOnStart)
             { PrintStringHashes(); }
-            DoEffects = 6f;
+            DoEffects = 9f;
             if (WheelVisuals.Length > 0 && WheelVisuals.Length == WheelColliders.Length)
             {
                 DoWheelPose = true;

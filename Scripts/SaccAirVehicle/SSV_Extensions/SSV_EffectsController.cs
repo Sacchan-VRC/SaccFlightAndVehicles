@@ -57,7 +57,7 @@ namespace SaccFlightAndVehicles
 
             if (PrintAnimHashNamesOnStart)
             { PrintStringHashes(); }
-            DoEffects = 6;
+            DoEffects = 9;
             FlatWaterEffectsLength = FlatWaterEffects.Length;
             FlatWaterFXLocalSpawnPos = new Vector3[FlatWaterEffects.Length];
             for (int x = 0; x < FlatWaterEffectsLength; x++)

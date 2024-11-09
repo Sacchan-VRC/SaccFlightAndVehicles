@@ -69,7 +69,7 @@ namespace SaccFlightAndVehicles
         private double L_UpdateTime;
         private double O_LastUpdateTime;
         //make everyone think they're the owner for the first frame so that don't set the position to 0,0,0 before SFEXT_L_EntityStart runs
-        private bool IsOwner = true;
+        private bool IsOwner = false;
         private Vector3 ExtrapolationDirection;
         private Quaternion RotationExtrapolationDirection;
         private Vector3 lerpedCurVel;
@@ -101,9 +101,10 @@ namespace SaccFlightAndVehicles
         private float ErrorLastFrame;
         private float StartDrag;
         private float StartAngDrag;
+        [System.NonSerialized] public SaccEntity EntityControl;
         private void Start()
         {
-            if (SyncRigid)
+            if (SyncRigid)//object mode
             {
                 ObjectMode = true;
                 VehicleRigid = SyncRigid;
@@ -113,22 +114,30 @@ namespace SaccFlightAndVehicles
                 if (!SyncTransform)
                 { SyncTransform = VehicleRigid.transform; }
                 SFEXT_L_EntityStart();
+                return;
             }
-            else
+
+            // prevent crash & incorrect movement if this object was left enabled
+            if (!VehicleRigid)
             {
-                if (!VehicleRigid)
-                {
-                    VehicleRigid = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Rigidbody>();
-                }
-                if (!SyncTransform)
-                { SyncTransform = VehicleRigid.transform; }
-#if UNITY_EDITOR
-                else { TestMode = true; }
-#endif
+                VehicleRigid = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).GetComponent<Rigidbody>();
+                if (!VehicleTransform)
+                { VehicleTransform = VehicleRigid.transform; }
+                InitSyncValues();
             }
+
+            if (!SyncTransform)
+            { SyncTransform = VehicleRigid.transform; }
+#if UNITY_EDITOR
+            else { TestMode = true; }
+#endif
+
         }
         public void SFEXT_L_EntityStart()
         {
+            Initialized = true;
+            VRCPlayerApi localPlayer = Networking.LocalPlayer;
+            bool InEditor = !Utilities.IsValid(localPlayer);
             if (SyncRigid)
             {
                 ObjectMode = true;
@@ -137,19 +146,9 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                VehicleTransform = ((SaccEntity)SAVControl.GetProgramVariable("EntityControl")).transform;
-                VehicleRigid = (Rigidbody)SAVControl.GetProgramVariable("VehicleRigidbody");
+                VehicleTransform = EntityControl.transform;
+                VehicleRigid = EntityControl.VehicleRigidbody;
             }
-            if (gameObject.activeInHierarchy) { InitSyncValues(); }//this gameobject shouldn't be active at start, but some people might still have it active from older versions
-            EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
-            //script is disabled for 5 seconds to make sure nothing moves before everything is initialized    
-            SendCustomEventDelayedSeconds(nameof(ActivateScript), 5);
-        }
-        public void ActivateScript()
-        {
-            Initialized = true;
-            VRCPlayerApi localPlayer = Networking.LocalPlayer;
-            bool InEditor = localPlayer == null;
             if (!InEditor)
             {
                 if (localPlayer.isMaster)
@@ -179,6 +178,15 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.drag = 9999;
                 VehicleRigid.angularDrag = 9999;
             }
+            if (gameObject.activeInHierarchy) { InitSyncValues(); }//this gameobject shouldn't be active at start, but some people might still have it active from older versions
+            EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
+            // script activation is delayed to allow all scripts on this vehicle to activate first
+            // 10 frames to be safe, 4 is the minimum for car wheels to not behave strangely (ingame only) if they're touching the ground at Start(), reason unknown.
+            SendCustomEventDelayedFrames(nameof(ActivateScript), 10);
+        }
+        public void ActivateScript()
+        {
+            Initialized = true;
             InitSyncValues();
             gameObject.SetActive(true);
             VehicleRigid.constraints = RigidbodyConstraints.None;
