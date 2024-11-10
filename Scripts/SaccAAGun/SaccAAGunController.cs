@@ -67,12 +67,20 @@ namespace SaccFlightAndVehicles
         public float AAMLockAngle = 20;
         [Tooltip("AAM takes this long to lock before it can fire (seconds)")]
         public float AAMLockTime = 1.5f;
+        [Tooltip("Heatseekers only: How much faster is locking if the target has afterburner on? (AAMLockTime / value)")]
+        public float LockTimeABDivide = 2f;
+        [Tooltip("Heatseekers only: If target's engine throttle is 0%, what is the minimum number to divide lock time by, to prevent infinite lock time. (AAMLockTime / value)")]
+        public float LockTimeMinDivide = .2f;
         [Tooltip("Minimum time between missile launches")]
         public float AAMLaunchDelay = 0f;
         [Tooltip("Point missile is launched from, flips on local X each time fired")]
         public Transform AAMLaunchPoint;
         [Tooltip("Allow locking on target with no missiles left. Enable if creating FOX-1/3 missiles, otherwise your last missile will be unusable.")]
         public bool AllowNoAmmoLock = false;
+        [Tooltip("Make it only possible to lock if the angle you are looking at the back of the enemy plane is less than HighAspectPreventLock (for heatseekers)")]
+        public bool HighAspectPreventLock;
+        [Tooltip("Angle beyond which aspect is too high to lock")]
+        public float HighAspectAngle = 85;
         [Tooltip("Require re-lock after firing?")]
         public bool LoseLockWhenFired = false;
         [Tooltip("Send the missile warning alarm to aircraft?")]
@@ -83,6 +91,10 @@ namespace SaccFlightAndVehicles
         public bool OnlyTargetVehicles;
         [Tooltip("Multiplies how much damage is taken from bullets")]
         public float BulletDamageTaken = 10f;
+        private float HighAspectPreventLockAngleDot;
+        private bool TriggerLastFrame;
+        [Tooltip("Layers to check raycast hits for (in place of OnboardVehicleLayer and OutsideVehicleLayer) (OnboardVehicleLayer is required for an AAGun you own to target yourself)")]
+        [SerializeField] private int[] TargetLayers = { 17, 31 };
         public bool AI_GUN;
         [SerializeField] private float AI_GUN_TurnStrength = 1f;
         [SerializeField] private Vector2 AI_GUN_BurstLength = new Vector2(1.5f, 4.0f);
@@ -184,6 +196,11 @@ namespace SaccFlightAndVehicles
             AAGunAnimator.SetFloat("AAMs", (float)NumAAM * FullAAMsDivider);
             MGAmmoFull = MGAmmoSeconds;
             FullMGDivider = 1f / (MGAmmoFull > 0 ? MGAmmoFull : 10000000);
+            HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
+            if (LockTimeABDivide <= 0)
+            { LockTimeABDivide = 0.0001f; }
+            if (LockTimeMinDivide <= 0)
+            { LockTimeMinDivide = 0.0001f; }
 
             AAMTargets = EntityControl.AAMTargets;
             NumAAMTargets = AAMTargets.Length;
@@ -290,10 +307,28 @@ namespace SaccFlightAndVehicles
                     RotateGun(InputX, InputY);
                     GunFireCheck();
 
+                    bool lockedLast = AAMLocked;
                     if (DoAAMTargeting)
                     {
-                        if (AAMLockTimer > AAMLockTime && AAMHasTarget) AAMLocked = true;
-                        else { AAMLocked = false; }
+                        if (MissileType == 1)//heatseekers check engine output of target
+                        {
+                            if (AAMCurrentTargetSAVControl ?//if target is SaccAirVehicle, adjust lock time based on throttle status 
+                            AAMLockTimer > AAMLockTime /
+                            (AAMCurrentTargetSAVControl.AfterburnerOn ?
+                                        LockTimeABDivide
+                                        :
+                                        Mathf.Clamp(AAMCurrentTargetSAVControl.EngineOutput / AAMCurrentTargetSAVControl.ThrottleAfterburnerPoint, LockTimeMinDivide, 1))
+                            : AAMLockTimer > AAMLockTime && AAMHasTarget)//target is not a SaccAirVehicle
+                            { AAMLocked = true; }
+                            else { AAMLocked = false; }
+                        }
+                        else
+                        {
+                            if (AAMLockTimer > AAMLockTime && AAMHasTarget) { AAMLocked = true; }
+                            else { AAMLocked = false; }
+                        }
+                        if (lockedLast != AAMLocked) { RequestSerialization(); }
+
                         //firing AAM
                         if (LTrigger > 0.75 || (Input.GetKey(KeyCode.C)))
                         {
@@ -623,6 +658,30 @@ namespace SaccFlightAndVehicles
                 }
             }
         }
+        bool rayhitIsOnCorrectLayer(RaycastHit target)
+        {
+            //hitnext.collider && (hitnext.collider.gameObject.layer == 17 || hitnext.collider.gameObject.layer == 31)
+            if (!target.collider) return false;
+            int targlayer = target.collider.gameObject.layer;
+            for (int i = 0; i < TargetLayers.Length; i++)
+            {
+                if (targlayer == TargetLayers[i])
+                    return true;
+            }
+            return false;
+        }
+        bool rayhitIsNotOnCorrectLayer(RaycastHit target)
+        {
+            //(hitcurrent.collider && hitcurrent.collider.gameObject.layer != 17 && hitcurrent.collider.gameObject.layer != 31)
+            if (!target.collider) return false;
+            int targlayer = target.collider.gameObject.layer;
+            for (int i = 0; i < TargetLayers.Length; i++)
+            {
+                if (targlayer == TargetLayers[i])
+                    return false;
+            }
+            return true;
+        }
         private void AAMFindTargets(float Lock_Angle)
         {
             float DeltaTime = Time.deltaTime;
@@ -655,32 +714,40 @@ namespace SaccFlightAndVehicles
                     int layermask_Next = 133137;/* Default, Water, Environment, and Walkthrough */
                     if (AI_GUN_RUNNINGLOCAL) layermask_Next += 1 << EntityControl.OnboardVehicleLayer; // add OnBoardVehicleLayer so it can hit you if you're owner of this and in another vehicle
                     bool LineOfSightNext = Physics.Raycast(HudControlPosition, AAMNextTargetDirection, out hitnext, Mathf.Infinity, layermask_Next, QueryTriggerInteraction.Ignore);
-
+#if UNITY_EDITOR
+                    if (hitnext.collider)
+                        Debug.DrawLine(HudControlPosition, hitnext.point, Color.red);
+                    else
+                        Debug.DrawRay(HudControlPosition, AAMNextTargetDirection, Color.yellow);
+#endif
                     /* Debug.Log(string.Concat("LoS ", LineOfSightNext));
                     Debug.Log(string.Concat("RayCastLayer ", hitnext.collider.gameObject.layer == PlaneHitBoxLayer));
                     Debug.Log(string.Concat("InAngle ", NextTargetAngle < Lock_Angle));
                     Debug.Log(string.Concat("BelowMaxDist ", NextTargetDistance < AAMMaxTargetDistance));
                     Debug.Log(string.Concat("LowerAngle ", NextTargetAngle < AAMCurrentTargetAngle));
                     Debug.Log(string.Concat("CurrentTargTaxiing ", !AAMCurrentTargetSAVControlNull && AAMCurrentTargetSAVControl.Taxiing)); */
-                    if ((!OnlyTargetVehicles || NextTargetSAVControl) && ((LineOfSightNext
-                        && hitnext.collider && (hitnext.collider.gameObject.layer == 17 || hitnext.collider.gameObject.layer == 31)
-                            && NextTargetAngle < Lock_Angle
-                                && NextTargetDistance < AAMMaxTargetDistance
-                                    && NextTargetAngle < AAMCurrentTargetAngle)
-                                        || ((AAMCurrentTargetSAVControl && AAMCurrentTargetSAVControl.Taxiing) || !AAMTargets[AAMTarget].activeInHierarchy))) //prevent being unable to target next target if it's angle is higher than your current target and your current target happens to be taxiing and is therefore untargetable
+                    if (LineOfSightNext
+                        && rayhitIsOnCorrectLayer(hitnext) //did raycast hit an object on the layer planes are on?
+                            && NextTargetAngle < AAMLockAngle
+                                && NextTargetAngle < AAMCurrentTargetAngle
+                                    && NextTargetDistance < AAMMaxTargetDistance
+                                        && (!NextTargetSAVControl ||//null check
+                                            ((!HighAspectPreventLock || Vector3.Dot(NextTargetSAVControl.VehicleTransform.forward, AAMNextTargetDirection.normalized) > HighAspectPreventLockAngleDot)
+                                            && (MissileType != 1 || NextTargetSAVControl._EngineOn)))
+                                        || (AAMCurrentTargetSAVControl &&//null check
+                                                                    (AAMCurrentTargetSAVControl.Taxiing ||//switch target if current target is taxiing
+                                                                    (MissileType == 1 && !AAMCurrentTargetSAVControl._EngineOn)))//switch target if heatseeker and current target's engine is off
+                                            || !AAMTargets[AAMTarget].activeInHierarchy//switch target if current target is destroyed
+                                            )
                     {
-                        //found new target
-                        AAMCurrentTargetAngle = NextTargetAngle;
-                        AAMTarget = AAMTargetChecker;
-                        AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
-                        AAMCurrentTargetSAVControl = NextTargetSAVControl;
-                        AAMLockTimer = 0;
-                        AAMTargetedTime = 99f;//send targeted straight away
-                        if (HUDControl)
+                        if (!LTriggerLastFrame)
                         {
-                            HUDControl.RelativeTargetVelLastFrame = Vector3.zero;
-                            HUDControl.GUN_TargetSpeedLerper = 0f;
-                            HUDControl.GUN_TargetDirOld = AAMNextTargetDirection * 1.00001f; //so the difference isn't 0
+                            //found new target
+                            AAMCurrentTargetAngle = NextTargetAngle;
+                            AAMTarget = AAMTargetChecker;
+                            AAMCurrentTargetPosition = AAMTargets[AAMTarget].transform.position;
+                            AAMCurrentTargetSAVControl = NextTargetSAVControl;
+                            AAMLockTimer = 0;
                         }
                     }
                 }
@@ -703,22 +770,32 @@ namespace SaccFlightAndVehicles
             int layermask_Current = 133137;
             if (AI_GUN_RUNNINGLOCAL) layermask_Current += 1 << EntityControl.OnboardVehicleLayer;
             bool LineOfSightCur = Physics.Raycast(HudControlPosition, AAMCurrentTargetDirection, out hitcurrent, Mathf.Infinity, layermask_Current, QueryTriggerInteraction.Ignore);
+#if UNITY_EDITOR
+            if (hitcurrent.collider)
+                Debug.DrawLine(HudControlPosition, hitcurrent.point, Color.green);
+            else
+                Debug.DrawRay(HudControlPosition, AAMNextTargetDirection, Color.blue);
+#endif
             //used to make lock remain for .25 seconds after target is obscured
-            if (!LineOfSightCur || (hitcurrent.collider && hitcurrent.collider.gameObject.layer != 17 && hitcurrent.collider.gameObject.layer != 31))
+            if (!LineOfSightCur || rayhitIsNotOnCorrectLayer(hitcurrent))
             { AAMTargetObscuredDelay += DeltaTime; }
             else
             { AAMTargetObscuredDelay = 0; }
-            if (AAMTargets[AAMTarget].activeInHierarchy
-                    && (!AAMCurrentTargetSAVControl || (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl._dead)))
+
+            if (
+                (AAMTargetObscuredDelay < .25f)
+                    && AAMCurrentTargetDistance < AAMMaxTargetDistance
+                        && AAMTargets[AAMTarget].activeInHierarchy
+                            && (!AAMCurrentTargetSAVControl ||
+                                (!AAMCurrentTargetSAVControl.Taxiing && !AAMCurrentTargetSAVControl.EntityControl._dead &&
+                                    (MissileType != 1 || AAMCurrentTargetSAVControl._EngineOn)))//heatseekers cant lock if engine off
+                                &&
+                                    (!HighAspectPreventLock || !AAMCurrentTargetSAVControl || Vector3.Dot(AAMCurrentTargetSAVControl.VehicleTransform.forward, AAMCurrentTargetDirection.normalized) > HighAspectPreventLockAngleDot)
+                                    )
             {
-                if ((AAMTargetObscuredDelay < .25f)
-                            && AAMCurrentTargetDistance < AAMMaxTargetDistance)
+                if ((AAMTargetObscuredDelay < .25f) && AAMCurrentTargetDistance < AAMMaxTargetDistance)
                 {
-                    if (!AAMHasTarget)
-                    {
-                        AAMHasTarget = true;
-                        RequestSerialization();
-                    }
+                    AAMHasTarget = true;
                     if (AAMCurrentTargetAngle < AAMLockAngle && (NumAAM > 0 || AllowNoAmmoLock))
                     {
                         AAMLockTimer += DeltaTime;
@@ -735,26 +812,29 @@ namespace SaccFlightAndVehicles
                     }
                     else
                     {
-                        AAMTargetedTime = 0f;
+                        AAMTargetedTime = 0;
                         AAMLockTimer = 0;
                     }
-                }
-                else
-                {
-                    noLock();
                 }
             }
             else
             {
-                noLock();
+                AAMTargetedTime = 0f;
+                AAMLockTimer = 0;
+                AAMHasTarget = false;
             }
-            /*Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
-            Debug.Log(string.Concat("LoS ", LineOfSightCur));
-            Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == PlaneHitBoxLayer)));
-            Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
-            Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
-            Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < Lock_Angle));
-            Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance)); */
+            /*                 Debug.Log(string.Concat("AAMTarget ", AAMTarget));
+                            Debug.Log(string.Concat("HasTarget ", AAMHasTarget));
+                            Debug.Log(string.Concat("AAMTargetObscuredDelay ", AAMTargetObscuredDelay));
+                            Debug.Log(string.Concat("LoS ", LineOfSightCur));
+                            if (hitcurrent.collider)
+                            {
+                                Debug.Log(string.Concat("RayCastCorrectLayer ", (hitcurrent.collider.gameObject.layer == OutsideVehicleLayer)));
+                                Debug.Log(string.Concat("RayCastLayer ", hitcurrent.collider.gameObject.layer));
+                            }
+                            Debug.Log(string.Concat("NotObscured ", AAMTargetObscuredDelay < .25f));
+                            Debug.Log(string.Concat("InAngle ", AAMCurrentTargetAngle < AAMLockAngle));
+                            Debug.Log(string.Concat("BelowMaxDist ", AAMCurrentTargetDistance < AAMMaxTargetDistance)); */
         }
         private void noLock()
         {
