@@ -84,7 +84,7 @@ namespace SaccFlightAndVehicles
             NumAAMTargets = AAMTargets.Length;
             VehicleTransform = EntityControl.transform;
             CenterOfMass = EntityControl.CenterOfMass;
-            OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer");
+            OutsideVehicleLayer = EntityControl.OutsideVehicleLayer;
             GunRecoil *= VehicleRigidbody.mass;
             if (GunDamageParticle) GunDamageParticle.gameObject.SetActive(false);
 

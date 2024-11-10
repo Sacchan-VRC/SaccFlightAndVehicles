@@ -231,7 +231,6 @@ namespace SaccFlightAndVehicles
         private float LowFuelDivider;
         private float LastResupplyTime = 0;
         [System.NonSerializedAttribute] public float FullGunAmmo;
-        [System.NonSerializedAttribute] public int OutsideVehicleLayer;
         [System.NonSerializedAttribute] public bool DoAAMTargeting;
         [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
         [System.NonSerializedAttribute] public bool UsingManualSync;
@@ -239,7 +238,6 @@ namespace SaccFlightAndVehicles
         private bool RepeatingWorldCheckAxis;
         bool FloatingLastFrame = false;
         bool GroundedLastFrame = false;
-        private int VehicleLayer;
         private float HandDistanceZLastFrame;
         private float EngineAngle;
         private float PitchThrustVecMultiStart;
@@ -469,8 +467,7 @@ namespace SaccFlightAndVehicles
                 SusiSpring.damper *= RBMass;
                 wheel.suspensionSpring = SusiSpring;
             }
-            VehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
-            OutsideVehicleLayer = VehicleMesh.gameObject.layer;
+            EntityControl.OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
             VehicleAnimator = EntityControl.GetComponent<Animator>();
 
             FullHealth = Health;
@@ -1517,7 +1514,7 @@ namespace SaccFlightAndVehicles
         {
             Passenger = false;
             if (!EntityControl.MySeatIsExternal) { localPlayer.SetVelocity(CurrentVel); }
-            SetCollidersLayer(VehicleLayer);
+            SetCollidersLayer(EntityControl.OutsideVehicleLayer);
         }
         public void SFEXT_G_PassengerEnter()
         {
@@ -1615,7 +1612,7 @@ namespace SaccFlightAndVehicles
             }
 
             //set vehicle's collider's layers back
-            SetCollidersLayer(VehicleLayer);
+            SetCollidersLayer(EntityControl.OutsideVehicleLayer);
         }
         public void SetCollidersLayer(int NewLayer)
         {

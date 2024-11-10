@@ -436,7 +436,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int MissilesIncomingHeat = 0;
         [System.NonSerializedAttribute] public int MissilesIncomingRadar = 0;
         [System.NonSerializedAttribute] public int MissilesIncomingOther = 0;
-        [System.NonSerializedAttribute] public int OutsideVehicleLayer;
         [System.NonSerializedAttribute] public bool DoAAMTargeting;
         [System.NonSerializedAttribute] public Rigidbody GDHitRigidbody;
         [System.NonSerializedAttribute] public bool UsingManualSync;
@@ -723,7 +722,7 @@ namespace SaccFlightAndVehicles
                 wheel.suspensionSpring = SusiSpring;
             }
 
-            OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
+            EntityControl.OutsideVehicleLayer = VehicleMesh.gameObject.layer;//get the layer of the vehicle as set by the world creator
             VehicleAnimator = EntityControl.GetComponent<Animator>();
 
             FullHealth = Health;
@@ -2176,7 +2175,7 @@ namespace SaccFlightAndVehicles
             MissilesIncomingHeat = 0;
             MissilesIncomingRadar = 0;
             MissilesIncomingOther = 0;
-            SetCollidersLayer(OutsideVehicleLayer);
+            SetCollidersLayer(EntityControl.OutsideVehicleLayer);
         }
         public void SFEXT_G_PassengerEnter()
         {
@@ -2291,7 +2290,7 @@ namespace SaccFlightAndVehicles
                 ThrottleInput = 0; ;
             }
             //set vehicle's collider's layers back
-            SetCollidersLayer(OutsideVehicleLayer);
+            SetCollidersLayer(EntityControl.OutsideVehicleLayer);
         }
         public void SetCollidersLayer(int NewLayer)
         {

@@ -177,10 +177,11 @@ namespace SaccFlightAndVehicles
                 TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
                 if (Target.parent)
                 {
-                    TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
+                    TargetSAVControl = Target.parent.GetComponent<UdonSharpBehaviour>();
                     if (TargetSAVControl)
                     {
-                        OutsideVehicleLayer = (int)TargetSAVControl.GetProgramVariable("OutsideVehicleLayer");
+                        TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
+                        OutsideVehicleLayer = TargetEntityControl.OutsideVehicleLayer;
                         if (SendMissileIncoming && ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger")))
                         {
                             if (!MissileIncoming)
@@ -189,7 +190,6 @@ namespace SaccFlightAndVehicles
                                 MissileIncoming = true;
                             }
                         }
-                        TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
                         TargetAnimator = (Animator)TargetSAVControl.GetProgramVariable("VehicleAnimator");
                         TargetAnimator.SetInteger(MissileIncomingName, (int)TargetSAVControl.GetProgramVariable(MissileTypes[MissileType]));
                         TargetABPoint = (float)TargetSAVControl.GetProgramVariable("ThrottleAfterburnerPoint");

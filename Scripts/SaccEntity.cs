@@ -43,6 +43,7 @@ namespace SaccFlightAndVehicles
         public Transform CenterOfMass;
         [Tooltip("Used in vehicle scripts to set the VehicleMesh and it's children's layer when entering vehicle")]
         [System.NonSerializedAttribute] public int OnboardVehicleLayer = 31;
+        [System.NonSerialized] public int OutsideVehicleLayer;
         [Tooltip("Change voice volumes for players who are in the vehicle together? (checked by SaccVehicleSeat)")]
         public bool DoVoiceVolumeChange = true;
         [Tooltip("Double tap the exit vehicle button to exit the vehicle?")]

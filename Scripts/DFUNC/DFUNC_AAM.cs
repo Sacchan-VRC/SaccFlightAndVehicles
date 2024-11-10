@@ -120,8 +120,7 @@ namespace SaccFlightAndVehicles
             NumAAMTargets = AAMTargets.Length;
             CenterOfMass = (Transform)EntityControl.CenterOfMass;
             VehicleTransform = EntityControl.transform;
-            if (SAVControl) { OutsideVehicleLayer = (int)SAVControl.GetProgramVariable("OutsideVehicleLayer"); }
-            else { OutsideVehicleLayer = 17; }
+            OutsideVehicleLayer = EntityControl.OutsideVehicleLayer;
             localPlayer = Networking.LocalPlayer;
             InEditor = localPlayer == null;
             HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
