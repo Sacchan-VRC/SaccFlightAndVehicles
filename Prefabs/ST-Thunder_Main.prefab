@@ -28754,9 +28754,6 @@ MonoBehaviour:
   SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
-  Bike_AutoSteer: 0
-  Bike_AutoSteer_CounterStrength: 0.01
-  Bike_AutoSteer_Strength: 0.01
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 5
@@ -28776,6 +28773,9 @@ MonoBehaviour:
   LeanSensitivity_Roll: 25
   LeanSensitivity_Pitch: 2.5
   EnableLeaning: 0
+  Bike_AutoSteer: 0
+  Bike_AutoSteer_CounterStrength: 0.01
+  Bike_AutoSteer_Strength: 0.01
   TankMode: 0
   Revs: 0
   Clutch: 0
@@ -29005,7 +29005,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2935594654065772025
 Transform:
   m_ObjectHideFlags: 0
@@ -100403,6 +100403,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   SeparateLongLatGrip: 0
+  SkidRatioMode: 0
   BrakeStrength: 250
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -100410,6 +100411,8 @@ MonoBehaviour:
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
+  ClutchStrength: 500
+  DisableEffects: 0
   SurfaceType_Grips:
   - 1
   - 0.85
@@ -100449,14 +100452,11 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  ClutchStrength: 500
   SkidSound_Min: 6
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
-  DisableEffects: 0
-  SkidRatioMode: 0
   LastTouchedTransform: {fileID: 0}
   LastTouchedTransform_RB: {fileID: 0}
   LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
@@ -100765,6 +100765,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   SeparateLongLatGrip: 0
+  SkidRatioMode: 0
   BrakeStrength: 250
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -100772,6 +100773,8 @@ MonoBehaviour:
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
+  ClutchStrength: 500
+  DisableEffects: 0
   SurfaceType_Grips:
   - 1
   - 0.85
@@ -100811,14 +100814,11 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  ClutchStrength: 500
   SkidSound_Min: 6
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
-  DisableEffects: 0
-  SkidRatioMode: 0
   LastTouchedTransform: {fileID: 0}
   LastTouchedTransform_RB: {fileID: 0}
   LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
@@ -101000,6 +101000,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   SeparateLongLatGrip: 0
+  SkidRatioMode: 0
   BrakeStrength: 250
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -101007,6 +101008,8 @@ MonoBehaviour:
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
+  ClutchStrength: 500
+  DisableEffects: 0
   SurfaceType_Grips:
   - 1
   - 0.85
@@ -101046,14 +101049,11 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  ClutchStrength: 500
   SkidSound_Min: 6
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
-  DisableEffects: 0
-  SkidRatioMode: 0
   LastTouchedTransform: {fileID: 0}
   LastTouchedTransform_RB: {fileID: 0}
   LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
@@ -101305,6 +101305,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   SeparateLongLatGrip: 0
+  SkidRatioMode: 0
   BrakeStrength: 250
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -101312,6 +101313,8 @@ MonoBehaviour:
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
+  ClutchStrength: 500
+  DisableEffects: 0
   SurfaceType_Grips:
   - 1
   - 0.85
@@ -101351,14 +101354,11 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  ClutchStrength: 500
   SkidSound_Min: 6
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
-  DisableEffects: 0
-  SkidRatioMode: 0
   LastTouchedTransform: {fileID: 0}
   LastTouchedTransform_RB: {fileID: 0}
   LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
