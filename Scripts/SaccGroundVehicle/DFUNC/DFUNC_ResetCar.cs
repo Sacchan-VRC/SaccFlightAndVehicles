@@ -86,7 +86,13 @@ namespace SaccFlightAndVehicles
             {
                 if (rb) { rb.velocity = Vector3.zero; }
             }
-            VehicleTransform.rotation = Quaternion.Euler(new Vector3(0f, VehicleTransform.rotation.eulerAngles.y, 0f));
+            Quaternion newrot = Quaternion.Euler(new Vector3(0f, VehicleTransform.rotation.eulerAngles.y, 0f));
+            if (Quaternion.Dot(newrot, VehicleTransform.rotation) < 0)
+            {
+                //flip to match the quat so we don't get messed up interpolations on remote clients
+                newrot = newrot * Quaternion.Euler(0, 360, 0);
+            }
+            VehicleTransform.rotation = newrot;
             VehicleRigidbody.rotation = VehicleTransform.rotation;
             VehicleTransform.position += Vector3.up * AddedHeight;
             VehicleRigidbody.position = VehicleTransform.position;
