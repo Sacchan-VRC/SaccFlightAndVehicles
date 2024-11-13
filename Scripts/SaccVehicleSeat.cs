@@ -192,8 +192,18 @@ namespace SaccFlightAndVehicles
             if (!SeatInitialized) { InitializeSeat(); }
             if (Utilities.IsValid(player) && player.playerId == EntityControl.SeatedPlayers[ThisStationID])
             {
+                if (PassengerFunctions)
+                    PassengerFunctions.pilotLeftFlag = true;
+                else if (IsPilotSeat)
+                    EntityControl.pilotLeftFlag = true;
                 PlayerExitPlane(player);
+                SendCustomEventDelayedFrames(nameof(resetPilotLeftFlag), 1);
             }
+        }
+        public void resetPilotLeftFlag()
+        {
+            if (PassengerFunctions) PassengerFunctions.pilotLeftFlag = false;
+            else EntityControl.pilotLeftFlag = false;
         }
         public void PlayerExitPlane(VRCPlayerApi player)
         {

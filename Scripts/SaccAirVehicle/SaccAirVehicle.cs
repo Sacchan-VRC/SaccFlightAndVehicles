@@ -2194,13 +2194,19 @@ namespace SaccFlightAndVehicles
             AllGs = 0f;
             if (_EngineOn)
             {
-                //the Occupied check is to check if the player just left the instance while in a vehicle
-                //OnPlayerLeft() runs after OnOwnershipTransferred()
-                if ((EntityControl.Piloting || !Occupied))
+                //The !Occupied check is to check if the player just left the instance while not in the vehicle
+                //We want the vehicle to keep flying itself if it was left in auto-hover/fly straight mode with no pilot and its owner leaves
+
+                //OnPlayerLeft() runs after OnOwnershipTransferred() // <--- no longer true
+                //!EntityControl.pilotLeftFlag is now needed because the order is random
+                //if OnPlayerLeft() runs first, '&& !EntityControl.pilotLeftFlag' ensures this still works
+
+                if ((EntityControl.Piloting || !Occupied) && !EntityControl.pilotLeftFlag)
+                // pilot wasn't in the vehicle when you took ownership, or you just took ownership by getting in
                 {
                     PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput;
                 }
-                else
+                else// user was in the vehicle when they left
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetEngineOff));
                     PlayerThrottle = ThrottleInput = EngineOutputLastFrame = EngineOutput = 0;

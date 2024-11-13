@@ -344,6 +344,7 @@ namespace SaccFlightAndVehicles
             RStickSelection = -1;
             SendEventToExtensions_Gunner("SFEXT_O_PilotExit");
         }
+        [NonSerialized] public bool pilotLeftFlag;
         public void UserExitVehicleGlobal()
         {
             SendEventToExtensions_Gunner("SFEXT_G_PilotExit");

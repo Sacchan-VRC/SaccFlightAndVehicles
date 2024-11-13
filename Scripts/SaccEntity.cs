@@ -714,6 +714,7 @@ namespace SaccFlightAndVehicles
                 SendEventToExtensions("SFEXT_G_PilotEnter");
             }
         }
+        [System.NonSerialized] public bool pilotLeftFlag;
         public void PilotExitVehicle(VRCPlayerApi player)
         {
             if (player.isLocal)
