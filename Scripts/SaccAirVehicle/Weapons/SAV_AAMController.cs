@@ -181,7 +181,10 @@ namespace SaccFlightAndVehicles
                     if (TargetSAVControl)
                     {
                         TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
-                        OutsideVehicleLayer = TargetEntityControl.OutsideVehicleLayer;
+                        if (TargetEntityControl)
+                            OutsideVehicleLayer = TargetEntityControl.OutsideVehicleLayer;
+                        else
+                            OutsideVehicleLayer = 17; //walkthrough    
                         if (SendMissileIncoming && ((bool)TargetSAVControl.GetProgramVariable("Piloting") || (bool)TargetSAVControl.GetProgramVariable("Passenger")))
                         {
                             if (!MissileIncoming)
@@ -196,7 +199,7 @@ namespace SaccFlightAndVehicles
                         TargetThrottleNormalizer = 1 / TargetABPoint;
                     }
                     else
-                    { OutsideVehicleLayer = 17; }//walkthrough                                        
+                        OutsideVehicleLayer = 17; //walkthrough    
                 }
 
                 if (InEditor || IsOwner || LockHackTime == 0)
