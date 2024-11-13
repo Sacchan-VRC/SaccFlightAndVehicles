@@ -138,7 +138,6 @@ namespace SaccFlightAndVehicles
         {
             EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
             InVR = EntityControl.InVR;
-            SGVControl.SetProgramVariable("GearRatio", GearRatios[_CurrentGear]);
             RevLimiter = (float)SGVControl.GetProgramVariable("RevLimiter");
             for (int i = 0; i < GearRatios.Length; i++)
             {
@@ -151,6 +150,7 @@ namespace SaccFlightAndVehicles
             if (AutoClutch_Length <= 0) { ClucthDecaySpeed = Mathf.Infinity; }
             else { ClucthDecaySpeed = 1 / AutoClutch_Length; }
             CurrentGear = NeutralGear;
+            SGVControl.SetProgramVariable("GearRatio", GearRatios[_CurrentGear]);
         }
         private void LateUpdate()
         {
