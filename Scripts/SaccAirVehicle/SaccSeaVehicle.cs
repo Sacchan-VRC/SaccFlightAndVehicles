@@ -1174,7 +1174,7 @@ namespace SaccFlightAndVehicles
         {
             VehicleRigidbody.centerOfMass = VehicleTransform.InverseTransformDirection(CenterOfMass.position - VehicleTransform.position);//correct position if scaled
             EntityControl.CoMSet = true;
-            VehicleRigidbody.ResetInertiaTensor();
+            VehicleRigidbody.inertiaTensor = VehicleRigidbody.inertiaTensor;
             VehicleRigidbody.inertiaTensorRotation = Quaternion.SlerpUnclamped(Quaternion.identity, VehicleRigidbody.inertiaTensorRotation, InertiaTensorRotationMulti);
             if (InvertITRYaw)
             {
