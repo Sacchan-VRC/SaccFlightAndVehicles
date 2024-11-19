@@ -793,6 +793,8 @@ namespace SaccFlightAndVehicles
             }
             if (!ControlsRoot)
             { ControlsRoot = VehicleTransform; }
+
+            if (ExplodeHealth >= 0) { ExplodeHealth = -0.0001f; }// /0
         }
         private void LateUpdate()
         {
