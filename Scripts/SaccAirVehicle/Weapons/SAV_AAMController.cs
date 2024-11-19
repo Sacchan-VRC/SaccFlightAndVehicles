@@ -74,7 +74,7 @@ namespace SaccFlightAndVehicles
         private SaccEntity EntityControl;
         Transform VehicleTransform;
         private int MissileType = 1;
-        private UdonSharpBehaviour TargetSAVControl;
+        private SaccAirVehicle TargetSAVControl;
         private Animator TargetAnimator;
         SaccEntity TargetEntityControl;
         private bool LockHack = true;
@@ -177,7 +177,7 @@ namespace SaccFlightAndVehicles
                 TargetPosLastFrame = Target.position - Target.forward;//assume enemy plane was 1 meter behind where it is now last frame because we don't know the truth
                 if (Target.parent)
                 {
-                    TargetSAVControl = Target.parent.GetComponent<UdonSharpBehaviour>();
+                    TargetSAVControl = Target.parent.GetComponent<SaccAirVehicle>();
                     if (TargetSAVControl)
                     {
                         TargetEntityControl = (SaccEntity)TargetSAVControl.GetProgramVariable("EntityControl");
