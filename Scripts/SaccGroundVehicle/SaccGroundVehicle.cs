@@ -153,6 +153,8 @@ namespace SaccFlightAndVehicles
         [Space(10)]
         [Tooltip("Completely change how the vehicle operates to behave like a tank, enables two throttle sliders, and turns DriveWheels/SteerWheels into Left/Right tracks")]
         public bool TankMode;
+        [Tooltip("Use WASD or QAED to control the tank?")]
+        public bool TANK_WASDMode = true;
         [Tooltip("Multiply how much the VR throttle moves from hand movement, TankMode only")]
         [System.NonSerializedAttribute] public float ThrottleSensitivity = 6f;
         [Header("Debug")]
@@ -583,17 +585,31 @@ namespace SaccFlightAndVehicles
                             VRThrottleL = ThrottleSlider(-1, 1, true, 0.02f);
                             VRThrottleR = ThrottleSlider(-1, 1, false, 0.02f);
                         }
-                        int Qi = 0;
-                        int Ai = 0;
-                        int Ei = 0;
-                        int Di = 0;
-                        Qi = Input.GetKey(KeyCode.Q) ? 1 : 0;
-                        Ai = Input.GetKey(KeyCode.A) ? -1 : 0;
-                        Ei = Input.GetKey(KeyCode.E) ? 1 : 0;
-                        Di = Input.GetKey(KeyCode.D) ? -1 : 0;
+                        int LeftTrackF = 0;
+                        int LeftTrackB = 0;
+                        int RightTrackF = 0;
+                        int RightTrackB = 0;
+                        if (TANK_WASDMode)
+                        {
+                            int Wi = Input.GetKey(KeyCode.W) ? 1 : 0;
+                            int Ai = Input.GetKey(KeyCode.A) ? 1 : 0;
+                            int Si = Input.GetKey(KeyCode.S) ? 1 : 0;
+                            int Di = Input.GetKey(KeyCode.D) ? 1 : 0;
+                            LeftTrackF = Wi - Ai + Di - Si;
+                            LeftTrackB = -Si - Ai + Di + Wi;
+                            RightTrackF = Wi - Di + Ai - Si;
+                            RightTrackB = -Si - Di + Ai + Wi;
+                        }
+                        else
+                        {
+                            LeftTrackF = Input.GetKey(KeyCode.Q) ? 1 : 0;
+                            LeftTrackB = Input.GetKey(KeyCode.A) ? -1 : 0;
+                            RightTrackF = Input.GetKey(KeyCode.E) ? 1 : 0;
+                            RightTrackB = Input.GetKey(KeyCode.D) ? -1 : 0;
+                        }
 
-                        float LeftThrottle = Mathf.Clamp(Qi + Ai + VRThrottleL, -1, 1);
-                        float RightThrottle = Mathf.Clamp(Ei + Di + VRThrottleR, -1, 1);
+                        float LeftThrottle = Mathf.Clamp(LeftTrackF + LeftTrackB + VRThrottleL, -1, 1);
+                        float RightThrottle = Mathf.Clamp(RightTrackF + RightTrackB + VRThrottleR, -1, 1);
                         if (DBGLR) { DBGLR.text = LeftThrottle.ToString("F1") + "    " + RightThrottle.ToString("F1"); }
                         FinalThrottle = 1;//Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
 
