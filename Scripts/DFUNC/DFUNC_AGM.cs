@@ -464,9 +464,12 @@ namespace SaccFlightAndVehicles
                 if (WorldParent) { NewAGM.transform.SetParent(WorldParent); }
                 else { NewAGM.transform.SetParent(null); }
                 NewAGM.transform.SetPositionAndRotation(AGMLaunchPoint.position, AGMLaunchPoint.rotation);
+                Rigidbody AGMRB = NewAGM.GetComponent<Rigidbody>();
+                AGMRB.position = NewAGM.transform.position;
+                AGMRB.rotation = NewAGM.transform.rotation;
                 NewAGM.SetActive(true);
                 if (!HandHeldMode)
-                { NewAGM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
+                { AGMRB.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
             }
             if (AGMAnimator)
             {

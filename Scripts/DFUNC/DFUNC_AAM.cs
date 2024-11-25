@@ -618,8 +618,11 @@ namespace SaccFlightAndVehicles
                 if (WorldParent) { NewAAM.transform.SetParent(WorldParent); }
                 else { NewAAM.transform.SetParent(null); }
                 NewAAM.transform.SetPositionAndRotation(AAMLaunchPoint.position, AAMLaunchPoint.transform.rotation);
+                Rigidbody AAMRB = NewAAM.GetComponent<Rigidbody>();
+                AAMRB.position = NewAAM.transform.position;
+                AAMRB.rotation = NewAAM.transform.rotation;
                 NewAAM.SetActive(true);
-                if (SAVControl) { NewAAM.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
+                if (SAVControl) { AAMRB.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
             }
             UpdateAmmoVisuals();
         }

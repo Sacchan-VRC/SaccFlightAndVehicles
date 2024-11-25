@@ -335,16 +335,18 @@ namespace SaccFlightAndVehicles
                 if (WorldParent) { NewBomb.transform.SetParent(WorldParent); }
                 else { NewBomb.transform.SetParent(null); }
                 NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, BombLaunchPoints[BombPoint].rotation);
+                Rigidbody BombRB = NewBomb.GetComponent<Rigidbody>();
+                BombRB.position = NewBomb.transform.position;
+                BombRB.rotation = NewBomb.transform.rotation;
                 NewBomb.SetActive(true);
                 if (BombInheritVelocity)
                 {
-                    Rigidbody newBombRigid = NewBomb.GetComponent<Rigidbody>();
-                    if (newBombRigid)
+                    if (BombRB)
                     {
                         if (SAVControl)
-                        { NewBomb.GetComponent<Rigidbody>().velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
+                        { BombRB.velocity = (Vector3)SAVControl.GetProgramVariable("CurrentVel"); }
                         else
-                        { NewBomb.GetComponent<Rigidbody>().velocity = VehicleRigid.velocity; }
+                        { BombRB.velocity = VehicleRigid.velocity; }
                     }
                 }
                 BombPoint++;
