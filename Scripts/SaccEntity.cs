@@ -967,7 +967,6 @@ namespace SaccFlightAndVehicles
                 if (VehicleRigidbody)
                 {
                     VehicleRigidbody.centerOfMass = transform.InverseTransformDirection(CenterOfMass.position - transform.position);//correct position if scaled}
-                    VehicleRigidbody.ResetInertiaTensor();
                 }
             }
             else { Debug.LogWarning(gameObject.name + ": No CoM set"); }
