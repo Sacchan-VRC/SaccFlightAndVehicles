@@ -484,6 +484,7 @@ namespace SaccFlightAndVehicles
             LastCurAngMom = CurAngMom;
             //time between this update and last
             float updatedelta = (float)(O_UpdateTime - O_LastUpdateTime);
+            if (updatedelta < 0.0001f) return;
             float speednormalizer = 1 / updatedelta;
 
             //local time update was received
