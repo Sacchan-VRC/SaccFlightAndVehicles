@@ -67,26 +67,19 @@ namespace SaccFlightAndVehicles
                 float lowestAngle = 9999999;
                 for (int i = 0; i < TargetVehicles.Length; i++)
                 {
-                    float angle = Vector3.Angle(zoomCamera.transform.forward, TargetVehicles[i].transform.position - zoomCamera.transform.position);
-                    float targetDistance = Vector3.Distance(TargetVehicles[i].CenterOfMass.position, zoomCamera.transform.position);
+                    Transform vcom = TargetVehicles[i].CenterOfMass;
+                    float angle = Vector3.Angle(zoomCamera.transform.forward, vcom.transform.position - zoomCamera.transform.position);
+                    float targetDistance = Vector3.Distance(vcom.position, zoomCamera.transform.position);
                     RaycastHit hit;
-                    bool rayhit = Physics.Raycast(zoomCamera.transform.position, TargetVehicles[i].CenterOfMass.position - zoomCamera.transform.position, out hit, targetDistance, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore);
+                    bool rayhit = Physics.Raycast(zoomCamera.transform.position, vcom.position - zoomCamera.transform.position, out hit, targetDistance, 2049 /* Default and Environment */, QueryTriggerInteraction.Ignore);
                     bool visible = (hit.distance / targetDistance) > 0.95f;
                     if (!rayhit || visible)
                     {
                         if (angle < lowestAngle)
                         {
                             lowestAngle = angle;
-                            if (TargetVehicles[i].CenterOfMass)
-                            {
-                                currentTarget = TargetVehicles[i].CenterOfMass;
-                                TargetVehicle_SAV = (SaccAirVehicle)TargetVehicles[i].GetExtention(GetUdonTypeName<SaccAirVehicle>());
-                            }
-                            else
-                            {
-                                currentTarget = TargetVehicles[i].transform;
-                                TargetVehicle_SAV = null;
-                            }
+                            currentTarget = TargetVehicles[i].CenterOfMass;
+                            TargetVehicle_SAV = (SaccAirVehicle)TargetVehicles[i].GetExtention(GetUdonTypeName<SaccAirVehicle>());
                         }
                     }
                 }
@@ -244,15 +237,9 @@ namespace SaccFlightAndVehicles
             if (currentTarget)
             {
                 currentTargetDir_Quat = Quaternion.LookRotation(currentTarget.position - zoomCamera.transform.position);
-                if (TargetVehicle_SAV)
-                {
-                    targetVelocity = (currentTarget.position - targetPosLast).normalized * TargetVehicle_SAV.AirSpeed;
-                }
-                else
-                {
-                    targetVelocity = (currentTarget.position - targetPosLast) / Time.deltaTime;
-                }
-                targetPosLast = currentTarget.position;
+                // if (TargetVehicle_SAV) targetVelocity = (currentTarget.position - targetPosLast).normalized * TargetVehicle_SAV.AirSpeed;
+                // else targetVelocity = (currentTarget.position - targetPosLast) / Time.deltaTime;
+                // targetPosLast = currentTarget.position;
             }
             float transistionPos = Time.time - transitionStartTime;
             float t = transistionPos / LockOnTransitionLength;

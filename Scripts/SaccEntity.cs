@@ -370,9 +370,8 @@ namespace SaccFlightAndVehicles
             SendEventToExtensions("SFEXT_L_EntityStart");
 
             if (!CoMSet)
-            {
                 SetCoM();
-            }
+            if (!CenterOfMass) { CenterOfMass = transform; }
 
             //if in editor play mode without clientsim
             if (InEditor)
