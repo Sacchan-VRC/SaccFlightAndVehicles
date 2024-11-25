@@ -732,6 +732,12 @@ namespace SaccFlightAndVehicles
         {
             InVR = EntityControl.InVR;
             if (!InVR && !KeyboardSelectMode) { foreach (GameObject obj in EnableOnSelect) { obj.SetActive(true); } }
+            //take ownership of whatever we're attached to if applicable
+            if (TwoWayForces && !TwoWayForces_LocalForceMode)
+            {
+                if (HookAttached && HookedEntity && (!HookedEntity.Occupied || !TwoWayForces_DisableIfOccupied))
+                { Networking.SetOwner(localPlayer, HookedEntity.gameObject); }
+            }
         }
         public void SFEXT_G_PilotEnter()
         {
