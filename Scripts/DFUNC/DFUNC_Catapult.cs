@@ -41,7 +41,6 @@ namespace SaccFlightAndVehicles
         private bool Piloting = false;
         private Transform VehicleTransform;
         [System.NonSerializedAttribute] public Transform CatapultTransform;
-        private int CatapultDeadTimer;
         private Rigidbody VehicleRigidbody;
         private float InVehicleThrustVolumeFactor;
         private Animator VehicleAnimator;
@@ -202,7 +201,7 @@ namespace SaccFlightAndVehicles
 
                                     if (AlignToCatapult)
                                     {
-                                        Quaternion newrotation = Quaternion.Euler(VehicleTransform.rotation.eulerAngles);
+                                        Quaternion newrotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
                                         VehicleTransform.rotation = newrotation;
                                         if (Quaternion.Dot(VehicleTransform.rotation, newrotation) < 0)
                                         {
@@ -242,7 +241,7 @@ namespace SaccFlightAndVehicles
                                     }
                                     //use dead to make plane invincible for x frames when entering the catapult to prevent taking G damage from stopping instantly
                                     EntityControl.dead = true;
-                                    CatapultDeadTimer = 5;
+                                    SendCustomEventDelayedFrames(nameof(deadfalse), 5);
 
                                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(CatapultLockIn));
                                 }
@@ -315,16 +314,11 @@ namespace SaccFlightAndVehicles
                         else { TriggerLastFrame = false; }
                     }
                 }
-                if (EntityControl._dead)
-                {
-                    CatapultDeadTimer -= 1;
-                    if (CatapultDeadTimer == 0) { EntityControl.dead = false; }
-                }
 
                 VehicleTransform.rotation = PlaneCatapultRotDif * CatapultTransform.rotation;
                 VehicleTransform.position = CatapultTransform.position + PlaneCatapultOffset;
-                VehicleRigidbody.position = VehicleTransform.position;//Unity 2022.3.6f1 bug workaround
-                VehicleRigidbody.rotation = VehicleTransform.rotation;//Unity 2022.3.6f1 bug workaround
+                VehicleRigidbody.position = VehicleTransform.position;
+                VehicleRigidbody.rotation = VehicleTransform.rotation;
                 VehicleRigidbody.velocity = Vector3.zero;
                 VehicleRigidbody.angularVelocity = Vector3.zero;
                 Quaternion CatapultRotDif = CatapultTransform.rotation * Quaternion.Inverse(CatapultRotLastFrame);
@@ -363,7 +357,7 @@ namespace SaccFlightAndVehicles
                     Vector3 CatapultRotDifrad = (CatapultRotDifEULER * Mathf.Deg2Rad) / DeltaTime;
                     VehicleRigidbody.angularVelocity = CatapultRotDifrad;
                     EntityControl.dead = true;
-                    SendCustomEventDelayedSeconds(nameof(deadfalse), Time.fixedDeltaTime * 3);
+                    SendCustomEventDelayedFrames(nameof(deadfalse), 5);
                 }
                 CatapultRotLastFrame = CatapultTransform.rotation;
                 CatapultPosLastFrame = CatapultTransform.position;
