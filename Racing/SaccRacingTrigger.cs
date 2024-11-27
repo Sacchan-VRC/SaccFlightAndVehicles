@@ -278,7 +278,6 @@ namespace SaccFlightAndVehicles
                 //add submit my time
                 CurrentCourse.TimeReporter.MyLastTime = RaceTime;
                 CurrentCourse.TimeReporter.MyLastVehicle = PlaneName;
-                CurrentCourse.UpdateMyLastTime();
                 int mypos = CurrentCourse.CheckIfOnBoard(localPlayer.displayName, ref CurrentCourse.PlayerNames);
                 if (mypos < 0)//i am not on the board
                 {
@@ -292,7 +291,7 @@ namespace SaccFlightAndVehicles
                 }
                 else//i am on the board
                 {
-                    if (RaceTime < CurrentCourse.PlayerTimes[mypos])
+                    // if (RaceTime < CurrentCourse.PlayerTimes[mypos])
                     { SendMyTime(false); }
                 }
             }
@@ -300,7 +299,6 @@ namespace SaccFlightAndVehicles
             {
                 CurrentCourse.TimeReporter.MyLastTime_R = RaceTime;
                 CurrentCourse.TimeReporter.MyLastVehicle_R = PlaneName;
-                CurrentCourse.UpdateMyLastTime();
                 int mypos = CurrentCourse.CheckIfOnBoard(localPlayer.displayName, ref CurrentCourse.PlayerNames_R);
                 if (mypos < 0)//i am not on the board
                 {
@@ -314,7 +312,7 @@ namespace SaccFlightAndVehicles
                 }
                 else//i am on the board
                 {
-                    if (RaceTime < CurrentCourse.PlayerTimes_R[mypos])
+                    // if (RaceTime < CurrentCourse.PlayerTimes_R[mypos])
                     { SendMyTime(true); }
                 }
             }

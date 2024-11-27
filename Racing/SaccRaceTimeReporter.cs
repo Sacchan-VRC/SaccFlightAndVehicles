@@ -37,13 +37,13 @@ namespace SaccFlightAndVehicles
         }
         [UdonSynced] public string ReportedVehicle;
         [UdonSynced] public bool Reported_RaceReverse = false;
+        [UdonSynced] public bool Reported_isRecord = false;
         [FieldChangeCallback(nameof(MyLastTime))] public float _MyLastTime = 0f;
         public float MyLastTime
         {
             set
             {
                 _MyLastTime = value;
-                SB.UpdateMyLastTime();
             }
             get => _MyLastTime;
         }
@@ -53,7 +53,6 @@ namespace SaccFlightAndVehicles
             set
             {
                 _MyLastTime_R = value;
-                SB.UpdateMyLastTime();
             }
             get => _MyLastTime_R;
         }
@@ -90,16 +89,16 @@ namespace SaccFlightAndVehicles
                         if (SB.PlayerTimes.Length > 0)
                         {
                             if (Checking_time < SB.PlayerTimes[SB.PlayerTimes.Length - 1] || SB.PlayerTimes.Length < SB.MaxRecordedTimes)
-                            { SendMyTime(false); }
+                            { SendMyTime(); }
                             else { CheckingReception = false; return; }
                         }
                         else
-                        { SendMyTime(false); }
+                        { SendMyTime(); }
                     }
                     else//i am on the board
                     {
                         if (Checking_time < SB.PlayerTimes[mypos])
-                        { SendMyTime(false); }
+                        { SendMyTime(); }
                         else { CheckingReception = false; return; }
                     }
                 }
@@ -111,16 +110,16 @@ namespace SaccFlightAndVehicles
                         if (SB.PlayerTimes_R.Length > 0)
                         {
                             if (Checking_time < SB.PlayerTimes_R[SB.PlayerTimes_R.Length - 1] || SB.PlayerTimes_R.Length < SB.MaxRecordedTimes)
-                            { SendMyTime(true); }
+                            { SendMyTime(); }
                             else { CheckingReception = false; return; }
                         }
                         else
-                        { SendMyTime(true); }
+                        { SendMyTime(); }
                     }
                     else//i am on the board
                     {
                         if (Checking_time < SB.PlayerTimes_R[mypos])
-                        { SendMyTime(true); }
+                        { SendMyTime(); }
                         else { CheckingReception = false; return; }
                     }
                 }
@@ -128,7 +127,7 @@ namespace SaccFlightAndVehicles
                 SendCustomEventDelayedSeconds(nameof(CheckIfRecordRecieved), 4);
             }
         }
-        private void SendMyTime(bool reverse)
+        private void SendMyTime()
         {
             Networking.SetOwner(Networking.LocalPlayer, gameObject);
             ReportedVehicle = Checking_vehicle;

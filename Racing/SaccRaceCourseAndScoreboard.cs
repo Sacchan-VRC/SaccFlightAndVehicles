@@ -43,53 +43,43 @@ namespace SaccFlightAndVehicles
         public GameObject[] EndPointFX;
         [System.NonSerializedAttribute] public float[] SplitTimes;
         [System.NonSerializedAttribute] public float[] SplitTimes_R;
-        [System.NonSerializedAttribute] public string MyLastTime = string.Empty;
-        [System.NonSerializedAttribute] public string MyLastTime_R = string.Empty;
-        public void UpdateMyLastTime()
-        {
-            if (!MyLastTime_text) { return; }
-            if (TimeReporter._MyLastTime != 0f)
-            {
-                MyLastTime_text.text = MyLastTime = "My Last Time : " + SecsToMinsSec(TimeReporter._MyLastTime) + " In: " + TimeReporter.MyLastVehicle.ToString();
-            }
-            else { MyLastTime_text.text = string.Empty; }
-            if (!MyLastTime_R_text) { return; }
-            if (AllowReverse && TimeReporter._MyLastTime_R != 0f)
-            {
-                MyLastTime_R_text.text = MyLastTime_R = "My Last Time : " + SecsToMinsSec(TimeReporter._MyLastTime_R) + " In: " + TimeReporter.MyLastVehicle_R.ToString();
-            }
-            else { MyLastTime_R_text.text = string.Empty; }
-        }
         [System.NonSerialized] public float MyBestTime;
         [System.NonSerialized] public float MyBestTime_R;
         [Header("Scoreboard:")]
         [Tooltip("Record the top MaxRecordedTimes number of records, forget about the rest")]
         public int MaxRecordedTimes = 15;
-        public TextMeshProUGUI Names_text;
-        public TextMeshProUGUI Times_text;
-        public TextMeshProUGUI Vehicles_text;
-        public TextMeshProUGUI MyLastTime_text;
-        public TextMeshProUGUI Names_R_text;
-        public TextMeshProUGUI Times_R_text;
-        public TextMeshProUGUI Vehicles_R_text;
-        public TextMeshProUGUI MyLastTime_R_text;
+        public TextMeshProUGUI ScoreboardText;
+        public TextMeshProUGUI ScoreboardText_R;
+        [SerializeField] string CollumnPos0 = "<pos=0>";
+        [SerializeField] string CollumnPos1 = "<pos=0.4>";
+        [SerializeField] string CollumnPos2 = "<pos=2.7>";
+        [SerializeField] string CollumnPos3 = "<pos=4.5>";
+        [SerializeField] string CollumnPos4 = "<pos=6>";
+        [SerializeField] string CollumnPos5 = "<pos=7.3>";
+        [SerializeField] string CollumnPos6 = "<pos=8.6>";
+        [SerializeField] string CollumnPos7 = "<pos=9.4>";
+        [SerializeField] string EvenColor = "<color=#FFFFFF>";
+        [SerializeField] string OddColor = "<color=#D8D8D8>";
         [Header("Debug:")]
         [UdonSynced] public float[] PlayerTimes;
+        [UdonSynced] public float[] PlayerTimes_MostRecent;
         [UdonSynced] public string[] PlayerVehicles;
         [UdonSynced] public string[] PlayerNames;
+        [UdonSynced] public ushort[] PlayerLaps;
         [UdonSynced] public float[] PlayerTimes_R;
+        [UdonSynced] public float[] PlayerTimes_MostRecent_R;
         [UdonSynced] public string[] PlayerVehicles_R;
         [UdonSynced] public string[] PlayerNames_R;
+        [UdonSynced] public ushort[] PlayerLaps_R;
         [System.NonSerialized] public bool RaceInProgress;
         private void Start()
         {
-            UpdateMyLastTime();
             UpdateScoreBoards_Vis();
             SendCustomEventDelayedSeconds(nameof(UpdateScoreBoards_Vis), 15);
             SplitTimes = new float[RaceCheckpoints.Length];
             SplitTimes_R = new float[RaceCheckpoints.Length];
         }
-        public void AddNewPlayerToBoard(string playername, float time, string vehicle, ref string[] playernames, ref float[] playertimes, ref string[] playervehicles)
+        public void AddNewPlayerToBoard(string playername, float time, string vehicle, ref string[] playernames, ref float[] playertimes, ref string[] playervehicles, ref float[] playertimes_mostrecent, ref ushort[] playerlaps)
         {
             if (playertimes.Length > 0)
             {
@@ -120,24 +110,34 @@ namespace SaccFlightAndVehicles
                 playertimes.CopyTo(pt2, 0);
                 string[] pv2 = new string[onemore];
                 playervehicles.CopyTo(pv2, 0);
+                float[] mr2 = new float[onemore];
+                playertimes_mostrecent.CopyTo(mr2, 0);
+                ushort[] l2 = new ushort[onemore];
+                playerlaps.CopyTo(l2, 0);
                 playernames = pn2;
                 playertimes = pt2;
                 playervehicles = pv2;
+                playertimes_mostrecent = mr2;
+                playerlaps = l2;
                 playernames[len] = playername;
                 playertimes[len] = time;
+                playertimes_mostrecent[len] = time;
                 playervehicles[len] = vehicle;
+                playerlaps[len] = 1;
                 //+1 to each array
                 //set new values to new players record
-                SortScoreboard(ref playernames, ref playertimes, ref playervehicles);
+                SortScoreboard(ref playernames, ref playertimes, ref playervehicles, ref playertimes_mostrecent, ref playerlaps);
             }
             else
             {
                 //replace slowest time
                 int last = playertimes.Length - 1;
                 playertimes[last] = time;
+                playertimes_mostrecent[last] = time;
                 playervehicles[last] = vehicle;
                 playernames[last] = playername;
-                SortScoreboard(ref PlayerNames, ref playertimes, ref playervehicles);
+                playerlaps[last] = 1;
+                SortScoreboard(ref PlayerNames, ref playertimes, ref playervehicles, ref playertimes_mostrecent, ref playerlaps);
             }
         }
         public void PlayNewTimeSound()
@@ -158,7 +158,7 @@ namespace SaccFlightAndVehicles
             return -1;
         }
         // public bool SortAsc = true;
-        public void SortScoreboard(ref string[] playernames, ref float[] playertimes, ref string[] playervehicles)//currently sorts backwards
+        public void SortScoreboard(ref string[] playernames, ref float[] playertimes, ref string[] playervehicles, ref float[] playertimes_mostrecent, ref ushort[] playerlaps)//currently sorts backwards
         {
             int length = playertimes.Length;
             for (int i = 1; i < length; i++)
@@ -166,6 +166,8 @@ namespace SaccFlightAndVehicles
                 var keynames = playernames[i];
                 var keytimes = playertimes[i];
                 var keyvehicles = playervehicles[i];
+                var keymostrecent = playertimes_mostrecent[i];
+                var keylaps = playerlaps[i];
                 var flag = false;
                 // if (SortAsc)
                 // {
@@ -177,10 +179,14 @@ namespace SaccFlightAndVehicles
                         playernames[jp1] = playernames[j];
                         playertimes[jp1] = playertimes[j];
                         playervehicles[jp1] = playervehicles[j];
+                        playertimes_mostrecent[jp1] = playertimes_mostrecent[j];
+                        playerlaps[jp1] = playerlaps[j];
                         j--; jp1--;
                         playernames[jp1] = keynames;
                         playertimes[jp1] = keytimes;
                         playervehicles[jp1] = keyvehicles;
+                        playertimes_mostrecent[jp1] = keymostrecent;
+                        playerlaps[jp1] = keylaps;
                     }
                     else flag = true;
                 }
@@ -222,21 +228,37 @@ namespace SaccFlightAndVehicles
                 bool NewTopRcrd = false;
                 if (reverse)
                 {
-                    if (newtime > PlayerTimes_R[posonboard]) { return; }
+                    if (newtime > PlayerTimes_R[posonboard])
+                    {
+                        PlayerTimes_MostRecent_R[posonboard] = newtime;
+                        PlayerLaps_R[posonboard] = (ushort)(PlayerLaps_R[posonboard] + 1);
+                        SortScoreboard(ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
+                        return;
+                    }
                     if (newtime < PlayerTimes_R[0]) { NewTopRcrd = true; }
                     PlayerNames_R[posonboard] = playername;
+                    PlayerTimes_MostRecent_R[posonboard] = newtime;
                     PlayerTimes_R[posonboard] = newtime;
                     PlayerVehicles_R[posonboard] = newvehicle;
-                    SortScoreboard(ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R);
+                    PlayerLaps_R[posonboard] = (ushort)(PlayerLaps_R[posonboard] + 1);
+                    SortScoreboard(ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
                 }
                 else
                 {
-                    if (newtime > PlayerTimes[posonboard]) { return; }
+                    if (newtime > PlayerTimes[posonboard])
+                    {
+                        PlayerTimes_MostRecent[posonboard] = newtime;
+                        PlayerLaps[posonboard] = (ushort)(PlayerLaps[posonboard] + 1);
+                        SortScoreboard(ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
+                        return;
+                    }
                     if (newtime < PlayerTimes[0]) { NewTopRcrd = true; }
                     PlayerNames[posonboard] = playername;
+                    PlayerTimes_MostRecent[posonboard] = newtime;
                     PlayerTimes[posonboard] = newtime;
                     PlayerVehicles[posonboard] = newvehicle;
-                    SortScoreboard(ref PlayerNames, ref PlayerTimes, ref PlayerVehicles);
+                    PlayerLaps[posonboard] = (ushort)(PlayerLaps[posonboard] + 1);
+                    SortScoreboard(ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
                 }
                 if (NewTopRcrd)
                 {
@@ -255,14 +277,14 @@ namespace SaccFlightAndVehicles
                 {
                     if (PlayerTimes_R.Length < MaxRecordedTimes || newtime < PlayerTimes_R[PlayerTimes_R.Length - 1])
                     {
-                        AddNewPlayerToBoard(playername, newtime, newvehicle, ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R);
+                        AddNewPlayerToBoard(playername, newtime, newvehicle, ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
                     }
                 }
                 else
                 {
                     if (PlayerTimes.Length < MaxRecordedTimes || newtime < PlayerTimes[PlayerTimes.Length - 1])
                     {
-                        AddNewPlayerToBoard(playername, newtime, newvehicle, ref PlayerNames, ref PlayerTimes, ref PlayerVehicles);
+                        AddNewPlayerToBoard(playername, newtime, newvehicle, ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
                     }
                 }
             }
@@ -274,38 +296,55 @@ namespace SaccFlightAndVehicles
         }
         public void UpdateScoreBoards_Vis()
         {
-            //forward
-            if (!Times_text) { return; }
-            Names_text.text = LineHeightTxt + "Names\n";
-            for (int i = 0; i < PlayerNames.Length; i++)
+            if (ScoreboardText)
             {
-                Names_text.text += PlayerNames[i] + "\n";
+                ScoreboardText.text = LineHeightTxt + CollumnPos0 + "#" + CollumnPos1 + "Name" + CollumnPos2 + "Vehicle" + CollumnPos3 + "Best Time" + CollumnPos4 + "Delay" + CollumnPos5 + "Gap" + CollumnPos6 + "Laps" + CollumnPos7 + "Last Time\n";
+                for (int i = 0; i < PlayerNames.Length; i++)
+                {
+                    string gap;
+                    string delay;
+                    if (i == 0)
+                    {
+                        gap = "--";
+                        delay = "--";
+                    }
+                    else
+                    {
+                        gap = (PlayerTimes[i] - PlayerTimes[i - 1]).ToString("F3");
+                        delay = (PlayerTimes[i] - PlayerTimes[0]).ToString("F3");
+                    }
+
+                    if (i % 2 == 0)
+                        ScoreboardText.text += EvenColor;
+                    else
+                        ScoreboardText.text += OddColor;
+                    ScoreboardText.text += CollumnPos0 + (i + 1).ToString("F0") + CollumnPos1 + PlayerNames[i] + CollumnPos2 + PlayerVehicles[i] + CollumnPos3 + SecsToMinsSec(PlayerTimes[i]) + CollumnPos4 + delay + CollumnPos5 + gap + CollumnPos6 + PlayerLaps[i] + CollumnPos7 + SecsToMinsSec(PlayerTimes_MostRecent[i]) + "\n";
+                }
             }
-            Times_text.text = LineHeightTxt + "Times\n";
-            for (int i = 0; i < PlayerTimes.Length; i++)
+            if (ScoreboardText_R)
             {
-                Times_text.text += SecsToMinsSec(PlayerTimes[i]) + "\n";
-            }
-            Vehicles_text.text = LineHeightTxt + "Vehicles\n";
-            for (int i = 0; i < PlayerVehicles.Length; i++)
-            {
-                Vehicles_text.text += PlayerVehicles[i] + "\n";
-            }
-            //reverse
-            Names_R_text.text = LineHeightTxt + "Names\n";
-            for (int i = 0; i < PlayerNames_R.Length; i++)
-            {
-                Names_R_text.text += PlayerNames_R[i] + "\n";
-            }
-            Times_R_text.text = LineHeightTxt + "Times\n";
-            for (int i = 0; i < PlayerTimes_R.Length; i++)
-            {
-                Times_R_text.text += SecsToMinsSec(PlayerTimes_R[i]) + "\n";
-            }
-            Vehicles_R_text.text = LineHeightTxt + "Vehicles\n";
-            for (int i = 0; i < PlayerVehicles_R.Length; i++)
-            {
-                Vehicles_R_text.text += PlayerVehicles_R[i] + "\n";
+                ScoreboardText_R.text = LineHeightTxt + CollumnPos0 + "#" + CollumnPos1 + "Name" + CollumnPos2 + "Vehicle" + CollumnPos3 + "Best Time" + CollumnPos4 + "Delay" + CollumnPos5 + "Gap" + CollumnPos6 + "Laps" + CollumnPos7 + "Last Time\n";
+                for (int i = 0; i < PlayerNames_R.Length; i++)
+                {
+                    string gap;
+                    string delay;
+                    if (i == 0)
+                    {
+                        gap = "--";
+                        delay = "--";
+                    }
+                    else
+                    {
+                        gap = (PlayerTimes_R[i] - PlayerTimes_R[i - 1]).ToString("F3");
+                        delay = (PlayerTimes_R[i] - PlayerTimes_R[0]).ToString("F3");
+                    }
+
+                    if (i % 2 == 0)
+                        ScoreboardText_R.text += EvenColor;
+                    else
+                        ScoreboardText_R.text += OddColor;
+                    ScoreboardText_R.text += CollumnPos0 + (i + 1).ToString("F0") + CollumnPos1 + PlayerNames_R[i] + CollumnPos2 + PlayerVehicles_R[i] + CollumnPos3 + SecsToMinsSec(PlayerTimes_R[i]) + CollumnPos4 + delay + CollumnPos5 + gap + CollumnPos6 + PlayerLaps_R[i] + CollumnPos7 + SecsToMinsSec(PlayerTimes_MostRecent_R[i]) + "\n";
+                }
             }
         }
         private string SecsToMinsSec(float Seconds)
