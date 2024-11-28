@@ -126,8 +126,8 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_PilotEnter()
         {
             OnEnableDeserializationBlocker = true;
+            SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10); // from testing 8 was the min that worked
             gameObject.SetActive(true);
-            SendCustomEventDelayedSeconds(nameof(FireDisablerFalse), .1f);
             if (EntityControl.EntityPickup)
             {
                 if (EntityControl.Holding)
@@ -404,7 +404,7 @@ namespace SaccFlightAndVehicles
         bool OnEnableDeserializationBlocker;
         public override void OnDeserialization()
         {
-            if (OnEnableDeserializationBlocker) { OnEnableDeserializationBlocker = false; return; }
+            if (OnEnableDeserializationBlocker) { return; }
             if (BombFireNow) { LaunchBombs_Event(); }
         }
     }
