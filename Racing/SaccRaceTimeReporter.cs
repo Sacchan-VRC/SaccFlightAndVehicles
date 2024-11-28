@@ -97,7 +97,7 @@ namespace SaccFlightAndVehicles
                     }
                     else//i am on the board
                     {
-                        if (Checking_time < SB.PlayerTimes[mypos])
+                        if (Checking_time != SB.PlayerTimes_MostRecent[mypos])
                         { SendMyTime(); }
                         else { CheckingReception = false; return; }
                     }
@@ -118,7 +118,7 @@ namespace SaccFlightAndVehicles
                     }
                     else//i am on the board
                     {
-                        if (Checking_time < SB.PlayerTimes_R[mypos])
+                        if (Checking_time != SB.PlayerTimes_MostRecent_R[mypos])
                         { SendMyTime(); }
                         else { CheckingReception = false; return; }
                     }

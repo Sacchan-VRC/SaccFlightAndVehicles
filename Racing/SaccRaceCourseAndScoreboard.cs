@@ -212,7 +212,7 @@ namespace SaccFlightAndVehicles
             }
             SendCustomEventDelayedFrames(nameof(SendScoreboardUpdate_Delayed), 1);
         }
-        public void NewRecord()//master runs this
+        public void NewRecord()//owner runs this
         {
             float newtime = TimeReporter._ReportedTime;
             string newvehicle = TimeReporter.ReportedVehicle;
@@ -346,6 +346,26 @@ namespace SaccFlightAndVehicles
                     ScoreboardText_R.text += CollumnPos0 + (i + 1).ToString("F0") + CollumnPos1 + PlayerNames_R[i] + CollumnPos2 + PlayerVehicles_R[i] + CollumnPos3 + SecsToMinsSec(PlayerTimes_R[i]) + CollumnPos4 + delay + CollumnPos5 + gap + CollumnPos6 + PlayerLaps_R[i] + CollumnPos7 + SecsToMinsSec(PlayerTimes_MostRecent_R[i]) + "\n";
                 }
             }
+        }
+        public void ResetScoreboard()
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            PlayerTimes = new float[0];
+            PlayerTimes_MostRecent = new float[0];
+            PlayerVehicles = new string[0];
+            PlayerNames = new string[0];
+            PlayerLaps = new ushort[0];
+            SortScoreboard(ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
+        }
+        public void ResetScoreboard_R()
+        {
+            Networking.SetOwner(Networking.LocalPlayer, gameObject);
+            PlayerTimes_R = new float[0];
+            PlayerTimes_MostRecent_R = new float[0];
+            PlayerVehicles_R = new string[0];
+            PlayerNames_R = new string[0];
+            PlayerLaps_R = new ushort[0];
+            SortScoreboard(ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
         }
         private string SecsToMinsSec(float Seconds)
         {

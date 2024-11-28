@@ -15,6 +15,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Can be used to set a default course -1 = none")]
         public int CurrentCourseSelection = -1;
         private bool Reverse = false;
+        private bool Reverse_uiSetting;
         public bool _AutomaticRaceSelection = true;
         public bool AutomaticRaceSelection
         {
@@ -32,13 +33,16 @@ namespace SaccFlightAndVehicles
                 _AutomaticRaceSelection = value;
                 if (value)
                 {
+                    Reverse_uiSetting = Reverse;
                     RaceSelectionLoop();
                 }
                 else
                 {
+                    if (Reverse_uiSetting) SetTrack_Reverse();
+                    else SetTrack_Forward();
                     SetRace(-1);
                     AutoEnableRace_NextRace = 0;
-                    ClosestRaceDist = 99999f;
+                    ClosestRaceDist = 99999999f;
                 }
             }
             get => _AutomaticRaceSelection;
@@ -162,10 +166,8 @@ namespace SaccFlightAndVehicles
         }
         public void ToggleReverse()
         {
-            if (!Reverse)
-            { SetTrack_Reverse(); }
-            else
-            { SetTrack_Forward(); }
+            if (!Reverse) SetTrack_Reverse();
+            else SetTrack_Forward();
             SetRace(CurrentCourseSelection);
         }
         public void SetTrack_Reverse()
@@ -187,7 +189,7 @@ namespace SaccFlightAndVehicles
         private int AutoEnableRace_NextRace = 0;
         private int ClosestRace = 0;
         private bool ClosestRace_forward = false;
-        private float ClosestRaceDist = 99999f;
+        private float ClosestRaceDist = 99999999f;
         public void ToggleAutoRaceSelection()
         { AutomaticRaceSelection = !AutomaticRaceSelection; }
         public void RaceSelectionLoop()
@@ -197,7 +199,7 @@ namespace SaccFlightAndVehicles
             if (RacesInProgress > 0)
             {
                 AutoEnableRace_NextRace = 0;
-                ClosestRaceDist = 99999f;
+                ClosestRaceDist = 99999999f;
                 return;
             }
             float checkdiststart = Vector3.Distance(Races[AutoEnableRace_NextRace].RaceCheckpoints[0].transform.position, Networking.LocalPlayer.GetPosition());
@@ -261,7 +263,7 @@ namespace SaccFlightAndVehicles
                     SetRace(ClosestRace);
                 }
                 AutoEnableRace_NextRace = 0;
-                ClosestRaceDist = 99999f;
+                ClosestRaceDist = 99999999f;
             }
         }
     }
