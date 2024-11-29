@@ -52,6 +52,8 @@ namespace SaccFlightAndVehicles
         private double nextUpdateTime = double.MaxValue;
         [UdonSynced] private double O_UpdateTime;
         [UdonSynced] private Vector3 O_Position;
+        //the reason it's using a quat for rotation instead of euler angles is because it has to rotate twice to come back to the same value
+        //giving a greater range for reconstruction of angular velocity, since that isn't synced
         [UdonSynced] private short O_RotationW;
         [UdonSynced] private short O_RotationX;
         [UdonSynced] private short O_RotationY;
@@ -79,10 +81,9 @@ namespace SaccFlightAndVehicles
         private int UpdatesSentWhileStill;
         private Rigidbody VehicleRigid;
         private bool Initialized = false;
-        private bool IdleUpdateMode;
+        public bool IdleUpdateMode;
         private bool Piloting;
         private bool Occupied;
-        private bool Grounded;
         private int EnterIdleModeNumber;
         private double lastframetime;
         private double lastframetime_extrap;
@@ -109,11 +110,9 @@ namespace SaccFlightAndVehicles
                 ObjectMode = true;
                 VehicleRigid = SyncRigid;
                 VehicleTransform = SyncRigid.transform;
-                StartDrag = VehicleRigid.drag;
-                StartAngDrag = VehicleRigid.angularDrag;
                 if (!SyncTransform)
                 { SyncTransform = VehicleRigid.transform; }
-                SFEXT_L_EntityStart();
+                if (!Initialized) SFEXT_L_EntityStart();
                 return;
             }
 
@@ -149,6 +148,8 @@ namespace SaccFlightAndVehicles
                 VehicleTransform = EntityControl.transform;
                 VehicleRigid = EntityControl.VehicleRigidbody;
             }
+            StartDrag = VehicleRigid.drag;
+            StartAngDrag = VehicleRigid.angularDrag;
             if (!InEditor)
             {
                 if (localPlayer.isMaster)
@@ -183,10 +184,10 @@ namespace SaccFlightAndVehicles
             // script activation is delayed to allow all scripts on this vehicle to activate first
             // 10 frames to be safe, 4 is the minimum for car wheels to not behave strangely (ingame only) if they're touching the ground at Start(), reason unknown.
             SendCustomEventDelayedFrames(nameof(ActivateScript), 10);
+            InitSyncValues();
         }
         public void ActivateScript()
         {
-            Initialized = true;
             InitSyncValues();
             gameObject.SetActive(true);
             VehicleRigid.constraints = RigidbodyConstraints.None;
@@ -198,9 +199,11 @@ namespace SaccFlightAndVehicles
             ResetSyncTimes();
             Extrapolation_Raw = O_Position = VehicleTransform.position;
             O_LastRotation = O_Rotation_Q = VehicleTransform.rotation;
-            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime + Random.Range(0f, updateInterval));
-            O_LastUpdateTime = L_UpdateTime = lastframetime = lastframetime_extrap = Networking.GetServerTimeInMilliseconds();
+            double time = (StartupServerTime + (double)(Time.time - StartupLocalTime));
+            nextUpdateTime = time + Random.Range(0f, updateInterval);
+            O_LastUpdateTime = L_UpdateTime = lastframetime = lastframetime_extrap = time;
             O_LastUpdateTime -= updateInterval;
+            O_LastPosition = O_Position = VehicleTransform.position;
         }
         public void SFEXT_L_OwnershipTransfer()
         { ExitIdleMode(); }
@@ -232,6 +235,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.angularDrag = 0;
             }
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
+            UpdatesSentWhileStill = 0;
         }
         private void LoseOwnerStuff()
         {
@@ -246,7 +250,6 @@ namespace SaccFlightAndVehicles
             VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             VehicleRigid.drag = 9999;
             VehicleRigid.angularDrag = 9999;
-            UpdatesSentWhileStill = 0;
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -270,7 +273,6 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_RespawnButton()
         {
             ExitIdleMode();
-            UpdatesSentWhileStill = 0;
             //make it teleport instead of interpolating
             ExtrapolationDirection = Vector3.zero;
             Extrapolation_Raw = O_LastPosition = O_Position;
@@ -331,12 +333,12 @@ namespace SaccFlightAndVehicles
                     }
                 }
                 lastframetime = time;
-                if (time > nextUpdateTime - (Time.deltaTime * .5f))
+                if (time > nextUpdateTime)
                 {
                     if (!Networking.IsClogged || Piloting)
                     {
                         //check if the vehicle has moved enough from it's last sent location and rotation to bother exiting idle mode
-                        bool Still = !Piloting && (Grounded || VehicleRigid.isKinematic) && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
+                        bool Still = !Piloting && (((VehicleTransform.position - O_Position).magnitude < IdleMovementRange) && Quaternion.Angle(VehicleTransform.rotation, O_Rotation_Q) < IdleRotationRange);
 
                         if (Still)
                         {
@@ -346,13 +348,12 @@ namespace SaccFlightAndVehicles
                         }
                         else
                         {
-                            UpdatesSentWhileStill = 0;
                             ExitIdleMode();
                         }
                         //never use rigidbody values for position or rotation because the interpolation/extrapolation from update is needed for it to be smooth
                         O_Position = VehicleTransform.position;
                         O_Rotation_Q = VehicleTransform.rotation;
-                        //convert each euler angle to shorts to save bandwidth
+                        //convert each quat to shorts to save bandwidth
                         float smv = short.MaxValue;
                         O_RotationX = (short)(O_Rotation_Q.x * smv);
                         O_RotationY = (short)(O_Rotation_Q.y * smv);
@@ -437,7 +438,7 @@ namespace SaccFlightAndVehicles
         private void EnterIdleMode()
         { IdleUpdateMode = true; }
         private void ExitIdleMode()
-        { IdleUpdateMode = false; }
+        { IdleUpdateMode = false; UpdatesSentWhileStill = 0; }
 #if UNITY_EDITOR
         [Tooltip("Doesn't work properly, can't wait beyond update interval.")]
         public float LagSimDelay;
@@ -480,12 +481,17 @@ namespace SaccFlightAndVehicles
 #endif
         public override void OnDeserialization()
         {
-            LastAcceleration = Acceleration;
-            LastCurAngMom = CurAngMom;
             //time between this update and last
             float updatedelta = (float)(O_UpdateTime - O_LastUpdateTime);
-            if (updatedelta < 0.0001f) return;
+            if (updatedelta < 0.0001f)
+            {
+                O_LastUpdateTime = O_UpdateTime;
+                return;
+            }
             float speednormalizer = 1 / updatedelta;
+
+            LastAcceleration = Acceleration;
+            LastCurAngMom = CurAngMom;
 
             //local time update was received
             L_UpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime);
@@ -506,7 +512,7 @@ namespace SaccFlightAndVehicles
             else
             { L_CurVel = O_CurVel; }
             O_CurVelLast = O_CurVel;
-            Acceleration = L_CurVel - L_CurVelLast;//acceleration is difference in velocity
+            Acceleration = L_CurVel - L_CurVelLast;
 
             float smv = short.MaxValue;
             O_Rotation_Q = new Quaternion(O_RotationX / smv, O_RotationY / smv, O_RotationZ / smv, O_RotationW / smv);
@@ -514,7 +520,7 @@ namespace SaccFlightAndVehicles
             //rotate Acceleration by the difference in rotation of vehicle between last and this update to make it match the angle for the next update better
             Quaternion PlaneRotDif = O_Rotation_Q * Quaternion.Inverse(O_LastRotation);
             Acceleration = (PlaneRotDif * Acceleration) * .5f;//not sure why it's 0.5, but it seems correct from testing
-            Acceleration += Acceleration * (Ping / updateInterval);
+            Acceleration += Acceleration * (Ping / updatedelta);
 
             //current angular momentum as a quaternion
             CurAngMom = RealSlerp(Quaternion.identity, PlaneRotDif, speednormalizer);
@@ -576,26 +582,6 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.drag = 9999;
                 VehicleRigid.angularDrag = 9999;
             }
-        }
-        public void SFEXT_G_TouchDown()
-        {
-            Grounded = true;
-        }
-        public void SFEXT_G_TouchDownWater()
-        {
-            Grounded = true;
-        }
-        public void SFEXT_G_TakeOff()
-        {
-            Grounded = false;
-        }
-        public void SFEXT_O_Airborne()
-        {
-            Grounded = false;
-        }
-        public void SFEXT_O_Grounded()
-        {
-            Grounded = true;
         }
         public void SFEXT_L_SetPhysics() { SetPhysics(); }//not used in base prefab
         public void SetPhysics()
