@@ -22,8 +22,6 @@ namespace SaccFlightAndVehicles
         public float WheelRadius;
         public float SpringForceMulti = .25f;
         public float DampingForceMulti = 0.01111111f;
-        [Tooltip("Limit suspension force so that the car doesn't fly up when going up large step instantly")]
-        public float MaxSuspensionForce = .2f;
         // [Tooltip("Limit Damping when suspension is decomopressing?")]
         // public float MaxNegDamping = 999999f;
         [Tooltip("Extra height on the raycast origin to prevent the wheel from sticking through the floor")]
@@ -343,11 +341,6 @@ namespace SaccFlightAndVehicles
                 Vector3 DampingForce = SusDirection/* WheelPoint.up */ * (damping * DampingForceMulti);
                 //these are added together, but both contain deltatime, potential deltatime problem source?
                 SusForce = SpringForce + DampingForce;//The total weight on this suspension
-                                                      //limit sus force
-                if (SusForce.magnitude / fixedDT > MaxSuspensionForce)
-                {
-                    SusForce *= MaxSuspensionForce * fixedDT / (SusForce).magnitude;
-                }
 
                 float susdot = Vector3.Dot(transform.up, SusForce);
                 if (susdot > 0)// don't let the suspension force push the car down
