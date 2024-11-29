@@ -202,12 +202,12 @@ namespace SaccFlightAndVehicles
                                     if (AlignToCatapult)
                                     {
                                         Quaternion newrotation = Quaternion.Euler(new Vector3(VehicleTransform.rotation.eulerAngles.x, CatapultTransform.rotation.eulerAngles.y, CatapultTransform.rotation.eulerAngles.z));
-                                        VehicleTransform.rotation = newrotation;
                                         if (Quaternion.Dot(VehicleTransform.rotation, newrotation) < 0)
                                         {
                                             //flip to match the quat so we don't get messed up interpolations on remote clients
                                             newrotation = newrotation * Quaternion.Euler(0, 360, 0);
                                         }
+                                        VehicleTransform.rotation = newrotation;
                                         //move the plane to the catapult, excluding the y component (relative to the catapult), so we are 'above' it
 
                                         float PlaneCatapultUpDistance = CatapultTransform.transform.InverseTransformDirection(CatapultTransform.position - VehicleTransform.position).y;
@@ -217,6 +217,9 @@ namespace SaccFlightAndVehicles
                                         VehicleTransform.position += CatapultTransform.forward * PlaneCatapultBackDistance;
                                         PlaneCatapultOffset = -(CatapultTransform.up * PlaneCatapultUpDistance) + (CatapultTransform.forward * PlaneCatapultBackDistance);
                                         PlaneCatapultRotDif = VehicleTransform.rotation * Quaternion.Inverse(CatapultTransform.rotation);
+
+                                        VehicleRigidbody.position = VehicleTransform.position;
+                                        VehicleRigidbody.rotation = VehicleTransform.rotation;
                                     }
                                     else
                                     {
