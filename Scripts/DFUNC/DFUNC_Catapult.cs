@@ -167,6 +167,7 @@ namespace SaccFlightAndVehicles
         }
         private bool FindCatapultAnimator(GameObject other)
         {
+            if (OnCatapult && CatapultAnimator) return true;
             GameObject CatapultObjects = other.gameObject;
             CatapultAnimator = null;
             CatapultAnimator = other.GetComponent<Animator>();
@@ -179,7 +180,8 @@ namespace SaccFlightAndVehicles
         }
         private void OnTriggerEnter(Collider other)
         {
-            if (Piloting && !EntityControl._dead)
+            if (EntityControl._dead) return;
+            if (Piloting)
             {
                 if (!OnCatapult)
                 {
@@ -193,6 +195,7 @@ namespace SaccFlightAndVehicles
                                 //Hit detected, check if the plane is facing in the right direction..
                                 if (Vector3.Angle(VehicleTransform.forward, CatapultTransform.transform.forward) < MaxAttachAngle)
                                 {
+                                    OnCatapult = true;
                                     AttachTime = Time.time;
                                     Launching_AB = false;
                                     CatapultPosLastFrame = CatapultTransform.position;
@@ -416,8 +419,11 @@ namespace SaccFlightAndVehicles
         }
         public void CatapultLockIn()
         {
-            if (!IsOwner) { EnableToFindAnimator(); }
-            OnCatapult = true;
+            if (!IsOwner)
+            {
+                EnableToFindAnimator();
+                OnCatapult = true;
+            }
             if (VehicleAnimator) { VehicleAnimator.SetBool("oncatapult", true); }
             if (CatapultLock) { CatapultLock.Play(); }
             if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
