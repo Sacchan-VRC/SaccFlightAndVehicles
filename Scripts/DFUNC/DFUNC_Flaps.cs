@@ -162,6 +162,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetFlapsOff()
         {
+            if (!Flaps) { return; }
             if (Dial_Funcon) Dial_Funcon.SetActive(false);
             Flaps = false;
             FlapsAnimator.SetBool(AnimatorBool, false);
@@ -201,6 +202,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetFlapsOn()
         {
+            if (Flaps) { return; }
             Flaps = true;
             FlapsAnimator.SetBool(AnimatorBool, true);
             if (Dial_Funcon) Dial_Funcon.SetActive(true);

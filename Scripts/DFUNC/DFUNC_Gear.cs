@@ -128,6 +128,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetGearUp()
         {
+            if (GearUp) { return; }
             //Debug.Log("SetGearUp");
             if (!DisableGroundDetector)
             {
@@ -144,13 +145,15 @@ namespace SaccFlightAndVehicles
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") - LandingGearDragMulti);
                 DragApplied = false;
             }
-            if (LandingGearSound_Up && ((EntityControl.InVehicle || (Vector3.Distance(Networking.LocalPlayer.GetPosition(), LandingGearSound_Up.transform.position) < 20)) && !EntityControl.dead)) { LandingGearSound_Up.PlayOneShot(LandingGearSound_Up.clip); }
+            if (LandingGearSound_Up && ((EntityControl.InVehicle || (Vector3.Distance(Networking.LocalPlayer.GetPosition(), LandingGearSound_Up.transform.position) < 20)) && !EntityControl.dead))
+                LandingGearSound_Up.PlayOneShot(LandingGearSound_Up.clip);
 
             EntityControl.SendEventToExtensions("SFEXT_G_GearUp");
             TransitionTime = Time.time;
         }
         public void SetGearDown()
         {
+            if (!GearUp) { return; }
             //Debug.Log("SetGearDown");
             if (DisableGroundDetector)
             {
@@ -165,7 +168,8 @@ namespace SaccFlightAndVehicles
                 SAVControl.SetProgramVariable("ExtraDrag", (float)SAVControl.GetProgramVariable("ExtraDrag") + LandingGearDragMulti);
                 DragApplied = true;
             }
-            if (LandingGearSound_Down && ((EntityControl.InVehicle || (Vector3.Distance(Networking.LocalPlayer.GetPosition(), LandingGearSound_Down.transform.position) < 20)) && !EntityControl.dead)) { LandingGearSound_Down.PlayOneShot(LandingGearSound_Down.clip); }
+            if (LandingGearSound_Down && ((EntityControl.InVehicle || (Vector3.Distance(Networking.LocalPlayer.GetPosition(), LandingGearSound_Down.transform.position) < 20)) && !EntityControl.dead))
+                LandingGearSound_Down.PlayOneShot(LandingGearSound_Down.clip);
 
             EntityControl.SendEventToExtensions("SFEXT_G_GearDown");
             TransitionTime = Time.time;

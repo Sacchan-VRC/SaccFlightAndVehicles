@@ -187,6 +187,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetHookDown()
         {
+            if (HookDown) return;
             HookDown = true;
             VehicleAnimator.SetBool("hookdown", true);
 
@@ -197,6 +198,7 @@ namespace SaccFlightAndVehicles
         }
         public void SetHookUp()
         {
+            if (!HookDown) return;
             HookDown = false;
             VehicleAnimator.SetBool("hookdown", false);
             Hooked = false;
