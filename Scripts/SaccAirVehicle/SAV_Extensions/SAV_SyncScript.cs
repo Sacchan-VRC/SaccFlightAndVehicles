@@ -597,6 +597,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.collisionDetectionMode = CollisionDetectionMode.Discrete;
             }
         }
+        public void SFEXT_L_OnCollisionEnter() { ExitIdleMode(); }
         private bool DisableAntiWarp;
         public void SFEXT_L_FinishRace() { DisableAntiWarp = false; }
         public void SFEXT_L_StartRace() { DisableAntiWarp = true; }
