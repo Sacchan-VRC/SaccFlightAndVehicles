@@ -252,7 +252,6 @@ namespace SaccFlightAndVehicles
                 for (int i = 0; i < TrackEmptys.Length; i++)
                 {
                     Vector3 Dif = TrackEmptys[i].position - TrackLast[i];
-                    Dif.y = 0;
                     float dist = Dif.magnitude;
                     TrackLast[i] = TrackEmptys[i].position;
                     float forward = Vector3.Dot(TrackEmptys[i].forward, Dif) > 0 ? 1 : -1;
@@ -289,6 +288,10 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_RespawnButton()
         {
             WakeUp();
+            for (int i = 0; i < Tracks.Length; i++)
+            {
+                Tracks[i].mainTextureOffset = Vector2.zero;
+            }
         }
         public void SFEXT_L_GrappleAttach()
         {
