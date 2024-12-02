@@ -1839,6 +1839,7 @@ MonoBehaviour:
   SyncRigid: {fileID: 0}
   SyncTransform: {fileID: 0}
   SyncTransform_Raw: {fileID: 0}
+  IdleUpdateMode: 0
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &1217889975477297945
@@ -2331,9 +2332,6 @@ MonoBehaviour:
   SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
-  Bike_AutoSteer: 0
-  Bike_AutoSteer_CounterStrength: 0.01
-  Bike_AutoSteer_Strength: 0.01
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 10
@@ -2353,7 +2351,11 @@ MonoBehaviour:
   LeanSensitivity_Roll: 25
   LeanSensitivity_Pitch: 2.5
   EnableLeaning: 0
+  Bike_AutoSteer: 0
+  Bike_AutoSteer_CounterStrength: 0.01
+  Bike_AutoSteer_Strength: 0.01
   TankMode: 0
+  TANK_WASDMode: 1
   Revs: 0
   Clutch: 0
   CurrentGear: 1
@@ -84337,7 +84339,7 @@ MonoBehaviour:
   WheelRadius: 0.3326535
   SpringForceMulti: 8
   DampingForceMulti: 1
-  MaxSuspensionForce: 20
+  MaxSuspensionForce: 40
   ExtraRayCastDistance: 0.5
   Grip: 3.3
   GripCurve:
@@ -84616,7 +84618,7 @@ MonoBehaviour:
   WheelRadius: 0.3326535
   SpringForceMulti: 8
   DampingForceMulti: 1
-  MaxSuspensionForce: 20
+  MaxSuspensionForce: 40
   ExtraRayCastDistance: 0.5
   Grip: 2.8
   GripCurve:
@@ -84949,7 +84951,7 @@ MonoBehaviour:
   WheelRadius: 0.3326535
   SpringForceMulti: 8
   DampingForceMulti: 1
-  MaxSuspensionForce: 20
+  MaxSuspensionForce: 40
   ExtraRayCastDistance: 0.5
   Grip: 3.3
   GripCurve:
@@ -85228,7 +85230,7 @@ MonoBehaviour:
   WheelRadius: 0.3326535
   SpringForceMulti: 8
   DampingForceMulti: 1
-  MaxSuspensionForce: 20
+  MaxSuspensionForce: 40
   ExtraRayCastDistance: 0.5
   Grip: 2.8
   GripCurve:

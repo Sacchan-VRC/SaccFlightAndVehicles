@@ -22,6 +22,8 @@ namespace SaccFlightAndVehicles
         public float WheelRadius;
         public float SpringForceMulti = .25f;
         public float DampingForceMulti = 0.01111111f;
+        [Tooltip("Limit suspension force so that the car doesn't jump up when going over a step")]
+        public float MaxSusForce = 60f;
         // [Tooltip("Limit Damping when suspension is decomopressing?")]
         // public float MaxNegDamping = 999999f;
         [Tooltip("Extra height on the raycast origin to prevent the wheel from sticking through the floor")]
@@ -334,15 +336,20 @@ namespace SaccFlightAndVehicles
                 //SUSPENSION//
                 compression = 1f - ((SusOut.distance - ExtraRayCastDistance) / SuspensionDistance);
                 //Spring force: More compressed = more force
-                Vector3 SpringForce = (SusDirection/* WheelPoint.up */ * compression * SpringForceMulti) * fixedDT;
-                float damping = (compression - compressionLast);
+                Vector3 SpringForce = SusDirection * compression * SpringForceMulti * fixedDT;
+                float damping = compression - compressionLast;
                 compressionLast = compression;
                 //Damping force: The more the difference in compression between updates, the more force
-                Vector3 DampingForce = SusDirection/* WheelPoint.up */ * (damping * DampingForceMulti);
+                Vector3 DampingForce = SusDirection * damping * DampingForceMulti/*  * Vector3.Dot(SusOut.normal, WheelPoint.up) */;
                 //these are added together, but both contain deltatime, potential deltatime problem source?
                 SusForce = SpringForce + DampingForce;//The total weight on this suspension
 
-                float susdot = Vector3.Dot(transform.up, SusForce);
+                if (SusForce.magnitude / fixedDT > MaxSusForce)
+                {
+                    SusForce = SusForce.normalized * MaxSusForce * fixedDT;
+                }
+
+                float susdot = Vector3.Dot(WheelPoint.up, SusForce);
                 if (susdot > 0)// don't let the suspension force push the car down
                 { CarRigid.AddForceAtPosition(SusForce, WheelPoint.position, ForceMode.VelocityChange); }
 

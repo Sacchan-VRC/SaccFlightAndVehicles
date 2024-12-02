@@ -58121,9 +58121,6 @@ MonoBehaviour:
   SteeringReturnSpeedDT: 0.5
   SteeringReturnSpeedVR: 5
   UseStickSteering: 0
-  Bike_AutoSteer: 0
-  Bike_AutoSteer_CounterStrength: 0.01
-  Bike_AutoSteer_Strength: 0.01
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 5
@@ -58143,7 +58140,11 @@ MonoBehaviour:
   LeanSensitivity_Roll: 25
   LeanSensitivity_Pitch: 2.5
   EnableLeaning: 0
+  Bike_AutoSteer: 0
+  Bike_AutoSteer_CounterStrength: 0.01
+  Bike_AutoSteer_Strength: 0.01
   TankMode: 0
+  TANK_WASDMode: 1
   Revs: 0
   Clutch: 0
   CurrentGear: 1
@@ -58565,6 +58566,7 @@ MonoBehaviour:
   SyncRigid: {fileID: 0}
   SyncTransform: {fileID: 0}
   SyncTransform_Raw: {fileID: 0}
+  IdleUpdateMode: 0
   LagSimDelay: 0
   DBGPING: 0
 --- !u!114 &6141758680275868697
@@ -77646,22 +77648,22 @@ PrefabInstance:
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8415274
+      value: 0.84152657
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.00000010115706
+      value: 0.0000049002856
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.00000015757895
+      value: 0.0000079800975
       objectReference: {fileID: 0}
     - target: {fileID: -5501324209680438103, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.54021454
+      value: 0.54021573
       objectReference: {fileID: 0}
     - target: {fileID: -5491882240545318371, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77741,22 +77743,22 @@ PrefabInstance:
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8415274
+      value: 0.8415254
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.00000020231413
+      value: -0.0000052096184
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.0000003151579
+      value: 0.000008115297
       objectReference: {fileID: 0}
     - target: {fileID: -1704222629400663876, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.54021454
+      value: -0.5402176
       objectReference: {fileID: 0}
     - target: {fileID: -1551168584785544901, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77961,22 +77963,22 @@ PrefabInstance:
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8415273
+      value: 0.84152627
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.00000020231418
+      value: 0.0000015173608
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.00000031515785
+      value: -0.0000023636812
       objectReference: {fileID: 0}
     - target: {fileID: 2999520217675769812, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.54021466
+      value: -0.5402162
       objectReference: {fileID: 0}
     - target: {fileID: 3783353238668546013, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -77986,22 +77988,22 @@ PrefabInstance:
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8415275
+      value: 0.84152645
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.0000028323964
+      value: -0.0000015173604
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.0000044122116
+      value: -0.0000023636817
       objectReference: {fileID: 0}
     - target: {fileID: 3868395919765504106, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.54021424
+      value: 0.540216
       objectReference: {fileID: 0}
     - target: {fileID: 5419709599708206005, guid: 7fc44c7d356d48b4e853645a7acb7e08,
         type: 3}
@@ -78288,7 +78290,7 @@ MonoBehaviour:
   SuspensionDistance: 0.25
   WheelRadius: 0.385672
   SpringForceMulti: 7
-  DampingForceMulti: 1
+  DampingForceMulti: 0.5
   MaxSuspensionForce: 50
   ExtraRayCastDistance: 0.23
   Grip: 3
@@ -78396,6 +78398,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   SeparateLongLatGrip: 0
+  SkidRatioMode: 0
   BrakeStrength: 500
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -78403,6 +78406,8 @@ MonoBehaviour:
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
+  ClutchStrength: 500
+  DisableEffects: 0
   SurfaceType_Grips:
   - 1
   - 0.85
@@ -78442,14 +78447,11 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  ClutchStrength: 500
   SkidSound_Min: 6
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
-  DisableEffects: 0
-  SkidRatioMode: 0
   LastTouchedTransform: {fileID: 0}
   LastTouchedTransform_RB: {fileID: 0}
   LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
@@ -78637,7 +78639,7 @@ MonoBehaviour:
   SuspensionDistance: 0.25
   WheelRadius: 0.385672
   SpringForceMulti: 7
-  DampingForceMulti: 1
+  DampingForceMulti: 0.5
   MaxSuspensionForce: 50
   ExtraRayCastDistance: 0.23
   Grip: 3
@@ -78745,6 +78747,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   SeparateLongLatGrip: 0
+  SkidRatioMode: 0
   BrakeStrength: 500
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -78752,6 +78755,8 @@ MonoBehaviour:
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
+  ClutchStrength: 500
+  DisableEffects: 0
   SurfaceType_Grips:
   - 1
   - 0.85
@@ -78791,14 +78796,11 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  ClutchStrength: 500
   SkidSound_Min: 6
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
-  DisableEffects: 0
-  SkidRatioMode: 0
   LastTouchedTransform: {fileID: 0}
   LastTouchedTransform_RB: {fileID: 0}
   LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
@@ -78898,7 +78900,7 @@ MonoBehaviour:
   SuspensionDistance: 0.35
   WheelRadius: 0.48209
   SpringForceMulti: 9
-  DampingForceMulti: 1
+  DampingForceMulti: 0.75
   MaxSuspensionForce: 50
   ExtraRayCastDistance: 0.23
   Grip: 3.5
@@ -79006,6 +79008,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   SeparateLongLatGrip: 0
+  SkidRatioMode: 0
   BrakeStrength: 500
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -79013,6 +79016,8 @@ MonoBehaviour:
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
+  ClutchStrength: 500
+  DisableEffects: 0
   SurfaceType_Grips:
   - 1
   - 0.85
@@ -79052,14 +79057,11 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  ClutchStrength: 500
   SkidSound_Min: 6
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
-  DisableEffects: 0
-  SkidRatioMode: 0
   LastTouchedTransform: {fileID: 0}
   LastTouchedTransform_RB: {fileID: 0}
   LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
@@ -79177,7 +79179,7 @@ MonoBehaviour:
   SuspensionDistance: 0.35
   WheelRadius: 0.48209
   SpringForceMulti: 9
-  DampingForceMulti: 1
+  DampingForceMulti: 0.75
   MaxSuspensionForce: 50
   ExtraRayCastDistance: 0.23
   Grip: 3.5
@@ -79285,6 +79287,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   SeparateLongLatGrip: 0
+  SkidRatioMode: 0
   BrakeStrength: 500
   HandBrakeStrength: 70
   WheelWeight: 0.1
@@ -79292,6 +79295,8 @@ MonoBehaviour:
   WheelLayers:
     serializedVersion: 2
     m_Bits: 133121
+  ClutchStrength: 500
+  DisableEffects: 0
   SurfaceType_Grips:
   - 1
   - 0.85
@@ -79331,14 +79336,11 @@ MonoBehaviour:
   - 0.3
   - 0.3
   - 0.3
-  ClutchStrength: 500
   SkidSound_Min: 6
   SkidSound_VolumeIncrease: 0.2
   SkidSound_PitchIncrease: 0.015
   SkidSound_Pitch: 0.85
   SkidVolInVehicleMulti: 0.55
-  DisableEffects: 0
-  SkidRatioMode: 0
   LastTouchedTransform: {fileID: 0}
   LastTouchedTransform_RB: {fileID: 0}
   LastTouchedTransform_Position: {x: 0, y: 0, z: 0}
