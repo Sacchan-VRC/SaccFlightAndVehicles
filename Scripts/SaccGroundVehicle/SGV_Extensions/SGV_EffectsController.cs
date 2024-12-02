@@ -61,7 +61,7 @@ namespace SaccFlightAndVehicles
         public Renderer TracksRenderer;
         public float TrackSpeedMulti = 1f;
         public int[] TrackMaterialSlots;
-        private Material[] Tracks;
+        private Material[] Tracks = new Material[0];
         private SaccEntity EntityControl;
         private Animator VehicleAnimator;
         private bool InWater;
@@ -255,7 +255,10 @@ namespace SaccFlightAndVehicles
                     float dist = Dif.magnitude;
                     TrackLast[i] = TrackEmptys[i].position;
                     float forward = Vector3.Dot(TrackEmptys[i].forward, Dif) > 0 ? 1 : -1;
-                    Tracks[i].mainTextureOffset += new Vector2(0, TrackSpeedMulti * dist * forward);
+                    Vector2 uvs = Tracks[i].mainTextureOffset;
+                    uvs += new Vector2(0, TrackSpeedMulti * dist * forward);
+                    uvs.y = uvs.y - Mathf.Floor(uvs.y);
+                    Tracks[i].mainTextureOffset = uvs;
                 }
             }
             if (!Occupied)
@@ -288,9 +291,10 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_RespawnButton()
         {
             WakeUp();
-            for (int i = 0; i < Tracks.Length; i++)
+            if (DoCaterpillarTracks)
             {
-                Tracks[i].mainTextureOffset = Vector2.zero;
+                for (int i = 0; i < Tracks.Length; i++)
+                    Tracks[i].mainTextureOffset = Vector2.zero;
             }
         }
         public void SFEXT_L_GrappleAttach()
