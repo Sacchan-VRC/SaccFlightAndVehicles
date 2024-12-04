@@ -27,7 +27,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("How long it takes to fully reload from empty in seconds")]
         public float FullReloadTimeSec = 20;
         [UdonSynced(UdonSyncMode.None)] public float GunAmmoInSeconds = 12;
-        public float GunRecoil = 150;
+        public float RecoilForce = 1;
         [Tooltip("Set a boolean value in the animator when switching to this weapon?")]
         public bool DoAnimBool = false;
         [Tooltip("Animator bool that is true when this function is selected")]
@@ -54,6 +54,10 @@ namespace SaccFlightAndVehicles
         {
             set
             {
+                if (value && EntityControl.IsOwner && RecoilForce > 0 && !EntityControl.Piloting)
+                {
+                    EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
+                }
                 GunAnimator.SetBool(GunFiringBoolName, value);
                 _firing = value;
             }
@@ -85,7 +89,6 @@ namespace SaccFlightAndVehicles
             VehicleTransform = EntityControl.transform;
             CenterOfMass = EntityControl.CenterOfMass;
             OutsideVehicleLayer = EntityControl.OutsideVehicleLayer;
-            GunRecoil *= VehicleRigidbody.mass;
             if (GunDamageParticle) GunDamageParticle.gameObject.SetActive(false);
 
             //HUD
@@ -239,14 +242,6 @@ namespace SaccFlightAndVehicles
                             { EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
                         }
                         GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
-                        if (!GunRecoilEmpty)
-                        {
-                            VehicleRigidbody.AddRelativeForce(-Vector3.forward * GunRecoil * .01f * Time.deltaTime, ForceMode.Impulse);
-                        }
-                        else
-                        {
-                            VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * GunRecoil * .01f * Time.deltaTime, GunRecoilEmpty.position, ForceMode.Impulse);
-                        }
                     }
                     else
                     {
@@ -266,6 +261,17 @@ namespace SaccFlightAndVehicles
                     Firing = false;
                     RequestSerialization();
                     EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
+                }
+            }
+            if (_firing && EntityControl.IsOwner)
+            {
+                if (!GunRecoilEmpty)
+                {
+                    VehicleRigidbody.AddRelativeForce(-Vector3.forward * RecoilForce, ForceMode.Acceleration);
+                }
+                else
+                {
+                    VehicleRigidbody.AddForceAtPosition(-GunRecoilEmpty.forward * RecoilForce, GunRecoilEmpty.position, ForceMode.Acceleration);
                 }
             }
         }

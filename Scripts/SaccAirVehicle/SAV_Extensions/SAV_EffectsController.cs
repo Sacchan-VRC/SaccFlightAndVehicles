@@ -301,10 +301,10 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
-            WakeUp();
+            DoEffects = 0f;
             VehicleAnimator.SetTrigger("bullethit");
         }
-        public void WakeUp()
+        public void SFEXT_L_WakeUp()
         {
             DoEffects = 0f;
         }

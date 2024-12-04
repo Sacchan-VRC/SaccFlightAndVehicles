@@ -301,8 +301,9 @@ namespace SaccFlightAndVehicles
         {
             WakeUp();
         }
-        public void WakeUp()
+        public void SFEXT_L_WakeUp()
         {
+            if (!Sleeping) return;
             if (DespawnIfUnused && !EntityControl.gameObject.activeSelf)
             {
                 EntityControl.gameObject.SetActive(true);
@@ -319,7 +320,9 @@ namespace SaccFlightAndVehicles
             { SteerWheels[i].SendCustomEvent("WakeUp"); }
             for (int i = 0; i < OtherWheels.Length; i++)
             { OtherWheels[i].SendCustomEvent("WakeUp"); }
-
+        }
+        public void WakeUp()
+        {
             EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
         }
         private void EnableWings(bool enable)
@@ -554,13 +557,13 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_BulletHit()
         {
+            DoEffects = 0f;
             if (!BulletHitNull)
             {
                 int rand = Random.Range(0, BulletHit.Length);
                 BulletHit[rand].pitch = Random.Range(.8f, 1.2f);
                 BulletHit[rand].PlayOneShot(BulletHit[rand].clip);
             }
-            WakeUp();
             VehicleAnimator.SetTrigger("bullethit");
         }
         public void SFEXT_G_ReAppear()

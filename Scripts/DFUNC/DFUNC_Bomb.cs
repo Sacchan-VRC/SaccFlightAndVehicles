@@ -30,6 +30,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
         public Transform[] BombLaunchPoints;
         public AudioSource LaunchSound;
+        public ParticleSystem LaunchParticle;
+        public int LaunchParticle_numtest = 15;
         [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
         public bool AllowFiringWhenGrounded = false;
         [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
@@ -175,6 +177,7 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Selected()
         {
             TriggerLastFrame = true;
+            LastBombDropTime = Mathf.Max(LastBombDropTime, Time.time - BombHoldDelay + 0.5f);
             Selected = EntityControl.InVR || !KeyboardInput_InstantFire;
             if (DoAnimBool && !AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOn)); }
@@ -352,9 +355,13 @@ namespace SaccFlightAndVehicles
                 BombPoint++;
                 if (BombPoint == BombLaunchPoints.Length) BombPoint = 0;
             }
-            if (IsOwner && !Held)
-            { VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange); }
+            if (EntityControl.IsOwner && !Held && Recoil > 0)
+            {
+                if (!EntityControl.Piloting) { EntityControl.SendEventToExtensions("SFEXT_L_WakeUp"); }
+                VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange);
+            }
             if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
+            if (LaunchParticle) { LaunchParticle.Emit(LaunchParticle_numtest); }
             UpdateAmmoVisuals();
             if (IsOwner)
             { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
