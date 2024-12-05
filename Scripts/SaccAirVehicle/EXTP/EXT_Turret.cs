@@ -120,6 +120,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
+            SendCustomEventDelayedFrames(nameof(ResetSyncTimes), 1);// the frame the pilot enters is more likely to be a longer frame, so reset afterwards
             IsOwner = true;
             Manning = true;
             InVR = EntityControl.InVR;

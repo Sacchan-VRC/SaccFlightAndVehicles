@@ -87,6 +87,7 @@ namespace SaccFlightAndVehicles
         private int EnterIdleModeNumber;
         private double lastframetime;
         private double lastframetime_extrap;
+        float updateDelta = 0.25f;
         private Vector3 poslasframe;
         private Vector3 Extrapolation_Raw;
         private Quaternion RotExtrapolation_Raw = Quaternion.identity;
@@ -256,6 +257,7 @@ namespace SaccFlightAndVehicles
             Piloting = true;
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
             ExitIdleMode();
+            SendCustomEventDelayedFrames(nameof(ResetSyncTimes), 1);// the frame the pilot enters is more likely to be a longer frame, so reset afterwards
         }
         public void SFEXT_G_PilotEnter()
         {
@@ -407,7 +409,7 @@ namespace SaccFlightAndVehicles
             }
             ErrorLastFrame = Error;
             lastframetime_extrap = Networking.GetServerTimeInSeconds();
-            float TimeSinceUpdate = (float)((time - L_UpdateTime) / updateInterval);
+            float TimeSinceUpdate = (float)((time - L_UpdateTime) / updateDelta);
             //extrapolated position based on time passed since update
             Vector3 VelEstimate = L_CurVel + (Acceleration * TimeSinceUpdate);
             ExtrapDirection_Smooth = Vector3.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction + Deriv, SpeedLerpTime * deltatime);
@@ -482,13 +484,13 @@ namespace SaccFlightAndVehicles
         public override void OnDeserialization()
         {
             //time between this update and last
-            float updatedelta = (float)(O_UpdateTime - O_LastUpdateTime);
-            if (updatedelta < 0.0001f)
+            float updateDelta = (float)(O_UpdateTime - O_LastUpdateTime);
+            if (updateDelta < 0.0001f)
             {
                 O_LastUpdateTime = O_UpdateTime;
                 return;
             }
-            float speednormalizer = 1 / updatedelta;
+            float speednormalizer = 1 / updateDelta;
 
             LastAcceleration = Acceleration;
             LastCurAngMom = CurAngMom;
@@ -520,7 +522,7 @@ namespace SaccFlightAndVehicles
             //rotate Acceleration by the difference in rotation of vehicle between last and this update to make it match the angle for the next update better
             Quaternion PlaneRotDif = O_Rotation_Q * Quaternion.Inverse(O_LastRotation);
             Acceleration = (PlaneRotDif * Acceleration) * .5f;//not sure why it's 0.5, but it seems correct from testing
-            Acceleration += Acceleration * (Ping / updatedelta);
+            Acceleration += Acceleration * (Ping / updateDelta);
 
             //current angular momentum as a quaternion
             CurAngMom = RealSlerp(Quaternion.identity, PlaneRotDif, speednormalizer);
