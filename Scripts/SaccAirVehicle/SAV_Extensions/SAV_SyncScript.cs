@@ -97,6 +97,7 @@ namespace SaccFlightAndVehicles
         private double StartupLocalTime;
         private Vector3 ExtrapDirection_Smooth;
         private Quaternion RotExtrapDirection_Smooth;
+        float IntervalsMid = 999f;
 #if UNITY_EDITOR
         private bool TestMode;
 #endif
@@ -182,6 +183,7 @@ namespace SaccFlightAndVehicles
             }
             if (gameObject.activeInHierarchy) { InitSyncValues(); }//this gameobject shouldn't be active at start, but some people might still have it active from older versions
             EnterIdleModeNumber = Mathf.FloorToInt(IdleModeUpdateInterval / updateInterval);//enter idle after IdleModeUpdateInterval seconds of being still
+            IntervalsMid = Mathf.Lerp(updateInterval, IdleModeUpdateInterval, 0.5f);
             // script activation is delayed to allow all scripts on this vehicle to activate first
             // 10 frames to be safe, 4 is the minimum for car wheels to not behave strangely (ingame only) if they're touching the ground at Start(), reason unknown.
             SendCustomEventDelayedFrames(nameof(ActivateScript), 10);
@@ -376,7 +378,7 @@ namespace SaccFlightAndVehicles
                 }
 #endif
             }
-            else//extrapolate and interpolate based on received data
+            else if (!idleDetected)//extrapolate and interpolate based on received data
             {
                 ExtrapolationAndSmoothing();
             }
@@ -481,6 +483,8 @@ namespace SaccFlightAndVehicles
             }
         }
 #endif
+        bool idleDetected = false;
+        uint idleTicks = 0;
         public override void OnDeserialization()
         {
             //time between this update and last
@@ -489,6 +493,27 @@ namespace SaccFlightAndVehicles
             {
                 O_LastUpdateTime = O_UpdateTime;
                 return;
+            }
+            // detect if the updates are coming in at a rate closer to the idle rate
+            if (updateDelta > IntervalsMid)
+            {
+                if (!idleDetected)
+                {
+                    idleTicks++;
+                    if (idleTicks > 1)// since we also waited for the owner to decide it's idle one tick should be enough
+                    {
+                        idleDetected = true;
+                        SyncTransform.position = O_Position;
+                        float smv_ = short.MaxValue;
+                        O_Rotation_Q = new Quaternion(O_RotationX / smv_, O_RotationY / smv_, O_RotationZ / smv_, O_RotationW / smv_);
+                        SyncTransform.rotation = O_Rotation_Q;
+                    }
+                }
+            }
+            else
+            {
+                idleDetected = false;
+                idleTicks = 0;
             }
             float speednormalizer = 1 / updateDelta;
 
