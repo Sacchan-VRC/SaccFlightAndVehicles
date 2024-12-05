@@ -65,7 +65,7 @@ namespace SaccFlightAndVehicles
         private double StartupTime;
         private Vector2 LastGunRotationSpeed;
         private Vector2 GunRotationSpeed;
-        private Vector2 GunRotationAcceleration;
+        // private Vector2 GunRotationAcceleration;
         private Vector2 L_LastGunRotation;
         private double O_LastUpdateTime2;
         private float SmoothingTimeDivider;
@@ -124,20 +124,31 @@ namespace SaccFlightAndVehicles
             IsOwner = true;
             Manning = true;
             InVR = EntityControl.InVR;
+            LastForward_HOR = VehicleTransform.forward;
+            LastForward_VERT = TurretRotatorHor.forward;
             nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
         }
         public void SFEXT_G_PilotEnter()
         {
+            justEnabled = true;
+            ExtrapDirection_Smooth = Vector2.zero;
+            GunRotationSpeed = LastGunRotationSpeed = Vector2.zero;
+            SND_RotLerper = Vector2.zero;
             gameObject.SetActive(true);
             if (RotatingSound && (PlayRotatingSoundForOthers || Manning))
             { RotatingSound.Play(); }
+            if (Stabilize)
+            {
+                Extrapolation_Raw = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.eulerAngles.y);
+                if (Extrapolation_Raw.y > 180) { Extrapolation_Raw.y -= 360; }
+                if (Extrapolation_Raw.x > 180) { Extrapolation_Raw.x -= 360; }
+                L_LastGunRotation = L_GunRotation = Extrapolation_Raw;
+            }
         }
         public void SFEXT_O_PilotExit()
         {
             IsOwner = false;
-            SendCustomEventDelayedFrames(nameof(ManningFalse), 1);
-            RotationSpeedX = 0;
-            RotationSpeedY = 0;
+            SendCustomEventDelayedFrames(nameof(ManningFalse), 1);//if this isnt delayed update runs for one frame with Manning false before it's disabled
         }
         public void SFEXT_G_PilotExit()
         {
@@ -145,12 +156,29 @@ namespace SaccFlightAndVehicles
             if (RotatingSound && RotatingSound.isPlaying) { RotatingSound.Stop(); }
         }
         public void ManningFalse()
-        { Manning = false; }//if this is in SFEXT_O_UserExit rather than here update runs for one frame with it false before it's disabled
+        {
+            RotationSpeedX = 0;
+            RotationSpeedY = 0;
+            Manning = false;
+        }
+        private void ResetSyncVars()
+        {
+            L_LastGunRotation = L_GunRotation = Extrapolation_Raw = GunRotationSpeed = LastGunRotationSpeed = Vector2.zero;
+            ExtrapDirection_Smooth = Vector2.zero;
+        }
         public void SFEXT_G_RespawnButton()
         {
             ResetSyncTimes();
-            HORSYNC.localRotation = Quaternion.identity;
-            VERTSYNC.localRotation = Quaternion.identity;
+            ResetSyncVars();
+            TurretRotatorHor.localRotation = Quaternion.identity;
+            TurretRotatorVert.localRotation = Quaternion.identity;
+        }
+        public void SFEXT_O_LoseOwnership()
+        {
+            Extrapolation_Raw = O_GunRotation;
+            if (Extrapolation_Raw.y > 180) { Extrapolation_Raw.y -= 360; }
+            if (Extrapolation_Raw.x > 180) { Extrapolation_Raw.x -= 360; }
+            L_LastGunRotation = L_GunRotation = Extrapolation_Raw;
         }
         private void Update()
         {
@@ -237,8 +265,8 @@ namespace SaccFlightAndVehicles
                 RotationSpeedY += -(RotationSpeedY * friction) + (InputY);
 
                 //rotate turret
-                Vector3 rothor = TurretRotatorHor.localRotation.eulerAngles;
-                Vector3 rotvert = TurretRotatorVert.localRotation.eulerAngles;
+                Vector3 rothor = TurretRotatorHor.localEulerAngles;
+                Vector3 rotvert = TurretRotatorVert.localEulerAngles;
 
                 float NewX = rotvert.x;
                 NewX += (RotationSpeedX * deltaTime) + RotationDifferenceX;
@@ -301,10 +329,13 @@ namespace SaccFlightAndVehicles
             }
             else { time = StartupServerTime + (double)(Time.time - StartupLocalTime); }
             lastframetime_extrap = Networking.GetServerTimeInSeconds();
+            Vector2 turretRot;
+            if (Stabilize)
+                turretRot = new Vector2(VERTSYNC.localEulerAngles.x, HORSYNC.eulerAngles.y);
+            else
+                turretRot = new Vector2(VERTSYNC.localEulerAngles.x, HORSYNC.localEulerAngles.y);
 
-            Vector2 turretRot = new Vector2(VERTSYNC.localEulerAngles.x, HORSYNC.eulerAngles.y);
             if (turretRot.y > 180) { turretRot.y -= 360; }
-
             //prevent wrong interpolation direction when crossing 0-360 / 180--180
             if (!ClampHor)
             {
@@ -326,17 +357,13 @@ namespace SaccFlightAndVehicles
             float TimeSinceUpdate = (float)(time - L_UpdateTime);
             float updateTimeNormalized = TimeSinceUpdate / updateDelta;
 
-            Vector2 VelEstimate = GunRotationSpeed;
-            Vector2 Correction = Extrapolation_Raw - turretRot;
+            Vector2 Correction = (Extrapolation_Raw - turretRot) * CorrectionTime;
 
-            Correction *= CorrectionTime;
-
-            ExtrapDirection_Smooth = Vector2.Lerp(ExtrapDirection_Smooth, VelEstimate + Correction, SpeedLerpTime * deltaTime);
-
+            ExtrapDirection_Smooth = Vector2.Lerp(ExtrapDirection_Smooth, GunRotationSpeed + Correction, SpeedLerpTime * deltaTime);
 
             float newroty;
             if (Stabilize) newroty = HORSYNC.rotation.eulerAngles.y + ExtrapDirection_Smooth.y * deltaTime;
-            else newroty = HORSYNC.localRotation.eulerAngles.y + ExtrapDirection_Smooth.y * deltaTime;
+            else newroty = HORSYNC.localEulerAngles.y + ExtrapDirection_Smooth.y * deltaTime;
             if (newroty > 180) newroty -= 360;
 
             Vector2 rawprediction = GunRotationSpeed * TimeSinceUpdate;
@@ -386,7 +413,7 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
-            Extrapolation_Raw = O_GunRotation + rawprediction;
+            Extrapolation_Raw = L_GunRotation + rawprediction;
             if (Extrapolation_Raw.y > 180) { Extrapolation_Raw.y -= 360; }
             if (Extrapolation_Raw.x > 180) { Extrapolation_Raw.x -= 360; }
             Extrapolation_Raw.x = Mathf.Clamp(Extrapolation_Raw.x, -UpAngleMax, DownAngleMax);
@@ -408,7 +435,7 @@ namespace SaccFlightAndVehicles
 #endif
             }
 
-            float newrotx = VERTSYNC.localRotation.eulerAngles.x + ExtrapDirection_Smooth.x * deltaTime;
+            float newrotx = VERTSYNC.localEulerAngles.x + ExtrapDirection_Smooth.x * deltaTime;
             if (newrotx > 180) newrotx -= 360;
             newrotx = Mathf.Clamp(newrotx, -UpAngleMax, DownAngleMax);
             VERTSYNC.localRotation = Quaternion.Euler(new Vector3(newrotx, 0, 0));
@@ -425,16 +452,18 @@ namespace SaccFlightAndVehicles
                 RotatingSound.pitch = turnvol;
             }
         }
+        bool justEnabled;
         public override void OnDeserialization()
         {
-            float uDelta = (float)(O_UpdateTime - O_LastUpdateTime);
-            if (uDelta < 0.0001f)
+            float updateDelta = (float)(O_UpdateTime - O_LastUpdateTime);
+            if (updateDelta < 0.0001f || justEnabled)
             {
                 O_LastUpdateTime = O_UpdateTime;
+                justEnabled = false;
                 return;
             }
-            updateDelta = uDelta;
-            float speednormalizer = 1 / updateDelta;
+            this.updateDelta = updateDelta;
+            float speednormalizer = 1 / this.updateDelta;
             L_UpdateTime = O_UpdateTime;
 
             L_LastGunRotation = L_GunRotation;
@@ -463,7 +492,7 @@ namespace SaccFlightAndVehicles
                     GunRotationSpeed.y *= -1;
             }
             GunRotationSpeed *= speednormalizer;
-            GunRotationAcceleration = (GunRotationSpeed - LastGunRotationSpeed) * speednormalizer;
+            // GunRotationAcceleration = (GunRotationSpeed - LastGunRotationSpeed) * speednormalizer;
             O_LastUpdateTime = O_UpdateTime;
         }
         private void InitSyncValues()
