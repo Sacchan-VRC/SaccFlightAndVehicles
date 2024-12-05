@@ -73,6 +73,12 @@ namespace SaccFlightAndVehicles
             Seat = Station.stationEnterPlayerLocation;
             SeatStartRot = Seat.localRotation;
             SeatAdjustedPos = SeatStartPos = Seat.localPosition;
+            DT180SeatCalcCounter = Random.Range(0, 10);
+            for (int i = 0; i < EntityControl.ExternalSeats.Length; i++)
+            {
+                if (Station == EntityControl.ExternalSeats[i])
+                { ThisSeatExternal = true; break; }
+            }
             if (InEditor)
             {
                 for (int i = 0; i < EnableInSeat.Length; i++)
@@ -80,16 +86,14 @@ namespace SaccFlightAndVehicles
                 for (int i = 0; i < DisableInSeat.Length; i++)
                 { if (DisableInSeat[i]) DisableInSeat[i].SetActive(false); }
             }
-            DT180SeatCalcCounter = Random.Range(0, 10);
-            for (int i = 0; i < EntityControl.ExternalSeats.Length; i++)
+            else
             {
-                if (Station == EntityControl.ExternalSeats[i])
-                { ThisSeatExternal = true; break; }
+                for (int i = 0; i < EnableInSeat.Length; i++)
+                { if (EnableInSeat[i]) EnableInSeat[i].SetActive(false); }
+                for (int i = 0; i < DisableInSeat.Length; i++)
+                { if (DisableInSeat[i]) DisableInSeat[i].SetActive(true); }
             }
-            for (int i = 0; i < EnableInSeat.Length; i++)
-            { if (EnableInSeat[i]) EnableInSeat[i].SetActive(false); }
-            for (int i = 0; i < DisableInSeat.Length; i++)
-            { if (DisableInSeat[i]) DisableInSeat[i].SetActive(true); }
+            if (PassengerFunctions) { PassengerFunctions.Station = Station; }
         }
         public override void Interact()//entering the vehicle
         {
@@ -166,7 +170,7 @@ namespace SaccFlightAndVehicles
                 }
                 if (!player.IsUserInVR() && !Fake && !Disable180Rotation) { ThreeSixtySeat(); }
                 if (PassengerFunctions)
-                { PassengerFunctions.UserEnterVehicleGlobal(); }
+                { PassengerFunctions.UserEnterVehicleGlobal(player); }
                 if (IsPilotSeat) { EntityControl.PilotEnterVehicleGlobal(player); }
                 else
                 {

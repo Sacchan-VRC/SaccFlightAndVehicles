@@ -1025,6 +1025,8 @@ namespace SaccFlightAndVehicles
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
                 foreach (UdonSharpBehaviour EXT in Dial_Functions_R)
                 { if (EXT) { if (!localPlayer.IsOwner(EXT.gameObject)) { Networking.SetOwner(localPlayer, EXT.gameObject); } } }
+                foreach (SAV_PassengerFunctionsController EXT in PassengerFunctionControllers)
+                { if (EXT && !EXT.Occupied) { EXT.TakeOwnerShipOfExtensions(); } }
             }
         }
         public bool passengerFuncIgnorePassengerFlag;
@@ -1068,15 +1070,19 @@ namespace SaccFlightAndVehicles
                     if (EXT)
                     {
                         EXT.SendCustomEvent(eventname);
-                        if (eventname == "SFEXT_L_EntityStart") continue;
+                        if (
+                            eventname == "SFEXT_L_EntityStart" ||
+                            eventname == "SFEXT_O_LoseOwnership"
+                        ) continue;
+                        if (EXT.Occupied && eventname == "SFEXT_O_TakeOwnership") continue;
                         //Pilot from SaccEntity is the Pilot of the vehicle
                         //DFUNCs assume that the pilot of the vehicle should control the DFUNC
                         //but since this controls passenger functions we turn the pilot events into passenger events
                         string passengerEventName = eventname;
-                        passengerEventName = passengerEventName.Replace("G_PilotEnter", "G_PassengerEnter");
-                        passengerEventName = passengerEventName.Replace("G_PilotExit", "G_PassengerExit");
-                        passengerEventName = passengerEventName.Replace("O_PilotEnter", "P_PassengerEnter");
-                        passengerEventName = passengerEventName.Replace("O_PilotExit", "P_PassengerExit");
+                        passengerEventName = passengerEventName.Replace("G_PilotEnter", "G_PassengerEnter")
+                        .Replace("G_PilotExit", "G_PassengerExit")
+                        .Replace("O_PilotEnter", "P_PassengerEnter")
+                        .Replace("O_PilotExit", "P_PassengerExit");
 
                         EXT.SendEventToExtensions_Gunner(passengerEventName);
                     }

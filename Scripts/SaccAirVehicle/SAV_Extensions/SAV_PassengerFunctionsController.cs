@@ -48,7 +48,11 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int LStickSelection = -1;
         [System.NonSerializedAttribute] public int RStickSelectionLastFrame = -1;
         [System.NonSerializedAttribute] public int LStickSelectionLastFrame = -1;
-        private bool FunctionsActive = false;
+        public bool IsOwner = false;
+        public bool FunctionsActive = false;
+        public bool Occupied = false;
+        VRCPlayerApi currentUser;
+        [NonSerialized] public VRCStation Station;
         private bool DoDialLeft;
         private bool DoDialRight;
         [NonSerialized] public SaccEntity EntityControl;
@@ -69,6 +73,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             localPlayer = Networking.LocalPlayer;
+            IsOwner = EntityControl.IsOwner;
             if (localPlayer != null)
             {
                 InEditor = false;
@@ -316,6 +321,7 @@ namespace SaccFlightAndVehicles
         {
             LStickSelectionLastFrame = -1;
             RStickSelectionLastFrame = -1;
+            Occupied = true;
             if (LStickNumFuncs == 1)
             {
                 LStickSelection = 0;
@@ -330,11 +336,18 @@ namespace SaccFlightAndVehicles
             if (LStickDisplayHighlighter) { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             TakeOwnerShipOfExtensions();
             FunctionsActive = true;
+            if (!IsOwner)
+            { IsOwner = true; SendEventToExtensions_Gunner("SFEXT_O_TakeOwnership"); }
             SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             SendEventToExtensions_Gunner("SFEXT_O_PilotEnter");
         }
-        public void UserEnterVehicleGlobal()
+        public void UserEnterVehicleGlobal(VRCPlayerApi player)
         {
+            Occupied = true;
+            currentUser = player;
+            if (!player.isLocal && IsOwner)
+                SendEventToExtensions_Gunner("SFEXT_O_LoseOwnership");
+
             SendEventToExtensions_Gunner("SFEXT_G_PilotEnter");
         }
         public void UserExitVehicleLocal()
@@ -347,7 +360,21 @@ namespace SaccFlightAndVehicles
         [NonSerialized] public bool pilotLeftFlag;
         public void UserExitVehicleGlobal()
         {
+            currentUser = null;
             SendEventToExtensions_Gunner("SFEXT_G_PilotExit");
+            Occupied = false;
+            if (pilotLeftFlag)
+            {
+                SendCustomEventDelayedFrames(nameof(checkIfNewOwner), 1);
+            }
+        }
+        public void checkIfNewOwner()
+        {
+            // all owned objects should be transferred to the same person when a player leaves so this should be fine
+            if (localPlayer.IsOwner(Station.gameObject))
+            {
+                IsOwner = true; SendEventToExtensions_Gunner("SFEXT_O_TakeOwnership");
+            }
         }
 
         public void ToggleStickSelectionLeft(UdonSharpBehaviour dfunc)
