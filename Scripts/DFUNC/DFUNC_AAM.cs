@@ -11,6 +11,8 @@ namespace SaccFlightAndVehicles
     {
         [SerializeField] public UdonSharpBehaviour SAVControl;
         public Animator AAMAnimator;
+        [Tooltip("Desktop key for firing when selected")]
+        public KeyCode FireKey = KeyCode.Space;
         [Range(0, 2)]
         [Tooltip("0 = Radar, 1 = Heat, 2 = Other. Controls what variable is added to in SaccAirVehicle to count incoming missiles, AND which variable to check for reduced tracking, (MissilesIncomingRadar NumActiveChaff, MissilesIncomingHeat NumActiveFlares, MissilesIncomingOther NumActiveOtherCM)")]
         public int MissileType = 1;
@@ -355,7 +357,7 @@ namespace SaccFlightAndVehicles
                     if (lockedLast != AAMLocked) { RequestSerialization(); }
 
                     //firing AAM
-                    if (Trigger > 0.75 || (!Holding && (Input.GetKey(KeyCode.Space))))
+                    if (Trigger > 0.75 || (!Holding && (Input.GetKey(FireKey))))
                     {
                         if (!TriggerLastFrame)
                         {

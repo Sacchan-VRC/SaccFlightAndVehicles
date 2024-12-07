@@ -12,6 +12,9 @@ namespace SaccFlightAndVehicles
         [SerializeField] public UdonSharpBehaviour SAVControl;
         public Animator BombAnimator;
         public GameObject Bomb;
+        [Tooltip("Desktop key for firing when selected")]
+        public KeyCode FireKey = KeyCode.Space;
+        [Tooltip("Desktop key for firing when not selected")]
         public KeyCode FireNowKey = KeyCode.None;
         [Tooltip("How many bombs to create at Start() so they don't have to be created later")]
         public int NumPreInstatiated = 5;
@@ -315,7 +318,7 @@ namespace SaccFlightAndVehicles
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                if ((Trigger > 0.75 || Input.GetKey(KeyCode.Space) || Input.GetKey(FireNowKey)) && !Held || HoldingTrigger_Held)
+                if ((Trigger > 0.75 || Input.GetKey(FireKey) || Input.GetKey(FireNowKey)) && !Held || HoldingTrigger_Held)
                 {
                     if (!TriggerLastFrame)
                     {

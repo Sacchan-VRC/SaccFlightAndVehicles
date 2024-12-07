@@ -13,6 +13,8 @@ namespace SaccFlightAndVehicles
         [Tooltip("NOT required if 'Hand Held Mode' is enabled")]
         [SerializeField] public UdonSharpBehaviour SAVControl;
         public Animator AGMAnimator;
+        [Tooltip("Desktop key for firing when selected")]
+        public KeyCode FireKey = KeyCode.Space;
         [Tooltip("Camera script that is used to see the target")]
         public GameObject AGM;
         public int NumAGM = 4;
@@ -306,7 +308,7 @@ namespace SaccFlightAndVehicles
                     if (AGMUnlock)
                     { AGMUnlock.Play(); }
                 }
-                if (Trigger > 0.75 || (!HandHeldMode && Input.GetKey(KeyCode.Space)))
+                if (Trigger > 0.75 || (!HandHeldMode && Input.GetKey(FireKey)))
                 {
                     if (!TriggerLastFrame)
                     {//new button press

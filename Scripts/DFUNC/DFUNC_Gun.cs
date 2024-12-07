@@ -13,6 +13,9 @@ namespace SaccFlightAndVehicles
         public Animator GunAnimator;
         [Tooltip("Animator bool that is true when the gun is firing")]
         public string GunFiringBoolName = "gunfiring";
+        [Tooltip("Desktop key for firing when selected")]
+        public KeyCode FireKey = KeyCode.Space;
+        [Tooltip("Desktop key for firing when not selected")]
         public KeyCode FireNowKey = KeyCode.None;
         [Tooltip("Transform of which its X scale scales with ammo")]
         public Transform[] AmmoBars;
@@ -227,7 +230,7 @@ namespace SaccFlightAndVehicles
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(KeyCode.Space) || Input.GetKey(FireNowKey))) && GunAmmoInSeconds > 0))
+                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(FireKey) || Input.GetKey(FireNowKey))) && GunAmmoInSeconds > 0))
                     {
                         if (DisallowFireIfWind)
                         {
