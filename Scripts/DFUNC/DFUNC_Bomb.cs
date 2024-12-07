@@ -33,7 +33,7 @@ namespace SaccFlightAndVehicles
         public Transform[] BombLaunchPoints;
         public AudioSource LaunchSound;
         public ParticleSystem LaunchParticle;
-        public int LaunchParticle_numtest = 15;
+        public int LaunchParticle_num = 15;
         [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
         public bool AllowFiringWhenGrounded = false;
         [Tooltip("Disable the weapon if wind is enabled, to prevent people gaining an unfair advantage")]
@@ -379,7 +379,7 @@ namespace SaccFlightAndVehicles
                 VehicleRigid.AddForceAtPosition(-RecoilDirection.forward * Recoil, RecoilDirection.position, ForceMode.VelocityChange);
             }
             if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
-            if (LaunchParticle) { LaunchParticle.Emit(LaunchParticle_numtest); }
+            if (LaunchParticle) { LaunchParticle.Emit(LaunchParticle_num); }
             UpdateAmmoVisuals();
             if (IsOwner)
             { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
