@@ -8,11 +8,12 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class EXT_Turret : UdonSharpBehaviour
     {
-        public UdonSharpBehaviour SAVControl;
-        [Tooltip("Transform to base your controls on, should be facing the same direction as the seat. If left empty it will be set to the Horizontal Rotator.")]
-        public Transform ControlsRoot;
         public Transform TurretRotatorHor;
         public Transform TurretRotatorVert;
+        [Tooltip("Transform to base your controls on, should be facing the same direction as the seat. If left empty it will be set to the Horizontal Rotator.")]
+        public Transform ControlsRoot;
+        [Tooltip("Optional transform to define the forward direction of the turret")]
+        public Transform TurretForwardEmpty;
         public float TurnSpeedMultiX = 600;
         public float TurnSpeedMultiY = 600;
         [Tooltip("Joystick sensitivity. Angle at which joystick will reach maximum deflection in VR")]
@@ -31,6 +32,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("In seconds")]
         [Range(0.05f, 1f)]
         public float updateInterval = 0.25f;
+        public float networkSmoothing = 6;
         [Tooltip("Stabilize the turrets movement? Easier to aim in moving vehicles")]
         public bool Stabilize;
 
@@ -53,24 +55,16 @@ namespace SaccFlightAndVehicles
         private float InputYKeyb;
         private float RotationSpeedX = 0f;
         private float RotationSpeedY = 0f;
-        private Vector3 AmmoBarScaleStart;
         private bool InEditor = true;
         private bool RGripLastFrame;
         private bool InVR;
         private VRCPlayerApi localPlayer;
-
-        private double O_LastUpdateTime;
-        private double L_UpdateTime;
-        private double nextUpdateTime = double.MaxValue;
-        private double StartupTime;
-        private Vector2 LastGunRotationSpeed;
-        private Vector2 GunRotationSpeed;
-        // private Vector2 GunRotationAcceleration;
-        private Vector2 L_LastGunRotation;
-        private double O_LastUpdateTime2;
+        private float L_UpdateTime;
+        private float L_LastUpdateTime;
+        private float nextUpdateTime = float.MaxValue;
+        private Quaternion GunRotationSpeed;
         private float SmoothingTimeDivider;
         private bool ClampHor = false;
-        private bool Occupied;
         private bool Manning;
         private float RotateSoundVol;
         private Rigidbody VehicleRigid;
@@ -79,16 +73,13 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public bool IsOwner;//required by the bomb script, not actually related to being the owner of the object
         private Vector3 LastForward_HOR;
         private Vector3 LastForward_VERT;
-        [UdonSynced(UdonSyncMode.None)] private Vector2 O_GunRotation;
-        private Vector2 L_GunRotation;
-        [UdonSynced] private double O_UpdateTime;
-        private Vector2 SND_RotLerper;
-        Vector3 ExtrapDirection_Smooth;
+        [UdonSynced] private short O_RotationX;
+        [UdonSynced] private short O_RotationY;
+        [UdonSynced] private short O_RotationZ;
+        private Quaternion L_GunRotation;
+        private Quaternion L_LastGunRotation;
+        private float SND_RotLerper;
         float updateDelta = 0.25f;
-        private double lastframetime_extrap;
-        private double StartupServerTime;
-        private double StartupLocalTime;
-        private float ErrorLastFrame;
         [Header("For debug, leave empty for normal use")]
         [SerializeField] private Transform HORSYNC;
         [SerializeField] private Transform VERTSYNC;
@@ -105,6 +96,7 @@ namespace SaccFlightAndVehicles
 #endif
             if (!HORSYNC) { HORSYNC = TurretRotatorHor; }
             if (!VERTSYNC) { VERTSYNC = TurretRotatorVert; }
+            if (!TurretForwardEmpty) { TurretForwardEmpty = EntityControl.transform; }
             localPlayer = Networking.LocalPlayer;
             InVR = EntityControl.InVR;
             InEditor = localPlayer == null;
@@ -116,34 +108,26 @@ namespace SaccFlightAndVehicles
             if (SideAngleMax < 180f) { ClampHor = true; }
 
             if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
-            InitSyncValues();
+            // InitSyncValues();
         }
         public void SFEXT_O_PilotEnter()
         {
-            SendCustomEventDelayedFrames(nameof(ResetSyncTimes), 1);// the frame the pilot enters is more likely to be a longer frame, so reset afterwards
             IsOwner = true;
             Manning = true;
             InVR = EntityControl.InVR;
             LastForward_HOR = VehicleTransform.forward;
             LastForward_VERT = TurretRotatorHor.forward;
-            nextUpdateTime = StartupServerTime + (double)(Time.time - StartupLocalTime) - .01f;
+            nextUpdateTime = Time.time - .01f;
         }
         public void SFEXT_G_PilotEnter()
         {
             justEnabled = true;
-            ExtrapDirection_Smooth = Vector2.zero;
-            GunRotationSpeed = LastGunRotationSpeed = Vector2.zero;
-            SND_RotLerper = Vector2.zero;
+            GunRotationSpeed = Quaternion.identity;
+            SND_RotLerper = 0;
             gameObject.SetActive(true);
             if (RotatingSound && (PlayRotatingSoundForOthers || Manning))
             { RotatingSound.Play(); }
-            if (Stabilize)
-            {
-                Extrapolation_Raw = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.eulerAngles.y);
-                if (Extrapolation_Raw.y > 180) { Extrapolation_Raw.y -= 360; }
-                if (Extrapolation_Raw.x > 180) { Extrapolation_Raw.x -= 360; }
-                L_LastGunRotation = L_GunRotation = Extrapolation_Raw;
-            }
+            RotExtrapolation_Raw = Extrapolation_Smooth = L_LastGunRotation = L_GunRotation = TurretRotatorVert.rotation;
         }
         public void SFEXT_O_PilotExit()
         {
@@ -161,37 +145,24 @@ namespace SaccFlightAndVehicles
             RotationSpeedY = 0;
             Manning = false;
         }
-        private void ResetSyncVars()
-        {
-            L_LastGunRotation = L_GunRotation = Extrapolation_Raw = GunRotationSpeed = LastGunRotationSpeed = Vector2.zero;
-            ExtrapDirection_Smooth = Vector2.zero;
-        }
         public void SFEXT_G_RespawnButton()
         {
-            ResetSyncTimes();
-            ResetSyncVars();
-            TurretRotatorHor.localRotation = Quaternion.identity;
-            TurretRotatorVert.localRotation = Quaternion.identity;
+            RotExtrapolation_Raw = Extrapolation_Smooth = L_LastGunRotation = L_GunRotation = TurretRotatorVert.localRotation = TurretRotatorHor.localRotation = Quaternion.identity;
         }
-        public void SFEXT_O_LoseOwnership()
-        {
-            Extrapolation_Raw = O_GunRotation;
-            if (Extrapolation_Raw.y > 180) { Extrapolation_Raw.y -= 360; }
-            if (Extrapolation_Raw.x > 180) { Extrapolation_Raw.x -= 360; }
-            L_LastGunRotation = L_GunRotation = Extrapolation_Raw;
-        }
+        // public void SFEXT_O_LoseOwnership()
+        // {
+        //     RotExtrapolation_Raw = O_GunRotation;
+        //     if (RotExtrapolation_Raw.y > 180) { RotExtrapolation_Raw.y -= 360; }
+        //     if (RotExtrapolation_Raw.x > 180) { RotExtrapolation_Raw.x -= 360; }
+        //     L_LastGunRotation = L_GunRotation = RotExtrapolation_Raw;
+        // }
         private void Update()
         {
             if (Manning)
             {
                 //ROTATION
-                double time = StartupServerTime + (double)(Time.time - StartupLocalTime);
+                float time = Time.time;
                 float deltaTime = Time.deltaTime;
-                if (deltaTime > .099f)
-                {
-                    ResetSyncTimes();
-                    //no antiwarp stuff, probably not needed
-                }
                 //get inputs
                 int Wf = Input.GetKey(KeyCode.W) ? 1 : 0; //inputs as ints
                 int Sf = Input.GetKey(KeyCode.S) ? -1 : 0;
@@ -286,11 +257,13 @@ namespace SaccFlightAndVehicles
 
                 if (time > nextUpdateTime)
                 {
-                    O_UpdateTime = time;
-                    if (Stabilize)
-                    { O_GunRotation = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.eulerAngles.y); }
-                    else
-                    { O_GunRotation = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.localEulerAngles.y); }
+                    Quaternion sendrot = TurretRotatorVert.rotation;
+                    if (sendrot.w < 0)
+                    { sendrot = sendrot = sendrot * Quaternion.Euler(0, 360, 0); } // ensure w componant is positive
+                    float smv = short.MaxValue;
+                    O_RotationX = (short)(sendrot.x * smv);
+                    O_RotationY = (short)(sendrot.y * smv);
+                    O_RotationZ = (short)(sendrot.z * smv);
                     RequestSerialization();
                     nextUpdateTime = time + updateInterval;
 #if UNITY_EDITOR
@@ -316,202 +289,89 @@ namespace SaccFlightAndVehicles
 #if UNITY_EDITOR
         public bool NetTestMode;
 #endif
-        Vector2 Extrapolation_Raw;
+        Quaternion RotExtrapolation_Raw;
+        Quaternion Extrapolation_Smooth;
         private void Extrapolation()
         {
             float deltaTime = Time.deltaTime;
-            double time;
-            if (deltaTime > .099f)
+
+            Quaternion FrameRotExtrap = Quaternion.Slerp(Quaternion.identity, GunRotationSpeed, deltaTime);
+            RotExtrapolation_Raw = FrameRotExtrap * RotExtrapolation_Raw;
+            Extrapolation_Smooth = Quaternion.Slerp(Extrapolation_Smooth, RotExtrapolation_Raw, 1 - Mathf.Pow(0.5f, networkSmoothing * deltaTime));
+
+            Vector3 lookDirHor = Vector3.ProjectOnPlane(Extrapolation_Smooth * Vector3.forward, HORSYNC.up);
+            Vector3 lookDirVert = Extrapolation_Smooth * Vector3.forward;
+            float turretAngleHor = Vector3.SignedAngle(TurretForwardEmpty.forward, lookDirHor, HORSYNC.up);
+            //prevent going past angle limits
+            if (turretAngleHor > SideAngleMax)
             {
-                time = Networking.GetServerTimeInSeconds();
-                deltaTime = (float)(time - lastframetime_extrap);
-                ResetSyncTimes();
+                Quaternion unrotate = Quaternion.AngleAxis(SideAngleMax - turretAngleHor, HORSYNC.up);
+                lookDirHor = unrotate * lookDirHor;
+                lookDirVert = unrotate * lookDirVert;
             }
-            else { time = StartupServerTime + (double)(Time.time - StartupLocalTime); }
-            lastframetime_extrap = Networking.GetServerTimeInSeconds();
-            Vector2 turretRot;
-            if (Stabilize)
-                turretRot = new Vector2(VERTSYNC.localEulerAngles.x, HORSYNC.eulerAngles.y);
-            else
-                turretRot = new Vector2(VERTSYNC.localEulerAngles.x, HORSYNC.localEulerAngles.y);
-
-            if (turretRot.y > 180) { turretRot.y -= 360; }
-            //prevent wrong interpolation direction when crossing 0-360 / 180--180
-            if (!ClampHor)
+            else if (turretAngleHor < -SideAngleMax)
             {
-                if (Mathf.Abs(Extrapolation_Raw.y - turretRot.y) > 180)
-                {
-                    if (Extrapolation_Raw.y > turretRot.y)
-                        turretRot.y += 360;
-                    else
-                        turretRot.y -= 360;
-                }
+                Quaternion unrotate = Quaternion.AngleAxis(-SideAngleMax - turretAngleHor, HORSYNC.up);
+                lookDirHor = unrotate * lookDirHor;
+                lookDirVert = unrotate * lookDirVert;
             }
-            if (Mathf.Abs(Extrapolation_Raw.x - turretRot.x) > 180)
+            float turretAngleVert = Vector3.SignedAngle(HORSYNC.forward, lookDirVert, HORSYNC.right);
+            if (turretAngleVert < -UpAngleMax)
             {
-                if (Extrapolation_Raw.x > turretRot.x)
-                    turretRot.x += 360;
-                else
-                    turretRot.x -= 360;
+                Quaternion unrotate = Quaternion.AngleAxis(-UpAngleMax - turretAngleVert, HORSYNC.right);
+                lookDirVert = unrotate * lookDirVert;
             }
-            float TimeSinceUpdate = (float)(time - L_UpdateTime);
-            float updateTimeNormalized = TimeSinceUpdate / updateDelta;
-
-            Vector2 Correction = (Extrapolation_Raw - turretRot) * CorrectionTime;
-
-            ExtrapDirection_Smooth = Vector2.Lerp(ExtrapDirection_Smooth, GunRotationSpeed + Correction, SpeedLerpTime * deltaTime);
-
-            float newroty;
-            if (Stabilize) newroty = HORSYNC.rotation.eulerAngles.y + ExtrapDirection_Smooth.y * deltaTime;
-            else newroty = HORSYNC.localEulerAngles.y + ExtrapDirection_Smooth.y * deltaTime;
-            if (newroty > 180) newroty -= 360;
-
-            Vector2 rawprediction = GunRotationSpeed * TimeSinceUpdate;
-            if (ClampHor)
+            else if (turretAngleVert > DownAngleMax)
             {
-                // prevent smooth extrapolation from overshooting
-                if (ExtrapDirection_Smooth.y > 0)//moving right
-                {
-                    if (newroty > SideAngleMax)
-                    { newroty = SideAngleMax; }
-                }
-                else//moving left
-                {
-                    if (-newroty > SideAngleMax)
-                    { newroty = -SideAngleMax; }
-                }
-                // prevent raw extrapolation from overshooting
-                float maxturn;
-                if (L_GunRotation.y < 180)//looking right
-                {
-                    if (rawprediction.y > 0)//moving right
-                    {
-                        maxturn = SideAngleMax - L_GunRotation.y;
-                        if (rawprediction.y > maxturn)
-                        { rawprediction.y = maxturn; }
-                    }
-                    else//moving left
-                    {
-                        maxturn = L_GunRotation.y + SideAngleMax;
-                        if (-rawprediction.y > maxturn)
-                        { rawprediction.y = -maxturn; }
-                    }
-                }
-                else//looking left
-                {
-                    if (rawprediction.y > 0)//moving right
-                    {
-                        maxturn = 360 - L_GunRotation.y + SideAngleMax;
-                        if (rawprediction.y > maxturn)
-                        { rawprediction.y = maxturn; }
-                    }
-                    else//moving left
-                    {
-                        maxturn = SideAngleMax - (360 - L_GunRotation.y);
-                        if (-rawprediction.y > maxturn)
-                        { rawprediction.y = -maxturn; }
-                    }
-                }
+                Quaternion unrotate = Quaternion.AngleAxis(DownAngleMax - turretAngleVert, HORSYNC.right);
+                lookDirVert = unrotate * lookDirVert;
             }
-            Extrapolation_Raw = L_GunRotation + rawprediction;
-            if (Extrapolation_Raw.y > 180) { Extrapolation_Raw.y -= 360; }
-            if (Extrapolation_Raw.x > 180) { Extrapolation_Raw.x -= 360; }
-            Extrapolation_Raw.x = Mathf.Clamp(Extrapolation_Raw.x, -UpAngleMax, DownAngleMax);
 
-            if (Stabilize)
-            {
-                HORSYNC.rotation = Quaternion.Euler(new Vector3(0, newroty, 0));
-                HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, HORSYNC.localEulerAngles.y, 0));
+            HORSYNC.LookAt(HORSYNC.position + lookDirHor, HORSYNC.up);
+            VERTSYNC.LookAt(VERTSYNC.position + lookDirVert, HORSYNC.up);
 #if UNITY_EDITOR
-                if (HORSYNC_RAW) HORSYNC_RAW.rotation = Quaternion.Euler(new Vector3(0, Extrapolation_Raw.y, 0));
-                if (HORSYNC_RAW) HORSYNC_RAW.localRotation = Quaternion.Euler(new Vector3(0, HORSYNC_RAW.localEulerAngles.y, 0));
+            if (HORSYNC_RAW) HORSYNC_RAW.LookAt(HORSYNC_RAW.position + Vector3.ProjectOnPlane(RotExtrapolation_Raw * Vector3.forward, HORSYNC_RAW.up), HORSYNC_RAW.up);
+            if (VERTSYNC_RAW) VERTSYNC_RAW.LookAt(VERTSYNC_RAW.position + RotExtrapolation_Raw * Vector3.forward, HORSYNC_RAW.up);
 #endif
-            }
-            else
+            if (RotatingSound && PlayRotatingSoundForOthers)
             {
-                HORSYNC.localRotation = Quaternion.Euler(new Vector3(0, newroty, 0));
-#if UNITY_EDITOR
-                if (HORSYNC_RAW) HORSYNC_RAW.localRotation = Quaternion.Euler(new Vector3(0, Extrapolation_Raw.y, 0));
-#endif
-            }
-
-            float newrotx = VERTSYNC.localEulerAngles.x + ExtrapDirection_Smooth.x * deltaTime;
-            if (newrotx > 180) newrotx -= 360;
-            newrotx = Mathf.Clamp(newrotx, -UpAngleMax, DownAngleMax);
-            VERTSYNC.localRotation = Quaternion.Euler(new Vector3(newrotx, 0, 0));
-#if UNITY_EDITOR
-            if (VERTSYNC_RAW) VERTSYNC_RAW.localRotation = Quaternion.Euler(new Vector3(Extrapolation_Raw.x, 0, 0));
-#endif
-
-            if (RotatingSound)
-            {
-                SND_RotLerper = Vector2.Lerp(SND_RotLerper, GunRotationSpeed, 1 - Mathf.Pow(0.5f, 5 * deltaTime));
-                if (RotatingSound_HorizontalOnly) { SND_RotLerper.x = 0; }
-                float turnvol = SND_RotLerper.magnitude * RotatingSoundMulti;
+                SND_RotLerper = Mathf.Lerp(SND_RotLerper, GunRotationSpeed_angle, 1 - Mathf.Pow(0.5f, 5 * deltaTime));
+                float turnvol = SND_RotLerper * RotatingSoundMulti;
                 RotatingSound.volume = Mathf.Min(turnvol, RotateSoundVol);
                 RotatingSound.pitch = turnvol;
             }
         }
         bool justEnabled;
+        float GunRotationSpeed_angle;
         public override void OnDeserialization()
         {
-            float updateDelta = (float)(O_UpdateTime - O_LastUpdateTime);
-            if (updateDelta < 0.0001f || justEnabled)
+            float uDelta = Time.time - L_LastUpdateTime;
+            if (uDelta < 0.0001f || justEnabled)
             {
-                O_LastUpdateTime = O_UpdateTime;
+                L_LastUpdateTime = Time.time;
                 justEnabled = false;
                 return;
             }
-            this.updateDelta = updateDelta;
-            float speednormalizer = 1 / this.updateDelta;
-            L_UpdateTime = O_UpdateTime;
+            updateDelta = uDelta;
+            float speednormalizer = 1 / uDelta;
+            L_UpdateTime = Time.time;
 
             L_LastGunRotation = L_GunRotation;
-            L_GunRotation = O_GunRotation;
-            if (L_GunRotation.x > 180) { L_GunRotation.x -= 360; }
+            float smv = short.MaxValue;
+            Vector3 quatParts = new Vector3(O_RotationX / smv, O_RotationY / smv, O_RotationZ / smv); //undo short compression
+            float quatW = Mathf.Sqrt(1 - (quatParts.x * quatParts.x + quatParts.y * quatParts.y + quatParts.z * quatParts.z));// re calculate w
+            L_GunRotation = new Quaternion(quatParts.x, quatParts.y, quatParts.z, quatW);
+            RotExtrapolation_Raw = L_GunRotation;
 
-            Vector2 LGRTemp = L_LastGunRotation;
-            if (LGRTemp.y > 180) { LGRTemp.y -= 360; }
+            GunRotationSpeed = L_GunRotation * Quaternion.Inverse(L_LastGunRotation);
+            GunRotationSpeed = Quaternion.LerpUnclamped(Quaternion.identity, GunRotationSpeed, speednormalizer);
+            L_LastUpdateTime = L_UpdateTime;
 
-            //check if going from rotation 0->360 and fix values for interpolation
-            if (Mathf.Abs(L_GunRotation.y - L_LastGunRotation.y) > 180)
-            {
-                if (L_GunRotation.y > L_LastGunRotation.y)
-                    L_LastGunRotation.y += 360;
-                else
-                    L_LastGunRotation.y -= 360;
-            }
-            Vector2 LGRSTemp = GunRotationSpeed;
-            GunRotationSpeed = L_GunRotation - L_LastGunRotation;
-            LastGunRotationSpeed = LGRSTemp;
-
-            if (ClampHor)
-            {
-                //prevent interpolating in the wrong direction if max angle set
-                if (Mathf.Abs(LGRTemp.y + GunRotationSpeed.y) > SideAngleMax)
-                    GunRotationSpeed.y *= -1;
-            }
-            GunRotationSpeed *= speednormalizer;
-            // GunRotationAcceleration = (GunRotationSpeed - LastGunRotationSpeed) * speednormalizer;
-            O_LastUpdateTime = O_UpdateTime;
-        }
-        private void InitSyncValues()
-        {
-            ResetSyncTimes();
-            double time = StartupServerTime + (double)(Time.time - StartupLocalTime);
-            nextUpdateTime = time + Random.Range(0f, updateInterval);
-            O_LastUpdateTime = L_UpdateTime = lastframetime_extrap = time;
-            O_LastUpdateTime -= updateInterval;
-
-            if (Stabilize)
-            { O_GunRotation = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.eulerAngles.y); }
+            if (RotatingSound_HorizontalOnly)
+                GunRotationSpeed_angle = Vector3.Angle(Vector3.ProjectOnPlane(L_LastGunRotation * Vector3.forward, HORSYNC.up), Vector3.ProjectOnPlane(L_GunRotation * Vector3.forward, HORSYNC.up));
             else
-            { O_GunRotation = new Vector2(TurretRotatorVert.localEulerAngles.x, TurretRotatorHor.localEulerAngles.y); }
-        }
-        public void ResetSyncTimes()
-        {
-            StartupServerTime = Networking.GetServerTimeInSeconds();
-            StartupLocalTime = Time.time;
+                GunRotationSpeed_angle = Quaternion.Angle(Quaternion.identity, GunRotationSpeed);
+            GunRotationSpeed_angle *= speednormalizer;
         }
     }
 }
