@@ -7,7 +7,6 @@ using TMPro;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class DFUNC_Bomb : UdonSharpBehaviour
     {
         [SerializeField] public UdonSharpBehaviour SAVControl;
@@ -60,6 +59,9 @@ namespace SaccFlightAndVehicles
         public Camera AtGCam;
         public bool SetAtGCamSettings = true;
         public GameObject[] EnableOnSelected;
+        [Header("")]
+        [Tooltip("Delegate firing sync to EXT_Turret script to sync shoot direction properly.\nIf using FireSyncDelegate, syncmode can be set to None")]
+        public UdonBehaviour FireSyncDelegate;
         [UdonSynced(UdonSyncMode.None)] private bool BombFireNow = false;
         private float boolToggleTime;
         private bool AnimOn = false;
@@ -99,6 +101,7 @@ namespace SaccFlightAndVehicles
             if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
             EntityColliders = EntityControl.gameObject.GetComponentsInChildren<Collider>();
             StartEntityLayer = EntityControl.gameObject.layer;
+            if (FireSyncDelegate) { FireSyncDelegate.SetProgramVariable("DelegateFireCallback", this); }
 
             UpdateAmmoVisuals();
             for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
@@ -255,8 +258,20 @@ namespace SaccFlightAndVehicles
         }
         private void LaunchBomb_Owner()
         {
-            FireNextSerialization = true;
-            RequestSerialization();
+            LastBombDropTime = Time.time;
+            if (!FireSyncDelegate)
+            {
+                FireNextSerialization = true;
+                RequestSerialization();
+                LaunchBombs_Event();
+            }
+            else
+            {
+                FireSyncDelegate.SendCustomEvent("DelegateFire");
+            }
+        }
+        public void DelegatedFire()
+        {
             LaunchBombs_Event();
         }
         public void LaunchBombs_Event()

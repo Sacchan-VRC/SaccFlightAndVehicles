@@ -5,7 +5,6 @@ using VRC.Udon;
 
 namespace SaccFlightAndVehicles
 {
-    [UdonBehaviourSyncMode(BehaviourSyncMode.Manual)]
     public class EXT_Turret : UdonSharpBehaviour
     {
         public Transform TurretRotatorHor;
@@ -50,6 +49,8 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
+        [Header("Syncmode can be set to None if using DelegateFireCallback")]
+        [System.NonSerialized] public UdonSharpBehaviour DelegateFireCallback;
         private Transform VehicleTransform;
         private float InputXKeyb;
         private float InputYKeyb;
@@ -76,6 +77,7 @@ namespace SaccFlightAndVehicles
         [UdonSynced] private short O_RotationX;
         [UdonSynced] private short O_RotationY;
         [UdonSynced] private short O_RotationZ;
+        [UdonSynced] private bool TeleportAndFire;
         private Quaternion L_GunRotation;
         private Quaternion L_LastGunRotation;
         private float SND_RotLerper;
@@ -257,18 +259,8 @@ namespace SaccFlightAndVehicles
 
                 if (time > nextUpdateTime)
                 {
-                    Quaternion sendrot = TurretRotatorVert.rotation;
-                    if (sendrot.w < 0)
-                    { sendrot = sendrot = sendrot * Quaternion.Euler(0, 360, 0); } // ensure w componant is positive
-                    float smv = short.MaxValue;
-                    O_RotationX = (short)(sendrot.x * smv);
-                    O_RotationY = (short)(sendrot.y * smv);
-                    O_RotationZ = (short)(sendrot.z * smv);
-                    RequestSerialization();
-                    nextUpdateTime = time + updateInterval;
-#if UNITY_EDITOR
-                    if (NetTestMode) { OnDeserialization(); }
-#endif
+                    TeleportAndFire = false;
+                    OwnerSend();
                 }
                 if (RotatingSound)
                 {
@@ -289,6 +281,21 @@ namespace SaccFlightAndVehicles
 #if UNITY_EDITOR
         public bool NetTestMode;
 #endif
+        public void OwnerSend()
+        {
+            Quaternion sendrot = TurretRotatorVert.rotation;
+            if (sendrot.w < 0)
+            { sendrot = sendrot = sendrot * Quaternion.Euler(0, 360, 0); } // ensure w componant is positive
+            float smv = short.MaxValue;
+            O_RotationX = (short)(sendrot.x * smv);
+            O_RotationY = (short)(sendrot.y * smv);
+            O_RotationZ = (short)(sendrot.z * smv);
+            RequestSerialization();
+            nextUpdateTime = Time.time + updateInterval;
+#if UNITY_EDITOR
+            if (NetTestMode) { OnDeserialization(); }
+#endif
+        }
         Quaternion RotExtrapolation_Raw;
         Quaternion Extrapolation_Smooth;
         private void Extrapolation()
@@ -372,6 +379,29 @@ namespace SaccFlightAndVehicles
             else
                 GunRotationSpeed_angle = Quaternion.Angle(Quaternion.identity, GunRotationSpeed);
             GunRotationSpeed_angle *= speednormalizer;
+
+            if (TeleportAndFire)
+            {
+                Extrapolation_Smooth = L_GunRotation;
+                Vector3 lookDirHor = Vector3.ProjectOnPlane(Extrapolation_Smooth * Vector3.forward, HORSYNC.up);
+                Vector3 lookDirVert = Extrapolation_Smooth * Vector3.forward;
+                HORSYNC.LookAt(HORSYNC.position + lookDirHor, HORSYNC.up);
+                VERTSYNC.LookAt(VERTSYNC.position + lookDirVert, HORSYNC.up);
+                DelegateFireCallback.SendCustomEvent("DelegatedFire");
+            }
+        }
+        public void DelegateFire()
+        {
+            TeleportAndFire = true;
+            OwnerSend();
+#if UNITY_EDITOR
+            if (!NetTestMode)
+            {
+#endif
+                DelegateFireCallback.SendCustomEvent("DelegatedFire");
+#if UNITY_EDITOR
+            }
+#endif
         }
     }
 }
