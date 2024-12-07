@@ -252,11 +252,10 @@ namespace SaccFlightAndVehicles
                 for (int i = 0; i < TrackEmptys.Length; i++)
                 {
                     Vector3 Dif = TrackEmptys[i].position - TrackLast[i];
-                    float dist = Dif.magnitude;
                     TrackLast[i] = TrackEmptys[i].position;
-                    float forward = Vector3.Dot(TrackEmptys[i].forward, Dif) > 0 ? 1 : -1;
+                    float forward = Vector3.Dot(TrackEmptys[i].forward, Dif);
                     Vector2 uvs = Tracks[i].mainTextureOffset;
-                    uvs += new Vector2(0, TrackSpeedMulti * dist * forward);
+                    uvs += new Vector2(0, TrackSpeedMulti * forward);
                     uvs.y = uvs.y - Mathf.Floor(uvs.y);
                     Tracks[i].mainTextureOffset = uvs;
                 }
