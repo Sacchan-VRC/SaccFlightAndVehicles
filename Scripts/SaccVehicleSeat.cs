@@ -27,6 +27,9 @@ namespace SaccFlightAndVehicles
         [SerializeField] float HeadXOffset = 0.25f;
         [Tooltip("Disable the ability for desktop users to turn 180 degrees")]
         public bool Disable180Rotation = false;
+        [SerializeField] Animator AnimBoolAnimator;
+        [Tooltip("Boolean to set to true on the above animator when a player is sitting in this seat")]
+        [SerializeField] string AnimBoolOnEnter;
         // [Tooltip("Calbrate rotation towards this transform's forward vector, leave empty to use this station's transform")]
         // public Transform RotationCalibrationTarget; //YAWCALIBRATION
         private Vector3 SeatAdjustedPos;
@@ -178,17 +181,22 @@ namespace SaccFlightAndVehicles
                     { EntityControl.passengerFuncIgnorePassengerFlag = true; }
                     EntityControl.PassengerEnterVehicleGlobal(player);
                 }
+                if (AnimBoolAnimator) { AnimBoolAnimator.SetBool(AnimBoolOnEnter, true); }
             }
         }
         public override void OnStationExited(VRCPlayerApi player)
         {
             if (!SeatInitialized) { InitializeSeat(); }
-            PlayerExitPlane(player);
-            if (!Fake)
+            if (player != null)
             {
-                Seat.localPosition = SeatAdjustedPos = SeatPosTarget = SeatStartPos;
-                Seat.localRotation = SeatRotTarget = SeatStartRot;
-                // _adjustedPos.z = Seat.localEulerAngles.y;//YAWCALIBRATION
+                PlayerExitPlane(player);
+                if (!Fake)
+                {
+                    Seat.localPosition = SeatAdjustedPos = SeatPosTarget = SeatStartPos;
+                    Seat.localRotation = SeatRotTarget = SeatStartRot;
+                    // _adjustedPos.z = Seat.localEulerAngles.y;//YAWCALIBRATION
+                }
+                if (AnimBoolAnimator) { AnimBoolAnimator.SetBool(AnimBoolOnEnter, false); }
             }
         }
         public override void OnPlayerLeft(VRCPlayerApi player)
