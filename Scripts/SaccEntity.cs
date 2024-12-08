@@ -50,6 +50,8 @@ namespace SaccFlightAndVehicles
         public bool DoubleTapToExit = false;
         [Tooltip("Ignore particles hitting the object?")]
         public bool DisableBulletHitEvent = false;
+        [Tooltip("Using the particle system name damage system, ignore damage events below this level of damage -10 to 14")]
+        public int MinDamageLevel = -10;
         [Header("Selection Sound")]
 
         [Tooltip("Oneshot sound played each time function selection changes")]
@@ -422,6 +424,10 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
+            if (More)
+            { if (dmg < MinDamageLevel) return; }
+            else
+            { if (-dmg < MinDamageLevel) return; }
             //Try to find the saccentity that shot at us
             GameObject EnemyObjs = other;
             SaccEntity EnemyEntityControl = null;
@@ -445,7 +451,6 @@ namespace SaccFlightAndVehicles
                 if (EnemyUdonBehaviour)
                 { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
             }
-            SendEventToExtensions("SFEXT_L_BulletHit");
             SendDamageEvent(dmg, More);
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
@@ -1269,7 +1274,7 @@ namespace SaccFlightAndVehicles
                         break;
                 }
             }
-            else
+            else//less that default damage
             {
                 switch (dmg)
                 {
