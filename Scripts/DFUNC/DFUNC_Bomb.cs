@@ -88,6 +88,7 @@ namespace SaccFlightAndVehicles
         private VRCPlayerApi localPlayer;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         [System.NonSerializedAttribute] public bool IsOwner;
+        bool inVR;
         public void SFEXT_L_EntityStart()
         {
             FullBombs = NumBomb;
@@ -127,6 +128,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
+            inVR = EntityControl.InVR;
             UpdateAmmoVisuals();
         }
         private Collider[] EntityColliders;
@@ -311,13 +313,17 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (Selected || Input.GetKey(FireNowKey))
+            if (!Piloting) return;
+            if (Selected || !inVR)
             {
-                float Trigger;
-                if (LeftDial)
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                else
-                { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                float Trigger = 0;
+                if (Selected)
+                {
+                    if (LeftDial)
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                    else
+                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                }
                 if ((Trigger > 0.75 || Input.GetKey(FireKey) || Input.GetKey(FireNowKey)) && !Held || HoldingTrigger_Held)
                 {
                     if (!TriggerLastFrame)
@@ -327,10 +333,7 @@ namespace SaccFlightAndVehicles
                             if (SAVControl && ((Vector3)SAVControl.GetProgramVariable("FinalWind")).magnitude > 0f)
                             { return; }
                         }
-                        if (NumBomb > 0 && (AllowFiringWhenGrounded || !SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing")) && ((Time.time - LastBombDropTime) > BombDelay))
-                        {
-                            TryToFire();
-                        }
+                        TryToFire();
                     }
                     else if (NumBomb > 0 && ((Time.time - LastBombDropTime) > BombHoldDelay) && (AllowFiringWhenGrounded || (!SAVControl || !(bool)SAVControl.GetProgramVariable("Taxiing"))))
                     {///launch every BombHoldDelay
@@ -380,6 +383,7 @@ namespace SaccFlightAndVehicles
             }
             if (LaunchSound) { LaunchSound.PlayOneShot(LaunchSound.clip); }
             if (LaunchParticle) { LaunchParticle.Emit(LaunchParticle_num); }
+
             UpdateAmmoVisuals();
             if (IsOwner)
             { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }

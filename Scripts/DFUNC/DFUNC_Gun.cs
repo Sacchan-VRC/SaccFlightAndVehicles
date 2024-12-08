@@ -68,6 +68,7 @@ namespace SaccFlightAndVehicles
         }
         private float FullGunAmmoDivider;
         private bool Selected = false;
+        bool inVR;
         private bool Selected_HUD = false;
         private float reloadspeed;
         private bool Piloting = false;
@@ -130,6 +131,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_PilotEnter()
         {
             Piloting = true;
+            inVR = EntityControl.InVR;
             if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(true); }
             if (_firing) { Firing = false; }
             gameObject.SetActive(true);
@@ -222,14 +224,17 @@ namespace SaccFlightAndVehicles
         {
             if (Piloting)
             {
-                if (Selected || Input.GetKey(FireNowKey))
+                if (Selected || !inVR)
                 {
                     float DeltaTime = Time.deltaTime;
-                    float Trigger;
-                    if (LeftDial)
-                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
-                    else
-                    { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                    float Trigger = 0;
+                    if (Selected)
+                    {
+                        if (LeftDial)
+                        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
+                        else
+                        { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
+                    }
                     if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(FireKey) || Input.GetKey(FireNowKey))) && GunAmmoInSeconds > 0))
                     {
                         if (DisallowFireIfWind)
@@ -266,7 +271,7 @@ namespace SaccFlightAndVehicles
                     EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                 }
             }
-            if (_firing && EntityControl.IsOwner)
+            if (_firing && IsOwner)
             {
                 if (!GunRecoilEmpty)
                 {
