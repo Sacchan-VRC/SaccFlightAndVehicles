@@ -424,13 +424,17 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
+            WeaponDamageVehicle(dmg, More, other);
+        }
+        public void WeaponDamageVehicle(int dmg, bool More, GameObject damagingObject)
+        {
             if (More)
             { if (dmg < MinDamageLevel) return; }
             else
             { if (-dmg < MinDamageLevel) return; }
             //Try to find the saccentity that shot at us
-            GameObject EnemyObjs = other;
-            SaccEntity EnemyEntityControl = null;
+            GameObject EnemyObjs = damagingObject;
+            SaccEntity EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
             //search up the hierarchy to find the saccentity directly
             while (!EnemyEntityControl && EnemyObjs.transform.parent)
             {
@@ -441,8 +445,8 @@ namespace SaccFlightAndVehicles
             //if failed to find it, search up the hierarchy for an udonsharpbehaviour with a reference to the saccentity (for instantiated missiles etc)
             if (!EnemyEntityControl)
             {
-                EnemyObjs = other;
-                UdonBehaviour EnemyUdonBehaviour = null;
+                EnemyObjs = damagingObject;
+                UdonBehaviour EnemyUdonBehaviour = (UdonBehaviour)EnemyObjs.GetComponent(typeof(UdonBehaviour));
                 while (!EnemyUdonBehaviour && EnemyObjs.transform.parent)
                 {
                     EnemyObjs = EnemyObjs.transform.parent.gameObject;
@@ -1310,6 +1314,7 @@ namespace SaccFlightAndVehicles
             }
         }
         [System.NonSerializedAttribute] public float LastHitBulletDamageMulti = 1;
+        [System.NonSerializedAttribute] public byte LastHitBulletType = 0;// 0=bullet 1=tank shell
         public void BulletDamageNinth()
         {
             LastHitBulletDamageMulti = .11111111111111f;
