@@ -32,17 +32,27 @@ namespace SaccFlightAndVehicles
         [Range(0.05f, 1f)]
         public float updateInterval = 0.25f;
         public float networkSmoothing = 6;
+        [FieldChangeCallback(nameof(Stabilize_))] public bool Stabilize;
         [Tooltip("Stabilize the turrets movement? Easier to aim in moving vehicles")]
-        public bool Stabilize;
-
+        public bool Stabilize_
+        {
+            set
+            {
+                LastForward_HOR = VehicleTransform.forward;
+                LastForward_VERT = TurretRotatorHor.forward;
+                Stabilize = value;
+            }
+            get => Stabilize;
+        }
         [Tooltip("Audio source that plays when rotating")]
         public AudioSource RotatingSound;
+        [SerializeField] float RotatingSound_maxpitch = 2f;
         [SerializeField] bool PlayRotatingSoundForOthers = false;
         [SerializeField] bool RotatingSound_HorizontalOnly;
         public float RotatingSoundMulti = .02f;
         [Header("Networking:")]
         [Tooltip("How much vehicle accelerates extra towards its 'raw' position when not owner in order to correct positional errors")]
-        public float CorrectionTime = 8f;
+        public float CorrectionTime = 2f;
         [Tooltip("How quickly non-owned vehicle's velocity vector lerps towards its new value")]
         public float SpeedLerpTime = 25f;
         [System.NonSerializedAttribute] public bool LeftDial = false;
@@ -110,7 +120,7 @@ namespace SaccFlightAndVehicles
             if (SideAngleMax < 180f) { ClampHor = true; }
 
             if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
-            // InitSyncValues();
+            Stabilize_ = Stabilize;
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -130,6 +140,7 @@ namespace SaccFlightAndVehicles
             if (RotatingSound && (PlayRotatingSoundForOthers || Manning))
             { RotatingSound.Play(); }
             RotExtrapolation_Raw = Extrapolation_Smooth = L_LastGunRotation = L_GunRotation = TurretRotatorVert.rotation;
+            L_LastVehicleRotation = TurretForwardEmpty.rotation;
         }
         public void SFEXT_O_PilotExit()
         {
@@ -151,13 +162,6 @@ namespace SaccFlightAndVehicles
         {
             RotExtrapolation_Raw = Extrapolation_Smooth = L_LastGunRotation = L_GunRotation = TurretRotatorVert.localRotation = TurretRotatorHor.localRotation = Quaternion.identity;
         }
-        // public void SFEXT_O_LoseOwnership()
-        // {
-        //     RotExtrapolation_Raw = O_GunRotation;
-        //     if (RotExtrapolation_Raw.y > 180) { RotExtrapolation_Raw.y -= 360; }
-        //     if (RotExtrapolation_Raw.x > 180) { RotExtrapolation_Raw.x -= 360; }
-        //     L_LastGunRotation = L_GunRotation = RotExtrapolation_Raw;
-        // }
         private void Update()
         {
             if (Manning)
@@ -266,7 +270,7 @@ namespace SaccFlightAndVehicles
                 {
                     float turnvol = new Vector2(RotatingSound_HorizontalOnly ? 0 : RotationSpeedX, RotationSpeedY).magnitude * RotatingSoundMulti;
                     RotatingSound.volume = Mathf.Min(turnvol, RotateSoundVol);
-                    RotatingSound.pitch = turnvol;
+                    RotatingSound.pitch = Mathf.Min(turnvol, RotatingSound_maxpitch);
                 }
             }
             else
@@ -304,6 +308,7 @@ namespace SaccFlightAndVehicles
 
             Quaternion FrameRotExtrap = Quaternion.Slerp(Quaternion.identity, GunRotationSpeed, deltaTime);
             RotExtrapolation_Raw = FrameRotExtrap * RotExtrapolation_Raw;
+            Extrapolation_Smooth = FrameRotExtrap * Extrapolation_Smooth;
             Extrapolation_Smooth = Quaternion.Slerp(Extrapolation_Smooth, RotExtrapolation_Raw, 1 - Mathf.Pow(0.5f, networkSmoothing * deltaTime));
 
             Vector3 lookDirHor = Vector3.ProjectOnPlane(Extrapolation_Smooth * Vector3.forward, HORSYNC.up);
@@ -345,11 +350,12 @@ namespace SaccFlightAndVehicles
                 SND_RotLerper = Mathf.Lerp(SND_RotLerper, GunRotationSpeed_angle, 1 - Mathf.Pow(0.5f, 5 * deltaTime));
                 float turnvol = SND_RotLerper * RotatingSoundMulti;
                 RotatingSound.volume = Mathf.Min(turnvol, RotateSoundVol);
-                RotatingSound.pitch = turnvol;
+                RotatingSound.pitch = Mathf.Min(turnvol, RotatingSound_maxpitch);
             }
         }
         bool justEnabled;
         float GunRotationSpeed_angle;
+        Quaternion L_LastVehicleRotation;
         public override void OnDeserialization()
         {
             float uDelta = Time.time - L_LastUpdateTime;
@@ -374,10 +380,21 @@ namespace SaccFlightAndVehicles
             GunRotationSpeed = Quaternion.LerpUnclamped(Quaternion.identity, GunRotationSpeed, speednormalizer);
             L_LastUpdateTime = L_UpdateTime;
 
+            Quaternion VehicleRotationDif = TurretForwardEmpty.rotation * Quaternion.Inverse(L_LastVehicleRotation);
+            L_LastVehicleRotation = TurretForwardEmpty.rotation;
+            Quaternion compareRotation = L_LastGunRotation;
+            float GunRotationSpeed_angley;
+            float GunRotationSpeed_anglex = 0;
+            compareRotation = VehicleRotationDif * compareRotation;
+            // subtract dif in TurretForwardEmpty's rot from this caculation
             if (RotatingSound_HorizontalOnly)
-                GunRotationSpeed_angle = Vector3.Angle(Vector3.ProjectOnPlane(L_LastGunRotation * Vector3.forward, HORSYNC.up), Vector3.ProjectOnPlane(L_GunRotation * Vector3.forward, HORSYNC.up));
+                GunRotationSpeed_angley = Vector3.Angle(Vector3.ProjectOnPlane(compareRotation * Vector3.forward, HORSYNC.up), Vector3.ProjectOnPlane(L_GunRotation * Vector3.forward, HORSYNC.up));
             else
-                GunRotationSpeed_angle = Quaternion.Angle(Quaternion.identity, GunRotationSpeed);
+            {
+                GunRotationSpeed_angley = Vector3.Angle(Vector3.ProjectOnPlane(compareRotation * Vector3.forward, HORSYNC.up), Vector3.ProjectOnPlane(L_GunRotation * Vector3.forward, HORSYNC.up));
+                GunRotationSpeed_anglex = Vector3.Angle(Vector3.ProjectOnPlane(compareRotation * Vector3.forward, HORSYNC.right), Vector3.ProjectOnPlane(L_GunRotation * Vector3.forward, HORSYNC.right));
+            }
+            GunRotationSpeed_angle = GunRotationSpeed_angley + GunRotationSpeed_anglex;
             GunRotationSpeed_angle *= speednormalizer;
 
             if (TeleportAndFire)
