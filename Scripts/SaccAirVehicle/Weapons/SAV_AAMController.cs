@@ -115,6 +115,7 @@ namespace SaccFlightAndVehicles
         private int OutsideVehicleLayer;
         Vector3 LocalLaunchPoint;
         private bool ColliderAlwaysActive;
+        bool isNotHeat;
         void Initialize()
         {
             EntityControl = (SaccEntity)AAMLauncherControl.GetProgramVariable("EntityControl");
@@ -134,6 +135,8 @@ namespace SaccFlightAndVehicles
             NotchLimitDot = 1 - Mathf.Cos(NotchAngle * Mathf.Deg2Rad);
             HighAspectTrack = Mathf.Cos(HighAspectTrackAngle * Mathf.Deg2Rad);
             ColliderAlwaysActive = ColliderActiveDistance == 0;
+
+            isNotHeat = MissileType != 1;
         }
         public void StartTracking()
         {
@@ -298,8 +301,13 @@ namespace SaccFlightAndVehicles
                         ||
                         (!TargetLineOfSight && (!RequireParentLock || PitBull))
                         ;
-                    AspectTrack = Vector3.Dot(MissileToTargetVector, -TargetEntityControl.transform.forward) > HighAspectTrack ? HighAspectRotSpeedMulti : 1;
-                    EngineTrack = Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack);//Track target more weakly the lower their throttle
+
+                    //Heat missiles have a harder time tracking from the front
+                    AspectTrack = isNotHeat ? 1 :
+                        (Vector3.Dot(MissileToTargetVector, -TargetEntityControl.transform.forward) > HighAspectTrack ? HighAspectRotSpeedMulti : 1);
+                    //Heat missiles track more weakly if engine is low (unless wrecked (on fire))
+                    EngineTrack = (TargetSAVControl.EntityControl.wrecked || isNotHeat) ? 1 :
+                        (Mathf.Max((float)TargetSAVControl.GetProgramVariable("EngineOutput") * TargetThrottleNormalizer, TargetMinThrottleTrack));
                 }
                 else
                 {
