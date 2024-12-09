@@ -9,6 +9,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.NoVariableSync)]
     public class DFUNC_ToggleHandling : UdonSharpBehaviour
     {
+        [Tooltip("Scripts other than SaccGroundVehicle work, but the wheel related stuff will not work if you choose something else")]
         public UdonSharpBehaviour SGVControl;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
@@ -30,6 +31,7 @@ namespace SaccFlightAndVehicles
         private UdonSharpBehaviour[] DriveWheels;
         private UdonSharpBehaviour[] SteerWheels;
         private UdonSharpBehaviour[] OtherWheels;
+        private bool isSGV;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -42,13 +44,34 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_EntityStart()
         {
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-
-            DriveWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("DriveWheels");
-            SteerWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("SteerWheels");
-            OtherWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("OtherWheels");
-            EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
             CoM = EntityControl.CenterOfMass;
             CoMOriginalPos = CoM.localPosition;
+
+            if (SGVControl.GetUdonTypeName() == GetUdonTypeName<SaccGroundVehicle>())
+            {
+                Debug.Log(SGVControl.GetUdonTypeName() + " : " + GetUdonTypeName<SaccGroundVehicle>());
+                isSGV = true;
+                EntityControl = (SaccEntity)SGVControl.GetProgramVariable("EntityControl");
+                DriveWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("DriveWheels");
+                SteerWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("SteerWheels");
+                OtherWheels = (UdonSharpBehaviour[])SGVControl.GetProgramVariable("OtherWheels");
+
+                floatDriveWheelsToggleOriginalValues = new float[floatDriveWheelsNames.Length];
+                for (int i = 0; i < floatDriveWheelsToggleOriginalValues.Length; i++)
+                {
+                    floatDriveWheelsToggleOriginalValues[i] = (float)DriveWheels[i].GetProgramVariable(floatDriveWheelsNames[i]);
+                }
+                floatSteerWheelsToggleOriginalValues = new float[floatSteerWheelsNames.Length];
+                for (int i = 0; i < floatSteerWheelsToggleOriginalValues.Length; i++)
+                {
+                    floatSteerWheelsToggleOriginalValues[i] = (float)SteerWheels[i].GetProgramVariable(floatSteerWheelsNames[i]);
+                }
+                floatOtherWheelsToggleOriginalValues = new float[floatOtherWheelsNames.Length];
+                for (int i = 0; i < floatOtherWheelsToggleOriginalValues.Length; i++)
+                {
+                    floatOtherWheelsToggleOriginalValues[i] = (float)OtherWheels[i].GetProgramVariable(floatOtherWheelsNames[i]);
+                }
+            }
 
             floatSGVToggleOriginalValues = new float[floatSGVNames.Length];
             for (int i = 0; i < floatSGVToggleOriginalValues.Length; i++)
@@ -59,23 +82,6 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i < boolSGVToggleOriginalValues.Length; i++)
             {
                 boolSGVToggleOriginalValues[i] = (bool)SGVControl.GetProgramVariable(boolSGVNames[i]);
-            }
-
-
-            floatDriveWheelsToggleOriginalValues = new float[floatDriveWheelsNames.Length];
-            for (int i = 0; i < floatDriveWheelsToggleOriginalValues.Length; i++)
-            {
-                floatDriveWheelsToggleOriginalValues[i] = (float)DriveWheels[i].GetProgramVariable(floatDriveWheelsNames[i]);
-            }
-            floatSteerWheelsToggleOriginalValues = new float[floatSteerWheelsNames.Length];
-            for (int i = 0; i < floatSteerWheelsToggleOriginalValues.Length; i++)
-            {
-                floatSteerWheelsToggleOriginalValues[i] = (float)SteerWheels[i].GetProgramVariable(floatSteerWheelsNames[i]);
-            }
-            floatOtherWheelsToggleOriginalValues = new float[floatOtherWheelsNames.Length];
-            for (int i = 0; i < floatOtherWheelsToggleOriginalValues.Length; i++)
-            {
-                floatOtherWheelsToggleOriginalValues[i] = (float)OtherWheels[i].GetProgramVariable(floatOtherWheelsNames[i]);
             }
         }
         void Update()
@@ -137,29 +143,31 @@ namespace SaccFlightAndVehicles
                     SGVControl.SetProgramVariable(boolSGVNames[i], boolSGVToggleOriginalValues[i]);
                 }
 
-
-                for (int i = 0; i < floatDriveWheelsNames.Length; i++)
+                if (isSGV)
                 {
-                    for (int x = 0; x < DriveWheels.Length; x++)
+                    for (int i = 0; i < floatDriveWheelsNames.Length; i++)
                     {
-                        DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggleOriginalValues[i]);
-                        DriveWheels[x].SendCustomEvent("ChangeSurface");
+                        for (int x = 0; x < DriveWheels.Length; x++)
+                        {
+                            DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggleOriginalValues[i]);
+                            DriveWheels[x].SendCustomEvent("ChangeSurface");
+                        }
                     }
-                }
-                for (int i = 0; i < floatSteerWheelsNames.Length; i++)
-                {
-                    for (int x = 0; x < SteerWheels.Length; x++)
+                    for (int i = 0; i < floatSteerWheelsNames.Length; i++)
                     {
-                        SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggleOriginalValues[i]);
-                        SteerWheels[x].SendCustomEvent("ChangeSurface");
+                        for (int x = 0; x < SteerWheels.Length; x++)
+                        {
+                            SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggleOriginalValues[i]);
+                            SteerWheels[x].SendCustomEvent("ChangeSurface");
+                        }
                     }
-                }
-                for (int i = 0; i < floatOtherWheelsNames.Length; i++)
-                {
-                    for (int x = 0; x < OtherWheels.Length; x++)
+                    for (int i = 0; i < floatOtherWheelsNames.Length; i++)
                     {
-                        OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggleOriginalValues[i]);
-                        OtherWheels[x].SendCustomEvent("ChangeSurface");
+                        for (int x = 0; x < OtherWheels.Length; x++)
+                        {
+                            OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggleOriginalValues[i]);
+                            OtherWheels[x].SendCustomEvent("ChangeSurface");
+                        }
                     }
                 }
                 Toggled = false;
@@ -182,29 +190,31 @@ namespace SaccFlightAndVehicles
                     SGVControl.SetProgramVariable(boolSGVNames[i], !boolSGVToggleOriginalValues[i]);
                 }
 
-
-                for (int i = 0; i < floatDriveWheelsNames.Length; i++)
+                if (isSGV)
                 {
-                    for (int x = 0; x < DriveWheels.Length; x++)
+                    for (int i = 0; i < floatDriveWheelsNames.Length; i++)
                     {
-                        DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggledValues[i]);
-                        DriveWheels[x].SendCustomEvent("ChangeSurface");
+                        for (int x = 0; x < DriveWheels.Length; x++)
+                        {
+                            DriveWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatDriveWheelsToggledValues[i]);
+                            DriveWheels[x].SendCustomEvent("ChangeSurface");
+                        }
                     }
-                }
-                for (int i = 0; i < floatSteerWheelsNames.Length; i++)
-                {
-                    for (int x = 0; x < SteerWheels.Length; x++)
+                    for (int i = 0; i < floatSteerWheelsNames.Length; i++)
                     {
-                        SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggledValues[i]);
-                        SteerWheels[x].SendCustomEvent("ChangeSurface");
+                        for (int x = 0; x < SteerWheels.Length; x++)
+                        {
+                            SteerWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatSteerWheelsToggledValues[i]);
+                            SteerWheels[x].SendCustomEvent("ChangeSurface");
+                        }
                     }
-                }
-                for (int i = 0; i < floatOtherWheelsNames.Length; i++)
-                {
-                    for (int x = 0; x < OtherWheels.Length; x++)
+                    for (int i = 0; i < floatOtherWheelsNames.Length; i++)
                     {
-                        OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggledValues[i]);
-                        OtherWheels[x].SendCustomEvent("ChangeSurface");
+                        for (int x = 0; x < OtherWheels.Length; x++)
+                        {
+                            OtherWheels[x].SetProgramVariable(floatSteerWheelsNames[i], floatOtherWheelsToggledValues[i]);
+                            OtherWheels[x].SendCustomEvent("ChangeSurface");
+                        }
                     }
                 }
                 Toggled = true;
