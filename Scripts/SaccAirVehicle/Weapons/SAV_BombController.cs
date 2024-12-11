@@ -30,6 +30,9 @@ namespace SaccFlightAndVehicles
         [SerializeField] private float StraightenFactor = .1f;
         [Tooltip("Amount of drag bomb has when moving horizontally/vertically")]
         [SerializeField] private float AirPhysicsStrength = .1f;
+        [Tooltip("For colliders using the armor system (Tanks), final damage = base damage * 2^(ArmorPenetrationLevel - ColliderArmorLevel)")]
+        [Range(0, 14)]
+        public int ArmorPenetrationLevel = 5;
         [Header("Torpedo mode settings")]
         [SerializeField] private bool IsTorpedo;
         [SerializeField] private float TorpedoSpeed = 60;
@@ -44,7 +47,7 @@ namespace SaccFlightAndVehicles
         private float TorpedoHeight;
         private Quaternion TorpedoRot;
         private Animator BombAnimator;
-        private SaccEntity EntityControl;
+        [System.NonSerialized] public SaccEntity EntityControl;
         private Rigidbody VehicleRigid;
         private Rigidbody BombRigid;
         [System.NonSerializedAttribute] public bool Exploding = false;
@@ -146,7 +149,52 @@ namespace SaccFlightAndVehicles
             for (int i = 0; i < DisableInWater_TrailEmission.Length; i++) { DisableInWater_TrailEmission[i].emitting = true; }
         }
         private void OnCollisionEnter(Collision other)
-        { if (!Exploding) { hitwater = false; Explode(); } }
+        {
+            // Ricochets could be added here
+            if (IsOwner && other.gameObject)
+            {
+                SaccEntity HitVehicle = other.gameObject.GetComponent<SaccEntity>();
+                if (HitVehicle)
+                {
+                    int dmgLvl = ArmorPenetrationLevel;
+
+                    int Armor = 0;
+                    if (other.collider.transform.childCount > 0)
+                    {
+                        string pname = other.collider.transform.GetChild(0).name;
+                        getArmorValue(pname, ref Armor);
+                    }
+                    bool DoDamage = true;
+                    dmgLvl = dmgLvl - Armor;
+                    if (dmgLvl > 0) DoDamage = true;
+
+                    if (DoDamage) HitVehicle.WeaponDamageVehicle(dmgLvl, gameObject);
+                }
+            }
+            if (!Exploding)
+            {
+                hitwater = false; Explode();
+            }
+        }
+        void getArmorValue(string name, ref int armor)
+        {
+            int index = name.LastIndexOf(':');
+            if (index > -1)
+            {
+                name = name.Substring(index);
+                if (name.Length == 3)
+                {
+                    if (name[1] >= '0' && name[1] <= '9')
+                    {
+                        if (name[2] >= '0' && name[2] <= '9')
+                        {
+                            armor = 10 * (name[1] - 48);
+                            armor += name[2] - 48;
+                        }
+                    }
+                }
+            }
+        }
         private void OnTriggerEnter(Collider other)
         {
             if (other && other.gameObject.layer == 4 /* water */)

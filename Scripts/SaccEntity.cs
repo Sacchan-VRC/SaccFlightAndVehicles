@@ -50,8 +50,9 @@ namespace SaccFlightAndVehicles
         public bool DoubleTapToExit = false;
         [Tooltip("Ignore particles hitting the object?")]
         public bool DisableBulletHitEvent = false;
-        [Tooltip("Using the particle system name damage system, ignore damage events below this level of damage -10 to 14")]
-        public int MinDamageLevel = -10;
+        [Tooltip("Using the particle damage system, ignore damage events below this level of damage")]
+        [Range(-9, 14)]
+        public int BulletArmorLevel = -9;
         [Header("Selection Sound")]
 
         [Tooltip("Oneshot sound played each time function selection changes")]
@@ -387,51 +388,46 @@ namespace SaccFlightAndVehicles
             if (!other || dead || DisableBulletHitEvent) { return; }//avatars can't hurt you, and you can't get hurt when you're dead
             LastHitParticle = other;
 
-            int index = -1;
-            string pname = string.Empty;
+            int dmg = 1;
             if (other.transform.childCount > 0)
             {
-                pname = other.transform.GetChild(0).name;
-                index = pname.LastIndexOf(':');
+                string pname = other.transform.GetChild(0).name;
+                getDamageValue(pname, ref dmg);
             }
-            int dmg = 1;
-            bool More = true;
+            if (dmg < BulletArmorLevel) return;
+            WeaponDamageVehicle(dmg, other);
+        }
+        void getDamageValue(string name, ref int dmg)
+        {
+            int index = name.LastIndexOf(':');
             if (index > -1)
             {
-                pname = pname.Substring(index);
-                if (pname.Length == 3)
+                name = name.Substring(index);
+                if (name.Length == 3)
                 {
-                    if (pname[1] == 'x')
+                    if (name[1] == 'x')
                     {
-                        if (pname[2] >= '0' && pname[2] <= '9')
+                        if (name[2] >= '0' && name[2] <= '9')
                         {
-                            //damage reduction using case:
-                            dmg = pname[2] - 48;
+                            dmg = name[2] - 48;
                             LastHitBulletDamageMulti = 1 / (float)(dmg);
-                            More = false;
+                            dmg = -dmg;
                         }
                     }
-                    else if (pname[1] >= '0' && pname[1] <= '9')
+                    else if (name[1] >= '0' && name[1] <= '9')
                     {
-                        if (pname[2] >= '0' && pname[2] <= '9')
+                        if (name[2] >= '0' && name[2] <= '9')
                         {
-                            //damage increase using case:
-                            dmg = 10 * (pname[1] - 48);
-                            dmg += pname[2] - 48;
+                            dmg = 10 * (name[1] - 48);
+                            dmg += name[2] - 48;
                             LastHitBulletDamageMulti = dmg == 1 ? 1 : Mathf.Pow(2, dmg - 1);
-                            More = true;
                         }
                     }
                 }
             }
-            WeaponDamageVehicle(dmg, More, other);
         }
-        public void WeaponDamageVehicle(int dmg, bool More, GameObject damagingObject)
+        public void WeaponDamageVehicle(int dmg, GameObject damagingObject)
         {
-            if (More)
-            { if (dmg < MinDamageLevel) return; }
-            else
-            { if (-dmg < MinDamageLevel) return; }
             //Try to find the saccentity that shot at us
             GameObject EnemyObjs = damagingObject;
             SaccEntity EnemyEntityControl = damagingObject.GetComponent<SaccEntity>();
@@ -455,7 +451,7 @@ namespace SaccFlightAndVehicles
                 if (EnemyUdonBehaviour)
                 { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
             }
-            SendDamageEvent(dmg, More);
+            SendDamageEvent(dmg);
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
         public void InVehicleControls()
@@ -1227,90 +1223,78 @@ namespace SaccFlightAndVehicles
             SendCustomEventDelayedSeconds(nameof(UnsetSetDead), deadtime);
         }
         public void UnsetSetDead() { dead = false; }
-        public void SendDamageEvent(int dmg, bool More)
+        public void SendDamageEvent(int dmg)
         {
-            if (More)//More than default damage
+            switch (dmg)
             {
-                switch (dmg)
-                {
-                    case 2:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2x));
-                        break;
-                    case 3:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4x));
-                        break;
-                    case 4:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8x));
-                        break;
-                    case 5:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage16x));
-                        break;
-                    case 6:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage32x));
-                        break;
-                    case 7:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage64x));
-                        break;
-                    case 8:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage128x));
-                        break;
-                    case 9:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage256x));
-                        break;
-                    case 10:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage512x));
-                        break;
-                    case 11:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage1024x));
-                        break;
-                    case 12:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2048x));
-                        break;
-                    case 13:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4096x));
-                        break;
-                    case 14:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8192x));
-                        break;
-                    default:
-                        if (dmg != 1) { Debug.LogWarning("Invalid bullet damage, using default"); }
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
-                        break;
-                }
-            }
-            else//less that default damage
-            {
-                switch (dmg)
-                {
-                    case 2:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageHalf));
-                        break;
-                    case 3:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageThird));
-                        break;
-                    case 4:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageQuarter));
-                        break;
-                    case 5:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageFifth));
-                        break;
-                    case 6:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSixth));
-                        break;
-                    case 7:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSeventh));
-                        break;
-                    case 8:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageEighth));
-                        break;
-                    case 9:
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageNinth));
-                        break;
-                    default:
-                        if (dmg != 1) { Debug.LogWarning("Invalid bullet damage, using default"); }
-                        SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
-                        break;
-                }
+                case 2:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2x));
+                    break;
+                case 3:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4x));
+                    break;
+                case 4:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8x));
+                    break;
+                case 5:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage16x));
+                    break;
+                case 6:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage32x));
+                    break;
+                case 7:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage64x));
+                    break;
+                case 8:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage128x));
+                    break;
+                case 9:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage256x));
+                    break;
+                case 10:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage512x));
+                    break;
+                case 11:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage1024x));
+                    break;
+                case 12:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage2048x));
+                    break;
+                case 13:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage4096x));
+                    break;
+                case 14:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamage8192x));
+                    break;
+
+                case -2:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageHalf));
+                    break;
+                case -3:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageThird));
+                    break;
+                case -4:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageQuarter));
+                    break;
+                case -5:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageFifth));
+                    break;
+                case -6:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSixth));
+                    break;
+                case -7:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageSeventh));
+                    break;
+                case -8:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageEighth));
+                    break;
+                case -9:
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageNinth));
+                    break;
+                default:
+                    if (dmg != 1) { Debug.LogWarning("Invalid bullet damage, using default"); }
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BulletDamageDefault));
+                    break;
             }
         }
         [System.NonSerializedAttribute] public float LastHitBulletDamageMulti = 1;
