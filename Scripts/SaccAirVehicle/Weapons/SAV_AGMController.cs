@@ -36,7 +36,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("Enable this tickbox to make the ThrowVelocity vector local to the vehicle instead of the missile")]
         public bool ThrowSpaceVehicle = false;
         private Animator MissileAnimator;
-        private SaccEntity EntityControl;
+        [System.NonSerialized] public SaccEntity EntityControl;
         private bool StartTrack = false;
         private Transform TargetTransform;
         private Vector3 TargetOffset;

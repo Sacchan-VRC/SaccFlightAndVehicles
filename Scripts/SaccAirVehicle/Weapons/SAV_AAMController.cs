@@ -71,7 +71,7 @@ namespace SaccFlightAndVehicles
         public bool ThrowSpaceVehicle = true;
         private string[] MissileTypes = { "MissilesIncomingRadar", "MissilesIncomingHeat", "MissilesIncomingOther" };//names of variables in SaccAirVehicle
         private string[] CMTypes = { "NumActiveChaff", "NumActiveFlares", "NumActiveOtherCM" };//names of variables in SaccAirVehicle
-        private SaccEntity EntityControl;
+        [System.NonSerialized] public SaccEntity EntityControl;
         Transform VehicleTransform;
         private int MissileType = 1;
         private SaccAirVehicle TargetSAVControl;
