@@ -18,6 +18,8 @@ namespace SaccFlightAndVehicles
         public Transform WheelPoint;
         public Transform WheelVisual;
         public Transform WheelVisual_Ground;
+        [Tooltip("For if wheel is part of a caterpillar track, so wheels can match rotation with each other, prevent (visual) wheelspinning")]
+        public SaccWheel WheelVisual_RotationSource;
         public float SuspensionDistance;
         public float WheelRadius;
         public float SpringForceMulti = .25f;
@@ -684,18 +686,28 @@ namespace SaccFlightAndVehicles
         }
         private void RotateWheelOwner()
         {
-            WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
-            Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
-            WheelVisual.localRotation = newrot;
+            if (WheelVisual_RotationSource)
+                WheelVisual.localRotation = WheelVisual_RotationSource.WheelVisual.localRotation;
+            else
+            {
+                WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
+                Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
+                WheelVisual.localRotation = newrot;
+            }
         }
         private void RotateWheelOther()
         {
-            float speed = SGVControl.VehicleSpeed;
-            WheelRotationSpeedRPS = speed / WheelCircumference;
-            if ((bool)SGVControl.GetProgramVariable("MovingForward")) { WheelRotationSpeedRPS = -WheelRotationSpeedRPS; }
-            WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
-            Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
-            WheelVisual.localRotation = newrot;
+            if (WheelVisual_RotationSource)
+                WheelVisual.localRotation = WheelVisual_RotationSource.WheelVisual.localRotation;
+            else
+            {
+                float speed = SGVControl.VehicleSpeed;
+                WheelRotationSpeedRPS = speed / WheelCircumference;
+                if ((bool)SGVControl.GetProgramVariable("MovingForward")) { WheelRotationSpeedRPS = -WheelRotationSpeedRPS; }
+                WheelRotation += WheelRotationSpeedRPS * 360f * Time.deltaTime;
+                Quaternion newrot = Quaternion.AngleAxis(WheelRotation, Vector3.right);
+                WheelVisual.localRotation = newrot;
+            }
         }
         public void FallAsleep()
         {
