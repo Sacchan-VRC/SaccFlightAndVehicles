@@ -2416,7 +2416,7 @@ namespace SaccFlightAndVehicles
             {
                 VTOLAngleInput = Mathf.Clamp(VTOLAngleInput, 0, 1);
             }
-            VTOLAngle = Mathf.MoveTowards(VTOLAngle, VTOLAngleInput, VTOLAngleDivider * Time.smoothDeltaTime);
+            VTOLAngle = Mathf.MoveTowards(VTOLAngle, VTOLAngleInput, VTOLAngleDivider * Time.deltaTime);
             if (VTOLAngle < 0) { VTOLAngle++; }
             else if (VTOLAngle > 1) { VTOLAngle--; }
             VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);

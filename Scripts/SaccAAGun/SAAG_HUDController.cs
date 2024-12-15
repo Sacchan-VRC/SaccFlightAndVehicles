@@ -53,7 +53,6 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            float SmoothDeltaTime = Time.smoothDeltaTime;
             //AAM Target Indicator
             if (AAMTargetIndicator)
             {

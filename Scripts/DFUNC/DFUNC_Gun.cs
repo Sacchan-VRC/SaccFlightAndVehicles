@@ -451,7 +451,6 @@ namespace SaccFlightAndVehicles
         public float BulletSpeed;
         private void Hud()
         {
-            float SmoothDeltaTime = Time.smoothDeltaTime;
             if (GUNHasTarget)
             {
                 if (TargetIndicator)

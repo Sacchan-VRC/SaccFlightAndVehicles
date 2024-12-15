@@ -423,7 +423,7 @@ namespace SaccFlightAndVehicles
 
 
                 //AGMScreen
-                float SmoothDeltaTime = Time.smoothDeltaTime;
+                float deltaTime = Time.deltaTime;
                 if (!AGMLocked)
                 {
                     //if turning camera fast, zoom out
@@ -433,12 +433,12 @@ namespace SaccFlightAndVehicles
                         Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                         //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
                         float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(CamZoomScale * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
+                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * deltaTime), 0.3f, 90);
                     }
                     else
                     {
                         float newzoom = 80;
-                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                        AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 5f * deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                     }
                 }
                 else
@@ -447,7 +447,7 @@ namespace SaccFlightAndVehicles
                     RaycastHit camhit;
                     Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                     //dolly zoom //Mathf.Atan(60 <--the 60 is the height of the camera frustrum at the target distance
-                    AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * SmoothDeltaTime), 0.3f);
+                    AtGCam.fieldOfView = Mathf.Max(Mathf.Lerp(AtGCam.fieldOfView, 2.0f * Mathf.Atan(60 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 5 * deltaTime), 0.3f);
                 }
             }
         }

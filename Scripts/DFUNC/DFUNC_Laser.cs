@@ -189,7 +189,7 @@ namespace SaccFlightAndVehicles
                 else { TriggerLastFrame = false; }
 
                 //AGMScreen
-                float SmoothDeltaTime = Time.smoothDeltaTime;
+                float deltaTime = Time.deltaTime;
                 Quaternion newangle;
                 if (InVR)
                 {
@@ -233,12 +233,12 @@ namespace SaccFlightAndVehicles
                     Physics.Raycast(AtGCam.transform.position, AtGCam.transform.forward, out camhit, Mathf.Infinity, 1);
                     //dolly zoom //Mathf.Atan(100 <--the 100 is the height of the camera frustrum at the target distance
                     float newzoom = Mathf.Clamp(2.0f * Mathf.Atan(100 * 0.5f / Vector3.Distance(gameObject.transform.position, camhit.point)) * Mathf.Rad2Deg, 1.5f, 90);
-                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * SmoothDeltaTime), 0.3f, 90);
+                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 1.5f * deltaTime), 0.3f, 90);
                 }
                 else
                 {
                     float newzoom = 80;
-                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 5f * SmoothDeltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
+                    AtGCam.fieldOfView = Mathf.Clamp(Mathf.Lerp(AtGCam.fieldOfView, newzoom, 5f * deltaTime), 0.3f, 90); //zooming in is a bit slower than zooming out                       
                 }
                 if (TimeSinceSerialization > .3f)
                 {
@@ -251,7 +251,7 @@ namespace SaccFlightAndVehicles
             else
             {
                 Quaternion newrot = (Quaternion.Euler(new Vector3(GunRotation.x, GunRotation.y, 0)));
-                LaserBarrel.rotation = Quaternion.Slerp(LaserBarrel.rotation, newrot, 4 * Time.deltaTime);
+                LaserBarrel.rotation = Quaternion.Slerp(LaserBarrel.rotation, newrot, 1 - Mathf.Pow(0.5f, 4 * Time.deltaTime));
             }
         }
         private void PullTrigger()

@@ -88,7 +88,7 @@ namespace SaccFlightAndVehicles
                     if (pgup + pgdn != 0)
                     {
                         UpdatingKeyb = true;
-                        float NewVTOL = (float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.smoothDeltaTime));
+                        float NewVTOL = (float)SAVControl.GetProgramVariable("VTOLAngleInput") + ((pgdn - pgup) * (VTOLAngleDivider * Time.deltaTime));
                         SAVControl.SetProgramVariable("VTOLAngleInput", NewVTOL);
                     }
                     float Trigger;
@@ -161,13 +161,13 @@ namespace SaccFlightAndVehicles
                         if (Mathf.Abs(VTOLMover - NewVTOLAngle) > .5f)
                         { NewVTOLAngle -= 1; }
                     }
-                    VTOLMover = Mathf.MoveTowards(VTOLMover, NewVTOLAngle, VTOLAngleDivider * Time.smoothDeltaTime);
+                    VTOLMover = Mathf.MoveTowards(VTOLMover, NewVTOLAngle, VTOLAngleDivider * Time.deltaTime);
                     if (VTOLMover < 0) { VTOLMover++; }
                     else if (VTOLMover > 1) { VTOLMover--; }
                 }
                 else
                 {
-                    VTOLMover = Mathf.MoveTowards(VTOLMover, NewVTOLAngle, VTOLAngleDivider * Time.smoothDeltaTime);
+                    VTOLMover = Mathf.MoveTowards(VTOLMover, NewVTOLAngle, VTOLAngleDivider * Time.deltaTime);
                 }
                 SAVControl.SetProgramVariable("VTOLAngle", VTOLMover);
             }

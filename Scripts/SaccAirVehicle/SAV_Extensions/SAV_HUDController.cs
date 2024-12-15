@@ -66,7 +66,7 @@ namespace SaccFlightAndVehicles
         }
         private void LateUpdate()
         {
-            float SmoothDeltaTime = Time.smoothDeltaTime;
+            float deltaTime = Time.deltaTime;
             bool updatedVectors = false;
             if (check_vectors > updateInterval_vectors)
             {
@@ -93,7 +93,7 @@ namespace SaccFlightAndVehicles
                             Vel_UpdateTime = tim;
                         }
                         Vel_PredictedCurVel = currentvel + (Vel_NormalizedExtrapDir * (Time.time - Vel_UpdateTime));
-                        Vel_Lerper = Vector3.Lerp(Vel_Lerper, Vel_PredictedCurVel, 9f * Time.smoothDeltaTime);
+                        Vel_Lerper = Vector3.Lerp(Vel_Lerper, Vel_PredictedCurVel, 1 - Mathf.Pow(0.5f, 9f * deltaTime));
                         VelocityIndicator.position = transform.position + Vel_Lerper;
                     }
                     VelocityIndicator.localPosition = VelocityIndicator.localPosition.normalized * distance_from_head;
@@ -164,8 +164,8 @@ namespace SaccFlightAndVehicles
                 }
                 check_text = 0;
             }
-            check_text += SmoothDeltaTime;
-            check_vectors += SmoothDeltaTime;
+            check_text += deltaTime;
+            check_vectors += deltaTime;
         }
     }
 }

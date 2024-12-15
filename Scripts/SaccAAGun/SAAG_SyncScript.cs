@@ -132,12 +132,12 @@ namespace SaccFlightAndVehicles
                     Vector3 OldPredictedRotation_3 = new Vector3(OldPredictedRotation.x, OldPredictedRotation.y, 0);
 
                     Vector3 TargetRot = Vector3.Lerp(OldPredictedRotation_3, PredictedRotation_3, TimeSinceUpdate * SmoothingTimeDivider);
-                    // NonOwnerRotLerper = Vector3.Lerp(NonOwnerRotLerper, TargetRot, Time.smoothDeltaTime * 10);
+                    // NonOwnerRotLerper = Vector3.Lerp(NonOwnerRotLerper, TargetRot, Time.deltaTime * 10);
                     Rotator.localRotation = Quaternion.Euler(TargetRot);
                 }
                 else
                 {
-                    // NonOwnerRotLerper = Vector3.Lerp(NonOwnerRotLerper, PredictedRotation_3, Time.smoothDeltaTime * 10);
+                    // NonOwnerRotLerper = Vector3.Lerp(NonOwnerRotLerper, PredictedRotation_3, Time.deltaTime * 10);
                     Rotator.localRotation = Quaternion.Euler(PredictedRotation_3);
                 }
             }
