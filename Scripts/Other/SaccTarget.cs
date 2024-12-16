@@ -50,6 +50,7 @@ namespace SaccFlightAndVehicles
                 getDamageValue(pname, ref dmg);
             }
             if (dmg < BulletArmorLevel) return;
+            TargetAnimator.SetTrigger("hit");
             WeaponDamageTarget(dmg, other);
         }
         public void WeaponDamageTarget(int dmg, GameObject damagingObject)
