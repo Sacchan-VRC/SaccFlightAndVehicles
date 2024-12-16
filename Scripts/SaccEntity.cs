@@ -451,6 +451,7 @@ namespace SaccFlightAndVehicles
                 if (EnemyUdonBehaviour)
                 { LastAttacker = (SaccEntity)EnemyUdonBehaviour.GetProgramVariable("EntityControl"); }
             }
+            SendEventToExtensions("SFEXT_L_BulletHit");
             SendDamageEvent(dmg);
             if (LastAttacker && LastAttacker != this) { LastAttacker.SendEventToExtensions("SFEXT_L_DamageFeedback"); }
         }
