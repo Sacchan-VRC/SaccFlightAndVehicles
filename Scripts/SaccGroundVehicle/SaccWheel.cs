@@ -832,6 +832,7 @@ namespace SaccFlightAndVehicles
             // }
             IsOwner = IsOwner_New;
         }
+        public void ResetGrip() { GroundPointLast = WheelPoint.position; }
         public void SyncSkid()
         {
             if (!SyncSkid_Running) { return; }

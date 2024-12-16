@@ -1384,13 +1384,12 @@ namespace SaccFlightAndVehicles
             bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && Speed > .2f;
             if (Occupied || EntityControl._dead || BlockedCheck) { return; }
             Networking.SetOwner(localPlayer, EntityControl.gameObject);
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
             IsOwner = true;
             //synced variables
             Health = FullHealth;
             Fuel = FullFuel;
             SetRespawnPos();
-            VehicleRigidbody.angularVelocity = Vector3.zero;//editor needs this
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
         }
         public void ResetStatus()//called globally when using respawn button
         {

@@ -1950,7 +1950,6 @@ namespace SaccFlightAndVehicles
             bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && Speed > .2f;
             if (Occupied || EntityControl._dead || BlockedCheck) { return; }
             Networking.SetOwner(localPlayer, EntityControl.gameObject);
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
             Atmosphere = 1;//vehiclemoving optimization requires this to be here
                            //synced variables
             Health = FullHealth;
@@ -1960,6 +1959,7 @@ namespace SaccFlightAndVehicles
             VTOLAngleInput = VTOLDefaultValue;
             VTOLAngleDegrees = VTOLMinAngle + (vtolangledif * VTOLAngle);
             SetRespawnPos();
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
         }
         public void ResetStatus()//called globally when using respawn button
         {

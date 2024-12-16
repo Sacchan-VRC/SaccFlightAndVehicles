@@ -324,9 +324,20 @@ namespace SaccFlightAndVehicles
 
             EntityControl.SendEventToExtensions("SFEXT_L_FallAsleep");
         }
+        public void ResetGrips()
+        {
+            for (int i = 0; i < DriveWheels.Length; i++)
+            { DriveWheels[i].SendCustomEvent("ResetGrip"); }
+            for (int i = 0; i < SteerWheels.Length; i++)
+            { SteerWheels[i].SendCustomEvent("ResetGrip"); }
+            for (int i = 0; i < OtherWheels.Length; i++)
+            { OtherWheels[i].SendCustomEvent("ResetGrip"); }
+        }
         public void SFEXT_G_RespawnButton()
         {
             WakeUp();
+            ResetGrips();
+
             if (DoCaterpillarTracks)
             {
                 for (int i = 0; i < Tracks.Length; i++)
@@ -614,6 +625,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_ReAppear()
         {
             WakeUp();
+            ResetGrips();
         }
         public void SFEXT_G_Explode()
         {

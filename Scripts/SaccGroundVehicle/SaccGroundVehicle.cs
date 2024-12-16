@@ -153,9 +153,9 @@ namespace SaccFlightAndVehicles
         [Space(10)]
         [Tooltip("Completely change how the vehicle operates to behave like a tank, enables two throttle sliders, and turns DriveWheels/SteerWheels into Left/Right tracks")]
         public bool TankMode;
-        [Tooltip("Use WASD or QAED to control the tank?")]
+        [Tooltip("In desktop mode, use WASD or QAED to control the tank?")]
         public bool TANK_WASDMode = true;
-        [Tooltip("Multiply how much the VR throttle moves from hand movement, TankMode only")]
+        [Tooltip("Multiply how much the VR throttle moves from hand movement, for DFUNCS and TankMode")]
         [System.NonSerializedAttribute] public float ThrottleSensitivity = 6f;
         [Header("Debug")]
         [UdonSynced(UdonSyncMode.Linear)] public float Revs;
@@ -1127,14 +1127,14 @@ namespace SaccFlightAndVehicles
             VRCPlayerApi currentOwner = Networking.GetOwner(EntityControl.gameObject);
             bool BlockedCheck = (currentOwner != null && currentOwner.GetBonePosition(HumanBodyBones.Hips) == Vector3.zero) && VehicleSpeed > .2f;
             if (Occupied || EntityControl._dead || BlockedCheck) { return; }
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
+            Networking.SetOwner(localPlayer, EntityControl.gameObject);
             IsOwner = true;
             Fuel = FullFuel;
             Health = FullHealth;
             YawInput = 0;
             AutoSteerLerper = 0;
             SetRespawnPos();
-            Networking.SetOwner(localPlayer, EntityControl.gameObject);
+            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(ResetStatus));
         }
         public void ResetStatus()//called globally when using respawn button
         {
