@@ -314,7 +314,7 @@ namespace SaccFlightAndVehicles
         private void Update()
         {
             if (!Piloting) return;
-            if (Selected || !inVR)
+            if (Selected || !inVR & Input.GetKey(FireNowKey))
             {
                 float Trigger = 0;
                 if (Selected)
@@ -343,6 +343,7 @@ namespace SaccFlightAndVehicles
                 }
                 else { TriggerLastFrame = false; }
             }
+            else { TriggerLastFrame = false; }
         }
         public void LaunchBomb()
         {

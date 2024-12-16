@@ -224,7 +224,7 @@ namespace SaccFlightAndVehicles
         {
             if (Piloting)
             {
-                if (Selected || !inVR)
+                if (Selected || (!inVR && Input.GetKey(FireNowKey)))
                 {
                     float DeltaTime = Time.deltaTime;
                     float Trigger = 0;
