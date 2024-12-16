@@ -75,31 +75,11 @@ namespace SaccFlightAndVehicles
         private void Start()
         {
             UpdateScoreBoards_Vis();
-            SendCustomEventDelayedSeconds(nameof(UpdateScoreBoards_Vis), 15);
             SplitTimes = new float[RaceCheckpoints.Length];
             SplitTimes_R = new float[RaceCheckpoints.Length];
         }
         public void AddNewPlayerToBoard(string playername, float time, string vehicle, ref string[] playernames, ref float[] playertimes, ref string[] playervehicles, ref float[] playertimes_mostrecent, ref ushort[] playerlaps)
         {
-            if (playertimes.Length > 0)
-            {
-                if (time < playertimes[0])
-                {
-                    if (NewTopRecord_Snd)
-                    { { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayNewRecordSound)); } }
-                }
-                else
-                {
-                    if (NewTimeAdded_Snd)
-                    { { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayNewTimeSound)); } }
-                }
-            }
-            else
-            {
-                if (NewTopRecord_Snd)
-                { { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayNewRecordSound)); } }
-            }
-
             if (playertimes.Length < MaxRecordedTimes)
             {
                 int len = playertimes.Length;
@@ -126,7 +106,6 @@ namespace SaccFlightAndVehicles
                 playerlaps[len] = 1;
                 //+1 to each array
                 //set new values to new players record
-                SortScoreboard(ref playernames, ref playertimes, ref playervehicles, ref playertimes_mostrecent, ref playerlaps);
             }
             else
             {
@@ -137,7 +116,6 @@ namespace SaccFlightAndVehicles
                 playervehicles[last] = vehicle;
                 playernames[last] = playername;
                 playerlaps[last] = 1;
-                SortScoreboard(ref PlayerNames, ref playertimes, ref playervehicles, ref playertimes_mostrecent, ref playerlaps);
             }
         }
         public void PlayNewTimeSound()
@@ -210,7 +188,6 @@ namespace SaccFlightAndVehicles
                 //     }
                 // }
             }
-            SendCustomEventDelayedFrames(nameof(SendScoreboardUpdate_Delayed), 1);
         }
         public void NewRecord()//owner runs this
         {
@@ -223,25 +200,37 @@ namespace SaccFlightAndVehicles
             { posonboard = CheckIfOnBoard(playername, ref PlayerNames_R); }
             else
             { posonboard = CheckIfOnBoard(playername, ref PlayerNames); }
+            bool NewTopRcrd = false;
+            if (PlayerTimes.Length > 0)
+            { if (newtime < PlayerTimes[0]) { NewTopRcrd = true; } }
+            else NewTopRcrd = true;
+            if (NewTopRcrd)
+            {
+                if (NewTopRecord_Snd)
+                { { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayNewRecordSound)); } }
+            }
+            else
+            {
+                if (NewTimeAdded_Snd)
+                { { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayNewTimeSound)); } }
+            }
             if (posonboard > -1)//on board
             {
-                bool NewTopRcrd = false;
                 if (reverse)
                 {
                     if (newtime > PlayerTimes_R[posonboard])
                     {
                         PlayerTimes_MostRecent_R[posonboard] = newtime;
                         PlayerLaps_R[posonboard] = (ushort)(PlayerLaps_R[posonboard] + 1);
-                        SortScoreboard(ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
-                        return;
                     }
-                    if (newtime < PlayerTimes_R[0]) { NewTopRcrd = true; }
-                    PlayerNames_R[posonboard] = playername;
-                    PlayerTimes_MostRecent_R[posonboard] = newtime;
-                    PlayerTimes_R[posonboard] = newtime;
-                    PlayerVehicles_R[posonboard] = newvehicle;
-                    PlayerLaps_R[posonboard] = (ushort)(PlayerLaps_R[posonboard] + 1);
-                    SortScoreboard(ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
+                    else
+                    {
+                        PlayerNames_R[posonboard] = playername;
+                        PlayerTimes_MostRecent_R[posonboard] = newtime;
+                        PlayerTimes_R[posonboard] = newtime;
+                        PlayerVehicles_R[posonboard] = newvehicle;
+                        PlayerLaps_R[posonboard] = (ushort)(PlayerLaps_R[posonboard] + 1);
+                    }
                 }
                 else
                 {
@@ -249,26 +238,15 @@ namespace SaccFlightAndVehicles
                     {
                         PlayerTimes_MostRecent[posonboard] = newtime;
                         PlayerLaps[posonboard] = (ushort)(PlayerLaps[posonboard] + 1);
-                        SortScoreboard(ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
-                        return;
                     }
-                    if (newtime < PlayerTimes[0]) { NewTopRcrd = true; }
-                    PlayerNames[posonboard] = playername;
-                    PlayerTimes_MostRecent[posonboard] = newtime;
-                    PlayerTimes[posonboard] = newtime;
-                    PlayerVehicles[posonboard] = newvehicle;
-                    PlayerLaps[posonboard] = (ushort)(PlayerLaps[posonboard] + 1);
-                    SortScoreboard(ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
-                }
-                if (NewTopRcrd)
-                {
-                    if (NewTopRecord_Snd)
-                    { { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayNewRecordSound)); } }
-                }
-                else
-                {
-                    if (NewTimeAdded_Snd)
-                    { { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlayNewTimeSound)); } }
+                    else
+                    {
+                        PlayerNames[posonboard] = playername;
+                        PlayerTimes_MostRecent[posonboard] = newtime;
+                        PlayerTimes[posonboard] = newtime;
+                        PlayerVehicles[posonboard] = newvehicle;
+                        PlayerLaps[posonboard] = (ushort)(PlayerLaps[posonboard] + 1);
+                    }
                 }
             }
             else//not on board
@@ -288,11 +266,13 @@ namespace SaccFlightAndVehicles
                     }
                 }
             }
+            SortScoreboard(ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
             RequestSerialization();
+            UpdateScoreBoards_Vis();
         }
-        public void SendScoreboardUpdate_Delayed()
+        public override void OnDeserialization()
         {
-            SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(UpdateScoreBoards_Vis));
+            UpdateScoreBoards_Vis();
         }
         public void UpdateScoreBoards_Vis()
         {
@@ -356,6 +336,8 @@ namespace SaccFlightAndVehicles
             PlayerNames = new string[0];
             PlayerLaps = new ushort[0];
             SortScoreboard(ref PlayerNames, ref PlayerTimes, ref PlayerVehicles, ref PlayerTimes_MostRecent, ref PlayerLaps);
+            RequestSerialization();
+            UpdateScoreBoards_Vis();
         }
         public void ResetScoreboard_R()
         {
@@ -366,6 +348,8 @@ namespace SaccFlightAndVehicles
             PlayerNames_R = new string[0];
             PlayerLaps_R = new ushort[0];
             SortScoreboard(ref PlayerNames_R, ref PlayerTimes_R, ref PlayerVehicles_R, ref PlayerTimes_MostRecent_R, ref PlayerLaps_R);
+            RequestSerialization();
+            UpdateScoreBoards_Vis();
         }
         private string SecsToMinsSec(float Seconds)
         {
