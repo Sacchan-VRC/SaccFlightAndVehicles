@@ -58,7 +58,7 @@ namespace SaccFlightAndVehicles
         public bool DoCaterpillarTracks;
         public UdonSharpBehaviour[] TrackSourceWheels;
         public Renderer TracksRenderer;
-        public float TrackSpeedMulti = 1f;
+        public Vector2 TrackSpeedMulti = new Vector2(0f, 0.01f);
         public int[] TrackMaterialSlots;
         [Header("Corresponding arrays must be of equal length")]
         [Tooltip("Extra objects that rotate with the tracks, each with their own speed multiplier\nTrack0/1/2/3 use TrackSourceWheels0/1/2/3")]
@@ -260,9 +260,10 @@ namespace SaccFlightAndVehicles
                 {
                     Vector2 uvs;
                     float wheelrot = (float)TrackSourceWheels[i].GetProgramVariable("WheelRotation");
-                    float wheelRotUV = wheelrot * TrackSpeedMulti;
-                    wheelRotUV = wheelRotUV - Mathf.Floor(wheelrot);
-                    uvs = new Vector2(0, wheelRotUV);
+                    Vector2 wheelRotUV = wheelrot * TrackSpeedMulti;
+                    wheelRotUV.x = wheelRotUV.x - Mathf.Floor(wheelrot);
+                    wheelRotUV.y = wheelRotUV.y - Mathf.Floor(wheelrot);
+                    uvs = wheelRotUV;
                     Tracks[i].mainTextureOffset = uvs;
                     switch (i)
                     {
