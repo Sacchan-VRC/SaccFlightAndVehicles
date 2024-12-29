@@ -50,8 +50,12 @@ namespace SaccFlightAndVehicles
                 getDamageValue(pname, ref dmg);
             }
             if (dmg < BulletArmorLevel) return;
-            TargetAnimator.SetTrigger("hit");
-            WeaponDamageTarget(dmg, other);
+
+            if (!Networking.LocalPlayer.IsOwner(gameObject) && Time.time - lastUpdateTime > 1)
+                Networking.SetOwner(localPlayer, gameObject);
+
+            if (Networking.LocalPlayer.IsOwner(gameObject)) BulletDamage_Owner();
+            else WeaponDamageTarget(dmg, other);
         }
         public void WeaponDamageTarget(int dmg, GameObject damagingObject)
         {
@@ -339,9 +343,35 @@ namespace SaccFlightAndVehicles
             HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
             SendNetworkUpdate();
         }
+        public void BulletDamage_Owner()
+        {
+            HitPoints -= DamageFromBullet * LastHitBulletDamageMulti;
+            SendNetworkUpdate();
+        }
         private void OnCollisionEnter(Collision other)
         {
-            if (!localPlayer.IsOwner(gameObject)) return;
+            if (!other.collider) return;
+            // the owner of unsynced objects(missiles etc) returns the master.
+            // so we need to find owner another way
+            SAV_AAMController aam = other.collider.GetComponent<SAV_AAMController>();
+            bool isColliderOwner;
+            if (aam)
+                isColliderOwner = (bool)aam.AAMLauncherControl.GetProgramVariable("IsOwner");
+            else
+            {
+                SAV_AGMController agm = other.collider.GetComponent<SAV_AGMController>();
+                if (agm)
+                    isColliderOwner = (bool)agm.AGMLauncherControl.GetProgramVariable("IsOwner");
+                else
+                {
+                    SAV_BombController bomb = other.collider.GetComponent<SAV_BombController>();
+                    if (bomb)
+                        isColliderOwner = (bool)bomb.BombLauncherControl.GetProgramVariable("IsOwner");
+                    else
+                        isColliderOwner = localPlayer.IsOwner(other.collider.gameObject);
+                }
+            }
+            if (isColliderOwner && !localPlayer.IsOwner(gameObject)) { Networking.SetOwner(localPlayer, gameObject); }
             HitPoints -= DamageFromCollision;
             SendNetworkUpdate();
         }
@@ -384,6 +414,7 @@ namespace SaccFlightAndVehicles
         {
             lastUpdateTime = Time.time;
             dead = HitPoints <= 0f;
+            TargetAnimator.SetTrigger("hit");
             TargetAnimator.SetBool("dead", dead);
             TargetAnimator.SetFloat("healthpc", HitPoints / FullHealth);
             if (dead && !deadlast)
