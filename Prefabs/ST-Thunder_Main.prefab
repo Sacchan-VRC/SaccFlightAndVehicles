@@ -101,6 +101,9 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   DialSensitivity: 0.7
+  IsOwner: 0
+  FunctionsActive: 0
+  Occupied: 0
   DialFuncPos: 0
 --- !u!114 &8005464590886231918
 MonoBehaviour:
@@ -28397,6 +28400,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &11707293986087042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28567,6 +28572,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &2935594653223068943
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -28963,6 +28970,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &2935594653914077342
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29202,6 +29211,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &2935594654126660740
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29363,6 +29374,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  MinDamageLevel: -10
   SwitchFunctionSound: {fileID: 627101967383212201}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -30005,6 +30017,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &5870588325563423881
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42323,7 +42337,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 50
+      scalar: 15
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -46489,16 +46503,17 @@ MonoBehaviour:
   SAVControl: {fileID: 2935594653847325617}
   GunAnimator: {fileID: 2935594654239514265}
   GunFiringBoolName: gunfire
+  FireKey: 32
   FireNowKey: 32
   AmmoBars:
   - {fileID: 7643922150233396247}
-  GunRecoilEmpty: {fileID: 0}
+  GunRecoilEmpty: {fileID: 6096119339172870666}
   GunDamageParticle: {fileID: 533464335176836633}
   HudCrosshairGun: {fileID: 0}
   HudCrosshair: {fileID: 0}
   FullReloadTimeSec: 20
   GunAmmoInSeconds: 60
-  GunRecoil: 0
+  RecoilForce: 1
   DoAnimBool: 0
   AnimBoolName: 
   AnimBoolStayTrueOnExit: 0
@@ -53110,7 +53125,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 50
+      scalar: 15
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -73356,6 +73371,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &253449787524344531
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90265,7 +90282,7 @@ ParticleSystem:
     rateOverTime:
       serializedVersion: 2
       minMaxState: 0
-      scalar: 40
+      scalar: 5
       minScalar: 10
       maxCurve:
         serializedVersion: 2
@@ -99336,6 +99353,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &9026632105835266004
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -100298,7 +100317,7 @@ MonoBehaviour:
   WheelRadius: 0.4747345
   SpringForceMulti: 8.5
   DampingForceMulti: 1.1
-  MaxSuspensionForce: 22
+  MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 2.3
   GripCurve:
@@ -100660,7 +100679,7 @@ MonoBehaviour:
   WheelRadius: 0.4747345
   SpringForceMulti: 8.5
   DampingForceMulti: 1.1
-  MaxSuspensionForce: 22
+  MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.8
   GripCurve:
@@ -100895,7 +100914,7 @@ MonoBehaviour:
   WheelRadius: 0.4747345
   SpringForceMulti: 8.5
   DampingForceMulti: 1.1
-  MaxSuspensionForce: 22
+  MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 1.8
   GripCurve:
@@ -101200,7 +101219,7 @@ MonoBehaviour:
   WheelRadius: 0.4747345
   SpringForceMulti: 8.5
   DampingForceMulti: 1.1
-  MaxSuspensionForce: 22
+  MaxSusForce: 60
   ExtraRayCastDistance: 1
   Grip: 2.3
   GripCurve:

@@ -1210,6 +1210,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &1217889974125167124
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1347,6 +1349,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &1217889974575203308
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1741,6 +1745,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &1217889975416420967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2003,6 +2009,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 5507597191322025560}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -2335,6 +2342,8 @@ MonoBehaviour:
   RevLimiter: 8000
   MaxGs: 10
   GDamage: 10
+  CrashDmg_MinSpeed: 15
+  CrashDmg_MaxSpeed: 60
   RespawnDelay: 10
   InvincibleAfterSpawn: 2.5
   BulletDamageTaken: 0
@@ -2510,6 +2519,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &1217889975763254909
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7722,10 +7733,18 @@ MonoBehaviour:
   Wings:
   - {fileID: 264292837108118855}
   DoCaterpillarTracks: 0
-  TrackEmptys: []
+  TrackSourceWheels: []
   TracksRenderer: {fileID: 0}
-  TrackSpeedMulti: 1
+  TrackSpeedMulti: {x: 0, y: 0.01}
   TrackMaterialSlots: 
+  CogWheelsTrack0: []
+  CogWheelsTrack0_rotSpeeds: []
+  CogWheelsTrack1: []
+  CogWheelsTrack1_rotSpeeds: []
+  CogWheelsTrack2: []
+  CogWheelsTrack2_rotSpeeds: []
+  CogWheelsTrack3: []
+  CogWheelsTrack3_rotSpeeds: []
 --- !u!114 &2873066051735144449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45909,6 +45928,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &5034242081967368629
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -51742,6 +51763,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &5034242082806762028
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -84335,11 +84358,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 3731056625559623309}
   WheelVisual: {fileID: 126663418511229904}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.3326535
   SpringForceMulti: 8
   DampingForceMulti: 1
-  MaxSuspensionForce: 40
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.5
   Grip: 3.3
   GripCurve:
@@ -84614,11 +84638,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 7597664762943680424}
   WheelVisual: {fileID: 2883316143006554622}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.3326535
   SpringForceMulti: 8
   DampingForceMulti: 1
-  MaxSuspensionForce: 40
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.5
   Grip: 2.8
   GripCurve:
@@ -84947,11 +84972,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 5635687635756386850}
   WheelVisual: {fileID: 6297078974878207425}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.3326535
   SpringForceMulti: 8
   DampingForceMulti: 1
-  MaxSuspensionForce: 40
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.5
   Grip: 3.3
   GripCurve:
@@ -85226,11 +85252,12 @@ MonoBehaviour:
   WheelPoint: {fileID: 887899305417962517}
   WheelVisual: {fileID: 6222540144188693721}
   WheelVisual_Ground: {fileID: 0}
+  WheelVisual_RotationSource: {fileID: 0}
   SuspensionDistance: 0.1
   WheelRadius: 0.3326535
   SpringForceMulti: 8
   DampingForceMulti: 1
-  MaxSuspensionForce: 40
+  MaxSusForce: 60
   ExtraRayCastDistance: 0.5
   Grip: 2.8
   GripCurve:

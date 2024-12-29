@@ -161,6 +161,9 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   DialSensitivity: 0.7
+  IsOwner: 0
+  FunctionsActive: 0
+  Occupied: 0
   DialFuncPos: 0
 --- !u!114 &241204804
 MonoBehaviour:
@@ -243,10 +246,10 @@ MonoBehaviour:
     PrefabModifications: []
     SerializationNodes: []
   _udonSharpBackingUdonBehaviour: {fileID: 504276390}
-  SAVControl: {fileID: -2400341428957135530}
-  ControlsRoot: {fileID: 0}
   TurretRotatorHor: {fileID: 7293944282278909810}
   TurretRotatorVert: {fileID: 7455050868411296326}
+  ControlsRoot: {fileID: 0}
+  TurretForwardEmpty: {fileID: 0}
   TurnSpeedMultiX: 600
   TurnSpeedMultiY: 600
   MaxJoyAngles: {x: 45, y: 45, z: 45}
@@ -256,14 +259,20 @@ MonoBehaviour:
   DownAngleMax: 5
   SideAngleMax: 180
   updateInterval: 0.25
+  networkSmoothing: 6
   Stabilize: 1
   RotatingSound: {fileID: 8392481251208784315}
+  RotatingSound_maxpitch: 2
   PlayRotatingSoundForOthers: 0
   RotatingSound_HorizontalOnly: 0
+  UseControlStickL: 0
+  UseControlStickR: 0
+  ControlStickSensitivityR: 0.3
+  ControlStickSensitivityL: 0.3
+  RollAsYaw: 0
   RotatingSoundMulti: 0.02
   CorrectionTime: 8
   SpeedLerpTime: 25
-  SND_RotLerper: {x: 0, y: 0}
   HORSYNC: {fileID: 0}
   VERTSYNC: {fileID: 0}
   HORSYNC_RAW: {fileID: 0}
@@ -438,6 +447,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &706443860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -578,6 +589,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &747948962
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1651,6 +1664,9 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   DialSensitivity: 0.7
+  IsOwner: 0
+  FunctionsActive: 0
+  Occupied: 0
   DialFuncPos: 0
 --- !u!114 &1695366941
 MonoBehaviour:
@@ -1858,6 +1874,7 @@ MonoBehaviour:
   SAVControl: {fileID: -2400341428957135530}
   BombAnimator: {fileID: 0}
   Bomb: {fileID: 1447528591343650870}
+  FireKey: 32
   FireNowKey: 99
   NumPreInstatiated: 5
   FullReloadTimeSec: 14
@@ -1873,7 +1890,7 @@ MonoBehaviour:
   - {fileID: 3852796878609073751}
   LaunchSound: {fileID: 0}
   LaunchParticle: {fileID: 0}
-  LaunchParticle_numtest: 15
+  LaunchParticle_num: 15
   AllowFiringWhenGrounded: 1
   DisallowFireIfWind: 0
   Recoil: 0
@@ -1891,6 +1908,7 @@ MonoBehaviour:
   AtGCam: {fileID: 0}
   SetAtGCamSettings: 1
   EnableOnSelected: []
+  FireSyncDelegate: {fileID: 0}
 --- !u!114 &6278865674925798219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22009,16 +22027,17 @@ MonoBehaviour:
   SAVControl: {fileID: -2400341428957135530}
   GunAnimator: {fileID: 7105509206176202441}
   GunFiringBoolName: frontgunfiring
+  FireKey: 32
   FireNowKey: 32
   AmmoBars:
   - {fileID: 6567230413882760949}
-  GunRecoilEmpty: {fileID: 0}
+  GunRecoilEmpty: {fileID: 5368211242935392779}
   GunDamageParticle: {fileID: 3977813096208303387}
   HudCrosshairGun: {fileID: 0}
   HudCrosshair: {fileID: 0}
   FullReloadTimeSec: 20
   GunAmmoInSeconds: 60
-  GunRecoil: 0
+  RecoilForce: 1
   DoAnimBool: 0
   AnimBoolName: 
   AnimBoolStayTrueOnExit: 0
@@ -22251,6 +22270,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &3818207961936412323
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -53893,6 +53914,7 @@ MonoBehaviour:
   SAVControl: {fileID: 0}
   BombAnimator: {fileID: 0}
   Bomb: {fileID: 849432948575845059}
+  FireKey: 32
   FireNowKey: 32
   NumPreInstatiated: 5
   FullReloadTimeSec: 8
@@ -53907,7 +53929,7 @@ MonoBehaviour:
   - {fileID: 1064588171}
   LaunchSound: {fileID: 1060008484}
   LaunchParticle: {fileID: 5693358537823994957}
-  LaunchParticle_numtest: 15
+  LaunchParticle_num: 15
   AllowFiringWhenGrounded: 1
   DisallowFireIfWind: 0
   Recoil: 0
@@ -53926,6 +53948,7 @@ MonoBehaviour:
   SetAtGCamSettings: 0
   EnableOnSelected:
   - {fileID: 1386235095}
+  FireSyncDelegate: {fileID: 0}
 --- !u!114 &871312884518953148
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -70411,6 +70434,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 7105509204289583361}
   SAVControl: {fileID: -2400341428957135530}
   AGMAnimator: {fileID: 7105509206176202441}
+  FireKey: 32
   AGM: {fileID: 9072628041462008830}
   NumAGM: 8
   HUDText_AGM_ammo: {fileID: 0}
@@ -75515,6 +75539,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &7105509204448147700
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -90942,6 +90968,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &7105509204755205035
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92938,6 +92966,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 7105509204779129781}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -93200,6 +93229,8 @@ MonoBehaviour:
   VelLiftMax: 10
   MaxGs: 10
   GDamage: 10
+  CrashDmg_MinSpeed: 15
+  CrashDmg_MaxSpeed: 60
   ControlsRoot: {fileID: 0}
   Wind: {x: 0, y: 0, z: 0}
   WindGustStrength: 0
@@ -93423,6 +93454,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &793195262885574237
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93832,6 +93865,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &6685914054707775335
 MonoBehaviour:
   m_ObjectHideFlags: 0

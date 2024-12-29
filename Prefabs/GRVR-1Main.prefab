@@ -31185,6 +31185,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &1564986658979985648
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -32120,6 +32122,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &1564986659165521402
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -42338,6 +42342,7 @@ MonoBehaviour:
   SAVControl: {fileID: 2961384493794590454}
   GunAnimator: {fileID: 1564986660552776568}
   GunFiringBoolName: gunfiring
+  FireKey: 32
   FireNowKey: 0
   AmmoBars:
   - {fileID: 1564986660355104341}
@@ -42347,7 +42352,7 @@ MonoBehaviour:
   HudCrosshair: {fileID: 1564986660219039906}
   FullReloadTimeSec: 20
   GunAmmoInSeconds: 35
-  GunRecoil: 150
+  RecoilForce: 1
   DoAnimBool: 0
   AnimBoolName: GunSelected
   AnimBoolStayTrueOnExit: 0
@@ -42775,6 +42780,7 @@ MonoBehaviour:
   SAVControl: {fileID: 2961384493794590454}
   BombAnimator: {fileID: 0}
   Bomb: {fileID: 5141064103186665271}
+  FireKey: 32
   FireNowKey: 0
   NumPreInstatiated: 5
   FullReloadTimeSec: 8
@@ -42789,6 +42795,8 @@ MonoBehaviour:
   - {fileID: 6866471498013573617}
   - {fileID: 6866471498141761955}
   LaunchSound: {fileID: 0}
+  LaunchParticle: {fileID: 0}
+  LaunchParticle_num: 15
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
   Recoil: 0
@@ -42806,6 +42814,7 @@ MonoBehaviour:
   AtGCam: {fileID: 0}
   SetAtGCamSettings: 1
   EnableOnSelected: []
+  FireSyncDelegate: {fileID: 0}
 --- !u!114 &1564986659538012441
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -54539,6 +54548,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 1564986658502680149}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -90837,6 +90847,8 @@ MonoBehaviour:
   VelLiftMax: 7
   MaxGs: 20
   GDamage: 20
+  CrashDmg_MinSpeed: 25
+  CrashDmg_MaxSpeed: 100
   GroundEffectMaxDistance: 4
   GroundEffectStrength: 0
   GroundEffectLiftMax: 100
@@ -90874,10 +90886,6 @@ MonoBehaviour:
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  CrashDoesDamage: 0
-  SmallCrashDmg: 0.1
-  MediumCrashDmg: 0.25
-  BigCrashDmg: 0.75
   MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080

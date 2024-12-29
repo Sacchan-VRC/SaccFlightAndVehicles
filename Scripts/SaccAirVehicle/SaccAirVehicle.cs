@@ -179,6 +179,10 @@ namespace SaccFlightAndVehicles
         public float MaxGs = 40f;
         [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
         public float GDamage = 10f;
+        [Tooltip("Speed at which vehicle will start to take damage from a crash (m/s)")]
+        public float CrashDmg_MinSpeed = 15f;
+        [Tooltip("Speed at which vehicle will take damage equal to its max health from a crash (m/s)")]
+        public float CrashDmg_MaxSpeed = 100f;
         [Tooltip("Length of the trace that looks for the ground to calculate ground effect")]
         public float GroundEffectMaxDistance = 7;
         [Tooltip("Multiply the force of the ground effect")]
@@ -255,11 +259,6 @@ namespace SaccFlightAndVehicles
         public float MediumCrashSpeed = 8f;
         [Tooltip("Impact speed that defines a big crash")]
         public float BigCrashSpeed = 25f;
-        [Tooltip("Do a fixed amount of damage per crash? This is on top of G damage caused by crashes, use if you want damage from crashing, but no G damage.")]
-        public bool CrashDoesDamage = false;
-        public float SmallCrashDmg = .1f;
-        public float MediumCrashDmg = .25f;
-        public float BigCrashDmg = .75f;
         [Tooltip("Multiply how much damage is done by missiles")]
         public float MissileDamageTakenMultiplier = 1f;
         [Tooltip("Strength of force that pushes the vehicle when a missile hits it")]
@@ -370,7 +369,6 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public float VTOLAngleForward90;//dot converted to angle, 0=0 90=1 max 1, for adjusting values that change with engine angle
         [System.NonSerializedAttribute] public float VTOLAngleForwardDot;
         [System.NonSerializedAttribute] public bool VTOLAngleForward = true;
-        [System.NonSerializedAttribute] public Vector3 Gs3;
         private GameObject VehicleGameObj;
         [System.NonSerializedAttribute] public Transform CenterOfMass;
         private float LerpedRoll;
@@ -795,6 +793,13 @@ namespace SaccFlightAndVehicles
             { ControlsRoot = VehicleTransform; }
 
             if (ExplodeHealth >= 0) { ExplodeHealth = -0.0001f; }// /0
+
+            SetupGCalcValues();
+        }
+        public void SetupGCalcValues()
+        {
+            NumFUinAvgTime = (int)(GsAveragingTime / Time.fixedDeltaTime);
+            FrameGs = new Vector3[NumFUinAvgTime];
         }
         private void LateUpdate()
         {
@@ -815,10 +820,7 @@ namespace SaccFlightAndVehicles
                     {
                         if (Piloting)
                         { EntityControl.SendEventToExtensions("SFEXT_O_Suicide"); }
-                        if (thisGDMG > FullHealth * 0.5f)
-                        { NetworkExplode(); }
-                        else
-                        { EntityControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetWrecked"); }
+                        EntityControl.SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, "SetWrecked");
                     }
                 }
                 else if (!dead)
@@ -1520,17 +1522,25 @@ namespace SaccFlightAndVehicles
                 }
                 //calc Gs
                 float gravity = 9.81f * DeltaTime;
-                LastFrameVel.y -= gravity; //add gravity
-
-                Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);
-                VertGs = Gs3.y / gravity;
-
-                AllGs = Vector3.Magnitude(Gs3) / gravity;
+                LastFrameVel.y -= gravity;
+                Vector3 Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);
+                Vector3 thisFrameGs = Gs3 / gravity;
+                Gs_all -= FrameGs[GsFrameCheck];
+                Gs_all += thisFrameGs;
+                FrameGs[GsFrameCheck] = thisFrameGs;
+                GsFrameCheck++;
+                if (GsFrameCheck >= NumFUinAvgTime) { GsFrameCheck = 0; }
+                VertGs = Gs_all.y / NumFUinAvgTime;
+                AllGs = Gs_all.magnitude / NumFUinAvgTime;
                 GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
-
                 LastFrameVel = VehicleVel;
             }
         }
+        float GsAveragingTime = .1f;
+        private int NumFUinAvgTime = 1;
+        private Vector3 Gs_all;
+        private Vector3[] FrameGs;
+        private int GsFrameCheck;
         public void NetworkExplode()
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Explode));
@@ -2030,13 +2040,26 @@ namespace SaccFlightAndVehicles
             {
                 NetworkExplode();
             }
-            LastCollisionTime = Time.time;
-            if (Time.time - LastCollisionTime < MinCollisionSoundDelay)
+            Collision col = EntityControl.LastCollisionEnter;
+            if (col == null) { return; }
+            float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
+            float colmag_dmg = colmag;
+            if (colmag_dmg > CrashDmg_MinSpeed)
             {
-                LastCollisionTime = Time.time;
-                Collision col = EntityControl.LastCollisionEnter;
-                if (col == null) { return; }
-                float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
+                if (colmag_dmg < CrashDmg_MaxSpeed)
+                {
+                    float dif = CrashDmg_MaxSpeed - CrashDmg_MinSpeed;
+                    float newcolT = (colmag_dmg - CrashDmg_MinSpeed) / dif;
+                    colmag_dmg = Mathf.Lerp(0, CrashDmg_MaxSpeed, newcolT);
+                }
+                float thisGDMG = (colmag_dmg / CrashDmg_MaxSpeed) * FullHealth;
+                Health -= thisGDMG;
+
+                if (Health <= 0 && thisGDMG > FullHealth * 0.5f)
+                { NetworkExplode(); }
+            }
+            if (Time.time - LastCollisionTime > MinCollisionSoundDelay)
+            {
                 if (colmag > BigCrashSpeed)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(BigCrash));
@@ -2050,20 +2073,18 @@ namespace SaccFlightAndVehicles
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SmallCrash));
                 }
             }
+            LastCollisionTime = Time.time;
         }
         public void SmallCrash()
         {
-            if (CrashDoesDamage) { Health -= FullHealth * SmallCrashDmg; }
             EntityControl.SendEventToExtensions("SFEXT_G_SmallCrash");
         }
         public void MediumCrash()
         {
-            if (CrashDoesDamage) { Health -= FullHealth * MediumCrashDmg; }
             EntityControl.SendEventToExtensions("SFEXT_G_MediumCrash");
         }
         public void BigCrash()
         {
-            if (CrashDoesDamage) { Health -= FullHealth * BigCrashDmg; }
             EntityControl.SendEventToExtensions("SFEXT_G_BigCrash");
         }
         //Add .001 to each value of damage taken to prevent float comparison bullshit
@@ -2194,6 +2215,7 @@ namespace SaccFlightAndVehicles
             GDamageToTake = 0f;
             VertGs = 0f;
             AllGs = 0f;
+            for (int i = 0; i < NumFUinAvgTime; i++) { FrameGs[i] = Vector3.zero; }
             if (_EngineOn)
             {
                 //The !Occupied check is to check if the player just left the instance while not in the vehicle

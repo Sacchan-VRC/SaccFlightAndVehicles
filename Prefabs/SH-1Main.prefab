@@ -7850,6 +7850,9 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   DialSensitivity: 0.7
+  IsOwner: 0
+  FunctionsActive: 0
+  Occupied: 0
   DialFuncPos: 0
 --- !u!114 &3672560189053500627
 MonoBehaviour:
@@ -44082,6 +44085,7 @@ MonoBehaviour:
   SAVControl: {fileID: 5695413857654158265}
   BombAnimator: {fileID: 0}
   Bomb: {fileID: 7198344129521655469}
+  FireKey: 32
   FireNowKey: 99
   NumPreInstatiated: 5
   FullReloadTimeSec: 14
@@ -44096,6 +44100,8 @@ MonoBehaviour:
   - {fileID: 7240980354073692193}
   - {fileID: 7240980354209745011}
   LaunchSound: {fileID: 0}
+  LaunchParticle: {fileID: 0}
+  LaunchParticle_num: 15
   AllowFiringWhenGrounded: 1
   DisallowFireIfWind: 0
   Recoil: 0
@@ -44113,6 +44119,7 @@ MonoBehaviour:
   AtGCam: {fileID: 0}
   SetAtGCamSettings: 1
   EnableOnSelected: []
+  FireSyncDelegate: {fileID: 0}
 --- !u!114 &1283717154052526582
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44365,6 +44372,8 @@ MonoBehaviour:
   VelLiftMax: 7
   MaxGs: 10
   GDamage: 22
+  CrashDmg_MinSpeed: 15
+  CrashDmg_MaxSpeed: 50
   GroundEffectMaxDistance: 4
   GroundEffectStrength: 3
   GroundEffectLiftMax: 100
@@ -44402,10 +44411,6 @@ MonoBehaviour:
   SmallCrashSpeed: 1
   MediumCrashSpeed: 8
   BigCrashSpeed: 25
-  CrashDoesDamage: 0
-  SmallCrashDmg: 0.1
-  MediumCrashDmg: 0.25
-  BigCrashDmg: 0.75
   MissileDamageTakenMultiplier: 1
   MissilePushForce: 1
   SeaLevel: -1080
@@ -51276,6 +51281,7 @@ MonoBehaviour:
   SAVControl: {fileID: 5695413857654158265}
   GunAnimator: {fileID: 8333115239819171383}
   GunFiringBoolName: sidegunfiring
+  FireKey: 32
   FireNowKey: 32
   AmmoBars:
   - {fileID: 6416334152273763144}
@@ -51285,7 +51291,7 @@ MonoBehaviour:
   HudCrosshair: {fileID: 0}
   FullReloadTimeSec: 20
   GunAmmoInSeconds: 60
-  GunRecoil: 0
+  RecoilForce: 1
   DoAnimBool: 0
   AnimBoolName: 
   AnimBoolStayTrueOnExit: 0
@@ -77221,6 +77227,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &8333115238084813638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77474,6 +77482,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115238161862601}
   SAVControl: {fileID: 5695413857654158265}
   AAMAnimator: {fileID: 8333115239819171383}
+  FireKey: 32
   MissileType: 1
   NumAAM: 2
   AAMLockAngle: 15
@@ -78332,6 +78341,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &8333115238229734847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -94221,6 +94232,9 @@ MonoBehaviour:
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
   DialSensitivity: 0.7
+  IsOwner: 0
+  FunctionsActive: 0
+  Occupied: 0
   DialFuncPos: 0
 --- !u!114 &8333115238588098056
 MonoBehaviour:
@@ -94370,6 +94384,7 @@ MonoBehaviour:
   SAVControl: {fileID: 5695413857654158265}
   GunAnimator: {fileID: 8333115239819171383}
   GunFiringBoolName: gunfiring
+  FireKey: 32
   FireNowKey: 0
   AmmoBars:
   - {fileID: 8333115239605801754}
@@ -94379,7 +94394,7 @@ MonoBehaviour:
   HudCrosshair: {fileID: 8333115240010841581}
   FullReloadTimeSec: 20
   GunAmmoInSeconds: 35
-  GunRecoil: 150
+  RecoilForce: 1
   DoAnimBool: 0
   AnimBoolName: GunSelected
   AnimBoolStayTrueOnExit: 0
@@ -94863,6 +94878,7 @@ MonoBehaviour:
   SAVControl: {fileID: 5695413857654158265}
   BombAnimator: {fileID: 8333115239819171383}
   Bomb: {fileID: 2398841539399631480}
+  FireKey: 32
   FireNowKey: 0
   NumPreInstatiated: 5
   FullReloadTimeSec: 8
@@ -94877,6 +94893,8 @@ MonoBehaviour:
   - {fileID: 4132127738751896766}
   - {fileID: 4132127738884279532}
   LaunchSound: {fileID: 0}
+  LaunchParticle: {fileID: 0}
+  LaunchParticle_num: 15
   AllowFiringWhenGrounded: 0
   DisallowFireIfWind: 0
   Recoil: 0
@@ -94894,6 +94912,7 @@ MonoBehaviour:
   AtGCam: {fileID: 0}
   SetAtGCamSettings: 1
   EnableOnSelected: []
+  FireSyncDelegate: {fileID: 0}
 --- !u!114 &8333115238754075734
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95349,6 +95368,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &8333115238828317008
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95703,6 +95724,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &8333115238922619061
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105997,6 +106020,7 @@ MonoBehaviour:
   _udonSharpBackingUdonBehaviour: {fileID: 8333115239043645012}
   SAVControl: {fileID: 5695413857654158265}
   AGMAnimator: {fileID: 8333115239819171383}
+  FireKey: 32
   AGM: {fileID: 8764863212401809087}
   NumAGM: 2
   HUDText_AGM_ammo: {fileID: 8333115238833962017}
@@ -122532,6 +122556,7 @@ MonoBehaviour:
   DoVoiceVolumeChange: 1
   DoubleTapToExit: 0
   DisableBulletHitEvent: 0
+  BulletArmorLevel: -9
   SwitchFunctionSound: {fileID: 8333115238311187226}
   PlaySelectSoundLeft: 1
   PlaySelectSoundRight: 1
@@ -133078,6 +133103,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &8333115240067380491
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133352,6 +133379,8 @@ MonoBehaviour:
   SeatOutSideVehicle: 0
   HeadXOffset: 0.25
   Disable180Rotation: 0
+  AnimBoolAnimator: {fileID: 0}
+  AnimBoolOnEnter: 
 --- !u!114 &8333115240080910066
 MonoBehaviour:
   m_ObjectHideFlags: 0

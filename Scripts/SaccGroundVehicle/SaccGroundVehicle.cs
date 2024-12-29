@@ -117,6 +117,10 @@ namespace SaccFlightAndVehicles
         public float MaxGs = 10;
         [Tooltip("Damage taken Per G above maxGs, per second.\n(Gs - MaxGs) * GDamage = damage/second")]
         public float GDamage = 10f;
+        [Tooltip("Speed at which vehicle will start to take damage from a crash (m/s)")]
+        public float CrashDmg_MinSpeed = 15f;
+        [Tooltip("Speed at which vehicle will take damage equal to its max health from a crash (m/s)")]
+        public float CrashDmg_MaxSpeed = 100f;
         [Header("Other")]
         [Tooltip("Time until vehicle reappears after exploding")]
         public float RespawnDelay = 10;
@@ -357,6 +361,13 @@ namespace SaccFlightAndVehicles
 
             CurrentlyDistant = true;
             SendCustomEventDelayedSeconds(nameof(CheckDistance), Random.Range(5f, 7f));//dont do all vehicles on same frame
+
+            SetupGCalcValues();
+        }
+        public void SetupGCalcValues()
+        {
+            NumFUinAvgTime = (int)(GsAveragingTime / Time.fixedDeltaTime);
+            FrameGs = new Vector3[NumFUinAvgTime];
         }
         private void Init()
         {
@@ -961,17 +972,30 @@ namespace SaccFlightAndVehicles
         }
         float Steps_Error;
         bool frame_even = true;
+        float GsAveragingTime = .1f;
+        private int NumFUinAvgTime = 1;
+        private Vector3 Gs_all;
+        private Vector3[] FrameGs;
+        private int GsFrameCheck;
         private void FixedUpdate()
         {
             if (!IsOwner) { return; }
             float DeltaTime = Time.fixedDeltaTime;
             Vector3 absVel = VehicleRigidbody.velocity;
             VehicleVel = absVel - LastTouchedTransform_Speed;
+            //calc Gs
             float gravity = 9.81f * DeltaTime;
-            LastFrameVel.y -= gravity; //add gravity
-            AllGs = Vector3.Distance(LastFrameVel, absVel) / gravity;
+            LastFrameVel.y -= gravity;
+            Vector3 Gs3 = VehicleTransform.InverseTransformDirection(VehicleVel - LastFrameVel);
+            Vector3 thisFrameGs = Gs3 / gravity;
+            Gs_all -= FrameGs[GsFrameCheck];
+            Gs_all += thisFrameGs;
+            FrameGs[GsFrameCheck] = thisFrameGs;
+            GsFrameCheck++;
+            if (GsFrameCheck >= NumFUinAvgTime) { GsFrameCheck = 0; }
+            AllGs = Gs_all.magnitude / NumFUinAvgTime;
             GDamageToTake += Mathf.Max((AllGs - MaxGs), 0);
-            LastFrameVel = absVel;
+            LastFrameVel = VehicleVel;
 
             if (Piloting)
             {
@@ -1148,6 +1172,7 @@ namespace SaccFlightAndVehicles
             AllGs = 0;
             GDamageToTake = 0f;
             UpdateWheelIsOwner();
+            for (int i = 0; i < NumFUinAvgTime; i++) { FrameGs[i] = Vector3.zero; }
         }
         public void SFEXT_O_LoseOwnership()
         {
@@ -1336,13 +1361,26 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_OnCollisionEnter()
         {
             if (!IsOwner) { return; }
-            LastCollisionTime = Time.time;
-            if (Time.time - LastCollisionTime < MinCollisionSoundDelay)
+            Collision col = EntityControl.LastCollisionEnter;
+            if (col == null) { return; }
+            float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
+            float colmag_dmg = colmag;
+            if (colmag_dmg > CrashDmg_MinSpeed)
             {
-                LastCollisionTime = Time.time;
-                Collision col = EntityControl.LastCollisionEnter;
-                if (col == null) { return; }
-                float colmag = col.impulse.magnitude / VehicleRigidbody.mass;
+                if (colmag_dmg < CrashDmg_MaxSpeed)
+                {
+                    float dif = CrashDmg_MaxSpeed - CrashDmg_MinSpeed;
+                    float newcolT = (colmag_dmg - CrashDmg_MinSpeed) / dif;
+                    colmag_dmg = Mathf.Lerp(0, CrashDmg_MaxSpeed, newcolT);
+                }
+                float thisGDMG = (colmag_dmg / CrashDmg_MaxSpeed) * FullHealth;
+                Health -= thisGDMG;
+
+                if (Health <= 0 && thisGDMG > FullHealth * 0.5f)
+                { NetworkExplode(); }
+            }
+            if (Time.time - LastCollisionTime > MinCollisionSoundDelay)
+            {
                 if (colmag > BigCrashSpeed)
                 {
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendBigCrash));
@@ -1356,6 +1394,7 @@ namespace SaccFlightAndVehicles
                     SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendSmallCrash));
                 }
             }
+            LastCollisionTime = Time.time;
         }
         public void SendSmallCrash()
         {
