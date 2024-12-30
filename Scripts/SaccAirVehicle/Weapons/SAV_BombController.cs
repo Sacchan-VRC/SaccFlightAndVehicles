@@ -9,7 +9,7 @@ namespace SaccFlightAndVehicles
     [UdonBehaviourSyncMode(BehaviourSyncMode.None)]
     public class SAV_BombController : UdonSharpBehaviour
     {
-        [SerializeField] private UdonSharpBehaviour BombLauncherControl;
+        public UdonSharpBehaviour BombLauncherControl;
         [Tooltip("Bomb will explode after this time")]
         [SerializeField] private float MaxLifetime = 40;
         [Tooltip("Maximum liftime of bomb is randomized by +- this many seconds on appearance")]
