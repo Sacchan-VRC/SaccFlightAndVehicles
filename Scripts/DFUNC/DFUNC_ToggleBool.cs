@@ -303,6 +303,8 @@ namespace SaccFlightAndVehicles
             EngineOn = false;
             CheckToggleAllowed();
         }
+        public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
+        public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
         public void SFEXT_O_TakeOwnership()
         {//disable if owner leaves while piloting
             if (!IsSecondary)
