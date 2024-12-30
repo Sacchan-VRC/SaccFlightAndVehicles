@@ -10,6 +10,7 @@ namespace SaccFlightAndVehicles
     public class DFUNC_SlideAnimation : UdonSharpBehaviour
     {
         public UdonSharpBehaviour SAVControl;
+        [SerializeField] private Transform ControlsRoot;
         public float SyncUpdateRate = .25f;
         [SerializeField] KeyCode AnimUpKey = KeyCode.PageUp;
         [SerializeField] KeyCode AnimDownKey = KeyCode.PageDown;
@@ -20,7 +21,6 @@ namespace SaccFlightAndVehicles
         [SerializeField] float AnimDefaultValue;
         [SerializeField] private float AnimMoveSpeed = 1f;
         [SerializeField] private bool ResetOnEnter = false;
-        private Transform ControlsRoot;
         private VRCPlayerApi localPlayer;
         private bool TriggerLastFrame;
         private bool IsOwner;
@@ -43,7 +43,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public SAV_PassengerFunctionsController PassengerFunctionsControl;
         public void SFEXT_L_EntityStart()
         {
-            ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot");
+            if (!ControlsRoot) { ControlsRoot = (Transform)SAVControl.GetProgramVariable("ControlsRoot"); }
             localPlayer = Networking.LocalPlayer;
             ThrottleSensitivity = (float)SAVControl.GetProgramVariable("ThrottleSensitivity");
             InVR = EntityControl.InVR;
@@ -109,7 +109,7 @@ namespace SaccFlightAndVehicles
                             AnimZeroPoint = handpos.z;
                             AnimTemp = AnimValue;
                         }
-                        float newAnim = AnimTemp + ((AnimZeroPoint - handpos.z) * -ThrottleSensitivity);
+                        float newAnim = AnimTemp + ((AnimZeroPoint - handpos.z) * ThrottleSensitivity);
                         AnimValueInput = newAnim;
 
                         TriggerLastFrame = true;

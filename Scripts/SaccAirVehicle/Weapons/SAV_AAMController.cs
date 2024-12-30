@@ -21,6 +21,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("For simulating FOX-3. Missile will not require parent vehicle lock after it is closer to target than this distance. Unlike a real FOX-3, it will only chase it's original target in pitbull mode. Meters. Set to 0 for FOX-1")]
         public float PitBullDistance = 0;
         [Range(0, 180f)]
+        [Tooltip("If angle of missile velocity to target vector is greater than this, go dumb")]
+        public float MaxTrackingAngle = 90;
+        [Range(0, 180f)]
         [Tooltip("If the missile and target vehicle are facing towards each other, multiply rotation speed by HighAspectRotSpeedMulti with this nose angle (facing perfectly towards each other = 0 degrees, which is the same as disabled) Set 0 for any non-heatseeker missiles")]
         public float HighAspectTrackAngle = 60;
         [Tooltip("See above")]
@@ -300,6 +303,8 @@ namespace SaccFlightAndVehicles
                         )
                         ||
                         (!TargetLineOfSight && (!RequireParentLock || PitBull))
+                        ||
+                        Vector3.Angle(MissileToTargetVector, AAMRigid.velocity) > MaxTrackingAngle
                         ;
 
                     //Heat missiles have a harder time tracking from the front
@@ -318,15 +323,18 @@ namespace SaccFlightAndVehicles
                     Targetmovedir = (TargetPos - TargetPosLastFrame) / DeltaTime;
                     EngineTrack = 1;
                     AspectTrack = 1;
-                    Dumb = //FOX-1
+                    Dumb =
                         (RequireParentLock && !PitBull &&
                             (!MotherLoS || Target.gameObject != AAMTargets[(int)AAMLauncherControl.GetProgramVariable("AAMTarget")] || !(bool)AAMLauncherControl.GetProgramVariable("_AAMLocked"))
-                        );
+                        )
+                        ||
+                        Vector3.Angle(MissileToTargetVector, AAMRigid.velocity) > MaxTrackingAngle
+                        ;
                 }
                 if (EngineTrack > 1) { EngineTrack = AfterBurnerTrackMulti; }//if AB on, faster rotation
                 if (Target.gameObject.activeInHierarchy && UnlockTimer < UnlockTime)
                 {
-                    if (!Dumb && Vector3.Dot(MissileToTargetVector, AAMRigid.velocity) > 0 || LockHack)
+                    if (!Dumb || LockHack)
                     {
                         if (PredictiveChase)
                         {
