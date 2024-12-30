@@ -5,6 +5,7 @@ using VRC.Udon;
 
 namespace SaccFlightAndVehicles
 {
+    [DefaultExecutionOrder(100)]//after syncscript
     public class EXT_Turret : UdonSharpBehaviour
     {
         public Transform TurretRotatorHor;
@@ -49,6 +50,12 @@ namespace SaccFlightAndVehicles
         [SerializeField] float RotatingSound_maxpitch = 2f;
         [SerializeField] bool PlayRotatingSoundForOthers = false;
         [SerializeField] bool RotatingSound_HorizontalOnly;
+        [SerializeField] bool UseVirtualJoystick = true;
+        [SerializeField] bool UseControlStickL;
+        [SerializeField] bool UseControlStickR;
+        [SerializeField] float ControlStickSensitivityL = 1f;
+        [SerializeField] float ControlStickSensitivityR = 1f;
+        [SerializeField] bool RollAsYaw;
         public float RotatingSoundMulti = .02f;
         [Header("Networking:")]
         [Tooltip("How much vehicle accelerates extra towards its 'raw' position when not owner in order to correct positional errors")]
@@ -121,6 +128,18 @@ namespace SaccFlightAndVehicles
 
             if (RotatingSound) { RotateSoundVol = RotatingSound.volume; }
             Stabilize_ = Stabilize;
+            //enable for 5 seconds to sync turret rotation to late joiners
+            if (localPlayer.isMaster) { OwnerSend(); }
+            else
+            {
+                gameObject.SetActive(true);
+                SendCustomEventDelayedSeconds(nameof(InitalSyncDisable), 5f);
+            }
+        }
+        public void InitalSyncDisable()
+        {
+            if (!Manned)
+            { gameObject.SetActive(false); }
         }
         public void SFEXT_O_PilotEnter()
         {
@@ -131,8 +150,10 @@ namespace SaccFlightAndVehicles
             LastForward_VERT = TurretRotatorHor.forward;
             nextUpdateTime = Time.time - .01f;
         }
+        bool Manned;
         public void SFEXT_G_PilotEnter()
         {
+            Manned = true;
             justEnabled = true;
             GunRotationSpeed = Quaternion.identity;
             SND_RotLerper = 0;
@@ -149,6 +170,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_PilotExit()
         {
+            Manned = false;
             gameObject.SetActive(false);
             if (RotatingSound && RotatingSound.isPlaying) { RotatingSound.Stop(); }
         }
@@ -186,7 +208,7 @@ namespace SaccFlightAndVehicles
                 }
                 //virtual joystick
                 Vector2 VRPitchYawInput = Vector2.zero;
-                if (InVR)
+                if (InVR && UseVirtualJoystick)
                 {
                     if (RGrip > 0.75)
                     {
@@ -202,10 +224,14 @@ namespace SaccFlightAndVehicles
                         Quaternion JoystickDifference = (Quaternion.Inverse(ControlsRoot.rotation) * localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.RightHand).rotation) * Quaternion.Inverse(JoystickZeroPoint) * ControlsRoot.rotation;
                         //create normalized vectors facing towards the 'forward' and 'up' directions of the joystick
                         Vector3 JoystickPosYaw = (JoystickDifference * Vector3.forward);
+                        Vector3 JoystickPos = (JoystickDifference * Vector3.up);
                         //use acos to convert the relevant elements of the array into radians, re-center around zero, then normalize between -1 and 1 and multiply for desired deflection
                         //the clamp is there because rotating a vector3 can cause it to go a miniscule amount beyond length 1, resulting in NaN (crashes vrc)
                         VRPitchYawInput.x = ((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.y, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.x;
-                        VRPitchYawInput.y = -((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
+                        if (RollAsYaw)
+                            VRPitchYawInput.y = -((Mathf.Acos(Mathf.Clamp(JoystickPos.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
+                        else
+                            VRPitchYawInput.y = -((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
                     }
                     else
                     {
@@ -214,12 +240,23 @@ namespace SaccFlightAndVehicles
                     }
                     ControlsRotLastFrame = ControlsRoot.rotation;
                 }
+                if (UseControlStickL)
+                {
+                    VRPitchYawInput.x -= Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickVertical") * ControlStickSensitivityL;
+                    VRPitchYawInput.y += Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryThumbstickHorizontal") * ControlStickSensitivityL;
+                }
+                if (UseControlStickR)
+                {
+                    VRPitchYawInput.x -= Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickVertical") * ControlStickSensitivityR;
+                    VRPitchYawInput.y += Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal") * ControlStickSensitivityR;
+                }
+
                 int InX = (Wf + Sf);
                 int InY = (Af + Df);
                 if (InX > 0 && InputXKeyb < 0 || InX < 0 && InputXKeyb > 0) InputXKeyb = 0;
                 if (InY > 0 && InputYKeyb < 0 || InY < 0 && InputYKeyb > 0) InputYKeyb = 0;
-                InputXKeyb = Mathf.Lerp(InputXKeyb, InX, Mathf.Abs(InX) > 0 ? TurningResponseDesktop * deltaTime : 1);
-                InputYKeyb = Mathf.Lerp(InputYKeyb, InY, Mathf.Abs(InY) > 0 ? TurningResponseDesktop * deltaTime : 1);
+                InputXKeyb = Mathf.Lerp(InputXKeyb, InX, Mathf.Abs(InX) > 0 ? 1 - Mathf.Pow(0.5f, TurningResponseDesktop * deltaTime) : 1);
+                InputYKeyb = Mathf.Lerp(InputYKeyb, InY, Mathf.Abs(InY) > 0 ? 1 - Mathf.Pow(0.5f, TurningResponseDesktop * deltaTime) : 1);
 
                 float InputX = Mathf.Clamp((VRPitchYawInput.x + InputXKeyb), -1, 1);
                 float InputY = Mathf.Clamp((VRPitchYawInput.y + InputYKeyb), -1, 1);
@@ -231,8 +268,8 @@ namespace SaccFlightAndVehicles
                 float RotationDifferenceX = 0;
                 if (Stabilize)
                 {
-                    RotationDifferenceY = Vector3.SignedAngle(VehicleTransform.forward, Vector3.ProjectOnPlane(LastForward_HOR, VehicleTransform.up), VehicleTransform.up);
-                    LastForward_HOR = VehicleTransform.forward;
+                    RotationDifferenceY = Vector3.SignedAngle(TurretForwardEmpty.forward, Vector3.ProjectOnPlane(LastForward_HOR, TurretForwardEmpty.up), TurretForwardEmpty.up);
+                    LastForward_HOR = TurretForwardEmpty.forward;
 
                     RotationDifferenceX = Vector3.SignedAngle(TurretRotatorHor.forward, Vector3.ProjectOnPlane(LastForward_VERT, TurretRotatorHor.right), TurretRotatorHor.right);
                     LastForward_VERT = TurretRotatorHor.forward;
