@@ -13,6 +13,7 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour SGVControl;
         [Tooltip("Object enabled when function is active (used on MFD)")]
         public GameObject Dial_Funcon;
+        [SerializeField] private bool Funcon_Invert;
         public Transform ToggledCoMPos;
         public string[] floatSGVNames;
         public float[] floatSGVToggledValues;
@@ -43,7 +44,7 @@ namespace SaccFlightAndVehicles
         private bool TriggerLastFrame;
         public void SFEXT_L_EntityStart()
         {
-            if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+            if (Dial_Funcon) { Dial_Funcon.SetActive(Funcon_Invert); }
             CoM = EntityControl.CenterOfMass;
             CoMOriginalPos = CoM.localPosition;
 
@@ -133,7 +134,7 @@ namespace SaccFlightAndVehicles
                     EntityControl.SetCoM();
                 }
 
-                if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
+                if (Dial_Funcon) { Dial_Funcon.SetActive(Funcon_Invert); }
                 for (int i = 0; i < floatSGVNames.Length; i++)
                 {
                     SGVControl.SetProgramVariable(floatSGVNames[i], floatSGVToggleOriginalValues[i]);
@@ -180,7 +181,7 @@ namespace SaccFlightAndVehicles
                     EntityControl.SetCoM();
                 }
 
-                if (Dial_Funcon) { Dial_Funcon.SetActive(true); }
+                if (Dial_Funcon) { Dial_Funcon.SetActive(!Funcon_Invert); }
                 for (int i = 0; i < floatSGVNames.Length; i++)
                 {
                     SGVControl.SetProgramVariable(floatSGVNames[i], floatSGVToggledValues[i]);
