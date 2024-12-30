@@ -224,7 +224,7 @@ namespace SaccFlightAndVehicles
         {
             if (Piloting)
             {
-                if (Selected || (!inVR && Input.GetKey(FireNowKey)))
+                if (Selected || (!inVR && Input.GetKey(FireNowKey)) || HoldingTrigger_Held)
                 {
                     float DeltaTime = Time.deltaTime;
                     float Trigger = 0;
@@ -235,7 +235,7 @@ namespace SaccFlightAndVehicles
                         else
                         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                     }
-                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(FireKey) || Input.GetKey(FireNowKey))) && GunAmmoInSeconds > 0))
+                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(FireKey) || Input.GetKey(FireNowKey)) || HoldingTrigger_Held) && GunAmmoInSeconds > 0))
                     {
                         if (DisallowFireIfWind)
                         {
@@ -436,6 +436,26 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_TouchDown() { Grounded = true; }
         public void SFEXT_G_TouchDownWater() { Grounded = true; }
         public void SFEXT_G_TakeOff() { Grounded = false; }
+        private bool HoldingTrigger_Held = false;
+        public void SFEXT_O_OnPickupUseDown()
+        {
+            if (inVR) { return; }
+            HoldingTrigger_Held = true;
+        }
+        public void SFEXT_O_OnPickupUseUp()
+        {
+            HoldingTrigger_Held = false;
+        }
+        public void SFEXT_O_OnPickup()
+        {
+            SFEXT_O_PilotEnter();
+        }
+        public void SFEXT_O_OnDrop()
+        {
+            SFEXT_O_PilotExit();
+        }
+        public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
+        public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
         //hud stuff
         public Transform TargetIndicator;
         public Transform GUNLeadIndicator;

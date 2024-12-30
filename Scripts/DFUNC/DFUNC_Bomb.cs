@@ -239,12 +239,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_OnPickupUseDown()
         {
             if (!Selected) { return; }
-            if (HandHeld_MachineGun)
-            {
-                HoldingTrigger_Held = true;
-                return;
-            }
-            else if (HandHeld_UseEventToFire)
+            if (HandHeld_UseEventToFire)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchBombs_Event));
                 return;
@@ -293,12 +288,21 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_OnPickup()
         {
             Held = true;
+            if (HandHeld_MachineGun)
+            {
+                SFEXT_O_PilotEnter();
+            }
+            else { UpdateAmmoVisuals(); }
         }
         public void SFEXT_O_OnDrop()
         {
             Held = false;
             HoldingTrigger_Held = false;
             DFUNC_Deselected();
+            if (HandHeld_MachineGun)
+            {
+                SFEXT_O_PilotExit();
+            }
         }
         public void UpdateAmmoVisuals()
         {
@@ -324,7 +328,7 @@ namespace SaccFlightAndVehicles
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                 }
-                if ((Trigger > 0.75 || Input.GetKey(FireKey) || Input.GetKey(FireNowKey)) && !Held || HoldingTrigger_Held)
+                if ((Trigger > 0.75 || Input.GetKey(FireKey) || Input.GetKey(FireNowKey)) || HoldingTrigger_Held)
                 {
                     if (!TriggerLastFrame)
                     {
