@@ -15,7 +15,6 @@ namespace SaccFlightAndVehicles
         public SaccEntity EntityControl;
         [System.NonSerialized] public SaccRadioBase RadioBase;
         // public bool RadioOn = true;
-        [Header("Debug:")]
         [UdonSynced, FieldChangeCallback(nameof(Channel))] private byte _Channel;
         public byte Channel
         {
@@ -64,6 +63,7 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_PilotEnter()
         {
+            Piloting = true;
             InVR = EntityControl.InVR;
             EnterVehicle();
         }
@@ -79,8 +79,10 @@ namespace SaccFlightAndVehicles
                 RadioBase.SetProgramVariable("CurrentChannel", Channel);
             }
         }
+        bool Piloting;
         public void SFEXT_O_PilotExit()
         {
+            Piloting = false;
             ExitVehicle();
         }
         public void SFEXT_P_PassengerEnter()
@@ -102,8 +104,11 @@ namespace SaccFlightAndVehicles
                 UpdateChannel();
             }
             UpdateChannelText();
-            controlsRunning = true;
-            Controls();
+            if (!controlsRunning && Piloting)
+            {
+                controlsRunning = true;
+                Controls();
+            }
         }
         public void NewChannel()
         {
@@ -169,7 +174,7 @@ namespace SaccFlightAndVehicles
 
 
 
-
+        [Header("Optional, DFUNC Mode:")]
         [SerializeField] private KeyCode ChannelUpKey = KeyCode.RightBracket;
         [SerializeField] private KeyCode ChannelDownKey = KeyCode.LeftBracket;
         [SerializeField] private TextMeshProUGUI ChannelNumber;
