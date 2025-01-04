@@ -27,6 +27,8 @@ namespace SaccFlightAndVehicles
             }
             get => _Channel;
         }
+        [Header("For moveable/respawnable radiozone:")]
+        [SerializeField] VRC.SDK3.Components.VRCObjectSync PickupObject;
         int nextplayer;
         float VoiceNear;
         float VoiceFar;
@@ -168,6 +170,14 @@ namespace SaccFlightAndVehicles
                 Channel--;
             }
             RequestSerialization();
+        }
+        public void RespawnRadio()
+        {
+            if (PickupObject)
+            {
+                Networking.SetOwner(Networking.LocalPlayer, PickupObject.gameObject);
+                PickupObject.Respawn();
+            }
         }
     }
 }
