@@ -51,11 +51,13 @@ namespace SaccFlightAndVehicles
         [SerializeField] bool PlayRotatingSoundForOthers = false;
         [SerializeField] bool RotatingSound_HorizontalOnly;
         [SerializeField] bool UseVirtualJoystick = true;
+        [SerializeField] bool VJoy_RollAsYaw = false;
         [SerializeField] bool UseControlStickL;
         [SerializeField] bool UseControlStickR;
         [SerializeField] float ControlStickSensitivityL = 1f;
         [SerializeField] float ControlStickSensitivityR = 1f;
-        [SerializeField] bool RollAsYaw;
+        [SerializeField] KeyCode KeyboardSpeedModifier = KeyCode.LeftShift;
+        [SerializeField] float K_ModifierSpeed = 0.2f;
         public float RotatingSoundMulti = .02f;
         [Header("Networking:")]
         [Tooltip("How much vehicle accelerates extra towards its 'raw' position when not owner in order to correct positional errors")]
@@ -228,7 +230,7 @@ namespace SaccFlightAndVehicles
                         //use acos to convert the relevant elements of the array into radians, re-center around zero, then normalize between -1 and 1 and multiply for desired deflection
                         //the clamp is there because rotating a vector3 can cause it to go a miniscule amount beyond length 1, resulting in NaN (crashes vrc)
                         VRPitchYawInput.x = ((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.y, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.x;
-                        if (RollAsYaw)
+                        if (VJoy_RollAsYaw)
                             VRPitchYawInput.y = -((Mathf.Acos(Mathf.Clamp(JoystickPos.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
                         else
                             VRPitchYawInput.y = -((Mathf.Acos(Mathf.Clamp(JoystickPosYaw.x, -1, 1)) - 1.5707963268f) * Mathf.Rad2Deg) / MaxJoyAngles.y;
@@ -251,12 +253,18 @@ namespace SaccFlightAndVehicles
                     VRPitchYawInput.y += Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryThumbstickHorizontal") * ControlStickSensitivityR;
                 }
 
-                int InX = (Wf + Sf);
-                int InY = (Af + Df);
+                float InX = (Wf + Sf);
+                float InY = (Af + Df);
                 if (InX > 0 && InputXKeyb < 0 || InX < 0 && InputXKeyb > 0) InputXKeyb = 0;
                 if (InY > 0 && InputYKeyb < 0 || InY < 0 && InputYKeyb > 0) InputYKeyb = 0;
+                if (Input.GetKey(KeyboardSpeedModifier))
+                {
+                    InX *= K_ModifierSpeed;
+                    InY *= K_ModifierSpeed;
+                }
                 InputXKeyb = Mathf.Lerp(InputXKeyb, InX, Mathf.Abs(InX) > 0 ? 1 - Mathf.Pow(0.5f, TurningResponseDesktop * deltaTime) : 1);
                 InputYKeyb = Mathf.Lerp(InputYKeyb, InY, Mathf.Abs(InY) > 0 ? 1 - Mathf.Pow(0.5f, TurningResponseDesktop * deltaTime) : 1);
+
 
                 float InputX = Mathf.Clamp((VRPitchYawInput.x + InputXKeyb), -1, 1);
                 float InputY = Mathf.Clamp((VRPitchYawInput.y + InputYKeyb), -1, 1);
