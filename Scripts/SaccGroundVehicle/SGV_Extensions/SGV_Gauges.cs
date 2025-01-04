@@ -45,38 +45,41 @@ namespace SaccFlightAndVehicles
         }
         private void LateUpdate()
         {
-            HGs_txt.text = Mathf.Abs(AllGsLocal.x).ToString("F1");
+            if (HGs_txt) HGs_txt.text = Mathf.Abs(AllGsLocal.x).ToString("F1");
             AllGsLocal.x = Mathf.Clamp(AllGsLocal.x, -4, 4);
-            FGs_txt.text = Mathf.Abs(AllGsLocal.z).ToString("F1");
+            if (FGs_txt) FGs_txt.text = Mathf.Abs(AllGsLocal.z).ToString("F1");
             AllGsLocal.z = Mathf.Clamp(AllGsLocal.z, -4, 4);
             Vector3 GPos = new Vector3(-AllGsLocal.z * 2.5f, 0, AllGsLocal.x * 2.5f);
-            Gs_Marker.localPosition = GPos;
+            if (Gs_Marker) Gs_Marker.localPosition = GPos;
 
             float speed = (float)SGVControl.GetProgramVariable("VehicleSpeed");
             Speed_txt.text = (speed * SpeedMultiplier).ToString("F0");
 
             int gear = (SGVControl.CurrentGear - NumReverseGears);
-            if (gear < 1)
+            if (Gear_txt)
             {
-                if (gear == 0) { Gear_txt.text = "N"; }
-                else
+                if (gear < 1)
                 {
-                    if (MoreThanOneRevrseGear)
-                    {
-                        Gear_txt.text = string.Concat("R", (-gear).ToString("F0"));
-                    }
+                    if (gear == 0) { Gear_txt.text = "N"; }
                     else
                     {
-                        Gear_txt.text = "R";
+                        if (MoreThanOneRevrseGear)
+                        {
+                            Gear_txt.text = string.Concat("R", (-gear).ToString("F0"));
+                        }
+                        else
+                        {
+                            Gear_txt.text = "R";
+                        }
                     }
                 }
-            }
-            else
-            {
-                Gear_txt.text = (gear).ToString("F0");
+                else
+                {
+                    Gear_txt.text = (gear).ToString("F0");
+                }
             }
             Vector3 ClutchScale = new Vector3(1, 1, SGVControl.Clutch);
-            ClutchBar.localScale = ClutchScale;
+            if (ClutchBar) ClutchBar.localScale = ClutchScale;
         }
         private float AllGs;
         private Vector3 AllGsLocal;
