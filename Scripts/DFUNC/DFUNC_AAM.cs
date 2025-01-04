@@ -128,8 +128,6 @@ namespace SaccFlightAndVehicles
             HighAspectPreventLockAngleDot = Mathf.Cos(HighAspectAngle * Mathf.Deg2Rad);
             IsOwner = EntityControl.IsOwner;
             if (AnimFiredTriggerName != string.Empty) { DoAnimFiredTrigger = true; }
-            EntityColliders = EntityControl.gameObject.GetComponentsInChildren<Collider>();
-            StartEntityLayer = EntityControl.gameObject.layer;
 
             if (LockTimeABDivide <= 0)
             { LockTimeABDivide = 0.0001f; }
@@ -184,42 +182,17 @@ namespace SaccFlightAndVehicles
                 AAMCurrentTargetSAVControl = Target.transform.parent.GetComponent<SaccAirVehicle>();
             }
         }
-        private Collider[] EntityColliders;
-        private int StartEntityLayer;
         public void SFEXT_G_PilotEnter()
         {
             OnEnableDeserializationBlocker = true;
             SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10);
             gameObject.SetActive(true);
-            if (EntityControl.EntityPickup)
-            {
-                if (Holding)
-                {
-                    EntityControl.gameObject.layer = 9;
-                    foreach (Collider stngcol in EntityColliders)
-                    { stngcol.isTrigger = true; }
-                }
-                else
-                {
-                    foreach (Collider stngcol in EntityColliders)
-                    { stngcol.enabled = false; }
-                }
-            }
         }
         public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
         {
             gameObject.SetActive(false);
             AAMLocked = false;
-            if (EntityControl.EntityPickup)
-            {
-                EntityControl.gameObject.layer = StartEntityLayer;
-                foreach (Collider stngcol in EntityColliders)
-                {
-                    stngcol.isTrigger = false;
-                    stngcol.enabled = true;
-                }
-            }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -333,7 +306,6 @@ namespace SaccFlightAndVehicles
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                 else
                 { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-
                 bool lockedLast = AAMLocked;
                 if (NumAAMTargets != 0)
                 {
@@ -357,7 +329,7 @@ namespace SaccFlightAndVehicles
                     if (lockedLast != AAMLocked) { RequestSerialization(); }
 
                     //firing AAM
-                    if (Trigger > 0.75 || (!Holding && (Input.GetKey(FireKey))))
+                    if (!Holding && (Trigger > 0.75 || Input.GetKey(FireKey)))
                     {
                         if (!TriggerLastFrame)
                         {

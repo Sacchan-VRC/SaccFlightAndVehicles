@@ -125,8 +125,6 @@ namespace SaccFlightAndVehicles
             IsOwner = EntityControl.IsOwner;
             VehicleTransform = EntityControl.transform;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
-            EntityColliders = EntityControl.gameObject.GetComponentsInChildren<Collider>();
-            StartEntityLayer = EntityControl.gameObject.layer;
             InVR = EntityControl.InVR;
 
             UpdateAmmoVisuals();
@@ -166,27 +164,11 @@ namespace SaccFlightAndVehicles
         {
             if (HUDText_AGM_ammo) { HUDText_AGM_ammo.text = NumAGM.ToString("F0"); }
         }
-        private Collider[] EntityColliders;
-        private int StartEntityLayer;
         public void SFEXT_G_PilotEnter()
         {
             OnEnableDeserializationBlocker = true;
             SendCustomEventDelayedFrames(nameof(FireDisablerFalse), 10);
             gameObject.SetActive(true);
-            if (EntityControl.EntityPickup)
-            {
-                if (EntityControl.Holding)
-                {
-                    EntityControl.gameObject.layer = 9;
-                    foreach (Collider stngcol in EntityColliders)
-                    { stngcol.isTrigger = true; }
-                }
-                else
-                {
-                    foreach (Collider stngcol in EntityColliders)
-                    { stngcol.enabled = false; }
-                }
-            }
         }
         public void FireDisablerFalse() { OnEnableDeserializationBlocker = false; }
         public void SFEXT_G_PilotExit()
@@ -194,15 +176,6 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             if (DoAnimBool && !AnimBoolStayTrueOnExit && AnimOn)
             { SetBoolOff(); }
-            if (EntityControl.EntityPickup)
-            {
-                EntityControl.gameObject.layer = StartEntityLayer;
-                foreach (Collider stngcol in EntityColliders)
-                {
-                    stngcol.isTrigger = false;
-                    stngcol.enabled = true;
-                }
-            }
         }
         public void SFEXT_O_PilotExit()
         {
@@ -212,7 +185,7 @@ namespace SaccFlightAndVehicles
             gameObject.SetActive(false);
             func_active = false;
             Piloting = false;
-            UseTrigger = 0;
+            HoldingTrigger_Held = 0;
             if (Dial_Funcon) { Dial_Funcon.SetActive(false); }
         }
         public void SFEXT_G_RespawnButton()
@@ -260,6 +233,7 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             func_active = false;
+            HoldingTrigger_Held = 0;
             AtGScreen.SetActive(false);
             AtGCam.gameObject.SetActive(false);
             if (DoAnimBool && AnimOn)
@@ -287,16 +261,14 @@ namespace SaccFlightAndVehicles
                 TriggerTapTime += DeltaTime;
                 AGMUnlockTimer += DeltaTime * AGMUnlocking;//AGMUnlocking is 1 if it was locked and just pressed, else 0, (waits for double tap delay to disable)
                 float Trigger;
-                if (!HandHeldMode)
+                if (HandHeldMode)
+                    Trigger = HoldingTrigger_Held;
+                else
                 {
                     if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
-                }
-                else
-                {
-                    Trigger = UseTrigger;
                 }
                 if (AGMUnlockTimer > 0.4f && AGMLocked)
                 {
@@ -512,14 +484,14 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
-        private float UseTrigger;
+        private float HoldingTrigger_Held;
         public void SFEXT_O_OnPickupUseDown()
         {
-            UseTrigger = 1;
+            HoldingTrigger_Held = 1;
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            UseTrigger = 0;
+            HoldingTrigger_Held = 0;
         }
         private void LaunchAGM_Owner()
         {

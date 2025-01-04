@@ -32,6 +32,9 @@ namespace SaccFlightAndVehicles
         [Tooltip("Points at which bombs appear, each succesive bomb appears at the next transform")]
         public Transform[] BombLaunchPoints;
         public AudioSource LaunchSound;
+        public AudioSource ReloadSound;
+        [Tooltip("Play the Reload sound after BombDelay + this (negative values encouraged)")]
+        public float ReloadSound_offset = 0f;
         public ParticleSystem LaunchParticle;
         public int LaunchParticle_num = 15;
         [Tooltip("Allow user to fire the weapon while the vehicle is on the ground taxiing?")]
@@ -54,8 +57,9 @@ namespace SaccFlightAndVehicles
         public bool AnimBoolStayTrueOnExit;
         [Tooltip("KeyboardInput function fires instantly instead of selecting the DFUNC")]
         public bool KeyboardInput_InstantFire = false;
-        public bool HandHeld_MachineGun = false;
         public bool HandHeld_UseEventToFire = false;
+        [Tooltip("On desktop mode, fire even when not selected if OnPickupUseDown is pressed")]
+        [SerializeField] bool DT_UseToFire;
         private bool Held = false;
         [Tooltip("Dropped bombs will be parented to this object, use if you happen to have some kind of moving origin system")]
         public Transform WorldParent;
@@ -203,7 +207,7 @@ namespace SaccFlightAndVehicles
         public void DFUNC_Deselected()
         {
             Selected = false;
-            HoldingTrigger_Held = false;
+            HoldingTrigger_Held = 0;
             if (DoAnimBool && AnimOn)
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SetBoolOff)); }
             for (int i = 0; i < EnableOnSelected.Length; i++) { EnableOnSelected[i].SetActive(false); }
@@ -235,19 +239,16 @@ namespace SaccFlightAndVehicles
         }
         public void SFEXT_O_TakeOwnership() { IsOwner = true; }
         public void SFEXT_O_LoseOwnership() { IsOwner = false; }
-        private bool HoldingTrigger_Held = false;
+        private int HoldingTrigger_Held = 0;
         public void SFEXT_O_OnPickupUseDown()
         {
-            if (!Selected) { return; }
             if (HandHeld_UseEventToFire)
             {
                 SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(LaunchBombs_Event));
                 return;
             }
-            else
-            {
-                TryToFire();
-            }
+            HoldingTrigger_Held = 1;
+            return;
         }
         void TryToFire()
         {
@@ -280,29 +281,24 @@ namespace SaccFlightAndVehicles
             {
                 LaunchBomb();
             }
+            if (EntityControl.InVehicle && ReloadSound) SendCustomEventDelayedSeconds(nameof(PlayReloadSound), BombDelay + ReloadSound_offset);
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger_Held = false;
+            HoldingTrigger_Held = 0;
         }
         public void SFEXT_O_OnPickup()
         {
             Held = true;
-            if (HandHeld_MachineGun)
-            {
-                SFEXT_O_PilotEnter();
-            }
-            else { UpdateAmmoVisuals(); }
+            SFEXT_O_PilotEnter();
+            UpdateAmmoVisuals();
         }
         public void SFEXT_O_OnDrop()
         {
             Held = false;
-            HoldingTrigger_Held = false;
+            HoldingTrigger_Held = 0;
+            SFEXT_O_PilotExit();
             DFUNC_Deselected();
-            if (HandHeld_MachineGun)
-            {
-                SFEXT_O_PilotExit();
-            }
         }
         public void UpdateAmmoVisuals()
         {
@@ -317,18 +313,20 @@ namespace SaccFlightAndVehicles
         }
         private void Update()
         {
-            if (!Piloting) return;
-            if (Selected || !inVR & Input.GetKey(FireNowKey))
+            if (!(Piloting || Held)) return;
+            if (Selected || Input.GetKey(FireNowKey) || (!inVR && DT_UseToFire))
             {
                 float Trigger = 0;
-                if (Selected)
+                if (EntityControl.Holding || !inVR && DT_UseToFire)
+                    Trigger = HoldingTrigger_Held;
+                else if (Selected)
                 {
                     if (LeftDial)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                 }
-                if ((Trigger > 0.75 || Input.GetKey(FireKey) || Input.GetKey(FireNowKey)) || HoldingTrigger_Held)
+                if ((Trigger > 0.75 || Input.GetKey(FireKey) || Input.GetKey(FireNowKey)))
                 {
                     if (!TriggerLastFrame)
                     {
@@ -365,8 +363,11 @@ namespace SaccFlightAndVehicles
                 else { NewBomb.transform.SetParent(null); }
                 NewBomb.transform.SetPositionAndRotation(BombLaunchPoints[BombPoint].position, BombLaunchPoints[BombPoint].rotation);
                 Rigidbody BombRB = NewBomb.GetComponent<Rigidbody>();
-                BombRB.position = NewBomb.transform.position;
-                BombRB.rotation = NewBomb.transform.rotation;
+                if (BombRB)
+                {
+                    BombRB.position = NewBomb.transform.position;
+                    BombRB.rotation = NewBomb.transform.rotation;
+                }
                 NewBomb.SetActive(true);
                 if (BombInheritVelocity)
                 {
@@ -392,6 +393,10 @@ namespace SaccFlightAndVehicles
             UpdateAmmoVisuals();
             if (IsOwner)
             { EntityControl.SendEventToExtensions("SFEXT_O_BombLaunch"); }
+        }
+        public void PlayReloadSound()
+        {
+            ReloadSound.PlayOneShot(ReloadSound.clip);
         }
         public void SetBoolOn()
         {

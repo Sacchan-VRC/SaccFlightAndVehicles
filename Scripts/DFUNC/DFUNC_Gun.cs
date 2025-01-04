@@ -43,6 +43,8 @@ namespace SaccFlightAndVehicles
         public bool DisallowFireIfWind = false;
         [Tooltip("Enable these objects when GUN selected")]
         public GameObject[] EnableOnSelected;
+        [Tooltip("On desktop mode, fire even when not selected if OnPickupUseDown is pressed")]
+        [SerializeField] bool DT_UseToFire;
         private bool Grounded;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
@@ -120,6 +122,7 @@ namespace SaccFlightAndVehicles
         {
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(Set_Unselected));
             Selected = false;
+            HoldingTrigger_Held = 0;
             if (_firing)
             {
                 Firing = false;
@@ -155,11 +158,16 @@ namespace SaccFlightAndVehicles
             Selected = false;
             if (GunDamageParticle) { GunDamageParticle.gameObject.SetActive(false); }
         }
+        public void SFEXT_O_ReSupply()
+        {
+            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+            RequestSerialization();
+            UpdateAmmoVisuals();
+        }
         public void SFEXT_G_ReSupply()
         {
-            if (GunAmmoInSeconds != FullGunAmmoInSeconds)
+            if (SAVControl && GunAmmoInSeconds != FullGunAmmoInSeconds)
             { SAVControl.SetProgramVariable("ReSupplied", (int)SAVControl.GetProgramVariable("ReSupplied") + 1); }
-            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
             UpdateAmmoVisuals();
         }
 
@@ -170,9 +178,15 @@ namespace SaccFlightAndVehicles
                 AmmoBars[i].localScale = new Vector3((GunAmmoInSeconds * FullGunAmmoDivider) * AmmoBarScaleStarts[i].x, AmmoBarScaleStarts[i].y, AmmoBarScaleStarts[i].z);
             }
         }
+        public void SFEXT_O_RespawnButton()
+        {
+            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
+            RequestSerialization();
+            UpdateAmmoVisuals();
+        }
         public void SFEXT_G_RespawnButton()
         {
-            GunAmmoInSeconds = FullGunAmmoInSeconds;
+            GunAmmoInSeconds = Mathf.Min(GunAmmoInSeconds + reloadspeed, FullGunAmmoInSeconds);
             UpdateAmmoVisuals();
             if (DoAnimBool && AnimOn)
             { SetBoolOff(); }
@@ -224,18 +238,20 @@ namespace SaccFlightAndVehicles
         {
             if (Piloting)
             {
-                if (Selected || (!inVR && Input.GetKey(FireNowKey)) || HoldingTrigger_Held)
+                if (Selected || Input.GetKey(FireNowKey) || (!inVR && DT_UseToFire))
                 {
                     float DeltaTime = Time.deltaTime;
                     float Trigger = 0;
-                    if (Selected)
+                    if (EntityControl.Holding || !inVR && DT_UseToFire)
+                        Trigger = HoldingTrigger_Held;
+                    else if (Selected)
                     {
                         if (LeftDial)
                         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                         else
                         { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
                     }
-                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(FireKey) || Input.GetKey(FireNowKey)) || HoldingTrigger_Held) && GunAmmoInSeconds > 0))
+                    if ((!Grounded || AllowFiringGrounded) && ((Trigger > 0.75 || (Input.GetKey(FireKey) || Input.GetKey(FireNowKey))) && GunAmmoInSeconds > 0))
                     {
                         if (DisallowFireIfWind)
                         {
@@ -246,8 +262,7 @@ namespace SaccFlightAndVehicles
                         {
                             Firing = true;
                             RequestSerialization();
-                            if (IsOwner)
-                            { EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring"); }
+                            // EntityControl.SendEventToExtensions("SFEXT_O_GunStartFiring");
                         }
                         GunAmmoInSeconds = Mathf.Max(GunAmmoInSeconds - DeltaTime, 0);
                     }
@@ -257,7 +272,7 @@ namespace SaccFlightAndVehicles
                         {
                             Firing = false;
                             RequestSerialization();
-                            EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
+                            // EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                         }
                     }
                     if (HUDControl)
@@ -268,7 +283,7 @@ namespace SaccFlightAndVehicles
                 {
                     Firing = false;
                     RequestSerialization();
-                    EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
+                    // EntityControl.SendEventToExtensions("SFEXT_O_GunStopFiring");
                 }
             }
             if (_firing && IsOwner)
@@ -436,15 +451,14 @@ namespace SaccFlightAndVehicles
         public void SFEXT_G_TouchDown() { Grounded = true; }
         public void SFEXT_G_TouchDownWater() { Grounded = true; }
         public void SFEXT_G_TakeOff() { Grounded = false; }
-        private bool HoldingTrigger_Held = false;
+        private int HoldingTrigger_Held = 0;
         public void SFEXT_O_OnPickupUseDown()
         {
-            if (inVR) { return; }
-            HoldingTrigger_Held = true;
+            HoldingTrigger_Held = 1;
         }
         public void SFEXT_O_OnPickupUseUp()
         {
-            HoldingTrigger_Held = false;
+            HoldingTrigger_Held = 0;
         }
         public void SFEXT_O_OnPickup()
         {
@@ -453,6 +467,7 @@ namespace SaccFlightAndVehicles
         public void SFEXT_O_OnDrop()
         {
             SFEXT_O_PilotExit();
+            HoldingTrigger_Held = 0;
         }
         public void SFEXT_G_OnPickup() { SFEXT_G_PilotEnter(); }
         public void SFEXT_G_OnDrop() { SFEXT_G_PilotExit(); }
