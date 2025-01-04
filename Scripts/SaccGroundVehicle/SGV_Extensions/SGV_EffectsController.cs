@@ -57,8 +57,9 @@ namespace SaccFlightAndVehicles
         public GameObject[] Wings;
         public bool DoCaterpillarTracks;
         public UdonSharpBehaviour[] TrackSourceWheels;
+        public float[] TrackRotations;
         public Renderer TracksRenderer;
-        public Vector2 TrackSpeedMulti = new Vector2(0f, 0.01f);
+        public Vector2[] TrackSpeedMulti = new Vector2[2];
         public int[] TrackMaterialSlots;
         [Header("Corresponding arrays must be of equal length")]
         [Tooltip("Extra objects that rotate with the tracks, each with their own speed multiplier\nTrack0/1/2/3 use TrackSourceWheels0/1/2/3")]
@@ -148,6 +149,7 @@ namespace SaccFlightAndVehicles
             SmallCrashInsideNULL = SmallCrashInside.Length == 0;
             MediumCrashInsideNULL = MediumCrashInside.Length == 0;
             BigCrashInsideNULL = BigCrashInside.Length == 0;
+            TrackRotations = new float[TrackSourceWheels.Length];
 
             //save original positions of all the crash sounds because non-owners can't set them to the collision contact point
             SmallCrashPos = new Vector3[SmallCrash.Length];
@@ -259,10 +261,10 @@ namespace SaccFlightAndVehicles
                 for (int i = 0; i < TrackSourceWheels.Length; i++)
                 {
                     Vector2 uvs;
-                    float wheelrot = (float)TrackSourceWheels[i].GetProgramVariable("WheelRotation");
-                    Vector2 wheelRotUV = wheelrot * TrackSpeedMulti;
-                    wheelRotUV.x = wheelRotUV.x - Mathf.Floor(wheelrot);
-                    wheelRotUV.y = wheelRotUV.y - Mathf.Floor(wheelrot);
+                    TrackRotations[i] = (float)TrackSourceWheels[i].GetProgramVariable("WheelRotation");
+                    Vector2 wheelRotUV = TrackRotations[i] * TrackSpeedMulti[i];
+                    wheelRotUV.x = wheelRotUV.x - Mathf.Floor(wheelRotUV.x);
+                    wheelRotUV.y = wheelRotUV.y - Mathf.Floor(wheelRotUV.x);
                     uvs = wheelRotUV;
                     Tracks[i].mainTextureOffset = uvs;
                     switch (i)
@@ -270,28 +272,28 @@ namespace SaccFlightAndVehicles
                         case 0:
                             for (int o = 0; o < CogWheelsTrack0.Length; o++)
                             {
-                                Quaternion newrot = Quaternion.AngleAxis(wheelrot * CogWheelsTrack0_rotSpeeds[o], Vector3.right);
+                                Quaternion newrot = Quaternion.AngleAxis(TrackRotations[i] * CogWheelsTrack0_rotSpeeds[o], Vector3.right);
                                 CogWheelsTrack0[o].localRotation = newrot;
                             }
                             break;
                         case 1:
                             for (int o = 0; o < CogWheelsTrack1.Length; o++)
                             {
-                                Quaternion newrot = Quaternion.AngleAxis(wheelrot * CogWheelsTrack1_rotSpeeds[o], Vector3.right);
+                                Quaternion newrot = Quaternion.AngleAxis(TrackRotations[i] * CogWheelsTrack1_rotSpeeds[o], Vector3.right);
                                 CogWheelsTrack1[o].localRotation = newrot;
                             }
                             break;
                         case 2:
                             for (int o = 0; o < CogWheelsTrack2.Length; o++)
                             {
-                                Quaternion newrot = Quaternion.AngleAxis(wheelrot * CogWheelsTrack2_rotSpeeds[o], Vector3.right);
+                                Quaternion newrot = Quaternion.AngleAxis(TrackRotations[i] * CogWheelsTrack2_rotSpeeds[o], Vector3.right);
                                 CogWheelsTrack2[o].localRotation = newrot;
                             }
                             break;
                         case 3:
                             for (int o = 0; o < CogWheelsTrack3.Length; o++)
                             {
-                                Quaternion newrot = Quaternion.AngleAxis(wheelrot * CogWheelsTrack3_rotSpeeds[o], Vector3.right);
+                                Quaternion newrot = Quaternion.AngleAxis(TrackRotations[i] * CogWheelsTrack3_rotSpeeds[o], Vector3.right);
                                 CogWheelsTrack3[o].localRotation = newrot;
                             }
                             break;
@@ -342,7 +344,7 @@ namespace SaccFlightAndVehicles
             if (DoCaterpillarTracks)
             {
                 for (int i = 0; i < Tracks.Length; i++)
-                    Tracks[i].mainTextureOffset = Vector2.zero;
+                    TrackRotations[i] = 0f;
 
                 for (int o = 0; o < CogWheelsTrack0.Length; o++)
                     CogWheelsTrack0[o].localRotation = Quaternion.identity;
