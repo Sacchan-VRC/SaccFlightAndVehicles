@@ -17,6 +17,12 @@ namespace SaccFlightAndVehicles
         public UdonSharpBehaviour[] OtherScripts;
         public string OtherScripts_Event_Name;
         public bool OtherScript_EventGlobal = false;
+        [Tooltip("(Optional) Animator to send Trigger to")]
+        [SerializeField] Animator AnimTriggerAnimator;
+        [SerializeField] string AnimTriggerName;
+        [SerializeField] bool AnimTrigger_Global;
+        public AudioSource Sound;
+        [SerializeField] bool Sound_Global;
         private bool BothGlobal;
         bool initialized;
         void Start() { Initialize(); }
@@ -50,6 +56,20 @@ namespace SaccFlightAndVehicles
                 else
                 { NormalEvent(); }
             }
+            if (AnimTriggerAnimator && (AnimTriggerName != string.Empty))
+            {
+                if (AnimTrigger_Global)
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(AnimTrigger));
+                else
+                    AnimTrigger();
+            }
+            if (Sound)
+            {
+                if (Sound_Global)
+                    SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(PlaySound));
+                else
+                    PlaySound();
+            }
         }
         public void Event_both()
         {
@@ -81,6 +101,14 @@ namespace SaccFlightAndVehicles
                     OtherScripts[i].SendCustomEvent(OtherScripts_Event_Name);
                 }
             }
+        }
+        public void AnimTrigger()
+        {
+            AnimTriggerAnimator.SetTrigger(AnimTriggerName);
+        }
+        public void PlaySound()
+        {
+            Sound.PlayOneShot(Sound.clip);
         }
 
         // can now be used as a DFUNC
