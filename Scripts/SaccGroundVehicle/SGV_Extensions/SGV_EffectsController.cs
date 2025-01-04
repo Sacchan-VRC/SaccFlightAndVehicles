@@ -369,7 +369,7 @@ namespace SaccFlightAndVehicles
             }
             CheckingToDisable = false;
             Sleeping = false;
-            DoEffects = 0f;
+            DoEffects = 9.99f;
 
             if (IsOwner) { EnableWings(true); }
 
