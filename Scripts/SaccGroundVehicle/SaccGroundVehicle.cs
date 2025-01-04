@@ -502,7 +502,6 @@ namespace SaccFlightAndVehicles
             }
             return result;
         }
-        public TMPro.TextMeshPro DBGLR;
         private void LateUpdate()
         {
             float DeltaTime = Time.deltaTime;
@@ -621,7 +620,10 @@ namespace SaccFlightAndVehicles
 
                         float LeftThrottle = Mathf.Clamp(LeftTrackF + LeftTrackB + VRThrottleL, -1, 1);
                         float RightThrottle = Mathf.Clamp(RightTrackF + RightTrackB + VRThrottleR, -1, 1);
-                        if (DBGLR) { DBGLR.text = LeftThrottle.ToString("F1") + "    " + RightThrottle.ToString("F1"); }
+                        //For animations
+                        ThrottleInput = LeftThrottle * .5f + .5f;
+                        YawInput = RightThrottle;
+                        //
                         FinalThrottle = 1;//Mathf.Max(Mathf.Abs(LeftThrottle) + Mathf.Abs(RightThrottle));
 
                         // bool LeftNeg = LeftThrottle < 0;
