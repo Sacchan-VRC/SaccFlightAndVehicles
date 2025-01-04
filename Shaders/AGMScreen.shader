@@ -3,6 +3,11 @@ Shader "SaccFlight/AGMScreen"
     Properties
     {
         [NoScaleOffset] _MainTex ("Texture", 2D) = "white" {}
+		[Toggle(TRIPLANAR_ROCKS)]_BlackAndWhite ("Black and White", Range(0,1)) = 1
+        [HDR] _Color ("B&W Screen Color", Color) = (1,1,1,1)
+		[Toggle(TRIPLANAR_ROCKS)]_BlackAndWhite_R ("B&W Use R", Range(0,1)) = 1
+		[Toggle(TRIPLANAR_ROCKS)]_BlackAndWhite_G ("B&W Use G", Range(0,1)) = 1
+		[Toggle(TRIPLANAR_ROCKS)]_BlackAndWhite_B ("B&W Use B", Range(0,1)) = 1
     }
     SubShader
     {
@@ -32,10 +37,42 @@ Shader "SaccFlight/AGMScreen"
             }
             
             sampler2D _MainTex;
+            float _BlackAndWhite;
+            float _BlackAndWhite_R;
+            float _BlackAndWhite_G;
+            float _BlackAndWhite_B;
+            float4 _Color;
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float col = tex2D(_MainTex, i.uv).b;
+                float4 col;
+                if (_BlackAndWhite)
+                {
+                    float numcols = 0;
+                    float4 newcol4 = tex2D(_MainTex, i.uv);
+                    float newcol = 0;
+                    if (_BlackAndWhite_R)
+                    {
+                        newcol += newcol4.r;
+                        numcols++;
+                    }
+                    if (_BlackAndWhite_G)
+                    {
+                        newcol += newcol4.g;
+                        numcols++;
+                    }
+                    if (_BlackAndWhite_B)
+                    {
+                        newcol += newcol4.b;
+                        numcols++;
+                    }
+                    newcol /= numcols;
+                    col = newcol * _Color;
+                }
+                else
+                {
+                    col = tex2D(_MainTex, i.uv);
+                }
                 return col;
             }
             ENDCG
