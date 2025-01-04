@@ -103,6 +103,7 @@ namespace SaccFlightAndVehicles
         private bool NonLocalAttached;//if you are in a vehicle that is attached
         private bool PlayReelIn = true;
         private bool Occupied = false;
+        bool KeepingECAwake;
         private bool KeepingHEAwake = false;
         private bool Overriding_DisallowOwnerShipTransfer = false;
         private Vector3 PredictedHitPointStartScale;
@@ -283,6 +284,12 @@ namespace SaccFlightAndVehicles
                 SkippedFrames = 1;
                 SetHookPos();
                 HookAttach.Play();
+                if (!KeepingECAwake)
+                {
+                    KeepingECAwake = true;
+                    EntityControl.KeepAwake_++;
+                    EntityControl.SendEventToExtensions("SFEXT_L_GrappleAttach");
+                }
                 EntityControl.SendEventToExtensions("SFEXT_G_GrappleActive");
                 DoEventCallbacks("DFUNC_Grapple_Attached");
                 _HookAttachPointLocal = hookedpoint;
@@ -509,7 +516,12 @@ namespace SaccFlightAndVehicles
             Hook.localRotation = HookStartRot;
             if (HookedEntity)
             {
-                HookedEntity.SendEventToExtensions("SFEXT_L_GrappleDetach");
+                if (KeepingECAwake)
+                {
+                    KeepingECAwake = false;
+                    EntityControl.KeepAwake_--;
+                    EntityControl.SendEventToExtensions("SFEXT_L_GrappleDetach");
+                }
                 if (KeepingHEAwake)
                 {
                     KeepingHEAwake = false;
@@ -961,7 +973,7 @@ namespace SaccFlightAndVehicles
                 else
                 {
                     float Trigger;
-                    if (EntityControl.CustomPickup_LeftHand)
+                    if (EntityControl.Pickup_LeftHand)
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_PrimaryIndexTrigger"); }
                     else
                     { Trigger = Input.GetAxisRaw("Oculus_CrossPlatform_SecondaryIndexTrigger"); }
