@@ -83,6 +83,9 @@ namespace SaccFlightAndVehicles
         public KeyCode CustomPickup_DropKey = KeyCode.G;
         public Vector3 CustomPickup_RotationOffsetVR = new Vector3(0, 60, 90);
         public Vector3 CustomPickup_RotationOffsetDesktop = new Vector3(0, 35, 90);
+        [Tooltip("Disable collision when held by changing the layer and setting the colliders to trigger")]
+        [SerializeField] bool Pickup_DisableCollisionOnGrab;
+        private int StartEntityLayer;
         [Header("For debugging, auto filled on build")]
         [Tooltip("These are automatically collected from the vehicle's seat scripts")]
         public SAV_PassengerFunctionsController[] PassengerFunctionControllers;
@@ -93,6 +96,7 @@ namespace SaccFlightAndVehicles
         [System.NonSerializedAttribute] public VRC_Pickup EntityPickup;
         [System.NonSerializedAttribute] public VRC.SDK3.Components.VRCObjectSync EntityObjectSync;
         [System.NonSerializedAttribute] public Rigidbody VehicleRigidbody;
+        [System.NonSerializedAttribute] public Collider[] EntityColliders;
         [System.NonSerializedAttribute] public bool Piloting;
         [System.NonSerializedAttribute] public int UsersID;
         [System.NonSerializedAttribute] public string UsersName;
@@ -285,6 +289,9 @@ namespace SaccFlightAndVehicles
             EntityPickup = (VRC_Pickup)gameObject.GetComponent<VRC_Pickup>();
             EntityObjectSync = (VRC.SDK3.Components.VRCObjectSync)gameObject.GetComponent(typeof(VRC.SDK3.Components.VRCObjectSync));
 
+            EntityColliders = gameObject.GetComponentsInChildren<Collider>();
+            StartEntityLayer = gameObject.layer;
+
             //Dial Stuff
             LStickNumFuncs = Dial_Functions_L.Length;
             RStickNumFuncs = Dial_Functions_R.Length;
@@ -457,7 +464,7 @@ namespace SaccFlightAndVehicles
         }
         public void InVehicleControls()
         {
-            if (!InVehicle) { return; }
+            if (!(InVehicle || Using)) { return; }
             SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
             if (Input.GetKeyDown(KeyCode.Return))
             {
@@ -466,7 +473,7 @@ namespace SaccFlightAndVehicles
                     ExitVehicleCheck();
                 }
             }
-            if (!Piloting) { return; }
+            if (!Using) { return; }
             Vector2 LStickPos = Vector2.zero;
             Vector2 RStickPos = Vector2.zero;
             float LTrigger = 0;
@@ -790,21 +797,19 @@ namespace SaccFlightAndVehicles
                 { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Pickup)); }
             }
         }
-        [System.NonSerialized] public int CustomPickup_Hand = 0;
-        [System.NonSerialized] public bool CustomPickup_LeftHand;
+        [System.NonSerialized] public int Pickup_Hand = 0;
+        [System.NonSerialized] public bool Pickup_LeftHand;
         [System.NonSerialized] public bool CustomPickup_localHeld;
         public void CustomPickup_Grab()
         {
             if (string.IsNullOrEmpty(localPlayer.GetPlayerTag("SFCP_R")))
             {
-                CustomPickup_Hand = 1;
-                CustomPickup_LeftHand = false;
+                Pickup_Hand = 2;
                 localPlayer.SetPlayerTag("SFCP_R", "T");
             }
             else if (string.IsNullOrEmpty(localPlayer.GetPlayerTag("SFCP_L")))
             {
-                CustomPickup_Hand = 0;
-                CustomPickup_LeftHand = true;
+                Pickup_Hand = 1;
                 localPlayer.SetPlayerTag("SFCP_L", "T");
             }
             else { return; }
@@ -821,7 +826,7 @@ namespace SaccFlightAndVehicles
         public void CustomPickup_HoldLoop()
         {
             Vector3 grabOffset = CustomPickup_GrabPosition.position - transform.position;
-            if (CustomPickup_LeftHand)
+            if (Pickup_LeftHand)
             {
                 transform.position = localPlayer.GetTrackingData(VRCPlayerApi.TrackingDataType.LeftHand).position - grabOffset;
                 if (CustomPickup_SetRotation)
@@ -853,7 +858,7 @@ namespace SaccFlightAndVehicles
             int numHolding = int.Parse(localPlayer.GetPlayerTag("SFCP_N"));
             if (numHolding > numHolding_last) { OnPickupUseUp(); }
             numHolding_last = numHolding;
-            if (!CustomPickup_LeftHand && numHolding == 1)
+            if (!Pickup_LeftHand && numHolding == 1)
             {
                 if (Input.GetMouseButtonDown(0))
                 { OnPickupUseDown(); }
@@ -862,9 +867,9 @@ namespace SaccFlightAndVehicles
             }
             else
             {
-                if (Input.GetMouseButtonDown(CustomPickup_Hand))
+                if (Input.GetMouseButtonDown(Pickup_Hand - 1))
                 { OnPickupUseDown(); }
-                if (Input.GetMouseButtonUp(CustomPickup_Hand))
+                if (Input.GetMouseButtonUp(Pickup_Hand - 1))
                 { OnPickupUseUp(); }
             }
             SendCustomEventDelayedFrames(nameof(CustomPickup_HoldLoop), 1, VRC.Udon.Common.Enums.EventTiming.Update);
@@ -872,7 +877,7 @@ namespace SaccFlightAndVehicles
         private void CustomPickup_Drop()
         {
             if (!CustomPickup_localHeld) { return; }
-            if (CustomPickup_LeftHand)
+            if (Pickup_LeftHand)
             { localPlayer.SetPlayerTag("SFCP_L", string.Empty); }
             else
             { localPlayer.SetPlayerTag("SFCP_R", string.Empty); }
@@ -891,6 +896,8 @@ namespace SaccFlightAndVehicles
         {
             Holding = true;
             Using = true;
+            if (!Interact_CustomPickup) Pickup_Hand = (int)EntityPickup.currentHand;
+            Pickup_LeftHand = Pickup_Hand == 1;
             EnableWhenHolding_Enable();
             DisableWhenHolding_Disable();
             if (!_DisallowOwnerShipTransfer) { TakeOwnerShipOfExtensions(); }
@@ -898,8 +905,21 @@ namespace SaccFlightAndVehicles
             { Dial_Functions_L[0].SendCustomEvent("DFUNC_Selected"); }
             if (RStickNumFuncs == 1)
             { Dial_Functions_R[0].SendCustomEvent("DFUNC_Selected"); }
+            if (Pickup_DisableCollisionOnGrab)
+            {
+                foreach (Collider col in EntityColliders)
+                {
+                    col.gameObject.layer = 9;
+                    col.isTrigger = true;
+                }
+            }
+            if (LStickDisplayHighlighter)
+            { LStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
+            if (RStickDisplayHighlighter)
+            { RStickDisplayHighlighter.localRotation = Quaternion.Euler(0, 180, 0); }
             SendEventToExtensions("SFEXT_O_OnPickup");
             SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Pickup));
+            SendCustomEventDelayedFrames(nameof(InVehicleControls), 1);
         }
         public override void Interact()
         {
@@ -915,6 +935,14 @@ namespace SaccFlightAndVehicles
             EnableWhenHolding_Disable();
             DisableWhenHolding_Enable();
             SendEventToExtensions("SFEXT_O_OnDrop");
+            if (Pickup_DisableCollisionOnGrab)
+            {
+                foreach (Collider col in EntityColliders)
+                {
+                    col.gameObject.layer = StartEntityLayer;
+                    col.isTrigger = false;
+                }
+            }
             if (snatched)//Don't send drop if it was snatched because the drop event will arrive after the other player's grab event
             { SendCustomNetworkEvent(VRC.Udon.Common.Interfaces.NetworkEventTarget.All, nameof(SendEvent_Snatched)); snatched = false; }
             else
