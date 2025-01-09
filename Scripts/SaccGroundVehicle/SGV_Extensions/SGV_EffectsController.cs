@@ -200,18 +200,8 @@ namespace SaccFlightAndVehicles
         public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
         private void LateUpdate()
         {
-            if (DoEffects > 10)
-            {
-                if (Sleeping)
-                { return; }
-                else
-                {
-                    if (!KeepAwake && (float)SGVControl.GetProgramVariable("VehicleSpeed") < 0.1f)
-                    { FallAsleep(); }
-                    else
-                    { DoEffects = 5f; }
-                }
-            }
+            if (Sleeping)
+            { return; }
             if (dopplecounter > 4)
             {
                 float SmoothDeltaTime = Time.smoothDeltaTime;
@@ -302,6 +292,13 @@ namespace SaccFlightAndVehicles
             }
             if (!Occupied)
             {
+                if (DoEffects > 10)
+                {
+                    if (!KeepAwake && (float)SGVControl.GetProgramVariable("Revs") / RevLimiter < 0.015f)
+                    { FallAsleep(); }
+                    else
+                        DoEffects = 8f;
+                }
                 DoEffects += Time.deltaTime;
             }
         }
@@ -495,7 +492,7 @@ namespace SaccFlightAndVehicles
         }
         public void ResupplySound()
         {
-            if ((int)SGVControl.GetProgramVariable("ReSupplied") > 0)
+            if ((int)EntityControl.GetProgramVariable("ReSupplied") > 0)
             {
                 if (ReSupply)
                 {
@@ -598,7 +595,8 @@ namespace SaccFlightAndVehicles
         {
             IsOwner = true;
             VehicleAnimator.SetBool("owner", true);
-            DoEffects = 5f;
+            DoEffects = 9.99f;
+            Sleeping = false;
             WakeUp();
         }
         public void SFEXT_O_LoseOwnership()
