@@ -46,6 +46,7 @@ namespace SaccFlightAndVehicles
         [Tooltip("On desktop mode, fire even when not selected if OnPickupUseDown is pressed")]
         [SerializeField] bool DT_UseToFire;
         private bool Grounded;
+        bool KeepingAwake;
         [System.NonSerializedAttribute] public bool LeftDial = false;
         [System.NonSerializedAttribute] public int DialPosition = -999;
         [System.NonSerializedAttribute] public SaccEntity EntityControl;
@@ -59,9 +60,24 @@ namespace SaccFlightAndVehicles
         {
             set
             {
-                if (value && EntityControl.IsOwner && RecoilForce > 0 && !EntityControl.Piloting)
+                if (EntityControl.IsOwner && RecoilForce > 0)
                 {
-                    EntityControl.SendEventToExtensions("SFEXT_L_WakeUp");
+                    if (value)
+                    {
+                        if (!KeepingAwake)
+                        {
+                            KeepingAwake = true;
+                            EntityControl.KeepAwake_++;
+                        }
+                    }
+                    else
+                    {
+                        if (KeepingAwake)
+                        {
+                            KeepingAwake = false;
+                            EntityControl.KeepAwake_--;
+                        }
+                    }
                 }
                 GunAnimator.SetBool(GunFiringBoolName, value);
                 _firing = value;

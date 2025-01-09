@@ -151,7 +151,7 @@ namespace SaccFlightAndVehicles
                 DoEffects = 0f;
                 VehicleAnimator.SetFloat(FUEL_STRING, (float)SAVControl.GetProgramVariable("Fuel") * FullFuelDivider);
             }
-            else { DoEffects += DeltaTime; }
+            else if (!KeepAwake) { DoEffects += DeltaTime; }
 
             VehicleAnimator.SetFloat(VTOLANGLE_STRING, (float)SAVControl.GetProgramVariable("VTOLAngle"));
 
@@ -232,6 +232,9 @@ namespace SaccFlightAndVehicles
                                                                                                                            //("Gs", vapor ? EngineControl.Gs / 200 + .5f : 0) (.5 == 0 Gs, 1 == 100Gs, 0 == -100Gs)
             VehicleAnimator.SetFloat(GS_STRING, vapor ? ((float)SAVControl.GetProgramVariable("VertGs") * 0.005f) + 0.5f : 0.5f);
         }
+        private bool KeepAwake = false;
+        public void SFEXT_L_KeepAwake() { KeepAwake = true; DoEffects = 0; }
+        public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
         public void GearDownEvent()
         {
             GearDown = true;

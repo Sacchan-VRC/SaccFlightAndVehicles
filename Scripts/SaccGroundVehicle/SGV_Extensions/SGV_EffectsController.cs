@@ -196,7 +196,7 @@ namespace SaccFlightAndVehicles
             Sleeping = false;
         }
         private bool KeepAwake = false;
-        public void SFEXT_L_KeepAwake() { KeepAwake = true; }
+        public void SFEXT_L_KeepAwake() { KeepAwake = true; WakeUp(); }
         public void SFEXT_L_KeepAwakeFalse() { KeepAwake = false; }
         private void LateUpdate()
         {
@@ -294,7 +294,7 @@ namespace SaccFlightAndVehicles
             {
                 if (DoEffects > 10)
                 {
-                    if (!KeepAwake && (float)SGVControl.GetProgramVariable("Revs") / RevLimiter < 0.015f)
+                    if (!KeepAwake && (float)SGVControl.GetProgramVariable("Revs") / RevLimiter < 0.015f && (float)SGVControl.GetProgramVariable("VehicleSpeed") < 0.1f)
                     { FallAsleep(); }
                     else
                         DoEffects = 8f;
@@ -366,7 +366,7 @@ namespace SaccFlightAndVehicles
             }
             CheckingToDisable = false;
             Sleeping = false;
-            DoEffects = 9.99f;
+            DoEffects = 8f;
 
             if (IsOwner) { EnableWings(true); }
 
@@ -595,8 +595,6 @@ namespace SaccFlightAndVehicles
         {
             IsOwner = true;
             VehicleAnimator.SetBool("owner", true);
-            DoEffects = 9.99f;
-            Sleeping = false;
             WakeUp();
         }
         public void SFEXT_O_LoseOwnership()
